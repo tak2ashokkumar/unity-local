@@ -6,10 +6,16 @@ import * as moment from 'moment';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
+  PUBLIC_CLOUD_ACTIVE_DATABASE_WORKLOAD_ENDPOINT,
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_ENDPOINT,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_PROVIDER_CONFIG,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG,
+  PUBLIC_CLOUD_DATABASE_HEALTH_METRIC_COLORS,
+  PUBLIC_CLOUD_DATABASE_HEALTH_SCORE_ENDPOINT,
+  PUBLIC_CLOUD_DATABASE_LATENCY_COLORS,
+  PUBLIC_CLOUD_DATABASE_LATENCY_OVERVIEW_ENDPOINT,
+  PUBLIC_CLOUD_DATABASE_WIDGET_COLORS,
   PUBLIC_CLOUD_FILTERS_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT,
@@ -19,13 +25,35 @@ import {
   PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
   PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT,
   PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG,
+  PUBLIC_CLOUD_OBJECT_FILE_GROWTH_TREND_ENDPOINT,
+  PUBLIC_CLOUD_READ_VS_WRITE_TRAFFIC_ENDPOINT,
   PUBLIC_CLOUD_RECENT_ALERTS_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_DISTRIBUTION_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_DISTRIBUTION_COLORS,
+  PUBLIC_CLOUD_STORAGE_HEALTH_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_SERVICES_VISIBILITY_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_TREND_COLORS,
+  PUBLIC_CLOUD_STORAGE_UTILIZATION_BY_CLOUD_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_UTILIZATION_COLORS,
   PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG,
-  PUBLIC_CLOUD_TAG_STYLE_CONFIG
+  PUBLIC_CLOUD_TAG_STYLE_CONFIG,
+  PUBLIC_CLOUD_TRANSACTION_VOLUME_TREND_ENDPOINT,
+  PUBLIC_CLOUD_TOP_LOCK_CONTENTION_ENDPOINT,
+  PUBLIC_CLOUD_TOP_MEMORY_CONSUMERS_ENDPOINT,
+  PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT
 } from './public-cloud-compute-dashboard.const';
 import {
   PublicCloudAccountOption,
+  PublicCloudActiveDatabaseWorkloadViewData,
   PublicCloudAlertSummaryMetric,
+  PublicCloudDatabaseBarItem,
+  PublicCloudDatabaseBarResponseItem,
+  PublicCloudDatabaseConsumerRow,
+  PublicCloudDatabaseHealthMetric,
+  PublicCloudDatabaseHealthScoreResponse,
+  PublicCloudDatabaseHealthScoreViewData,
+  PublicCloudDatabaseMetricItem,
+  PublicCloudDatabaseWidgetResponse,
   PublicCloudComputeBreakdownProvider,
   PublicCloudComputeBreakdownProviderKey,
   PublicCloudDashboardFilterCriteria,
@@ -34,6 +62,9 @@ import {
   PublicCloudFiltersResponse,
   PublicCloudFilterAccountResponseItem,
   PublicCloudComputeBreakdownResponse,
+  PublicCloudLockContentionResponse,
+  PublicCloudLockContentionResponseItem,
+  PublicCloudLockContentionRow,
   PublicCloudIdleDeviceRow,
   PublicCloudIdleDevicesResponse,
   PublicCloudIdleDurationApiResponse,
@@ -59,6 +90,17 @@ import {
   PublicCloudRecentAlertsResponse,
   PublicCloudRecentAlertsSummary,
   PublicCloudRegionOption,
+  PublicCloudStorageBarItem,
+  PublicCloudStorageConsumerRow,
+  PublicCloudStorageDistributionItem,
+  PublicCloudStorageHealthResponse,
+  PublicCloudStorageKeyedNumberResponse,
+  PublicCloudStorageKpi,
+  PublicCloudStorageServicesVisibilityResponse,
+  PublicCloudStorageSeriesPoint,
+  PublicCloudStorageTrafficResponse,
+  PublicCloudStorageTrendResponse,
+  PublicCloudStorageTrendViewData,
   PublicCloudSummaryMetric,
   PublicCloudStatusTone,
   PublicCloudTagItem
@@ -341,6 +383,884 @@ export class PublicCloudComputeDashboardService {
   }
   /*
    * ******End ****** Compute Breakdown Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Cloud Database Performance Widget Related -------------------
+   */
+  getDatabaseHealthScore(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseHealthScoreResponse> {
+    return this.http.get<PublicCloudDatabaseHealthScoreResponse>(PUBLIC_CLOUD_DATABASE_HEALTH_SCORE_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getActiveDatabaseWorkload(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
+    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_ACTIVE_DATABASE_WORKLOAD_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getDatabaseLatencyOverview(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
+    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_DATABASE_LATENCY_OVERVIEW_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getTopLockContention(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudLockContentionResponse> {
+    return this.http.get<PublicCloudLockContentionResponse>(PUBLIC_CLOUD_TOP_LOCK_CONTENTION_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getTopMemoryConsumers(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
+    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_TOP_MEMORY_CONSUMERS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getTopStorageConsumers(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
+    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToDatabaseHealthScoreViewData(data: PublicCloudDatabaseHealthScoreResponse): PublicCloudDatabaseHealthScoreViewData {
+    const source = this.getObjectResponseData(data) as PublicCloudDatabaseHealthScoreResponse;
+    const healthPie = source?.health_pie || source?.healthPie;
+    const scoreValue = this.getFirstNumericValue(healthPie?.health_score, healthPie?.healthScore, healthPie?.score,
+      source?.score, source?.health_score, source?.healthScore, source?.value);
+    const maxValue = this.getFirstNumericValue(healthPie?.max, healthPie?.total, source?.max, source?.total) || 100;
+    const metrics = this.getDatabaseHealthMetricRows(data).map(item => this.convertToDatabaseHealthMetric(item));
+    const hasScore = scoreValue !== null;
+    const score = hasScore ? Math.max(Math.min(scoreValue, maxValue), 0) : 0;
+    const scorePercent = maxValue ? Math.max(Math.min((score / maxValue) * 100, 100), 0) : 0;
+    return {
+      score,
+      scoreLabel: hasScore ? `${this.formatNumber(score)}/${this.formatNumber(maxValue)}` : '',
+      scoreGradient: `conic-gradient(#14bd75 0 ${scorePercent}%, #cfeedd ${scorePercent}% 100%)`,
+      metrics,
+      hasData: hasScore || !!metrics.length
+    };
+  }
+
+  convertToActiveDatabaseWorkloadViewData(data: PublicCloudDatabaseWidgetResponse): PublicCloudActiveDatabaseWorkloadViewData {
+    const source = this.getObjectResponseData(data) as PublicCloudDatabaseWidgetResponse;
+    const rows = this.getDatabaseBarRows(data, ['workloads', 'databases', 'results', 'items', 'rows']).map((item, index) => {
+      const value = this.getDatabaseItemValue(item, ['transactions_per_sec', 'transactions', 'value', 'count', 'total']);
+      const rowValue = value === null ? -1 : value;
+      return {
+        label: this.getDatabaseItemLabel(item),
+        value: rowValue,
+        color: this.getDatabaseItemColor(item, index),
+        displayValue: this.formatNumber(rowValue)
+      };
+    }).filter(item => item.label && item.value >= 0);
+
+    const totalRawValue = this.getFirstValue(source?.summary?.value, source?.summary?.total, source?.total, source?.value);
+    const total = this.getFirstNumericValue(source?.summary?.value, source?.summary?.total, source?.total, source?.value);
+    return {
+      totalLabel: totalRawValue && /[a-z]/i.test(totalRawValue) ? totalRawValue : total !== null ? this.formatCompactNumber(total) : '',
+      unit: source?.summary?.unit || source?.unit || 'transactions/sec',
+      rows
+    };
+  }
+
+  convertToActiveDatabaseWorkloadOptions(rows: PublicCloudDatabaseBarItem[]): EChartsOption {
+    return this.getDatabaseHorizontalBarOptions(rows, 100, false);
+  }
+
+  convertToDatabaseLatencyRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudDatabaseBarItem[] {
+    return this.getDatabaseBarRows(data, ['latency', 'databases', 'results', 'items', 'rows']).map((item, index) => {
+      const value = this.getDatabaseItemValue(item, ['latency_ms', 'avg_latency', 'latency', 'value', 'percent', 'percentage']);
+      const rowValue = value === null ? -1 : value;
+      return {
+        label: this.getDatabaseItemLabel(item),
+        value: rowValue,
+        color: this.getLatencyColor(item, index)
+      };
+    }).filter(item => item.label && item.value >= 0);
+  }
+
+  convertToDatabaseLatencyOptions(rows: PublicCloudDatabaseBarItem[]): EChartsOption {
+    return this.getDatabaseHorizontalBarOptions(rows, 100, true);
+  }
+
+  convertToTopLockContentionRows(data: PublicCloudLockContentionResponse): PublicCloudLockContentionRow[] {
+    return this.getLockContentionRows(data).map(item => {
+      const cloud = this.getFirstValue(item.cloud, item.provider, item.platform);
+      return {
+        database: this.getFirstValue(item.database, item.database_name, item.databaseName, item.name),
+        locks: this.formatNumber(this.getFirstNumericValue(item.locks, item.lock_count, item.lockCount) || 0),
+        type: this.getFirstValue(item.type, item.lock_type, item.lockType),
+        wait: this.formatDatabaseWaitValue(this.getFirstValue(item.wait, item.wait_time, item.waitTime)),
+        cloud,
+        cloudClass: `database-cloud-${this.normalizeCssClass(cloud)}`
+      };
+    }).filter(row => !!row.database);
+  }
+
+  convertToTopMemoryConsumersRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudDatabaseConsumerRow[] {
+    return this.getDatabaseMemoryConsumerRows(data).map((item, index) => {
+      const value = this.getDatabaseItemValue(item, ['memory_gb', 'memory', 'used', 'value', 'count', 'total']);
+      const rowValue = value === null ? -1 : value;
+      return {
+        name: this.getDatabaseItemLabel(item),
+        value: rowValue,
+        displayValue: `${this.formatNumber(rowValue)} GB`,
+        percent: 0,
+        color: this.getDatabaseItemColor(item, index)
+      };
+    }).filter(item => item.name && item.value >= 0).slice(0, 10);
+  }
+
+  convertToTopStorageConsumersRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudDatabaseConsumerRow[] {
+    return this.getDatabaseBarRows(data, ['consumers', 'databases', 'results', 'items', 'rows']).map((item, index) => {
+      const value = this.getDatabaseItemValue(item, ['used_tb', 'used', 'storage', 'value', 'count']);
+      const rowValue = value === null ? -1 : value;
+      const total = this.getFirstNumericValue(item.total_tb, item.capacity, item.total);
+      const percent = this.getDatabaseItemPercent(item, rowValue, total || 0);
+      return {
+        name: this.getDatabaseItemLabel(item),
+        value: rowValue,
+        displayValue: `${this.formatDecimalNumber(rowValue)} TB`,
+        totalValue: total || undefined,
+        totalLabel: total ? `${this.formatDecimalNumber(total)}T` : '',
+        percent,
+        color: this.getStorageConsumerColor(item, index)
+      };
+    }).filter(item => item.name && item.value >= 0).slice(0, 10);
+  }
+
+  private convertToDatabaseHealthMetric(item: PublicCloudDatabaseMetricItem): PublicCloudDatabaseHealthMetric {
+    const label = this.formatDatabaseLabel(this.getFirstValue(item.label, item.name, item.metric, item.category));
+    const value = this.getFirstNumericValue(item.current, item.value, item.score, item.count) || 0;
+    const total = this.getFirstNumericValue(item.total, item.max, item.target, item.threshold) || 100;
+    const percent = this.getDatabaseItemPercent(item, value, total);
+    return {
+      label,
+      value: this.formatNumber(value),
+      total: this.formatNumber(total),
+      percent,
+      color: item.color || this.getHealthMetricColor(label)
+    };
+  }
+
+  private getDatabaseHealthMetricRows(data: PublicCloudDatabaseHealthScoreResponse): PublicCloudDatabaseMetricItem[] {
+    const source = this.getObjectResponseData(data) as PublicCloudDatabaseHealthScoreResponse;
+    const metricSource = source?.metrics || source?.results || source?.items || source?.data;
+    const keyedMetricRows = this.convertDatabaseMetricRecordToItems(metricSource);
+    if (keyedMetricRows.length) {
+      return keyedMetricRows;
+    }
+    const rows = this.getDatabaseRowsFromValue(metricSource, []);
+    if (rows.length) {
+      return rows as PublicCloudDatabaseMetricItem[];
+    }
+    return this.convertDatabaseMetricRecordToItems(source);
+  }
+
+  private convertDatabaseMetricRecordToItems(data: any): PublicCloudDatabaseMetricItem[] {
+    const record = data as unknown as Record<string, string | number | PublicCloudDatabaseMetricItem>;
+    return ['latency', 'locks', 'memory', 'storage'].reduce((items: PublicCloudDatabaseMetricItem[], key) => {
+      const recordKey = Object.keys(record || {}).find(item => item.toLowerCase() === key);
+      const value = recordKey ? record?.[recordKey] : undefined;
+      if (value !== undefined && value !== null && value !== '') {
+        const itemValue: PublicCloudDatabaseMetricItem = typeof value === 'object' ? value as PublicCloudDatabaseMetricItem : { value };
+        items.push({
+          ...itemValue,
+          label: itemValue.label || itemValue.name || itemValue.metric || itemValue.category || recordKey || key
+        });
+      }
+      return items;
+    }, []);
+  }
+
+  private getDatabaseBarRows(data: PublicCloudDatabaseWidgetResponse, keys: string[]): PublicCloudDatabaseBarResponseItem[] {
+    const source = this.getObjectResponseData(data);
+    const rows = this.getDatabaseRowsFromValue(source, keys) as PublicCloudDatabaseBarResponseItem[];
+    return rows.length ? rows : this.convertDatabaseRecordToBarItems(source);
+  }
+
+  private getLockContentionRows(data: PublicCloudLockContentionResponse): PublicCloudLockContentionResponseItem[] {
+    const source = this.getObjectResponseData(data);
+    return this.getDatabaseRowsFromValue(source, ['results', 'items', 'rows']) as PublicCloudLockContentionResponseItem[];
+  }
+
+  private getDatabaseMemoryConsumerRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudDatabaseBarResponseItem[] {
+    const rows = this.getDatabaseBarRows(data, ['consumers', 'databases', 'results', 'items', 'rows']);
+    if (rows.length === 1 && !this.getDatabaseItemLabel(rows[0]) &&
+      this.getDatabaseItemValue(rows[0], ['memory_gb', 'memory', 'used', 'value', 'count', 'total']) === null) {
+      return this.convertDatabaseRecordToBarItems(rows[0]);
+    }
+    return rows;
+  }
+
+  private getObjectResponseData(data: any): any {
+    if (data?.data && !Array.isArray(data.data) && typeof data.data === 'object') {
+      return data.data;
+    }
+    return data;
+  }
+
+  private getDatabaseRowsFromValue(value: any, keys: string[]): any[] {
+    if (!value) {
+      return [];
+    }
+    if (Array.isArray(value)) {
+      return value;
+    }
+    const record = value as Record<string, any>;
+    const containerKeys = [...keys, 'data', 'results', 'items', 'rows'];
+    for (const key of containerKeys) {
+      const rows = this.getDatabaseRowsFromValue(record[key], []);
+      if (rows.length) {
+        return rows;
+      }
+    }
+    return [];
+  }
+
+  private convertDatabaseRecordToBarItems(data: any): PublicCloudDatabaseBarResponseItem[] {
+    const record = data as Record<string, any>;
+    return Object.keys(record || {}).reduce((items: PublicCloudDatabaseBarResponseItem[], key) => {
+      if (['total', 'value', 'unit', 'data', 'results', 'items', 'rows'].includes(key)) {
+        return items;
+      }
+      const value = record[key];
+      if (value !== undefined && value !== null && value !== '' && typeof value !== 'object') {
+        items.push({
+          name: key,
+          value
+        });
+      }
+      return items;
+    }, []);
+  }
+
+  private getDatabaseItemLabel(item: PublicCloudDatabaseBarResponseItem): string {
+    return this.getFirstValue(item.name, item.label, item.database, item.database_name, item.databaseName, item.service, item.cloud, item.provider);
+  }
+
+  private getDatabaseItemValue(item: PublicCloudDatabaseBarResponseItem, keys: string[]): number | null {
+    const record = item as unknown as Record<string, string | number>;
+    const value = keys.map(key => record[key]).find(itemValue => itemValue !== undefined && itemValue !== null && itemValue !== '');
+    return value === undefined || value === null || value === '' ? null : this.getFirstNumericValue(value);
+  }
+
+  private getDatabaseItemPercent(item: PublicCloudDatabaseMetricItem | PublicCloudDatabaseBarResponseItem, value: number, total: number): number {
+    const percent = this.getFirstNumericValue(item.percent, item.percentage);
+    if (percent !== null) {
+      return Math.max(Math.min(percent, 100), 0);
+    }
+    return total ? Math.max(Math.min(Math.round((value / total) * 100), 100), 0) : Math.max(Math.min(value, 100), 0);
+  }
+
+  private getDatabaseItemColor(item: PublicCloudDatabaseBarResponseItem, index: number): string {
+    return item.color || PUBLIC_CLOUD_DATABASE_WIDGET_COLORS[index % PUBLIC_CLOUD_DATABASE_WIDGET_COLORS.length];
+  }
+
+  private getLatencyColor(item: PublicCloudDatabaseBarResponseItem, index: number): string {
+    const key = this.getFirstValue(item.tone, item.status, item.bucket).toLowerCase();
+    const designColors = ['#5fa2dd', '#e99a5c', '#43c78c', '#c65355', '#bd8752'];
+    return PUBLIC_CLOUD_DATABASE_LATENCY_COLORS[key] || item.color || designColors[index % designColors.length];
+  }
+
+  private getStorageConsumerColor(item: PublicCloudDatabaseBarResponseItem, index: number): string {
+    const designColors = ['#87d3aa', '#ff9f32', '#f68d93', '#f7dda7', '#43c78c', '#f68d93', '#f7dda7', '#ff9f32', '#ff9f32', '#43c78c'];
+    return item.color || designColors[index % designColors.length];
+  }
+
+  private formatDatabaseWaitValue(value: string): string {
+    if (!value) {
+      return '';
+    }
+    return /[a-z]/i.test(value) ? value : `${value}s`;
+  }
+
+  private getHealthMetricColor(label: string): string {
+    const key = String(label || '').toLowerCase();
+    const metricKey = Object.keys(PUBLIC_CLOUD_DATABASE_HEALTH_METRIC_COLORS).find(item => key.includes(item));
+    return metricKey ? PUBLIC_CLOUD_DATABASE_HEALTH_METRIC_COLORS[metricKey] : '#13bd77';
+  }
+
+  private getDatabaseHorizontalBarOptions(rows: PublicCloudDatabaseBarItem[], maxValue: number, showTopAxis: boolean): EChartsOption {
+    return {
+      grid: {
+        left: showTopAxis ? 110 : 116,
+        right: showTopAxis ? 18 : 12,
+        top: showTopAxis ? 28 : 8,
+        bottom: 4
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params.name}: ${params.value}`
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: maxValue,
+        position: 'top',
+        splitLine: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          show: showTopAxis,
+          color: '#555555',
+          fontSize: 12
+        }
+      },
+      yAxis: {
+        type: 'category',
+        inverse: true,
+        data: (rows || []).map(item => item.label),
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          color: '#555555',
+          fontSize: 12
+        }
+      },
+      series: [
+        {
+          type: 'bar',
+          barWidth: showTopAxis ? 40 : 34,
+          barCategoryGap: showTopAxis ? '28%' : '24%',
+          data: (rows || []).map(item => ({
+            value: item.value,
+            name: item.label,
+            itemStyle: { color: item.color }
+          })),
+          label: {
+            show: !showTopAxis,
+            position: 'insideRight',
+            color: '#1f2933',
+            fontSize: 13,
+            formatter: '{c}'
+          }
+        }
+      ]
+    };
+  }
+
+  private getFirstNumericValue(...values: Array<string | number | undefined | null>): number | null {
+    const value = values.find(item => item !== undefined && item !== null && item !== '');
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+    if (!/[0-9]/.test(String(value))) {
+      return null;
+    }
+    const numericValue = this.getNumericValue(value);
+    return isNaN(numericValue) ? null : numericValue;
+  }
+
+  private formatCompactNumber(value: number): string {
+    if (value >= 1000) {
+      return `${Number((value / 1000).toFixed(1))}k`;
+    }
+    return this.formatNumber(value);
+  }
+
+  private formatDecimalNumber(value: number): string {
+    return Number(value || 0).toLocaleString('en-US', {
+      maximumFractionDigits: 2
+    });
+  }
+
+  private formatDatabaseLabel(value: string): string {
+    return this.formatRegionLabel(value || '');
+  }
+
+  private normalizeCssClass(value: string): string {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  }
+  /*
+   * ******End ****** Cloud Database Performance Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Cloud Storage Health Widget Related -------------------
+   */
+  getCloudStorageHealth(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageHealthResponse> {
+    return this.http.get<PublicCloudStorageHealthResponse>(PUBLIC_CLOUD_STORAGE_HEALTH_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getStorageUtilizationByCloud(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageKeyedNumberResponse> {
+    return this.http.get<PublicCloudStorageKeyedNumberResponse>(PUBLIC_CLOUD_STORAGE_UTILIZATION_BY_CLOUD_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getReadVsWriteTraffic(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageTrafficResponse> {
+    return this.http.get<PublicCloudStorageTrafficResponse>(PUBLIC_CLOUD_READ_VS_WRITE_TRAFFIC_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getCloudStorageTopConsumers(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
+    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getTransactionVolumeTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageTrendResponse> {
+    return this.http.get<PublicCloudStorageTrendResponse>(PUBLIC_CLOUD_TRANSACTION_VOLUME_TREND_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getObjectFileGrowthTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageTrendResponse> {
+    return this.http.get<PublicCloudStorageTrendResponse>(PUBLIC_CLOUD_OBJECT_FILE_GROWTH_TREND_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getStorageServicesVisibility(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageServicesVisibilityResponse> {
+    return this.http.get<PublicCloudStorageServicesVisibilityResponse>(PUBLIC_CLOUD_STORAGE_SERVICES_VISIBILITY_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getCloudStorageDistribution(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageKeyedNumberResponse> {
+    return this.http.get<PublicCloudStorageKeyedNumberResponse>(PUBLIC_CLOUD_STORAGE_DISTRIBUTION_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToCloudStorageHealthMetrics(data: PublicCloudStorageHealthResponse): PublicCloudStorageKpi[] {
+    const rows = this.getDatabaseRowsFromValue(this.getObjectResponseData(data), ['results', 'items', 'rows']) as any[];
+    return (rows || []).map((item): PublicCloudStorageKpi => {
+      const label = this.getFirstValue(item.metric, item.label, item.name);
+      const value = this.getFirstNumericValue(item.value);
+      const unit = this.getFirstValue(item.unit);
+      return {
+        label,
+        value: value !== null ? this.formatStorageValue(value, unit) : '',
+        tone: label.toLowerCase().includes('availability') ? 'success' : undefined
+      };
+    }).filter(item => item.label && item.value);
+  }
+
+  convertToStorageUtilizationRows(data: PublicCloudStorageKeyedNumberResponse): PublicCloudStorageBarItem[] {
+    return this.convertStorageKeyedNumberRows(data, PUBLIC_CLOUD_STORAGE_UTILIZATION_COLORS)
+      .sort((first, second) => first.value - second.value);
+  }
+
+  convertToStorageUtilizationOptions(rows: PublicCloudStorageBarItem[]): EChartsOption {
+    return this.getStorageHorizontalBarOptions(rows);
+  }
+
+  convertToReadVsWriteTrend(data: PublicCloudStorageTrafficResponse): PublicCloudStorageTrendViewData {
+    const readRows = data?.read_ingress || data?.readIngress || [];
+    const writeRows = data?.write_egress || data?.writeEgress || [];
+    const labels = this.getStorageTrendLabels([readRows, writeRows]);
+    return {
+      labels,
+      series: [
+        {
+          name: 'Read (ingress)',
+          color: PUBLIC_CLOUD_STORAGE_TREND_COLORS.read,
+          values: this.getStorageTrendValues(readRows)
+        },
+        {
+          name: 'Write (egress)',
+          color: PUBLIC_CLOUD_STORAGE_TREND_COLORS.write,
+          values: this.getStorageTrendValues(writeRows)
+        }
+      ].filter(item => item.values.length)
+    };
+  }
+
+  convertToReadVsWriteOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
+    return this.getReadVsWriteLineOptions(data);
+  }
+
+  convertToCloudStorageTopConsumersRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudStorageConsumerRow[] {
+    return this.getDatabaseBarRows(data, ['consumers', 'databases', 'results', 'items', 'rows']).map(item => {
+      const used = this.getDatabaseItemValue(item, ['used_tb', 'used', 'storage', 'value', 'count']);
+      const cloud = this.getFirstValue(item.cloud, item.provider, item.platform);
+      const latency = this.getFirstValue(item.latency, item.latency_ms, item.avg_latency);
+      const growth = this.getFirstValue((item as any).growth, (item as any).growth_percent, (item as any).growthPercentage);
+      return {
+        account: this.getDatabaseItemLabel(item),
+        cloud,
+        cloudClass: `database-cloud-${this.normalizeCssClass(cloud)}`,
+        used: used !== null ? `${this.formatDecimalNumber(used)} TB` : '',
+        tps: this.getFirstValue((item as any).tps, (item as any).transactions, (item as any).transactions_per_sec),
+        latency: latency ? this.formatStorageValue(latency, /[a-z%]/i.test(latency) ? '' : 'ms') : '',
+        growth,
+        growthClass: this.getStorageGrowthClass(growth)
+      };
+    }).filter(item => !!item.account).slice(0, 10);
+  }
+
+  convertToTransactionVolumeTrend(data: PublicCloudStorageTrendResponse): PublicCloudStorageTrendViewData {
+    return this.convertToStorageTrendViewData(data, ['AWS', 'Azure', 'GCP', 'OCI']);
+  }
+
+  convertToObjectFileGrowthTrend(data: PublicCloudStorageTrendResponse): PublicCloudStorageTrendViewData {
+    return this.convertToStorageTrendViewData(data, ['Blob', 'File', 'Object', 'Table']);
+  }
+
+  convertToStorageTrendOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
+    return this.getStorageMultiLineOptions(data);
+  }
+
+  convertToStorageServicesVisibilityMetrics(data: PublicCloudStorageServicesVisibilityResponse): PublicCloudStorageKpi[] {
+    const latency = data?.highest_latency_cloud || data?.highestLatencyCloud;
+    const mostUtilized = data?.most_utilized || data?.mostUtilized;
+    const totalCapacity = data?.total_capacity_tracked || data?.totalCapacityTracked;
+    const metrics: PublicCloudStorageKpi[] = [
+      {
+        label: 'Active Accounts',
+        value: this.formatNumber(this.getFirstNumericValue(data?.active_accounts, data?.activeAccounts) || 0)
+      },
+      {
+        label: 'Highest Latency Cloud',
+        value: this.formatStorageCloudMetric(latency?.cloud_name || latency?.cloudName, latency?.value, latency?.unit),
+        tone: 'danger'
+      },
+      {
+        label: 'Most Utilized',
+        value: this.formatStorageCloudMetric(mostUtilized?.cloud_name || mostUtilized?.cloudName, mostUtilized?.value, mostUtilized?.unit),
+        tone: 'warning'
+      },
+      {
+        label: 'Total Capacity Tracked',
+        value: this.formatStorageValue(totalCapacity?.value, totalCapacity?.unit)
+      }
+    ];
+    return metrics.filter(item => !!item.value);
+  }
+
+  convertToCloudStorageDistributionRows(data: PublicCloudStorageKeyedNumberResponse): PublicCloudStorageDistributionItem[] {
+    const rows = this.convertStorageKeyedNumberRows(data, []);
+    const total = rows.reduce((sum, item) => sum + item.value, 0);
+    return rows.map(item => ({
+      label: item.label,
+      value: item.value,
+      percent: total ? Math.round((item.value / total) * 100) : 0,
+      color: this.getStorageDistributionColor(item.label)
+    })).filter(item => item.value > 0).sort((first, second) => {
+      return this.getStorageDistributionOrder(first.label) - this.getStorageDistributionOrder(second.label);
+    });
+  }
+
+  convertToCloudStorageDistributionOptions(rows: PublicCloudStorageDistributionItem[]): EChartsOption {
+    return {
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params.name}: ${params.value}%`
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: ['42%', '72%'],
+          center: ['50%', '48%'],
+          avoidLabelOverlap: true,
+          minAngle: 8,
+          data: (rows || []).map(item => ({
+            name: item.label,
+            value: item.percent,
+            itemStyle: { color: item.color }
+          })),
+          label: {
+            formatter: '{c}%',
+            color: '#566170',
+            fontSize: 10
+          },
+          labelLine: {
+            length: 18,
+            length2: 14
+          }
+        }
+      ]
+    };
+  }
+
+  private convertStorageKeyedNumberRows(data: PublicCloudStorageKeyedNumberResponse, colors: string[]): PublicCloudStorageBarItem[] {
+    const source = this.getObjectResponseData(data);
+    const rows = this.getDatabaseRowsFromValue(source, ['results', 'items', 'rows']) as any[];
+    const record = rows.length ? rows[0] : source;
+    return Object.keys(record || {}).reduce((items: PublicCloudStorageBarItem[], key, index) => {
+      const value = this.getFirstNumericValue(record[key]);
+      if (value !== null) {
+        items.push({
+          label: this.formatStorageLabel(key),
+          value,
+          color: colors.length ? colors[index % colors.length] : this.getStorageDistributionColor(key)
+        });
+      }
+      return items;
+    }, []);
+  }
+
+  private getStorageHorizontalBarOptions(rows: PublicCloudStorageBarItem[]): EChartsOption {
+    return {
+      grid: {
+        left: 78,
+        right: 18,
+        top: 6,
+        bottom: 20
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params.name}: ${params.value}`
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        splitLine: { lineStyle: { color: '#e9eef3' } },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          color: '#7b8490',
+          fontSize: 11
+        }
+      },
+      yAxis: {
+        type: 'category',
+        inverse: true,
+        data: (rows || []).map(item => item.label),
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          color: '#6f7782',
+          fontSize: 10
+        }
+      },
+      series: [
+        {
+          type: 'bar',
+          barWidth: 28,
+          data: (rows || []).map(item => ({
+            value: item.value,
+            name: item.label,
+            itemStyle: { color: item.color, borderRadius: [4, 4, 4, 4] }
+          }))
+        }
+      ]
+    };
+  }
+
+  private convertToStorageTrendViewData(data: PublicCloudStorageTrendResponse, order: string[]): PublicCloudStorageTrendViewData {
+    const seriesRows = order
+      .filter(key => Array.isArray(data?.[key]))
+      .map(key => {
+        const rows = data[key] || [];
+        return {
+          name: this.formatStorageSeriesLabel(key),
+          color: this.getStorageTrendColor(key),
+          values: this.getStorageTrendValues(rows)
+        };
+      }).filter(item => item.values.length);
+    return {
+      labels: this.getStorageTrendLabels(order.map(key => data?.[key]).filter(rows => Array.isArray(rows)) as any[]),
+      series: seriesRows
+    };
+  }
+
+  private getReadVsWriteLineOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
+    const readValues = data.series?.[0]?.values || [];
+    const writeValues = data.series?.[1]?.values || [];
+    return {
+      legend: {
+        top: 0,
+        left: 'center',
+        icon: 'circle',
+        itemWidth: 10,
+        itemHeight: 10,
+        textStyle: { color: '#555555', fontSize: 12 }
+      },
+      grid: {
+        left: 44,
+        right: 42,
+        top: 32,
+        bottom: 28
+      },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: data.labels,
+        axisLine: { lineStyle: { color: '#9aa6b2' } },
+        axisTick: { show: false },
+        axisLabel: {
+          color: '#6f7782',
+          fontSize: 11,
+          interval: this.getStorageAxisLabelInterval(data.labels)
+        }
+      },
+      yAxis: [
+        this.getStorageTrafficAxis('Read', 0, readValues),
+        this.getStorageTrafficAxis('Write', 1, writeValues)
+      ],
+      series: (data.series || []).map((item, index) => ({
+        name: item.name,
+        type: 'line',
+        yAxisIndex: index === 1 ? 1 : 0,
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
+        lineStyle: { width: 2.5, color: item.color, type: index === 1 ? 'dashed' : 'solid' },
+        itemStyle: { color: item.color },
+        areaStyle: index === 0 ? { color: 'rgba(47, 115, 196, 0.08)' } : undefined,
+        data: item.values
+      }))
+    };
+  }
+
+  private getStorageMultiLineOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
+    return {
+      legend: {
+        top: 0,
+        left: 'center',
+        icon: 'circle',
+        itemWidth: 10,
+        itemHeight: 10,
+        textStyle: { color: '#555555', fontSize: 12 }
+      },
+      grid: {
+        left: 38,
+        right: 14,
+        top: 38,
+        bottom: 26
+      },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: data.labels,
+        axisLine: { lineStyle: { color: '#9aa6b2' } },
+        axisTick: { show: false },
+        axisLabel: {
+          color: '#6f7782',
+          fontSize: 11,
+          interval: this.getStorageAxisLabelInterval(data.labels)
+        }
+      },
+      yAxis: {
+        type: 'value',
+        splitLine: { lineStyle: { color: '#e4e9ef' } },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: '#6f7782', fontSize: 11 }
+      },
+      series: (data.series || []).map(item => ({
+        name: item.name,
+        type: 'line',
+        smooth: false,
+        symbol: 'circle',
+        symbolSize: 5,
+        lineStyle: { width: 2, color: item.color },
+        itemStyle: { color: item.color },
+        data: item.values
+      }))
+    };
+  }
+
+  private getStorageTrafficAxis(name: string, index: number, values: number[]): any {
+    const bounds = this.getStorageAxisBounds(values);
+    return {
+      type: 'value',
+      name,
+      nameLocation: 'middle',
+      nameGap: 32,
+      min: bounds.min,
+      max: bounds.max,
+      interval: bounds.interval,
+      position: index === 1 ? 'right' : 'left',
+      splitLine: index === 0 ? { lineStyle: { color: '#e4e9ef' } } : { show: false },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: '#6f7782',
+        fontSize: 11,
+        formatter: (value: number) => `${value}G`
+      },
+      nameTextStyle: {
+        color: index === 1 ? PUBLIC_CLOUD_STORAGE_TREND_COLORS.write : PUBLIC_CLOUD_STORAGE_TREND_COLORS.read,
+        fontWeight: 600
+      }
+    };
+  }
+
+  private getStorageAxisLabelInterval(labels: string[]): number {
+    return (labels || []).length > 8 ? 1 : 0;
+  }
+
+  private getStorageAxisBounds(values: number[]): { min: number; max: number; interval: number } {
+    if (!values.length) {
+      return { min: 0, max: 100, interval: 20 };
+    }
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const min = minValue >= 40 ? Math.floor(minValue / 10) * 10 : 0;
+    const max = Math.ceil((maxValue + 5) / 10) * 10;
+    return {
+      min,
+      max: max <= min ? min + 10 : max,
+      interval: max - min <= 70 ? 10 : 20
+    };
+  }
+
+  private getStorageTrendLabels(seriesRows: PublicCloudStorageSeriesPoint[][]): string[] {
+    const longest = (seriesRows || []).reduce((result, rows) => rows.length > result.length ? rows : result, [] as PublicCloudStorageSeriesPoint[]);
+    const hasApiLabels = longest.some(item => !!item?.time);
+    return longest.map((item, index) => hasApiLabels && item?.time ? item.time : `T-${longest.length - index}`);
+  }
+
+  private getStorageTrendValues(rows: PublicCloudStorageSeriesPoint[]): number[] {
+    return (rows || []).map(item => this.getFirstNumericValue(item?.value)).filter((item): item is number => item !== null);
+  }
+
+  private formatStorageValue(value: string | number | undefined | null, unit?: string): string {
+    const numericValue = this.getFirstNumericValue(value);
+    const formattedValue = numericValue !== null ? this.formatDecimalNumber(numericValue) : this.getFirstValue(value);
+    const separator = ['PB', 'TB', 'GB', 'MB'].includes(unit || '') ? ' ' : '';
+    return unit ? `${formattedValue}${separator}${unit}` : formattedValue;
+  }
+
+  private formatStorageCloudMetric(name: string | undefined, value: string | number | undefined, unit?: string): string {
+    const cloudName = this.formatStorageSeriesLabel(name);
+    const metricValue = this.formatStorageValue(value, unit);
+    return cloudName && metricValue ? `${cloudName} - ${metricValue}` : cloudName || metricValue;
+  }
+
+  private formatStorageLabel(value: string | undefined): string {
+    return String(value || '').replace(/_/g, ' ');
+  }
+
+  private formatStorageSeriesLabel(value: string | undefined): string {
+    const label = this.formatStorageLabel(value);
+    return label.toLowerCase() === 'oci' ? 'Oracle' : label;
+  }
+
+  private getStorageTrendColor(value: string): string {
+    return PUBLIC_CLOUD_STORAGE_TREND_COLORS[String(value || '').toLowerCase()] || '#5a7ed8';
+  }
+
+  private getStorageDistributionColor(label: string): string {
+    return PUBLIC_CLOUD_STORAGE_DISTRIBUTION_COLORS[String(label || '').toLowerCase()] || '#3376bd';
+  }
+
+  private getStorageDistributionOrder(label: string): number {
+    const order = ['object storage', 'file storage', 'queue storage', 'table storage'];
+    const index = order.indexOf(String(label || '').toLowerCase());
+    return index >= 0 ? index : order.length;
+  }
+
+  private getStorageGrowthClass(value: string): string {
+    if (!value) {
+      return '';
+    }
+    return value.trim().startsWith('-') ? 'storage-growth-danger' : 'storage-growth-success';
+  }
+  /*
+   * ******End ****** Cloud Storage Health Widget Related ********************
    */
 
   /*

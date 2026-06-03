@@ -84,12 +84,11 @@
         <div class="dashboard-card inventory-card" *ngIf="hasInventoryWidgets">
             <div class="summary-metrics" *ngIf="hasSummaryMetrics">
                 <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
-                <button type="button" class="summary-metric dashboard-link-surface"
-                    *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex"
-                    (click)="openSummaryMetric(metric)" [tooltip]="'Open linked page'" container="body">
-                    <div class="metric-label">{{metric.label}}</div>
+                <div class="summary-metric" *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex">
+                    <button type="button" class="metric-label metric-link" (click)="openSummaryMetric(metric)"
+                        [tooltip]="'Open linked page'" container="body">{{metric.label}}</button>
                     <div class="metric-value" [ngClass]="{'metric-primary': first}">{{metric.value}}</div>
-                </button>
+                </div>
             </div>
             <div class="inventory-grid" *ngIf="hasProviderDistribution || hasTags">
                 <div class="provider-panel">
@@ -126,16 +125,284 @@
         <div class="dashboard-card compute-card" *ngIf="hasComputeBreakdown">
             <app-spinner [name]="loaderNames.computeBreakdown" [width]="0"></app-spinner>
             <div class="compute-provider" *ngFor="let provider of computeBreakdown; trackBy: trackByIndex">
-                <button type="button" class="provider-brand provider-link" [ngClass]="provider.brandClass"
-                    (click)="openComputeProvider(provider)" [tooltip]="'Open linked page'" container="body">
+                <div class="provider-brand" [ngClass]="provider.brandClass">
                     <img class="provider-logo" [src]="provider.logoPath" [alt]="provider.displayName">
-                </button>
-                <button type="button" class="compute-row dashboard-link-row"
-                    *ngFor="let stat of provider.stats; trackBy: trackByIndex"
-                    (click)="openComputeStat(provider, stat)" [tooltip]="'Open linked page'" container="body">
-                    <span>{{stat.name}}</span>
+                </div>
+                <div class="compute-row" *ngFor="let stat of provider.stats; trackBy: trackByIndex">
+                    <button type="button" class="stat-link" (click)="openComputeStat(provider, stat)"
+                        [tooltip]="'Open linked page'" container="body">{{stat.name}}</button>
                     <span>{{stat.value}}</span>
-                </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card cloud-database-card" *ngIf="hasCloudDatabasePerformanceSection">
+            <div class="cloud-database-section-header">Cloud Database Performance</div>
+            <div class="cloud-database-grid">
+                <div class="cloud-database-widget database-health-widget">
+                    <app-spinner [name]="loaderNames.databaseHealthScore" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Database Health Score</div>
+                    <ng-container *ngIf="hasDatabaseHealthScoreData; else databaseHealthNoData">
+                        <div class="database-health-score" [style.background]="databaseHealthScore.scoreGradient">
+                            <div class="database-health-score-inner">{{databaseHealthScore.scoreLabel}}</div>
+                        </div>
+                        <div class="database-health-metrics">
+                            <div class="database-health-row"
+                                *ngFor="let metric of databaseHealthScore.metrics; trackBy: trackByIndex">
+                                <div class="database-health-label">{{metric.label}}</div>
+                                <div class="database-health-track">
+                                    <div class="database-health-fill" [style.width.%]="metric.percent"
+                                        [style.background]="metric.color">
+                                        <span>{{metric.value}}</span>
+                                    </div>
+                                </div>
+                                <div class="database-health-total">{{metric.total}}</div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-template #databaseHealthNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.databaseHealthScore">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="cloud-database-widget active-workload-widget">
+                    <app-spinner [name]="loaderNames.activeDatabaseWorkload" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Active Database Workload</div>
+                    <ng-container *ngIf="hasActiveDatabaseWorkloadData; else activeWorkloadNoData">
+                        <div class="database-workload-total" *ngIf="activeDatabaseWorkload.totalLabel">
+                            <strong>{{activeDatabaseWorkload.totalLabel}}</strong>
+                            <span>{{activeDatabaseWorkload.unit}}</span>
+                        </div>
+                        <div echarts [options]="activeDatabaseWorkloadOptions" class="database-workload-chart"></div>
+                    </ng-container>
+                    <ng-template #activeWorkloadNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.activeDatabaseWorkload">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="cloud-database-widget latency-overview-widget">
+                    <app-spinner [name]="loaderNames.databaseLatencyOverview" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Database Latency Overview</div>
+                    <ng-container *ngIf="hasDatabaseLatencyOverviewData; else latencyOverviewNoData">
+                        <div echarts [options]="databaseLatencyOptions" class="database-latency-chart"></div>
+                        <div class="database-latency-legend">
+                            <span><i class="latency-dot latency-success"></i>&lt;100ms</span>
+                            <span><i class="latency-dot latency-warning"></i>100-500ms</span>
+                            <span><i class="latency-dot latency-danger"></i>&gt;500ms</span>
+                        </div>
+                    </ng-container>
+                    <ng-template #latencyOverviewNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.databaseLatencyOverview">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="cloud-database-widget lock-contention-widget">
+                    <app-spinner [name]="loaderNames.topLockContention" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Top 10 Lock Contention</div>
+                    <ng-container *ngIf="hasTopLockContentionData; else lockContentionNoData">
+                        <table class="table table-sm database-lock-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Database</th>
+                                    <th>Locks</th>
+                                    <th>Type</th>
+                                    <th>Wait</th>
+                                    <th>Cloud</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of topLockContentionRows; trackBy: trackByIndex">
+                                    <td>{{row.database}}</td>
+                                    <td>{{row.locks}}</td>
+                                    <td>{{row.type}}</td>
+                                    <td>{{row.wait}}</td>
+                                    <td><span class="database-cloud-pill" [ngClass]="row.cloudClass">{{row.cloud}}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </ng-container>
+                    <ng-template #lockContentionNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.topLockContention">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="cloud-database-widget memory-consumers-widget">
+                    <app-spinner [name]="loaderNames.topMemoryConsumers" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Top 10 Memory Consumers</div>
+                    <ng-container *ngIf="hasTopMemoryConsumersData; else memoryConsumersNoData">
+                        <div class="database-memory-list">
+                            <div class="database-memory-row"
+                                *ngFor="let row of topMemoryConsumerRows; trackBy: trackByIndex">
+                                <span>{{row.name}}</span>
+                                <strong>{{row.displayValue}}</strong>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-template #memoryConsumersNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.topMemoryConsumers">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="cloud-database-widget storage-consumers-widget">
+                    <app-spinner [name]="loaderNames.topStorageConsumers" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Top 10 Storage Consumers</div>
+                    <ng-container *ngIf="hasTopStorageConsumersData; else storageConsumersNoData">
+                        <div class="database-storage-list">
+                            <div class="database-storage-row"
+                                *ngFor="let row of topStorageConsumerRows; trackBy: trackByIndex">
+                                <div class="database-storage-name">{{row.name}}</div>
+                                <div class="database-storage-track">
+                                    <div class="database-storage-fill" [style.width.%]="row.percent"
+                                        [style.background]="row.color"></div>
+                                </div>
+                                <div class="database-storage-value">
+                                    {{row.displayValue}}<ng-container *ngIf="row.totalLabel"> / {{row.totalLabel}}</ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="database-storage-legend">
+                            <span><i class="latency-dot latency-success"></i>&lt;60% used</span>
+                            <span><i class="latency-dot latency-warning"></i>60-80% used</span>
+                            <span><i class="latency-dot latency-danger"></i>&gt;80% used</span>
+                        </div>
+                    </ng-container>
+                    <ng-template #storageConsumersNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.topStorageConsumers">No data available</div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card cloud-storage-card mt-3" *ngIf="hasCloudStorageHealthSection">
+            <div class="cloud-storage-section-header">Cloud Storage Health</div>
+
+            <div class="cloud-storage-kpi-strip">
+                <app-spinner [name]="loaderNames.cloudStorageHealth" [width]="0"></app-spinner>
+                <ng-container *ngIf="hasCloudStorageHealthData; else cloudStorageHealthNoData">
+                    <div class="cloud-storage-kpi" *ngFor="let metric of cloudStorageHealthMetrics; trackBy: trackByIndex">
+                        <div class="cloud-storage-kpi-label">{{metric.label}}</div>
+                        <div class="cloud-storage-kpi-value" [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</div>
+                    </div>
+                </ng-container>
+                <ng-template #cloudStorageHealthNoData>
+                    <div class="widget-no-data" *ngIf="!widgetLoading.cloudStorageHealth">No data available</div>
+                </ng-template>
+            </div>
+
+            <div class="cloud-storage-subsection-title">Performance &amp; Utilization</div>
+            <div class="cloud-storage-performance-grid">
+                <div class="cloud-storage-widget storage-utilization-widget">
+                    <app-spinner [name]="loaderNames.storageUtilizationByCloud" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Storage Utilization By Cloud</div>
+                    <ng-container *ngIf="hasStorageUtilizationByCloudData; else storageUtilizationNoData">
+                        <div echarts [options]="storageUtilizationOptions" class="storage-utilization-chart"></div>
+                    </ng-container>
+                    <ng-template #storageUtilizationNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.storageUtilizationByCloud">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="cloud-storage-widget read-write-widget">
+                    <app-spinner [name]="loaderNames.readVsWriteTraffic" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Read vs Write Traffic</div>
+                    <ng-container *ngIf="hasReadVsWriteTrafficData; else readWriteNoData">
+                        <div echarts [options]="readVsWriteOptions" class="read-write-chart"></div>
+                    </ng-container>
+                    <ng-template #readWriteNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.readVsWriteTraffic">No data available</div>
+                    </ng-template>
+                </div>
+            </div>
+
+            <div class="cloud-storage-subsection-title">Operation Intelligence</div>
+            <div class="cloud-storage-operation-grid">
+                <div class="cloud-storage-widget storage-consumer-table-widget">
+                    <app-spinner [name]="loaderNames.cloudStorageTopConsumers" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Top Storage Consumers</div>
+                    <ng-container *ngIf="hasCloudStorageTopConsumersData; else cloudStorageTopConsumersNoData">
+                        <table class="table table-sm cloud-storage-consumer-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Account</th>
+                                    <th>Cloud</th>
+                                    <th>Used</th>
+                                    <th>TPS</th>
+                                    <th>Latency</th>
+                                    <th>Growth</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of cloudStorageTopConsumerRows; trackBy: trackByIndex">
+                                    <td>{{row.account}}</td>
+                                    <td>
+                                        <span class="database-cloud-pill" [ngClass]="row.cloudClass" *ngIf="row.cloud">{{row.cloud}}</span>
+                                    </td>
+                                    <td>{{row.used}}</td>
+                                    <td>{{row.tps}}</td>
+                                    <td>{{row.latency}}</td>
+                                    <td><span class="storage-growth-pill" [ngClass]="row.growthClass" *ngIf="row.growth">{{row.growth}}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </ng-container>
+                    <ng-template #cloudStorageTopConsumersNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.cloudStorageTopConsumers">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="cloud-storage-widget transaction-volume-widget">
+                    <app-spinner [name]="loaderNames.transactionVolumeTrend" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Transaction Volume Trend</div>
+                    <ng-container *ngIf="hasTransactionVolumeTrendData; else transactionTrendNoData">
+                        <div echarts [options]="transactionVolumeTrendOptions" class="storage-trend-chart"></div>
+                    </ng-container>
+                    <ng-template #transactionTrendNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.transactionVolumeTrend">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="cloud-storage-widget object-growth-widget">
+                    <app-spinner [name]="loaderNames.objectFileGrowthTrend" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Object &amp; File Growth Trend</div>
+                    <ng-container *ngIf="hasObjectFileGrowthTrendData; else objectGrowthNoData">
+                        <div echarts [options]="objectFileGrowthTrendOptions" class="storage-trend-chart"></div>
+                    </ng-container>
+                    <ng-template #objectGrowthNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.objectFileGrowthTrend">No data available</div>
+                    </ng-template>
+                </div>
+            </div>
+
+            <div class="cloud-storage-subsection-title">Storage Services Visibility</div>
+            <div class="cloud-storage-visibility-strip">
+                <app-spinner [name]="loaderNames.storageServicesVisibility" [width]="0"></app-spinner>
+                <ng-container *ngIf="hasStorageServicesVisibilityData; else storageVisibilityNoData">
+                    <div class="cloud-storage-kpi" *ngFor="let metric of storageServicesVisibilityMetrics; trackBy: trackByIndex">
+                        <div class="cloud-storage-kpi-label">{{metric.label}}</div>
+                        <div class="cloud-storage-kpi-value" [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</div>
+                    </div>
+                </ng-container>
+                <ng-template #storageVisibilityNoData>
+                    <div class="widget-no-data" *ngIf="!widgetLoading.storageServicesVisibility">No data available</div>
+                </ng-template>
+            </div>
+
+            <div class="cloud-storage-distribution-row">
+                <div class="cloud-storage-widget cloud-storage-distribution-widget">
+                    <app-spinner [name]="loaderNames.cloudStorageDistribution" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Cloud Storage Distribution</div>
+                    <ng-container *ngIf="hasCloudStorageDistributionData; else storageDistributionNoData">
+                        <div echarts [options]="cloudStorageDistributionOptions" class="cloud-storage-distribution-chart"></div>
+                        <div class="cloud-storage-distribution-legend">
+                            <span *ngFor="let item of cloudStorageDistributionRows; trackBy: trackByIndex">
+                                <i class="latency-dot" [style.background]="item.color"></i>{{item.label}} <strong>{{item.percent}}%</strong>
+                            </span>
+                        </div>
+                    </ng-container>
+                    <ng-template #storageDistributionNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.cloudStorageDistribution">No data available</div>
+                    </ng-template>
+                </div>
             </div>
         </div>
 
@@ -143,14 +410,31 @@
             [ngClass]="{'single-widget-grid': !(hasOrphanedDevices && hasOrphanedByCategory)}">
             <div class="dashboard-card orphaned-device-card" *ngIf="hasOrphanedDevices">
                 <div class="orphaned-widget-header">
-                    <button type="button" class="subsection-title orphaned-title-link mb-0"
-                        (click)="openOrphanedDevices()" [tooltip]="'Open linked page'" container="body">
+                    <div class="subsection-title mb-0">
                         <span class="badge badge-secondary orphaned-count-badge">{{orphanedDevicesTotal}}</span>
                         Orphaned device list
-                    </button>
+                        <button type="button" class="header-link-icon" (click)="openOrphanedDevices()"
+                            [tooltip]="'Open linked page'" container="body">
+                            <i class="fas fa-link"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="orphaned-table-wrap">
                     <app-spinner [name]="loaderNames.orphanedDevices" [width]="0"></app-spinner>
+                    <div class="device-status-legend" *ngIf="orphanedDevices.length">
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-check-circle text-success font-xs-sm"></i>
+                            Active / Reachable
+                        </span>
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-exclamation-circle text-warning font-xs-sm"></i>
+                            Partially Reachable / Warning State
+                        </span>
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-exclamation-triangle text-danger font-xs-sm"></i>
+                            Offline / Critical / Unreachable
+                        </span>
+                    </div>
                     <table class="table table-sm orphaned-table mb-0" *ngIf="orphanedDevices.length">
                         <colgroup>
                             <col class="orphaned-name-col">
@@ -226,6 +510,20 @@
                 </div>
                 <div class="idle-table-wrap">
                     <app-spinner [name]="loaderNames.idleDevices" [width]="0"></app-spinner>
+                    <div class="device-status-legend" *ngIf="idleDevices.length">
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-check-circle text-success font-xs-sm"></i>
+                            Device Is Active / Reachable
+                        </span>
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-exclamation-circle text-warning font-xs-sm"></i>
+                            Partially Reachable / Warning State
+                        </span>
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-exclamation-triangle text-danger font-xs-sm"></i>
+                            Offline / Critical / Unreachable
+                        </span>
+                    </div>
                     <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
                         <colgroup>
                             <col class="idle-device-name-col">
@@ -320,16 +618,20 @@
                 </div>
             </div>
         </div>
-        <div class="section-title" *ngIf="hasRecentAlertSummary || hasRecentAlerts">Recent Alerts</div>
+        <div class="section-title section-title-with-link" *ngIf="hasRecentAlertSummary || hasRecentAlerts">
+            Recent Alerts
+            <button type="button" class="header-link-icon" (click)="openRecentAlerts()"
+                [tooltip]="'Open linked page'" container="body">
+                <i class="fas fa-link"></i>
+            </button>
+        </div>
         <div class="dashboard-card alert-card recent-alerts-card" *ngIf="hasRecentAlertSummary || hasRecentAlerts">
             <div class="alert-summary" *ngIf="hasRecentAlertSummary">
                 <app-spinner [name]="loaderNames.recentAlertSummary" [width]="0"></app-spinner>
-                <button type="button" class="alert-summary-metric dashboard-link-surface"
-                    *ngFor="let metric of recentAlertSummaryMetrics; trackBy: trackByIndex"
-                    (click)="openRecentAlerts()" [tooltip]="'Open linked page'" container="body">
+                <div class="alert-summary-metric" *ngFor="let metric of recentAlertSummaryMetrics; trackBy: trackByIndex">
                     <div>{{metric.label}}</div>
                     <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
-                </button>
+                </div>
             </div>
 
             <div class="table-responsive" *ngIf="hasRecentAlerts">
@@ -366,4 +668,3 @@
     </div>
 </div>
 <aiml-alert-details></aiml-alert-details>
- 

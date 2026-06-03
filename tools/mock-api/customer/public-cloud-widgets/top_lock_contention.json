@@ -1,0 +1,32 @@
+{
+    "data": [
+        {
+            "cloud": "Azure",
+            "database": "prod-s3-fin-01",
+            "locks": 420,
+            "type": "Row",
+            "wait": "18"
+        },
+        {
+            "cloud": "Oracle",
+            "database": "azure-blob-hr",
+            "locks": 318,
+            "type": "Table",
+            "wait": "31"
+        },
+        {
+            "cloud": "AWS",
+            "database": "gcp-media-store",
+            "locks": 281,
+            "type": "Row",
+            "wait": "16"
+        },
+        {
+            "cloud": "GCP",
+            "database": "prod-s3-fin-01",
+            "locks": 198,
+            "type": "Page",
+            "wait": "18"
+        }
+    ]
+}

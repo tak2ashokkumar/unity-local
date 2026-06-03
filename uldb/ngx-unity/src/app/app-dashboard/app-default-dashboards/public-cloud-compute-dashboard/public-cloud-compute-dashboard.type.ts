@@ -95,6 +95,294 @@ export interface PublicCloudComputeBreakdownStat {
   value: number;
 }
 
+export interface PublicCloudDatabaseMetricItem {
+  label?: string;
+  name?: string;
+  metric?: string;
+  category?: string;
+  current?: string | number;
+  value?: string | number;
+  score?: string | number;
+  count?: string | number;
+  total?: string | number;
+  max?: string | number;
+  target?: string | number;
+  threshold?: string | number;
+  percent?: string | number;
+  percentage?: string | number;
+  color?: string;
+  tone?: PublicCloudStatusTone;
+}
+
+export interface PublicCloudDatabaseHealthPie {
+  health_score?: string | number;
+  healthScore?: string | number;
+  score?: string | number;
+  max?: string | number;
+  total?: string | number;
+}
+
+export interface PublicCloudDatabaseHealthScoreResponse {
+  health_pie?: PublicCloudDatabaseHealthPie;
+  healthPie?: PublicCloudDatabaseHealthPie;
+  score?: string | number;
+  health_score?: string | number;
+  healthScore?: string | number;
+  value?: string | number;
+  max?: string | number;
+  total?: string | number;
+  metrics?: PublicCloudDatabaseMetricItem[] | Record<string, PublicCloudDatabaseMetricItem>;
+  results?: PublicCloudDatabaseMetricItem[];
+  items?: PublicCloudDatabaseMetricItem[];
+  data?: PublicCloudDatabaseMetricItem[] | PublicCloudDatabaseHealthScoreResponse;
+}
+
+export interface PublicCloudDatabaseHealthMetric {
+  label: string;
+  value: string;
+  total: string;
+  percent: number;
+  color: string;
+}
+
+export interface PublicCloudDatabaseHealthScoreViewData {
+  score: number;
+  scoreLabel: string;
+  scoreGradient: string;
+  metrics: PublicCloudDatabaseHealthMetric[];
+  hasData: boolean;
+}
+
+export interface PublicCloudDatabaseBarResponseItem {
+  name?: string;
+  label?: string;
+  database?: string;
+  database_name?: string;
+  databaseName?: string;
+  service?: string;
+  cloud?: string;
+  provider?: string;
+  platform?: string;
+  value?: string | number;
+  count?: string | number;
+  total?: string | number;
+  transactions?: string | number;
+  transactions_per_sec?: string | number;
+  latency?: string | number;
+  latency_ms?: string | number;
+  avg_latency?: string | number;
+  memory?: string | number;
+  memory_gb?: string | number;
+  storage?: string | number;
+  used?: string | number;
+  used_tb?: string | number;
+  capacity?: string | number;
+  total_tb?: string | number;
+  percent?: string | number;
+  percentage?: string | number;
+  color?: string;
+  tone?: PublicCloudStatusTone;
+  status?: string;
+  bucket?: string;
+}
+
+export interface PublicCloudDatabaseWidgetSummary {
+  value?: string | number;
+  total?: string | number;
+  unit?: string;
+}
+
+export interface PublicCloudDatabaseKeyedNumberRecord {
+  [key: string]: string | number;
+}
+
+export interface PublicCloudDatabaseWidgetResponse {
+  total?: string | number;
+  value?: string | number;
+  unit?: string;
+  summary?: PublicCloudDatabaseWidgetSummary;
+  results?: PublicCloudDatabaseBarResponseItem[];
+  items?: PublicCloudDatabaseBarResponseItem[];
+  rows?: PublicCloudDatabaseBarResponseItem[];
+  data?: PublicCloudDatabaseBarResponseItem[] | PublicCloudDatabaseKeyedNumberRecord[] | PublicCloudDatabaseWidgetResponse;
+  workloads?: PublicCloudDatabaseBarResponseItem[];
+  databases?: PublicCloudDatabaseBarResponseItem[];
+  latency?: PublicCloudDatabaseBarResponseItem[];
+  consumers?: PublicCloudDatabaseBarResponseItem[];
+}
+
+export interface PublicCloudDatabaseBarItem {
+  label: string;
+  value: number;
+  color: string;
+  displayValue?: string;
+}
+
+export interface PublicCloudActiveDatabaseWorkloadViewData {
+  totalLabel: string;
+  unit: string;
+  rows: PublicCloudDatabaseBarItem[];
+}
+
+export interface PublicCloudLockContentionResponseItem {
+  database?: string;
+  database_name?: string;
+  databaseName?: string;
+  name?: string;
+  locks?: string | number;
+  lock_count?: string | number;
+  lockCount?: string | number;
+  type?: string;
+  lock_type?: string;
+  lockType?: string;
+  wait?: string | number;
+  wait_time?: string | number;
+  waitTime?: string | number;
+  cloud?: string;
+  provider?: string;
+  platform?: string;
+}
+
+export interface PublicCloudLockContentionResponse {
+  results?: PublicCloudLockContentionResponseItem[];
+  items?: PublicCloudLockContentionResponseItem[];
+  rows?: PublicCloudLockContentionResponseItem[];
+  data?: PublicCloudLockContentionResponseItem[] | PublicCloudLockContentionResponse;
+}
+
+export interface PublicCloudLockContentionRow {
+  database: string;
+  locks: string;
+  type: string;
+  wait: string;
+  cloud: string;
+  cloudClass: string;
+}
+
+export interface PublicCloudDatabaseConsumerRow {
+  name: string;
+  value: number;
+  displayValue: string;
+  totalValue?: number;
+  totalLabel?: string;
+  percent: number;
+  color: string;
+}
+
+export interface PublicCloudStorageHealthResponseItem {
+  metric?: string;
+  label?: string;
+  name?: string;
+  value?: string | number;
+  unit?: string;
+}
+
+export interface PublicCloudStorageHealthResponse {
+  data?: PublicCloudStorageHealthResponseItem[];
+  results?: PublicCloudStorageHealthResponseItem[];
+  items?: PublicCloudStorageHealthResponseItem[];
+}
+
+export interface PublicCloudStorageKpi {
+  label: string;
+  value: string;
+  tone?: PublicCloudStatusTone;
+}
+
+export interface PublicCloudStorageKeyedNumberResponse {
+  data?: PublicCloudDatabaseKeyedNumberRecord[];
+  results?: PublicCloudDatabaseKeyedNumberRecord[];
+  items?: PublicCloudDatabaseKeyedNumberRecord[];
+}
+
+export interface PublicCloudStorageBarItem {
+  label: string;
+  value: number;
+  color: string;
+}
+
+export interface PublicCloudStorageSeriesPoint {
+  time?: string;
+  value?: string | number;
+}
+
+export interface PublicCloudStorageTrafficResponse {
+  read_ingress?: PublicCloudStorageSeriesPoint[];
+  readIngress?: PublicCloudStorageSeriesPoint[];
+  write_egress?: PublicCloudStorageSeriesPoint[];
+  writeEgress?: PublicCloudStorageSeriesPoint[];
+}
+
+export interface PublicCloudStorageTrendResponse {
+  [key: string]: PublicCloudStorageSeriesPoint[] | undefined;
+}
+
+export interface PublicCloudStorageTrendSeries {
+  name: string;
+  color: string;
+  values: number[];
+}
+
+export interface PublicCloudStorageTrendViewData {
+  labels: string[];
+  series: PublicCloudStorageTrendSeries[];
+}
+
+export interface PublicCloudStorageConsumerRow {
+  account: string;
+  cloud: string;
+  cloudClass: string;
+  used: string;
+  tps: string;
+  latency: string;
+  growth: string;
+  growthClass: string;
+}
+
+export interface PublicCloudStorageServicesVisibilityResponse {
+  active_accounts?: string | number;
+  activeAccounts?: string | number;
+  highest_latency_cloud?: {
+    cloud_name?: string;
+    cloudName?: string;
+    value?: string | number;
+    unit?: string;
+  };
+  highestLatencyCloud?: {
+    cloud_name?: string;
+    cloudName?: string;
+    value?: string | number;
+    unit?: string;
+  };
+  most_utilized?: {
+    cloud_name?: string;
+    cloudName?: string;
+    value?: string | number;
+    unit?: string;
+  };
+  mostUtilized?: {
+    cloud_name?: string;
+    cloudName?: string;
+    value?: string | number;
+    unit?: string;
+  };
+  total_capacity_tracked?: {
+    value?: string | number;
+    unit?: string;
+  };
+  totalCapacityTracked?: {
+    value?: string | number;
+    unit?: string;
+  };
+}
+
+export interface PublicCloudStorageDistributionItem {
+  label: string;
+  value: number;
+  percent: number;
+  color: string;
+}
+
 export interface PublicCloudOrphanedDeviceResponseItem {
   name?: string;
   device_name?: string;
