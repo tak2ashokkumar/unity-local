@@ -107,6 +107,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   droppedAsTool = false;
   toolsArr = [];
   currentAgentNodeId: number | null = null;
+  isViewMode = false;
 
   constructor(
     @Inject(DOCUMENT) private document,
@@ -124,9 +125,11 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.workFlowId = params.get('id');
     });
+    this.isViewMode = this.router.url.includes('view');
   }
 
   ngOnInit(): void {
+
     document.addEventListener('click', (event) => this.closeDropdown(event));
     this.minimizeLeftPanel();
     const container = document.getElementById('agentic-drawflow') as HTMLElement;
@@ -1052,6 +1055,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
         realTimeData: this.realTimeNodeDetails ? this.realTimeNodeDetails.nodes.find(n => n.node_id === nodeId) : {},
         connectedNodes: _clone(this.connectedNodeDetails),
         modalName: modalName,
+        isViewMode: this.isViewMode,
         workflowId: this.workFlowId,
         workflowVarsData: this.workflowVarsData,
         onClose: (formDatas: any, modalState: any) => {
@@ -2221,8 +2225,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
                onclick="event.stopPropagation();"
                onmousedown="event.stopPropagation();"
                onmouseup="event.stopPropagation();">
-             <i class="fas fa-play action test"
-               title="Test"></i>
+             ${!this.isViewMode ? `<i class="fas fa-play action test" title="Test"></i>` : ''}
              <i class="fas fa-pen action edit"
                title="Edit"></i>
              <i class="fas fa-trash action delete"
@@ -2296,8 +2299,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
               onclick="event.stopPropagation();"
               onmousedown="event.stopPropagation();"
               onmouseup="event.stopPropagation();">
-            <i class="fas fa-play action test"
-              title="Test"></i>
+            ${!this.isViewMode ? `<i class="fas fa-play action test" title="Test"></i>` : ''}
             <i class="fas fa-pen action edit"
               title="Edit"></i>
             <i class="fas fa-trash action delete"
@@ -2348,8 +2350,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
           onclick="event.stopPropagation();"
           onmousedown="event.stopPropagation();"
           onmouseup="event.stopPropagation();">
-        <i class="fas fa-play action test"
-            title="Test"></i>
+        ${!this.isViewMode ? `<i class="fas fa-play action test" title="Test"></i>` : ''}
         <i class="fas fa-pen action edit"
           title="Edit"></i>
         <i class="fas fa-trash action delete"
@@ -3342,7 +3343,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   }
 
   returnWorkflow() {
-    if (this.nodeDetailsArr.length) {
+    if (this.nodeDetailsArr.length && !this.isViewMode) {
       this.workflowReturnModalRef = this.modalService.show(this.confirmreturn, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
     } else {
       this.goBack();
@@ -3357,6 +3358,8 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   goBack() {
     if (this.workFlowId) {
       this.router.navigate(['../../../'], { relativeTo: this.route });
+    } else if (this.isViewMode) {
+      this.router.navigate(['../../'], { relativeTo: this.route });
     } else {
       this.router.navigate(['../'], { relativeTo: this.route });
     }

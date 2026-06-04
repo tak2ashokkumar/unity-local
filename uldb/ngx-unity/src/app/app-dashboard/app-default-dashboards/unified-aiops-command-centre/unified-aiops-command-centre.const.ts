@@ -1,6 +1,9 @@
+import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import {
+  UnifiedAiopsDeviceTypeOption,
   UnifiedAiopsFilterOption,
-  UnifiedAiopsTone
+  UnifiedAiopsTone,
+  UnifiedAiopsViewByOption
 } from './unified-aiops-command-centre.type';
 
 export const UNIFIED_AIOPS_ALL_SELECTED_VALUE = 'all';
@@ -38,6 +41,39 @@ export const UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT = '/customer/aiops-dashboard/r
 export const UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/auto-remediation-summary/';
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT = '/customer/private_cloud_fast/';
 export const UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT = '/customer/public_cloud_fast/';
+
+export const UNIFIED_AIOPS_ALERT_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+export const UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY = 'event_source';
+export const UNIFIED_AIOPS_ALERT_DEFAULT_DURATION = 'last_week';
+
+export const UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS: UnifiedAiopsDeviceTypeOption[] = [
+  { type: 'Switch', key: 'switch' },
+  { type: 'Firewall', key: 'firewall' },
+  { type: 'Load Balancer', key: 'load_balancer' },
+  { type: 'Hypervisor', key: 'hypervisor' },
+  { type: 'Bare Metal Server', key: 'bms' },
+  { type: 'Storage Device', key: 'storage' },
+  { type: 'MAC Device', key: 'mac_device' },
+  { type: 'Database Server', key: 'database' },
+  { type: 'PDU', key: 'pdu' },
+  { type: 'Virtual Machine', key: 'vm' }
+];
+
+export const UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS: UnifiedAiopsViewByOption[] = [
+  { name: 'Device Type', key: 'device_type' },
+  { name: 'Event Source', key: 'event_source' },
+  { name: 'Datacenter', key: 'datacenter' },
+  { name: 'Cloud', key: 'private_cloud' },
+  { name: 'Severity', key: 'severity' }
+];
+
+export const UNIFIED_AIOPS_ALERT_DURATION_OPTIONS: DateRangeOption[] = [
+  { label: 'Last 24 Hours', value: 'last_24_hours' },
+  { label: 'Yesterday', value: 'yesterday' },
+  { label: 'Last Week', value: 'last_week' },
+  { label: 'Last Month', value: 'last_month' },
+  { label: 'Last Year', value: 'last_year' }
+];
 
 export const UNIFIED_AIOPS_DATACENTER_OPTIONS: UnifiedAiopsFilterOption[] = [
   { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Selected' },

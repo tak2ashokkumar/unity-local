@@ -22,7 +22,8 @@
           </div>
 
           <button *ngIf="hasNode" class="btn btn-primary btn-sm mr-2" type="button" aria-haspopup="true"
-            aria-expanded="false" (click)="toggleDropdown();onFromBeginning()" [disabled]="isWorkflowExecuting">
+            aria-expanded="false" (click)="toggleDropdown();onFromBeginning()"
+            [disabled]="isWorkflowExecuting">
             <i class="fas fa-play mr-1"></i>
             Run
           </button>
@@ -39,8 +40,8 @@
             Resume
           </button>
 
-          <button class="btn btn-sm btn-success font-500" type="button" [disabled]="workFlowViewData?.isInProgress"
-            (click)="saveWorkFlow()" [disabled]="isWorkflowExecuting">
+          <button class="btn btn-sm btn-success font-500" type="button"
+            [disabled]="workFlowViewData?.isInProgress || isWorkflowExecuting || isViewMode" (click)="saveWorkFlow()">
             <span class="fas fa-spinner" *ngIf="workFlowViewData?.isInProgress"></span>
             <span class="font-xs-sm mx-1">Save Workflow</span>
           </button>

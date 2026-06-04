@@ -104,6 +104,16 @@ export class UnifiedAiopsCommandCentreService {
     });
   }
 
+  /** Builds the Alerts widget's local filter form, seeded from the page-level datacenter/cloud selection. */
+  buildAlertsFilterForm(datacenters: UnifiedAiopsFilterOption[], clouds: UnifiedAiopsFilterOption[], deviceTypes: string[], viewBy: string): FormGroup {
+    return this.builder.group({
+      datacenters: [datacenters || []],
+      clouds: [clouds || []],
+      deviceTypes: [deviceTypes || []],
+      viewBy: [viewBy]
+    });
+  }
+
   getDatacenters(): Observable<UnifiedAiopsFilterOption[]> {
     return this.datacenterService.getDataCenters().pipe(
       map(datacenters => this.getDatacenterFilterOptions(datacenters))
@@ -2440,14 +2450,22 @@ export class UnifiedAiopsCommandCentreService {
       this.addSankeyLink(links, sourceName, 'Events', count);
     });
 
+    // Total Events splits into Alerts + Suppressed Events + Deduped Events.
     this.addSankeyLink(links, 'Events', 'Alerts', this.getNumberFromPayload(totals, ['total_alerts', 'totalAlerts']));
-    this.addSankeyLink(links, 'Events', 'Dedupe Events', this.getNumberFromPayload(totals, ['total_deduped_events', 'totalDedupedEvents']));
     this.addSankeyLink(links, 'Events', 'Suppressed Events', this.getNumberFromPayload(totals, ['total_suppressed_events', 'totalSuppressedEvents']));
+    this.addSankeyLink(links, 'Events', 'Dedupe Events', this.getNumberFromPayload(totals, ['total_deduped_events', 'totalDedupedEvents']));
+    // Alerts split into Conditions and alerts with no ticket generated; Conditions then generate tickets.
     this.addSankeyLink(links, 'Alerts', 'Conditions', this.getNumberFromPayload(conditions, ['total']));
+    this.addSankeyLink(links, 'Alerts', 'No Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_not_generated', 'ticketNotGenerated']));
     this.addSankeyLink(links, 'Conditions', 'Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_generated', 'ticketGenerated']));
-    this.addSankeyLink(links, 'Conditions', 'No Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_not_generated', 'ticketNotGenerated']));
 
-    return this.getSankeyOptions(links);
+    const nodeTotals = {
+      Events: this.getNumberFromPayload(totals, ['total_events', 'totalEvents']),
+      Alerts: this.getNumberFromPayload(totals, ['total_alerts', 'totalAlerts']),
+      Conditions: this.getNumberFromPayload(conditions, ['total'])
+    };
+
+    return this.getSankeyOptions(links, nodeTotals);
   }
 
   private getAlertLifecycleSankeyOptionsFromPayload(response: any): EChartsOption {
@@ -2465,7 +2483,16 @@ export class UnifiedAiopsCommandCentreService {
     this.addDurationSankeyLinks(links, 'Auto Healed', conditions?.resolved?.auto_healed?.duration || conditions?.resolved?.autoHealed?.duration);
     this.addDurationSankeyLinks(links, 'Auto Remediation', conditions?.resolved?.auto_remediation?.duration || conditions?.resolved?.autoRemediation?.duration);
 
-    return this.getSankeyOptions(links);
+    const nodeTotals = {
+      Condition: this.getNumberFromPayload(flatConditions, ['total']),
+      Open: this.getNumberFromPayload(flatConditions, ['open_count', 'open.count']),
+      Resolved: this.getNumberFromPayload(flatConditions, ['resolved_count', 'resolved.count']),
+      Acknowledged: this.getNumberFromPayload(flatConditions, ['open_acknowledged_count', 'open.acknowledged.count']),
+      'Auto Healed': this.getNumberFromPayload(flatConditions, ['resolved_auto_healed_count', 'resolved.autoHealed.count']),
+      'Auto Remediation': this.getNumberFromPayload(flatConditions, ['resolved_auto_remediation_count', 'resolved.autoRemediation.count'])
+    };
+
+    return this.getSankeyOptions(links, nodeTotals);
   }
 
   private addDurationSankeyLinks(links: Array<{ source: string; target: string; value: number }>, source: string, duration: any) {
@@ -2482,12 +2509,18 @@ export class UnifiedAiopsCommandCentreService {
     links.push({ source, target, value });
   }
 
-  private getSankeyOptions(links: Array<{ source: string; target: string; value: number }>): EChartsOption {
+  private getSankeyOptions(links: Array<{ source: string; target: string; value: number }>, nodeTotals: { [name: string]: number } = {}): EChartsOption {
     if (!links.length) {
       return {};
     }
     const nodes = Array.from(new Set(links.reduce((result: string[], link) => result.concat(link.source, link.target), [])))
-      .map(name => ({ name }));
+      .map(name => {
+        const incoming = links.filter(link => link.target === name).reduce((total, link) => total + link.value, 0);
+        const outgoing = links.filter(link => link.source === name).reduce((total, link) => total + link.value, 0);
+        const explicitTotal = nodeTotals[name];
+        const count = explicitTotal && explicitTotal > 0 ? explicitTotal : Math.max(incoming, outgoing);
+        return { name, count };
+      });
 
     return {
       tooltip: {
@@ -2498,8 +2531,8 @@ export class UnifiedAiopsCommandCentreService {
         type: 'sankey',
         data: nodes,
         links,
-        left: 8,
-        right: 24,
+        left: 28,
+        right: 48,
         top: 12,
         bottom: 12,
         nodeWidth: 10,
@@ -2513,7 +2546,11 @@ export class UnifiedAiopsCommandCentreService {
         },
         label: {
           color: '#1f2a34',
-          fontSize: 12
+          fontSize: 12,
+          formatter: (params: any) => {
+            const count = params?.data?.count;
+            return count ? `${params.name}  ${this.formatNumber(count)}` : params.name;
+          }
         }
       } as any]
     };
@@ -2864,6 +2901,21 @@ export class UnifiedAiopsCommandCentreService {
     }
     if (criteria?.availabilityTimeRange) {
       params = params.set('time_range', criteria.availabilityTimeRange);
+    }
+    if (criteria?.deviceTypes?.length) {
+      params = params.set('device_types', this.getCsvValue(criteria.deviceTypes));
+    }
+    if (criteria?.viewBy) {
+      params = params.set('view_by', criteria.viewBy);
+    }
+    if (criteria?.duration) {
+      params = params.set('duration', criteria.duration);
+    }
+    if (criteria?.startDate) {
+      params = params.set('start_date', criteria.startDate);
+    }
+    if (criteria?.endDate) {
+      params = params.set('end_date', criteria.endDate);
     }
     return params;
   }

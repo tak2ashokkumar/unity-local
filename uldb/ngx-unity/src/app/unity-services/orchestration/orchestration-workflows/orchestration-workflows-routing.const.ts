@@ -160,7 +160,25 @@ export const ORCHESTRATION_WORKFLOW_CRUD_ROUTES: Routes = [
         },
     },
     {
+        path: 'orchestration/workflows/agentic-workflow/view',
+        component: OrchestrationAgenticWorkflowContainerComponent,
+        data: {
+            breadcrumb: {
+                title: 'Workflow',
+            },
+        },
+    },
+    {
         path: 'orchestration/workflows/agentic-workflow/:id/edit',
+        component: OrchestrationAgenticWorkflowContainerComponent,
+        data: {
+            breadcrumb: {
+                title: 'Workflow',
+            },
+        },
+    },
+    {
+        path: 'orchestration/workflows/agentic-workflow/:id/view',
         component: OrchestrationAgenticWorkflowContainerComponent,
         data: {
             breadcrumb: {

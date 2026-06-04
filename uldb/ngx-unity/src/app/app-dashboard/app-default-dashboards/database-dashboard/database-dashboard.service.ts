@@ -1,42 +1,11 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { color, EChartsOption } from 'echarts';
+import { EChartsOption } from 'echarts';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { DatabaseServersService } from 'src/app/united-cloud/shared/database-servers/database-servers.service';
-import { DatabaseServer } from 'src/app/united-cloud/shared/entities/database-servers.type';
 import {
-  ALERTS_RESP,
-  CAPACITY_RESP,
-  DATABASE_DASHBOARD_ACTIVE_SESSIONS,
   DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG,
-  DATABASE_DASHBOARD_ALL_SELECTED_VALUE,
-  DATABASE_DASHBOARD_CACHE_HIT_RATIO,
-  DATABASE_DASHBOARD_CAPACITY_METRICS,
-  DATABASE_DASHBOARD_CLOUD_TYPE_DISTRIBUTION,
-  DATABASE_DASHBOARD_CRITICAL_ALERTS,
-  DATABASE_DASHBOARD_DATABASE_OPTIONS,
-  DATABASE_DASHBOARD_DB_SIZE_BY_SERVER,
-  DATABASE_DASHBOARD_DISK_UTILIZATION,
-  DATABASE_DASHBOARD_ENVIRONMENT_COUNTS,
-  DATABASE_DASHBOARD_ERROR_RATE,
-  DATABASE_DASHBOARD_HEALTH_GROUPS,
-  DATABASE_DASHBOARD_LOG_GROWTH_RATE,
-  DATABASE_DASHBOARD_LOG_SIZE_BY_SERVER,
-  DATABASE_DASHBOARD_PLATFORM_COUNTS,
-  DATABASE_DASHBOARD_QUERY_LATENCY,
-  DATABASE_DASHBOARD_QUERY_RESPONSE,
-  DATABASE_DASHBOARD_STORAGE_ROWS,
-  DATABASE_DASHBOARD_SUMMARY_METRICS,
-  DATABASE_DASHBOARD_TABLESPACE_USAGE,
-  DATABASE_DASHBOARD_TAGS,
-  DATABASE_DASHBOARD_UTILIZATION_ROWS,
-  DATABASE_DASHBOARD_VERSIONS,
   DBDASHBOARDCOLORS,
-  HEALTHGROWTH_RESP,
-  INVENTORY_RESP,
-  TOPQUERY_RESP,
   TOPUTIL_RESP
 } from './database-dashboard.const';
 import {
@@ -48,12 +17,8 @@ import {
   DatabaseDashboardDonutItem,
   DatabaseDashboardFilterCriteria,
   DatabaseDashboardFilterOption,
-  DbDashboardHealthGroup,
   DatabaseDashboardMetric,
-  DatabaseDashboardStorageRow,
   DatabaseDashboardTagItem,
-  DatabaseDashboardUtilizationRow,
-  DatabaseDashboardUtilizationViewRow,
   DatabaseDashboardVersionItem,
   InventoryWidgetType,
   DatabaseDashboardTopCriticalAlertsSummary,
@@ -83,13 +48,14 @@ import {
   DBDashboardTopServersViewData,
   DBDashboardTopServersType,
   DBDashboardTopTableSpaceUsageType,
-  DBDashboardTopTableSpaceUsageViewData,
   DBDashboardDiskUtilizationType,
   DBDashboardLogSizeByServerType,
   DBDashboardDbSizeByServerType,
   DBDashboardLogGrowthRateType,
   DBDashboardArchiveLogGrowthTrendType,
-  DBDashboardStroageGrowthTrendType
+  DBDashboardStroageGrowthTrendType,
+  DatabaseDashboardHeaderInfoResponse,
+  top10UtilizationTrendItem
 } from './database-dashboard.type';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
@@ -99,6 +65,17 @@ export class DatabaseDashboardService {
   constructor(private builder: FormBuilder,
     private databaseServersService: DatabaseServersService,
     private http: HttpClient) { }
+
+
+  /*
+   * -----Start----- Sub header Related -------------------
+   */
+  getHeaderInfo(): Observable<DatabaseDashboardHeaderInfoResponse> {
+    return this.http.get<DatabaseDashboardHeaderInfoResponse>('/customer/persona/database-dashboard/refresh-time/');
+  }
+  /*
+   * ******End ****** Sub header Related ********************
+   */
 
   /*
    * -----Start----- Filters Related -------------------
@@ -110,52 +87,54 @@ export class DatabaseDashboardService {
   }
 
   getDatabases(): Observable<DatabaseDashboardFilterOption[]> {
-    const criteria: SearchCriteria = {
-      sortColumn: '',
-      sortDirection: '',
-      searchValue: '',
-      pageNo: 1,
-      pageSize: PAGE_SIZES.ZERO
-    };
+    // const criteria: SearchCriteria = {
+    //   sortColumn: '',
+    //   sortDirection: '',
+    //   searchValue: '',
+    //   pageNo: 1,
+    //   pageSize: PAGE_SIZES.ZERO
+    // };
 
-    return this.databaseServersService.getAllDBServers(criteria).pipe(
-      map(databases => this.getDatabaseFilterOptions(databases))
-    );
+    // return this.databaseServersService.getAllDBServers(criteria).pipe(
+    //   map(databases => this.getDatabaseFilterOptions(databases))
+    // );
+    return this.http.get<any>('/customer/database_servers_fast/');
   }
 
-  getFallbackDatabases(): DatabaseDashboardFilterOption[] {
-    return this.getDatabaseFilterOptions([]);
-  }
+  // getFallbackDatabases(): DatabaseDashboardFilterOption[] {
+  //   return this.getDatabaseFilterOptions([]);
+  // }
 
-  private getDatabaseFilterOptions(servers: DatabaseServer[] | { results?: DatabaseServer[] }): DatabaseDashboardFilterOption[] {
-    const options = new Map<string, DatabaseDashboardFilterOption>();
-    const databaseServers = Array.isArray(servers) ? servers : servers?.results || [];
+  // private getDatabaseFilterOptions(servers: DatabaseServer[] | { results?: DatabaseServer[] }): DatabaseDashboardFilterOption[] {
+  //   const options = new Map<string, DatabaseDashboardFilterOption>();
+  //   const databaseServers = Array.isArray(servers) ? servers : servers?.results || [];
 
-    databaseServers.forEach((server, index) => {
-      const value = server.uuid || server.id?.toString() || `database-${index}`;
-      const label = server.db_instance_name
-        || server.database_name
-        || server.device_object?.name
-        || server.db_type?.name
-        || value;
+  //   databaseServers.forEach((server, index) => {
+  //     const value = server.uuid;
+  //     const label = server.db_instance_name || server.database_name
 
-      if (value && label && !options.has(value)) {
-        options.set(value, { value, label });
-      }
-    });
+  //     if (value && label && !options.has(value)) {
+  //       options.set(value, { value, label });
+  //     }
+  //   });
+    
+  //   console.log("database options, ", JSON.parse(JSON.stringify(options)));
 
-    // console.log("database options, ", JSON.parse(JSON.stringify(options)));
+  //   return options.size ? Array.from(options.values()) : []
+  //     // : DATABASE_DASHBOARD_DATABASE_OPTIONS.filter(option => option.value !== DATABASE_DASHBOARD_ALL_SELECTED_VALUE);
+  // }
 
-    return options.size
-      ? Array.from(options.values())
-      : DATABASE_DASHBOARD_DATABASE_OPTIONS.filter(option => option.value !== DATABASE_DASHBOARD_ALL_SELECTED_VALUE);
-  }
-
-  private convertFiltersToApiParams(criteria?: DatabaseDashboardFilterCriteria): HttpParams {
-    // console.log("criteria", JSON.parse(JSON.stringify(criteria)));
+  private convertFiltersToApiParams(criteria?: DatabaseDashboardFilterCriteria, sortColumn?: string, sortDirection?: string): HttpParams {
+    console.log("criteria", JSON.parse(JSON.stringify(criteria)), sortColumn, sortDirection);
     let params: HttpParams = new HttpParams();
     params = this.appendMultiValueParam(params, 'database', criteria?.databases);
-    // console.log("params", JSON.parse(JSON.stringify(params)));
+    if (sortColumn) {
+      params = params.append('sort_by', sortColumn);
+    }
+    if (sortDirection) {
+      params = params.append('sort_order', sortDirection);
+    }
+    console.log("params", JSON.parse(JSON.stringify(params)));
     return params;
   }
 
@@ -167,7 +146,6 @@ export class DatabaseDashboardService {
     });
     return params;
   }
-
   /*
    * ******End ****** Filters Related ********************
    */
@@ -175,7 +153,6 @@ export class DatabaseDashboardService {
   /*
    * -----Start----- Database Estate / Inventory Overview Widget Related -------------------
    */
-
   getInventoryOverviewWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<InventoryWidgetType> {
     // return of(INVENTORY_RESP)
     return this.http.get<InventoryWidgetType>('/customer/persona/database-dashboard/inventory-overview/', {
@@ -468,54 +445,55 @@ export class DatabaseDashboardService {
    * -----Start----- Performance / Workload Insights Widget Related -------------------
    */
 
-  getWorkloadInsightsTop10UtilizationViewData(criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardTop10Utilization[]> {
+  getWorkloadInsightsTop10UtilizationViewData(criteria?: DatabaseDashboardFilterCriteria, sortColumn?: string, sortDirection?: string): Observable<DatabaseDashboardTop10Utilization[]> {
     // return of(TOPUTIL_RESP)
     return this.http.get<DatabaseDashboardTop10Utilization[]>('/customer/persona/database-dashboard/workload-insights/', {
-      params: this.convertFiltersToApiParams(criteria)
+      params: this.convertFiltersToApiParams(criteria, sortColumn, sortDirection)
     });
   }
 
   convertToUtilizationRowsViewData(data: DatabaseDashboardTop10Utilization[]): DatabaseDashboardTop10UtilizationViewData[] {
     if (!data || data?.length == 0) { return; }
     let viewData: DatabaseDashboardTop10UtilizationViewData[] = [];
+    const diskIopsValues = data.map(row => Number(row.disk_read_ops || 0) + Number(row.disk_write_ops || 0));
+    const diskIopsTotal = Math.max(...diskIopsValues);
+
     data.forEach(row => {
       let view = new DatabaseDashboardTop10UtilizationViewData();
+      view.hostUUID = row.host_uuid ? row.host_uuid : null;
       view.dbUUID = row.db_uuid ? row.db_uuid : null;
       view.name = row.name;
-      // view.cpuSeries = row.cpuSeries;
-      // view.cpuChartOptions = this.getSparklineOptions(row.cpuSeries, '#5d8df5', 'rgba(93, 141, 245, 0.28)'),
-      view.cpuUtilizationPercent = row.cpu_usage_system_percent;
+
+      view.cpuChartOptions = this.getSparklineOptions(row.cpu_trend, '#5d8df5', 'rgba(93, 141, 245, 0.28)'),
+      view.cpuUtilizationPercent = Number(row.cpu_usage_system_percent.toFixed(0));
       view.cpuTone = this.getToneType(row.cpu_usage_system_percent);
-      // view.memorySeries = row.memorySeries;
-      // view.memoryChartOptions = this.getSparklineOptions(row.memorySeries, '#6aa544', 'rgba(106, 165, 68, 0.28)'),
-      view.memoryUtilizationPercent = row.memory_used_percent;
+
+      view.memoryChartOptions = this.getSparklineOptions(row.memory_trend, '#6aa544', 'rgba(106, 165, 68, 0.28)'),
+      view.memoryUtilizationPercent = Number(row.memory_used_percent.toFixed(0));
       view.memoryTone = this.getToneType(row.memory_used_percent);
 
-      view.storageFreePercent = row.stroage_free_percent;
-      view.storageCapacityGB = row.stroage_capacity;
-      view.storageUsedGB = row.stroage_used;
-      view.storageUsedPercent = Math.ceil(100 - row.stroage_free_percent);
-      view.storageTone = this.getToneType(view.storageUsedPercent);
+      view.diskCapacityGB = row.disk_capacity;
+      view.diskUsedGB = row.disk_used;
+      view.diskFreePercent = Number(row.disk_usage_percent.toFixed(0));
+      view.diskUsedPercent = Math.ceil(100 - row.disk_usage_percent);
+      view.diskTone = this.getToneType(view.diskUsedPercent);
 
-      view.diskIops = row.disk_usage_percent;
-      view.diskIopsTone = this.getToneType(row.disk_usage_percent);
+      view.diskRops = Number(row.disk_read_ops.toFixed(0));
+      view.diskWops = Number(row.disk_read_ops.toFixed(0));
+      const diskIops = view.diskRops + view.diskWops;
+      view.diskIops = Number(diskIops.toFixed(0));
+      view.diskIopsPercent = diskIopsTotal ? Math.round((diskIops / diskIopsTotal) * 100) : 0;
+      view.diskIopsTone = this.getToneType(view.diskIopsPercent);
 
       view.uptime = this.formatSeconds(row.system_uptime_seconds);
-
-      // view.cpuUsagePct = row['CPU Usage (System %)'];
-      // view.memoryUsagePct = row['Memory Used (%)'];
-      // view.diskUsagePct = row['Disk Usage (%)'];
-      // view.diskReadOps = row['Disk Read Ops'];
-      // view.diskWriteOps = row['Disk Write Ops'];
-      // view.uptime = row['System Uptime (seconds)'];
 
       viewData.push(view)
     });
     return (viewData);
-    // return (data || []).map(row => this.convertToUtilizationViewRow(viewData));
   }
 
-  private getSparklineOptions(data: number[], lineColor: string, areaColor: string): EChartsOption {
+  private getSparklineOptions(data: top10UtilizationTrendItem[], lineColor: string, areaColor: string): EChartsOption {
+    // const xAxisData = data?.map((item: top10UtilizationTrendItem) => item.ts) || [];
     return {
       animation: false,
       grid: { top: 2, right: 1, bottom: 2, left: 1 },
@@ -533,8 +511,8 @@ export class DatabaseDashboardService {
       },
       series: [
         {
-          type: 'line',
-          data: data,
+          type: 'line',        
+          data: data.map(item => item.value),
           symbol: 'none',
           smooth: false,
           lineStyle: { width: 1.5, color: lineColor },

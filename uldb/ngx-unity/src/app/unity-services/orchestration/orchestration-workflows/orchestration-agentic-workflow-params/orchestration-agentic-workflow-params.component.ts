@@ -310,6 +310,8 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
     { label: 'DESC', value: 'desc' }
   ];
 
+  isViewMode;
+
   constructor(
     public bsModalRef: BsModalRef,
     private fb: FormBuilder,

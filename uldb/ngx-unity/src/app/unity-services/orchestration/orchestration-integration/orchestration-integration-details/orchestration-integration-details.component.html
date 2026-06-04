@@ -166,14 +166,16 @@
                                         (click)="viewDetails(view)" [disabled]="view.type == 'Default'" [ngClass]="{
                                             'action-icons-disabled': view.type == 'Default', 
                                             'action-icons-enabled': view.type != 'Default'
-                                          }">
+                                          }" accessControl moduleName="DevOps Automation" accessType="View Scripts"
+                                        elementType="actionbtn">
                                     </button>
                                     <button class="action-icons mb-0 fas fa-copy font-sm ml-1" tooltip="Clone"
                                         (click)="cloneScript(view.name,view.uuid)" [disabled]="view.type == 'Default'"
                                         [ngClass]="{
                                             'action-icons-disabled': view.type == 'Default', 
                                             'action-icons-enabled': view.type != 'Default'
-                                          }">
+                                          }" accessControl moduleName="DevOps Automation" accessType="Manage Scripts"
+                                        elementType="actionbtn">
                                     </button>
                                     <button class="action-icons mb-0 fas fa-clipboard-list font-sm ml-1"
                                         tooltip="Activity Logs" (click)="goToActivityLogs(view)"
@@ -200,13 +202,15 @@
                                                 [disabled]="view.type == 'Default'" [ngClass]="{
                                                     'action-icons-disabled': view.type == 'Default', 
                                                     'action-icons-enabled': view.type != 'Default'
-                                                  }"></button>
+                                                  }" accessControl moduleName="DevOps Automation"
+                                                accessType="Manage Scripts" elementType="actionbtn"></button>
                                             <button class="action-icons mt-1 mb-2 far fa-trash-alt font-sm"
                                                 (click)="deleteScript(view.uuid)" [tooltip]="'Delete'" container="body"
                                                 [disabled]="view.type == 'Default'" [ngClass]="{
                                                     'action-icons-disabled': view.type == 'Default', 
                                                     'action-icons-enabled': view.type != 'Default'
-                                                  }"></button>
+                                                  }" accessControl moduleName="DevOps Automation"
+                                                accessType="Manage Scripts" elementType="actionbtn"></button>
                                             <button class="action-icons fas fa-download mt-1 mb-2" tooltip="Download"
                                                 container="body" (click)="downloadScript(view.uuid)"
                                                 [disabled]="view.type == 'Default'" [ngClass]="{

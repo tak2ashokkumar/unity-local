@@ -1319,10 +1319,33 @@
 
 .alerts-filter-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 6px;
+  align-items: flex-end;
+  gap: 8px;
   padding: 8px 12px;
   border-bottom: 1px solid #d8dee3;
+
+  .mini-filter {
+    min-width: 150px;
+  }
+
+  ::ng-deep custom-date-dropdown {
+
+    .dropdown,
+    .dropbtn {
+      width: 100%;
+    }
+
+    .dropbtn.form-control {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+  }
 }
 
 .alert-metric-row {
@@ -1342,8 +1365,22 @@
   padding: 0 24px 18px 20px;
 }
 
+.sankey-panel {
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
 .sankey-chart {
   height: 250px;
+}
+
+.sankey-empty {
+  flex: 1 1 auto;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .orphaned-widgets-grid,

@@ -15,11 +15,11 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
-import { DEVICE_OPTIONS, DEVICE_TYPE_MAP, PLATFORM_OPTIONS } from './private-cloud-compute-dashboard.const';
+import { DEVICE_OPTIONS, DEVICE_TYPE_MAP, PLATFORM_OPTIONS, privateCloudTabItems } from './private-cloud-compute-dashboard.const';
 import { CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DevicesRowViewData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceList, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, SwapBalloonMemoryWidgetData, Top10ClustersByVMsWidgetData, TopCriticalAlertsViewData, VmDensityHost } from './private-cloud-compute-dashboard.service';
-import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, PrivateCloudUtilizationViewRow, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
+import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
 
-type UtilizationSortKey = 'name' | 'cpu' | 'memory' | 'storage' | 'diskIops' | 'upTime';
+type UtilizationSortKey = 'cpuUtilization' | 'memoryUtilization' | 'storageUtilization' | 'diskOps' | 'uptime';
 type SortDirection = 'asc' | 'desc';
 
 @Component({
@@ -34,7 +34,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   private readonly platformRouteOptions = PLATFORM_OPTIONS;
   private readonly deviceRouteOptions = DEVICE_OPTIONS;
   private readonly deviceTypeMap = DEVICE_TYPE_MAP;
-  private utilizationSourceRows: any[] = [];
+  private readonly privateCloudVmRouteOptions = privateCloudTabItems;
   readonly compactBarLabelThreshold = 10;
 
   filterForm: FormGroup;
@@ -105,13 +105,13 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   performanceHotspotWidgetData: PerformanceHotspotWidgetData = new PerformanceHotspotWidgetData();
   utilizationRows: PrivateCloudUtilization = new PrivateCloudUtilization()
   utilizationSortOptions: { value: UtilizationSortKey; label: string }[] = [
-    { value: 'cpu', label: 'CPU Utilization' },
-    { value: 'memory', label: 'Memory Utilization' },
-    { value: 'storage', label: 'Storage Utilization' },
-    { value: 'diskIops', label: 'Disk IOPS' },
-    { value: 'upTime', label: 'Up Time' }
+    { value: 'cpuUtilization', label: 'CPU Utilization' },
+    { value: 'memoryUtilization', label: 'Memory Utilization' },
+    { value: 'storageUtilization', label: 'Storage Utilization' },
+    { value: 'diskOps', label: 'Disk IOPS' },
+    { value: 'uptime', label: 'Up Time' }
   ];
-  selectedUtilizationSort: UtilizationSortKey = 'cpu';
+  selectedUtilizationSort: UtilizationSortKey = 'cpuUtilization';
   utilizationSortDirection: SortDirection = 'desc';
 
   idleDevicesRow: IdleDevicesViewData = new IdleDevicesViewData()
@@ -444,19 +444,17 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   getPerformanceHotspotWidgetData() {
     this.utilizationRows.utilRow = [];
-    this.utilizationSourceRows = [];
     this.spinner.start(this.loaderNames.performanceHotspot);
-    this.svc.getUtilizationRows(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.spinner.stop(this.loaderNames.performanceHotspot);
-      this.utilizationRows = this.svc.convertToUtilizationViewData(res);
-      this.utilizationSourceRows = [...(this.utilizationRows.utilRow || [])];
-      this.applyUtilizationSort();
-    }, () => {
-      this.utilizationRows.utilRow = [];
-      this.utilizationSourceRows = [];
-      this.spinner.stop(this.loaderNames.performanceHotspot);
-      this.notification.error(new Notification('Failed to get Performance Hotspot data. Try again later'));
-    });
+    this.svc.getUtilizationRows(this.filterForm.getRawValue(), this.getUtilizationOrdering())
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        this.spinner.stop(this.loaderNames.performanceHotspot);
+        this.utilizationRows = this.svc.convertToUtilizationViewData(res);
+      }, () => {
+        this.utilizationRows.utilRow = [];
+        this.spinner.stop(this.loaderNames.performanceHotspot);
+        this.notification.error(new Notification('Failed to get Performance Hotspot data. Try again later'));
+      });
   }
 
   getIdleDevicesData() {
@@ -599,11 +597,15 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   }
 
   openOrphanedDeviceDetails(device: OrphanedDeviceList) {
-    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid);
+    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid, device?.vmSubType);
   }
 
   openIdleDeviceDetails(device: DevicesRowViewData) {
-    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid);
+    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid, device?.vmSubType);
+  }
+
+  openUtilizationDeviceDetails(device: { deviceType: string; uuid: string; vmSubType?: string }) {
+    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid, device?.vmSubType);
   }
 
   private getMappedOrphanedDeviceType(deviceType: string): string | undefined {
@@ -611,15 +613,43 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     return Object.entries(this.deviceTypeMap).find(([key]) => key.trim() === trimmedDeviceType)?.[1];
   }
 
-  private openDeviceDetailsInNewTab(deviceType: string, uuid: string) {
+  private getVmSubTypeRoute(vmSubType?: string): string | undefined {
+    const trimmedVmSubType = (vmSubType || '').trim();
+    const directMatch = this.privateCloudVmRouteOptions.find(option => option.name.trim() === trimmedVmSubType)?.url;
+
+    if (directMatch) {
+      return directMatch;
+    }
+
+    switch (trimmedVmSubType) {
+      case 'vCloud Director':
+        return 'vcloud';
+      case 'Hyperv':
+        return 'hyperv';
+      case 'G3KVM':
+        return 'g3kvm';
+      default:
+        return undefined;
+    }
+  }
+
+  private openDeviceDetailsInNewTab(deviceType: string, uuid: string, vmSubType?: string) {
     const devicePath = this.getMappedOrphanedDeviceType(deviceType);
 
     if (!devicePath || !uuid) {
       return;
     }
 
+    const vmSubTypeRoute = deviceType === 'Virtual Machine'
+      ? this.getVmSubTypeRoute(vmSubType)
+      : undefined;
+
+    const detailsPath = vmSubTypeRoute
+      ? `/unitycloud/devices/${devicePath}/${vmSubTypeRoute}/${uuid}/zbx/details`
+      : `/unitycloud/devices/${devicePath}/${uuid}/zbx/details`;
+
     const routeUrl = this.router.serializeUrl(
-      this.router.parseUrl(`/unitycloud/devices/${devicePath}/${uuid}/zbx/details`)
+      this.router.parseUrl(detailsPath)
     );
     const externalUrl = this.location.prepareExternalUrl(routeUrl);
     window.open(externalUrl, '_blank', 'noopener');
@@ -693,20 +723,22 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     const nextSortKey = sortKey as UtilizationSortKey;
 
     if (this.selectedUtilizationSort !== nextSortKey) {
-      this.utilizationSortDirection = nextSortKey === 'name' ? 'asc' : 'desc';
+      this.utilizationSortDirection = 'desc';
     }
 
     this.selectedUtilizationSort = nextSortKey;
-    this.applyUtilizationSort();
+    this.getPerformanceHotspotWidgetData();
   }
 
   onUtilizationHeaderSort(sortKey: UtilizationSortKey) {
-    if (this.selectedUtilizationSort !== sortKey) {
-      return;
+    if (this.selectedUtilizationSort === sortKey) {
+      this.utilizationSortDirection = this.utilizationSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.selectedUtilizationSort = sortKey;
+      this.utilizationSortDirection = 'desc';
     }
 
-    this.utilizationSortDirection = this.utilizationSortDirection === 'asc' ? 'desc' : 'asc';
-    this.applyUtilizationSort();
+    this.getPerformanceHotspotWidgetData();
   }
 
   applyFilters() {
@@ -759,77 +791,9 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     window.open(externalUrl, '_blank', 'noopener');
   }
 
-  private applyUtilizationSort() {
-    const rows = [...(this.utilizationSourceRows || [])];
-
-    rows.sort((left, right) => {
-      const leftValue = this.getUtilizationSortValue(left, this.selectedUtilizationSort);
-      const rightValue = this.getUtilizationSortValue(right, this.selectedUtilizationSort);
-
-      let result = 0;
-
-      if (typeof leftValue === 'string' && typeof rightValue === 'string') {
-        result = leftValue.localeCompare(rightValue);
-      } else {
-        result = Number(leftValue) - Number(rightValue);
-      }
-
-      return this.utilizationSortDirection === 'asc' ? result : -result;
-    });
-
-    this.utilizationRows.utilRow = rows;
-  }
-
-  private getUtilizationSortValue(row: PrivateCloudUtilizationViewRow, sortKey: UtilizationSortKey): number | string {
-    switch (sortKey) {
-      case 'name':
-        return row.name || '';
-      case 'cpu':
-        return row.cpuStatus ?? 0;
-      case 'memory':
-        return row.memoryStatus ?? 0;
-      case 'storage':
-        return row.storage?.percent ?? 0;
-      case 'diskIops':
-        return row.diskIops?.value ?? 0;
-      case 'upTime':
-        return this.getUptimeSortValue(row.upTime);
-      default:
-        return 0;
-    }
-  }
-
-  private getUptimeSortValue(upTime: string): number {
-    const normalizedValue = (upTime || '').trim().toLowerCase();
-    const matches = normalizedValue.match(/(\d+(?:\.\d+)?)([dhms])/g);
-
-    if (!matches?.length) {
-      return 0;
-    }
-
-    return matches.reduce((total, match) => {
-      const parsedMatch = match.match(/(\d+(?:\.\d+)?)([dhms])/);
-
-      if (!parsedMatch) {
-        return total;
-      }
-
-      const value = Number(parsedMatch[1]);
-      const unit = parsedMatch[2];
-
-      switch (unit) {
-        case 'd':
-          return total + value * 24 * 60 * 60;
-        case 'h':
-          return total + value * 60 * 60;
-        case 'm':
-          return total + value * 60;
-        case 's':
-          return total + value;
-        default:
-          return total;
-      }
-    }, 0);
+  private getUtilizationOrdering(): string {
+    const sortKey = this.selectedUtilizationSort;
+    return this.utilizationSortDirection === 'asc' ? sortKey : `-${sortKey}`;
   }
 
   private getPlatformRouteOption(cloudType: string): labelAndValueType | undefined {

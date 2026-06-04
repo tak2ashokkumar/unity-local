@@ -7,6 +7,11 @@ export interface UnifiedAiopsFilterOption {
   label: string;
 }
 
+export interface UnifiedAiopsAlertsDateRange {
+  from: string;
+  to: string;
+}
+
 export interface UnifiedAiopsCloudFilterOption extends UnifiedAiopsFilterOption {
   category: 'private' | 'public';
 }
@@ -16,6 +21,21 @@ export interface UnifiedAiopsDashboardFilterCriteria {
   clouds: string[];
   availabilityMonitor?: string;
   availabilityTimeRange?: string;
+  deviceTypes?: string[];
+  viewBy?: string;
+  duration?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface UnifiedAiopsViewByOption {
+  name: string;
+  key: string;
+}
+
+export interface UnifiedAiopsDeviceTypeOption {
+  type: string;
+  key: string;
 }
 
 export interface UnifiedAiopsMetric {

@@ -2,9 +2,16 @@ import { EChartsOption } from 'echarts';
 
 export type DatabaseDashboardTone = 'primary' | 'success' | 'warning' | 'danger' | 'muted';
 
+export interface DatabaseDashboardHeaderInfoResponse {
+  refresh_time: string;
+}
+
 export interface DatabaseDashboardFilterOption {
-  value: string;
-  label: string;
+  // value: string;
+  // label: string;
+  uuid: string;
+  id: number;
+  name: string;
 }
 
 export interface DatabaseDashboardFilterCriteria {
@@ -160,23 +167,32 @@ export interface InventoryWidgetByVersion {
 //performance workload
 export interface DatabaseDashboardTop10Utilization {
   host_id: number;
+  host_uuid: string;
   db_uuid: string;
   name: string;
   cpu_usage_system_percent: number;
-  cpu_usage_user_percent: number;
   memory_used_percent: number;
-  stroage_used: number;
-  stroage_capacity: string;
-  stroage_free_percent: number;
+  disk_capacity: string;
+  disk_used: number;
   disk_usage_percent: number;
   disk_read_ops: number;
   disk_write_ops: number;
+  disk_iops: number;
+  disk_iops_percent: number;
   system_uptime_seconds: number;
+  cpu_trend: top10UtilizationTrendItem[];
+  memory_trend: top10UtilizationTrendItem[];
+}
+
+export interface top10UtilizationTrendItem {
+    ts: number;
+    value: number;
 }
 
 export class DatabaseDashboardTop10UtilizationViewData {
   constructor() { }
   hostId: number;
+  hostUUID: string;
   dbUUID: string;
   name: string;
   cpuChartOptions?: EChartsOption;
@@ -185,12 +201,15 @@ export class DatabaseDashboardTop10UtilizationViewData {
   memoryChartOptions?: EChartsOption;
   memoryUtilizationPercent: number;
   memoryTone: string;
-  storageCapacityGB: string;
-  storageUsedGB: number;
-  storageUsedPercent: number;
-  storageFreePercent: number;
-  storageTone: string;
+  diskCapacityGB: string;
+  diskUsedGB: number;
+  diskUsedPercent: number;
+  diskFreePercent: number;
+  diskTone: string;
+  diskRops: number;
+  diskWops: number;
   diskIops: number;
+  diskIopsPercent: number;
   diskIopsTone: string;
   uptime: string;
 }

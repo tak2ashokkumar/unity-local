@@ -74,6 +74,8 @@ export class NetworkAgentConditionsComponent implements OnInit, OnDestroy {
   alertEventsEle: any;
   @ViewChild('alertEventsElem', { static: true }) alertEventsElem: ElementRef;
 
+  accessType = 'Manage AIML Event Management';
+
   constructor(
     private conditionSvc: NetworkAgentConditionsService,
     private conditionDetailSvc: AimlConditionDetailsService,
@@ -95,6 +97,11 @@ export class NetworkAgentConditionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    if(this.storage.getByKey('user', StorageType.SESSIONSTORAGE)?.org?.name.toLowerCase() === 'playground'){
+      this.accessType = 'View AIML Event Management';
+    } else {
+      this.accessType = 'Manage AIML Event Management';
+    }
     this.spinner.start('main');
     this.getConditions();
     this.getConditionsSummary();

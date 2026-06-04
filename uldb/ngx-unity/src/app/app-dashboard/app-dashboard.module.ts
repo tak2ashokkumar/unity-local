@@ -40,6 +40,7 @@ import { UnifiedAiopsCommandCentreComponent } from './app-default-dashboards/uni
 import { AppPersonaDashboardCrudComponent } from './app-persona-dashboards/app-persona-dashboard-crud/app-persona-dashboard-crud.component';
 import { AppPersonaDashboardViewComponent } from './app-persona-dashboards/app-persona-dashboard-view/app-persona-dashboard-view.component';
 import { AppPersonaDashboardsComponent } from './app-persona-dashboards/app-persona-dashboards.component';
+import { BankOfAnthosApplicationDashboardComponent } from './app-default-dashboards/application-overview-dashboard/bank-of-anthos-application-dashboard/bank-of-anthos-application-dashboard.component';
 // import { DashboardMapWidgetComponent } from '../app-home/dashboard-map-widget/dashboard-map-widget.component';
 
 export const MY_NATIVE_FORMATS = {
@@ -65,6 +66,7 @@ export const MY_NATIVE_FORMATS = {
     InterfaceDetailsDashboardComponent,
     ApplicationOverviewDashboardComponent,
     AstronomyShopApplicationDashboardComponent,
+    BankOfAnthosApplicationDashboardComponent,
     EasyTradeApplicationDashboardComponent,
     ExecutiveAiBusinessSummaryComponent,
     PrivateCloudComputeDashboardComponent,

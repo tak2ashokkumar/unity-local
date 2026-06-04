@@ -247,8 +247,8 @@
                                     <i class="fas fa-check text-success icon" *ngIf="connectionResult"></i>
                                 </span>
                                 <div class="input-group-append">
-                                    <button class="btn btn-outline-primary" type="button"
-                                        (click)="testConnection()">Test Connection</button>
+                                    <button class="btn btn-outline-primary" type="button" (click)="testConnection()"
+                                        [disabled]="isViewMode">Test Connection</button>
                                 </div>
                             </div>
                             <div class="col-8" *ngIf="form.get('connection').value">
@@ -840,8 +840,8 @@
                 </form>
                 <div class="d-flex justify-content-center">
                     <button class="btn btn-md btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
-                    <button class="btn btn-md btn-success ml-2" type="button"
-                        (click)="confirmTaskCreate()">Submit</button>
+                    <button class="btn btn-md btn-success ml-2" type="button" (click)="confirmTaskCreate()"
+                        [disabled]="isViewMode">Submit</button>
                 </div>
             </div>
         </div>

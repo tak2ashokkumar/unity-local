@@ -24,6 +24,9 @@ export interface WSOption {
     tab_type?: string;
     collector_uuid?: string;
     user_id?: string;
+    connection_type?: string;
+    transport?: string;
+    shell?: string;   
 }
 
 export class WSSHClient {
@@ -53,7 +56,11 @@ export class WSSHClient {
     }
 
     isShellReady(data: string): boolean {
-        return data.includes('$') || data.includes('#');
+        const isLinux = data.includes('$') || data.includes('#');
+        const isCmd = data.includes('>') && /[A-Za-z]:\\/.test(data);
+        const isPowershell = data.includes('PS ') && data.includes('>');
+        const isWinRM = data.includes('>');
+        return isLinux || isCmd || isPowershell || isWinRM;
     }
 
     getHostUrl(): string {
@@ -145,7 +152,10 @@ export class WSSHClient {
             collector_uuid: this.wsOptions.collector_uuid,
             tab_type: this.wsOptions['tab_type'],
             org_id: this.wsOptions.org_id,
-            user_id: this.wsOptions.user_id
+            user_id: this.wsOptions.user_id,
+            connection_type: this.wsOptions.connection_type,
+            transport: this.wsOptions.transport,
+            shell: this.wsOptions.shell,
         }));
     }
 

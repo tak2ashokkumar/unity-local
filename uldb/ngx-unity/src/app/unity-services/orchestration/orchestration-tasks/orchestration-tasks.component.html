@@ -240,6 +240,9 @@
                       moduleName="DevOps Automation" accessType="Manage Tasks" elementType="actionbtn"></button>
                   </td> -->
                   <td class="action-icons-column text-right text-truncate p-1 tdw-20">
+                    <button class="action-icons mb-0 fa fa-eye font-sm ml-1" tooltip="View" *ngIf="globalReadOnlyUser"
+                      (click)="goToviewDetails(view)" accessControl moduleName="DevOps Automation"
+                      accessType="View Tasks" elementType="actionbtn"></button>
                     <button class="action-icons mb-0 fas fa-play font-sm ml-1" tooltip="Execute" *ngIf="view.isCreated"
                       [ngClass]="{'action-icons-disabled': !view.isCreated || !view.taskStatus}"
                       [disabled]="!view.isCreated || !view.taskStatus" (click)="executeTask(view)" accessControl

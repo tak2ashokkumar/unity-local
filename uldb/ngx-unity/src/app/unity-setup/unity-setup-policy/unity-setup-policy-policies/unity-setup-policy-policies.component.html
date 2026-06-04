@@ -60,7 +60,8 @@
                             <td class="text-center">{{view.scopeIdentifier}}</td>
                             <td class="text-center">{{view.notificationEnabled}}</td>
                             <td class="tdw-15">
-                                <div class="d-inline-block" style="vertical-align: middle !important">
+                                <div class="d-inline-block" style="vertical-align: middle !important" accessControl
+                                    [moduleName]="'Policy'" [accessType]="'Manage Policy'" elementType="div">
                                     <ul class="d-flex justify-content-center px-0 mb-0">
                                         <li>
                                             <label class="pointer-link" [class.active]="view.isEnabled">
@@ -79,9 +80,11 @@
                             </td>
                             <td class="action-icons-column">
                                 <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
-                                    (click)="editPolicy(view)"></button>
+                                    (click)="editPolicy(view)" accessControl moduleName="Policy"
+                                    accessType="Manage Policy" elementType="actionbtn" container="body"></button>
                                 <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
-                                    (click)="deletePolicy(view.uuid)"></button>
+                                    (click)="deletePolicy(view.uuid)" accessControl moduleName="Policy"
+                                    accessType="Manage Policy" elementType="actionbtn" container="body"></button>
                             </td>
                         </tr>
                     </tbody>

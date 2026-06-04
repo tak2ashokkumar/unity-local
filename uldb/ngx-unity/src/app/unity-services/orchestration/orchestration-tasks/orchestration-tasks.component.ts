@@ -55,6 +55,7 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   catUuid: string;
   scriptChoices = SCRIPT_CHOICES;
   categoryUuid: string
+  globalReadOnlyUser = false;
 
   constructor(
     private router: Router,
@@ -78,6 +79,7 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.spinner.start('main');
+    this.globalReadOnlyUser = this.storage.getByKey('user', StorageType.SESSIONSTORAGE)?.active_rbac_roles?.some(r => r === 'Global Read-Only');
     this.taskCrudCheck();
     this.getListSummary();
     this.getCategoryData();
@@ -424,4 +426,13 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
       this.router.navigate([view.uuid, view.targetType, 'scheduleTasks'], { relativeTo: this.route });
     }
   }
+
+  goToviewDetails(task: TaskViewData) {
+    if (this.categoryUuid) {
+      this.router.navigate(['category', task.uuid, 'view'], { relativeTo: this.route });
+    } else {
+      this.router.navigate([task.uuid, 'view'], { relativeTo: this.route });
+    }
+  }
+
 }

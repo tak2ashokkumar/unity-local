@@ -19,15 +19,15 @@ export const DBDASHBOARDCOLORS = ['#f5a623','#2F8BD7','#5B9E29','#D03533','#26A6
 
 export const DATABASE_DASHBOARD_ALL_SELECTED_VALUE = 'all';
 
-export const DATABASE_DASHBOARD_DATABASE_OPTIONS: DatabaseDashboardFilterOption[] = [
-  { value: DATABASE_DASHBOARD_ALL_SELECTED_VALUE, label: 'All Selected' },
-  { value: 'oracle', label: 'Oracle' },
-  { value: 'mysql', label: 'MySQL' },
-  { value: 'mssql', label: 'MSSQL Server' },
-  { value: 'postgresql', label: 'PostgreSQL' },
-  { value: 'mongodb', label: 'MongoDB' },
-  { value: 'redis', label: 'Redis' }
-];
+// export const DATABASE_DASHBOARD_DATABASE_OPTIONS: DatabaseDashboardFilterOption[] = [
+//   { value: DATABASE_DASHBOARD_ALL_SELECTED_VALUE, label: 'All Selected' },
+//   { value: 'oracle', label: 'Oracle' },
+//   { value: 'mysql', label: 'MySQL' },
+//   { value: 'mssql', label: 'MSSQL Server' },
+//   { value: 'postgresql', label: 'PostgreSQL' },
+//   { value: 'mongodb', label: 'MongoDB' },
+//   { value: 'redis', label: 'Redis' }
+// ];
 
 export const DATABASE_DASHBOARD_SUMMARY_METRICS: DatabaseDashboardMetric[] = [
   { label: 'Total DB instances', key: 'total_databases', value: '128', tone: 'primary' },
@@ -430,35 +430,96 @@ export const TOPUTIL_RESP = [
   //   "Disk Write Ops": 198.3,
   //   "System Uptime (seconds)": 864000
   // },
+
+  // {
+  //   name: 'Cisco 1',
+  //   db_uuid: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+  //   host_id: 1,
+  //   disk_read_ops: 120,
+  //   disk_write_ops: 10012,
+  //   cpu_usage_system_percent: 24,
+  //   cpu_usage_user_percent: 45,
+  //   memory_used_percent: 24,
+  //   stroage_capacity: '256GB',
+  //   stroage_used: 128,
+  //   stroage_free_percent: 50,
+  //   disk_usage_percent: 68,
+  //   system_uptime_seconds: 2645854
+  // },
+  // {
+  //   name: 'Cisco 2',
+  //   db_uuid: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+  //   host_id: 2,
+  //   cpu_usage_system_percent: 80,
+  //   cpu_usage_user_percent: 34,
+  //   memory_used_percent: 50,
+  //   stroage_capacity: '1024GB',
+  //   stroage_used: 400,
+  //   stroage_free_percent: 40,
+  //   disk_usage_percent: 48,
+  //   disk_read_ops: 12000,
+  //   disk_write_ops: 5012,
+  //   system_uptime_seconds: 2645854
+  // },
+
   {
-    name: 'Cisco 1',
-    db_uuid: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
-    host_id: 1,
-    disk_read_ops: 120,
-    disk_write_ops: 10012,
-    cpu_usage_system_percent: 24,
-    cpu_usage_user_percent: 45,
-    memory_used_percent: 24,
-    stroage_capacity: '256GB',
-    stroage_used: 128,
-    stroage_free_percent: 50,
-    disk_usage_percent: 68,
-    system_uptime_seconds: 264585453
+    "host_id": 10084,
+    "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "db_uuid": "f0e1d2c3-b4a5-6789-0abc-def123456789",
+
+    "name": "prod-postgres-01",
+    "cpu_usage_system_percent": 14.73,
+    "memory_used_percent": 67.40,
+
+    "disk_capacity": '1024GB',
+    "disk_used": 400,    
+    "disk_usage_percent": 82.15,
+
+    "disk_read_ops": 120.500,
+    "disk_write_ops": 95.200,
+    "disk_iops": 120.500,
+
+    "system_uptime_seconds": 2592000,
+    "cpu_trend": [
+      { "ts": 1748822400, "value": 12.45 },
+      { "ts": 1748826000, "value": 13.10 },
+      { "ts": 1748829600, "value": 15.02 }
+    ],
+    "memory_trend": [
+      { "ts": 1748822400, "value": 65.30 },
+      { "ts": 1748826000, "value": 66.80 },
+      { "ts": 1748829600, "value": 67.40 }
+    ]
   },
   {
-    name: 'Cisco 2',
-    db_uuid: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
-    host_id: 2,
-    cpu_usage_system_percent: 80,
-    cpu_usage_user_percent: 34,
-    memory_used_percent: 50,
-    stroage_capacity: '1024GB',
-    stroage_used: 400,
-    stroage_free_percent: 40,
-    disk_usage_percent: 48,
-    disk_read_ops: 12000,
-    disk_write_ops: 5012,
-    system_uptime_seconds: 26485453
+    "host_id": 10084,
+    "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "db_uuid": "f0e1d2c3-b4a5-6789-0abc-def123456789",
+    
+    "name": "prod-postgres-01",
+    "cpu_usage_system_percent": 14.73,
+    "memory_used_percent": 67.40,
+
+    "disk_capacity": '1024GB',
+    "disk_used": 400,    
+    "disk_usage_percent": 82.15,
+
+    "disk_read_ops": 120.500,
+    "disk_write_ops": 95.200,
+    "disk_iops": 2000.500,
+
+    "system_uptime_seconds": 2592000,
+    
+    "cpu_trend": [
+      { "ts": 1748822400, "value": 12.45 },
+      { "ts": 1748826000, "value": 80.10 },
+      { "ts": 1748829600, "value": 50.02 }
+    ],
+    "memory_trend": [
+      { "ts": 1748822400, "value": 65.30 },
+      { "ts": 1748826000, "value": 30.80 },
+      { "ts": 1748829600, "value": 70.40 }
+    ]
   }
 ]
 

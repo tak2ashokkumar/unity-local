@@ -55,7 +55,7 @@ export class PcCrudService {
 
   delete(pcId: string, cloudName?: string) {
     this.deleteAnnouncedSource.next(pcId);
-    if(cloudName){
+    if (cloudName) {
       this.cloudName = cloudName;
     }
   }
@@ -241,11 +241,11 @@ export class PcCrudService {
       'vcloud_org': {
         'required': 'Organization is required'
       },
-      'collector': {
-        'uuid': {
-          'required': 'Collector is required'
-        }
-      }
+      // 'collector': {
+      //   'uuid': {
+      //     'required': 'Collector is required'
+      //   }
+      // }
     },
     proxmoxFormMessages: {
       'host_address': {
@@ -381,7 +381,7 @@ export class PcCrudService {
         });
         if (this.userInfo.linkDeviceToCollector) {
           const collector = this.builder.group({
-            'uuid': [vm.private_cloud && vm.private_cloud.collector ? vm.private_cloud.collector.uuid : '', [Validators.required]],
+            'uuid': [vm.private_cloud && vm.private_cloud.collector ? vm.private_cloud.collector.uuid : ''],
           });
           form.addControl('collector', collector);
         }
@@ -396,7 +396,7 @@ export class PcCrudService {
       })).pipe(map(form => {
         if (this.userInfo.linkDeviceToCollector) {
           const collector = this.builder.group({
-            'uuid': ['', [Validators.required]],
+            'uuid': [''],
           });
           form.addControl('collector', collector);
         }
@@ -470,12 +470,12 @@ export class PcCrudService {
 
   getPlarformType(pcType: string) {
     switch (pcType) {
-      case 'esxi' : return ServerSidePlatFormMapping.ESXI;
-      case 'vcloud' : return ServerSidePlatFormMapping.VCLOUD;
-      case 'hyperv' : return ServerSidePlatFormMapping.HYPER_V;
-      case 'openstack' : return ServerSidePlatFormMapping.OPENSTACK;
-      case 'proxmox' : return ServerSidePlatFormMapping.PROXMOX;
-      case 'unity-kvm' : return ServerSidePlatFormMapping.G3_KVM;
+      case 'esxi': return ServerSidePlatFormMapping.ESXI;
+      case 'vcloud': return ServerSidePlatFormMapping.VCLOUD;
+      case 'hyperv': return ServerSidePlatFormMapping.HYPER_V;
+      case 'openstack': return ServerSidePlatFormMapping.OPENSTACK;
+      case 'proxmox': return ServerSidePlatFormMapping.PROXMOX;
+      case 'unity-kvm': return ServerSidePlatFormMapping.G3_KVM;
       default: console.error('Invalid cloud type : ', pcType);
     }
   }

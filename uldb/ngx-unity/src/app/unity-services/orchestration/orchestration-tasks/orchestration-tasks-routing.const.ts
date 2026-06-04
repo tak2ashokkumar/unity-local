@@ -115,4 +115,24 @@ export const ORCHESTRATION_TASKS_ROUTES: Routes = [
             }
         }
     },
+    {
+        path: 'tasks/:categoryId/category/:taskId/view',
+        component: OrchestrationTasksCrudComponent,
+        data: {
+            breadcrumb: {
+                title: 'Edit',
+                stepbackCount: 0
+            }
+        }
+    },
+    {
+        path: 'tasks/:taskId/view',
+        component: OrchestrationTasksCrudComponent,
+        data: {
+            breadcrumb: {
+                title: 'View',
+                stepbackCount: 0
+            }
+        }
+    },
 ]

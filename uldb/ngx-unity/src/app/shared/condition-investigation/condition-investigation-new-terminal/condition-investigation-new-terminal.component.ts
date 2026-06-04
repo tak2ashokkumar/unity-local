@@ -71,7 +71,10 @@ export class ConditionInvestigationNewTerminalComponent implements OnInit, OnDes
         password: this.config.password,
         agent_id: this.config.agent_id,
         org_id: this.config.org_id,
-        conversation_id: this.config.conversation_id
+        conversation_id: this.config.conversation_id,
+        connection_type: this.config.connection_type,
+        transport: this.config.transport,
+        shell: this.config.shell, 
       }));
     };
 

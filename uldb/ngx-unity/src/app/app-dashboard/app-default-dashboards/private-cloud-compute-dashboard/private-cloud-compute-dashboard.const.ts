@@ -123,6 +123,46 @@ export const DEVICE_OPTIONS: labelAndValueType[] = [
   }
 ];
 
+
+export const privateCloudTabItems = [
+  {
+    name: 'vmware',
+    url: 'vmware'
+  },
+  {
+    name: 'vcloud',
+    url: 'vcloud'
+  },
+  {
+    name: 'openstack',
+    url: 'openstack'
+  },
+  {
+    name: 'esxi',
+    url: 'esxi'
+  },
+  {
+    name: 'hyperv',
+    url: 'hyperv'
+  },
+  {
+    name: 'custom',
+    url: 'custom'
+  },
+  {
+    name: 'proxmox',
+    url: 'proxmox'
+  },
+  {
+    name: 'G3 g3kvm',
+    url: 'g3kvm'
+  },
+  {
+    name: 'nutanix',
+    url: 'nutanix'
+  },
+];
+
 export const DEVICE_TYPE_MAP: Record<string, string> = {
   'Baremetal Servers': 'bmservers',
   'Switches': 'switches',
@@ -137,52 +177,52 @@ export const DEVICE_TYPE_MAP: Record<string, string> = {
   'Database': 'databases'
 };
 
-export const Private_CLOUD_UTILIZATION_ROWS: PerformanceHotspots = {
-  "topUtilization": [
-    {
-      "name": "Cisco 1",
-      "cpuUtilization": {
-        "current": 81,
-        "sparkline": [
-          45,
-          50,
-          55,
-          60,
-          65,
-          70,
-          75,
-          80,
-          81
-        ]
-      },
-      "memoryUtilization": {
-        "current": 81,
-        "sparkline": [
-          40,
-          45,
-          50,
-          55,
-          60,
-          65,
-          70,
-          75,
-          81
-        ]
-      },
-      "storageUtilization": {
-        "capacity": 256,
-        "used": 170,
-        "free": 86,
-        "percentage": 66
-      },
-      "diskIOPS": {
-        "value": 40,
-        "percentage": 40
-      },
-      "uptime": "26d"
-    }
-  ]
-}
+// export const Private_CLOUD_UTILIZATION_ROWS: PerformanceHotspots = {
+//   "topUtilization": [
+//     {
+//       "name": "Cisco 1",
+//       "cpuUtilization": {
+//         "current": 81,
+//         "sparkline": [
+//           45,
+//           50,
+//           55,
+//           60,
+//           65,
+//           70,
+//           75,
+//           80,
+//           81
+//         ]
+//       },
+//       "memoryUtilization": {
+//         "current": 81,
+//         "sparkline": [
+//           40,
+//           45,
+//           50,
+//           55,
+//           60,
+//           65,
+//           70,
+//           75,
+//           81
+//         ]
+//       },
+//       "storageUtilization": {
+//         "capacity": 256,
+//         "used": 170,
+//         "free": 86,
+//         "percentage": 66
+//       },
+//       "diskIOPS": {
+//         "value": 40,
+//         "percentage": 40
+//       },
+//       "uptime": "26d"
+//     }
+//   ]
+// }
 
 
 //For Alerts

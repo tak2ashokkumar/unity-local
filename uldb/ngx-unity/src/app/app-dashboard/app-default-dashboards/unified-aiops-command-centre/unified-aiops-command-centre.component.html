@@ -621,30 +621,40 @@
                 <app-spinner [name]="loaderNames.alertResponse" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.alertSourceSankey" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.alertLifecycleSankey" [width]="0"></app-spinner>
-                <div class="alerts-filter-row">
-                    <div class="mini-filter">
+                <div class="alerts-filter-row" *ngIf="alertsFilterForm" [formGroup]="alertsFilterForm">
+                    <div class="mini-filter multi-filter-control">
                         <label>Datacenter</label>
-                        <select class="form-control form-control-sm"><option>All Datacenter</option></select>
+                        <multiselect-dropdown [options]="datacenterOptions" [settings]="multiselectSettings"
+                            [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
+                            formControlName="datacenters">
+                        </multiselect-dropdown>
                     </div>
-                    <div class="mini-filter">
+                    <div class="mini-filter multi-filter-control">
                         <label>Cloud</label>
-                        <select class="form-control form-control-sm"><option>All Cloud</option></select>
+                        <multiselect-dropdown [options]="cloudOptions" [settings]="multiselectSettings"
+                            [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
+                            formControlName="clouds">
+                        </multiselect-dropdown>
                     </div>
-                    <div class="mini-filter">
+                    <div class="mini-filter multi-filter-control">
                         <label>Devices</label>
-                        <select class="form-control form-control-sm"><option>All Devices</option></select>
+                        <multiselect-dropdown [options]="alertsDeviceTypeOptions" [settings]="alertsDeviceTypeSettings"
+                            [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
+                            formControlName="deviceTypes">
+                        </multiselect-dropdown>
                     </div>
                     <div class="mini-filter">
                         <label>View By</label>
-                        <select class="form-control form-control-sm"><option>Source</option></select>
-                    </div>
-                    <div class="mini-filter">
-                        <label>Source Type</label>
-                        <select class="form-control form-control-sm"><option>All Source</option></select>
+                        <select class="form-control form-control-sm" formControlName="viewBy">
+                            <option *ngFor="let option of alertsViewByOptions; trackBy: trackByIndex"
+                                [value]="option.key">{{option.name}}</option>
+                        </select>
                     </div>
                     <div class="mini-filter">
                         <label>Duration</label>
-                        <select class="form-control form-control-sm"><option>Last 7 days</option></select>
+                        <custom-date-dropdown [options]="alertsDurationOptions" [enableCustomDateRange]="true"
+                            [default]="alertsDuration" (onSubmit)="onAlertsDurationChange($event)">
+                        </custom-date-dropdown>
                     </div>
                 </div>
                 <div class="alert-metric-row" *ngIf="alertReductionMetrics.length || alertResponseMetrics.length">
@@ -660,15 +670,22 @@
                         <div class="metric-value tone-primary">{{metric.value}}</div>
                     </div>
                 </div>
-                <div class="sankey-grid" *ngIf="hasAlertSourceSankey || hasAlertLifecycleSankey"
-                    [ngClass]="{'single-widget-grid': !(hasAlertSourceSankey && hasAlertLifecycleSankey)}">
-                    <div *ngIf="hasAlertSourceSankey">
+                <div class="sankey-grid" *ngIf="hasAlertSourceSankey || hasAlertLifecycleSankey">
+                    <div class="sankey-panel">
                         <div echarts [options]="alertSourceSankeyOptions" (chartInit)="onAlertSankeyChartInit($event)"
                             class="sankey-chart linked-chart" *ngIf="hasChartData(alertSourceSankeyOptions)"></div>
+                        <div class="dashboard-empty-state sankey-empty"
+                            *ngIf="!widgetLoading.alertSourceSankey && !hasChartData(alertSourceSankeyOptions)">
+                            No data available
+                        </div>
                     </div>
-                    <div *ngIf="hasAlertLifecycleSankey">
+                    <div class="sankey-panel">
                         <div echarts [options]="alertLifecycleSankeyOptions" (chartInit)="onAlertSankeyChartInit($event)"
                             class="sankey-chart linked-chart" *ngIf="hasChartData(alertLifecycleSankeyOptions)"></div>
+                        <div class="dashboard-empty-state sankey-empty"
+                            *ngIf="!widgetLoading.alertLifecycleSankey && !hasChartData(alertLifecycleSankeyOptions)">
+                            No data available
+                        </div>
                     </div>
                 </div>
             </div>

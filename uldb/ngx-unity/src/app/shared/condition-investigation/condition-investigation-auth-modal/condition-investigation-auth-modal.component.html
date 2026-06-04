@@ -11,30 +11,64 @@
 
     <form [formGroup]="authForm">
 
+      <!-- OS -->
+      <div class="form-group">
+        <label>OS</label>
+        <select class="form-control" formControlName="connection_type">
+          <option value="ssh">Linux / SSH</option>
+          <option value="winrm">Windows / WinRM</option>
+        </select>
+      </div>
+
+      <!-- Host -->
       <div class="form-group">
         <label>Host</label>
         <input class="form-control" formControlName="host">
         <div class="text-danger">{{formErrors.host}}</div>
       </div>
 
+      <!-- Port -->
       <div class="form-group">
         <label>Port</label>
         <input type="number" class="form-control" formControlName="port">
         <div class="text-danger">{{formErrors.port}}</div>
       </div>
 
+      <!-- Username -->
       <div class="form-group">
         <label>Username</label>
         <input class="form-control" formControlName="username">
         <div class="text-danger">{{formErrors.username}}</div>
       </div>
 
+      <!-- Password -->
       <div class="form-group">
         <label>Password</label>
         <input type="password" class="form-control" formControlName="password">
         <div class="text-danger">{{formErrors.password}}</div>
       </div>
 
+      <!-- Windows-only fields -->
+      <ng-container *ngIf="isWindows">
+        <div class="form-group">
+          <label>Transport</label>
+          <select class="form-control" formControlName="transport">
+            <option value="ntlm">NTLM</option>
+            <option value="plaintext">Plaintext</option>
+            <option value="ssl">SSL</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Shell</label>
+          <select class="form-control" formControlName="shell">
+            <option value="cmd">CMD</option>
+            <option value="powershell">PowerShell</option>
+          </select>
+        </div>
+      </ng-container>
+
+      <!-- Collector -->
       <div class="form-group" formGroupName="collector">
         <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
         <select id="collectoruuid" class="form-control" formControlName="uuid"
@@ -48,8 +82,8 @@
           {{formErrors.collector.uuid}}
         </div>
       </div>
-      <div class="text-danger">{{formErrors.invalidCred}}</div>
 
+      <div class="text-danger">{{formErrors.invalidCred}}</div>
     </form>
 
   </div>

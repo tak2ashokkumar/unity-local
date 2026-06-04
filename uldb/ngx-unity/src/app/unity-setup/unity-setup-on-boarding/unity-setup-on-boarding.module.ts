@@ -73,6 +73,7 @@ import { UnitySetupOnBoardingResolverService } from './unity-setup-on-boarding-r
 import { UnitySetupOnBoardingRoutingModule } from './unity-setup-on-boarding-routing.module';
 import { UnitySetupOnBoardingSummaryComponent } from './unity-setup-on-boarding-summary/unity-setup-on-boarding-summary.component';
 import { UnitySetupOnBoardingComponent } from './unity-setup-on-boarding.component';
+import { AdvancedDiscoveryConnectivityRequestComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity-request/advanced-discovery-connectivity-request.component';
 
 
 @NgModule({
@@ -143,6 +144,7 @@ import { UnitySetupOnBoardingComponent } from './unity-setup-on-boarding.compone
     AdvancedDiscoverySummaryNetworkViewComponent,
     ExcelOnBoardingDatabaseComponent,
     AdvancedDiscoveryConnectivityCrudComponent,
+    AdvancedDiscoveryConnectivityRequestComponent,
     AdvancedDiscoveryPolicyCrudComponent,
   ],
   imports: [

@@ -56,10 +56,18 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
         this.conversationId = id;
       });
 
+    this.authForm.get('connection_type')!.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((connection_type: string) => {
+      const port = connection_type === 'winrm' ? 5985 : 22;
+      this.authForm.patchValue({ port }, { emitEvent: false });
+    });
     const saved = localStorage.getItem('last_credentials');
     if (saved) {
       this.authForm.patchValue(JSON.parse(saved));
     }
+  }
+
+  get isWindows(): boolean {
+    return this.authForm.get('connection_type')?.value === 'winrm';
   }
 
   getCollectors() {
@@ -80,16 +88,21 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
 
   buildForm() {
     this.authForm = this.fb.group({
+      connection_type: ['ssh', Validators.required],
       host: ['', Validators.required],
       port: [22, [Validators.required, Validators.min(1)]],
       username: ['', Validators.required],
       password: ['', Validators.required],
+      transport: ['ntlm'],
+      shell: ['cmd'],
       collector: this.fb.group({
         uuid: ['', Validators.required]
       })
     });
+
     this.formErrors = {
-      host: '', port: '', username: '', password: '', invalidCred: '', collector: { uuid: '' }
+      host: '', port: '', username: '', password: '', invalidCred: '',
+      connection_type: '', transport: '', shell: '', collector: { uuid: '' }
     };
 
     this.validationMessages = {
@@ -97,130 +110,10 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
       port: { required: 'Port is required', min: 'Min 1' },
       username: { required: 'Username required' },
       password: { required: 'Password required' },
-      collector: {
-        uuid: 'Collector is required'
-      }
+      connection_type: { required: 'OS is required' },
+      collector: { uuid: 'Collector is required' }
     };
   }
-
-  // onSubmit() {
-  //   const payload = this.authForm.getRawValue();
-  //   localStorage.setItem('last_credentials', JSON.stringify(payload));
-  //   const conversationId = this.terminalService.getConversationId();
-  //   const pendingType = this.terminalService.getPendingTabType();
-  //   const backendTabId = this.terminalService.getBackendTabId();
-
-  //   const tabId = backendTabId || this.generateTabId();
-
-  //   const input = {
-  //     tabId,
-  //     deviceName: payload.host,
-  //   };
-
-  //   const auth = {
-  //     host: payload.host,
-  //     port: payload.port,
-  //     username: payload.username,
-  //     password: payload.password,
-  //     conversation_id: conversationId,
-  //     tab_type: pendingType === 'sameTab' ? 'same' : 'new',
-  //     collector_uuid: payload.collector.uuid
-  //   };
-
-  //   this.modalRef.hide();
-
-  //   if (pendingType !== 'sameTab') {
-  //     const currentUrl = window.location.href;
-  //     const [base, hash] = currentUrl.split('#');
-  //     if (hash) {
-  //       const [path, query] = hash.split('?');
-  //       const params = new URLSearchParams(query || '');
-  //       if (!params.get('tabId')) {
-  //         params.set('tabId', tabId);
-  //         const newHash = `${path}?${params.toString()}`;
-  //         window.history.replaceState({}, '', `${base}#${newHash}`);
-  //       }
-  //     }
-  //     this.registerChannel = new BroadcastChannel('terminal-tabs');
-  //     let registered = false;
-
-  //     this.registerChannel.onmessage = (e) => {
-  //       if (e.data.type === 'REGISTER_ACK' && e.data.tabId === tabId) {
-  //         registered = true;
-  //         this.registerChannel.close(); // cleanup once ACK'd
-  //       }
-  //     };
-
-  //     // Broadcast immediately, then retry every 300ms
-  //     const broadcastRegister = () => {
-  //       this.registerChannel.postMessage({ type: 'REGISTER', tabId });
-  //     };
-
-  //     broadcastRegister(); // immediate
-
-  //     const interval = setInterval(() => {
-  //       if (registered) {
-  //         clearInterval(interval);
-  //         return;
-  //       }
-  //       broadcastRegister();
-  //     }, 300);
-
-  //     // Stop after 2s regardless
-  //     setTimeout(() => {
-  //       clearInterval(interval);
-  //       if (!registered) {
-  //         console.warn('REGISTER never ACKd for tabId:', tabId);
-  //       }
-  //     }, 2000);
-  //   }
-  //   if (pendingType === 'sameTab' && backendTabId) {
-  //     const cmd = localStorage.getItem('terminal_command');
-  //     if (cmd) {
-  //       this.floatingTerminalService.executeInTerminal(backendTabId, cmd, 'sameTab');
-  //       this.floatingTerminalService.switchToTab(backendTabId);
-  //       localStorage.removeItem('terminal_command');
-  //     }
-  //     this.terminalService.setBackendTabId(null);
-  //     return; // skip openTerminalDirect
-  //   }
-
-  //   this.terminalService.openTerminalDirect(input, auth);
-  // }
-
-  // onSubmit() {
-  //   if (this.authForm.invalid) return;
-
-  //   const payload = this.authForm.getRawValue();
-
-  //   // this.http.post('ws://10.192.11.57:8006/ws/terminal/tab-igd3zlz', payload)
-  //   //   .pipe(takeUntil(this.ngUnsubscribe))
-  //   //   .subscribe(
-  //   //     (res: any) => {
-
-  //   //       const config = {
-  //   //         ...payload,
-  //   //         agent_id: res.agent_id,
-  //   //         org_id: res.org_id
-  //   //       };
-
-  //   //       this.modalRef.hide();
-  //   //       this.terminalService.openTerminalWithConfig(config);
-  //   //     },
-  //   //     err => {
-  //   //       this.formErrors.invalidCred = 'Invalid credentials';
-  //   //     }
-  //   //   );
-
-  //   const config = {
-  //     ...payload
-  //   };
-
-  //   const auth = { host: payload.host, port: payload.port, username: payload.username, password: payload.password };
-  //   this.modalRef.hide();
-  //   this.terminalService.openTerminalWithConfig(config);
-  // }
-
 
   onSubmit() {
     const payload = this.authForm.getRawValue();
@@ -239,6 +132,11 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
       collector_uuid: payload.collector.uuid,
       org_id: this.userInfoService.userOrgId,
       user_id: `${this.userInfoService.userDetails.id}`,
+      connection_type: payload.connection_type,
+      ...(payload.connection_type === 'winrm' && {
+        transport: payload.transport,
+        shell: payload.shell,
+      }),
     };
 
     this.modalRef.hide();
@@ -263,7 +161,8 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
 
     // command exists = came from command execution, call API
     const tabParam = pendingType === 'sameTab' ? 'same' : 'new';
-    this.svc.getTab(tabParam, conversationId, payload.host).subscribe((res: any) => {
+    const shell = payload.connection_type === 'winrm' ? payload.shell : '';
+    this.svc.getTab(tabParam, conversationId, payload.host, shell).subscribe((res: any) => {
       console.log('getTab res', res);
       const backendTabId = res?.tab_id;
 

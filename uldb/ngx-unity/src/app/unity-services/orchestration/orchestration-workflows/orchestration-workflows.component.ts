@@ -53,7 +53,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   @ViewChild('dropdown', { static: false }) dropdown!: ElementRef;
   agenticIcon = `${environment.assetsUrl}external-brand/workflow/AIAgent.svg`;
   workflowIcon = `${environment.assetsUrl}external-brand/workflow/Non-agentic-black.svg`;
-
+  globalReadOnlyUser = false;
 
   constructor(private svc: OrchestrationWorkflowsService,
     private crudSvc: OrchestrationWorkflowCrudService,
@@ -73,6 +73,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     document.addEventListener('click', (event) => this.closeDropdown(event));
     this.workflowsInProgress = this.storage.getByKey('workflowsInProgress', StorageType.SESSIONSTORAGE);
+    this.globalReadOnlyUser = this.storage.getByKey('user', StorageType.SESSIONSTORAGE)?.active_rbac_roles?.some(r => r === 'Global Read-Only');
     console.log(this.workflowsInProgress, "workflow In progress")
     this.jsonValue = {
       "workflow_name": "",
@@ -265,7 +266,12 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   openAgentic() {
-    this.router.navigate(['agentic-workflow'], { relativeTo: this.route })
+    console.log(this.globalReadOnlyUser, "Read only")
+    if (!this.globalReadOnlyUser) {
+      this.router.navigate(['agentic-workflow'], { relativeTo: this.route })
+    } else {
+      this.router.navigate(['agentic-workflow', 'view'], { relativeTo: this.route });
+    }
   }
 
   toggleStatus(index: number, status: boolean) {
@@ -325,6 +331,10 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     } else {
       this.router.navigate([task.uuid, 'edit'], { relativeTo: this.route });
     }
+  }
+
+  goToviewDetails(task: WorkflowViewData) {
+    this.router.navigate(['agentic-workflow', task.uuid, 'view'], { relativeTo: this.route });
   }
 
   scheduleWorkflow(view: WorkflowViewData) {

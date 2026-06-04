@@ -188,8 +188,8 @@
 
           <div class="d-flex align-items-center" *ngIf="!nodeData?.isTool">
             <i [ngClass]="getStatusFaClass(realTimeData?.status) + ' pr-2'"></i>
-            <button class="btn btn-primary btn-sm" (click)="closeModal('test')"><i class="fas fa-play mr-1"></i>Run
-              Node</button>
+            <button class="btn btn-primary btn-sm" [disabled]="isViewMode"
+             (click)="closeModal('test')"><i class="fas fa-play mr-1"></i>Run Node</button>
           </div>
         </div>
         <!-- Tabs -->

@@ -97,6 +97,7 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
   selectedSource: string;
   scriptValue: string;
   selectedScript: string;
+  isViewMode = false;
 
   scriptOptions = [
     { label: 'Ansible Playbook', icon: 'static/assets/images/external-brand/logos/Anisble.svg' },
@@ -136,6 +137,7 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
     } else {
       this.buildForm();
     }
+    this.isViewMode = this.router.url.includes('view');
     // this.getInputTemplate();
   }
 

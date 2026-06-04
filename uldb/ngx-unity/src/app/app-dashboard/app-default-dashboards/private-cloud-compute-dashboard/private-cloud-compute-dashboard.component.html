@@ -601,38 +601,41 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th [ngClass]="getUtilizationHeaderClass('cpu')"
-                                        (click)="onUtilizationHeaderSort('cpu')">
+                                    <th [ngClass]="getUtilizationHeaderClass('cpuUtilization')"
+                                        (click)="onUtilizationHeaderSort('cpuUtilization')">
                                         <span class="utilization-sort-heading">CPU Utilization
-                                            <i *ngIf="getUtilizationSortIcon('cpu') as iconClass" class="fa ml-1"
+                                            <i *ngIf="getUtilizationSortIcon('cpuUtilization') as iconClass"
+                                                class="fa ml-1"
                                                 [ngClass]="iconClass"></i>
                                         </span>
                                     </th>
-                                    <th [ngClass]="getUtilizationHeaderClass('memory')"
-                                        (click)="onUtilizationHeaderSort('memory')">
+                                    <th [ngClass]="getUtilizationHeaderClass('memoryUtilization')"
+                                        (click)="onUtilizationHeaderSort('memoryUtilization')">
                                         <span class="utilization-sort-heading">Memory Utilization
-                                            <i *ngIf="getUtilizationSortIcon('memory') as iconClass" class="fa ml-1"
+                                            <i *ngIf="getUtilizationSortIcon('memoryUtilization') as iconClass"
+                                                class="fa ml-1"
                                                 [ngClass]="iconClass"></i>
                                         </span>
                                     </th>
-                                    <th [ngClass]="getUtilizationHeaderClass('storage')"
-                                        (click)="onUtilizationHeaderSort('storage')">
+                                    <th [ngClass]="getUtilizationHeaderClass('storageUtilization')"
+                                        (click)="onUtilizationHeaderSort('storageUtilization')">
                                         <span class="utilization-sort-heading">Storage Utilization
-                                            <i *ngIf="getUtilizationSortIcon('storage') as iconClass" class="fa ml-1"
+                                            <i *ngIf="getUtilizationSortIcon('storageUtilization') as iconClass"
+                                                class="fa ml-1"
                                                 [ngClass]="iconClass"></i>
                                         </span>
                                     </th>
-                                    <th [ngClass]="getUtilizationHeaderClass('diskIops')"
-                                        (click)="onUtilizationHeaderSort('diskIops')">
+                                    <th [ngClass]="getUtilizationHeaderClass('diskOps')"
+                                        (click)="onUtilizationHeaderSort('diskOps')">
                                         <span class="utilization-sort-heading">Disk IOPS
-                                            <i *ngIf="getUtilizationSortIcon('diskIops') as iconClass" class="fa ml-1"
+                                            <i *ngIf="getUtilizationSortIcon('diskOps') as iconClass" class="fa ml-1"
                                                 [ngClass]="iconClass"></i>
                                         </span>
                                     </th>
-                                    <th [ngClass]="getUtilizationHeaderClass('upTime')"
-                                        (click)="onUtilizationHeaderSort('upTime')">
+                                    <th [ngClass]="getUtilizationHeaderClass('uptime')"
+                                        (click)="onUtilizationHeaderSort('uptime')">
                                         <span class="utilization-sort-heading">Up Time
-                                            <i *ngIf="getUtilizationSortIcon('upTime') as iconClass" class="fa ml-1"
+                                            <i *ngIf="getUtilizationSortIcon('uptime') as iconClass" class="fa ml-1"
                                                 [ngClass]="iconClass"></i>
                                         </span>
                                     </th>
@@ -640,7 +643,12 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of utilizationRows?.utilRow; trackBy: trackByIndex">
-                                    <td>{{row.name}}
+                                    <td>
+                                        <button type="button" class="btn btn-link p-0 table-link text-left"
+                                            (click)="openUtilizationDeviceDetails(row)" [tooltip]="'Open linked page'"
+                                            container="body">
+                                            {{row.name}}
+                                        </button>
                                     </td>
                                     <td>
                                         <div class="sparkline-cell">

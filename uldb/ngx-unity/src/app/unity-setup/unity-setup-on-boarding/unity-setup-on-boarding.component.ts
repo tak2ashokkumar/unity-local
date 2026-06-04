@@ -19,11 +19,12 @@ import { OnboardingTabStepType, UnitySetupOnBoardingService } from './unity-setu
   providers: [UnitySetupOnBoardingService]
 })
 export class UnitySetupOnBoardingComponent implements OnInit, OnDestroy {
+  private ngUnsubscribe = new Subject();
   public steps: OnboardingTabStepType[] = [];
   currentUrl: string;
   subscr: Subscription;
   collectorsCount: number = 0;
-  private ngUnsubscribe = new Subject();
+  showOnboardingSteps = true;
   @ViewChild('confirmAdd') confirmAdd: ElementRef;
   confirmAddModalRef: BsModalRef;
 
@@ -44,6 +45,7 @@ export class UnitySetupOnBoardingComponent implements OnInit, OnDestroy {
     this.route.data.pipe(take(1)).subscribe((data: { collectors: PaginatedResult<any> }) => {
       this.collectorsCount = data.collectors.count;
       this.setDiscoveryTab();
+      this.setActive(this.router.url);
     });
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -116,6 +118,7 @@ export class UnitySetupOnBoardingComponent implements OnInit, OnDestroy {
   }
 
   setActive(url: string) {
+    this.showOnboardingSteps = !url.match('/setup/devices/connectivity/request-access');
     for (let i = 0; i < this.steps.length; i++) {
       const step = this.steps[i];
       if (url.match(`/setup/devices/${step.url}`)) {

@@ -134,8 +134,11 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
         return { from: moment().subtract(2, 'h').format(), to: moment().subtract(1, 'm').format(format) };
       case DateRangePeriod.LAST_24_HOURS:
         return { from: moment().subtract(1, 'd').format(), to: moment().subtract(1, 'm').format(format) };
+      case DateRangePeriod.YESTERDAY:
+        return { from: moment().subtract(1, 'd').startOf('day').format(format), to: moment().subtract(1, 'd').endOf('day').format(format) };
       case DateRangePeriod.LAST_7_DAYS:
       case DateRangePeriod.LAST_1_WEEK:
+      case DateRangePeriod.LAST_WEEK:
         return { from: moment().subtract(7, 'days').startOf('day').format(format), to: moment().endOf('day').format(format) };
       case DateRangePeriod.THIS_MONTH:
         return { from: moment().startOf('month').format(format), to: moment().endOf('month').format(format) };
@@ -230,8 +233,10 @@ export enum DateRangePeriod {
   LAST_1_HOUR = 'last_1_hour',
   LAST_2_HOURS = 'last_2_hours',
   LAST_24_HOURS = 'last_24_hours',
+  YESTERDAY = 'yesterday',
   LAST_7_DAYS = 'last_7_days',
   LAST_1_WEEK = 'last_1_week',
+  LAST_WEEK = 'last_week',
   THIS_MONTH = 'this_month',
   LAST_MONTH = 'last_month',
   LAST_30_DAYS = 'last_30_days',

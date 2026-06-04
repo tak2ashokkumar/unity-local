@@ -370,6 +370,7 @@ import { NetworkDevicesDetailsComponentsComponent } from './device-details-compo
 import { BaremetalDetailsComponentsComponent } from './device-details-components/baremetal-details-components/baremetal-details-components.component';
 import { StorageDetailsComponentsComponent } from './device-details-components/storage-details-components/storage-details-components.component';
 import { VmDetailsComponentsComponent } from './device-details-components/vm-details-components/vm-details-components.component';
+import { FileSizeConversionPipe } from 'src/app/app-filters/pipes';
 /**
  * Change format according to need
  */
@@ -771,6 +772,7 @@ export const MY_NATIVE_FORMATS = {
     VmsListVmwareDeployOvfService,
     VmsListVmwareDeployOvaService,
     TitleCasePipe,
+    FileSizeConversionPipe
   ]
 })
 export class UnitedCloudSharedModule { }

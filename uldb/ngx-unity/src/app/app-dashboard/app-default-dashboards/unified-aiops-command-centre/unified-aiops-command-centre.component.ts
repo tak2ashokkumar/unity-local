@@ -5,6 +5,7 @@ import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@an
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import * as moment from 'moment';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
 import { forkJoin, Observable, of, Subject } from 'rxjs';
@@ -20,13 +21,24 @@ import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.se
 import { environment } from 'src/environments/environment';
 import { UnifiedAiopsCommandCentreService } from './unified-aiops-command-centre.service';
 import {
+  UNIFIED_AIOPS_ALERT_DATE_FORMAT,
+  UNIFIED_AIOPS_ALERT_DEFAULT_DURATION,
+  UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY,
+  UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS,
+  UNIFIED_AIOPS_ALERT_DURATION_OPTIONS,
+  UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS
+} from './unified-aiops-command-centre.const';
+import {
   UnifiedAiopsAvailabilityCategoryRow,
   UnifiedAiopsAvailabilityCategorySummary,
   UnifiedAiopsBusinessService,
   UnifiedAiopsCloudFilterOption,
+  UnifiedAiopsAlertsDateRange,
   UnifiedAiopsCoverageCard,
   UnifiedAiopsDashboardFilterCriteria,
+  UnifiedAiopsDeviceTypeOption,
   UnifiedAiopsFilterOption,
+  UnifiedAiopsViewByOption,
   UnifiedAiopsIdleDeviceRow,
   UnifiedAiopsIdleDurationItem,
   UnifiedAiopsLegendMetric,
@@ -189,6 +201,13 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   };
 
   filterForm: FormGroup;
+  alertsFilterForm: FormGroup;
+  readonly alertsDeviceTypeOptions: UnifiedAiopsDeviceTypeOption[] = UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS;
+  readonly alertsViewByOptions: UnifiedAiopsViewByOption[] = UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS;
+  readonly alertsDurationOptions = UNIFIED_AIOPS_ALERT_DURATION_OPTIONS;
+  readonly alertsDefaultViewBy = UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY;
+  alertsDuration: string = UNIFIED_AIOPS_ALERT_DEFAULT_DURATION;
+  private alertsDateRange: UnifiedAiopsAlertsDateRange | null = null;
   readonly availabilityMonitorOptions = ['Datacenter', 'Compute', 'Containers', 'Applications', 'Database', 'Storage'];
   readonly availabilityTimeRangeOptions = ['1 Hour', '24 Hour', '7 Days', '30 Days', '60 Days', '90 Days'];
   datacenterOptions: UnifiedAiopsFilterOption[] = [];
@@ -373,6 +392,20 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     allSelected: 'All Selected'
   };
 
+  alertsDeviceTypeSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: 'type',
+    keyToSelect: 'key',
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block',
+    dynamicTitleMaxItems: 1,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    maxHeight: '240px'
+  };
+
   constructor(private svc: UnifiedAiopsCommandCentreService,
     private dashboardMapWidgetService: DashboardMapWidgetService,
     public mapSvc: MapService,
@@ -425,11 +458,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  /** Reloads datacenter filter options and rebuilds the dashboard after the filter form is ready. */
-  refreshData() {
-    this.loadFilterOptionsAndDashboard();
-  }
-
   /** Reloads all filter options and recreates the filter form only after datacenter data is ready. */
   refreshFilters() {
     this.loadFilterOptionsAndDashboard();
@@ -468,6 +496,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   /** Clears existing filter form/options so a fresh filter loading sequence can run. */
   private resetFilterState() {
     this.filterForm = null;
+    this.alertsFilterForm = null;
+    this.alertsDateRange = null;
+    this.alertsDuration = UNIFIED_AIOPS_ALERT_DEFAULT_DURATION;
     this.orphanedDevicesPageNo = 1;
     this.idleDevicesPageNo = 1;
     this.datacenterOptions = [];
@@ -543,6 +574,76 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.getAlertTrend(analyticsFilterCriteria);
   }
 
+  /** Builds (first load) or re-syncs (on global apply) the Alerts widget's local filters from the page-level scope. */
+  private setupAlertsFilters() {
+    const datacenters = this.clonePageSelection('datacenters');
+    const clouds = this.clonePageSelection('clouds');
+    if (!this.alertsFilterForm) {
+      this.alertsFilterForm = this.svc.buildAlertsFilterForm(datacenters, clouds, [], this.alertsDefaultViewBy);
+      this.alertsFilterForm.valueChanges
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(() => this.reloadAlerts());
+      return;
+    }
+    this.alertsFilterForm.patchValue({
+      datacenters,
+      clouds,
+      deviceTypes: [],
+      viewBy: this.alertsDefaultViewBy
+    });
+  }
+
+  /** Reloads only the Alerts widget APIs using the widget-local filter selections. */
+  private reloadAlerts() {
+    if (!this.hasFilterFormData() || !this.alertsFilterForm) {
+      return;
+    }
+    const alertsCriteria = this.getAlertsCriteria();
+    this.getAlertReductionMetrics(alertsCriteria);
+    this.getAlertResponseMetrics(alertsCriteria);
+    this.getAlertSourceSankey(alertsCriteria);
+    this.getAlertLifecycleSankey(alertsCriteria);
+  }
+
+  /** Reads the Alerts widget-local filter form into the criteria sent to the Alerts APIs. */
+  private getAlertsCriteria(): UnifiedAiopsDashboardFilterCriteria {
+    const datacenters = this.getValuesFromOptions(this.alertsFilterForm?.get('datacenters')?.value || []);
+    const clouds = this.getValuesFromOptions(this.alertsFilterForm?.get('clouds')?.value || []);
+    const deviceTypes = ((this.alertsFilterForm?.get('deviceTypes')?.value as string[]) || []).filter(value => !!value);
+    const viewBy = this.alertsFilterForm?.get('viewBy')?.value || this.alertsDefaultViewBy;
+    return {
+      datacenters,
+      clouds,
+      deviceTypes,
+      viewBy,
+      duration: this.alertsDuration,
+      startDate: this.alertsDateRange?.from || '',
+      endDate: this.alertsDateRange?.to || ''
+    };
+  }
+
+  /** Handles the Alerts duration dropdown selection (named period or custom range) and reloads the Alerts widget. */
+  onAlertsDurationChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
+    this.alertsDuration = event?.period || this.alertsDuration;
+    this.alertsDateRange = {
+      from: this.formatAlertsDate(event?.from),
+      to: this.formatAlertsDate(event?.to)
+    };
+    this.reloadAlerts();
+  }
+
+  private formatAlertsDate(value: string | Date | undefined): string {
+    if (!value) {
+      return '';
+    }
+    const date = moment(value);
+    return date.isValid() ? date.format(UNIFIED_AIOPS_ALERT_DATE_FORMAT) : '';
+  }
+
+  private clonePageSelection(controlName: string): UnifiedAiopsFilterOption[] {
+    return [...((this.filterForm?.get(controlName)?.value as UnifiedAiopsFilterOption[]) || [])];
+  }
+
   /** Stops the top filter loader in the next tick so synchronous static responses still render the loader correctly. */
   private stopFilterLoader() {
     setTimeout(() => this.spinnerService.stop(this.loaderNames.filters), 0);
@@ -580,7 +681,18 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `Today ${hours}:${minutes} IST`;
+    const timeZoneLabel = this.getBrowserTimeZoneLabel(now);
+    return `Today ${hours}:${minutes}${timeZoneLabel ? ` ${timeZoneLabel}` : ''}`;
+  }
+
+  /** Resolves the viewer's local time-zone abbreviation (e.g. IST, PST, GMT+9) so the refreshed label is correct in any region. */
+  private getBrowserTimeZoneLabel(date: Date): string {
+    try {
+      const parts = new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' }).formatToParts(date);
+      return parts.find(part => part.type === 'timeZoneName')?.value || '';
+    } catch {
+      return '';
+    }
   }
 
   get showEmployeeExperienceWidget(): boolean {
@@ -595,6 +707,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     const filterFormOutput = this.appliedFilterCriteria;
     const analyticsFilterCriteria = this.getAnalyticsFilterCriteria(filterFormOutput);
     this.startWidgetLoadingState();
+    this.setupAlertsFilters();
     setTimeout(() => {
       this.getSummaryMetrics(filterFormOutput);
       this.getDiscoveryOptions(filterFormOutput);
@@ -624,10 +737,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.getDeviceAvailability(analyticsFilterCriteria);
       this.getAvailabilityCategory(analyticsFilterCriteria);
       this.getAlertTrend(analyticsFilterCriteria);
-      this.getAlertReductionMetrics(filterFormOutput);
-      this.getAlertResponseMetrics(filterFormOutput);
-      this.getAlertSourceSankey(filterFormOutput);
-      this.getAlertLifecycleSankey(filterFormOutput);
       this.getOrphanedDevices(filterFormOutput);
       this.getOrphanedDevicesByCategory(filterFormOutput);
       this.getIdleDevices(filterFormOutput);

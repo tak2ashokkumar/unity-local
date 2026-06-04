@@ -807,8 +807,12 @@ export class PrivateCloudComputeDashboardService {
   /*
   * -----Start----- Performance Hotspots Widget Related -------------------
   */
-  getUtilizationRows(filters?: any): Observable<PerformanceHotspots> {
-    let params = this.convertFiltersToParams(filters)
+  getUtilizationRows(filters?: any, ordering?: string): Observable<PerformanceHotspots> {
+    let params = this.convertFiltersToParams(filters);
+    if (ordering) {
+      params = params.set('ordering', ordering);
+      params = params.set('limit', 10);
+    }
     return this.http.get<PerformanceHotspots>('/customer/widgets/performance_hotspots/', { params });
 
   }
@@ -853,7 +857,10 @@ export class PrivateCloudComputeDashboardService {
         tone: this.getProgressClass(item.diskIOPS?.percentage ?? 0)
       },
 
-      upTime: item.uptime || 'N/A'
+      upTime: item.uptime || 'N/A',
+      uuid: item.uuid,
+      deviceType: item.deviceType,
+      vmSubType: item.deviceType === 'Virtual Machine' ? item.vmSubType : undefined
     }));
   }
 
@@ -945,6 +952,7 @@ export class PrivateCloudComputeDashboardService {
       idleDuration: item.idleDuration,
       uuid: item.uuid,
       deviceType: item.deviceType,
+      vmSubType: item.deviceType === 'Virtual Machine' ? item.vmSubType : undefined,
       status: item.status,
 
       avgCpu: {
@@ -1050,13 +1058,13 @@ export class PrivateCloudComputeDashboardService {
   getPerformanceWorkloadWidgetData(filters: FiltersCriteriaType): Observable<PerformanceWorkloadDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<PerformanceWorkloadDataType>('/customer/widgets/performance_workload_insights/', { params });
-
   }
 
   createProgressBarChart(title: string, data: any[], maxValue?: number): EChartsOption {
 
     const max = maxValue || Math.max(...data.map(d => d.value));
-    const visualMax = max > 0 ? max * 1.15 : 1;
+    const visualMax = max > 0 ? max * 1.05 : 1;
+    const gridHeight = Math.min(Math.max(data.length * 24, 28), 176);
     const truncateVmName = (name: string) => {
       if (!name) {
         return '';
@@ -1075,10 +1083,11 @@ export class PrivateCloudComputeDashboardService {
 
     return {
       grid: {
-        left: 92,
-        right: 56,
-        top: 12,
-        bottom: 12,
+        left: 84,
+        right: 44,
+        top: 10,
+        bottom: 8,
+        height: gridHeight,
         containLabel: true
       },
       // title: {
@@ -1105,7 +1114,7 @@ export class PrivateCloudComputeDashboardService {
         axisLabel: {
           color: '#6b7280',
           fontSize: 12,
-          width: 90,
+          width: 82,
           overflow: 'truncate',
           formatter: (value: string) => truncateVmName(value)
         }
@@ -1118,7 +1127,7 @@ export class PrivateCloudComputeDashboardService {
         {
           name: 'Background',
           type: 'bar',
-          barWidth: 8,
+          barWidth: 10,
           barGap: '-100%',
           silent: true,
           data: data.map(() => visualMax),
@@ -1131,7 +1140,7 @@ export class PrivateCloudComputeDashboardService {
         {
           name: title,
           type: 'bar',
-          barWidth: 8,
+          barWidth: 10,
           data: data.map((item, index) => ({
             value: item.value,
             itemStyle: {
@@ -1546,6 +1555,7 @@ export class OrphanedDeviceList {
   status: string;
   uuid: string;
   deviceType: string
+  vmSubType?: string;
   lastSeen: string;
   datacenter: string;
 }
@@ -1662,6 +1672,7 @@ export class DevicesRowViewData {
   avgCpu: AvgCpu;
   uuid: string;
   deviceType: string;
+  vmSubType?: string;
   avgMem: AvgMem;
   networkIO: string;
   idleDuration: string;

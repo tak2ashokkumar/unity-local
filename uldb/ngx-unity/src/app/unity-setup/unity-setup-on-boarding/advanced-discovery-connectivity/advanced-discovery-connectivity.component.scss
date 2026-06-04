@@ -8,9 +8,11 @@
     background: $white;
     cursor: pointer;
     outline: none;
+
     &.test-success {
         color: $success;
     }
+
     &.test-fail {
         color: $danger;
     }
@@ -18,6 +20,7 @@
 
 .test-result-action-icons-disabled {
     color: $secondary !important;
+
     &:hover,
     &:focus {
         background: $white !important;
@@ -36,4 +39,16 @@
     white-space: pre-wrap;
     border: 5px ridge;
     border-color: #000;
+}
+
+.connectivity-table-card {
+    border-color: $gray-300;
+
+    .card-header {
+        border-bottom-color: $gray-300;
+    }
+}
+
+.ttl-input {
+    max-width: 7rem;
 }

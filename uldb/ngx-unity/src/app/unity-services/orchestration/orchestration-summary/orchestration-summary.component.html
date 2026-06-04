@@ -55,10 +55,11 @@
                     [extentions]="workflowWidget?.byStatusChartData.extensions" [defaultHeight]="120"></div>
                 </ng-container>
               </div>
-              <div class="col-12 p-0"> 
+              <div class="col-12 p-0">
                 <ng-container *ngIf="workflowWidget?.byTargetTypeChartData">
-                  <div echarts [options]="workflowWidget?.byTargetTypeChartData.options" (chartInit)="onChartClick($event)"
-                    [extentions]="workflowWidget?.byTargetTypeChartData.extensions" [defaultHeight]="120"></div>
+                  <div echarts [options]="workflowWidget?.byTargetTypeChartData.options"
+                    (chartInit)="onChartClick($event)" [extentions]="workflowWidget?.byTargetTypeChartData.extensions"
+                    [defaultHeight]="120"></div>
                 </ng-container>
               </div>
             </div>
@@ -382,7 +383,8 @@
               </td>
               <td class="action-icons-column text-center tdw-10">
                 <button class="action-icons action-icons-off mb-0 fas fa-play font-sm ml-1" tooltip="Execute"
-                  (click)="execute(data)"></button>
+                  (click)="execute(data)" accessControl moduleName="DevOps Automation" accessType="Execute Tasks"
+                  elementType="actionbtn" container="body"></button>
               </td>
             </tr>
           </tbody>
@@ -433,7 +435,8 @@
               </td>
               <td class="action-icons-column text-center">
                 <button class="action-icons action-icons-off mb-0 fas fa-calendar-alt font-sm ml-1" tooltip="Schedule"
-                  (click)="schedule(data)"></button>
+                  (click)="schedule(data)" accessControl moduleName="DevOps Automation" accessType="Manage Tasks"
+                  elementType="actionbtn" container="body"></button>
               </td>
             </tr>
           </tbody>

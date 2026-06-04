@@ -319,7 +319,7 @@
                                 </div>
                                 <div class="col-2 d-flex justify-content-end align-items-center">
                                     <button class="btn bg-primary py-2 px-3" (click)="goToInvestigate()" accessControl
-                                        moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                        moduleName="AIML Event Management" [accessType]="accessType"
                                         elementType="actionbtn"
                                         *ngIf="!viewData[selectedConditionIndex].isStatusResolved"><i
                                             class="fas fa-file-signature mr-1"></i>Investigate</button>

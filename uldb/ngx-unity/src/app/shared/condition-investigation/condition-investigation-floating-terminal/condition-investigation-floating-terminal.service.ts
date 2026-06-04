@@ -146,4 +146,7 @@ export interface AuthType {
   tab_type?: string;
   collector_uuid: string;
   user_id?: string;
+  connection_type: string;
+  transport?: string;
+  shell?: string;
 }

@@ -223,6 +223,9 @@ export interface TopUtilizationItem {
   storageUtilization: StorageUtilization;
   diskIOPS: DiskIOPS;
   uptime: string;
+  uuid: string;
+  deviceType: string;
+  vmSubType?: string;
 }
 export interface CpuUtilization {
   current: number;
@@ -266,6 +269,9 @@ export interface PrivateCloudUtilizationRow {
   storage: PrivateCloudStorageUtilization;
   diskIops: PrivateCloudDiskIops;
   upTime: string;
+  uuid: string;
+  deviceType: string;
+  vmSubType?: string;
 }
 
 export interface PrivateCloudUtilizationViewRow extends PrivateCloudUtilizationRow {
@@ -399,6 +405,7 @@ export interface IdleDeviceListItem {
   uuid: string;
   deviceType: string;
   avgMem: AvgMem;
+  vmSubType?: string;
   networkIO: string;
   idleDuration: string;
   status: string;
