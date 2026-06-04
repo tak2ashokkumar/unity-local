@@ -264,7 +264,6 @@
 }
 
 .summary-card > .dashboard-empty-state,
-.employee-card > .dashboard-empty-state,
 .metric-strip > .dashboard-empty-state,
 .compact-metric-grid > .dashboard-empty-state,
 .performance-metrics > .dashboard-empty-state,
@@ -310,7 +309,6 @@
 
 .summary-metric,
 .strip-metric,
-.employee-metric,
 .compact-metric {
   min-width: 0;
   padding: 0 18px;
@@ -719,11 +717,21 @@
 }
 
 .employee-card {
-  min-height: 184px;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  align-items: center;
-  padding: 22px 18px 18px;
+  min-height: 260px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.employee-experience-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .employee-widget-header {
@@ -748,16 +756,6 @@
     background: #e96f00;
     border-color: #e96f00;
   }
-}
-
-.employee-card .metric-label {
-  font-size: 12px;
-  line-height: 16px;
-}
-
-.employee-card .metric-value {
-  font-size: 22px;
-  line-height: 28px;
 }
 
 .geo-card {
@@ -792,7 +790,7 @@
 .coverage-card {
   min-width: 238px;
   max-width: calc(50% - 8px);
-  max-height: 248px;
+  max-height: 300px;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
@@ -803,6 +801,38 @@
     width: 0;
     height: 0;
   }
+}
+
+.coverage-rows-col {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.coverage-card-with-chart {
+  flex-basis: 100%;
+  max-width: 100%;
+  max-height: none;
+
+  .coverage-rows-col {
+    flex: 0 0 40%;
+    max-width: 40%;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .coverage-chart-col {
+    flex: 0 0 60%;
+    max-width: 60%;
+    border-left: 1px solid #dce2e7;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.coverage-resource-chart {
+  height: 300px;
+  width: 100%;
 }
 
 .coverage-title {
@@ -1227,10 +1257,11 @@
 
 .availability-category-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 286px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 5px;
   align-items: stretch;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .availability-category-chart {
@@ -1239,10 +1270,16 @@
 }
 
 .availability-category-list {
-  padding-top: 4px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .availability-category-title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #ffffff;
   padding-bottom: 6px;
   margin-bottom: 4px;
   color: #20272e;
@@ -1256,7 +1293,7 @@
   grid-template-columns: 12px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
-  min-height: 38px;
+  min-height: 30px;
   border-bottom: 1px solid #e8edf1;
 }
 
@@ -1429,8 +1466,6 @@
   flex-wrap: wrap;
   gap: 10px 14px;
   padding: 10px 8px 14px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #dce2e6;
   color: #20272e;
   font-size: 13px;
   line-height: 18px;
@@ -2083,7 +2118,6 @@
 
   .summary-card,
   .metric-strip,
-  .employee-card,
   .compact-metric-grid,
   .performance-metrics {
     grid-template-columns: 1fr;
@@ -2097,7 +2131,6 @@
 
   .summary-metric,
   .strip-metric,
-  .employee-metric,
   .compact-metric,
   .remediation-metric {
     border-right: 0;

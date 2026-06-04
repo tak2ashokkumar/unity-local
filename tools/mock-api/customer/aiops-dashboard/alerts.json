@@ -1,66 +1,84 @@
 {
-  "summary": {
-    "cumulative_reduction_pct": 100.0,
-    "noise_reduction_pct": 0.0,
-    "correlation_pct": 100.0
-  },
-  "events_per_source": [
-    {
-      "source": "Unity",
-      "count": 645
-    }
-  ],
-  "totals": {
-    "total_events": 645,
-    "total_alerts": 186,
-    "total_deduped_events": 644,
-    "total_suppressed_events": 0
-  },
-  "conditions": {
-    "total": 181,
-    "mtta_minutes": 0.0,
-    "mttr_minutes": 7977.6,
-    "ticket_generated": 95,
-    "ticket_not_generated": 86,
-    "open": {
-      "count": 180,
-      "acknowledged": {
-        "count": 0,
-        "duration": {
-          "lte_5min": 0,
-          "lte_30min": 0,
-          "gt_30min": 0
-        }
-      }
+    "summary": {
+        "cumulative_reduction_pct": 100.0,
+        "noise_reduction_pct": 0.0,
+        "correlation_pct": 100.0
     },
-    "resolved": {
-      "count": 1,
-      "auto_healed": {
-        "count": 1,
-        "duration": {
-          "lte_5min": 0,
-          "lte_30min": 0,
-          "gt_30min": 1
+    "events_per_source": [
+        {
+            "source": "Unity",
+            "count": 14196
+        },
+        {
+            "source": "OpsRamp",
+            "count": 758
+        },
+        {
+            "source": "Custom",
+            "count": 3
         }
-      },
-      "auto_remediation": {
-        "count": 0,
-        "duration": {
-          "lte_5min": 0,
-          "lte_30min": 0,
-          "gt_30min": 0
+    ],
+    "totals": {
+        "total_events": 14957,
+        "total_alerts": 6736,
+        "total_deduped_events": 7735,
+        "total_suppressed_events": 0
+    },
+    "conditions": {
+        "total": 615,
+        "mtta_minutes": 0.0,
+        "mttr_minutes": 2.0,
+        "ticket_generated": 326,
+        "ticket_not_generated": 289,
+        "open": {
+            "count": 209,
+            "acknowledged": {
+                "count": 0,
+                "duration": {
+                    "lte_5min": 0,
+                    "lte_30min": 0,
+                    "gt_30min": 0
+                }
+            }
+        },
+        "resolved": {
+            "count": 406,
+            "auto_healed": {
+                "count": 406,
+                "duration": {
+                    "lte_5min": 332,
+                    "lte_30min": 56,
+                    "gt_30min": 18
+                }
+            },
+            "auto_remediation": {
+                "count": 0,
+                "duration": {
+                    "lte_5min": 0,
+                    "lte_30min": 0,
+                    "gt_30min": 0
+                }
+            }
         }
-      }
+    },
+    "view_by": {
+        "type": "event_source",
+        "breakdown": [
+            {
+                "label": "Unity",
+                "events": 14196,
+                "alerts": 6495
+            },
+            {
+                "label": "OpsRamp",
+                "events": 758,
+                "alerts": 239
+            },
+            {
+                "label": "Custom",
+                "events": 3,
+                "alerts": 2
+            }
+        ]
     }
-  },
-  "view_by": {
-    "type": "source",
-    "breakdown": [
-      {
-        "label": "Unity",
-        "events": 645,
-        "alerts": 186
-      }
-    ]
-  }
 }

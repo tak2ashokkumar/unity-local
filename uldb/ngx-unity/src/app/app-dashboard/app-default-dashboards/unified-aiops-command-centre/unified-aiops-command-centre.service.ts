@@ -14,8 +14,8 @@ import {
   UNIFIED_AIOPS_AI_GPU_METRIC_CONFIG,
   UNIFIED_AIOPS_ALL_SELECTED_VALUE,
   UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT,
+  UNIFIED_AIOPS_AVAILABILITY_BY_CATEGORY_ENDPOINT,
   UNIFIED_AIOPS_APPLICATION_OVERVIEW_ENDPOINT,
-  UNIFIED_AIOPS_APPLICATION_SERVICES_ALERTS_ENDPOINT,
   UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT,
   UNIFIED_AIOPS_BUSINESS_SERVICES_ENDPOINT,
   UNIFIED_AIOPS_CONTAINER_SUMMARY_ENDPOINT,
@@ -24,7 +24,6 @@ import {
   UNIFIED_AIOPS_DATACENTER_INFRA_ENDPOINT,
   UNIFIED_AIOPS_DATACENTER_OPTIONS,
   UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT,
-  UNIFIED_AIOPS_EMPLOYEE_METRIC_CONFIG,
   UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT,
   UNIFIED_AIOPS_EXECUTIVE_SUMMARY_METRIC_CONFIG,
   UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT,
@@ -575,43 +574,6 @@ export class UnifiedAiopsCommandCentreService {
    * ******End ****** Business Services Widget Related ********************
    */
 
-  /*
-   * -----Start----- Employee / Digital Experience Widget Related -------------------
-   */
-  getEmployeeMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_APPLICATION_SERVICES_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getEmployeeExperienceMetrics(res))
-    );
-  }
-
-  private getEmployeeExperienceMetrics(response: any): UnifiedAiopsMetric[] {
-    const payload = this.getMetricPayload(response, ['summary', 'metrics', 'application_services_alerts', 'data']);
-    if (!this.hasUsablePayloadValue(payload)) {
-      return [];
-    }
-    const flatPayload = this.flattenPayload(payload || response);
-    const warning = this.getNumberFromPayload(flatPayload, ['warnings', 'warning', 'total_warning', 'totalWarning', 'warning_count', 'warningCount']);
-    const critical = this.getNumberFromPayload(flatPayload, ['critical', 'total_critical', 'totalCritical', 'critical_count', 'criticalCount']);
-    const totalEndpoints = this.getNumberFromPayload(flatPayload, ['total_endpoints', 'totalEndpoints', 'endpoints', 'endpoint_count', 'total_services', 'totalServices']);
-    const healthy = this.getNumberFromPayload(flatPayload, ['healthy', 'total_healthy', 'totalHealthy', 'healthy_count', 'healthyCount'], Math.max(totalEndpoints - warning - critical, 0));
-
-    return UNIFIED_AIOPS_EMPLOYEE_METRIC_CONFIG.map(metric => {
-      let value = this.getFirstMetricValue(flatPayload, metric.keys);
-
-      if (metric.label === 'Healthy') {
-        value = healthy;
-      }
-
-      return {
-        label: metric.label,
-        value: this.formatNumber(value),
-        tone: metric.tone
-      };
-    });
-  }
-  /*
-   * ******End ****** Employee / Digital Experience Widget Related ********************
-   */
 
   /*
    * -----Start----- Geo Distribution / Global Operations Widget Related -------------------
@@ -969,7 +931,66 @@ export class UnifiedAiopsCommandCentreService {
     return {
       title,
       rows,
-      totalResources: this.formatNumber(totalResources)
+      totalResources: this.formatNumber(totalResources),
+      chartOptions: this.getCoverageChartOptions(rows)
+    };
+  }
+
+  // Vertical bar chart of a coverage card's resource rows; rendered only for a single private cloud type.
+  private getCoverageChartOptions(rows: Array<{ label: string; value: string }>): EChartsOption {
+    const data = (rows || [])
+      .map((row, index) => ({
+        name: row.label,
+        value: this.getNumberValue(row.value),
+        itemStyle: { color: UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS[index % UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS.length] }
+      }))
+      .filter(item => item.value > 0);
+
+    if (!data.length) {
+      return {};
+    }
+
+    const categoryLabels = data.map(item => item.name);
+    // Keep bars readable: when there are many resource types, show a window with a scroll/zoom slider.
+    const visibleBarCount = 12;
+    const enableZoom = data.length > visibleBarCount;
+    const zoomEndPercent = Math.min(100, (visibleBarCount / data.length) * 100);
+
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: '{b}: {c}'
+      },
+      grid: { left: 8, right: 16, top: 18, bottom: enableZoom ? 30 : 8, containLabel: true },
+      dataZoom: enableZoom ? [
+        { type: 'inside', start: 0, end: zoomEndPercent },
+        { type: 'slider', start: 0, end: zoomEndPercent, height: 14, bottom: 4, brushSelect: false }
+      ] : undefined,
+      xAxis: {
+        type: 'category',
+        data: categoryLabels,
+        axisLabel: {
+          fontSize: 11,
+          color: '#5b6570',
+          interval: 0,
+          rotate: categoryLabels.length > 4 ? 30 : 0
+        }
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: { fontSize: 11, color: '#5b6570' },
+        splitLine: { lineStyle: { color: '#d6dce2', type: 'dashed' } }
+      },
+      series: [
+        {
+          name: 'Resource Distribution',
+          type: 'bar',
+          barMaxWidth: 34,
+          data,
+          itemStyle: { borderRadius: [3, 3, 0, 0] }
+        }
+      ]
     };
   }
 
@@ -1709,7 +1730,7 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   getAvailabilityCategory(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsAvailabilityCategoryViewData> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT, criteria).pipe(map(res => this.getAvailabilityCategoryViewData(res)));
+    return this.getWidgetResponse(UNIFIED_AIOPS_AVAILABILITY_BY_CATEGORY_ENDPOINT, criteria).pipe(map(res => this.getAvailabilityCategoryViewData(res)));
   }
 
   convertToAvailabilityCategoryOptions(data: UnifiedAiopsAvailabilityCategoryViewData | EChartsOption): EChartsOption {
@@ -1725,7 +1746,7 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   private getAvailabilityCategoryViewData(response: any): UnifiedAiopsAvailabilityCategoryViewData {
-    const payload = this.getMetricPayload(response, ['availability_by_category', 'availabilityByCategory', 'availability_category']);
+    const payload = this.getMetricPayload(response, ['items', 'availability_by_category', 'availabilityByCategory', 'availability_category']);
     if (this.isEChartsOption(payload)) {
       return {
         options: payload,
@@ -1744,7 +1765,7 @@ export class UnifiedAiopsCommandCentreService {
 
     return {
       options: this.getAvailabilityCategoryOptions(items),
-      summary: this.getAvailabilityCategorySummary(items),
+      summary: this.getAvailabilityCategorySummary(items, this.getPayloadByKeys(response, ['summary'])),
       rows: this.getAvailabilityCategoryRows(items)
     };
   }
@@ -1770,7 +1791,7 @@ export class UnifiedAiopsCommandCentreService {
   private getAvailabilityCategoryItems(payload: any): Array<{ label: string; up: number; down: number; unknown: number }> {
     const entries = Array.isArray(payload)
       ? payload.map(item => ({
-        key: this.getFirstDefinedValue(item?.category, item?.name, item?.label, item?.type),
+        key: this.getFirstDefinedValue(item?.resource, item?.category, item?.name, item?.label, item?.type),
         value: item
       }))
       : Object.keys(payload || {}).map(key => ({ key, value: payload[key] }));
@@ -1781,15 +1802,26 @@ export class UnifiedAiopsCommandCentreService {
         const label = this.getReadableAvailabilityCategoryLabel(String(entry.key || ''));
         return {
           label,
-          up: this.getNumberFromPayload(flatPayload, ['up', 'online', 'healthy', 'up_percent', 'upPercent']),
-          down: this.getNumberFromPayload(flatPayload, ['down', 'offline', 'unhealthy', 'down_percent', 'downPercent']),
-          unknown: this.getNumberFromPayload(flatPayload, ['unknown', 'unknowns', 'unknown_percent', 'unknownPercent'])
+          up: this.getNumberFromPayload(flatPayload, ['avg_up', 'avgUp', 'up_percent', 'upPercent', 'up', 'online', 'healthy']),
+          down: this.getNumberFromPayload(flatPayload, ['avg_down', 'avgDown', 'down_percent', 'downPercent', 'down', 'offline', 'unhealthy']),
+          unknown: this.getNumberFromPayload(flatPayload, ['avg_unknown', 'avgUnknown', 'unknown_percent', 'unknownPercent', 'unknown', 'unknowns'])
         };
       })
       .filter(item => !!item.label && (item.up > 0 || item.down > 0 || item.unknown > 0));
   }
 
-  private getAvailabilityCategorySummary(items: Array<{ up: number; down: number; unknown: number }>): UnifiedAiopsAvailabilityCategorySummary {
+  private getAvailabilityCategorySummary(
+    items: Array<{ up: number; down: number; unknown: number }>,
+    summaryPayload?: any
+  ): UnifiedAiopsAvailabilityCategorySummary {
+    const flatSummary = this.flattenPayload(summaryPayload || {});
+    if (this.hasUsablePayloadValue(summaryPayload)) {
+      return {
+        up: this.formatPercentage(this.getNumberFromPayload(flatSummary, ['avg_up', 'avgUp', 'up_percent', 'upPercent', 'up'])),
+        down: this.formatPercentage(this.getNumberFromPayload(flatSummary, ['avg_down', 'avgDown', 'down_percent', 'downPercent', 'down'])),
+        unknown: this.formatPercentage(this.getNumberFromPayload(flatSummary, ['avg_unknown', 'avgUnknown', 'unknown_percent', 'unknownPercent', 'unknown']))
+      };
+    }
     return {
       up: this.formatPercentage(this.getAverageValue(items.map(item => item.up))),
       down: this.formatPercentage(this.getAverageValue(items.map(item => item.down))),
@@ -2436,7 +2468,13 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   private getAlertSourceSankeyOptionsFromPayload(response: any): EChartsOption {
-    const links: Array<{ source: string; target: string; value: number }> = [];
+    type SankeyLink = { source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } };
+    const links: SankeyLink[] = [];
+    const nodeTotals: { [name: string]: number } = {};
+    const nodeColors: { [name: string]: string } = {};
+    // Severity tiles render the source name only on the topmost existing tile; others stay blank
+    const nodeLabels: { [name: string]: string } = {};
+
     const totals = this.flattenPayload(this.getPayloadByKeys(response, ['totals']) || {});
     const conditions = this.flattenPayload(this.getPayloadByKeys(response, ['conditions']) || {});
     const sources = this.getArrayFromPayload<any>(this.getPayloadByKeys(response, ['events_per_source', 'eventsPerSource']));
@@ -2444,32 +2482,86 @@ export class UnifiedAiopsCommandCentreService {
     const sourceBreakdown = this.getArrayFromPayload<any>(viewBy?.breakdown);
     const sourceItems = sources.length ? sources : sourceBreakdown;
 
-    sourceItems.forEach(item => {
-      const sourceName = String(item?.source || item?.label || item?.name || '').trim();
-      const count = this.getNumberFromPayload(this.flattenPayload(item || {}), ['count', 'events', 'value']);
-      this.addSankeyLink(links, sourceName, 'Events', count);
-    });
+    const totalAlerts = this.getNumberFromPayload(totals, ['total_alerts', 'totalAlerts']);
+    const totalDeduped = this.getNumberFromPayload(totals, ['total_deduped_events', 'totalDedupedEvents']);
+    const totalSuppressed = this.getNumberFromPayload(totals, ['total_suppressed_events', 'totalSuppressedEvents']);
+    const mainFlow = Math.max(totalAlerts + totalDeduped + totalSuppressed, 1);
 
-    // Total Events splits into Alerts + Suppressed Events + Deduped Events.
-    this.addSankeyLink(links, 'Events', 'Alerts', this.getNumberFromPayload(totals, ['total_alerts', 'totalAlerts']));
-    this.addSankeyLink(links, 'Events', 'Suppressed Events', this.getNumberFromPayload(totals, ['total_suppressed_events', 'totalSuppressedEvents']));
-    this.addSankeyLink(links, 'Events', 'Dedupe Events', this.getNumberFromPayload(totals, ['total_deduped_events', 'totalDedupedEvents']));
-    // Alerts split into Conditions and alerts with no ticket generated; Conditions then generate tickets.
-    this.addSankeyLink(links, 'Alerts', 'Conditions', this.getNumberFromPayload(conditions, ['total']));
-    this.addSankeyLink(links, 'Alerts', 'No Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_not_generated', 'ticketNotGenerated']));
-    this.addSankeyLink(links, 'Conditions', 'Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_generated', 'ticketGenerated']));
+    // Source node heights bounded to 10px min and 25px max out of 226px usable chart height
+    const maxGroupValue = (25 / 226) * mainFlow;
+    const minGroupValue = (10 / 226) * mainFlow;
 
-    const nodeTotals = {
-      Events: this.getNumberFromPayload(totals, ['total_events', 'totalEvents']),
-      Alerts: this.getNumberFromPayload(totals, ['total_alerts', 'totalAlerts']),
-      Conditions: this.getNumberFromPayload(conditions, ['total'])
+    const SEVERITY_COLORS: { [key: string]: string } = {
+      Critical: '#cc0000',
+      Warning: '#ff8800',
+      Info: '#378ad8'
     };
 
-    return this.getSankeyOptions(links, nodeTotals);
+    sourceItems.forEach((item: any) => {
+      const sourceName = String(item?.source || item?.label || item?.name || '').trim();
+      if (!sourceName) { return; }
+
+      const flat = this.flattenPayload(item || {});
+      const totalSourceEvents = this.getNumberFromPayload(flat, ['count', 'events', 'value']);
+
+      // Try severity fields — support multiple naming conventions from API
+      const criticalCount = this.getNumberFromPayload(flat, ['critical', 'critical_events', 'criticalEvents', 'severity_critical']);
+      const warningCount = this.getNumberFromPayload(flat, ['warning', 'warning_events', 'warningEvents', 'severity_warning']);
+      const infoCount = this.getNumberFromPayload(flat, [
+        'info', 'information', 'info_events', 'infoEvents', 'information_events', 'informationEvents', 'severity_info'
+      ]);
+      const hasSeverity = criticalCount > 0 || warningCount > 0 || infoCount > 0;
+
+      if (hasSeverity) {
+        // Scenario A: severity data present — 3 tiles per source (Critical, Warning, Info)
+        const severityTotal = Math.max(criticalCount + warningCount + infoCount, 1);
+        const clampedGroup = Math.min(Math.max(severityTotal, minGroupValue), maxGroupValue);
+
+        const severities = [
+          { suffix: 'Critical', count: criticalCount },
+          { suffix: 'Warning',  count: warningCount },
+          { suffix: 'Info',     count: infoCount }
+        ];
+
+        let sourceLabelAssigned = false;
+        severities.forEach(({ suffix, count }) => {
+          if (count <= 0) { return; }
+          const nodeName = `${sourceName} :: ${suffix}`;
+          const color = SEVERITY_COLORS[suffix];
+          const tileValue = (count / severityTotal) * clampedGroup;
+          nodeColors[nodeName] = color;
+          nodeTotals[nodeName] = count;
+          // Show the source name on the topmost existing tile only; remaining tiles stay blank
+          nodeLabels[nodeName] = sourceLabelAssigned ? '' : sourceName;
+          sourceLabelAssigned = true;
+          links.push({ source: nodeName, target: 'Events', value: tileValue, lineStyle: { color, opacity: 0.35 } });
+        });
+      } else {
+        // Scenario B: no severity data — single node per source, gradient flow
+        const clampedValue = Math.min(Math.max(totalSourceEvents, minGroupValue), maxGroupValue);
+        nodeTotals[sourceName] = totalSourceEvents;
+        links.push({ source: sourceName, target: 'Events', value: clampedValue });
+      }
+    });
+
+    nodeTotals['Events'] = this.getNumberFromPayload(totals, ['total_events', 'totalEvents']);
+    nodeTotals['Alerts'] = totalAlerts;
+    nodeTotals['Conditions'] = this.getNumberFromPayload(conditions, ['total']);
+
+    // Events wall splits into Alerts, Dedupe Events, Suppressed Events
+    this.addSankeyLink(links, 'Events', 'Alerts', totalAlerts);
+    this.addSankeyLink(links, 'Events', 'Dedupe Events', totalDeduped);
+    this.addSankeyLink(links, 'Events', 'Suppressed Events', totalSuppressed);
+    // All Alerts flow into Conditions; Conditions split into Ticket Generated / No Ticket Generated
+    this.addSankeyLink(links, 'Alerts', 'Conditions', this.getNumberFromPayload(conditions, ['total']));
+    this.addSankeyLink(links, 'Conditions', 'Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_generated', 'ticketGenerated']));
+    this.addSankeyLink(links, 'Conditions', 'No Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_not_generated', 'ticketNotGenerated']));
+
+    return this.getSankeyOptions(links, nodeTotals, nodeColors, nodeLabels);
   }
 
   private getAlertLifecycleSankeyOptionsFromPayload(response: any): EChartsOption {
-    const links: Array<{ source: string; target: string; value: number }> = [];
+    const links: Array<{ source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } }> = [];
     const conditions = this.getPayloadByKeys(response, ['conditions']) || {};
     const flatConditions = this.flattenPayload(conditions || {});
 
@@ -2495,32 +2587,59 @@ export class UnifiedAiopsCommandCentreService {
     return this.getSankeyOptions(links, nodeTotals);
   }
 
-  private addDurationSankeyLinks(links: Array<{ source: string; target: string; value: number }>, source: string, duration: any) {
+  private addDurationSankeyLinks(links: Array<{ source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } }>, source: string, duration: any) {
     const flatDuration = this.flattenPayload(duration || {});
     this.addSankeyLink(links, source, '5 Min', this.getNumberFromPayload(flatDuration, ['lte_5min', 'lte5min', 'under_5min']));
     this.addSankeyLink(links, source, '30 Min', this.getNumberFromPayload(flatDuration, ['lte_30min', 'lte30min', 'under_30min']));
     this.addSankeyLink(links, source, '> 30 Min', this.getNumberFromPayload(flatDuration, ['gt_30min', 'gt30min', 'over_30min']));
   }
 
-  private addSankeyLink(links: Array<{ source: string; target: string; value: number }>, source: string, target: string, value: number) {
+  private addSankeyLink(
+    links: Array<{ source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } }>,
+    source: string, target: string, value: number
+  ) {
     if (!source || !target || value <= 0) {
       return;
     }
     links.push({ source, target, value });
   }
 
-  private getSankeyOptions(links: Array<{ source: string; target: string; value: number }>, nodeTotals: { [name: string]: number } = {}): EChartsOption {
+  private getSankeyOptions(
+    links: Array<{ source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } }>,
+    nodeTotals: { [name: string]: number } = {},
+    nodeColors: { [name: string]: string } = {},
+    nodeLabels: { [name: string]: string } = {}
+  ): EChartsOption {
     if (!links.length) {
       return {};
     }
-    const nodes = Array.from(new Set(links.reduce((result: string[], link) => result.concat(link.source, link.target), [])))
-      .map(name => {
-        const incoming = links.filter(link => link.target === name).reduce((total, link) => total + link.value, 0);
-        const outgoing = links.filter(link => link.source === name).reduce((total, link) => total + link.value, 0);
-        const explicitTotal = nodeTotals[name];
-        const count = explicitTotal && explicitTotal > 0 ? explicitTotal : Math.max(incoming, outgoing);
-        return { name, count };
-      });
+
+    const allNames = Array.from(new Set(links.reduce((result: string[], link) => result.concat(link.source, link.target), [])));
+
+    const nodes = allNames.map(name => {
+      const incoming = links.filter(link => link.target === name).reduce((total, link) => total + link.value, 0);
+      const outgoing = links.filter(link => link.source === name).reduce((total, link) => total + link.value, 0);
+      const explicitTotal = nodeTotals[name];
+      const count = explicitTotal && explicitTotal > 0 ? explicitTotal : Math.max(incoming, outgoing);
+      const node: any = { name, count };
+      if (nodeColors[name]) {
+        node.itemStyle = { color: nodeColors[name] };
+      }
+      // Source nodes (no incoming links) label to the left; terminal nodes label to the right
+      const isSource = !links.some(link => link.target === name);
+      const isTerminal = !links.some(link => link.source === name);
+      if (isSource) {
+        node.label = { position: 'left' };
+      } else if (isTerminal) {
+        node.label = { position: 'right' };
+      }
+      return node;
+    });
+
+    // Fixed label box width keeps wall spacing consistent and wraps long names instead of
+    // letting them spill past the left/right chart edges.
+    const labelWidth = 86;
+    const sideMargin = labelWidth + 24;
 
     return {
       tooltip: {
@@ -2531,12 +2650,14 @@ export class UnifiedAiopsCommandCentreService {
         type: 'sankey',
         data: nodes,
         links,
-        left: 28,
-        right: 48,
-        top: 12,
-        bottom: 12,
+        left: sideMargin,
+        right: sideMargin,
+        top: 28,
+        bottom: 28,
         nodeWidth: 10,
-        nodeGap: 14,
+        nodeGap: 48,
+        nodeAlign: 'left',
+        layoutIterations: 0,
         draggable: false,
         emphasis: { focus: 'adjacency' },
         lineStyle: {
@@ -2547,9 +2668,17 @@ export class UnifiedAiopsCommandCentreService {
         label: {
           color: '#1f2a34',
           fontSize: 12,
+          width: labelWidth,
+          overflow: 'break',
+          lineHeight: 14,
           formatter: (params: any) => {
+            const name: string = params?.name || '';
             const count = params?.data?.count;
-            return count ? `${params.name}  ${this.formatNumber(count)}` : params.name;
+            // Scenario A severity tile: source name shows only on the designated topmost tile
+            if (name.includes(' :: ')) {
+              return nodeLabels[name] || '';
+            }
+            return count ? `${name}\n(${this.formatNumber(count)})` : name;
           }
         }
       } as any]

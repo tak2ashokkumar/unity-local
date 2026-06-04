@@ -1,0 +1,161 @@
+{
+    "availability_monitor": "Datacenter",
+    "availability_monitor_key": "datacenter",
+    "duration": "Last 30 Days",
+    "duration_key": "last_30_days",
+    "from_date": "2026-05-05T08:37:12.992798+00:00",
+    "summary": {
+        "total": 58,
+        "up": 36,
+        "down": 8,
+        "unknown": 14,
+        "avg_up": 62.07,
+        "avg_down": 13.79,
+        "avg_unknown": 24.14
+    },
+    "items": [
+        {
+            "resource": "Switch",
+            "name": "Switch",
+            "total": 7,
+            "up": 6,
+            "down": 1,
+            "unknown": 0,
+            "avg_up": 85.71,
+            "avg_down": 14.29,
+            "avg_unknown": 0.0
+        },
+        {
+            "resource": "Firewall",
+            "name": "Firewall",
+            "total": 7,
+            "up": 5,
+            "down": 1,
+            "unknown": 1,
+            "avg_up": 71.43,
+            "avg_down": 14.29,
+            "avg_unknown": 14.29
+        },
+        {
+            "resource": "Load Balancer",
+            "name": "Load Balancer",
+            "total": 5,
+            "up": 3,
+            "down": 1,
+            "unknown": 1,
+            "avg_up": 60.0,
+            "avg_down": 20.0,
+            "avg_unknown": 20.0
+        },
+        {
+            "resource": "Custom Device",
+            "name": "Custom Device",
+            "total": 2,
+            "up": 0,
+            "down": 0,
+            "unknown": 2,
+            "avg_up": 0.0,
+            "avg_down": 0.0,
+            "avg_unknown": 100.0
+        },
+        {
+            "resource": "Mac Device",
+            "name": "Mac Device",
+            "total": 1,
+            "up": 1,
+            "down": 0,
+            "unknown": 0,
+            "avg_up": 100.0,
+            "avg_down": 0.0,
+            "avg_unknown": 0.0
+        },
+        {
+            "resource": "Storage",
+            "name": "Storage",
+            "total": 3,
+            "up": 2,
+            "down": 0,
+            "unknown": 1,
+            "avg_up": 66.67,
+            "avg_down": 0.0,
+            "avg_unknown": 33.33
+        },
+        {
+            "resource": "Smart PDU",
+            "name": "Smart PDU",
+            "total": 1,
+            "up": 1,
+            "down": 0,
+            "unknown": 0,
+            "avg_up": 100.0,
+            "avg_down": 0.0,
+            "avg_unknown": 0.0
+        },
+        {
+            "resource": "Sensor",
+            "name": "Sensor",
+            "total": 1,
+            "up": 1,
+            "down": 0,
+            "unknown": 0,
+            "avg_up": 100.0,
+            "avg_down": 0.0,
+            "avg_unknown": 0.0
+        },
+        {
+            "resource": "PDU",
+            "name": "PDU",
+            "total": 2,
+            "up": 1,
+            "down": 1,
+            "unknown": 0,
+            "avg_up": 50.0,
+            "avg_down": 50.0,
+            "avg_unknown": 0.0
+        },
+        {
+            "resource": "Hypervisor",
+            "name": "Hypervisor",
+            "total": 8,
+            "up": 7,
+            "down": 0,
+            "unknown": 1,
+            "avg_up": 87.5,
+            "avg_down": 0.0,
+            "avg_unknown": 12.5
+        },
+        {
+            "resource": "Baremetal",
+            "name": "Baremetal",
+            "total": 3,
+            "up": 1,
+            "down": 1,
+            "unknown": 1,
+            "avg_up": 33.33,
+            "avg_down": 33.33,
+            "avg_unknown": 33.33
+        },
+        {
+            "resource": "Database",
+            "name": "Database",
+            "total": 6,
+            "up": 0,
+            "down": 0,
+            "unknown": 6,
+            "avg_up": 0.0,
+            "avg_down": 0.0,
+            "avg_unknown": 100.0
+        },
+        {
+            "resource": "Custom VM",
+            "name": "Custom VM",
+            "total": 12,
+            "up": 8,
+            "down": 3,
+            "unknown": 1,
+            "avg_up": 66.67,
+            "avg_down": 25.0,
+            "avg_unknown": 8.33
+        }
+    ]
+}

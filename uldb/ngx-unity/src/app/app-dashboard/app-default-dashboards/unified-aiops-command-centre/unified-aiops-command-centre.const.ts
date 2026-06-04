@@ -17,8 +17,10 @@ export const UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT = '/customer/ai
 export const UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT = '/customer/aiops-dashboard/discovery-vs-monitoring/';
 export const UNIFIED_AIOPS_ALERT_SEGREGATION_BY_TYPE_ENDPOINT = '/customer/aiops-dashboard/alert-segregation-by-type/';
 export const UNIFIED_AIOPS_BUSINESS_SERVICES_ENDPOINT = '/customer/aiops-dashboard/business-services/';
-export const UNIFIED_AIOPS_APPLICATION_SERVICES_ALERTS_ENDPOINT = '/customer/aiops-dashboard/application-services-alerts/';
 export const UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT = '/customer/aiops-dashboard/geo-distribution-global-ops/';
+
+// Employee / Digital Experience is a static widget that links out to the external Nexthink dashboard.
+export const UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL = 'https://nam10.safelinks.protection.outlook.com/?url=https%3A%2F%2Fkanopy.us.nexthink.cloud%2Fdigital-experience%2Foverview&data=05%7C02%7Cakumar%40unityone.ai%7Cb44d558871ec43ece36d08dec17ad94b%7Cd5f609efb8ac4047a41f4efa1cbb5bc8%7C0%7C0%7C639160930561405792%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=xVjr9CeG4cYEUDs0MbqSAQnlf7eeqDDtnuT%2Fv3PEqp0%3D&reserved=0';
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/private-cloud-infra-coverage/';
 export const UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/public-cloud-infra-coverage/';
 export const UNIFIED_AIOPS_DATACENTER_GEOGRAPHY_ENDPOINT = '/customer/aiops-dashboard/datacenter-geography/';
@@ -31,6 +33,7 @@ export const UNIFIED_AIOPS_DATABASE_MONITORING_ENDPOINT = '/customer/aiops-dashb
 export const UNIFIED_AIOPS_OS_MONITORING_ENDPOINT = '/customer/aiops-dashboard/os-monitoring/';
 export const UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT = '/customer/aiops-dashboard/infra-platform-performance/';
 export const UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT = '/customer/aiops-dashboard/analytics-health-charts/';
+export const UNIFIED_AIOPS_AVAILABILITY_BY_CATEGORY_ENDPOINT = '/customer/aiops-dashboard/availability-by-category/';
 export const UNIFIED_AIOPS_ALERTS_ENDPOINT = '/customer/aiops-dashboard/alerts/';
 export const UNIFIED_AIOPS_PARENT_APPLICATIONS_ENDPOINT = '/apm/monitoring/parent_app_list/';
 export const UNIFIED_AIOPS_ORPHANED_DEVICES_ENDPOINT = '/customer/aiops-dashboard/orphaned-devices/';
@@ -92,14 +95,6 @@ export const UNIFIED_AIOPS_EXECUTIVE_SUMMARY_METRIC_CONFIG: Array<{ label: strin
   { label: 'VM', tone: 'primary', keys: ['vm', 'vms', 'vm_count', 'vmCount', 'virtual_machines', 'virtualMachines'] },
   { label: 'Orphaned Devices', keys: ['orphaned_devices', 'orphanedDevices', 'orphaned'] },
   { label: 'Idle Devices', keys: ['idle_devices', 'idleDevices', 'idle'] }
-];
-
-export const UNIFIED_AIOPS_EMPLOYEE_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[] }> = [
-  { label: 'Total Endpoints', tone: 'primary', keys: ['total_endpoints', 'totalEndpoints', 'endpoints', 'endpoint_count', 'total_services', 'totalServices'] },
-  { label: 'Applications', tone: 'primary', keys: ['applications', 'total_applications', 'totalApplications', 'application_count', 'applicationCount'] },
-  { label: 'Healthy', tone: 'success', keys: ['healthy', 'total_healthy', 'totalHealthy', 'healthy_count', 'healthyCount'] },
-  { label: 'Warnings', tone: 'warning', keys: ['warnings', 'warning', 'total_warning', 'totalWarning', 'warning_count', 'warningCount'] },
-  { label: 'Critical', tone: 'danger', keys: ['critical', 'total_critical', 'totalCritical', 'critical_count', 'criticalCount'] }
 ];
 
 export const UNIFIED_AIOPS_DATACENTER_INFRA_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; aggregateKeys?: string[] }> = [

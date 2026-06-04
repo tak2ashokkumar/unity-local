@@ -120,6 +120,7 @@ export interface UnifiedAiopsCoverageCard {
   title: string;
   rows: UnifiedAiopsCoverageRow[];
   totalResources?: string;
+  chartOptions?: EChartsOption;
 }
 
 export interface UnifiedAiopsCoverageRow {

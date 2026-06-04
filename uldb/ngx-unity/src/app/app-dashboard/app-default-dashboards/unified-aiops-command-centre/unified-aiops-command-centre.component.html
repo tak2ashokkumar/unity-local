@@ -156,20 +156,18 @@
                 </table>
             </div>
 
-        <div class="two-column-grid mt-3" *ngIf="hasEmployeeMetrics || hasGeoDistribution"
-            [ngClass]="{'single-widget-grid': !(hasEmployeeMetrics && hasGeoDistribution)}">
-            <div *ngIf="hasEmployeeMetrics">
+        <div class="two-column-grid mt-3" *ngIf="hasEmployeeExperience || hasGeoDistribution"
+            [ngClass]="{'single-widget-grid': !(hasEmployeeExperience && hasGeoDistribution)}">
+            <div *ngIf="hasEmployeeExperience">
                 <div class="employee-widget-header">
                     <div class="section-title mb-0">Employee / Digital Experience</div>
                     <button type="button" class="btn btn-sm employee-view-btn" (click)="openEmployeeExperience()"
-                        [tooltip]="'Open linked page'" placement="top" container="body">View</button>
+                        [tooltip]="'Open Digital Experience'" placement="top" container="body">View</button>
                 </div>
-                <div class="dashboard-card employee-card">
-                    <app-spinner [name]="loaderNames.employeeExperience" [width]="0"></app-spinner>
-                    <div class="employee-metric" *ngFor="let metric of employeeMetrics; trackBy: trackByIndex">
-                        <div class="metric-label">{{metric.label}}</div>
-                        <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
-                    </div>
+                <div class="dashboard-card employee-card linked-widget" (click)="openEmployeeExperience()"
+                    [tooltip]="'Open Digital Experience'" placement="top" container="body">
+                    <img class="employee-experience-image" src="static/assets/images/external-brand/Nexthink_Cloud_Wipro.png"
+                        alt="Employee Digital Experience" />
                 </div>
             </div>
             <div *ngIf="hasGeoDistribution">
@@ -191,23 +189,32 @@
         </div>
         <div class="coverage-grid private-grid" *ngIf="hasPrivateCloudCoverage">
             <app-spinner [name]="loaderNames.privateCloudCoverage" [width]="0"></app-spinner>
-            <div class="coverage-card" *ngFor="let provider of privateCloudCoverage; trackBy: trackByIndex">
+            <div class="coverage-card" *ngFor="let provider of privateCloudCoverage; trackBy: trackByIndex"
+                [ngClass]="{'coverage-card-with-chart': showPrivateCloudCoverageChart}">
                 <div class="coverage-title">
                     <button type="button" class="btn btn-link p-0 coverage-link"
                         (click)="openPrivateCloudCoverage(provider)" [tooltip]="'Open linked page'" placement="top" container="body">
                         {{provider.title}}
                     </button>
                 </div>
-                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
-                    <span>
-                        <button type="button" class="btn btn-link p-0 coverage-link"
-                            *ngIf="canOpenPrivateCloudCoverage(provider, row); else privateCoverageLabelText"
-                            (click)="openPrivateCloudCoverage(provider, row)" [tooltip]="'Open linked page'" placement="top" container="body">
-                            {{row.label}}
-                        </button>
-                        <ng-template #privateCoverageLabelText>{{row.label}}</ng-template>
-                    </span>
-                    <strong>{{row.value}}</strong>
+                <div class="d-flex coverage-card-body">
+                    <div class="coverage-rows-col">
+                        <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
+                            <span>
+                                <button type="button" class="btn btn-link p-0 coverage-link"
+                                    *ngIf="canOpenPrivateCloudCoverage(provider, row); else privateCoverageLabelText"
+                                    (click)="openPrivateCloudCoverage(provider, row)" [tooltip]="'Open linked page'" placement="top" container="body">
+                                    {{row.label}}
+                                </button>
+                                <ng-template #privateCoverageLabelText>{{row.label}}</ng-template>
+                            </span>
+                            <strong>{{row.value}}</strong>
+                        </div>
+                    </div>
+                    <div class="coverage-chart-col"
+                        *ngIf="showPrivateCloudCoverageChart && hasChartData(provider.chartOptions)">
+                        <div echarts [options]="provider.chartOptions" class="coverage-resource-chart"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -216,7 +223,8 @@
         </div>
         <div class="coverage-grid public-grid" *ngIf="hasPublicCloudCoverage">
             <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
-            <div class="coverage-card" *ngFor="let provider of publicCloudCoverage; trackBy: trackByIndex">
+            <div class="coverage-card" *ngFor="let provider of publicCloudCoverage; trackBy: trackByIndex"
+                [ngClass]="{'coverage-card-with-chart': showPublicCloudCoverageChart}">
                 <div class="coverage-title">
                     <button type="button" class="btn btn-link p-0 coverage-link"
                         *ngIf="canOpenPublicCloudCoverage(provider); else publicCoverageTitleText"
@@ -225,16 +233,24 @@
                     </button>
                     <ng-template #publicCoverageTitleText>{{provider.title}}</ng-template>
                 </div>
-                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
-                    <span>
-                        <button type="button" class="btn btn-link p-0 coverage-link"
-                            *ngIf="canOpenPublicCloudCoverage(provider, row); else publicCoverageLabelText"
-                            (click)="openPublicCloudCoverage(provider, row)" [tooltip]="'Open linked page'" placement="top" container="body">
-                            {{row.label}}
-                        </button>
-                        <ng-template #publicCoverageLabelText>{{row.label}}</ng-template>
-                    </span>
-                    <strong>{{row.value}}</strong>
+                <div class="d-flex coverage-card-body">
+                    <div class="coverage-rows-col">
+                        <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
+                            <span>
+                                <button type="button" class="btn btn-link p-0 coverage-link"
+                                    *ngIf="canOpenPublicCloudCoverage(provider, row); else publicCoverageLabelText"
+                                    (click)="openPublicCloudCoverage(provider, row)" [tooltip]="'Open linked page'" placement="top" container="body">
+                                    {{row.label}}
+                                </button>
+                                <ng-template #publicCoverageLabelText>{{row.label}}</ng-template>
+                            </span>
+                            <strong>{{row.value}}</strong>
+                        </div>
+                    </div>
+                    <div class="coverage-chart-col"
+                        *ngIf="showPublicCloudCoverageChart && hasChartData(provider.chartOptions)">
+                        <div echarts [options]="provider.chartOptions" class="coverage-resource-chart"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -498,7 +514,7 @@
                 <div class="card-title-row">Infrastructure / Platform Performance</div>
                 <div class="performance-chart-grid adaptive-widget-grid">
                     <div class="inner-chart-card">
-                        <div class="chart-title">Avg Network Bandwidth Usage (%)</div>
+                        <div class="chart-title">Top 10 Devices by Network Utilization</div>
                         <div echarts [options]="bandwidthBarOptions"
                             class="small-chart" *ngIf="hasChartData(bandwidthBarOptions)"></div>
                         <div class="dashboard-empty-state performance-panel-empty"

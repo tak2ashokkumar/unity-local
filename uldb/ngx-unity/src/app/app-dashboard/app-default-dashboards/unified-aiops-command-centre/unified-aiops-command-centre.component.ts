@@ -26,7 +26,8 @@ import {
   UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY,
   UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS,
   UNIFIED_AIOPS_ALERT_DURATION_OPTIONS,
-  UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS
+  UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS,
+  UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL
 } from './unified-aiops-command-centre.const';
 import {
   UnifiedAiopsAvailabilityCategoryRow,
@@ -62,7 +63,6 @@ interface UnifiedAiopsWidgetLoadingState {
   alertSegregationLegend: boolean;
   alertSegregation: boolean;
   businessServices: boolean;
-  employeeExperience: boolean;
   geoDistribution: boolean;
   privateCloudCoverage: boolean;
   publicCloudCoverage: boolean;
@@ -129,7 +129,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     'alertSegregationLegend',
     'alertSegregation',
     'businessServices',
-    'employeeExperience',
     'geoDistribution',
     'privateCloudCoverage',
     'publicCloudCoverage',
@@ -225,7 +224,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   alertSegregationLegend: UnifiedAiopsLegendMetric[] = [];
   alertSegregationOptions: EChartsOption = {};
   businessServices: UnifiedAiopsBusinessService[] = [];
-  employeeMetrics: UnifiedAiopsMetric[] = [];
   geoHeatmapOptions: EChartsOption = {};
   privateCloudCoverage: UnifiedAiopsCoverageCard[] = [];
   publicCloudCoverage: UnifiedAiopsCoverageCard[] = [];
@@ -290,7 +288,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     alertSegregationLegend: false,
     alertSegregation: false,
     businessServices: false,
-    employeeExperience: false,
     geoDistribution: false,
     privateCloudCoverage: false,
     publicCloudCoverage: false,
@@ -332,7 +329,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     discovery: 'unifiedAiopsDiscoveryLoader',
     alertSegregation: 'unifiedAiopsAlertSegregationLoader',
     businessServices: 'unifiedAiopsBusinessServicesLoader',
-    employeeExperience: 'unifiedAiopsEmployeeExperienceLoader',
     geoDistribution: 'unifiedAiopsGeoDistributionLoader',
     privateCloudCoverage: 'unifiedAiopsPrivateCloudCoverageLoader',
     publicCloudCoverage: 'unifiedAiopsPublicCloudCoverageLoader',
@@ -536,11 +532,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     };
   }
 
-  private getAnalyticsFilterCriteria(criteria: UnifiedAiopsDashboardFilterCriteria): UnifiedAiopsDashboardFilterCriteria {
+  /** Builds the criteria for the Availability By Category widget; time range is sent as the `duration` param. */
+  private getAvailabilityCategoryCriteria(): UnifiedAiopsDashboardFilterCriteria {
     return {
-      ...criteria,
+      ...this.appliedFilterCriteria,
       availabilityMonitor: this.selectedAvailabilityMonitor,
-      availabilityTimeRange: this.selectedAvailabilityTimeRange
+      duration: this.selectedAvailabilityTimeRange
     };
   }
 
@@ -556,22 +553,20 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   onAvailabilityMonitorChange(event: Event) {
     this.selectedAvailabilityMonitor = String((event.target as HTMLSelectElement)?.value || 'Datacenter');
-    this.reloadAnalyticsHealthCharts();
+    this.reloadAvailabilityCategory();
   }
 
   onAvailabilityTimeRangeChange(event: Event) {
     this.selectedAvailabilityTimeRange = String((event.target as HTMLSelectElement)?.value || '30 Days');
-    this.reloadAnalyticsHealthCharts();
+    this.reloadAvailabilityCategory();
   }
 
-  private reloadAnalyticsHealthCharts() {
+  /** Reloads only the Availability By Category widget; Device Availability and Alert Trend are untouched. */
+  private reloadAvailabilityCategory() {
     if (!this.hasFilterFormData()) {
       return;
     }
-    const analyticsFilterCriteria = this.getAnalyticsFilterCriteria(this.appliedFilterCriteria);
-    this.getDeviceAvailability(analyticsFilterCriteria);
-    this.getAvailabilityCategory(analyticsFilterCriteria);
-    this.getAlertTrend(analyticsFilterCriteria);
+    this.getAvailabilityCategory(this.getAvailabilityCategoryCriteria());
   }
 
   /** Builds (first load) or re-syncs (on global apply) the Alerts widget's local filters from the page-level scope. */
@@ -705,7 +700,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
     const filterFormOutput = this.appliedFilterCriteria;
-    const analyticsFilterCriteria = this.getAnalyticsFilterCriteria(filterFormOutput);
+    const availabilityCategoryCriteria = this.getAvailabilityCategoryCriteria();
     this.startWidgetLoadingState();
     this.setupAlertsFilters();
     setTimeout(() => {
@@ -713,12 +708,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.getDiscoveryOptions(filterFormOutput);
       this.getAlertSegregation(filterFormOutput);
       this.getBusinessServices(filterFormOutput);
-      if (this.showEmployeeExperienceWidget) {
-        this.getEmployeeMetrics(filterFormOutput);
-      } else {
-        this.employeeMetrics = [];
-        this.widgetLoading.employeeExperience = false;
-      }
       this.getGeoDistribution(filterFormOutput);
       this.getPrivateCloudCoverage(filterFormOutput);
       this.getPublicCloudCoverage(filterFormOutput);
@@ -734,9 +723,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.getBandwidthLine(filterFormOutput);
       this.getPlatformPerformance(filterFormOutput);
       this.getPerformanceMetrics(filterFormOutput);
-      this.getDeviceAvailability(analyticsFilterCriteria);
-      this.getAvailabilityCategory(analyticsFilterCriteria);
-      this.getAlertTrend(analyticsFilterCriteria);
+      this.getDeviceAvailability(filterFormOutput);
+      this.getAvailabilityCategory(availabilityCategoryCriteria);
+      this.getAlertTrend(filterFormOutput);
       this.getOrphanedDevices(filterFormOutput);
       this.getOrphanedDevicesByCategory(filterFormOutput);
       this.getIdleDevices(filterFormOutput);
@@ -790,15 +779,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     }, () => {
       this.businessServices = [];
     }, 'businessServices');
-  }
-
-  getEmployeeMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.employeeMetrics = [];
-    this.loadWidget(this.loaderNames.employeeExperience, this.svc.getEmployeeMetrics(filterFormOutput), res => {
-      this.employeeMetrics = this.svc.convertToMetricsViewData(res);
-    }, () => {
-      this.employeeMetrics = [];
-    }, 'employeeExperience');
   }
 
   getGeoDistribution(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1489,8 +1469,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     return this.widgetLoading.businessServices || !!this.businessServices?.length;
   }
 
-  get hasEmployeeMetrics(): boolean {
-    return this.showEmployeeExperienceWidget && (this.widgetLoading.employeeExperience || this.hasMetricValues(this.employeeMetrics));
+  get hasEmployeeExperience(): boolean {
+    return this.showEmployeeExperienceWidget;
   }
 
   get hasGeoDistribution(): boolean {
@@ -1499,6 +1479,16 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   get hasPrivateCloudCoverage(): boolean {
     return this.widgetLoading.privateCloudCoverage || this.hasCoverageValues(this.privateCloudCoverage);
+  }
+
+  /** The resource bar chart renders only when the response has a single private cloud type. */
+  get showPrivateCloudCoverageChart(): boolean {
+    return this.privateCloudCoverage.length === 1;
+  }
+
+  /** The resource bar chart renders only when the response has a single public cloud type. */
+  get showPublicCloudCoverageChart(): boolean {
+    return this.publicCloudCoverage.length === 1;
   }
 
   get hasPublicCloudCoverage(): boolean {
@@ -1664,7 +1654,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.hasDiscovery ||
       this.hasAlertSegregation ||
       this.hasBusinessServices ||
-      this.hasEmployeeMetrics ||
+      this.hasEmployeeExperience ||
       this.hasGeoDistribution ||
       this.hasPrivateCloudCoverage ||
       this.hasPublicCloudCoverage ||
@@ -1752,7 +1742,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     }
   }
 
-  hasChartData(options: EChartsOption): boolean {
+  hasChartData(options?: EChartsOption): boolean {
     const chartOptions = options as any;
     if (!chartOptions || !Object.keys(chartOptions).length) {
       return false;
@@ -1853,7 +1843,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   openEmployeeExperience() {
-    this.openRouteInNewTab(this.linkRoutes.applications);
+    window.open(UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL, '_blank', 'noopener');
   }
 
   openDatacenters() {

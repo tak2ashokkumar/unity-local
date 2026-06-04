@@ -1,71 +1,44 @@
 {
-  "device_availability": {
-    "up": 88.31,
-    "down": 3.66,
-    "unknown": 8.03
-  },
-  "availability_by_category": {
-    "gcp_resource": {
-      "up": 99.64,
-      "down": 0.14,
-      "unknown": 0.21
+    "device_availability": {
+        "up": 87.93,
+        "down": 6.05,
+        "unknown": 6.01
     },
-    "aws_resource": {
-      "up": 100.0,
-      "down": 0.0,
-      "unknown": 0.0
-    },
-    "vm": {
-      "up": 55.14,
-      "down": 42.76,
-      "unknown": 2.1
-    },
-    "azure_resource": {
-      "up": 0.0,
-      "down": 0.0,
-      "unknown": 100.0
-    },
-    "switch": {
-      "up": 50.0,
-      "down": 28.57,
-      "unknown": 21.43
+    "alerts_trend": {
+        "2026-05-29": {
+            "information": 0,
+            "warning": 0,
+            "critical": 0
+        },
+        "2026-05-30": {
+            "information": 0,
+            "warning": 0,
+            "critical": 0
+        },
+        "2026-05-31": {
+            "information": 0,
+            "warning": 0,
+            "critical": 0
+        },
+        "2026-06-01": {
+            "information": 0,
+            "warning": 0,
+            "critical": 0
+        },
+        "2026-06-02": {
+            "information": 0,
+            "warning": 0,
+            "critical": 0
+        },
+        "2026-06-03": {
+            "information": 0,
+            "warning": 0,
+            "critical": 0
+        },
+        "2026-06-04": {
+            "information": 0,
+            "warning": 0,
+            "critical": 0
+        }
     }
-  },
-  "alerts_trend": {
-    "2026-05-27": {
-      "information": 8,
-      "warning": 0,
-      "critical": 84
-    },
-    "2026-05-28": {
-      "information": 20,
-      "warning": 0,
-      "critical": 422
-    },
-    "2026-05-29": {
-      "information": 22,
-      "warning": 0,
-      "critical": 451
-    },
-    "2026-05-30": {
-      "information": 15,
-      "warning": 0,
-      "critical": 50
-    },
-    "2026-05-31": {
-      "information": 11,
-      "warning": 0,
-      "critical": 130
-    },
-    "2026-06-01": {
-      "information": 13,
-      "warning": 0,
-      "critical": 108
-    },
-    "2026-06-02": {
-      "information": 13,
-      "warning": 10,
-      "critical": 82
-    }
-  }
 }
