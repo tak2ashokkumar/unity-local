@@ -657,3 +657,26 @@ export interface PublicCloudRecentAlert {
   acknowledged: string;
   duration: string;
 }
+
+export type PublicCloudLatencyHeatmapResponse = Record<string, Array<{ time?: string; value?: number | string }>>;
+
+export interface PublicCloudLatencyHeatmapCell {
+  value: number;
+  color: string;
+  tone: string;
+}
+
+export interface PublicCloudLatencyHeatmapRow {
+  account: string;
+  cells: PublicCloudLatencyHeatmapCell[];
+}
+
+export type PublicCloudQueueBacklogResponse = Record<string, { messages?: number | string; percentage?: number | string }>;
+
+export interface PublicCloudQueueBacklogRow {
+  name: string;
+  messages: string;
+  percentage: number;
+  color: string;
+  tone: string;
+}

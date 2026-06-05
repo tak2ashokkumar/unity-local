@@ -27,6 +27,8 @@ export const PUBLIC_CLOUD_TRANSACTION_VOLUME_TREND_ENDPOINT = '/customer/public-
 export const PUBLIC_CLOUD_OBJECT_FILE_GROWTH_TREND_ENDPOINT = '/customer/public-cloud-widgets/object_and_file_growth_trend/';
 export const PUBLIC_CLOUD_STORAGE_SERVICES_VISIBILITY_ENDPOINT = '/customer/public-cloud-widgets/storage_services_visibility/';
 export const PUBLIC_CLOUD_STORAGE_DISTRIBUTION_ENDPOINT = '/customer/public-cloud-widgets/cloud_storage_distribution/';
+export const PUBLIC_CLOUD_LATENCY_HEATMAP_ENDPOINT = '/customer/public-cloud-widgets/latency_heatmap/';
+export const PUBLIC_CLOUD_QUEUE_BACKLOG_MONITOR_ENDPOINT = '/customer/public-cloud-widgets/queue_backlog_monitor/';
 export const PUBLIC_CLOUD_FILTERS_ENDPOINT = '/customer/public-cloud-widgets/public_cloud_filters/';
 export const PUBLIC_CLOUD_ALL_SELECTED_VALUE = 'all';
 
@@ -175,4 +177,18 @@ export const PUBLIC_CLOUD_STORAGE_DISTRIBUTION_COLORS: Record<string, string> = 
   'file storage': '#28a878',
   'queue storage': '#c77f13',
   'table storage': '#5e4bd0'
+};
+
+// Latency Heatmap cell colors by threshold: <20ms low, 20-80ms medium, >80ms high.
+export const PUBLIC_CLOUD_LATENCY_HEATMAP_COLORS = {
+  low: '#5ba83f',
+  medium: '#b5742a',
+  high: '#cf4b3f'
+};
+
+// Queue Backlog Monitor bar colors by backlog %: <60 low, 60-89 medium, >=90 high.
+export const PUBLIC_CLOUD_QUEUE_BACKLOG_COLORS = {
+  low: '#43c78c',
+  medium: '#e0a51e',
+  high: '#ec6b6b'
 };

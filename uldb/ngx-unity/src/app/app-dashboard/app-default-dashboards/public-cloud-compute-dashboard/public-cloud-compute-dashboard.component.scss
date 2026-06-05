@@ -1224,7 +1224,7 @@ button.legend-link {
 }
 
 .cloud-storage-performance-grid {
-  grid-template-columns: minmax(300px, 1fr) minmax(420px, 1.25fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(300px, 1fr) minmax(380px, 1.05fr) minmax(330px, 1.1fr);
   max-width: 1260px;
   margin: 0 auto;
 }
@@ -1242,6 +1242,66 @@ button.legend-link {
 .read-write-chart {
   width: 100%;
   height: 230px;
+}
+
+.latency-heatmap-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #7b8794;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.latency-heatmap-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.latency-heatmap-account {
+  flex: 0 0 84px;
+  max-width: 84px;
+  color: #3a4651;
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.latency-heatmap-cells {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 3px;
+  min-width: 0;
+}
+
+.latency-heatmap-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.latency-heatmap-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+  color: #5f6f86;
+  font-size: 11px;
+  line-height: 16px;
 }
 
 .cloud-storage-operation-grid {
@@ -1301,12 +1361,62 @@ button.legend-link {
 .cloud-storage-distribution-row {
   display: flex;
   justify-content: flex-end;
-  padding: 0 150px 16px 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding: 0 24px 16px;
 }
 
 .cloud-storage-distribution-widget {
-  width: 410px;
+  width: 470px;
   min-height: 270px;
+}
+
+.queue-backlog-widget {
+  margin-right: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 560px;
+}
+
+.queue-backlog-row {
+  margin-bottom: 14px;
+}
+
+.queue-backlog-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.queue-backlog-name {
+  color: #1f2a34;
+  font-weight: 600;
+}
+
+.queue-backlog-msgs {
+  color: #6c7884;
+}
+
+.queue-backlog-percent {
+  margin-left: auto;
+  color: #3a4651;
+  font-weight: 600;
+}
+
+.queue-backlog-track {
+  height: 12px;
+  border-radius: 7px;
+  background: #eef1f4;
+  overflow: hidden;
+}
+
+.queue-backlog-fill {
+  height: 100%;
+  min-width: 6px;
+  border-radius: 7px;
 }
 
 .cloud-storage-distribution-chart {

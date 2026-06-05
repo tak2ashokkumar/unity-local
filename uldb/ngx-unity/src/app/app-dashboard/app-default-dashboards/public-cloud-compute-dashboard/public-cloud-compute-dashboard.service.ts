@@ -21,6 +21,10 @@ import {
   PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DURATION_COLORS,
   PUBLIC_CLOUD_INVENTORY_SUMMARY_ENDPOINT,
+  PUBLIC_CLOUD_LATENCY_HEATMAP_COLORS,
+  PUBLIC_CLOUD_LATENCY_HEATMAP_ENDPOINT,
+  PUBLIC_CLOUD_QUEUE_BACKLOG_COLORS,
+  PUBLIC_CLOUD_QUEUE_BACKLOG_MONITOR_ENDPOINT,
   PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS,
   PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
   PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT,
@@ -74,6 +78,10 @@ import {
   PublicCloudIdleMetric,
   PublicCloudIdleMetricResponse,
   PublicCloudInventorySummaryResponse,
+  PublicCloudLatencyHeatmapResponse,
+  PublicCloudLatencyHeatmapRow,
+  PublicCloudQueueBacklogResponse,
+  PublicCloudQueueBacklogRow,
   PublicCloudOrphanedCategoryItem,
   PublicCloudOrphanedCategoryResponseItem,
   PublicCloudOrphanedDeviceResponseItem,
@@ -829,6 +837,75 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
+  getLatencyHeatmap(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudLatencyHeatmapResponse> {
+    return this.http.get<PublicCloudLatencyHeatmapResponse>(PUBLIC_CLOUD_LATENCY_HEATMAP_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToLatencyHeatmapRows(data: PublicCloudLatencyHeatmapResponse): PublicCloudLatencyHeatmapRow[] {
+    const source = this.getObjectResponseData(data) as PublicCloudLatencyHeatmapResponse;
+    return Object.keys(source || {}).reduce((rows: PublicCloudLatencyHeatmapRow[], account) => {
+      const entries = Array.isArray(source[account]) ? source[account] : [];
+      const cells = entries.map(entry => {
+        const value = this.getNumericValue(entry?.value);
+        return {
+          value,
+          tone: this.getLatencyHeatmapTone(value),
+          color: this.getLatencyHeatmapColor(value)
+        };
+      });
+      if (cells.length) {
+        rows.push({ account, cells });
+      }
+      return rows;
+    }, []);
+  }
+
+  private getLatencyHeatmapTone(value: number): string {
+    if (value < 20) {
+      return 'low';
+    }
+    return value > 80 ? 'high' : 'medium';
+  }
+
+  private getLatencyHeatmapColor(value: number): string {
+    return PUBLIC_CLOUD_LATENCY_HEATMAP_COLORS[this.getLatencyHeatmapTone(value)];
+  }
+
+  getQueueBacklogMonitor(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudQueueBacklogResponse> {
+    return this.http.get<PublicCloudQueueBacklogResponse>(PUBLIC_CLOUD_QUEUE_BACKLOG_MONITOR_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToQueueBacklogRows(data: PublicCloudQueueBacklogResponse): PublicCloudQueueBacklogRow[] {
+    const source = this.getObjectResponseData(data) as PublicCloudQueueBacklogResponse;
+    return Object.keys(source || {}).reduce((rows: PublicCloudQueueBacklogRow[], name) => {
+      const entry = source[name] || {};
+      const percentage = this.getNumericValue(entry.percentage);
+      rows.push({
+        name,
+        messages: this.formatNumber(this.getNumericValue(entry.messages)),
+        percentage,
+        tone: this.getQueueBacklogTone(percentage),
+        color: this.getQueueBacklogColor(percentage)
+      });
+      return rows;
+    }, []);
+  }
+
+  private getQueueBacklogTone(percentage: number): string {
+    if (percentage >= 90) {
+      return 'high';
+    }
+    return percentage >= 60 ? 'medium' : 'low';
+  }
+
+  private getQueueBacklogColor(percentage: number): string {
+    return PUBLIC_CLOUD_QUEUE_BACKLOG_COLORS[this.getQueueBacklogTone(percentage)];
+  }
+
   convertToCloudStorageHealthMetrics(data: PublicCloudStorageHealthResponse): PublicCloudStorageKpi[] {
     const rows = this.getDatabaseRowsFromValue(this.getObjectResponseData(data), ['results', 'items', 'rows']) as any[];
     return (rows || []).map((item): PublicCloudStorageKpi => {
@@ -957,7 +1034,8 @@ export class PublicCloudComputeDashboardService {
       series: [
         {
           type: 'pie',
-          radius: ['42%', '72%'],
+          roseType: 'area',
+          radius: ['30%', '78%'],
           center: ['50%', '48%'],
           avoidLabelOverlap: true,
           minAngle: 8,

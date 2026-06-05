@@ -312,6 +312,32 @@
                         <div class="widget-no-data" *ngIf="!widgetLoading.readVsWriteTraffic">No data available</div>
                     </ng-template>
                 </div>
+
+                <div class="cloud-storage-widget latency-heatmap-widget">
+                    <app-spinner [name]="loaderNames.latencyHeatmap" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Latency Heatmap</div>
+                    <ng-container *ngIf="hasLatencyHeatmapData; else latencyHeatmapNoData">
+                        <div class="latency-heatmap-head">
+                            <span>Storage account</span>
+                            <span class="latency-heatmap-range">&larr; T-8 to Now &rarr;</span>
+                        </div>
+                        <div class="latency-heatmap-row" *ngFor="let row of latencyHeatmapRows; trackBy: trackByIndex">
+                            <div class="latency-heatmap-account">{{row.account}}</div>
+                            <div class="latency-heatmap-cells">
+                                <span class="latency-heatmap-cell" *ngFor="let cell of row.cells; trackBy: trackByIndex"
+                                    [style.background]="cell.color">{{cell.value}}</span>
+                            </div>
+                        </div>
+                        <div class="latency-heatmap-legend">
+                            <span><i class="latency-dot latency-success"></i>&lt;20ms</span>
+                            <span><i class="latency-dot latency-warning"></i>20&ndash;80ms</span>
+                            <span><i class="latency-dot latency-danger"></i>&gt;80ms</span>
+                        </div>
+                    </ng-container>
+                    <ng-template #latencyHeatmapNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.latencyHeatmap">No data available</div>
+                    </ng-template>
+                </div>
             </div>
 
             <div class="cloud-storage-subsection-title">Operation Intelligence</div>
@@ -388,6 +414,27 @@
             </div>
 
             <div class="cloud-storage-distribution-row">
+                <div class="cloud-storage-widget queue-backlog-widget">
+                    <app-spinner [name]="loaderNames.queueBacklogMonitor" [width]="0"></app-spinner>
+                    <div class="database-widget-title">Queue Backlog Monitor</div>
+                    <ng-container *ngIf="hasQueueBacklogMonitorData; else queueBacklogNoData">
+                        <div class="queue-backlog-row" *ngFor="let row of queueBacklogRows; trackBy: trackByIndex">
+                            <div class="queue-backlog-head">
+                                <span class="queue-backlog-name">{{row.name}}</span>
+                                <span class="queue-backlog-msgs">{{row.messages}} msgs</span>
+                                <span class="queue-backlog-percent">{{row.percentage}}%</span>
+                            </div>
+                            <div class="queue-backlog-track">
+                                <div class="queue-backlog-fill" [style.width.%]="row.percentage"
+                                    [style.background]="row.color"></div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-template #queueBacklogNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.queueBacklogMonitor">No data available</div>
+                    </ng-template>
+                </div>
+
                 <div class="cloud-storage-widget cloud-storage-distribution-widget">
                     <app-spinner [name]="loaderNames.cloudStorageDistribution" [width]="0"></app-spinner>
                     <div class="database-widget-title">Cloud Storage Distribution</div>

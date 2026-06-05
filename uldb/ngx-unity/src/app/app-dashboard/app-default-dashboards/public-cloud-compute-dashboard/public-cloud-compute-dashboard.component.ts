@@ -25,11 +25,13 @@ import {
   PublicCloudIdleDeviceRow,
   PublicCloudIdleDurationItem,
   PublicCloudInventorySummaryKey,
+  PublicCloudLatencyHeatmapRow,
   PublicCloudLockContentionRow,
   PublicCloudOrphanedCategoryItem,
   PublicCloudOrphanedDeviceRow,
   PublicCloudProviderDistributionKey,
   PublicCloudProviderDistributionItem,
+  PublicCloudQueueBacklogRow,
   PublicCloudRecentAlert,
   PublicCloudRegionOption,
   PublicCloudStorageBarItem,
@@ -68,6 +70,8 @@ interface PublicCloudWidgetLoadingState {
   objectFileGrowthTrend: boolean;
   storageServicesVisibility: boolean;
   cloudStorageDistribution: boolean;
+  latencyHeatmap: boolean;
+  queueBacklogMonitor: boolean;
 }
 
 @Component({
@@ -101,7 +105,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     'transactionVolumeTrend',
     'objectFileGrowthTrend',
     'storageServicesVisibility',
-    'cloudStorageDistribution'
+    'cloudStorageDistribution',
+    'latencyHeatmap',
+    'queueBacklogMonitor'
   ];
   private readonly linkRoutes = {
     publicCloud: ['/unitycloud/publiccloud'],
@@ -179,6 +185,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   storageServicesVisibilityMetrics: PublicCloudStorageKpi[] = [];
   cloudStorageDistributionRows: PublicCloudStorageDistributionItem[] = [];
   cloudStorageDistributionOptions: EChartsOption = {};
+  latencyHeatmapRows: PublicCloudLatencyHeatmapRow[] = [];
+  queueBacklogRows: PublicCloudQueueBacklogRow[] = [];
   recentAlertSummaryMetrics: PublicCloudAlertSummaryMetric[] = [];
   recentAlerts: PublicCloudRecentAlert[] = [];
   widgetLoading: PublicCloudWidgetLoadingState = {
@@ -202,7 +210,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     transactionVolumeTrend: false,
     objectFileGrowthTrend: false,
     storageServicesVisibility: false,
-    cloudStorageDistribution: false
+    cloudStorageDistribution: false,
+    latencyHeatmap: false,
+    queueBacklogMonitor: false
   };
 
   loaderNames = {
@@ -229,6 +239,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     objectFileGrowthTrend: 'publicCloudObjectFileGrowthTrendLoader',
     storageServicesVisibility: 'publicCloudStorageServicesVisibilityLoader',
     cloudStorageDistribution: 'publicCloudStorageDistributionLoader',
+    latencyHeatmap: 'publicCloudLatencyHeatmapLoader',
+    queueBacklogMonitor: 'publicCloudQueueBacklogMonitorLoader',
     recentAlertSummary: 'publicCloudRecentAlertSummaryLoader',
     recentAlerts: 'publicCloudRecentAlertsLoader'
   };
@@ -506,6 +518,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.getObjectFileGrowthTrend(filterFormOutput);
       this.getStorageServicesVisibility(filterFormOutput);
       this.getCloudStorageDistribution(filterFormOutput);
+      this.getLatencyHeatmap(filterFormOutput);
+      this.getQueueBacklogMonitor(filterFormOutput);
       this.getOrphanedDevices(filterFormOutput);
       this.getOrphanedDevicesByCategory(filterFormOutput);
       this.getIdleDevices(filterFormOutput);
@@ -735,6 +749,26 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     }, () => this.widgetLoading.cloudStorageDistribution = false);
   }
 
+  getLatencyHeatmap(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.latencyHeatmapRows = [];
+    this.widgetLoading.latencyHeatmap = true;
+    this.loadWidget(this.loaderNames.latencyHeatmap, this.svc.getLatencyHeatmap(filterFormOutput), res => {
+      this.latencyHeatmapRows = this.svc.convertToLatencyHeatmapRows(res);
+    }, () => {
+      this.latencyHeatmapRows = [];
+    }, () => this.widgetLoading.latencyHeatmap = false);
+  }
+
+  getQueueBacklogMonitor(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.queueBacklogRows = [];
+    this.widgetLoading.queueBacklogMonitor = true;
+    this.loadWidget(this.loaderNames.queueBacklogMonitor, this.svc.getQueueBacklogMonitor(filterFormOutput), res => {
+      this.queueBacklogRows = this.svc.convertToQueueBacklogRows(res);
+    }, () => {
+      this.queueBacklogRows = [];
+    }, () => this.widgetLoading.queueBacklogMonitor = false);
+  }
+
   getOrphanedDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.orphanedDevices = [];
     this.orphanedDevicesTotal = 0;
@@ -904,6 +938,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.storageServicesVisibilityMetrics = [];
     this.cloudStorageDistributionRows = [];
     this.cloudStorageDistributionOptions = {};
+    this.latencyHeatmapRows = [];
+    this.queueBacklogRows = [];
   }
 
   private startWidgetLoadingState() {
@@ -1029,6 +1065,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return !!this.cloudStorageDistributionRows?.length;
   }
 
+  get hasLatencyHeatmapData(): boolean {
+    return !!this.latencyHeatmapRows?.length;
+  }
+
+  get hasQueueBacklogMonitorData(): boolean {
+    return !!this.queueBacklogRows?.length;
+  }
+
   get hasCloudStorageHealthLoading(): boolean {
     return this.widgetLoading.cloudStorageHealth ||
       this.widgetLoading.storageUtilizationByCloud ||
@@ -1037,7 +1081,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.widgetLoading.transactionVolumeTrend ||
       this.widgetLoading.objectFileGrowthTrend ||
       this.widgetLoading.storageServicesVisibility ||
-      this.widgetLoading.cloudStorageDistribution;
+      this.widgetLoading.cloudStorageDistribution ||
+      this.widgetLoading.latencyHeatmap ||
+      this.widgetLoading.queueBacklogMonitor;
   }
 
   get hasCloudStorageHealthSection(): boolean {
@@ -1049,7 +1095,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.hasTransactionVolumeTrendData ||
       this.hasObjectFileGrowthTrendData ||
       this.hasStorageServicesVisibilityData ||
-      this.hasCloudStorageDistributionData;
+      this.hasCloudStorageDistributionData ||
+      this.hasLatencyHeatmapData ||
+      this.hasQueueBacklogMonitorData;
   }
 
   get hasAnyDashboardWidget(): boolean {
