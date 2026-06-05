@@ -35,7 +35,7 @@ const UNSELECTED_ICON_CLASS = 'fa-square';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ManageScheduleComponent implements OnInit, OnDestroy {
-  private readonly destroy$ = new Subject<void>();
+  private readonly ngUnsubscribe = new Subject<void>();
   private readonly modalConfig = { class: '', keyboard: true, ignoreBackdropClick: true, };
   private selectedScheduleId: string;
 
@@ -140,8 +140,8 @@ export class ManageScheduleComponent implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     this.spinner.stop('main');
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   /**
@@ -165,7 +165,7 @@ export class ManageScheduleComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.scheduleSvc.getManageSchedulesCount()
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       ).subscribe((response) => {
         this.scheduleReportSummaryData = response.schedules;
@@ -202,7 +202,7 @@ export class ManageScheduleComponent implements OnInit, OnDestroy {
   getSchedules(): void {
     this.spinner.start('main');
     this.scheduleSvc.getSchedules(this.feature, this.currentCriteria)
-      .pipe(takeUntil(this.destroy$), finalize(() => this.stopSpinnerAndMarkForCheck())).subscribe((schedules) => {
+      .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopSpinnerAndMarkForCheck())).subscribe((schedules) => {
         this.viewData = this.scheduleSvc.convertToViewData(schedules);
         this.updateSelectionState();
       }, () => {
@@ -256,7 +256,7 @@ export class ManageScheduleComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.closeModal();
     this.scheduleSvc.delete(this.selectedScheduleId)
-      .pipe(takeUntil(this.destroy$), finalize(() => this.stopSpinnerAndMarkForCheck())).subscribe(() => {
+      .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopSpinnerAndMarkForCheck())).subscribe(() => {
         this.getSchedules();
         this.getManageSchedulesCount();
         this.notification.success(
@@ -319,7 +319,7 @@ export class ManageScheduleComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.closeModal();
     this.scheduleSvc.multipleScheduleDelete(this.selectedScheduleIds)
-      .pipe(takeUntil(this.destroy$), finalize(() => this.stopSpinnerAndMarkForCheck())).subscribe(() => {
+      .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopSpinnerAndMarkForCheck())).subscribe(() => {
         this.getSchedules();
         this.getManageSchedulesCount();
         this.clearSelection();

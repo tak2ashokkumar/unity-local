@@ -58,7 +58,7 @@ export const MY_NATIVE_FORMATS = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
-  private readonly destroy$ = new Subject<void>();
+  private readonly ngUnsubscribe = new Subject<void>();
   private scheduleFormValueChangesBound = false;
 
   /**
@@ -137,7 +137,7 @@ export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {
     this.route.paramMap
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((params: ParamMap) => {
         this.scheduleId = params.get('scheduleId');
         this.feature = params.get('feature');
@@ -163,8 +163,8 @@ export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     this.spinner.stop('main');
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   /**
@@ -219,7 +219,7 @@ export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
   getUsers(): void {
     this.reportSvc
       .getUsers()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(
         (users) => {
           this.orgUsers = users;
@@ -245,7 +245,7 @@ export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
     this.reportSvc
       .getReports(this.feature)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       )
       .subscribe(
@@ -271,7 +271,7 @@ export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
     this.scheduleValidationMessages = this.reportSvc.scheduleFormMessages;
     this.reportSvc
       .createScheduleForm(this.scheduleId, this.formattedToday)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((form) => {
         this.scheduleForm = form;
         this.scheduleFormValueChangesBound = false;
@@ -384,7 +384,7 @@ export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
 
     this.scheduleFormValueChangesBound = true;
     this.scheduleForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => {
         this.validateScheduleForm();
         this.cdr.markForCheck();
@@ -395,7 +395,7 @@ export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
     this.reportSvc
       .addSchedule(data)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       )
       .subscribe(
@@ -417,7 +417,7 @@ export class ManageScheduleCrudComponent implements OnInit, OnDestroy {
     this.reportSvc
       .editSchedule(data)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       )
       .subscribe(

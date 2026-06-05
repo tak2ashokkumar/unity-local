@@ -107,6 +107,131 @@ function buildQuerySpecificFilePath(normalizedUrlPath, query) {
   return path.join(baseDir, `${normalizedUrlPath}.${querySuffix}.json`);
 }
 
+// ---------- Identity (id / uuid / *_id) resolution helpers ----------
+
+// UUID matcher reused by detail lookups.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Read a mock file from disk, rewrite hard-coded hosts, and parse it.
+function readMockFile(filePath) {
+  const raw = fs.readFileSync(filePath, "utf8");
+  const rewritten = raw.replace(/https:\/\/unity\.unitedlayer\.com/g, `http://localhost:${PORT}`);
+  return JSON.parse(rewritten);
+}
+
+// Known query-param -> item-field name mismatches. Params not listed here fall
+// back to the heuristic in candidateFieldsForParam(). Add an entry only when the
+// query param name differs from the field name carried by the data.
+const identityFieldMap = {
+  app_id: ["parent_app", "app_id"]
+};
+
+// True when a query param identifies a record (and should filter list results).
+function isIdentityParamName(name) {
+  if (ignoredQueryParamNames.has(name)) {
+    return false;
+  }
+  if (Object.prototype.hasOwnProperty.call(identityFieldMap, name)) {
+    return true;
+  }
+  return name === "id" || name === "uuid" || name.endsWith("_id");
+}
+
+// Item fields a given identity param may match against.
+function candidateFieldsForParam(name) {
+  if (identityFieldMap[name]) {
+    return identityFieldMap[name];
+  }
+  const fields = [name];
+  if (name.endsWith("_id")) {
+    fields.push(name.slice(0, -3));
+  }
+  fields.push("id", "uuid");
+  return fields;
+}
+
+function looseEquals(left, right) {
+  return String(left) === String(right);
+}
+
+// Filter a results array by every identity query param. A param only filters when
+// at least one item actually carries one of its candidate fields; otherwise it is
+// ignored so lists that are not keyed by that id are returned untouched.
+function filterByIdentityParams(results, query) {
+  if (!Array.isArray(results) || !results.length) {
+    return results;
+  }
+
+  let filtered = results;
+
+  Object.keys(query || {}).forEach(name => {
+    if (!isIdentityParamName(name)) {
+      return;
+    }
+
+    const rawValue = query[name];
+    const values = Array.isArray(rawValue) ? rawValue : [rawValue];
+    const fields = candidateFieldsForParam(name);
+
+    const fieldPresent = filtered.some(item =>
+      fields.some(field => item && Object.prototype.hasOwnProperty.call(item, field))
+    );
+    if (!fieldPresent) {
+      return;
+    }
+
+    filtered = filtered.filter(item =>
+      values.some(value =>
+        fields.some(field =>
+          item &&
+          Object.prototype.hasOwnProperty.call(item, field) &&
+          looseEquals(item[field], value)
+        )
+      )
+    );
+  });
+
+  return filtered;
+}
+
+// Split "parent/path/<id-or-uuid>" into its parent path and trailing identifier.
+function splitDetailPath(normalizedUrlPath) {
+  const match = normalizedUrlPath.match(/^(.*)\/([^/]+)$/);
+  if (!match) {
+    return null;
+  }
+  const id = match[2];
+  if (!/^[0-9]+$/.test(id) && !UUID_RE.test(id)) {
+    return null;
+  }
+  return { parentUrlPath: match[1], id };
+}
+
+// Find a single record inside its parent list file by trailing id or uuid.
+function findParentListItem(normalizedUrlPath) {
+  const detail = splitDetailPath(normalizedUrlPath);
+  if (!detail || !detail.parentUrlPath) {
+    return null;
+  }
+
+  const parentFilePath = path.join(baseDir, detail.parentUrlPath + ".json");
+  if (!fs.existsSync(parentFilePath)) {
+    return null;
+  }
+
+  const parsed = readMockFile(parentFilePath);
+  const list = Array.isArray(parsed)
+    ? parsed
+    : (parsed && Array.isArray(parsed.results) ? parsed.results : null);
+  if (!list) {
+    return null;
+  }
+
+  return list.find(item =>
+    item && (looseEquals(item.uuid, detail.id) || looseEquals(item.id, detail.id))
+  ) || null;
+}
+
 if (fs.existsSync(celeryDir)) {
   fs.readdirSync(celeryDir).forEach(file => {
     if (file.endsWith(".js")) {
@@ -140,6 +265,13 @@ app.use((req, res) => {
       .replace(/\/+$/, "")
       .replace(/\/+/g, "/");
     const patchFilePath = path.join(baseDir, patchPath + ".json");
+
+    // Resolve by trailing id/uuid inside the parent list and merge onto that record.
+    const targetItem = findParentListItem(patchPath);
+    if (targetItem) {
+      return res.json({ ...targetItem, ...body });
+    }
+
     if (fs.existsSync(patchFilePath)) {
       try {
         const existing = JSON.parse(fs.readFileSync(patchFilePath, "utf8"));
@@ -158,63 +290,52 @@ app.use((req, res) => {
 
   const exactFilePath = path.join(baseDir, normalizedUrlPath + ".json");
   const querySpecificFilePath = buildQuerySpecificFilePath(normalizedUrlPath, req.query);
-  const uuidMatch = normalizedUrlPath.match(/^(.*)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i);
-
-  const loadMockFile = filePath => {
-    const raw = fs.readFileSync(filePath, "utf8");
-    const rewritten = raw.replace(/https:\/\/unity\.unitedlayer\.com/g, `http://localhost:${PORT}`);
-    return JSON.parse(rewritten);
-  };
 
   const sendMockResponse = parsed => {
     if (Array.isArray(parsed)) {
-      return res.json(paginateArray(req, parsed));
+      const filtered = filterByIdentityParams(parsed, req.query);
+      return res.json(paginateArray(req, filtered));
+    }
+    if (parsed && Array.isArray(parsed.results)) {
+      const filteredResults = filterByIdentityParams(parsed.results, req.query);
+      if (filteredResults !== parsed.results) {
+        return res.json({ ...parsed, count: filteredResults.length, results: filteredResults });
+      }
     }
     return res.json(parsed);
   };
 
   if (querySpecificFilePath && fs.existsSync(querySpecificFilePath)) {
-    return sendMockResponse(loadMockFile(querySpecificFilePath));
+    return sendMockResponse(readMockFile(querySpecificFilePath));
   }
 
   if (fs.existsSync(exactFilePath)) {
-    return sendMockResponse(loadMockFile(exactFilePath));
+    return sendMockResponse(readMockFile(exactFilePath));
   }
 
-  if (uuidMatch) {
-    const parentUrlPath = uuidMatch[1];
-    const requestedUuid = uuidMatch[2];
-    const parentFilePath = path.join(baseDir, parentUrlPath + ".json");
-
-    if (fs.existsSync(parentFilePath)) {
-      const parsed = loadMockFile(parentFilePath);
-      const findItem = array => array.find(item => item && (item.uuid === requestedUuid || String(item.id) === requestedUuid));
-      let item = null;
-
-      if (Array.isArray(parsed)) {
-        item = findItem(parsed);
-      } else if (parsed && Array.isArray(parsed.results)) {
-        item = findItem(parsed.results);
-      }
-
-      if (item) {
-        return res.json(item);
-      }
+  const detail = splitDetailPath(normalizedUrlPath);
+  if (detail) {
+    const item = findParentListItem(normalizedUrlPath);
+    if (item) {
+      return res.json(item);
     }
 
-    const dir = path.dirname(exactFilePath);
-    fs.mkdirSync(dir, { recursive: true });
+    // Preserve prior behavior: auto-create a placeholder only for uuid detail lookups.
+    if (UUID_RE.test(detail.id)) {
+      const dir = path.dirname(exactFilePath);
+      fs.mkdirSync(dir, { recursive: true });
 
-    const placeholder = {
-      id: null,
-      uuid: requestedUuid
-    };
+      const placeholder = {
+        id: null,
+        uuid: detail.id
+      };
 
-    fs.writeFileSync(exactFilePath, JSON.stringify(placeholder, null, 2));
-    console.log(`\n⚠ Mock detail file created for ${req.path}:`);
-    console.log(exactFilePath);
-    console.log("Edit this file to add the object details.\n");
-    return res.json(placeholder);
+      fs.writeFileSync(exactFilePath, JSON.stringify(placeholder, null, 2));
+      console.log(`\nWARN Mock detail file created for ${req.path}:`);
+      console.log(exactFilePath);
+      console.log("Edit this file to add the object details.\n");
+      return res.json(placeholder);
+    }
   }
 
   const filePath = querySpecificFilePath || path.join(baseDir, normalizedUrlPath + ".json");

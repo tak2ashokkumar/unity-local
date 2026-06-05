@@ -37,7 +37,7 @@ const UNSELECTED_ICON_CLASS = 'fa-square';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReportManagementComponent implements OnInit, OnDestroy {
-  private readonly destroy$ = new Subject<void>();
+  private readonly ngUnsubscribe = new Subject<void>();
   private readonly modalConfig = { class: '', keyboard: true, ignoreBackdropClick: true, };
 
   readonly tabItems: RoundedTabDataType[] = [
@@ -90,8 +90,8 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.spinner.stop('main');
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   onSearched(searchValue: string): void {
@@ -111,7 +111,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.reportSvc.getManageReportsCount()
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       ).subscribe((response) => {
         this.manageReportSummaryData = response.reports;
@@ -138,7 +138,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.reportSvc.getReports(this.feature, this.currentCriteria)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       ).subscribe((reports) => {
         this.viewData = this.reportSvc.convertToViewData(reports);
@@ -173,7 +173,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.reportSvc.toggle(view.uuid)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       ).subscribe(() => {
         this.getReports();
@@ -195,7 +195,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.reportSvc.download(view.uuid)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       ).subscribe((response) => {
         const downloader = document.getElementById(
@@ -226,7 +226,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.closeModal();
     this.reportSvc.delete(this.reportId)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       ).subscribe(() => {
         this.getReports();
@@ -271,7 +271,7 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     this.closeModal();
     this.reportSvc.multipleReportDelete(this.selectedReportIds)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntil(this.ngUnsubscribe),
         finalize(() => this.stopSpinnerAndMarkForCheck())
       ).subscribe(() => {
         this.getReports();
