@@ -22,6 +22,12 @@ const unityProxy = createProxyMiddleware({
   changeOrigin: true
 });
 
+/* MTP UI PROXY */
+const mtpProxy = createProxyMiddleware({
+  target: "http://localhost:8060",
+  changeOrigin: true
+});
+
 /* ADMIN PORTAL PROXY (Angular 1.x) */
 const adminProxy = createProxyMiddleware({
   target: "http://localhost:8095",
@@ -43,6 +49,14 @@ app.use((req, res, next) => {
   if (isMockRequest) {
     console.log("→ MOCK:", req.url);
     return mockProxy(req, res, next);
+  }
+
+  // MTP UI Routing - Intercept everything needed for the MTP UI
+  const isMtpRequest = req.path.startsWith("/mtp");
+
+  if (isMtpRequest) {
+    console.log("→ MTP UI:", req.url);
+    return mtpProxy(req, res, next);
   }
 
   // Admin Portal (Legacy) Routing - Intercept everything needed for the Admin UI
