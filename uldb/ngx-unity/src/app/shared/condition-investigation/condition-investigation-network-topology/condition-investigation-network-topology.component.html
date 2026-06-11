@@ -2,7 +2,7 @@
     <app-spinner [name]="spinnerName"></app-spinner>
     <div class="py-0">
         <ng-container>
-            <div class="dc-node-details-wrapper" [id]="'dc-node-details-wrapper-'+ index" [popover]="nodeDetails"
+            <div class="dc-node-details-wrapper" [id]="'dc-node-details-wrapper-'+ messageInfo?.chat_message_id" [popover]="nodeDetails"
                 triggers="" [isOpen]="showNodeInfo">
             </div>
             <!-- <div id="dc-node-details-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo">

@@ -479,7 +479,7 @@ export class CostIntelligenceService {
       splitLine: {
         show: true,
         lineStyle: {
-          type: 'dotted'  // dotted lines from Y-axis ✅
+          type: 'dotted'  // dotted lines from Y-axis 
         }
       }
     }

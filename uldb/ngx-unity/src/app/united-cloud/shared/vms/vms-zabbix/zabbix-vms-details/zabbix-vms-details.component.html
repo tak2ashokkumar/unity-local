@@ -101,14 +101,26 @@
                             <label for="name" class="col-3 col-form-label">OS<em
                                     *ngIf="deviceType != customVM || isRequiredFieldInDetailForm('os_name') || isRequiredFieldInDetailForm('os')">*</em></label>
                             <div class=" col-9" *ngIf="detailForm.get('os')">
-                                <input id="os" class="form-control" type="text" formControlName="os"
+                                <select id="os" class="form-control" formControlName="os"
                                     [class.is-invalid]="detailFormErrors.os">
+                                    <option value="" disabled>Select Operating System</option>
+                                    <option *ngIf="detailForm.get('os').value && !hasOperatingSystemOption(detailForm.get('os').value)"
+                                        [value]="detailForm.get('os').value">{{detailForm.get('os').value}}</option>
+                                    <option *ngFor="let os of operatingSystems" [value]="os.full_name">
+                                        {{os.full_name}}</option>
+                                </select>
                                 <div class="invalid-feedback text-left" *ngIf="detailFormErrors.os">
                                     {{detailFormErrors.os}}</div>
                             </div>
                             <div class="col-9" *ngIf="detailForm.get('os_name')">
-                                <input id="os_name" class="form-control" type="text" formControlName="os_name"
+                                <select id="os_name" class="form-control" formControlName="os_name"
                                     [class.is-invalid]="detailFormErrors.os_name">
+                                    <option value="" disabled>Select Operating System</option>
+                                    <option *ngIf="detailForm.get('os_name').value && !hasOperatingSystemOption(detailForm.get('os_name').value)"
+                                        [value]="detailForm.get('os_name').value">{{detailForm.get('os_name').value}}</option>
+                                    <option *ngFor="let os of operatingSystems" [value]="os.full_name">
+                                        {{os.full_name}}</option>
+                                </select>
                                 <div class="invalid-feedback text-left" *ngIf="detailFormErrors.os_name">
                                     {{detailFormErrors.os_name}}</div>
                             </div>

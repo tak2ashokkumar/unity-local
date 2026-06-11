@@ -10,7 +10,13 @@
     </div>
     <div class="card-body card-body-custom d-flex flex-column p-0">
         <div class="custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top">
-            <div #messagesContainer class="messages-container d-flex flex-column">
+            <ng-container *ngIf="isLoadingChats && !loadChatHistory">
+                <div class="d-flex align-items-center justify-content-center p-5">
+                    <span class="fas fa-spinner fa-spin fa-lg"></span>
+                    <span class="ml-2 ">Loading</span>
+                </div>
+            </ng-container>
+            <div #messagesContainer class="messages-container d-flex flex-column" (scroll)="onScroll()">
                 <div class="d-flex flex-column w-100" style="max-width: 100%;">
                     <div *ngFor="let chat of chatHistoryData;let i = index" class="d-flex flex-column w-100"
                         style="max-width: 100%;">
@@ -175,8 +181,10 @@
             <div class="font-500 mt-2">{{command}}</div>
         </div>
         <div class="card-footer">
-            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button" (click)="confirmExecuteModal('newTab')"> Yes, Manage in New tab</button>
-            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button" (click)="confirmExecuteModal('sameTab')">Yes, Manage in Same tab</button>
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
+                (click)="confirmExecuteModal('newTab')"> Yes, Manage in New tab</button>
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
+                (click)="confirmExecuteModal('sameTab')">Yes, Manage in Same tab</button>
             <button class="btn btn-sm btn-danger pull-right" (click)="confirmExecutionModalRef.hide()"
                 type="button">No</button>
         </div>

@@ -1,0 +1,61 @@
+<div class="card round-edge mb-0 w-100 equalize-card">
+    <app-spinner [name]="'dashboard-recent-alerts'"></app-spinner>
+    <div class="card-header bg-transparent px-3 py-2 font-500">Recent Alerts</div>
+    <div class="card-body px-2 py-0">
+        <table class="table text-left font-xs-sm font-500 mb-0">
+            <thead>
+                <tr>
+                    <th>Tenant</th>
+                    <th>Device Name</th>
+                    <th>Count</th>
+                    <th>Alert Time</th>
+                    <th>Severity</th>
+                    <th>Description</th>
+                    <th>Staus</th>
+                    <th>Source</th>
+                    <th>Acknowledged</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of viewData;" truncateText>
+                    <td class="tdw-10 text-primary">
+                        <div>{{view.tenantName}}</div>
+                    </td>
+                    <td class="tdw-15">
+                        <div>
+                            <i *ngIf="view.deviveType" class="fa fas" [ngClass]="view.deviceIcon" ></i>
+                            <span class="ml-1">{{view.deviceName}}</span>
+                        </div>
+                    </td>
+                    <td class="tdw-5">
+                        <div>{{view.eventCount}}</div>
+                    </td>
+                    <td class="tdw-15">
+                        <div>{{view.alertTime}}</div>
+                    </td>
+                    <td class="tdw-5">
+                        <div class="text-center">
+                            <i class="fa status-icon" [ngClass]="view.severityIcon" [tooltip]="view.severity"
+                                container="body"></i>
+                        </div>
+                    </td>
+                    <td class="tdw-15">
+                        <div>{{view.description}}</div>
+                    </td>
+                    <td class="tdw-10">
+                        <div [ngClass]="[view.statusTextColor, 'text-capitalize']" [tooltip]="view.status">
+                            {{view.status}}
+                        </div>
+                    </td>
+                    <td class="tdw-10">
+                        <div>{{view.source}}</div>
+                    </td>
+                    <td class="tdw-10">
+                        <div>{{view.acknowledged}}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="text-center text-muted py-5" *ngIf="!viewData.length">No alerts avaialble.</div>
+    </div>
+</div>

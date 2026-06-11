@@ -1,0 +1,2 @@
+<span *ngIf="textToWrap && textToWrap.length > maxChar" (click)="false" [tooltip]="textToWrap" container="body">{{textToWrap | slice:0:maxChar}}...</span>
+<span *ngIf="textToWrap && !(textToWrap.length > maxChar)">{{textToWrap}}</span>

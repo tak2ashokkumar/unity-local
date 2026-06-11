@@ -1,0 +1,288 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white pt-2 px-0">
+                <div class="row mb-1 mx-0">
+                    <div class="col-2 font-weight-bold pt-1">My Profile</div>
+                    <div class="col-10 align-items-center">
+                        <button class="action-icons fa fa-angle-down font-sm pull-right mt-1 mb-1"
+                            [tooltip]="isCollapsed ? 'Expand' : 'Minimize'" (click)="isCollapsed = !isCollapsed"
+                            [attr.aria-expanded]="!isCollapsed"></button>
+                        <span class="pull-right mx-2 mt-1">{{view.lastLogin}}</span>
+                        <span class="pull-right font-weight-bold mt-1">Last Login -</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body my-profile px-4 pt-1 pb-3" [collapse]="isCollapsed" [isAnimated]="true">
+                <div class="bordered-container mb-3 mt-3">
+                    <div class="corner-text-container bg-white ">
+                        <span class="corner-text">Basic Details</span>
+                    </div>
+                    <form [formGroup]="basicDetailsForm" *ngIf="basicDetailsForm">
+                        <div class="form-group row mb-4">
+                            <label class="col-2 text-right pt-1">First Name<em>*</em> : </label>
+                            <div class="col-4">
+                                <input type="text" formControlName="first_name" name="first_name" class="form-control"
+                                    id="first_name" placeholder="Enter your First Name"
+                                    [class.is-invalid]="basicDetailsFormErrors.first_name" accessControl
+                                    moduleName="User Management" accessType="write" elementType="formelem">
+                                <div class="invalid-feedback" *ngIf="basicDetailsFormErrors.first_name">
+                                    {{basicDetailsFormErrors.first_name}}</div>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-4">
+                            <label class="col-2 text-right pt-1">Last Name<em>*</em> : </label>
+                            <div class="col-4">
+                                <input type="text" formControlName="last_name" name="last_name" class="form-control"
+                                    id="last_name" placeholder="Enter your Last Name"
+                                    [class.is-invalid]="basicDetailsFormErrors.last_name" accessControl
+                                    moduleName="User Management" accessType="write" elementType="formelem">
+                                <div class="invalid-feedback" *ngIf="basicDetailsFormErrors.last_name">
+                                    {{basicDetailsFormErrors.last_name}}</div>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-4">
+                            <label class="col-2 text-right pt-1">Email ID<em>*</em> : </label>
+                            <div class="col-4">
+                                <input type="text" formControlName="email" name="email" class="form-control" id="email"
+                                    placeholder="Enter your email" [class.is-invalid]="basicDetailsFormErrors.email"
+                                    accessControl moduleName="User Management" accessType="write"
+                                    elementType="formelem">
+                                <div class="invalid-feedback" *ngIf="basicDetailsFormErrors.email">
+                                    {{basicDetailsFormErrors.email}}</div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-2 text-right pt-1">Contact Number<em>*</em> : </label>
+                            <div class="col-4">
+                                <div class="input-group">
+                                    <input type="number" formControlName="phone_number" name="phone_number"
+                                        class="form-control" id="phone_number" placeholder="Enter phone number"
+                                        [class.is-invalid]="basicDetailsFormErrors.phone_number" accessControl
+                                        moduleName="User Management" accessType="write" elementType="formelem">
+                                    <div class="invalid-feedback" *ngIf="basicDetailsFormErrors.phone_number">
+                                        {{basicDetailsFormErrors.phone_number}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="bordered-container">
+                    <div class="corner-text-container bg-white ">
+                        <span class="corner-text">Setting</span>
+                    </div>
+                    <div class="row mb-4" accessControl moduleName="User Management" accessType="write"
+                        elementType="btn">
+                        <div class="col-2 text-right pt-1">Password<em>*</em> : </div>
+                        <div class="col-10">
+                            <button class="btn btn-primary" (click)="resetPassword()">Reset Password</button>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-2 text-right pt-1">User Group<em>*</em> : </div>
+                        <div class="col-10 pt-1">
+                            <button class="btn btn-sm btn-primary btn-pill mr-2 mb-2 font-xs-sm"
+                                *ngFor="let group of view.groups">{{group}}</button>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-2 text-right pt-1">Account Status<em>*</em> : </div>
+                        <div class="col-10 pt-1">
+                            <span [class]="view.isActive">{{view.isEnabled}}</span>
+                        </div>
+                    </div>
+                    <!-- <div class="row">
+                            <div class="col-2 text-right p-0 pt-1">Multi Factor Authentication<em>*</em> : </div>
+                            <div class="col-10 d-inline-block">
+                                <ul class="authentication-button d-flex justify-content-start">
+                                    <li>
+                                        <input type="radio" name="toggle" id="enable" class="toggle-radio" checked>
+                                        <label for="enable" class="toggle-label">Enable</label>
+                                    </li>
+                                    <li>
+                                        <input type="radio" name="toggle" id="disable" class="toggle-radio">
+                                        <label for="disable" class="toggle-label">Disable</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div> -->
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-primary mr-2" (click)="updateBasicDetails()" accessControl
+                        moduleName="User Management" accessType="write" elementType="btn">Update</button>
+                    <button class="btn btn-md btn-outline-danger" (click)="goBack()" accessControl
+                        moduleName="User Management" accessType="write" elementType="btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white border-bottom-0 pt-2 pl-0 pr-1">
+                <div class="row border-bottom mb-1 mx-0">
+                    <div class="col">
+                        <span class="badge bg-secondary user-count px-2 mx-2 mt-1 mb-2 rounded-3 h2"
+                            style="font-size: 15px;">{{count}}</span>
+                        <span class="font-weight-bold">Activity Log</span>
+                        <data-refresh-btn [page]="currentCriteria.pageNo"
+                            (refresh)="refreshData($event)"></data-refresh-btn>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body bg-white border-bottom-0 px-3 mt-2">
+                <div class="row mx-2">
+                    <div class="col-2 pl-0">
+                        <table-search-box (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div class="col-10">
+                        <div class="row justify-content-end">
+                            <!-- <div class="col-2">
+                                <select class="form-control form-control-sm text-capitalize" id="log.action"
+                                    name="log.action">
+                                    <option *ngFor="let log of viewDataActivity" [ngValue]="log.action">{{log.action}}
+                                    </option>
+                                </select>
+                            </div> -->
+                            <!-- <div class="col-2">
+                                <select class="form-control form-control-sm text-capitalize" id="log.actor_email"
+                                    name="log.actor_email">
+                                    <option *ngFor="let log of viewDataActivity" [ngValue]="log.actor_email">
+                                        {{log.actor_email}}
+                                    </option>
+                                </select>
+                            </div> -->
+                            <div class="mx-2">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table mt-2">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Entity Type</th>
+                            <th>Entity Name</th>
+                            <th>User </th>
+                            <th>Action</th>
+                            <th>Source IP</th>
+                            <th>Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let log of viewDataActivity">
+                            <td>
+                                <div [tooltip]="log.content_type.readable_model_name">
+                                    {{log.content_type.readable_model_name}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="log.object_repr">{{log.object_repr}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="log.actor_email">{{log.actor_email}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="log.action">{{log.action}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="log.remote_addr">{{log.remote_addr}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="log.timestamp">{{log.timestamp}}</div>
+                            </td>
+                            <td class="action-icons-column">
+                                <button class="action-icons mb-0 fa fa fa-info font-sm ml-1" tooltip="Show Changes"
+                                    (click)="showInfo(log)"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count">
+                </table-entries>
+                <table-pager *ngIf="viewDataActivity.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-5" *ngIf="!viewDataActivity.length">No records to display</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #loginfo>
+    <div class="card mb-0">
+        <div class="card-header p-2">
+            Log Details
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td class="h6">ModelName</td>
+                                <td>{{log.content_type.readable_model_name}}</td>
+                            </tr>
+                            <tr>
+                                <td class="h6">User</td>
+                                <td>{{ log.actor_email }}</td>
+                            </tr>
+                            <tr *ngIf="log.hijacker">
+                                <td class="h6">Impersonated By</td>
+                                <td>{{ log.hijacker.email }}</td>
+                            </tr>
+                            <tr>
+                                <td class="h6">Action</td>
+                                <td>{{ log.action }}</td>
+                            </tr>
+                            <tr *ngIf="log.additional_data">
+                                <td class="h6">Additional Actions</td>
+                                <td><span *ngFor="let action of log.additional_data">{{ action }}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="card">
+                        <div class="card-header p-2">
+                            Change Details <span
+                                class="badge badge-pill badge-secondary float-right"><b>{{log.changes_log_keys.length}}</b></span>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th *ngIf="log.action === 'Updated'">Old Value</th>
+                                        <th *ngIf="log.action === 'Updated'">New Value</th>
+                                        <th *ngIf="log.action !== 'Updated'">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let c of log.changes_log | keyvalue" class="text-wrap">
+                                        <td>{{ c.key }}</td>
+                                        <td [tooltip]="c.value[0]" container="body">{{c.value[0]| slice:0:30}}</td>
+                                        <td *ngIf="log.action === 'Updated'" [tooltip]="c.value[1]" container="body">
+                                            {{ c.value[1]| slice:0:30 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <span class="text-left">*Time is in GMT.
+                <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+            </span>
+        </div>
+    </div>
+</ng-template>

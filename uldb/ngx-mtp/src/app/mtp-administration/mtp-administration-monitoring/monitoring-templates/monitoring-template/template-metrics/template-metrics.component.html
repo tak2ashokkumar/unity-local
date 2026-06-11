@@ -1,0 +1,270 @@
+<div class="card">
+    <div class="card-header bg-white border-0">
+        <div class="row">
+            <div class="col-2">
+                <table-search-box (searched)="onSearched($event)"></table-search-box>
+            </div>
+            <div class="col-10">
+                <div class="row justify-content-end">
+                    <div class="col-2">
+                        <select class="form-control form-control-sm" type="text"
+                            [(ngModel)]="currentCriteria.params[0].status" (ngModelChange)="onFilterChange()">
+                            <option [value]="''">Status</option>
+                            <option [value]="'enabled'">Enabled</option>
+                            <option [value]="'disabled'">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="mx-2">
+                        <table-page-size class="float-left ml-1" [currentPageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        <ng-container *ngIf="componentId" [ngTemplateOutlet]='componentMetricsRef'></ng-container>
+        <ng-container *ngIf="!componentId" [ngTemplateOutlet]='templateMetricsRef'></ng-container>
+        <p *ngIf="viewData.length==0" class="text-center">No records to display</p>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+    </div>
+</div>
+
+<ng-template #templateMetricsRef>
+    <table class="table text-left">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Triggers</th>
+                <th>Interval</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let view of viewData; let i = index" truncateText>
+                <td class="tdw-20">
+                    <div>
+                        <form [formGroup]="view.eventForm" *ngIf="view.onForm">
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="item_name"
+                                    [ngClass]="{'is-invalid' : view.eventFormErrors.item_name}">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary lh-25" (click)="onSubmitEvent(view)" type="button">
+                                        <i class="fas fa-check fa-lg text-white"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback d-block" *ngIf="view.eventFormErrors.item_name">
+                                {{view.eventFormErrors.item_name}}
+                            </div>
+                        </form>
+                        <div class="pointer-link text-primary" *ngIf="!view.onForm" (click)="showInfo(view)">
+                            {{view.name}} </div>
+                    </div>
+                </td>
+                <td class="tdw-35">
+                    <div [tooltip]="view.description">{{view.description}}</div>
+                </td>
+                <td class="tdw-15">
+                    <div class="pointer-link">
+                        <span class="text-primary" (click)="goToTriggers(view.itemId)">Triggers</span>
+                        <span class="badge text-primary font-weight-bold ml-2 mr-1 mt-1 rounded-3"
+                            [ngClass]="view.triggers>=1 ?'bg-lb text-primary':'bg-secondary text-dark'">{{view.triggers}}</span>
+                    </div>
+                </td>
+                <td class="tdw-15">
+                    <div>
+                        <form [formGroup]="view.eventForm" *ngIf="view.onForm">
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="interval"
+                                    [ngClass]="{'is-invalid' : view.eventFormErrors.interval}">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary lh-25" (click)="onSubmitEvent(view)" type="button">
+                                        <i class="fas fa-check fa-lg text-white"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback d-block" *ngIf="view.eventFormErrors.interval">
+                                {{view.eventFormErrors.interval}}
+                            </div>
+                        </form>
+                        <div class="pointer-link text-primary" *ngIf="!view.onForm">{{view.interval}}</div>
+                    </div>
+                </td>
+                <td class="tdw-15">
+                    <div class="d-inline-block">
+                        <div class="btn-group rounded-pill border" style="border-radius: 50px;" accessControl
+                            moduleName="Monitoring Management" accessType="write" elementType="div">
+                            <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0" type="button"
+                                (click)="toggleStatus(view.itemId, 'enabled')" [disabled]="view.isDefault"
+                                [ngClass]=" view.status==='enabled'? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                                Enable
+                            </button>
+                            <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0" type="button"
+                                (click)="toggleStatus(view.itemId, 'disabled')" [disabled]="view.isDefault"
+                                [ngClass]="view.status==='disabled' ? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                                Disable
+                            </button>
+                        </div>
+                    </div>
+                </td>
+                <td class="action-icons-column">
+                    <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" [tooltip]="view.editTooltip"
+                        (click)="onEditEvent(i)" [ngClass]="view.editBtnClass" [disabled]="view.isDisabled"
+                        accessControl moduleName="Monitoring Management" accessType="write"
+                        elementType="actionbtn"></button>
+                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                        [ngClass]="{'action-icons-disabled':view.isDefault}" [disabled]="view.isDefault"
+                        (click)="deletePanelDevice(view)" accessControl moduleName="Monitoring Management"
+                        accessType="write" elementType="actionbtn"></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</ng-template>
+
+<ng-template #componentMetricsRef>
+    <table class="table text-left">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Interval</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let view of viewData; let i = index" truncateText>
+                <td class="tdw-25">
+                    <form [formGroup]="view.eventForm" *ngIf="view.onForm">
+                        <div class="input-group">
+                            <input type="text" class="form-control" formControlName="item_name"
+                                [ngClass]="{'is-invalid' : view.eventFormErrors.item_name}">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary lh-25" (click)="onSubmitEvent(view)" type="button">
+                                    <i class="fas fa-check fa-lg text-white"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="view.eventFormErrors.item_name">
+                                {{view.eventFormErrors.item_name}}
+                            </div>
+                    </form>
+                    <div class="text-primary" *ngIf="!view.onForm" (click)="showInfo(view)">
+                        <span style="cursor:pointer;" (click)="goToTemplate(view.templateID)">{{
+                            view.name}}</span>
+                    </div>
+                </td>
+                <td class="tdw-35">
+                    <div [tooltip]="view.description">{{view.description}}</div>
+                </td>
+                <td class="tdw-20">
+                    <form [formGroup]="view.eventForm" *ngIf="view.onForm">
+                        <div class="input-group">
+                            <input type="text" class="form-control" formControlName="interval"
+                                [ngClass]="{'is-invalid' : view.eventFormErrors.interval}">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary lh-25" (click)="onSubmitEvent(view)" type="button">
+                                    <i class="fas fa-check fa-lg text-white"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="view.eventFormErrors.interval">
+                            {{view.eventFormErrors.interval}}
+                        </div>
+                    </form>
+                    <div class="text-primary" *ngIf="!view.onForm">
+                        <span style="cursor:pointer;" (click)="goToTemplate(view.templateID)">{{
+                            view.interval}}</span>
+                    </div>
+                </td>
+
+                <td class="tdw-15">
+                    <div class="d-inline-block">
+                        <div class="btn-group rounded-pill border" style="border-radius: 50px;" accessControl
+                            moduleName="Monitoring Management" accessType="write" elementType="div"
+                            [disabled]="view.isDefault">
+                            <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0" type="button"
+                                (click)="toggleStatus(view.itemId, 'enabled')" [disabled]="view.isDefault"
+                                [ngClass]=" view.status==='enabled'? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                                Enable
+                            </button>
+                            <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0" type="button"
+                                (click)="toggleStatus(view.itemId, 'disabled')" [disabled]="view.isDefault"
+                                [ngClass]="view.status==='disabled' ? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                                Disable
+                            </button>
+                        </div>
+                    </div>
+                </td>
+                <td class="action-icons-column">
+                    <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" [tooltip]="view.editTooltip"
+                        (click)="onEditEvent(i)" [ngClass]="view.editBtnClass" [disabled]="view.isDisabled"
+                        accessControl moduleName="Monitoring Management" accessType="write"
+                        elementType="actionbtn"></button>
+                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                        [ngClass]="{'action-icons-disabled':view.isDefault}" [disabled]="view.isDefault"
+                        (click)="deletePanelDevice(view)" accessControl moduleName="Monitoring Management"
+                        accessType="write" elementType="actionbtn"></button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</ng-template>
+
+<ng-template #itemInfoRef>
+    <div class="card round-edge border-0 mb-2">
+        <div class="card-header font-500">Metric Info</div>
+        <div class="card-body text-center">
+            <table class="table text-left mb-0 font-sm">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Interval</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="text-primary">{{selectedView.name}}</div>
+                        </td>
+                        <td>
+                            <div>{{selectedView.description}}</div>
+                        </td>
+                        <td>
+                            <div class="text-primary">{{selectedView.interval}}</div>
+                        </td>
+                        <td>
+                            <div class="text-primary text-capitalize">{{selectedView.status}}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer bg-white border-0 py-0">
+            <button class="btn btn-sm btn-primary pull-right" type="button" (click)="modalRef.hide()">Close</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

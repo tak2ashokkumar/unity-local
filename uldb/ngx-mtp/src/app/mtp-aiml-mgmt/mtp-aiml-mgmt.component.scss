@@ -1,0 +1,31 @@
+@import "variables";
+
+.entity-card {
+    height: 100%;
+    background-color: $white;
+    .sub-entity {
+        color: $gray-500;
+    }
+    .value {
+        color: $primary;
+    }
+    .fas.value {
+        color: $danger;
+    }
+}
+
+.entity-card.active {
+    height: 100%;
+    background-color: $primary;
+    border-radius: 0.3rem !important;
+    color: $white !important;
+    .sub-entity {
+        color: $white !important;
+    }
+    .value {
+        color: $white !important;
+    }
+    .fas.value {
+        color: $white !important;
+    }
+}

@@ -5,17 +5,17 @@
             <div class="dashboard-subtitle">Refreshed: {{refreshedText}} | Scope: {{scopeText}}</div>
         </div>
         <form class="dashboard-filters" *ngIf="filterForm" [formGroup]="filterForm">
-            <div class="filter-control multi-filter-control">
-                <label>Database</label>
+            <div class="multi-filter-control">
+                <label class="m-0">Database</label>
                 <multiselect-dropdown [options]="databaseOptions" [settings]="multiselectSettings"
                     [texts]="multiselectTexts" class="form-control form-control-sm p-0 dashboard-multiselect"
                     formControlName="databases">
                 </multiselect-dropdown>
             </div>
-            <!-- <button class="round-action-btn" type="button" (click)="applyFilters()" [tooltip]="'Apply Filters'"
+            <button class="round-action-btn" type="button" (click)="applyFilters()" [tooltip]="'Apply Filters'"
                 container="body">
-                <i class="fa fa-filter"></i>
-            </button> -->
+                <i class="fas fa-filter"></i>
+            </button>
             <!-- <button class="round-action-btn" type="button" (click)="refreshFilters()" [tooltip]="'Reset Filters'"
                 container="body">
                 <i class="fas fa-sync-alt"></i>
@@ -116,14 +116,40 @@
 
         <div class="section-title mt-3">Performance / Workload Insights</div>
         <div class="card bg-white px-2">
-            <div class="font-500 font-md text-left pt-1 pb-2">Performance Hotspots - Top 10 Utilization</div>
+            <div class="bg-transparent d-flex align-items-center justify-content-between py-2">
+                <span class="font-500 font-md py-2">Performance Hotspots - Top 10 Utilization</span>
+                <div class="filter-control">
+                    <label for="utilization-sort-select" class="m-0">Sort By</label>
+                    <select #utilizationSortSelect id="utilization-sort-select"
+                        class="form-control form-control-sm" [value]="sortColumn"
+                        (change)="onUtilizationSortChange(utilizationSortSelect.value)">
+                        <option *ngFor="let sortOption of utilizationSortOptions" [value]="sortOption.value">
+                            {{sortOption.label}}
+                        </option>
+                    </select>
+                </div>
+            </div>
             <div class="col-12 p-0">
                 <app-spinner [name]="loaderNames.performancWorkloadUtilization" [width]="0"></app-spinner>
+                <div class="d-flex align-items-center justify-content-center px-2 pb-2">
+                    <div class="d-flex align-items-center p-2">
+                        <span class="legend-dot bg-success mr-1"></span>
+                        <span class="font-md">Healthy / Low Utilization (0-50%)</span>
+                    </div>
+                    <div class="d-flex align-items-center p-2">
+                        <span class="legend-dot bg-warning mr-1"></span>
+                        <span class="font-md">Warning / Moderate Utilization (51-80%)</span>
+                    </div>
+                    <div class="d-flex align-items-center p-2">
+                        <span class="legend-dot bg-danger mr-1"></span>
+                        <span class="font-md">Critical / High Utilization (81-100%)</span>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-sm utilization-table text-center" sortableTable (sorted)="onSorted($event)">
                         <thead class="bg-gray-200">
                             <tr>
-                                <th>Name</th>
+                                <th class="text-left">Name</th>
                                 <th sortable-column="cpu_usage_system_percent" [sort-direction]="getSortDirection('cpu_usage_system_percent')" [class.col-sorted]="isSortedColumn('cpu_usage_system_percent')">CPU Utilization</th>
                                 <th sortable-column="memory_used_percent" [sort-direction]="getSortDirection('memory_used_percent')" [class.col-sorted]="isSortedColumn('memory_used_percent')">Memory Utilization</th>
                                 <th sortable-column="disk_usage_percent" [sort-direction]="getSortDirection('disk_usage_percent')" [class.col-sorted]="isSortedColumn('disk_usage_percent')">Disk Utilization</th>
@@ -133,7 +159,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let row of utilizationRows; trackBy: trackByIndex">
-                                <td>
+                                <td class="text-left">
                                     <button class="btn btn-link text-decoration-none p-0 table-column-btn text-primary" type="button"
                                         [tooltip]="'Open linked page'" (click)="openDatabaseServerDetails(row.dbUUID)">{{row.name}}</button>
                                 </td>

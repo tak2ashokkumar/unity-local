@@ -1,0 +1,591 @@
+<ng-container>
+    <div class="card mb-2">
+        <div class="card-body py-2">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between col-8-w pt-2" *ngIf="ticketForm">
+                        <ng-container *ngIf="ticketForm.get('change_stage')">
+                            <div *ngFor="let stage of ticketStages; let i = index; let f= first;let l=last;"
+                                class="d-flex flex-column"
+                                [ngClass]="l ? 'align-items-end text-right' : 'align-items-start'">
+                                <span class="badge border p-3 ticket-state"
+                                    style="height:3rem; width:3rem; border-radius:1.5rem"
+                                    [ngClass]="stage.value == details?.stageValue ? 'badge-primary' : 'badge-secondary'">
+                                    <span class="fas font-lg"
+                                        [ngClass]="stage.value == details?.stageValue ? 'fa-check' : ''"></span>
+                                </span>
+                                <span class="ml-1 text-truncate" style="width:3.5rem"
+                                    [tooltip]="stage.display_name">{{stage.display_name}}</span>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!ticketForm.get('change_stage')">
+                            <div *ngFor="let status of ticketStatusList; let i = index; let f= first;let l=last;"
+                                class="d-flex flex-column"
+                                [ngClass]="l ? 'align-items-end text-right' : 'align-items-start'">
+                                <span class="badge border p-3 ticket-state"
+                                    style="height:3rem; width:3rem; border-radius:1.5rem"
+                                    [ngClass]="status.display_name == details?.statusReasonName ? 'badge-primary' : 'badge-secondary'">
+                                    <span class="fas font-lg"
+                                        [ngClass]="status.display_name == details?.statusReasonName ? 'fa-check' : ''"></span>
+                                </span>
+                                <span class="ml-1 text-truncate" style="width:3.5rem"
+                                    [tooltip]="status.display_name">{{status.display_name}}</span>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-flex justify-content-end col-4-w">
+                        <div class="d-flex flex-column align-items-center" *ngIf="details?.responseFailureTime">
+                            <div class="donut d-flex justify-content-center align-items-center"
+                                [style]="responseDonutStyle">
+                                <div class="hole d-flex justify-content-center flex-column align-items-center font-500"
+                                    [ngClass]="getResponseSLAClass()">
+                                    <span>{{details?.responseTime}}</span>
+                                    <span *ngIf="details?.isResponseSLASucceeded">Succeeded</span>
+                                    <span *ngIf="details?.isResponseSLABreached">Failed</span>
+                                </div>
+                            </div>
+                            <span>Response Time</span>
+                        </div>
+
+                        <div class="d-flex flex-column align-items-center ml-5" *ngIf="details?.resolutionFailureTime">
+                            <div class="donut d-flex justify-content-center align-items-center"
+                                [style]="resolutionDonutStyle">
+                                <div class="hole d-flex justify-content-center flex-column align-items-center font-500"
+                                    [ngClass]="getResolutionSLAClass()">
+                                    <span>{{details?.resolutionTime}}</span>
+                                    <span *ngIf="details?.isResolutionSLASucceeded">Succeeded</span>
+                                    <span *ngIf="details?.isResolutionSLAPaused">Paused</span>
+                                    <span *ngIf="details?.isResolutionSLABreached">Failed</span>
+                                </div>
+                            </div>
+                            <span>Resolution Time</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-8">
+                    <hr class="divider-line"
+                        [style.margin-top.rem]="details?.responseFailureTime || details?.resolutionFailureTime ? '-4' : '-3'">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-3 pr-0 font-sm">
+                    <div class="card equalize-card">
+                        <div class="card-body">
+                            <form *ngIf="ticketForm" [formGroup]="ticketForm">
+                                <div class="form-group row">
+                                    <label for="status" class="col-4 col-form-label">Ticket
+                                        ID</label>
+                                    <div class="col-8 px-0">
+                                        <input id="name" class="form-control" type="text"
+                                            formControlName="ticket_number">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="customer_name" class="col-4 col-form-label">Tenant Name</label>
+                                    <div class="col-8 px-0">
+                                        <input id="name" class="form-control" type="text"
+                                            formControlName="customer_name">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="ticket_type" class="col-4 col-form-label">Type</label>
+                                    <div class="col-8 px-0">
+                                        <select class="form-control form-control" id="ticket_type"
+                                            formControlName="ticket_type" accessControl moduleName="Ticket Management"
+                                            accessType="write" elementType="formelem">
+                                            <option *ngFor="let type of ticketTypeList" [value]="type.value">
+                                                {{type.display_name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="assignee" class="col-4 col-form-label">Assignee</label>
+                                    <div class="col-8 px-0">
+                                        <select class="form-control form-control" id="assignee"
+                                            formControlName="assignee" accessControl moduleName="Ticket Management"
+                                            accessType="write" elementType="formelem">
+                                            <option [value]="null" disabled>Select Assignee</option>
+                                            <option *ngFor="let c of contacts" [value]="c.contact_id">
+                                                {{c.contact_first_name}} {{c.contact_last_name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row" *ngIf="ticketForm.get('change_stage')">
+                                    <label for="change_stage" class="col-4 col-form-label">Stage</label>
+                                    <div class="col-8 px-0">
+                                        <select class="form-control form-control" id="change_stage"
+                                            formControlName="change_stage" accessControl moduleName="Ticket Management"
+                                            accessType="write" elementType="formelem">
+                                            <option *ngFor="let stage of ticketStages" [value]="stage.value">
+                                                {{stage.display_name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="status_reason" class="col-4 col-form-label">Status</label>
+                                    <div class="col-8 px-0">
+                                        <select class="form-control form-control" id="status_reason"
+                                            formControlName="status_reason"
+                                            [ngClass]="{'is-invalid' : invalidStatusReason}" accessControl
+                                            moduleName="Ticket Management" accessType="write" elementType="formelem">
+                                            <option *ngFor="let status of ticketStatusList" [value]="status.value">
+                                                {{status.display_name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="invalidStatusReason">
+                                            {{invalidStatusReason}}</div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="priority" class="col-4 col-form-label">Priority</label>
+                                    <div class="col-8 px-0">
+                                        <select class="form-control form-control" id="priority"
+                                            formControlName="priority" accessControl moduleName="Ticket Management"
+                                            accessType="write" elementType="formelem">
+                                            <option [value]="''" disabled>Select Priority</option>
+                                            <option *ngFor="let prt of ticketPriorityList" [value]="prt.value">
+                                                {{prt.display_name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="card equalize-card">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2">
+                            <span>{{details?.title}}</span>
+                            <div>
+                                <button class="btn btn-sm btn-primary ml-1" type="button" (click)="resolve()"
+                                    *ngIf="details.status=='Active'" accessControl moduleName="Ticket Management"
+                                    accessType="write" elementType="btn">Resolve</button>
+                                <!-- <button class="btn btn-sm btn-primary ml-2" type="button" (click)="cancel()"
+                                    *ngIf="details.status=='Active'">Cancel</button> -->
+                                <button class="btn btn-sm btn-primary ml-2" type="button" (click)="reactivate()"
+                                    *ngIf="details.status=='Resolved' || details.status=='Cancelled'" accessControl
+                                    moduleName="Ticket Management" accessType="write"
+                                    elementType="btn">Reactivate</button>
+                                <button class="btn btn-pill btn-warning btn-sm ml-2" tooltip="Back"
+                                    (click)="goBack()"><i class="fa fa-arrow-left"></i></button>
+                                <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                            </div>
+                        </div>
+                        <div class="card-body" style="min-height:20vh;">
+                            <div class="col-12" *ngIf="details" [innerHTML]="details.description"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header card-header d-flex justify-content-between align-items-center py-2">
+                            <strong>Updates</strong>
+                            <button class="btn btn-sm btn-primary float-right border" type="button"
+                                *ngIf="details.status == 'Active'" (click)="addNote()" accessControl
+                                moduleName="Ticket Management" accessType="write" elementType="btn"> Update
+                            </button>
+                        </div>
+                        <div class="card-body" style="min-height:20vh;">
+                            <div class="row border-bottom" *ngIf="noteForm">
+                                <div class="col-12 mb-2">
+                                    <form [formGroup]="noteForm">
+                                        <!-- <div class="form-group">
+                                            <input class="form-control" id="subject" type="text"
+                                                formControlName="subject" placeholder="Title"
+                                                [ngClass]="{'is-invalid' : noteFormErrors.subject}">
+                                            <div class="invalid-feedback" *ngIf="noteFormErrors.subject">
+                                                {{noteFormErrors.subject}}</div>
+                                        </div> -->
+                                        <div class="form-group">
+                                            <textarea class="form-control" id="description" name="description" rows="5"
+                                                formControlName="description"
+                                                [ngClass]="{'is-invalid' : noteFormErrors.description}"
+                                                placeholder="Enter text..."></textarea>
+                                            <div class="invalid-feedback" *ngIf="noteFormErrors.description">
+                                                {{noteFormErrors.description}}</div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col col-form-label">
+                                                <div
+                                                    class="form-check form-check-inline custom-control custom-radio d-inline">
+                                                    <input id="private" type="radio" class="custom-control-input"
+                                                        value="private" name="display_type"
+                                                        formControlName="display_type">
+                                                    <label class="custom-control-label" for="private">Private</label>
+                                                </div>
+
+                                                <div
+                                                    class="form-check form-check-inline custom-control custom-radio d-inline">
+                                                    <input id="public" type="radio" class="custom-control-input"
+                                                        value="public" name="display_type"
+                                                        formControlName="display_type">
+                                                    <label class="custom-control-label" for="public">Public</label>
+                                                </div>
+                                            </div>
+                                            <div class="d-block ml-3 invalid-feedback"
+                                                *ngIf="noteFormErrors.display_type">
+                                                {{noteFormErrors.display_type}}</div>
+                                        </div>
+                                    </form>
+                                    <form *ngIf="attachmentForm" [formGroup]="attachmentForm">
+                                        <div class="row form-group mb-0">
+                                            <div class="col-12 p-3 d-flex align-items-center">
+                                                <label class="col-form-label" for="file-multiple-input">Attachments
+                                                    :</label>
+                                                <input class="ml-3" id="file-multiple-input" multiple
+                                                    name="file-multiple-input" type="file" onclick="this.value = null"
+                                                    (change)="detectFiles($event.target.files)">
+                                            </div>
+                                        </div>
+                                        <span *ngFor="let attachment of attachments">
+                                            <span class="btn btn-primary mb-1 mr-1 btn-sm">
+                                                {{attachment}}<i class="fas fa-times ml-1"
+                                                    (click)="removeFiles(attachment)"></i>
+                                            </span>
+                                        </span>
+                                    </form>
+                                    <div class="form-group form-actions">
+                                        <button class="btn btn-sm btn-success float-right ml-1" type="button"
+                                            (click)="onSubmitNote()">Submit</button>
+                                        <button class="btn btn-sm btn-danger float-right" type="button"
+                                            (click)="cancelComment()">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="details && details.notes.length">
+                                <div class="row py-2" *ngFor="let view of details.notes; let last = last"
+                                    [ngClass]="{'border-bottom':!last}">
+                                    <ng-container
+                                        *ngTemplateOutlet="timelineNote; context: { $implicit: view }"></ng-container>
+                                </div>
+                            </div>
+                            <div class="text-center text-muted my-5" *ngIf="!details || !details.notes.length">No
+                                Updates available for ticket.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #timelineNote let-view>
+    <div class="col-12 nopointerevents">
+        <i class="fas fa-clipboard-list fa-lg text-success"></i>
+        <strong class="card-title mb-0 ml-1">Note By : </strong>
+        <a class="text-decoration-none text-primary ml-1"><i class="far fa-user"></i>&nbsp;&nbsp;{{view.modifiedBy}}</a>
+        <small class="text-muted font-sm float-right">{{view.modifiedOn}}</small>
+    </div>
+    <div class="col-12 nopointerevents">
+        <strong class="card-title mb-0">{{view.subject}}</strong>
+    </div>
+    <div class="col-12 mt-2 nopointerevents" [innerHTML]="view.description"></div>
+    <div class="col-12 mt-2" *ngIf="view.isDocument && view.fileUrl">
+        <a (click)="downloadAttachment(view)"
+            class="btn btn-sm btn-primary mb-1 mr-1 text-white">{{view.fileName}}&nbsp;<i
+                class="fa fa-download"></i></a>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Change Priority
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="cancelConfirm()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure to change the Ticket priority from <b>{{currentPriority}}</b> to <b>{{details.priority}}</b> ?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmChange()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="cancelConfirm()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmReactivate>
+    <div class="card mb-0">
+        <div class="card-header">
+            Reactivate
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure to reactivate ticket?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmReactivateSubmit()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #resolveRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Resolve Ticket
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="resolveForm" [formGroup]="resolveForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Resolution Type<em>*</em></label>
+                        <select id="resolution_type" class="form-control" formControlName="resolution_type"
+                            [class.is-invalid]="resolveFormErrors.resolution_type">
+                            <option value="" disabled>Select Resolution Type</option>
+                            <option *ngFor="let resolution of resolutionTypeList" [value]="resolution.value">
+                                {{resolution.display_name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="resolveFormErrors.resolution_type">
+                            {{resolveFormErrors.resolution_type}}</div>
+                    </div>
+
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Resolution<em>*</em></label>
+                        <textarea id="resolution" class="form-control" type="text" formControlName="resolution"
+                            [class.is-invalid]="resolveFormErrors.resolution"></textarea>
+                        <div class="invalid-feedback" *ngIf="resolveFormErrors.resolution">
+                            {{resolveFormErrors.resolution}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onResolveSubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #assigneeChangeRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Change Ticket Assignee
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="ticketForm" [formGroup]="ticketForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Assign to<em>*</em></label>
+                        <select id="assignee" class="form-control" formControlName="assignee"
+                            [class.is-invalid]="ticketFormErrors.assignee">
+                            <option *ngFor="let c of contacts" [value]="c.contact_id">{{c.contact_first_name}}
+                                {{c.contact_last_name}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Note<em>*</em></label>
+                        <textarea id="note" class="form-control" rows="4" formControlName="note"
+                            [class.is-invalid]="ticketFormErrors.note"></textarea>
+                        <div class="invalid-feedback" *ngIf="ticketFormErrors.note">
+                            {{ticketFormErrors.note}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onAssigneeChangeSubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeModal()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #stageChangeRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Change Ticket Stage
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="ticketForm" [formGroup]="ticketForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Stage<em>*</em></label>
+                        <select id="change_stage" class="form-control" formControlName="change_stage"
+                            [class.is-invalid]="ticketFormErrors.change_stage">
+                            <option *ngFor="let stage of ticketStages" [value]="stage.value">
+                                {{stage.display_name}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Note<em>*</em></label>
+                        <textarea id="note" class="form-control" rows="4" formControlName="note"
+                            [class.is-invalid]="ticketFormErrors.note"></textarea>
+                        <div class="invalid-feedback" *ngIf="ticketFormErrors.note">
+                            {{ticketFormErrors.note}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onStageChangeSubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeModal()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #statusChangeRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Change Ticket Status
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="ticketForm" [formGroup]="ticketForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Status<em>*</em></label>
+                        <select id="status_reason" class="form-control" formControlName="status_reason"
+                            [class.is-invalid]="ticketFormErrors.status_reason">
+                            <option *ngFor="let status of ticketStatusList" [value]="status.value">
+                                {{status.display_name}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Note<em>*</em></label>
+                        <textarea id="note" class="form-control" rows="4" formControlName="note"
+                            [class.is-invalid]="ticketFormErrors.note"></textarea>
+                        <div class="invalid-feedback" *ngIf="ticketFormErrors.note">
+                            {{ticketFormErrors.note}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onStatusChangeSubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeModal()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #priorityChangeRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Change Ticket Priority
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="ticketForm" [formGroup]="ticketForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Priority<em>*</em></label>
+                        <select id="priority" class="form-control" formControlName="priority"
+                            [class.is-invalid]="ticketFormErrors.priority">
+                            <option *ngFor="let prt of ticketPriorityList" [value]="prt.value">
+                                {{prt.display_name}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Note<em>*</em></label>
+                        <textarea id="note" class="form-control" rows="4" formControlName="note"
+                            [class.is-invalid]="ticketFormErrors.note"></textarea>
+                        <div class="invalid-feedback" *ngIf="ticketFormErrors.note">
+                            {{ticketFormErrors.note}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onPriorityChangeSubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeModal()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #cancelRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Cancel Ticket
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="cancelForm" [formGroup]="cancelForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Status<em>*</em></label>
+                        <select id="cancel_status" class="form-control" formControlName="cancel_status"
+                            [class.is-invalid]="cancelFormErrors.cancel_status">
+                            <option value="" disabled>Select Status</option>
+                            <option *ngFor="let status of cancelStatusList" [value]="status.value">
+                                {{status.display_name}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="cancelFormErrors.cancel_status">
+                            {{cancelFormErrors.cancel_status}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onCancelSubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

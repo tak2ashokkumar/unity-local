@@ -1,0 +1,125 @@
+<div class="card round-edge">
+    <div class="card-header bg-white rounded-3 py-2">
+        <div class="row">
+            <div class="col-6">
+                <div class="mt-1">
+                    <span class="font-lg font-weight-bold">{{ action }} User</span>
+                </div>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                        class="fa fa-arrow-left"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form *ngIf="userForm" [formGroup]="userForm">
+            <div class="form-group">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+            </div>
+            <div class="row">
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Type<em>*</em></label>
+                    <select id="user_type" class="form-control" type="text" formControlName="user_type"
+                        [ngClass]="{'is-invalid' : formErrors.user_type}">
+                        <option [value]="''" disabled>Select Type</option>
+                        <option [value]="'MSP'">MSP</option>
+                        <option [value]="'Tenant'">Tenant</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.user_type">
+                        {{formErrors.user_type}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">First Name<em>*</em></label>
+                    <input id="first_name" class="form-control" type="text" formControlName="first_name"
+                        [ngClass]="{'is-invalid' : formErrors.first_name}" placeholder="Enter First Name">
+                    <div class="invalid-feedback" *ngIf="formErrors.first_name">
+                        {{formErrors.first_name}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Last Name<em>*</em></label>
+                    <input id="last_name" class="form-control" type="text" formControlName="last_name"
+                        [ngClass]="{'is-invalid' : formErrors.last_name}" placeholder="Enter Last Name">
+                    <div class="invalid-feedback" *ngIf="formErrors.last_name">
+                        {{formErrors.last_name}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Email ID<em>*</em></label>
+                    <input id="email" class="form-control" type="text" formControlName="email"
+                        [ngClass]="{'is-invalid' : formErrors.email}" placeholder="Enter Email ID">
+                    <div class="invalid-feedback" *ngIf="formErrors.email">
+                        {{formErrors.email}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Contact Number</label>
+                    <input id="phone_number" class="form-control" type="number" formControlName="phone_number"
+                        [ngClass]="{'is-invalid' : formErrors.phone_number}" placeholder="Enter Contact Number">
+                    <div class="invalid-feedback" *ngIf="formErrors.phone_number">
+                        {{formErrors.phone_number}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Carrier</label>
+                    <select id="carrier" class="form-control" type="text" formControlName="carrier"
+                        [ngClass]="{'is-invalid' : formErrors.carrier}">
+                        <option [value]="''" disabled>Select Carrier</option>
+                        <option *ngFor="let carrier of carrierList" [value]="carrier.carrier_name">
+                            {{carrier.carrier_name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.carrier">
+                        {{formErrors.carrier}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">User Group</label>
+                    <select id="user_groups" class="form-control" type="text" formControlName="user_groups"
+                        [ngClass]="{'is-invalid' : formErrors.user_groups}">
+                        <option [value]="''">Select User Group</option>
+                        <option *ngFor="let group of filteredGroups" [value]="group.name">
+                            {{group.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.user_groups">
+                        {{formErrors.user_groups}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Role</label>
+                    <multiselect-dropdown class="form-control p-0" style="height:auto;" [options]="filteredRoles"
+                        [settings]="roleListSettings" formControlName="user_roles"
+                        [ngClass]="{'is-invalid' : formErrors.user_roles}"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="formErrors.user_roles">
+                        {{formErrors.user_roles}}</div>
+                </div>
+                <div *ngIf="userForm.get('user_type').value  == 'Tenant'" class="col-4 form-group">
+                    <label class="form-col-form-label">Tenant<em>*</em></label>
+                    <select id="org" class="form-control" type="text" formControlName="org"
+                        [ngClass]="{'is-invalid' : formErrors.org}">
+                        <option [value]="''">Select Tenant</option>
+                        <option *ngFor="let tenant of tenantList" [value]="tenant.id">
+                            {{tenant.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.org">
+                        {{formErrors.org}}</div>
+                </div>
+                <div *ngIf="userForm.get('user_type').value == 'MSP'" class="col-4 form-group">
+                    <label class="form-col-form-label">Tenant</label>
+                    <multiselect-dropdown class="form-control p-0" style="height:auto;" [options]="tenantList"
+                        [settings]="tenantListSettings" formControlName="tenants"
+                        [ngClass]="{'is-invalid' : formErrors.tenants}"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="formErrors.tenants">
+                        {{formErrors.tenants}}</div>
+                </div>
+                <div class="col-2 form-group align-self-center mt-2"
+                    [ngClass]="{'mt-4': userForm.get('user_type').value == ''}">
+                    <div class="form-check">
+                        <input class="form-check-input form-check-xl" type="checkbox" formControlName="send_invite">
+                        <label class="form-check-label">
+                            Send Invitation Email
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-3">
+        <button class="btn btn-primary" type="button" (click)="onSubmit()">{{ action }}</button>
+        <button class="btn btn-outline-danger ml-3" type="button" (click)="goBack()">Cancel</button>
+    </div>
+</div>

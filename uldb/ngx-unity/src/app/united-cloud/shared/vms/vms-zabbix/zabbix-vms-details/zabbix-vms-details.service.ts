@@ -9,8 +9,9 @@ import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { DatacenterFast } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { UnityCredentialsFast } from 'src/app/shared/SharedEntityTypes/unity-credentials.type';
-import { DEVICES_FAST_BY_DEVICE_TYPE, DEVICE_BY_ID, DEVICE_SERIAL_NUMBER_BY_DEVICE_TYPE, DEVICE_UPTIME_BY_DEVICE_ID, GET_ADVANCED_DISCOVERY_CREDENTIALS, GET_AGENT_CONFIGURATIONS, UNITY_CREDENTIALS_FAST, UPDATE_VM_DETAILS_BY_DEVICE_TYPE, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
+import { DEVICES_FAST_BY_DEVICE_TYPE, DEVICE_BY_ID, DEVICE_OS, DEVICE_SERIAL_NUMBER_BY_DEVICE_TYPE, DEVICE_UPTIME_BY_DEVICE_ID, GET_ADVANCED_DISCOVERY_CREDENTIALS, GET_AGENT_CONFIGURATIONS, UNITY_CREDENTIALS_FAST, UPDATE_VM_DETAILS_BY_DEVICE_TYPE, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { UnityOS } from '../../../entities/common-entities.type';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 
@@ -51,6 +52,10 @@ export class ZabbixVmsDetailsService {
 
   getCollectors(): Observable<DeviceDiscoveryAgentConfigurationType[]> {
     return this.http.get<DeviceDiscoveryAgentConfigurationType[]>(GET_AGENT_CONFIGURATIONS(), { params: new HttpParams().set('page_size', 0) });
+  }
+
+  getOperatingSystems(): Observable<UnityOS[]> {
+    return this.http.get<UnityOS[]>(DEVICE_OS());
   }
 
   getPowerStatus(d: any) {
@@ -134,10 +139,10 @@ export class ZabbixVmsDetailsService {
   addOSControl(d: any, form: FormGroup, platformType: DeviceMapping) {
     switch (platformType) {
       case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
-        form.addControl('os_name', new FormControl(d.os_name, d.os_name ? [Validators.required, NoWhitespaceValidator] : [NoWhitespaceValidator]));
+        form.addControl('os_name', new FormControl(d.os_name || '', [Validators.required, NoWhitespaceValidator]));
         break;
       default:
-        form.addControl('os', new FormControl(this.getOs(d.os), this.getOs(d.os) ? [Validators.required, NoWhitespaceValidator] : [NoWhitespaceValidator]));
+        form.addControl('os', new FormControl(this.getOs(d.os) || '', [Validators.required, NoWhitespaceValidator]));
         break;
     }
   }
@@ -154,6 +159,7 @@ export class ZabbixVmsDetailsService {
       'manufacturer': '',
       'model': '',
       'os': '',
+      'os_name': '',
       'os_build_version': '',
       'mac_address': '',
       'template': '',
@@ -188,6 +194,9 @@ export class ZabbixVmsDetailsService {
       'required': 'Manufacturer name is required'
     },
     'os': {
+      'required': 'os is required'
+    },
+    'os_name': {
       'required': 'os is required'
     },
     // 'collector': {

@@ -1,0 +1,292 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white">
+                <div class="row justify-content-between">
+                    <div class="col-5 font-weight-bold">
+                        <span class="align-middle">{{action}} Item</span>
+                    </div>
+                    <div class="col-1">
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form *ngIf="form" class="form-horizontal" [formGroup]="form">
+                    <div class="form-group text-center" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">SLA Group Name<em>*</em> : </div>
+                        <div class="col-4">
+                            <select class="form-control form-control-sm" formControlName="sla_group"
+                                [class.is-invalid]="formErrors.sla_group">
+                                <option [value]="''" disabled>Select Group</option>
+                                <option *ngFor="let group of slaGroups" [value]="group.id">{{group.name}}</option>
+                            </select>
+                            <small class="invalid-feedback"
+                                *ngIf="formErrors.sla_group">{{formErrors.sla_group}}</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">Request Type<em>*</em> : </div>
+                        <div class="col-4">
+                            <select class="form-control form-control-sm" formControlName="request_type"
+                                [class.is-invalid]="formErrors.request_type">
+                                <option [value]="''" disabled>Select Request Type</option>
+                                <option *ngFor="let requestType of requestTypesList" [value]="requestType.display_name">
+                                    {{requestType.display_name}}</option>
+                            </select>
+                            <small class="invalid-feedback"
+                                *ngIf="formErrors.request_type">{{formErrors.request_type}}</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">Name<em>*</em> : </div>
+                        <div class="col-4">
+                            <input id="name" class="form-control form-control-sm" type="text" formControlName="name"
+                                [class.is-invalid]="formErrors.name">
+                            <small class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">KPI Response<em>*</em> : </div>
+                        <div class="col-4">
+                            <select class="form-control form-control-sm" formControlName="response_sla_kpi"
+                                [class.is-invalid]="formErrors.response_sla_kpi">
+                                <option [value]="''" disabled>Select KPI Response</option>
+                                <option *ngFor="let responseSlaKpi of responseSlaKpiList" [ngValue]="responseSlaKpi">
+                                    {{responseSlaKpi.msdyn_name}}
+                                </option>
+                            </select>
+                            <small class="invalid-feedback"
+                                *ngIf="formErrors.response_sla_kpi">{{formErrors.response_sla_kpi}}</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">KPI Resoultion<em>*</em> : </div>
+                        <div class="col-4">
+                            <select class="form-control form-control-sm" formControlName="resolution_sla_kpi"
+                                [class.is-invalid]="formErrors.resolution_sla_kpi">
+                                <option [value]="''" disabled>Select KPI Resoultion</option>
+                                <option *ngFor="let resolutionSlaKpi of resolutionSlaKpiList"
+                                    [ngValue]="resolutionSlaKpi">
+                                    {{resolutionSlaKpi.msdyn_name}}
+                                </option>
+                            </select>
+                            <small class="invalid-feedback"
+                                *ngIf="formErrors.resolution_sla_kpi">{{formErrors.resolution_sla_kpi}}</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right font-sm">Response Success Condition<em>*</em> : </div>
+                        <div class="col-4">
+                            <select class="form-control form-control-sm"
+                                formControlName="response_success_condition_values_map"
+                                [class.is-invalid]="formErrors.response_success_condition_values_map">
+                                <option [value]="''" disabled>Select Response Success Condition</option>
+                                <option *ngFor="let responseSuccessCondition of responseSuccessConditionList"
+                                    [ngValue]="responseSuccessCondition">
+                                    {{responseSuccessCondition.display_name}}
+                                </option>
+                            </select>
+                            <small class="invalid-feedback"
+                                *ngIf="formErrors.response_success_condition_values_map">{{formErrors.response_success_condition_values_map}}</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="text-right font-sm mx-2">Resolution Success Condition<em>*</em> : </div>
+                        <div class="col-4">
+                            <multiselect-dropdown [options]="resolutionSuccessConditionList"
+                                [settings]="resolutionSuccessConditionSettings"
+                                [texts]="resolutionSuccessConditionTexts" class="form-control p-0" style="height:auto;"
+                                [class.is-invalid]="formErrors.resolution_success_condition_values_map"
+                                formControlName="resolution_success_condition_values_map"></multiselect-dropdown>
+                            <small class="invalid-feedback"
+                                *ngIf="formErrors.resolution_success_condition_values_map">{{formErrors.resolution_success_condition_values_map}}</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">Priority<em>*</em> : </div>
+                        <div class="col-4">
+                            <select class="form-control form-control-sm" formControlName="priority"
+                                [class.is-invalid]="formErrors.priority">
+                                <option [value]="''" disabled>Select Priority</option>
+                                <option *ngFor="let p of slaPriorities" [value]="p.display_name">{{p.display_name}}
+                                </option>
+                            </select>
+                            <small class="invalid-feedback" *ngIf="formErrors.priority">{{formErrors.priority}}</small>
+                        </div>
+                    </div>
+                    <fieldset>
+                        <legend>Response SLA</legend>
+                        <div class="form-group row">
+                            <div class="col-2 text-right">Time to first response<em>*</em> : </div>
+                            <div class="col-2">
+                                <div class="row">
+                                    <div class="col-9">
+                                        <input id="response_sla_hr" class="form-control form-control-sm"
+                                            formControlName="response_sla_hr" type="number"
+                                            [class.is-invalid]="formErrors.response_sla_hr" placeholder="HH">
+                                        <small class="invalid-feedback"
+                                            *ngIf="formErrors.response_sla_hr">{{formErrors.response_sla_hr}}</small>
+                                    </div>
+                                    <div class="col-3 px-0">
+                                        <small>Hours</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="row">
+                                    <div class="col-8 pl-0">
+                                        <input id="response_sla_min" class="form-control form-control-sm"
+                                            formControlName="response_sla_min" type="number"
+                                            [class.is-invalid]="formErrors.response_sla_min" placeholder="MM">
+                                        <small class="invalid-feedback"
+                                            *ngIf="formErrors.response_sla_min">{{formErrors.response_sla_min}}</small>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <small>Minutes</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right">Notification Email : </div>
+                            <div class="col">
+                                <input id="response_emails" class="form-control form-control-sm w-40"
+                                    formControlName="response_emails" [class.is-invalid]="formErrors.response_emails"
+                                    autocomplete="off" placeholder="Type Username or Email" [typeahead]="userList"
+                                    typeaheadOptionField="contact_email"
+                                    (typeaheadOnSelect)="typeaheadOnSelectResponseUser($event)"
+                                    (typeaheadOnBlur)="form.get('response_emails').setValue('')"
+                                    (typeaheadNoResults)="typeaheadNoResults($event)">
+                                <div class="alert alert-secondary" *ngIf="noUsers">No Results Found</div>
+                                <div *ngIf="selectedResponseUsers.length">
+                                    <span *ngFor="let user of selectedResponseUsers; let i = index;"
+                                        class="badge badge-pill badge-secondary font-xs py-1 my-2 mx-1">
+                                        {{user['name']}}<{{user['contact_email']}}>
+                                            <span class="fas fa-times pointer-link pl-1"
+                                                (click)="manageSelectedResponseUsers(i)"></span>
+                                    </span>
+                                </div>
+                                <small class="invalid-feedback"
+                                    *ngIf="formErrors.response_emails">{{formErrors.response_emails}}</small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right">Reminder<em>*</em> : </div>
+                            <div class="col-3">
+                                <select class="form-control form-control-sm" type="text">
+                                    <option selected>By Percentage</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <div class="input-group input-group-sm">
+
+                                    <input type="number" class="form-control form-control-sm"
+                                        aria-label="Recipient's username"
+                                        aria-describedby="response_reminder_percentage"
+                                        formControlName="response_reminder_percentage"
+                                        [class.is-invalid]="formErrors.response_reminder_percentage">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="response_reminder_percentage">%</span>
+                                    </div>
+                                    <small class="invalid-feedback"
+                                        *ngIf="formErrors.response_reminder_percentage">{{formErrors.response_reminder_percentage}}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Resolution SLA</legend>
+                        <div class="form-group row">
+                            <div class="col-2 text-right">Time to first resolution<em>*</em> : </div>
+                            <div class="col-2">
+                                <div class="row">
+                                    <div class="col-9">
+                                        <input id="resolution_sla_hr" class="form-control form-control-sm"
+                                            formControlName="resolution_sla_hr" type="number"
+                                            [class.is-invalid]="formErrors.resolution_sla_hr" placeholder="HH">
+                                        <small class="invalid-feedback"
+                                            *ngIf="formErrors.resolution_sla_hr">{{formErrors.resolution_sla_hr}}</small>
+                                    </div>
+                                    <div class="col-3 px-0">
+                                        <small>hours</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="row">
+                                    <div class="col-8 pl-0">
+                                        <input id="resolution_sla_min" class="form-control form-control-sm"
+                                            formControlName="resolution_sla_min" type="number"
+                                            [class.is-invalid]="formErrors.resolution_sla_min" placeholder="MM">
+                                        <small class="invalid-feedback"
+                                            *ngIf="formErrors.resolution_sla_min">{{formErrors.resolution_sla_min}}</small>
+                                    </div>
+                                    <div class="col-4 px-0">
+                                        <small>minutes</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right">Notification Email : </div>
+                            <div class="col">
+                                <input id="resolution_emails" class="form-control form-control-sm w-40"
+                                    formControlName="resolution_emails"
+                                    [class.is-invalid]="formErrors.resolution_emails" autocomplete="off"
+                                    placeholder="Type username or email" [typeahead]="userList"
+                                    typeaheadOptionField="contact_email"
+                                    (typeaheadOnSelect)="typeaheadOnSelectResolutionUser($event)"
+                                    (typeaheadOnBlur)="form.get('resolution_emails').setValue('')"
+                                    (typeaheadNoResults)="typeaheadNoResults($event)">
+                                <div class="alert alert-secondary" *ngIf="noUsers">No Results Found</div>
+                                <div *ngIf="selectedResolutionUsers.length">
+                                    <span *ngFor="let user of selectedResolutionUsers; let i = index;"
+                                        class="badge badge-pill badge-secondary font-xs py-1 my-2 mx-1">
+                                        {{user['name']}}<{{user['contact_email']}}>
+                                            <span class="fas fa-times pointer-link pl-1"
+                                                (click)="manageSelectedResolutionUsers(i)"></span>
+                                    </span>
+                                </div>
+                                <small class="invalid-feedback"
+                                    *ngIf="formErrors.resolution_emails">{{formErrors.resolution_emails}}</small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right">Reminder<em>*</em> : </div>
+                            <div class="col-3">
+                                <select class="form-control form-control-sm" type="text">
+                                    <option selected>By Percentage</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control form-control-sm"
+                                        aria-label="Recipient's username"
+                                        aria-describedby="resolution_reminder_percentage"
+                                        formControlName="resolution_reminder_percentage"
+                                        [class.is-invalid]="formErrors.resolution_reminder_percentage">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="resolution_reminder_percentage">%</span>
+                                    </div>
+                                    <small class="invalid-feedback"
+                                        *ngIf="formErrors.resolution_reminder_percentage">{{formErrors.resolution_reminder_percentage}}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn btn-primary mr-2" (click)="submit()">Submit</button>
+                    <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

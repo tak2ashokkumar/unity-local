@@ -1,0 +1,528 @@
+<ng-container>
+    <!-- <div class="row my-2">
+        <div class="col-5">
+            <div class="card round-edge mb-0" *ngIf="summaryViewData">
+                <div class="card-body d-flex flex-column p-2">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-truncate">Critical</div>
+                            <div class="d-flex align-items-baseline">
+                                <span class="text-primary text-value">{{summaryViewData.total.critical}}</span>
+                                <span class="font-xs text-muted font-500 ml-1 text-truncate">Events</span>
+                            </div>
+                        </div>
+                        <div class="my-2 border border-secondary"></div>
+                        <div>
+                            <div class="text-truncate">Warning</div>
+                            <div class="d-flex align-items-baseline">
+                                <span class="text-primary text-value">{{summaryViewData.total.warning}}</span>
+                                <span class="font-xs text-muted font-500 ml-1 text-truncate">Events</span>
+                            </div>
+                        </div>
+                        <div class="my-2 border border-secondary"></div>
+                        <div>
+                            <div class="text-truncate">Information</div>
+                            <div class="d-flex align-items-baseline">
+                                <span class="text-primary text-value">{{summaryViewData.total.information}}</span>
+                                <span class="font-xs text-muted font-500 ml-1 text-truncate">Events</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="donut d-flex justify-content-center align-items-center"
+                                [style]="severityDonutStyle">
+                                <div class="hole"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-7">
+            <div class="card round-edge mb-0" *ngIf="summaryViewData">
+                <div class="card-body d-flex flex-column p-2">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-truncate">Compute</div>
+                            <div class="d-flex align-items-baseline">
+                                <span class="text-primary text-value">{{summaryViewData.total.critical}}</span>
+                                <span class="font-xs text-muted font-500 ml-1 text-truncate">Events</span>
+                            </div>
+                        </div>
+                        <div class="my-2 border border-secondary"></div>
+                        <div>
+                            <div class="text-truncate">Network</div>
+                            <div class="d-flex align-items-baseline">
+                                <span class="text-primary text-value">{{summaryViewData.total.warning}}</span>
+                                <span class="font-xs text-muted font-500 ml-1 text-truncate">Events</span>
+                            </div>
+                        </div>
+                        <div class="my-2 border border-secondary"></div>
+                        <div>
+                            <div class="text-truncate">Storage</div>
+                            <div class="d-flex align-items-baseline">
+                                <span class="text-primary text-value">{{summaryViewData.total.information}}</span>
+                                <span class="font-xs text-muted font-500 ml-1 text-truncate">Events</span>
+                            </div>
+                        </div>
+                        <div class="my-2 border border-secondary"></div>
+                        <div>
+                            <div class="text-truncate">Others</div>
+                            <div class="d-flex align-items-baseline">
+                                <span class="text-primary text-value">{{summaryViewData.total.information}}</span>
+                                <span class="font-xs text-muted font-500 ml-1 text-truncate">Events</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card condition-card">
+                <div class="row h-100">
+                    <div class="col-3 condition-brief border-right pr-0 h-100">
+                        <div class="d-flex justify-content-between align-items-center px-2 border">
+                            <div class="col-7-w py-2">
+                                <table-search-box (searched)="onSearched($event)"></table-search-box>
+                            </div>
+                            <div class="col-5-w py-2">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    [isLargeSize]="true" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                        <div class="row mx-0 condition-brief-list" *ngIf="viewData.length">
+                            <div class="col-12 h-100" [perfectScrollbar]="{suppressScrollX: true}">
+                                <div class="border-bottom p-2 pointer-link" *ngFor="let view of viewData; let i = index"
+                                    (click)="selectCondition(i)" [class.bg-light]="i==selectedConditionIndex">
+                                    <div class="d-flex">
+                                        <div class="pl-0 pr-2 py-2">
+                                            <div class="rounded event-count d-flex justify-content-center align-items-center font-500"
+                                                [ngClass]="[view.severityBg, 'text-white']">{{view.alertCount}}
+                                            </div>
+                                        </div>
+                                        <div class="p-0 event-name mr-auto text-truncate">
+                                            <h6 class="mb-0 text-truncate">{{view.description}}</h6>
+                                            <div class="d-inline-flex">
+                                                <div class="p-0">
+                                                    <span class="font-sm-xs text-muted">ID: </span>
+                                                    <span class="font-sm-xs text-muted">{{view.id}}</span>
+                                                </div>
+                                                <div class="border-left ml-2 pl-2">
+                                                    <span class="font-sm-xs font-500"
+                                                        [ngClass]="[view.statusTextColor, 'text-capitalize']">{{view.conditionStatus}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="p-0 event-duration">
+                                            <span class="font-xs-sm font-500 text-truncate">
+                                                <i class="fas fa-history mr-1"></i>{{view.conditionDuration}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <span class="font-sm-xs text-muted">Tenant:&nbsp;</span>
+                                        <span class="font-sm-xs font-500 text-truncate w-65">{{view.tenant}}</span>
+                                    </div>
+                                    <div class="d-flex">
+                                        <span class="font-sm-xs text-muted">Hosts:&nbsp;</span>
+                                        <span class="font-sm-xs font-500 text-truncate w-65">{{view.hosts}}</span>
+                                        <div class="source-count d-inline-flex justify-content-center align-items-center font-xs font-500"
+                                            *ngIf="view.conditionHostsRemaining">+{{view.conditionHostsRemaining}}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <span class="font-sm-xs text-muted">Source:&nbsp;</span>
+                                        <span
+                                            class="font-sm-xs font-500 text-truncate w-65 text-capitalize">{{view.conditionSource}}</span>
+                                        <!-- <div class="source-count d-inline-flex justify-content-center align-items-center font-xs font-500"
+                                            *ngIf="view.conditionSourceRemaining">+{{view.conditionSourceRemaining}}
+                                        </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center p-0 pt-2 border">
+                            <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                                [pageSize]="currentCriteria.pageSize" [customSize]="4" [totalCount]="count"
+                                (pageChange)="pageChange($event)"></table-pager>
+                        </div>
+                    </div>
+                    <div class="col-9 condition-detail h-100 pl-0" [perfectScrollbar] *ngIf="viewData.length">
+                        <div class="card border-0">
+                            <div class="card-header border-bottom bg-white p-2 d-flex flex-column">
+                                <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center rounded event-severity small p-1 mr-2"
+                                        [ngClass]="[viewData[selectedConditionIndex].severityBg, 'text-white']">
+                                        {{viewData[selectedConditionIndex].conditionSeverity}}
+                                    </div>
+                                    <div class="d-flex align-items-center w-75 mr-auto">
+                                        <div class="font-lg font-500 event-name text-truncate">
+                                            {{viewData[selectedConditionIndex].description}}
+                                        </div>
+                                        <div class="w-20 ml-2 mt-1 font-xs text-muted">
+                                            {{viewData[selectedConditionIndex].conditionDatetime}}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-end w-15">
+                                        <button class="action-icons mb-0 fa fa-times font-sm ml-1"
+                                            [tooltip]="viewData[selectedConditionIndex].resolveInProgress ? 'In Progress': viewData[selectedConditionIndex].resolveBtnTooltipMsg"
+                                            [ngClass]="{'fa-times':!viewData[selectedConditionIndex].resolveInProgress,'fa-spinner fa-spin': viewData[selectedConditionIndex].resolveInProgress,'action-icons-disabled':viewData[selectedConditionIndex].resolveInProgress || viewData[selectedConditionIndex].isStatusResolved}"
+                                            container="body" (click)="resolveCondtion()" accessControl
+                                            moduleName="Event Management" accessType="write"
+                                            elementType="actionbtn"></button>
+                                        <button *ngIf="viewData[selectedConditionIndex].viewType == 'list'"
+                                            class="action-icons mb-0 fas fa-eye font-sm ml-1" [tooltip]="'Details View'"
+                                            container="body" (click)="switchView('timeline')"></button>
+                                        <button *ngIf="viewData[selectedConditionIndex].viewType == 'timeline'"
+                                            class="action-icons mb-0 fas fa-list-ul font-sm ml-1"
+                                            [tooltip]="'List View'" container="body"
+                                            (click)="switchView('list')"></button>
+                                        <button class="action-icons mb-0 fas fa-project-diagram font-sm ml-1"
+                                            [tooltip]="'Coming Soon'" container="body"></button>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <span class="font-sm-xs text-muted">Tenant: </span>
+                                        <span
+                                            class="font-sm-xs font-500">{{viewData[selectedConditionIndex].tenant}}</span>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1"
+                                        *ngIf="viewData[selectedConditionIndex]?.ticketId">
+                                        <span class="font-sm-xs text-muted">Ticket ID: </span>
+                                        <a class="font-sm-xs text-primary font-500"
+                                            (click)="goToTicketDetails(viewData[selectedConditionIndex])">{{viewData[selectedConditionIndex].ticketId}}</a>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Status: </span>
+                                        <span class="font-sm-xs font-500"
+                                            [ngClass]="[viewData[selectedConditionIndex].statusTextColor, 'text-capitalize']">{{viewData[selectedConditionIndex].conditionStatus}}</span>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Source: </span>
+                                        <div class="font-sm d-inline">
+                                            <span
+                                                class="font-500 text-capitalize">{{viewData[selectedConditionIndex].conditionSource}}</span>
+                                            <!-- <div class="d-inline source-count font-xss pl-0 py-1 pr-1 ml-1 text-capitalize"
+                                                *ngIf="viewData[selectedConditionIndex].conditionSource.length-1">
+                                                +{{viewData[selectedConditionIndex].conditionSource.length-1}}
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Hosts: </span>
+                                        <div class="font-sm d-inline">
+                                            <span class="font-500">{{viewData[selectedConditionIndex].hosts[0]}}</span>
+                                            <div class="d-inline source-count font-xss pl-0 py-1 pr-1 ml-1"
+                                                *ngIf="viewData[selectedConditionIndex].hosts.length-1">
+                                                +{{viewData[selectedConditionIndex].hosts.length-1}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Correlator: </span>
+                                        <span class="font-sm font-500">{{viewData[selectedConditionIndex].correlator ||
+                                            'NA'}}</span>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Time Window: </span>
+                                        <span
+                                            class="font-sm font-500">{{viewData[selectedConditionIndex].correlationWindow
+                                            || 'NA'}}</span>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Acknowledged: </span>
+                                        <span
+                                            class="font-sm font-500">{{viewData[selectedConditionIndex].isAcknowledged||
+                                            'NA'}}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <span class="font-sm-xs text-muted">Events: </span>
+                                            <span
+                                                class="badge badge-pill badge-secondary font-xs-sm">{{viewData[selectedConditionIndex].eventCount}}</span>
+                                        </div>
+                                        <div class="border-left ml-1 pl-1">
+                                            <span class="font-sm-xs text-muted">Alert Start Time: </span>
+                                            <div class="font-sm d-inline">
+                                                <span
+                                                    class="font-500 text-capitalize">{{viewData[selectedConditionIndex].firstAlertDateTime}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="border-left ml-1 pl-1">
+                                            <span class="font-sm-xs text-muted">Latest Alert Time: </span>
+                                            <div class="font-sm d-inline">
+                                                <span
+                                                    class="font-500">{{viewData[selectedConditionIndex].lastAlertDateTime}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="border-left ml-1 pl-1">
+                                            <span class="font-sm-xs text-muted">Duration: </span>
+                                            <span
+                                                class="font-sm font-500">{{viewData[selectedConditionIndex].conditionDuration
+                                                || 'NA'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center pr-2">
+                                        <span
+                                            class="badge badge-pill badge-secondary font-xs-sm">{{viewData[selectedConditionIndex].alertCount}}</span>
+                                        <span class="ml-1 font-sm float-right align-middle">Alerts</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0 px-0">
+                                <ng-container [ngSwitch]="viewData[selectedConditionIndex].viewType">
+                                    <ng-container *ngSwitchCase="'list'">
+                                        <ng-container *ngTemplateOutlet="alertsList"></ng-container>
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'timeline'">
+                                        <ng-container *ngTemplateOutlet="timelineByHost"></ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center text-muted my-5 py-5" *ngIf="!viewData.length">
+                        No associated conditions found.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<!-- <aiml-condition-details></aiml-condition-details>
+<aiml-alert-details></aiml-alert-details> -->
+
+<ng-template #alertsList>
+    <div class="table-responsive" *ngIf="viewData.length">
+        <table class="table text-left font-xs-sm font-500">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Device Name</th>
+                    <th class="text-center">Count</th>
+                    <th>Alert Time</th>
+                    <th class="text-center">Severity</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Source</th>
+                    <th>Acknowledged</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let alert of alerts;let i = index;" truncateText>
+                    <td class="tdw-7">
+                        <button class="btn btn-link text-decoration-none p-0 table-column-btn font-xs-sm font-500"
+                            type="button" [tooltip]="alert.id"
+                            (click)="viewAlertDetails(alert.uuid)">{{alert.id}}</button>
+                    </td>
+                    <td class="tdw-15 text-primary">
+                        <div [tooltip]="alert.deviceName">
+                            <span class="fas" [ngClass]="alert.deviceIcon"></span>
+                            <span class="ml-1">{{alert.deviceName}} </span>
+                        </div>
+                    </td>
+                    <td class="tdw-5">
+                        <div class="text-center" [tooltip]="alert.eventCount">
+                            {{alert.eventCount}}</div>
+                    </td>
+                    <td class="tdw-15">
+                        <div [tooltip]="alert.alertTime">{{alert.alertTime}}</div>
+                    </td>
+                    <td class="tdw-5">
+                        <div class="text-center" [tooltip]="alert.severity" container="body">
+                            <i class="fa status-icon" [ngClass]="alert.severityIcon"></i>
+                        </div>
+                    </td>
+                    <td class="tdw-15">
+                        <div [tooltip]="alert.description">{{alert.description}}</div>
+                    </td>
+                    <td class="tdw-8">
+                        <div [ngClass]="[alert.statusTextColor, 'text-capitalize']" [tooltip]="alert.status">
+                            {{alert.status}}</div>
+                    </td>
+                    <td class="tdw-10">
+                        <div class="text-capitalize">{{alert.source}}</div>
+                    </td>
+                    <td class="tdw-8">
+                        <div class="text-center">{{alert.isAcknowledged}}</div>
+                    </td>
+                    <td class="action-icons-column">
+                        <span dropdown placement="bottom right" container="body">
+                            <button id="button-container" class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                                data-toggle="dropdown" aria-controls="icons-dropdown-container" dropdownToggle
+                                (click)="false" [tooltip]="'More Actions'" container="body" accessControl
+                                moduleName="Event Management" accessType="write" elementType="actionbtn"></button>
+                            <div container="body" id="icons-dropdown-container"
+                                class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                                aria-labelledby="button-container">
+                                <button class="action-icons mb-0 fa fa-times font-sm mt-2 mb-1"
+                                    [tooltip]="alert.resolveInProgress ? 'In Progress': alert.resolveBtnTooltipMsg"
+                                    [ngClass]="{'fa-times':!alert.resolveInProgress,'fa-spinner fa-spin': alert.resolveInProgress,'action-icons-disabled':alert.resolveInProgress || alert.isStatusResolved}"
+                                    container="body" (click)="resolveAlert(alert)"></button>
+                                <button class="action-icons mb-0 fas fa-comment-dots font-sm mt-1 mb-1"
+                                    [tooltip]="'Coming Soon'" container="body"
+                                    [ngClass]="{'action-icons-disabled':true}"></button>
+                                <button class="action-icons mb-0 fas fa-edit font-sm mt-1 mb-1"
+                                    [tooltip]="'Coming Soon'" container="body"
+                                    [ngClass]="{'action-icons-disabled':true}"></button>
+                                <button class="action-icons mb-0 fas fa-external-link-alt font-sm mt-1 mb-1"
+                                    [tooltip]="'Coming Soon'" container="body"
+                                    [ngClass]="{'action-icons-disabled':true}"></button>
+                                <button class="action-icons mb-0 fas fa-ticket-alt font-sm mt-1 mb-2"
+                                    tooltip="Manage by creating support ticket" container="body"
+                                    [ngClass]="{'action-icons-disabled':true}"></button>
+                            </div>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mx-1">
+            <table-entries [pageNo]="alertsCurrentCriteria.pageNo" [pageSize]="alertsCurrentCriteria.pageSize"
+                [totalCount]="alertsCount"></table-entries>
+            <table-pager *ngIf="alerts.length" [pageNo]="alertsCurrentCriteria.pageNo"
+                [pageSize]="alertsCurrentCriteria.pageSize" [totalCount]="alertsCount"
+                (pageChange)="alertsPageChange($event)"></table-pager>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #timelineByHost>
+    <div class="row">
+        <div [ngClass]="selectedEvent ? 'col-7' : 'col-12'">
+            <div class="font-xs-sm font-500">
+                <div class="d-flex w-100 justify-content-between align-items-center table-header">
+                    <div class="d-flex w-20 font-weight-bold table-header-item">Device Name</div>
+                    <div class="d-flex justify-content-between w-80">
+                        <div class="d-flex flex-column align-items-start table-header-item">
+                            <span class="font-weight-bold">Start Time</span>
+                            <span
+                                class="font-weight-bold">{{viewData[selectedConditionIndex].firstAlertDateTime}}</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-start table-header-item">
+                            <span class="font-weight-bold">End Time</span>
+                            <span class="font-weight-bold">{{viewData[selectedConditionIndex].lastAlertDateTime}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex w-100 justify-content-between table-body"
+                    *ngFor="let host of viewData[selectedConditionIndex].hostBasedEvents;let hostIndex = index;">
+                    <div class="d-flex w-20 font-xs-sm font-500 text-primary align-items-baseline table-body-item">
+                        <span class="fas" [ngClass]="host.deviceIcon"></span>
+                        <span class="ml-1 text-truncate">{{host.deviceName}} </span>
+                    </div>
+                    <div id="condition-events-timeline" class="d-flex flex-column w-80 table-body-item"
+                        style="margin-top: -6px;">
+                        <div *ngIf="showConditionEventTimeline" class="d-flex w-100">
+                            <div class="d-flex flex-column justify-content-start align-items-start"
+                                style="position: absolute;"
+                                *ngFor="let event of viewData[selectedConditionIndex].hostBasedEvents[hostIndex].events; let hostEventIndex = index">
+                                <div class="badge rounded-pill font-xss" (click)="viewEventDetails(event)"
+                                    [ngClass]="event.severityPointerBGClass" [tooltip]="event.tooltipMessage"
+                                    [style.margin-left.px]="event.inActiveTimelineLength - 5">{{event.eventNumber}}
+                                </div>
+                                <div class="vertical border border-right-0" [ngClass]="event.severityPointerHookClass"
+                                    [style.margin-left.px]="event.inActiveTimelineLength"></div>
+                                <div style="z-index: 1; border-width: 2px !important; margin-top: -3px; margin-right:16px; margin-left:-5px;"
+                                    [style.margin-left.px]="event.inActiveTimelineLength"
+                                    [style.width.px]="event.activeTimelineLength"
+                                    [ngClass]="viewData[selectedConditionIndex].hostBasedEvents[hostIndex].events[hostEventIndex].activeTimelineClass">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-5" *ngIf="selectedEvent">
+            <div class="card mb-0 rounded">
+                <div class="card-header d-flex justify-content-between align-items-center px-3 py-2">
+                    <div>
+                        <span class="fas" [ngClass]="selectedEvent.deviceIcon"></span>
+                        <span class="ml-2">{{selectedEvent.deviceName}} </span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="font-sm font-500 mr-2">
+                            <span class="text-muted">Status : </span>
+                            <span
+                                [ngClass]="[selectedEvent.statusTextColor, 'text-capitalize']">{{selectedEvent.status}}</span>
+                        </span>
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeEventDetails()"></a>
+                    </div>
+                </div>
+                <div class="card-body pt-2 px-4 pb-4 d-flex flex-column font-sm">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Event Time :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.eventDateTime}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Device Name :</span>
+                        <span class="text-primary font-sm-xs font-500 mr-2">{{selectedEvent.deviceName}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Device IP :</span>
+                        <span class="font-sm-xs font-500 mr-1">{{selectedEvent.managementIp}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Description :</span>
+                        <span class="font-sm-xs w-60 font-500 mr-2">{{selectedEvent.description}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Source :</span>
+                        <span
+                            class="font-sm-xs w-60 font-500 mr-2 text-capitalize text-truncate">{{selectedEvent.source}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Component :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.category}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Private Cloud :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.privateCloud}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Datacenter :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.datacenter}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Trigger Name :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.triggerName}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Tags :</span>
+                        <span class="font-sm-xs w-60 font-500 mr-2 text-truncate">{{selectedEvent.tags}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Cabinet :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.cabinet}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Service :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.service}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Domain :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.domain}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Acknowledged :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.isAcknowledged}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1" *ngIf="selectedEvent.status == 'Resolved'">
+                        <span class="text-muted w-30 text-truncate">Resolved Time :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.recoveredDateTime}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<mtp-aiml-alert-details></mtp-aiml-alert-details>

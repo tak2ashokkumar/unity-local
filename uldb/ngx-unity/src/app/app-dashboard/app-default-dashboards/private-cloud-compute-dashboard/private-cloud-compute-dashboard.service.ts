@@ -135,10 +135,20 @@ export class PrivateCloudComputeDashboardService {
           radius: ['45%', '78%'],
           center: ['50%', '42%'],
           label: {
-            show: false
+            show: true,
+            position: 'outside',
+            color: '#6b7280',
+            fontSize: 11,
+            formatter: (params: any) => `${params.data.count}`
           },
           labelLine: {
-            show: false
+            show: true,
+            length: 14,
+            length2: 12,
+            lineStyle: {
+              color: '#b7c1cc',
+              width: 1
+            }
           },
           data: data.map((item, index) => ({
             value: item.percentage,
@@ -291,8 +301,22 @@ export class PrivateCloudComputeDashboardService {
           radius: ['45%', '72%'],
           center: ['50%', '48%'],
           bottom: 30,
-          label: { show: false },
-          labelLine: { show: false },
+          label: {
+            show: true,
+            position: 'outside',
+            color: '#6b7280',
+            fontSize: 11,
+            formatter: (params: any) => `${params.data.count}`
+          },
+          labelLine: {
+            show: true,
+            length: 14,
+            length2: 12,
+            lineStyle: {
+              color: '#b7c1cc',
+              width: 1
+            }
+          },
 
           data: data.map((item, index) => ({
             value: item.percentage,
@@ -330,8 +354,8 @@ export class PrivateCloudComputeDashboardService {
       grid: {
         left: 100,
         right: 40,
-        top: 0,
-        bottom: 10,
+        top: 6,
+        bottom: 2,
         containLabel: false
       },
 
@@ -373,7 +397,7 @@ export class PrivateCloudComputeDashboardService {
         // background gray bars
         {
           type: 'bar',
-          barWidth: 8,
+          barWidth: 7,
           barGap: '-100%',
           silent: true,
           z: 1,
@@ -389,7 +413,7 @@ export class PrivateCloudComputeDashboardService {
         // actual colored bars
         {
           type: 'bar',
-          barWidth: 8,
+          barWidth: 7,
           z: 2,
 
           data: data.map((item, index) => ({
@@ -581,6 +605,7 @@ export class PrivateCloudComputeDashboardService {
   getTop10ClustersByVMsWidgetData(filters: FiltersCriteriaType): Observable<Top10ClustersByVMsData> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<any>('/customer/widgets/top_clusters_by_vm_count/', { params });
+
   }
 
 
@@ -638,7 +663,8 @@ export class PrivateCloudComputeDashboardService {
           color: '#8a8a8a',
           fontSize: 11,
           interval: 0,
-
+          rotate: 45,
+          margin: 14,
           formatter: (value: string) => {
             return value.length > 8
               ? value.substring(0, 8) + '...'
@@ -851,10 +877,10 @@ export class PrivateCloudComputeDashboardService {
       },
 
       diskIops: {
-        value: item.diskIOPS?.value ?? 0,
-        label: `${item.diskIOPS?.value ?? 0}k`,
-        percent: item.diskIOPS?.percentage ?? 0,
-        tone: this.getProgressClass(item.diskIOPS?.percentage ?? 0)
+        value: item.diskIops?.value ?? 0,
+        label: `${item.diskIops?.value ?? 0}k`,
+        percent: item.diskIops?.percentage ?? 0,
+        tone: this.getProgressClass(item.diskIops?.percentage ?? 0)
       },
 
       upTime: item.uptime || 'N/A',
@@ -1014,18 +1040,30 @@ export class PrivateCloudComputeDashboardService {
       series: [
         {
           type: 'pie',
-          roseType: 'area',
+          roseType: 'radius',
           clockwise: true,
-          radius: ['28%', '78%'],
+          radius: ['42%', '64%'],
           center: ['50%', '50%'],
-          avoidLabelOverlap: false,
+          startAngle: 90,
+          avoidLabelOverlap: true,
+          padAngle: 0,
 
           label: {
-            show: false
+            show: true,
+            position: 'outside',
+            color: '#6b7280',
+            fontSize: 11,
+            formatter: (params: any) => `${params.name} (${params.value})`
           },
 
           labelLine: {
-            show: false
+            show: true,
+            length: 14,
+            length2: 12,
+            lineStyle: {
+              color: '#b7c1cc',
+              width: 1
+            }
           },
 
           data: data.map((item, index) => ({
@@ -1058,23 +1096,24 @@ export class PrivateCloudComputeDashboardService {
   getPerformanceWorkloadWidgetData(filters: FiltersCriteriaType): Observable<PerformanceWorkloadDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<PerformanceWorkloadDataType>('/customer/widgets/performance_workload_insights/', { params });
+
   }
 
   createProgressBarChart(title: string, data: any[], maxValue?: number): EChartsOption {
 
     const max = maxValue || Math.max(...data.map(d => d.value));
     const visualMax = max > 0 ? max * 1.05 : 1;
-    const gridHeight = Math.min(Math.max(data.length * 24, 28), 176);
-    const truncateVmName = (name: string) => {
-      if (!name) {
-        return '';
-      }
 
-      return name.length > 12 ? `${name.slice(0, 12)}...` : name;
-    };
+    const gridHeight = Math.min(Math.max(data.length * 22, 28), 212);
+
+    const longestNameLength = Math.max(...data.map(d => (d?.name || '').length), 0);
+
+    // Keep label area small so bars get more space
+    const labelWidth = Math.min(Math.max(longestNameLength * 6, 65), 90);
 
     const getColor = (value: number) => {
       const percent = (value / max) * 100;
+
       if (percent > 80) return '#e54b4b';     // red
       if (percent > 50) return '#f5a623';     // orange
       if (percent > 20) return '#2f80d1';     // blue
@@ -1083,28 +1122,20 @@ export class PrivateCloudComputeDashboardService {
 
     return {
       grid: {
-        left: 84,
-        right: 44,
-        top: 10,
-        bottom: 8,
+        left: labelWidth,
+        right: 36,
+        top: 8,
+        bottom: 6,
         height: gridHeight,
-        containLabel: true
+        containLabel: false
       },
-      // title: {
-      //   text: title,
-      //   left: 'center',
-      //   top: 5,
-      //   textStyle: {
-      //     fontSize: 16,
-      //     fontWeight: 500,
-      //     color: '#333'
-      //   }
-      // },
+
       xAxis: {
         type: 'value',
         max: visualMax,
         show: false
       },
+
       yAxis: {
         type: 'category',
         inverse: true,
@@ -1112,23 +1143,28 @@ export class PrivateCloudComputeDashboardService {
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: {
+          interval: 0,
           color: '#6b7280',
           fontSize: 12,
-          width: 82,
+          width: labelWidth - 8,
+          align: 'right',
           overflow: 'truncate',
-          formatter: (value: string) => truncateVmName(value)
+          margin: 8
         }
       },
+
       tooltip: {
         trigger: 'item',
         formatter: (params: any) => `${params.name}: ${params.value}`
       },
+
       series: [
         {
           name: 'Background',
           type: 'bar',
-          barWidth: 10,
+          barWidth: 8,
           barGap: '-100%',
+          barCategoryGap: '34%',
           silent: true,
           data: data.map(() => visualMax),
           itemStyle: {
@@ -1140,8 +1176,9 @@ export class PrivateCloudComputeDashboardService {
         {
           name: title,
           type: 'bar',
-          barWidth: 10,
-          data: data.map((item, index) => ({
+          barWidth: 8,
+          barCategoryGap: '34%',
+          data: data.map(item => ({
             value: item.value,
             itemStyle: {
               color: getColor(item.value),
@@ -1151,10 +1188,10 @@ export class PrivateCloudComputeDashboardService {
           label: {
             show: true,
             position: 'right',
-            distance: 8,
+            distance: 6,
             color: '#333',
             fontSize: 12,
-            formatter: '{c}'
+            formatter: (params: any) => params.value
           },
           z: 2
         }
@@ -1329,10 +1366,13 @@ export class PrivateCloudComputeDashboardService {
         {
           name: 'Orphaned By Category',
           type: 'pie',
-          roseType: 'area',
+          roseType: 'radius',
           clockwise: false,
-          radius: ['28%', '88%'],
+          radius: ['42%', '64%'],
           center: ['50%', '50%'],
+          startAngle: 90,
+          avoidLabelOverlap: true,
+          padAngle: 0,
           label: {
             show: true,
             position: 'outside',
@@ -1343,7 +1383,7 @@ export class PrivateCloudComputeDashboardService {
           labelLine: {
             show: true,
             length: 14,
-            length2: 10,
+            length2: 12,
             lineStyle: {
               width: 1
             }
@@ -1357,6 +1397,7 @@ export class PrivateCloudComputeDashboardService {
 
             itemStyle: {
               color: chartColors[index],
+              borderColor: 'transparent',
               borderWidth: 0,
               borderRadius: 0
             }
@@ -1366,6 +1407,10 @@ export class PrivateCloudComputeDashboardService {
             borderColor: 'transparent',
             borderWidth: 0,
             borderRadius: 0
+          },
+
+          emphasis: {
+            scale: false
           }
         }
       ]

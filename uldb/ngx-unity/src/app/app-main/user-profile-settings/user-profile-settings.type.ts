@@ -17,6 +17,7 @@ export interface UnityOrganizationSettings {
     auto_remediation_enabled: boolean;
     auto_ticketing_enabled: boolean;
     attach_rca_to_ticket: boolean;
+    auto_publish_condition_to_kb: boolean;
     object_id: number;
     ticketing_instance: UnityOrganizationSettingsTicketInstance;
     auto_ticketing_severity: string[];

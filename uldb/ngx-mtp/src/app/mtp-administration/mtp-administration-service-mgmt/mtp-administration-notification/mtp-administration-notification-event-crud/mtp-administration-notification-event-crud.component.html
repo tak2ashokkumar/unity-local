@@ -1,0 +1,87 @@
+<div class="card rounded-edge">
+    <div class="card-header bg-white">
+        <div class="row d-flex justify-content-between">
+            <div class="col-5">
+                <h5>{{action}} Notification Event</h5>
+            </div>
+            <div class="col-1">
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                    (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div calss="card-body">
+        <form class="row mx-2 my-2" *ngIf="form" [formGroup]="form">
+            <div class="form-group col-12" *ngIf="nonFieldErr">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+            </div>
+            <div class="form-group col-6">
+                <label for="ticket_type" class="form-col-form-label">Type<em>*</em></label>
+                <select name="ticket_type" id="ticket_type" class="form-control" formControlName="ticket_type"
+                    [class.is-invalid]="formErrors.ticket_type">
+                    <option value="''" disabled>Select Type</option>
+                    <option *ngFor="let ticket of ticketOptions" [value]="ticket.value">
+                        {{ticket.label}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.ticket_type">
+                    {{formErrors.ticket_type}}
+                </div>
+            </div>
+            <div class="form-group col-6">
+                <label for="severity" class="form-col-form-label">Severity<em>*</em></label>
+                <select name="severity" id="severity" class="form-control" formControlName="severity"
+                    [class.is-invalid]="formErrors.severity">
+                    <option value="''" disabled>Select Severity</option>
+                    <option *ngFor="let severity of severityOptions" [value]="severity.value">
+                        {{severity.label}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.severity">
+                    {{formErrors.severity}}
+                </div>
+            </div>
+            <div class="form-group col-6">
+                <label for="event" class="form-col-form-label">Event<em>*</em></label>
+                <multiselect-dropdown class="form-control p-0" style="height:auto;" [settings]="eventSettings"
+                    [options]="eventOptions" formControlName="event"
+                    [class.is-invalid]="formErrors.event"></multiselect-dropdown>
+                <div class="invalid-feedback" *ngIf="formErrors.event">
+                    {{formErrors.event}}
+                </div>
+            </div>
+            <div class="form-group col-6">
+                <label for="tenant" class="form-col-form-label">Select Tenant<em>*</em></label>
+                <multiselect-dropdown class="form-control p-0" style="height:auto;" [settings]="tenantSettings"
+                    [options]="tenants" formControlName="tenant"
+                    [class.is-invalid]="formErrors.tenant"></multiselect-dropdown>
+                <div class="invalid-feedback" *ngIf="formErrors.tenant">
+                    {{formErrors.tenant}}
+                </div>
+            </div>
+            <div class="form-group col-6">
+                <label for="event_status" class="form-col-form-label">Status<em>*</em></label>
+                <ul class="d-flex px-0 mb-0">
+                    <li>
+                        <label class="pointer-link" [class.active]="form.controls.event_status.value">
+                            <input type="radio" [value]="true" formControlName="event_status">
+                            <span class="font-sm">Enable</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link" [class.active]="!form.controls.event_status.value">
+                            <input type="radio" [value]="false" formControlName="event_status">
+                            <span class="font-sm radio-label">Disable</span>
+                        </label>
+                    </li>
+                </ul>
+                <div class="invalid-feedback" *ngIf="formErrors.event_status">
+                    {{formErrors.event_status}}
+                </div>
+            </div>
+        </form>
+        <div class="d-flex justify-content-center mb-4">
+            <button class="btn btn-primary mr-2" (click)="submit()">Submit</button>
+            <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NetworkAgentsChatResponseType } from './naci-chatbot.type';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupportedLLMConfigData } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-model.type';
+import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { UnityAssistantChatHistory } from 'src/app/unity-chatbot/uc-history/uc-history.type';
 
 @Component({
   selector: 'naci-chatbot',
@@ -34,6 +36,7 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
   shouldScroll: boolean = false;
   conversationId: string = null;
   title: string;
+  loadHistory: boolean
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
@@ -47,16 +50,27 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute) {
     this.route.queryParams.subscribe(params => {
-      console.log(params);
+      console.log(params, 'params');
       this.conversationId = params['conversation_id'] || null;
       this.title = params['title'] || '';
+      this.loadHistory = params['load_history'] || false;
     });
+    this.chatCurrentCriteria = {
+      searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.TEN,
+      params: [{
+        'org_id': userInfoService.userOrgId,
+        'user_id': userInfoService.userDetails.id,
+        'application': 'Network Agent',
+        'conversation_id': this.conversationId
+      }]
+    }
   }
 
   ngOnInit(): void {
     this.getAIModels();
     const firstQuery = `Create an investigation plan to resolve the condition ${this.conditionId}`;
-    this.getResponse(firstQuery);
+    console.log(this.loadHistory, 'onit')
+    this.loadHistory ? this.getChats() : this.getResponse(firstQuery);
     this.buildForm();
   }
 
@@ -69,6 +83,68 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
     if (this.shouldScroll) {
       this.scrollToBottom();
     }
+  }
+  chatCurrentCriteria: SearchCriteria;
+  isLoadingChats = false;
+  hasMoreChats = true;
+  isFirstLoad = true;
+  onScroll() {
+    const el = this.messagesContainer.nativeElement;
+    if (el.scrollTop <= 40 && !this.isLoadingChats && this.hasMoreChats) {
+      this.chatCurrentCriteria.pageNo++;
+      this.getChats();
+      console.log('here')
+    }
+  }
+
+  infiniteChats: UnityAssistantChatHistory[] = []
+  getChats() {
+    this.isLoadingChats = true;
+    this.service.getChats(this.chatCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      const el = this.messagesContainer.nativeElement;
+      const prevScrollHeight = el.scrollHeight;
+      // reverse since API returns newest first
+      const reversed = [...res.results].reverse();
+      if (this.isFirstLoad) {
+        this.infiniteChats = reversed;
+        this.chatHistoryData = this.mapToChatHistory(this.infiniteChats);
+        this.isFirstLoad = false;
+        this.hasMoreChats = this.infiniteChats.length < res.count;
+        this.isLoadingChats = false;
+        setTimeout(() => {
+          el.scrollTop = el.scrollHeight;
+        });
+      } else {
+        this.infiniteChats = [...reversed, ...this.infiniteChats];
+        this.chatHistoryData = this.mapToChatHistory(this.infiniteChats);
+        this.hasMoreChats = this.infiniteChats.length < res.count;
+        this.isLoadingChats = false;
+        setTimeout(() => {
+          const newScrollHeight = el.scrollHeight;
+          el.scrollTop += newScrollHeight - prevScrollHeight;
+        });
+      }
+    }, err => {
+      this.isLoadingChats = false;
+    });
+  }
+
+  mapToChatHistory(chats: any[]) {
+    return chats.map(chat => {
+      let message = chat.content;
+      // split on sectionBreak and take only the part before it
+      if (message.includes('sectionBreak')) {
+        message = message.split('sectionBreak')[0].trimEnd();
+      }
+      return {
+        user: (chat.role === 'User' ? 'user' : 'bot') as 'user' | 'bot',
+        message: message,
+        type: 'text',
+        actions: chat.metadata?.recommended_actions?.map((a: string) => ({ name: a })) || [],
+        showAction: chat.metadata?.recommended_actions?.length > 0,
+        botResponseId: chat.chat_message_id
+      };
+    });
   }
 
   // getResponse(chat: string) {

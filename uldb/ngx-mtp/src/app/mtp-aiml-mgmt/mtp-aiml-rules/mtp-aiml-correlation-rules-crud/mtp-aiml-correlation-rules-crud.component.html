@@ -1,0 +1,91 @@
+<div class="card">
+    <div class="card-header bg-white py-2">
+        <span *ngIf="isView">View</span>
+        <span *ngIf="ruleId && !isView">Edit</span>
+        <span *ngIf="!ruleId">Add</span> Rule
+        <button class="btn btn-square btn-sm btn-link text-warning text-decoration-none pull-right py-0"
+            (click)="goBack()">
+            <i class="fa fa-arrow-left">&nbsp;</i>To Correlation Rules
+        </button>
+        <button class="btn btn-sm btn-warning btn-pill mr-2 pull-right" type="button" *ngIf="isView">Edit Rule</button>
+    </div>
+    <div class="card-body">
+        <form *ngIf="form" [formGroup]="form">
+            <div class="form-group">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="name">Rule Name<em>*</em></label>
+                        <input class="form-control" id="name" type="text" placeholder="Rule 1" formControlName="name"
+                            [ngClass]="{'is-invalid' : formErrors.name}">
+                        <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <query-builder #queryBuilder formControlName='filter_rule_meta'
+                        [classNames]='queryBuilderClassNames' [config]='queryBuilderConfig'
+                        [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse'
+                        [persistValueOnFieldChange]='persistValueOnFieldChange'>
+                        <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+                            <textarea class="text-input text-area" [(ngModel)]="rule.value"
+                                [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                placeholder="Custom Textarea"></textarea>
+                        </ng-container>
+                        <ng-container *queryInput="let rule; type: 'tag'; let getDisabledState=getDisabledState">
+                            <div class="col-auto">
+                                <tag-input [clearOnBlur]="true" [(ngModel)]="rule.value"
+                                    [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                    [modelAsStrings]="true" [secondaryPlaceholder]="'Enter tag'">
+                                    <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+                                    </tag-input-dropdown>
+                                </tag-input>
+                            </div>
+                        </ng-container>
+                    </query-builder>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <textarea class="form-control" id="description" name="description" formControlName="description"
+                        rows="4" readonly></textarea>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="correlator">Correlator<em>*</em></label>
+                        <select class="form-control" id="correlator" formControlName="correlator"
+                            [class.is-invalid]="formErrors.correlator">
+                            <option [value]="''" disabled>Select Correlator</option>
+                            <option [value]="'topology'">Topology</option>
+                            <option [value]="'same-host'">Host</option>
+                            <option [value]="'same-dc'">Datacenter</option>
+                            <!-- <option [value]="'same-tag'">Tag</option> -->
+                            <option [value]="'textual-similarity'">Textual Similarity</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.correlator">{{formErrors.correlator}}</div>
+                    </div>
+                </div>
+                <div class="col-4" *ngIf="form.controls.similarity_rate">
+                    <div class="form-group">
+                        <label for="similarity_rate">Similarity Rate<em>*</em></label>
+                        <input class="form-control" id="similarity_rate" type="text" formControlName="similarity_rate"
+                            [ngClass]="{'is-invalid' : formErrors.similarity_rate}">
+                        <div class="invalid-feedback" *ngIf="formErrors.similarity_rate">{{formErrors.similarity_rate}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer d-flex justify-content-center bg-white border-top-0" *ngIf="!isView">
+        <button class="btn btn-sm btn-primary mr-2" type="button" (click)="onSubmit()" *ngIf="!ruleId">Create</button>
+        <button class="btn btn-sm btn-primary mr-2" type="button" (click)="onSubmit()" *ngIf="ruleId">Update</button>
+        <button class="btn btn-sm btn-outline-danger" type="button" (click)="reset()">Reset</button>
+    </div>
+</div>

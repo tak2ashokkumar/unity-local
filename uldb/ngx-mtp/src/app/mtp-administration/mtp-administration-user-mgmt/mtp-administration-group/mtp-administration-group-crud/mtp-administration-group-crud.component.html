@@ -1,0 +1,94 @@
+<div class="card round-edge">
+    <div class="card-header bg-white rounded-3 py-2">
+        <div class="row">
+            <div class="col-6">
+                <div class="mt-1">
+                    <span class="font-lg font-weight-bold">{{ action }} User Group</span>
+                </div>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                        class="fa fa-arrow-left"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form *ngIf="groupForm" [formGroup]="groupForm">
+            <div class="form-group">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+            </div>
+            <div class="row">
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Name<em>*</em></label>
+                    <input id="name" class="form-control" type="text" formControlName="name"
+                        [ngClass]="{'is-invalid' : formErrors.name}" placeholder="Enter Group Name">
+                    <div class="invalid-feedback" *ngIf="formErrors.name">
+                        {{formErrors.name}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Description</label>
+                    <input id="description" class="form-control" type="text" formControlName="description"
+                        [ngClass]="{'is-invalid' : formErrors.description}" placeholder="Enter Group Description">
+                    <div class="invalid-feedback" *ngIf="formErrors.description">
+                        {{formErrors.description}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Group Type<em>*</em></label>
+                    <select id="group_type" class="form-control" type="text" formControlName="group_type"
+                        [ngClass]="{'is-invalid' : formErrors.group_type}">
+                        <option [value]="''" disabled>Select Type</option>
+                        <option [value]="'MSP'">MSP</option>
+                        <option [value]="'Tenant'">Tenant</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.group_type">
+                        {{formErrors.group_type}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Select User</label>
+                    <multiselect-dropdown class="form-control p-0" style="height:auto;" [options]="filteredUsers"
+                        [settings]="userListSettings" formControlName="users"
+                        [ngClass]="{'is-invalid' : formErrors.users}"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="formErrors.users">
+                        {{formErrors.users}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Assign Role<em>*</em></label>
+                    <!-- <select id="roles" class="form-control" type="text" formControlName="roles"
+                        [ngClass]="{'is-invalid' : formErrors.roles}">
+                        <option [value]="''" disabled>Select Role</option>
+                        <option *ngFor="let role of filteredRoles" [value]="role.name">
+                            {{role.name}}</option>
+                    </select> -->
+                    <multiselect-dropdown class="form-control p-0" style="height:auto;" [options]="filteredRoles"
+                        [settings]="roleListSettings" formControlName="roles"
+                        [ngClass]="{'is-invalid' : formErrors.roles}"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="formErrors.roles">
+                        {{formErrors.roles}}</div>
+                </div>
+                <div *ngIf="groupForm.get('group_type').value  == 'Tenant'" class="col-4 form-group">
+                    <label class="form-col-form-label">Tenant</label>
+                    <select id="tenants" class="form-control" type="text" formControlName="tenants"
+                        [ngClass]="{'is-invalid' : formErrors.tenants}">
+                        <option [value]="''" disabled>Select Tenant</option>
+                        <option *ngFor="let tenant of tenantList" [value]="tenant.name">
+                            {{tenant.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.tenants">
+                        {{formErrors.tenants}}</div>
+                </div>
+                <div *ngIf="groupForm.get('group_type').value == 'MSP'" class="col-4 form-group">
+                    <label class="form-col-form-label">Tenant</label>
+                    <multiselect-dropdown class="form-control p-0" style="height:auto;" [options]="tenantList"
+                        [settings]="tenantListSettings" formControlName="tenants"
+                        [ngClass]="{'is-invalid' : formErrors.tenants}"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="formErrors.tenants">
+                        {{formErrors.tenants}}</div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-3">
+        <button class="btn btn-primary" type="button" (click)="onSubmit()">{{ action }}</button>
+        <button class="btn btn-outline-danger ml-3" type="button" (click)="goBack()">Cancel</button>
+    </div>
+</div>

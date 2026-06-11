@@ -1,0 +1,225 @@
+<div class="card round-edge">
+    <div class="card-header bg-white pl-0 py-2">
+        <span class="badge bg-secondary user-count font-weight-bold ml-3 mt-1 rounded-3">{{count}}</span>
+        <span class="ml-1 h5">Templates</span>
+        <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+    <div class="card-body pt-0">
+        <div class="row my-3">
+            <div class="col-2">
+                <table-search-box (searched)="onSearched($event)"></table-search-box>
+            </div>
+            <div class="col-10">
+                <div class="row justify-content-end">
+                    <div class="col-2">
+                        <select class="form-control form-control-sm" type="text"
+                            [(ngModel)]="currentCriteria.params[0].type" (change)="onFilterChange()">
+                            <option [value]="''">Type</option>
+                            <option [value]="'default'">Default</option>
+                            <option [value]="'cloned'">Cloned</option>
+                        </select>
+                    </div>
+                    <div class="mx-2">
+                        <table-page-size class="float-left ml-1" [currentPageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table text-left fold-table font-sm">
+            <thead class="bg-light">
+                <tr>
+                    <th></th>
+                    <th>Template Name</th>
+                    <th>Type</th>
+                    <th>Metrics</th>
+                    <th>Triggers</th>
+                    <th>Graph</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let view of viewData; let i = index">
+                    <tr truncateText>
+                        <td class="tdw-5 text-primary px-0">
+                            <div class="pointer-link w-100 text-center" *ngIf="view.components.length"
+                                (click)="openRow(view)">
+                                <span class="fas" [ngClass]="view.isOpen ? 'fa-minus-circle' : 'fa-plus-circle'"></span>
+                            </div>
+                        </td>
+                        <td class="tdw-30">
+                            <form [formGroup]="view.eventForm" *ngIf="view.onForm">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" formControlName="template_name"
+                                        [ngClass]="{'is-invalid' : view.isError}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary lh-25" (click)="onSubmitEvent(view)"
+                                            type="button">
+                                            <i class="fas fa-check fa-lg text-white"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="pointer-link" class="text-primary" *ngIf="!view.onForm"
+                                [tooltip]="view.templateName">
+                                <span style="cursor:pointer;" (click)="goToTemplate(view)">{{view.templateName}}</span>
+                            </div>
+                        </td>
+                        <td class="tdw-20">
+                            <div [tooltip]="view.templateType">{{view.templateType}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div class="pointer-link">
+                                <span class="text-primary" (click)="goToMetrics(view)">Metrics</span>
+                                <span class="badge text-primary font-weight-bold ml-2 mr-1 mt-1 rounded-3"
+                                    [ngClass]="view.templateMetricsCount>=1 ?'bg-lb text-primary':'bg-secondary text-dark'">{{view.templateMetricsCount}}</span>
+                            </div>
+                        </td>
+                        <td class="tdw-15">
+                            <div class="pointer-link">
+                                <span class="text-primary" (click)="goToTriggers(view)">Triggers</span>
+                                <span class="badge text-primary font-weight-bold ml-2 mr-1 mt-1 rounded-3"
+                                    [ngClass]="view.templateTriggersCount>=1 ?'bg-lb text-primary':'bg-secondary text-dark'">{{view.templateTriggersCount}}</span>
+                            </div>
+                        </td>
+                        <td class="tdw-15">
+                            <div class="pointer-link">
+                                <span class="text-primary" (click)="goToGraphs(view)">Graphs</span>
+                                <span class="badge font-weight-bold ml-2 mr-1 mt-1 rounded-3"
+                                    [ngClass]="view.templateGraphsCount>=1 ?'bg-lb text-primary':'bg-secondary text-dark'">{{view.templateGraphsCount}}</span>
+                            </div>
+                        </td>
+                        <td class="action-icons-column">
+                            <button class="action-icons mb-0 fas fa-copy font-sm ml-1" tooltip="Clone"
+                                (click)="cloneTemplate(view.templateID)" accessControl
+                                moduleName="Monitoring Management" accessType="write" elementType="actionbtn"></button>
+                            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                                (click)="onEditEvent(i) " [disabled]="view.templateIsDefault"
+                                [ngClass]="{'action-icons-disabled':view.templateIsDefault}" accessControl
+                                moduleName="Monitoring Management" accessType="write" elementType="actionbtn"></button>
+                            <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                (click)="deletePanelDevice(view)" [disabled]="view.templateIsDefault"
+                                [ngClass]="{'action-icons-disabled':view.templateIsDefault}" accessControl
+                                moduleName="Monitoring Management" accessType="write" elementType="actionbtn"></button>
+                        </td>
+                    </tr>
+                    <tr class="fold" #fold [ngClass]="{'open' : view.isOpen}">
+                        <td colspan="7">
+                            <ng-container [ngTemplateOutlet]='discoveredComponentsRef'
+                                [ngTemplateOutletContext]="{view:view}"></ng-container>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+        <p *ngIf="viewData.length==0" class="text-center">No records to display</p>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+    </div>
+</div>
+
+<ng-template #discoveredComponentsRef let-view="view">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 mb-0">
+                <div class="card-header py-2">
+                    Components
+                </div>
+                <div class="card-body p-0">
+                    <table class="table text-left mb-0 font-sm">
+                        <tbody>
+                            <ng-container *ngFor="let cview of view.components; let ci = index;">
+                                <tr truncateText>
+                                    <td class="tdw-10 text-primary" [style.visibility]="'hidden'">
+                                        <div class="pointer-link w-100 text-center" (click)="openRow(view)">
+                                            <span class="fas"
+                                                [ngClass]="view.isOpen ? 'fa-minus-circle' : 'fa-plus-circle'"></span>
+                                        </div>
+                                    </td>
+                                    <td class="tdw-45">
+                                        <div>{{cview.ruleName}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div class="pointer-link">
+                                            <span class="text-primary"
+                                                (click)="goToComponentMetrics(view, ci)">Metrics</span>
+                                            <span class="badge font-weight-bold ml-2 mr-1 mt-1 rounded-3"
+                                                [ngClass]="cview.itemCount ?'bg-lb text-primary':'bg-secondary text-dark'">{{cview.itemCount}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div class="pointer-link">
+                                            <span class="text-primary"
+                                                (click)="goToComponentTriggers(view, ci)">Triggers</span>
+                                            <span class="badge font-weight-bold ml-2 mr-1 mt-1 rounded-3"
+                                                [ngClass]="cview.triggerCount ?'bg-lb text-primary':'bg-secondary text-dark'">{{cview.triggerCount}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div class="pointer-link">
+                                            <span class="text-primary"
+                                                (click)="goToComponentGraphs(view, ci)">Graphs</span>
+                                            <span class="badge font-weight-bold ml-2 mr-1 mt-1 rounded-3"
+                                                [ngClass]="cview.graphCount ?'bg-lb text-primary':'bg-secondary text-dark'">{{cview.graphCount}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="action-icons-column" [style.visibility]="'hidden'">
+                                        <button class="action-icons mb-0 fas fa-copy font-sm ml-1"></button>
+                                        <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1"></button>
+                                        <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1"></button>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #clone>
+    <div class="card mb-0">
+        <div class="card-header">
+            Manage Status
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="cloneModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form class="form" [formGroup]="cloneForm">
+                <div class="form-group">
+                    <label for="name">Template Name</label>
+                    <input type="name" class="form-control" formControlName="template_name" placeholder="Enter Name"
+                        [ngClass]="{'is-invalid' : cloneFormErrors.template_name}">
+                    <div class="invalid-feedback" *ngIf="cloneFormErrors.template_name">
+                        {{cloneFormErrors.template_name}}</div>
+                </div>
+
+            </form>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-sm btn-primary pull-right ml-2 w-15"
+                (click)="onSubmit()">Create</button>
+            <button type="button" class="btn btn-sm btn-outline-danger pull-right w-15"
+                (click)="cloneModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

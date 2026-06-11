@@ -21,7 +21,8 @@ export class ConditionInvestigationNetworkTopologyComponent implements OnInit,On
   private ngUnsubscribe = new Subject();
 
   @Input('deviceData') deviceData: any;
-  @Input('index') index: number;
+  @Input('messageInfo') messageInfo: any;
+
   isVerifyAndAuditOpen: boolean = false;
   verifyAuditViewData: any;
 
@@ -55,11 +56,11 @@ export class ConditionInvestigationNetworkTopologyComponent implements OnInit,On
     private storageService: StorageService) { }
 
   ngOnInit(): void {
-    this.spinnerName = `unity-topology-${this.index}`;
+    this.spinnerName = `unity-topology-${this.messageInfo?.chat_message_id}`;
     this.options = this.getInitialOptions();
     setTimeout(() => {
       this.spinner.start(this.spinnerName);
-      this.nodeDetailsRef = document.getElementById(`dc-node-details-wrapper-${this.index}`);
+      this.nodeDetailsRef = document.getElementById(`dc-node-details-wrapper-${this.messageInfo?.chat_message_id}`);
     }, 0);
     this.remInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
     this.getNetworkTopologyData();

@@ -105,6 +105,9 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.router.events.pipe(filter(event => event instanceof NavigationEnd), skip(1)).subscribe((event: NavigationEnd) => {
       this.ngUnsubscribe.next();
       this.ngUnsubscribe.complete();
+      if (this.isExpanded) {
+        this.minimizeExpandedChatbot();
+      }
       if (this.userInfoService.isInsightsEnabled) {
         this.insights = [];
         this.showInsightsButton = this.hasInsights();

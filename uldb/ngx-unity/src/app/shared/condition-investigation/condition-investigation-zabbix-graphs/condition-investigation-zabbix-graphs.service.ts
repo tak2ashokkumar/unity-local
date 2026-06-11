@@ -18,12 +18,12 @@ export class ConditionInvestigationZabbixGraphsService {
     return this.http.get<ZabbixMonitoringItems[]>(`/mcp/dcim/monitoring_items/?customer_id=${device.customer_id}&device_id=${device.device_id}&device_ct=${device.device_ct}&monitoring_type=${mappedMonitoringType}`);
   }
 
-  convertItemsToViewData(graphList: ZabbixMonitoringItems[], index: number): ZabbixMonitoringItemsViewdata[] {
+  convertItemsToViewData(graphList: ZabbixMonitoringItems[], chatMessageId: string): ZabbixMonitoringItemsViewdata[] {
     let viewData: ZabbixMonitoringItemsViewdata[] = [];
     graphList.map(g => {
       let a = new ZabbixMonitoringItemsViewdata();
       a.itemId = g.item_id.toString();
-      a.graphSpinnerName = `${a.itemId}-${index}`;
+      a.graphSpinnerName = `${a.itemId}-${chatMessageId}`;
       a.name = g.name;
       viewData.push(a);
     })
@@ -65,19 +65,20 @@ export class ConditionInvestigationZabbixGraphsService {
     }
   };
 
-  getDateRangeByPeriod(graphRange: ZabbixGraphTimeRange): DateRange {
+  getDateRangeByPeriod(graphRange: ZabbixGraphTimeRange, createdAt: string): DateRange {
+    const baseMoment = createdAt ? moment(createdAt) : moment();
     const format = new DateRange().format;
     switch (graphRange) {
       case ZabbixGraphTimeRange.LAST_24_HOURS:
-        return { from: moment().subtract(1, 'd').format(), to: moment().subtract(1, 'm').format(format) };
+        return { from: baseMoment.clone().subtract(1, 'd').format(), to: baseMoment.clone().format(format) };
       case ZabbixGraphTimeRange.YESTERDAY:
-        return { from: moment().subtract(1, 'd').startOf('d').format(format), to: moment().subtract(1, 'd').endOf('d').format(format) };
+        return { from: baseMoment.clone().subtract(1, 'd').startOf('d').format(format), to: baseMoment.clone().subtract(1, 'd').endOf('d').format(format) };
       case ZabbixGraphTimeRange.LAST_WEEK:
-        return { from: moment().subtract(1, 'w').startOf('w').format(format), to: moment().subtract(1, 'w').endOf('w').format(format) };
+        return { from: baseMoment.clone().subtract(1, 'w').startOf('w').format(format), to: baseMoment.clone().subtract(1, 'w').endOf('w').format(format) };
       case ZabbixGraphTimeRange.LAST_MONTH:
-        return { from: moment().subtract(1, 'M').startOf('M').format(format), to: moment().subtract(1, 'M').endOf('M').format(format) };
+        return { from: baseMoment.clone().subtract(1, 'M').startOf('M').format(format), to: baseMoment.clone().subtract(1, 'M').endOf('M').format(format) };
       case ZabbixGraphTimeRange.LAST_YEAR:
-        return { from: moment().subtract(1, 'y').startOf('y').format(format), to: moment().subtract(1, 'y').endOf('y').format(format) };
+        return { from: baseMoment.clone().subtract(1, 'y').startOf('y').format(format), to: baseMoment.clone().subtract(1, 'y').endOf('y').format(format) };
       default: return null;
     }
   }

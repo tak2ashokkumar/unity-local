@@ -1,0 +1,24 @@
+<app-main-tab [tabItems]="tabItems">
+  <ng-template>
+    <!-- <form class="form-horizontal">
+      <div class="form-group mb-0 row">
+        <div class="col col-form-label">
+          <div class="form-check form-check-inline align-middle">
+            <input class="form-check-input" id="inline-checkbox1" type="checkbox" [(ngModel)]="welcomePage"
+              [ngModelOptions]="{standalone: true}" (change)="onChangeWelcomePage()">
+            <label class="form-check-label" for="inline-checkbox1">Show&nbsp;Next&nbsp;Time</label>
+          </div>
+        </div>
+      </div>
+    </form> -->
+    <div class="p-2">
+      <button class="btn btn-pill btn-warning btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+          class="fa fa-arrow-left"></i></button>
+    </div>
+  </ng-template>
+</app-main-tab>
+<div class="container-fluid pt-0">
+  <div class="animated fadeIn">
+    <router-outlet></router-outlet>
+  </div>
+</div>

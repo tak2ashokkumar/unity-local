@@ -1,0 +1,133 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white">
+                <div class="row justify-content-between">
+                    <div class="col-5 font-weight-bold">
+                        <span
+                            class="badge bg-secondary user-count font-weight-bold rounded-3 align-middle">{{count}}</span>
+                        <span class="ml-2 font-weight-bold align-middle">SLA Item</span>
+                    </div>
+                    <div class="col">
+                        <data-refresh-btn [page]="currentCriteria.pageNo"
+                            (refresh)="refreshData($event)"></data-refresh-btn>
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm pull-right" (click)="createItem()" accessControl
+                            moduleName="Service Management" accessType="write" elementType="btn">
+                            <i class="fas fa-plus"></i>&nbsp;SLA Item</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-2">
+                <div class="row pb-2">
+                    <div class="col-2">
+                        <table-search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div class="col-10">
+                        <form *ngIf="form" class="form-horizontal" [formGroup]="form">
+                            <div class="row justify-content-end">
+                                <div class="col-3">
+                                    <multiselect-dropdown class="form-control form-control-sm p-0" style="height:auto;"
+                                        [settings]="tenantSettings" [options]="tenants" [texts]="tenantTexts"
+                                        (dropdownClosed)="tenantFilterChanged()"
+                                        formControlName="tenants"></multiselect-dropdown>
+                                </div>
+                                <div class="col-3">
+                                    <multiselect-dropdown class="form-control form-control-sm p-0" style="height:auto;"
+                                        [settings]="groupSettings" [options]="groupViewData" [texts]="groupTexts"
+                                        (dropdownClosed)="groupFilterChanged()"
+                                        formControlName="group"></multiselect-dropdown>
+                                </div>
+                                <div class="col-2">
+                                    <select class="form-control form-control-sm" formControlName="ticket_type">
+                                        <option [value]="''">Type</option>
+                                        <option [value]="'incident'">Incident</option>
+                                        <option [value]="'request'">Request</option>
+                                        <!-- <option [value]="'question'">Question</option>
+                                        <option [value]="'change'">Change</option>
+                                        <option [value]="'problem'">Problem</option>
+                                        <option [value]="'task'">Task</option> -->
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <select class="form-control form-control-sm" formControlName="status">
+                                        <option [value]="''">Status</option>
+                                        <option [value]="'Critical'">Critical</option>
+                                        <option [value]="'High'">High</option>
+                                        <option [value]="'Normal'">Normal</option>
+                                        <option [value]="'Low'">Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <table class="table text-left" sortableTable (sorted)="onSorted($event)">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Name</th>
+                            <!-- <th>Tenant</th> -->
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr setTableColumnWidth *ngFor="let view of viewData">
+                            <td class="text-primary pointer-link">{{view.name}}</td>
+                            <!-- <td>
+                                <span *ngIf="view.tenants.length">{{view.tenants[0]}}</span>
+                                <span *ngIf="view.tenants.length - 1 > 0"
+                                    class="badge bg-secondary group-count rounded-3 w-auto ml-1 pointer-link" [popover]="popTemplate"
+                                    container="body" (click)="showTenants(view)" [outsideClick]="true">
+                                    +{{view.tenants.length - 1}}
+                                </span>
+                            </td> -->
+                            <td>
+                                <div class="text-capitalize">{{view.ticketType}}</div>
+                            </td>
+                            <td>{{view.priority}}</td>
+                            <td class="action-icons-column">
+                                <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" [tooltip]="'Edit'"
+                                    (click)="editItem(view)" accessControl moduleName="Service Management"
+                                    accessType="write" elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" [tooltip]="'Delete'"
+                                    (click)="deleteItem(view)" accessControl moduleName="Service Management"
+                                    accessType="write" elementType="actionbtn"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted" *ngIf="!viewData.length">No associated SLA Items were found.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #popTemplate>
+    <div *ngFor="let name of popOverList; let i = index">
+        <span *ngIf="i > 0">{{name}}</span>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

@@ -76,21 +76,38 @@
   border-radius: 0;
 }
 
-#chatbotPopUp.expanded {
-  top: 2rem;
-  right: 50%;
-  bottom: auto;
-  width: calc(100vw - 3rem);
-  max-width: 1280px;
-  height: calc(100vh - 4rem);
-  border: 1px solid #dfe8ed;
-  border-radius: 0.6rem;
-  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.32);
-  transform: translateX(50%);
+// #chatbotPopUp.expanded {
+//   top: 2rem;
+//   right: 50%;
+//   bottom: auto;
+//   width: calc(100vw - 3rem);
+//   max-width: 1280px;
+//   height: calc(100vh - 4rem);
+//   border: 1px solid #dfe8ed;
+//   border-radius: 0.6rem;
+//   box-shadow: 0 18px 56px rgba(0, 0, 0, 0.32);
+//   transform: translateX(50%);
+// }
+
+// #chatbotPopUp.expanded>.card {
+//   border-radius: 0.6rem;
+// }
+
+body.sidebar-expanded #chatbotPopUp.expanded {
+  left: 225px;
+  width: calc(100vw - 225px);
 }
 
-#chatbotPopUp.expanded>.card {
-  border-radius: 0.6rem;
+body.sidebar-minimized #chatbotPopUp.expanded {
+  left: 50px;
+  width: calc(100vw - 50px);
+}
+
+#chatbotPopUp.expanded {
+  position: fixed;
+  top: 55px;
+  height: calc(100vh - 55px);
+  right: 0;
 }
 
 .chatbot-pop-up .card {

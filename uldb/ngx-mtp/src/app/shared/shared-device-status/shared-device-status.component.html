@@ -1,0 +1,2 @@
+<span *ngIf="!status"><i class="fa fa-spinner fa-spin">&nbsp;</i></span>
+<span *ngIf="status"><i class="fa status-icon" [ngClass]="statusIcon" [tooltip]="status" container="body"></i></span>

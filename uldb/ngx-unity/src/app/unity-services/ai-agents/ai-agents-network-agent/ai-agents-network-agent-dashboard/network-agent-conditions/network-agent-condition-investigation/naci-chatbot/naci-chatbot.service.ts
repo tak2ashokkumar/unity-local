@@ -4,13 +4,18 @@ import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SupportedLLMConfig, SupportedLLMConfigData } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-model.type';
+import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
+import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
+import { UnityAssistantChatHistory } from 'src/app/unity-chatbot/uc-history/uc-history.type';
 import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class NaciChatbotService {
 
   constructor(private builder: FormBuilder,
-    private http: HttpClient) { }
+    private http: HttpClient,
+    private tableService: TableApiServiceService) { }
 
   getResponse(data: any) {
     return this.http.post(`${environment.networkAgentHostUrl}v1/investigate/`, data);
@@ -120,6 +125,10 @@ export class NaciChatbotService {
         return res && res.supported_llms ? res.supported_llms : [];
       })
     )
+  }
+
+  getChats(criteria: SearchCriteria): Observable<PaginatedResult<UnityAssistantChatHistory>> {
+    return this.tableService.getData<PaginatedResult<UnityAssistantChatHistory>>(`customer/network_agent/conversations/list_by_org_get/`, criteria);
   }
 
   buildForm() {

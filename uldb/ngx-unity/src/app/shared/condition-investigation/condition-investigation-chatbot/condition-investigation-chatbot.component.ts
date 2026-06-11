@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { NetworkAgentsChatResponseType } from './condition-investigation-chatbot.type';
@@ -11,6 +11,9 @@ import { SupportedLLMConfigData } from '../../SharedEntityTypes/ai-chatbot/llm-m
 import { takeUntil } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ConditionInvestigationNewTerminalService } from '../condition-investigation-new-terminal/condition-investigation-new-terminal.service';
+import { UnityAssistantChatHistory } from 'src/app/unity-chatbot/uc-history/uc-history.type';
+import { PAGE_SIZES, SearchCriteria } from '../../table-functionality/search-criteria';
+import { PaginatedResult } from '../../SharedEntityTypes/paginated.type';
 
 @Component({
   selector: 'condition-investigation-chatbot',
@@ -18,7 +21,7 @@ import { ConditionInvestigationNewTerminalService } from '../condition-investiga
   styleUrls: ['./condition-investigation-chatbot.component.scss'],
   providers: [ConditionInvestigationChatbotService]
 })
-export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy {
+export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy, OnChanges, AfterViewChecked {
 
   private ngUnsubscribe = new Subject();
   imageURL: string = `${environment.assetsUrl}external-brand/logos/Chatbot_Logo.svg`;
@@ -26,6 +29,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
   @Input() conditionId: string;
   @Output() chatResponse = new EventEmitter<NetworkAgentsChatResponseType>();
+  @Output() chatHistory = new EventEmitter<PaginatedResult<UnityAssistantChatHistory>>();
 
   chatHistoryData: Array<ChatHistoryData> = [];
   form: FormGroup;
@@ -48,6 +52,8 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       this.showModelDropdown = false;
     }
   }
+
+  loadHistory: any;
   constructor(private service: ConditionInvestigationChatbotService,
     private userInfoService: UserInfoService,
     private router: Router,
@@ -55,16 +61,30 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     private modalService: BsModalService,
     private newTerminalService: ConditionInvestigationNewTerminalService) {
     this.route.queryParams.subscribe(params => {
-      console.log(params);
-      this.conversationId = params['conversation_id'] || null;
+      this.loadHistory = params['load_history'] || 'false';
+      this.conversationId = this.loadHistory ? params['conversation_id'] : null;
       this.title = params['title'] || '';
     });
+    this.chatCurrentCriteria = {
+      searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.TEN,
+      params: [{
+        'org_id': userInfoService.userOrgId,
+        'user_id': userInfoService.userDetails.id,
+        'application': 'Network Agent',
+        'conversation_id': this.conversationId
+      }]
+    }
   }
 
   ngOnInit(): void {
     this.getAIModels();
     const firstQuery = `Create an investigation plan to resolve the condition ${this.conditionId}`;
-    this.getResponse(firstQuery);
+    if (this.loadHistory == 'true') {
+      this.getChats();
+    } else {
+      this.getResponse(firstQuery);
+    }
+    // this.getResponse(firstQuery);
     this.buildForm();
   }
 
@@ -77,6 +97,80 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     if (this.shouldScroll) {
       this.scrollToBottom();
     }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['loadChatHistory'] && changes['loadChatHistory'].currentValue === true) {
+      this.chatCurrentCriteria.pageNo++;
+      if(!this.isLoadingChats && this.hasMoreChats){
+        this.getChats();
+      }
+    }
+  }
+
+  chatCurrentCriteria: SearchCriteria;
+  isLoadingChats = false;
+  hasMoreChats = true;
+  isFirstLoad = true;
+  @Input() loadChatHistory: boolean;
+  onScroll() {
+    const el = this.messagesContainer.nativeElement;
+    if (el.scrollTop <= 40 && !this.isLoadingChats && this.hasMoreChats) {
+      this.chatCurrentCriteria.pageNo++;
+      this.getChats();
+    }
+  }
+
+  infiniteChats: UnityAssistantChatHistory[] = [];
+  getChats() {
+    this.isLoadingChats = true;
+    this.service.getChats(this.chatCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      const el = this.messagesContainer.nativeElement;
+      const prevScrollHeight = el.scrollHeight;
+      // reverse since API returns newest first
+      const reversed = [...res.results].reverse();
+      if (this.isFirstLoad) {
+        this.infiniteChats = reversed;
+        this.chatHistoryData = this.mapToChatHistory(this.infiniteChats);
+        this.isFirstLoad = false;
+        this.hasMoreChats = this.infiniteChats.length < res.count;
+        this.isLoadingChats = false;
+        setTimeout(() => {
+          el.scrollTop = el.scrollHeight;
+        });
+      } else {
+        this.infiniteChats = [...reversed, ...this.infiniteChats];
+        this.chatHistoryData = this.mapToChatHistory(this.infiniteChats);
+        this.hasMoreChats = this.infiniteChats.length < res.count;
+        this.isLoadingChats = false;
+        setTimeout(() => {
+          const newScrollHeight = el.scrollHeight;
+          el.scrollTop += newScrollHeight - prevScrollHeight;
+        });
+      }
+      this.chatHistory.emit(res);
+    }, err => {
+      this.isLoadingChats = false;
+      this.chatHistory.emit(null);
+    });
+  }
+
+  mapToChatHistory(chats: any[]) {
+    return chats.map(chat => {
+      let message = chat.content;
+      // split on sectionBreak and take only the part before it
+      if (message.includes('sectionBreak')) {
+        message = message.split('sectionBreak')[0].trimEnd();
+      }
+      return {
+        user: (chat.role === 'User' ? 'user' : 'bot') as 'user' | 'bot',
+        message: message,
+        type: 'text',
+        actions: chat.metadata?.recommended_actions?.map((a: string) => ({ name: a })) || [],
+        showAction: chat.metadata?.recommended_actions?.length > 0,
+        botResponseId: chat.chat_message_id
+      };
+    });
   }
 
   // getResponse(chat: string) {
@@ -147,6 +241,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       query: chat,
       org_id: this.userInfoService.userOrgId,
       user_id: `${this.userInfoService.userDetails.id}`,
+      condition_id: Number(this.conditionId),
       application: 'Network Agent',
       count: 0,
       conversation_id: this.conversationId,
@@ -176,7 +271,6 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
             this.doneData = data;
           }
           this.chatResponse.emit(this.doneData);
-          console.log('this.doneData', this.doneData);
           if (this.sectionBreakReached) {
             if (this.doneData?.meta?.recommended_actions?.length) {
               this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => {
@@ -210,10 +304,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
         // this.sectionBreakReached = false;
         this.isTyping = false;
         this.isStreaming = false;
-        console.log('this.doneData typeof', typeof this.doneData)
-        console.log('this.doneData?.meta', this.doneData?.meta);
         if (this.doneData?.meta?.recommended_actions?.length) {
-          console.log('inside complete if condition')
           this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => {
             return {
               name: ra,
@@ -234,7 +325,6 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
         if (char === 'sectionBreak') {
           const last = this.chatHistoryData[this.chatHistoryData.length - 1];
           last.showAction = true;
-          console.log('last', last);
           last.message = (last.message as string).trimEnd();
           this.sectionBreakReached = true;
           this.showStopButton = false;
@@ -312,7 +402,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     if (query.trim()) {
       this.shouldScroll = true;
       this.chatHistoryData.push({ user: 'user', message: query, type: 'text' });
-      this.getResponse(query + ' for ' + this.conditionId);
+      this.getResponse(query);
     }
   }
 
@@ -360,7 +450,6 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
 
   toggleDropdown() {
     this.showModelDropdown = !this.showModelDropdown;
-    console.log(this.showModelDropdown);
   }
 
   changeActiveModel(model: SupportedLLMConfigData) {

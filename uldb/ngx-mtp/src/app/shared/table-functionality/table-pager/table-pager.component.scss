@@ -1,0 +1,10 @@
+@import "variables";
+
+.pagination {
+  float: right;
+}
+.page-item.active .page-link {
+  &:hover {
+    color: $white;
+  }
+}

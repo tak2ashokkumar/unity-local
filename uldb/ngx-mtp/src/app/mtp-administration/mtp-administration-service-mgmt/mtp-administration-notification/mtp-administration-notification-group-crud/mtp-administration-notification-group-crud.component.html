@@ -1,0 +1,85 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white">
+                <div class="row justify-content-between">
+                    <div class="col-5 font-weight-bold">
+                        <span class="align-middle">{{action}} Notification Group</span>
+                    </div>
+                    <div class="col-1">
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form *ngIf="form" class="form-horizontal row" [formGroup]="form">
+                    <div class="form-group col-12" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label">Group Name <em>*</em></label>
+                        <input class="form-control" placeholder="Enter Group Name" type="text"
+                            formControlName="group_name" [class.is-invalid]="formErrors.group_name">
+                        <div class="invalid-feedback" *ngIf="formErrors.group_name">
+                            {{formErrors.group_name}}
+                        </div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label">Tenants <em>*</em></label>
+                        <multiselect-dropdown class="form-control p-0" style="height:auto;" [settings]="tenantSettings"
+                            [options]="tenants" formControlName="tenants"
+                            [class.is-invalid]="formErrors.tenants"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="formErrors.tenants">
+                            {{formErrors.tenants}}
+                        </div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label">User Groups <em>*</em></label>
+                        <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                            [settings]="userGroupSettings" [options]="userGroups" formControlName="mtp_groups"
+                            [class.is-invalid]="formErrors.mtp_groups"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="formErrors.mtp_groups">{{formErrors.mtp_groups}}</div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label">Alert Type <em>*</em></label>
+                        <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                            [settings]="alertTypeSettings" [options]="severityOptions" formControlName="alert_type"
+                            [class.is-invalid]="formErrors.alert_type"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="formErrors.alert_type">{{formErrors.alert_type}}</div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label">Mode <em>*</em></label>
+                        <multiselect-dropdown class="form-control p-0" style="height:auto;" [settings]="modeSettings"
+                            [options]="modes" formControlName="mode"
+                            [class.is-invalid]="formErrors.mode"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="formErrors.mode">{{formErrors.mode}}</div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label">Status <em>*</em></label>
+                        <ul class="d-flex px-0 mb-0">
+                            <li>
+                                <label class="pointer-link" [class.active]="form.controls.is_enabled.value">
+                                    <input type="radio" [value]="true" formControlName="is_enabled">
+                                    <span class="font-sm">Enable</span>
+                                </label>
+                            </li>
+                            <li>
+                                <label class="pointer-link" [class.active]="!form.controls.is_enabled.value">
+                                    <input type="radio" [value]="false" formControlName="is_enabled">
+                                    <span class="font-sm radio-label">Disable</span>
+                                </label>
+                            </li>
+                        </ul>
+                        <div class="invalid-feedback" *ngIf="formErrors.mtp_groups">{{formErrors.mtp_groups}}</div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-primary mr-2" (click)="submit()">Submit</button>
+                    <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

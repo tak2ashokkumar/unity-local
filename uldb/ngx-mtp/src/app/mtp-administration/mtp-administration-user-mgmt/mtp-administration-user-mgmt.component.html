@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col-2">
+        <div class="card round-edge">
+            <div class="card-header text-center bg-white border-bottom-0 pb-0">
+                <h6>User Management</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div class="mt-2">
+                    <button class="text-left btn btn-block" type="button" [ngClass]="isActive('users')"
+                        (click)="goTo('users')"><i class="fas fa-user mr-2"></i>Users</button>
+                </div>
+                <div class="mt-2">
+                    <button class="text-left btn btn-block" type="button" [ngClass]="isActive('groups')"
+                        (click)="goTo('groups')"><i class="fas fa-users mr-2"></i>User
+                        Groups</button>
+                </div>
+                <div class="mt-2">
+                    <button class="text-left btn btn-block" type="button" [ngClass]="isActive('roles')"
+                        (click)="goTo('roles')"><i class="fas fa-user-cog mr-2"></i>Roles</button>
+                </div>
+                <div class="mt-2">
+                    <button class="text-left btn btn-block" type="button" [ngClass]="isActive('profile')"
+                        (click)="goTo('profile')"><i class="fas fa-shield-alt mr-2"></i>My Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-10">
+        <router-outlet></router-outlet>
+    </div>
+</div>

@@ -226,6 +226,21 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     });
   }
 
+  toggleaiAgentKbSwitch() {
+    if (!this.orgSettings) {
+      return;
+    }
+    this.orgSettings.auto_publish_condition_to_kb = !this.orgSettings.auto_publish_condition_to_kb;
+    let action = this.orgSettings.auto_publish_condition_to_kb ? 'enable' : 'disable';
+    this.profileSvc.updateOrgSettings(this.orgSettings).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.orgSettings = res
+      this.notification.success(new Notification(`AI Agent to KB Injection ${action} successfully.`));
+    }, (err: HttpErrorResponse) => {
+      this.orgSettings.auto_publish_condition_to_kb = !this.orgSettings.auto_publish_condition_to_kb;
+      this.notification.error(new Notification(`Failed to ${action} AI Agent to KB Injection settings.`));
+    });
+  }
+
   toggleTicketingSwitch() {
     if (!this.orgSettings) {
       return;

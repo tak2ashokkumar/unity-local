@@ -2,10 +2,8 @@
     <div class="animated-fadeIn">
         <div class="row" style="height:calc(100vh - 75px)">
             <div class="col-8 condition-detail h-100 d-flex flex-column">
-                <div class="card mb-0"
-                    [ngClass]="{'h-100':(!initialChatResponseData?.length && !isAnyStepDataPresent)|| (initialChatResponseData?.length && !initialChatResponseData?.[0] && !isAnyStepDataPresent)}">
-                    <div class="card-header border-bottom bg-white p-2 d-flex flex-column position-relative"
-                        *ngIf="conditionDetailsViewData">
+                <div class="card mb-0" *ngIf="conditionDetailsViewData">
+                    <div class="card-header border-bottom bg-white p-2 d-flex flex-column position-relative">
                         <!-- <app-spinner [name]="'conditionDetailsSpinner'"></app-spinner> -->
                         <div class="d-flex align-items-center">
                             <div id="event-severity"
@@ -23,15 +21,20 @@
                             </div>
                             <div class="d-flex justify-content-end w-35">
                                 <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
-                                    tooltip="Manage in same tab" (click)="consoleSameTab(view)" [disabled]="!isTerminalReady" [ngClass]="{'action-icons-disabled': !isTerminalReady}"></button>
+                                    tooltip="Manage in same tab" (click)="consoleSameTab(view)"
+                                    [disabled]="!isTerminalReady"
+                                    [ngClass]="{'action-icons-disabled': !isTerminalReady}"></button>
                                 <span dropdown placement="bottom right" container="body">
                                     <button id="button-container"
                                         class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
                                         data-toggle="dropdown" aria-controls="dropdown-container" dropdownToggle
-                                        (click)="false" container="body" tooltip="Manage in New Tab" [disabled]="!isTerminalReady" [ngClass]="{'action-icons-disabled': !isTerminalReady}"></button>
+                                        (click)="false" container="body" tooltip="Manage in New Tab"
+                                        [disabled]="!isTerminalReady"
+                                        [ngClass]="{'action-icons-disabled': !isTerminalReady}"></button>
                                     <div id="dropdown-container" class="dropdown-menu dropdown-menu-right" *dropdownMenu
                                         aria-labelledby="button-container">
-                                        <a class="dropdown-item" (click)="consoleNewTab(view)" [disabled]="!isTerminalReady">
+                                        <a class="dropdown-item" (click)="consoleNewTab(view)"
+                                            [disabled]="!isTerminalReady">
                                             Console Access
                                         </a>
                                     </div>
@@ -159,10 +162,10 @@
                         </div>
                     </div>
 
-                    <div class="card-body"
+                    <!-- <div class="card-body"
                         [ngClass]="{'p-0 position-relative h-100':chatResponse?.answer?.stage!='Stage 0'}">
 
-                        <!-- <ng-container *ngIf="chatResponse?.answer?.stage == 'Stage 0'">
+                        <ng-container *ngIf="chatResponse?.answer?.stage == 'Stage 0'">
                             <div class="col mt-2 row pr-0 mb-2 align-items-center">
                                 <img [src]="analysisLogos.UnityOne.imageURL" alt="UnityOne.ai"
                                     style="height: 20px; max-width: 20px;" />
@@ -256,11 +259,11 @@
                                 <h6 class="font-500 border-bottom pb-2">Activity</h6>
                                 <ng-container *ngTemplateOutlet="activityList"></ng-container>
                             </div>
-                        </ng-container> -->
+                        </ng-container>
 
                         <div class="h-100"
                             *ngIf="((!initialChatResponseData?.length && !isAnyStepDataPresent)|| (initialChatResponseData?.length && !initialChatResponseData?.[0] && !isAnyStepDataPresent))">
-                            <app-spinner [name]="'conditionSummarySpinner'"></app-spinner>
+                            <app-spinner [name]="'conditionInitialHistoryLoadSpinner'"></app-spinner>
                             <div class="d-flex justify-content-center pt-5 h-100">
                                 <span class="font-500 pt-5"
                                     *ngIf="!initialChatResponseData?.length && !isAnyStepDataPresent">Investigating
@@ -270,9 +273,10 @@
                                     data available.</span>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+
                 </div>
-                <div class="my-3" *ngIf="chatResponseHistoryData.length">
+                <div class="my-3">
                     <div class="d-flex align-items-center justify-content-between">
                         <h1 class="font-500 font-xl mt-1">
                             Workspace
@@ -365,18 +369,55 @@
                 </ng-container> -->
 
                 <div #chatResponsHistoryScrollContainer class="card flex-grow-1 mb-0"
-                    *ngIf="chatResponseHistoryData.length" [perfectScrollbar]="{suppressScrollX: true}">
-                    <div class="card-body">
+                    *ngIf="chatResponseHistoryData.length" [perfectScrollbar]="{suppressScrollX: true}"
+                    (scroll)="onScroll()">
+                    <div #chatResponseHistoryCardBody class="card-body">
+                        <ng-container *ngIf="loadChatHistory">
+                            <div class="d-flex align-items-center justify-content-center p-5">
+                                <span class="fas fa-spinner fa-spin fa-lg"></span>
+                                <span class="ml-2 ">Loading</span>
+                            </div>
+                        </ng-container>
                         <div #chatResponseHistory
-                            *ngFor="let chat of chatResponseHistoryData;let i = index;let last = last" class="w-100"
-                            style="max-width: 100%;">
+                            *ngFor="let chat of chatResponseHistoryData;let i = index;let last = last;trackBy: trackByChatId"
+                            class="w-100" style="max-width: 100%;">
                             <markdown (click)="onMarkdownClick($event)" [data]="chat.workSpaceData"></markdown>
-                            <condition-investigation-zabbix-graphs [deviceData]="chat.meta?.device_data" [index]="i"
+                            <condition-investigation-zabbix-graphs [deviceData]="chat.meta?.device_data"
+                                [messageInfo]="chat.meta?.message_info"
                                 *ngIf="chat.meta?.device_data?.monitoring_type && chat.meta?.device_data?.monitoring_type!= 'Network Topology'"></condition-investigation-zabbix-graphs>
-                            <condition-investigation-network-topology [deviceData]="chat.meta?.device_data" [index]="i"
+                            <condition-investigation-network-topology [deviceData]="chat.meta?.device_data"
+                                [messageInfo]="chat.meta?.message_info"
                                 *ngIf="chat.meta?.device_data?.monitoring_type == 'Network Topology'">></condition-investigation-network-topology>
                             <hr class="border" *ngIf="!last">
                         </div>
+                    </div>
+                </div>
+
+                <div class="card d-flex justify-content-center align-items-center flex-grow-1 mb-0"
+                    *ngIf="!chatResponseHistoryData.length">
+                    <div *ngIf="!initialChatResponseData?.length && loadHistory == 'false'">
+                        <div class="tds-wrapper">
+                            <span class="font-xl font-500">
+                                {{ waitMessage }}
+                            </span>
+                            <div class="tds-track ml-2 mt-4">
+                                <span *ngFor="let dot of dots" class="tds-dot" [style.background-color]="dot.color"
+                                    [style.animation-delay]="dot.delay" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="position-relative h-100 w-100"
+                        *ngIf="!initialChatResponseData?.length && loadHistory == 'true'">
+                        <app-spinner [name]="'conditionInitialHistoryLoadSpinner'"></app-spinner>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <span class="font-500 pt-5">No
+                                data available.</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center"
+                        *ngIf="initialChatResponseData?.length  && !initialChatResponseData?.[0] && !chatResponseHistoryData.length">
+                        <span class="font-500 pt-5">No
+                            data available.</span>
                     </div>
                 </div>
             </div>
@@ -384,7 +425,8 @@
 
             <div class="col-4 h-100">
                 <condition-investigation-chatbot class="h-100" [conditionId]="conditionId"
-                    (chatResponse)="handleChatResponse($event)"></condition-investigation-chatbot>
+                    [loadChatHistory]="loadChatHistory" (chatResponse)="handleChatResponse($event)"
+                    (chatHistory)="handleChatHistoryResponse($event)"></condition-investigation-chatbot>
             </div>
         </div>
     </div>
@@ -420,7 +462,8 @@
                     </div>
                     <div>
                         <div>{{view.description}}</div>
-                        <div class="text-muted text-sm"><i class="far fa-clock mr-2"></i>{{view.createdDatetime}}</div>
+                        <div class="text-muted text-sm"><i class="far fa-clock mr-2"></i>{{view.createdDatetime}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -479,8 +522,10 @@
             <div class="font-500 mt-2">{{command}}</div>
         </div>
         <div class="card-footer">
-            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button" (click)="confirmExecuteModal('newTab')"> Yes, Manage in New tab</button>
-            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button" (click)="confirmExecuteModal('sameTab')">Yes, Manage in Same tab</button>
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
+                (click)="confirmExecuteModal('newTab')"> Yes, Manage in New tab</button>
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
+                (click)="confirmExecuteModal('sameTab')">Yes, Manage in Same tab</button>
             <button class="btn btn-sm btn-danger pull-right" (click)="confirmExecutionModalRef.hide()"
                 type="button">No</button>
         </div>

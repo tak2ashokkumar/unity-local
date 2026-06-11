@@ -5,12 +5,17 @@ import { SupportedLLMConfig, SupportedLLMConfigData } from '../../SharedEntityTy
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { TableApiServiceService } from '../../table-functionality/table-api-service.service';
+import { SearchCriteria } from '../../table-functionality/search-criteria';
+import { UnityAssistantChatHistory } from 'src/app/unity-chatbot/uc-history/uc-history.type';
+import { PaginatedResult } from '../../SharedEntityTypes/paginated.type';
 
 @Injectable()
 export class ConditionInvestigationChatbotService {
 
   constructor(private builder: FormBuilder,
-    private http: HttpClient) { }
+    private http: HttpClient,
+    private tableService: TableApiServiceService) { }
 
   getResponse(data: any) {
     return this.http.post(`${environment.networkAgentHostUrl}v1/investigate/`, data);
@@ -25,6 +30,10 @@ export class ConditionInvestigationChatbotService {
         },
         body: JSON.stringify(data)
       }).then(response => {
+        if (!response.ok) {
+          observer.error(`HTTP Error: ${response.status}`);
+          return;
+        }
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
@@ -53,7 +62,6 @@ export class ConditionInvestigationChatbotService {
                 const parsed = JSON.parse(dataStr);
                 observer.next({ event: currentEvent, data: parsed });
               } catch {
-                console.log('chatbot svc', dataStr)
                 observer.next({ event: currentEvent, data: dataStr });
               }
             });
@@ -120,6 +128,10 @@ export class ConditionInvestigationChatbotService {
         return res && res.supported_llms ? res.supported_llms : [];
       })
     )
+  }
+
+  getChats(criteria: SearchCriteria): Observable<PaginatedResult<UnityAssistantChatHistory>> {
+    return this.tableService.getData<PaginatedResult<UnityAssistantChatHistory>>(`customer/network_agent/conversations/list_by_org_get/`, criteria);
   }
 
   buildForm() {

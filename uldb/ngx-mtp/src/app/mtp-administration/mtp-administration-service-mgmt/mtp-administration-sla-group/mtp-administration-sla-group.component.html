@@ -1,0 +1,103 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white">
+                <span class="badge bg-secondary user-count font-weight-bold rounded-3 align-middle">{{count}}</span>
+                <span class="ml-2 font-weight-bold align-middle">SLA Group</span>
+                <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+                <button class="btn btn-primary btn-sm pull-right ml-1" (click)="goToItems()">
+                    <span>SLA Item</span>
+                    <span class="ml-2 fas fa-angle-double-right fa-lg"></span>
+                </button>
+                <button class="btn btn-primary btn-sm pull-right" (click)="createGroup()" accessControl
+                    moduleName="Service Management" accessType="write" elementType="btn">
+                    <i class="fas fa-plus"></i>&nbsp;SLA Group</button>
+            </div>
+            <div class="card-body pt-2">
+                <div class="row pb-2">
+                    <div class="col-2">
+                        <table-search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div class="col-10">
+                        <form *ngIf="form" class="form-horizontal" [formGroup]="form">
+                            <div class="row justify-content-end">
+                                <div class="col-2">
+                                    <multiselect-dropdown class="form-control form-control-sm p-0" style="height:auto;"
+                                        [settings]="tenantSettings" [options]="tenants"
+                                        (dropdownClosed)="tenantFilterChanged()"
+                                        formControlName="tenants"></multiselect-dropdown>
+                                </div>
+                                <div class="mr-2">
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <table class="table text-left" sortableTable (sorted)="onSorted($event)">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Tenant</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr setTableColumnWidth *ngFor="let view of viewData">
+                            <td class="text-primary pointer-link" (click)="goToItems(view)">{{view.name}}</td>
+                            <td>
+                                <span *ngIf="view.tenants.length">{{view.tenants[0]}}</span>
+                                <span *ngIf="view.tenants.length - 1 > 0"
+                                    class="badge bg-secondary group-count rounded-3 w-auto ml-1 pointer-link"
+                                    [popover]="popTemplate" container="body" (click)="showTenants(view)"
+                                    [outsideClick]="true">
+                                    +{{view.tenants.length - 1}}
+                                </span>
+                            </td>
+                            <td>{{view.description}}</td>
+                            <td class="action-icons-column">
+                                <button class="action-icons mb-0 fas fa-plus font-sm ml-1" [tooltip]="'Add Item'"
+                                    (click)="addItemToGroup(view)" accessControl moduleName="Service Management"
+                                    accessType="write" elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" [tooltip]="'Edit'"
+                                    (click)="editGroup(view)" accessControl moduleName="Service Management"
+                                    accessType="write" elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" [tooltip]="'Delete'"
+                                    (click)="deleteGroup(view)" accessControl moduleName="Service Management"
+                                    accessType="write" elementType="actionbtn"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted" *ngIf="!viewData.length">No associated SLA Groups were found.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirm>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #popTemplate>
+    <div *ngFor="let name of popOverList; let i = index">
+        <span *ngIf="i > 0">{{name}}</span>
+    </div>
+</ng-template>

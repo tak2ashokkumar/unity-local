@@ -1,0 +1,236 @@
+<mtp-tenants-mgmt-details-map></mtp-tenants-mgmt-details-map>
+
+<div class="card border-0 mb-0">
+    <div class="card-header bg-white">
+        <div class="row">
+            <div class="col-3 pt-2">
+                <h5>User List</h5>
+            </div>
+            <div class="col">
+                <button class="action-icons fa fa-angle-down font-sm pull-right mt-1 mb-1"
+                    [tooltip]="isCollapsed ? 'Expand' : 'Minimize'" (click)="isCollapsed = !isCollapsed"
+                    [attr.aria-expanded]="!isCollapsed"></button>
+            </div>
+        </div>
+    </div>
+    <div [collapse]="isCollapsed" [isAnimated]="true">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-3">
+                    <table-search-box (searched)="onSearched($event)"></table-search-box>
+                </div>
+                <div class="col">
+                    <data-refresh-btn [page]="currentCriteria.pageNo"
+                        (refresh)="refreshData($event)"></data-refresh-btn>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <table class="table text-left">
+                <thead>
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email Id</th>
+                        <th>Type</th>
+                        <th>Access Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of viewData" truncateText>
+                        <td class="tdw-10">
+                            <div [tooltip]="view.fullName">{{view.fullName}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div [tooltip]="view.emailId">{{view.emailId}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div [tooltip]="ut.name" *ngFor="let ut of view.userType">{{ut.name}}</div>
+                        </td>
+                        <td class="tdw-20">
+                            <div [tooltip]="at.name" *ngFor="let at of view.accessType">{{at.name}}</div>
+                        </td>
+                        <td class="tdw-10">
+                            <div [class]="view.statusClass">{{view.status}}</div>
+                        </td>
+                        <td class="action-icons-column">
+                            <span dropdown placement="bottom right" container="body">
+                                <button id="button-container" class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                                    data-toggle="dropdown" aria-controls="icons-dropdown-container" dropdownToggle
+                                    container="body"></button>
+                                <div container="body" id="icons-dropdown-container"
+                                    class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                                    aria-labelledby="button-container">
+                                    <!-- <button class="action-icons mt-2 mb-1 fas fa-eye font-sm" container="body"
+                                        tooltip="Impersonate" (click)="impersonateUser(view)"></button> -->
+                                    <button class="action-icons mt-1 mb-1 fas font-sm" container="body"
+                                        [tooltip]="view.toggleTootipMsg" [ngClass]="[view.toggleIcon]"
+                                        (click)="toggleUser(view)" accessControl moduleName="Tenant Management"
+                                        accessType="write" elementType="actionbtn"></button>
+                                    <button class="action-icons mt-1 mb-2 fas fa-unlock-alt font-sm" container="body"
+                                        tooltip="Reset Password" (click)="resetPassword(view)" accessControl
+                                        moduleName="Tenant Management" accessType="write"
+                                        elementType="actionbtn"></button>
+                                    <button class="action-icons mt-1 mb-1 fas fa-pencil-alt font-sm" container="body"
+                                        tooltip="Edit" (click)="editUserDetails(view)" accessControl
+                                        moduleName="Tenant Management" accessType="write"
+                                        elementType="actionbtn"></button>
+                                    <button class="action-icons mt-1 mb-1 far fa-trash-alt font-sm" container="body"
+                                        tooltip="Delete" (click)="deleteUser(view)" accessControl
+                                        moduleName="Tenant Management" accessType="write"
+                                        elementType="actionbtn"></button>
+                                </div>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                [totalCount]="count"></table-entries>
+            <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+            <div class="text-center text-muted py-5" *ngIf="!viewData.length">No User List data found.</div>
+        </div>
+    </div>
+</div>
+<div class="card border-0">
+    <div class="card-header bg-white">
+        <div class="row">
+            <div class="col-2 mt-2">
+                <h5>Subscription</h5>
+            </div>
+            <div class="col">
+                <div class="pull-right">
+                    <button class="action-icons mt-1 mb-1 fas fa-pencil-alt font-sm mr-2" tooltip="Edit"
+                        (click)="editSubscription()" accessControl moduleName="Subscription Management"
+                        accessType="write" elementType="btn"></button>
+                    <button class="action-icons fa fa-angle-down font-sm pull-right mt-1 "
+                        [tooltip]="isSubscriptionCollapsed ? 'Expand' : 'Minimize'"
+                        (click)="isSubscriptionCollapsed = !isSubscriptionCollapsed"
+                        [attr.aria-expanded]="!isCollapsed"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div [collapse]="isSubscriptionCollapsed" [isAnimated]="true">
+        <div class="card-body px-2 py-2">
+            <div *ngIf="view">
+                <div class="row mt-2 px-2 mb-2" *ngIf="view.subscribed_modules">
+                    <span
+                        class="badge bg-secondary font-weight-bold p-2 ml-2 mr-1 rounded-circle">{{view.subscribed_modules.length}}</span>
+                    <span class="subscription-subtitle">Subscriptions</span>
+                </div>
+                <div class="row d-flex px-3 pb-2" *ngIf="!isEditMode">
+                    <button class="btn btn-sm custom-bg-blue btn-pill mr-2 mb-2 font-xs-sm"
+                        *ngFor="let sp of view.subscribed_modules">{{sp.module_name}}</button>
+                </div>
+                <div class="row d-flex px-3 pb-2" *ngIf="isEditMode">
+                    <div *ngFor="let sp of view.subscribed_modules" class="input-group mb-2 mr-2"
+                        style="width:auto !important;">
+                        <span
+                            class="form-control form-control-sm custom-span text-dark custom-bg-blue pl-3 text-truncate">
+                            {{ sp.module_name }}
+                        </span>
+                        <div class="input-group-append">
+                            <button class="btn btn-sm fas fa-trash-alt bg-primary custom-btn py-1 px-2" type="button"
+                                (click)="deleteSubscribedModule(sp.module_id)"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2 px-2 mb-2" *ngIf="view.not_subscribed_modules">
+                    <span
+                        class="badge bg-secondary font-weight-bold p-2 ml-2 mr-1 rounded-circle">{{view.not_subscribed_modules.length}}</span>
+                    <span class="npsubscription-subtitle">Non Purchased Subscriptions</span>
+                </div>
+                <div class="row d-flex px-3 pb-2 mt-2" *ngIf="!isEditMode">
+                    <button class="btn btn-sm bg-secondary btn-pill mr-2 mb-2 font-xs-sm"
+                        *ngFor="let sp of view.not_subscribed_modules">{{sp.module_name}}</button>
+                </div>
+                <div class="row d-flex px-3 pb-2" *ngIf="isEditMode">
+                    <div class="input-group mb-3" *ngFor="let sp of view.not_subscribed_modules"
+                        style="width:auto !important;">
+                        <span class="form-control form-control-sm custom-span bg-light pl-3 text-truncate">
+                            {{sp.module_name }}
+                        </span>
+                        <div class="input-group-append mr-2">
+                            <button class="btn btn-sm fas fa-plus bg-secondary custom-btn py-1 px-2" type="button"
+                                (click)="addSubscribedModule(sp.module_id)"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #toggleConfirmUser>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to {{userlistview.toggleTootipMsg}}?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button"
+                (click)="confirmToggle()">{{userlistview.toggleTootipMsg}}</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="toggleUserModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deleteConfirmUser>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete {{userlistview.fullName}} ?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="deleteUserModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #resetPasswordUser>
+    <div class="card round-edge mb-0">
+        <div class="card-body pb-2">
+            <div>This action will disable the old password. A link for setting a new password will be sent to the
+                user's registered email address.</div>
+            <div class="mt-4">Are you sure you want to continue?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button"
+                (click)="confirmResetPassword()">Resent</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="resetPasswordUserModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deleteSubscription>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button"
+                (click)="confirmDeleteSubscribedModule()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="deleteSubscriptionModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #addSubscription>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to add?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button"
+                (click)="confirmAddSubscribedModule()">Add</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="addSubscriptionModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

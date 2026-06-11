@@ -1,0 +1,170 @@
+<div class="row">
+    <div class="col-3">
+        <h5 class="text-dark mb-2" *ngIf="!tenantId">Add Tenants</h5>
+        <h5 class="text-dark mb-2" *ngIf="tenantId">Update Tenants</h5>
+    </div>
+    <div class="col">
+        <div class="pull-right nav-item">
+            <a class="nav-link py-1 text-right text-warning mb-2" (click)="goBack()">
+                <i class="fa fa-arrow-left">&nbsp;</i>
+                <span> To Tenant Details</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card rounded">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <form *ngIf="form" [formGroup]="form">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-3">
+                            <label for="name" class="form-col-form-label">Name <em>*</em></label>
+                            <input id="name" class="form-control form-control-sm" placeholder="Enter Name" type="text"
+                                formControlName="name" [class.is-invalid]="formErrors.name" autocomplete="on">
+                            <div class="invalid-feedback" *ngIf="formErrors.name">
+                                {{formErrors.name}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="mtp_group" class="form-col-form-label">Tenant Group <em>*</em></label>
+                            <select id="mtp_group" class="form-control form-control-sm"
+                                formControlName="mtp_group" [class.is-invalid]="formErrors.mtp_group">
+                                <option value="''">Select</option>
+                                <option *ngFor="let group of tenantGroupList" [value]="group.id">
+                                    {{group.name}}</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.mtp_group">
+                                {{formErrors.mtp_group}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="address1" class="form-col-form-label">Address 1 <em>*</em></label>
+                            <input id="address1" class="form-control form-control-sm" placeholder="Enter Address 1" type="text"
+                                formControlName="address1" [class.is-invalid]="formErrors.address1">
+                            <div class="invalid-feedback" *ngIf="formErrors.address1">
+                                {{formErrors.address1}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="location" class="form-col-form-label">Location <em>*</em></label>
+                            <input id="location" class="form-control form-control-sm" placeholder="Search Location"
+                                type="text" formControlName="searchlocation"
+                                [class.is-invalid]="formErrors.searchlocation || formErrors.location || formErrors.lat">
+                            <div class="invalid-feedback" *ngIf="formErrors.searchlocation">
+                                {{formErrors.searchlocation}}</div>
+                            <div class="invalid-feedback" *ngIf="!formErrors.searchlocation && formErrors.location">
+                                {{formErrors.location}}</div>
+                            <div class="invalid-feedback" *ngIf="formErrors.lat">{{formErrors.lat}}</div>
+                        </div>
+                        <!-- <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">City <em>*</em></label>
+                            <input class="form-control form-control-sm" placeholder="Enter City" type="text"
+                                formControlName="city" [class.is-invalid]="formErrors.city">
+                            <div class="invalid-feedback" *ngIf="formErrors.city">
+                                {{formErrors.city}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">State <em>*</em></label>
+                            <input class="form-control form-control-sm" placeholder="Enter State" type="text"
+                                formControlName="state" [class.is-invalid]="formErrors.state">
+                            <div class="invalid-feedback" *ngIf="formErrors.state">
+                                {{formErrors.state}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">Country <em>*</em></label>
+                            <input class="form-control form-control-sm" placeholder="Enter Country" type="text"
+                                formControlName="country" [class.is-invalid]="formErrors.country">
+                            <div class="invalid-feedback" *ngIf="formErrors.country">
+                                {{formErrors.country}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">Postal Code <em>*</em></label>
+                            <input class="form-control form-control-sm" placeholder="Enter Postal Code" type="number"
+                                formControlName="postal_code" [class.is-invalid]="formErrors.postal_code">
+                            <div class="invalid-feedback" *ngIf="formErrors.postal_code">
+                                {{formErrors.postal_code}}
+                            </div>
+                        </div> -->
+                        <div class="form-group col-3">
+                            <label for="domain" class="form-col-form-label">Domain</label>
+                            <input id="domain" class="form-control form-control-sm" placeholder="Enter Domain" type="text"
+                                formControlName="domain">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="phone" class="form-col-form-label">Phone</label>
+                            <input id="phone" type="number" class="form-control form-control-sm"
+                                placeholder="Enter Phone Number" autocomplete="on" formControlName="phone"
+                                [class.is-invalid]="formErrors.phone">
+                            <div class="invalid-feedback" *ngIf="formErrors.phone">
+                                {{formErrors.phone}}</div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="email" class="form-col-form-label">Email</label>
+                            <input id="email" class="form-control form-control-sm" placeholder="Enter Email" type="text"
+                                formControlName="email" [class.is-invalid]="formErrors.email" autocomplete="email">
+                            <div class="invalid-feedback" *ngIf="formErrors.email">
+                                {{formErrors.email}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="unity_modules" class="form-col-form-label">Unity Modules <em>*</em></label>
+                            <multiselect-dropdown id="unity_modules" [options]="unityModulesList"
+                                [settings]="unityModuleSettings" formControlName="unity_modules" style="height:auto;"
+                                class="form-control form-control-sm p-0"
+                                [class.is-invalid]="formErrors.unity_modules"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.unity_modules">
+                                {{formErrors.unity_modules}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="region" class="form-col-form-label">Select Region <em>*</em></label>
+                            <select id="region" class="form-control form-control-sm" formControlName="region"
+                                [class.is-invalid]="formErrors.region" autocomplete="on">
+                                <option value="" disabled>Select Region Type</option>
+                                <option value="11">Europe Region</option>
+                                <option value="22">US Region</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.region">
+                                {{formErrors.region}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="_logo" class="form-col-form-label">Logo</label> <br>
+                            <input id="_logo" type="file" formControlName="_logo" accept=".png"
+                                (change)="onFileSelected($event.target.files)" class="form-control form-control-sm"
+                                [class.is-invalid]="formErrors._logo" #file hidden>
+                            <button class="btn btn-sm border form-control form-control-sm p-0" type="button"
+                                (click)="file.click()">
+                                <span class="font-sm float-left pl-2 text-muted pt-1 ">Select File</span>
+                                <i class="fa fa-upload pull-right bg-primary p-2 custom-icon-border"></i>
+                            </button>
+                            <!-- <span class="font-italic text-muted font-xs">Image ratio needs to be 1:4 and max
+                                allowed size is 700KB</span> -->
+                            <span class="d-block text-wrap mt-2" *ngIf="uploadedFileName">{{uploadedFileName}} <span
+                                    class="pointer-link" (click)="removeLogo()"><i
+                                        class="fas fa-trash-alt pt-1 pull-right text-danger"></i></span></span>
+                            <div class="invalid-feedback d-block" *ngIf="formErrors._logo">
+                                {{formErrors._logo}}
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex justify-content-center mt-4 mb-2">
+                            <button class="btn btn-sm btn-primary mr-2 px-3 py-2 w-6" (click)="submit()"
+                                *ngIf="!tenantId">Save</button>
+                            <button class="btn btn-sm btn-primary mr-2 px-2 py-2 w-6" (click)="submit()"
+                                *ngIf="tenantId">Update</button>
+                            <button class="btn btn-sm btn-outline-danger w-6" (click)="reset()">Reset</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

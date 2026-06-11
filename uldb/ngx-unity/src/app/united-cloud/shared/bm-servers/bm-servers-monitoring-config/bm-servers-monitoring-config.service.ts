@@ -18,6 +18,8 @@ export class BmServersMonitoringConfigService {
 
   form: FormGroup;
 
+  private _preservedIpAddress: string = '';
+
   constructor(private builder: FormBuilder,
     private http: HttpClient) { }
 
@@ -31,6 +33,10 @@ export class BmServersMonitoringConfigService {
 
   monitoringEnabled() {
     this.monitoringAnnouncedSource.next(null);
+  }
+
+  getCredentials(type: string) {
+    return this.http.get<any[]>(`/customer/unity_discovery/credential/?page_size=0&type=${type}`);
   }
 
   private getRawValue(obj: SNMPCrudType) {
@@ -76,13 +82,43 @@ export class BmServersMonitoringConfigService {
   }
   buildForm(obj: SNMPCrudType) {
     //TODO:Remove after server side fixed
+    if (obj?.mon_connection_type === 'SSH' || obj?.mon_connection_type === 'WinRM') {
+      this.form = this.builder.group({
+        connection_type: [{ value: obj.mon_connection_type, disabled: !!obj.mon_connection_type }, Validators.required],
+
+        host_ip: [
+          obj.ip_address || '',
+          [Validators.required, NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]
+        ],
+
+        mon_port: [
+          obj.mon_port || (obj.mon_connection_type === 'SSH' ? 22 : 5985)
+        ],
+
+        mon_credential_mode: [
+          obj.mon_credential_mode || 'local',
+          Validators.required
+        ],
+
+        mon_credential_id: [obj.mon_credential_id || ''],
+        mon_username: [obj.mon_username || ''],
+        mon_password: [''],
+
+        mtp_templates: [obj.mtp_templates || []]
+      });
+
+      return this.form;
+    }
     if (obj) {
       obj = this.getRawValue(obj);
+      // if (!obj.connection_type) {
+      //   obj.connection_type = 'SNMP';
+      // }
     }
     this.form = this.builder.group({
       'connection_type': [{ value: (obj && obj.connection_type) ? obj.connection_type : 'SNMP', disabled: (obj && obj.connection_type) ? true : false }, [Validators.required, NoWhitespaceValidator]],
       'ip_address': [{ value: (obj && obj.ip_address) ? obj.ip_address : '', disabled: false }, [Validators.required, NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
-      'mtp_templates': [obj && obj.mtp_templates ? obj.mtp_templates : [Validators.required]]
+      'mtp_templates': [obj && obj.mtp_templates ? obj.mtp_templates : [], [Validators.required]]
     });
     if (this.form.get('connection_type').value == 'SNMP') {
       if (obj && obj.ip_address) {
@@ -119,6 +155,69 @@ export class BmServersMonitoringConfigService {
       }
     }
     return this.form;
+  }
+
+  setSshWinRmFields(connectionType: 'SSH' | 'WinRM') {
+    // Remove SNMP-specific fields
+    this.removeSnmpField();
+    this.removeV1_V2Field();
+    this.removeAuthLevelField();
+    this.removeAuthNameField();
+    this.removeAuthFields();
+    this.removeCryptoFields();
+
+    // Remove Agent-specific field
+    // ip_address stays but we'll add host_ip separately
+    this._preservedIpAddress = this.form.get('ip_address')?.value || '';
+    this.form.get('ip_address') ? this.form.removeControl('ip_address') : null;
+
+    this.form.get('connection_type')?.setValue(connectionType, { emitEvent: false });
+
+    // Add SSH/WinRM fields if not already present
+    if (!this.form.get('host_ip')) {
+      this.form.addControl('host_ip', new FormControl('', [
+        Validators.required,
+        NoWhitespaceValidator,
+        RxwebValidators.ip({ version: IpVersion.AnyOne })
+      ]));
+    }
+    if (!this.form.get('mon_port')) {
+      this.form.addControl('mon_port', new FormControl(
+        connectionType === 'SSH' ? 22 : 5985
+      ));
+    } else {
+      this.form.get('mon_port').setValue(connectionType === 'SSH' ? 22 : 5985);
+    }
+    if (!this.form.get('mon_credential_mode')) {
+      this.form.addControl('mon_credential_mode', new FormControl('local', [Validators.required]));
+    }
+    if (!this.form.get('mon_credential_id')) {
+      this.form.addControl('mon_credential_id', new FormControl(''));
+    }
+    if (!this.form.get('mon_username')) {
+      this.form.addControl('mon_username', new FormControl(''));
+    }
+    if (!this.form.get('mon_password')) {
+      this.form.addControl('mon_password', new FormControl(''));
+    }
+
+    return this.form;
+  }
+
+  clearSshWinRmFields() {
+    ['host_ip', 'mon_port', 'mon_credential_mode', 'mon_credential_id', 'mon_username', 'mon_password']
+      .forEach(ctrl => {
+        this.form.get(ctrl) ? this.form.removeControl(ctrl) : null;
+      });
+
+    // Restore ip_address for SNMP/Agent
+    if (!this.form.get('ip_address')) {
+      this.form.addControl('ip_address', new FormControl(this._preservedIpAddress || '', [
+        Validators.required,
+        NoWhitespaceValidator,
+        RxwebValidators.ip({ version: IpVersion.AnyOne })
+      ]));
+    }
   }
 
   private addSnmpField(val?: SNMPCrudType) {
@@ -241,7 +340,14 @@ export class BmServersMonitoringConfigService {
       'snmp_authalgo': '',
       'snmp_cryptopass': '',
       'snmp_cryptoalgo': '',
-      'mtp_templates': ''
+      'mtp_templates': '',
+      'connection_type': '',
+      'host_ip': '',
+      'mon_port': '',
+      'mon_credential_mode': '',
+      'mon_credential_id': '',
+      'mon_username': '',
+      'mon_password': '',
     }
   }
 
@@ -276,6 +382,19 @@ export class BmServersMonitoringConfigService {
     },
     'mtp_templates': {
       'required': 'Templates are required'
+    },
+    'mon_credential_id': {
+      'required': 'Please select a credential'
+    },
+    'mon_username': {
+      'required': 'Username is required'
+    },
+    'mon_password': {
+      'required': 'Password is required'
+    },
+    'host_ip': {
+      'required': 'Host IP is required',
+      'ip': 'Invalid IP'
     }
   }
 

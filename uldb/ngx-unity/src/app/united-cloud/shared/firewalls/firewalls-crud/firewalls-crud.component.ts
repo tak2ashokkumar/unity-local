@@ -278,6 +278,3 @@ export class FirewallsCrudComponent implements OnInit, OnDestroy {
     });
   }
 }
-
-
-

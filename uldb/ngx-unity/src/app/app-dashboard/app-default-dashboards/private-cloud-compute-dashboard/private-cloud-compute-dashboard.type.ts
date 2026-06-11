@@ -221,7 +221,7 @@ export interface TopUtilizationItem {
   cpuUtilization: CpuUtilization;
   memoryUtilization: MemoryUtilization;
   storageUtilization: StorageUtilization;
-  diskIOPS: DiskIOPS;
+  diskIops: DiskIOPS;
   uptime: string;
   uuid: string;
   deviceType: string;

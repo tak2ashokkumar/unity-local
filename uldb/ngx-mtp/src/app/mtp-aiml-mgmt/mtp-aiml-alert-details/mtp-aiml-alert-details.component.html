@@ -1,0 +1,141 @@
+<div id="alertDetailsTemplate" class="alert-details">
+    <div class="card mb-0 rounded">
+        <div class="card-header d-flex justify-content-between align-items-center px-3 py-2" *ngIf="view">
+            <div>
+                <span class="fas" [ngClass]="view.deviceIcon"></span>
+                <span class="ml-2">{{view.deviceName}} </span>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="font-sm font-500 mr-2">
+                    <span class="text-muted">Status : </span>
+                    <span [ngClass]="[view.statusTextColor, 'text-capitalize']">{{view.status}}</span>
+                </span>
+                <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeAlertDetails()"></a>
+            </div>
+        </div>
+        <div class="card-body pt-2 px-4 d-flex flex-column font-sm" *ngIf="view">
+            <div class="d-flex align-items-center mb-2">
+                <span class="text-muted w-25 text-truncate">First Event Time :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.firstEventDateTime}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Last Event Time :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.lastEventDateTime}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Event Count :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.eventCount}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Device Name :</span>
+                <span class="text-primary w-75 font-sm-xs font-500 mr-2 text-truncate">{{view.deviceName}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Device IP :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.managementIp}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Description :</span>
+                <span class="font-sm-xs w-75 font-500 mr-2">{{view.description}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Source :</span>
+                <span class="font-sm-xs w-75 font-500 mr-2 text-capitalize text-truncate">{{view.source}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Component :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.category}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Private Cloud :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.privateCloud}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Datacenter :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.datacenter}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Trigger Name :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.triggerName}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Tags :</span>
+                <span class="font-sm-xs w-75 font-500 mr-2 text-truncate">{{view.tags}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Cabinet :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.cabinet}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Service :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.service}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Domain :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.domain}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Acknowledged :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.isAcknowledged}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1" *ngIf="view.status == 'Resolved'">
+                <span class="text-muted w-25 text-truncate">Resolved Time :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.recoveredDateTime}}</span>
+            </div>
+            <div class="d-flex mb-2 mt-1 mb-5">
+                <div class="table-responsive" *ngIf="view && showAlertDetailsTable">
+                    <table class="table text-left font-xs-sm font-500">
+                        <thead>
+                            <tr>
+                                <th>Device Name</th>
+                                <th class="text-center">Severity</th>
+                                <th>Event Timeline</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr truncateText>
+                                <td class="tdw-25 text-primary pt-4">
+                                    <div>
+                                        <span class="fas" [ngClass]="view.deviceIcon"></span>
+                                        <span class="ml-1">{{view.deviceName}} </span>
+                                    </div>
+                                </td>
+                                <td class="tdw-10 pt-4">
+                                    <div class="text-center" [tooltip]="view.severity" container="body">
+                                        <i class="fa status-icon" [ngClass]="view.severityIcon"></i>
+                                    </div>
+                                </td>
+                                <td id="alert-events-timeline" class="tdw-65">
+                                    <div class="d-flex flex-column px-2">
+                                        <div class="d-flex w-100" *ngIf="showAlertsEventTimeline">
+                                            <div class="pointer-link" *ngFor="let event of view.events; let i = index;"
+                                                (click)="viewEventDetails(event.uuid, view.uuid)">
+                                                <span class="badge rounded-pill"
+                                                    [ngClass]="event.severityPointerBGClass">{{i
+                                                    + 1}}</span>
+                                                <div class="vertical border border-right-0"
+                                                    [ngClass]="event.severityBorderClass"></div>
+                                                <div class="events_timeline_post_event_line"
+                                                    [ngClass]="event.severityBorderClass"
+                                                    [style.width.px]="event.severityBorderLength"></div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between font-xss font-500 w-100"
+                                            *ngIf="showAlertsEventTimeline">
+                                            <span class="text-muted text-truncate">{{view.firstEventDateTime}}</span>
+                                            <span *ngIf="view.eventCount > 1"
+                                                class="text-muted text-truncate">{{view.lastEventDateTime}}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <aiml-event-details></aiml-event-details> -->
+ <mtp-aiml-event-details></mtp-aiml-event-details>

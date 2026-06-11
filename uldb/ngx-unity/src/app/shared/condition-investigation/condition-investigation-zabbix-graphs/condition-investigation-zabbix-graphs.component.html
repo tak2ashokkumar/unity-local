@@ -71,7 +71,7 @@
             <app-spinner [name]="view.graphSpinnerName"></app-spinner>
             <div class="card-body">
                 <h5 class="card-title text-warning">{{view.name}}</h5>
-                <div class="row">
+                <div class="row custom-min-height">
                     <img class="img-fluid pointer-link" *ngIf="view.image" [src]="'data:image/png;base64,'+view.image">
                 </div>
             </div>

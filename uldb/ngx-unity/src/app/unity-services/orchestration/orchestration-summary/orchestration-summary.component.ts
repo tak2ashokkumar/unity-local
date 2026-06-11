@@ -3,13 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EChartsOption } from 'echarts';
 import { Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
+import { AppMainService } from 'src/app/app-main/app-main.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { ChartNames, ExecutionsOverviewViewData, ExecutionsSummaryViewData, OrchestrationSummaryService, RecentFailureViewModel, TaskWidgetViewData, UpccomingExecutionViewModel, WorkflowWidgetViewData } from './orchestration-summary.service';
-import { UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { AppMainService } from 'src/app/app-main/app-main.service';
+import { UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
+import { ChartNames, ExecutionsOverviewViewData, ExecutionsSummaryViewData, OrchestrationSummaryService, RecentFailureViewModel, TaskWidgetViewData, UpccomingExecutionViewModel, WorkflowWidgetViewData } from './orchestration-summary.service';
 
 @Component({
   selector: 'orchestration-summary',
@@ -268,4 +268,4 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
     this.spinnerSvc.stop(loader);
     this.cdr.markForCheck();
   }
-} 
+}

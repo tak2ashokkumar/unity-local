@@ -117,13 +117,29 @@
                         </div>
                     </div>
                 </div>
+                <div class="card mb-2">
+                    <div
+                        class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
+                        <span class="font-lg-xl">AI Agent to KB Injection</span>
+                        <div class="rcaAI-switch-container">
+                            <input type="checkbox" id="aiAgentKb" (click)="toggleaiAgentKbSwitch()"
+                                [checked]="orgSettings.auto_publish_condition_to_kb">
+                            <label for="aiAgentKb" class="rcaAI-toggle-button"></label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="">
+                            <span>Automatic injection of remediation documents into the Knowledge Base.</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="col px-0">
                 <div class="card mb-2">
                     <div class="card-header bg-transparent ml-0 card-title font-lg">
-                        <div class="row">
+                        <div class="row"> 
                             <div class="col-8">
                                 <h4 class="card-title d-inline font-lg mb-0">{{user.fullName}}
                                 </h4>

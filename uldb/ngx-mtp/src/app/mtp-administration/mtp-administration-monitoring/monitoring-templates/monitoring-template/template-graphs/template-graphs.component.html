@@ -1,0 +1,154 @@
+<div class="card">
+    <div class="card-header bg-white border-0">
+        <div class="row">
+            <div class="col-2">
+                <table-search-box (searched)="onSearched($event)"></table-search-box>
+            </div>
+            <div class="col-10">
+                <div class="row justify-content-end">
+                    <div class="col">
+                        <button type="button" class="btn btn-sm bg-primary pull-right" (click)="createGraph()"
+                            accessControl moduleName="Monitoring Management" accessType="write" elementType="btn">Create
+                            Graph</button>
+                    </div>
+                    <div class="mx-2">
+                        <table-page-size class="float-left ml-1" [currentPageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body py-0">
+        <ng-container *ngIf="componentId" [ngTemplateOutlet]='componentGraphsRef'></ng-container>
+        <ng-container *ngIf="!componentId" [ngTemplateOutlet]='templateGraphsRef'></ng-container>
+        <p *ngIf="viewData.length==0" class="text-center">No records to display</p>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+    </div>
+</div>
+
+<ng-template #templateGraphsRef>
+    <table class="table">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Graph Type</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let view of viewData; let i = index" setTableColumnWidth>
+                <td class="text-primary">{{view.name}}</td>
+                <td>{{view.graphtype}}</td>
+                <td class="action-icons-column">
+                    <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                        [ngClass]="{'action-icons-disabled':view.isDefault}" [disabled]="view.isDefault"
+                        (click)="editGraph(i)" accessControl moduleName="Monitoring Management" accessType="write"
+                        elementType="actionbtn"></button>
+                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                        [ngClass]="{'action-icons-disabled':view.isDefault}" [disabled]="view.isDefault"
+                        (click)="deletePanelDevice(view)" accessControl moduleName="Monitoring Management"
+                        accessType="write" elementType="actionbtn"></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</ng-template>
+<ng-template #componentGraphsRef>
+    <table class="table">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Graph Type</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let view of viewData; let i = index" setTableColumnWidth>
+                <td class="text-primary">{{view.name}}</td>
+                <td>{{view.graphtype}}</td>
+                <td class="action-icons-column">
+                    <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                        [ngClass]="{'action-icons-disabled':view.isDefault}" [disabled]="view.isDefault"
+                        (click)="editGraph(i)" accessControl moduleName="Monitoring Management" accessType="write"
+                        elementType="actionbtn"></button>
+                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                        [ngClass]="{'action-icons-disabled':view.isDefault}" [disabled]="view.isDefault"
+                        (click)="deletePanelDevice(view)" accessControl moduleName="Monitoring Management"
+                        accessType="write" elementType="actionbtn"></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</ng-template>
+
+<ng-template #create>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Graph
+            <div class="card-header-actions">
+                <a class="card-header-action" (click)="modalRef.hide()">
+                    <l class="fas fa-times"></l>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="createForm" *ngIf="createForm">
+                <div class="form-group">
+                    <label class="form-col-form-label">Name <em>*</em></label>
+                    <input type="text" class="form-control form-control-sm" formControlName="name"
+                        placeholder="Enter Name" [ngClass]="{'is-invalid' : createFormErrors.name}">
+                    <div class="invalid-feedback" *ngIf="createFormErrors.name">
+                        {{createFormErrors.name}}</div>
+
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">Graph Type <em>*</em></label>
+                    <select name="" id="" class="form-control form-control-sm" formControlName="graph_type"
+                        [ngClass]="{'is-invalid' : createFormErrors.graph_type}">
+                        <option value="">Select</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Stacked">Stacked</option>
+                        <option value="Pie">Pie</option>
+                        <option value="Exploded">Exploded</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createFormErrors.graph_type">
+                        {{createFormErrors.graph_type}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="form-col-form-label">Item <em>*</em></label>
+                    <multiselect-dropdown [options]="metrics" [settings]="tenantListSettings" class="form-control p-0"
+                        style="height:auto;" formControlName="item_id"
+                        [ngClass]="{'is-invalid' : createFormErrors.item_id}"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="createFormErrors.item_id">
+                        {{createFormErrors.item_id}}</div>
+
+
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-primary pull-right ml-2 w-15" *ngIf="action=='Add'"
+                (click)="onSubmit()">Create</button>
+            <button class="btn btn-sm btn-primary pull-right ml-2 w-15" (click)="onSubmit()"
+                *ngIf="action=='Edit'">Update</button>
+            <button class="btn btn-sm btn-outline-danger pull-right w-15" (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="delModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

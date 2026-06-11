@@ -17,6 +17,7 @@ import { DeviceInterfaceCrudService } from 'src/app/app-shared-crud/device-inter
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { DeviceTabData } from '../../../device-tab/device-tab.component';
+import { UnityOS } from '../../../entities/common-entities.type';
 import { VirtualMachineDetails } from '../../../entities/vm.type';
 import { ZabbixVmsDetailsService } from './zabbix-vms-details.service';
 import { UnityCredentialsFast } from 'src/app/shared/SharedEntityTypes/unity-credentials.type';
@@ -49,6 +50,7 @@ export class ZabbixVmsDetailsComponent implements OnInit, OnDestroy {
   deviceEnvironmentOptions: string[] = deviceEnvironmentOptions;
   credentials: UnityCredentialsFast[] = [];
   collectors: DeviceDiscoveryAgentConfigurationType[] = [];
+  operatingSystems: UnityOS[] = [];
 
   metaDataForm: FormGroup;
   metaDataFormErrors: any;
@@ -106,6 +108,7 @@ export class ZabbixVmsDetailsComponent implements OnInit, OnDestroy {
       this.deviceType = this.device.deviceType;
       this.isEditable = this.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.deviceType == DeviceMapping.HYPER_V;
       this.isHypervVm = this.deviceType == DeviceMapping.HYPER_V;
+      this.getOperatingSystems();
       this.getCollectors();
       this.getDeviceDetails();
     }, 0);
@@ -119,6 +122,7 @@ export class ZabbixVmsDetailsComponent implements OnInit, OnDestroy {
 
   refreshData() {
     this.getCredentials();
+    this.getOperatingSystems();
     this.getCollectors();
     this.getDeviceDetails();
   }
@@ -190,6 +194,22 @@ export class ZabbixVmsDetailsComponent implements OnInit, OnDestroy {
     this.detailService.getCollectors().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.collectors = res;
     });
+  }
+
+  getOperatingSystems() {
+    if (this.operatingSystems.length) {
+      return;
+    }
+    this.operatingSystems = [];
+    this.detailService.getOperatingSystems().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.operatingSystems = res;
+    }, err => {
+      this.operatingSystems = [];
+    });
+  }
+
+  hasOperatingSystemOption(value: string) {
+    return this.operatingSystems.some(os => os.full_name === value);
   }
 
   buildForm() {

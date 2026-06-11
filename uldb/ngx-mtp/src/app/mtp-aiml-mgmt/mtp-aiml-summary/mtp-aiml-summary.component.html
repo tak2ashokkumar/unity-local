@@ -1,0 +1,201 @@
+<ng-container>
+    <div class="row my-2">
+        <div class="col-4" *ngIf="summaryData">
+            <div class="card round-edge mb-0 equalize-card">
+                <div class="card-body">
+                    <div class="funnel-wrapper font-sm-xs">
+                        <div class="d-flex w-100 entity-events pointer-link mb-1" (click)="goTo('events')">
+                            <div class="d-flex flex-column w-30 font-500">
+                                <span class="font-xss">Raw Events</span>
+                                <span class="font-lg">{{summaryData.events}}</span>
+                            </div>
+                            <div class="funnel w-70 position-absolute text-white">
+                                <label class="position-absolute mb-0">Events </label>
+                            </div>
+                        </div>
+                        <div class="d-flex w-100 entity-alerts pointer-link mb-1" (click)="goTo('alerts')">
+                            <div class="d-flex flex-column w-30 font-500">
+                                <span class="font-xss">Noise Reduction</span>
+                                <span class="font-lg">{{summaryData.noiseReductionPercentage}}%</span>
+                            </div>
+                            <div class="funnel w-70 position-absolute text-white">
+                                <label class="position-absolute mb-0">Alerts</label>
+                            </div>
+                        </div>
+                        <div class="d-flex w-100 entity-conditions pointer-link" (click)="goTo('conditions')">
+                            <div class="d-flex flex-column w-30 font-500">
+                                <span class="font-xss">Correlation %</span>
+                                <span class="font-lg">{{summaryData.correlationPercentage}}%</span>
+                            </div>
+                            <div class="funnel w-70 position-absolute text-white">
+                                <label class="position-absolute mb-0">Conditions</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card round-edge mb-0 equalize-card">
+                <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                    <span> Events Trend - {{eventCountForm.value.target_type.name}}</span>
+                    <div>
+                        <form [formGroup]="eventCountForm">
+                            <div class="row pr-2">
+                                <div class="form-group mb-0">
+                                    <select class="form-control-sm border-secondary" formControlName="target_type">
+                                        <option *ngFor="let target of eventCountTargets" [ngValue]="target">
+                                            {{target.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <!-- <div class="form-group mb-0">
+                                    <select class="form-control-sm" formControlName="target_type">
+                                        <option value="active">Active</option>
+                                        <option value="last_24_hrs">Last 24 Hr</option>
+                                        <option value="last_week">Last Week</option>
+                                        <option value="last_month">Last Month</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div> -->
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body p-2">
+                    <canvas *ngIf="eventsData.length && eventsCountChartData" baseChart
+                        [chartType]="eventsCountChartData.type" [labels]="eventsCountChartData.lables"
+                        [data]="eventsCountChartData.piedata" [options]="eventsCountChartData.options"
+                        [plugins]="eventsCountChartData.plugins" [legend]="eventsCountChartData.legend"
+                        [colors]="eventsCountChartData.colors" height="90"></canvas>
+                    <div class="text-center text-muted py-5" *ngIf="!eventsData.length">No associated Events were
+                        found related to {{eventCountForm.value.target_type.name}}.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card round-edge border-0 mb-0 equalize-card" style="background-color: #f4f3ef;">
+                <div class="card-body border-0 p-0">
+                    <div class="row" *ngIf="alertsData">
+                        <div class="col-6">
+                            <div class="card round-edge mb-2">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="text-truncate">Compute</div>
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="text-primary font-xl font-500">{{alertsData.compute}}</span>
+                                        <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card round-edge mb-2">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="text-truncate">Network</div>
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="text-primary font-xl font-500">{{alertsData.network}}</span>
+                                        <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card round-edge mb-0">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="text-truncate">Storage</div>
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="text-primary font-xl font-500">{{alertsData.storage}}</span>
+                                        <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card round-edge mb-0">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="text-truncate">Others</div>
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="text-primary font-xl font-500">{{alertsData.others}}</span>
+                                        <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-8">
+            <div class="card round-edge mb-0 w-100 equalize-card">
+                <div class="card-header p-2 font-500">Noisy Events</div>
+                <div class="card-body p-0">
+                    <table class="table text-left font-xs-sm font-500">
+                        <thead>
+                            <tr>
+                                <th>Device</th>
+                                <th>Device Type</th>
+                                <th>Count</th>
+                                <th>Description</th>
+                                <th>Source</th>
+                                <th>Last Reported</th>
+                                <th>Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of noisyEvents" truncateText>
+                                <td class="tdw-15 text-primary">
+                                    <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="view.deviceDisplayType">{{view.deviceDisplayType}}</div>
+                                </td>
+                                <td class="tdw-5 text-primary">
+                                    <div [tooltip]="view.count">{{view.count}}</div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="view.description">{{view.description}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="view.source">{{view.source}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="view.lastReported">{{view.lastReported}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div [tooltip]="view.severity">
+                                        <span [class]="view.severityClass"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="!noisyEvents.length" class="text-center text-muted py-5">No Events available</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card round-edge mb-0 w-100 equalize-card">
+                <div class="card-header p-2 font-500">Noisy Hosts</div>
+                <div class="card-body d-flex flex-column px-1 pb-2 py-1">
+                    <div class="d-flex pt-2 align-items-center" *ngFor="let host of noisyHosts">
+                        <div class="px-2 w-30 font-xs-sm font-500 text-center text-truncate" [tooltip]="host.hostName">
+                            {{host.hostName}}
+                        </div>
+                        <div class="d-flex align-items-center w-70">
+                            <div class="progress" [style.width.%]="host.barwidth"
+                                style="height:25px; border-radius: 0 !important;">
+                                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="100"
+                                    aria-valuemin="0" aria-valuemax="100" [style.width.%]="100"></div>
+                            </div>
+                            <div class="px-2 w-20 font-xs-sm" style="top:-2px;">{{host.events}}</div>
+                        </div>
+                    </div>
+                    <div *ngIf="!noisyHosts.length" class="text-center text-muted py-5">No Hosts available</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>

@@ -86,7 +86,7 @@
 
               <ng-container *ngFor="let os of operatingSystems; let i = index">
                 <div class="d-flex align-items-center px-2 os-inline-item" *ngIf="i <= 2">
-                  <span class="font-sm text-muted pointer-link text-truncate" [tooltip]="os.key">
+                  <span class="font-sm text-muted pointer-link os-key-text-truncate" [tooltip]="os.key">
                     {{ os.key }}
                   </span>
 

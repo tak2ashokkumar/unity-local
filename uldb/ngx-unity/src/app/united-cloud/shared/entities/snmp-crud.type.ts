@@ -14,6 +14,13 @@ export interface SNMPCrudType {
     is_snmptrap_enabled?: boolean;
     mtp_templates?: number[];
     collector?: CollectorType;
+    mon_connection_type?: 'SSH' | 'WinRM';
+    mon_port?: number;
+    host_ip?: string;
+    mon_credential_mode?: 'local' | 'manual';
+    mon_credential_id?: string;
+    mon_username?: string;
+    mon_password?: string;
 }
 
 export interface CollectorType {

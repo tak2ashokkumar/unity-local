@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col-2">
+        <div class="card">
+            <div class="card-header text-center bg-white border-bottom-0 pb-0">
+                <h6>Service Management</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div class="mt-2">
+                    <button class="text-left btn btn-block" type="button" [ngClass]="isActive('sla')"
+                        (click)="goTo('sla/group')"><i class="fas fa-headset mr-2"></i>Service Level Agreement</button>
+                </div>
+                <div class="mt-2">
+                    <button class="text-left btn btn-block" type="button" [ngClass]="isActive('notification-group')"
+                        (click)="goTo('notification-group')"><i class="fas fa-bell mr-2"></i>Notification
+                    </button>
+                </div>
+                <div class="mt-2">
+                    <button class="text-left btn btn-block" type="button" [ngClass]="isActive('auto-ticketing')"
+                        (click)="goTo('auto-ticketing')"><i class="fas fa-ticket-alt mr-2"></i>Auto Ticketing</button>
+                </div>
+                <div class="mt-2">
+                    <button class="text-left btn btn-block" type="button" [ngClass]="isActive('auto-remediation')"
+                        (click)="goTo('auto-remediation')"><i class="fas fa-sliders-h mr-2"></i>Auto Remediation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-10">
+        <router-outlet></router-outlet>
+    </div>
+</div>

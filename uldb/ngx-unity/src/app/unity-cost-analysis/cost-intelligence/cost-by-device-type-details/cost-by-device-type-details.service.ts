@@ -33,8 +33,6 @@ export class CostByDeviceTypeDetailsService {
     })
     return viewdata;
   }
-
-
 }
 
 

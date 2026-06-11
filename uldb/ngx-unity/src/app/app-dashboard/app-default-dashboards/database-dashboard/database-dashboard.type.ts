@@ -172,7 +172,7 @@ export interface DatabaseDashboardTop10Utilization {
   name: string;
   cpu_usage_system_percent: number;
   memory_used_percent: number;
-  disk_capacity: string;
+  disk_capacity: number;
   disk_used: number;
   disk_usage_percent: number;
   disk_read_ops: number;
@@ -201,7 +201,7 @@ export class DatabaseDashboardTop10UtilizationViewData {
   memoryChartOptions?: EChartsOption;
   memoryUtilizationPercent: number;
   memoryTone: string;
-  diskCapacityGB: string;
+  diskCapacityGB: number;
   diskUsedGB: number;
   diskUsedPercent: number;
   diskFreePercent: number;

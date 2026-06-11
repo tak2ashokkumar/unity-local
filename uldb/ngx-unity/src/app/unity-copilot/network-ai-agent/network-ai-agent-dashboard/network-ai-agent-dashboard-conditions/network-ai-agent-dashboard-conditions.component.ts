@@ -17,6 +17,7 @@ import { takeUntil } from 'rxjs/operators';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { cloneDeep as _clone } from 'lodash-es';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'network-ai-agent-dashboard-conditions',
@@ -83,7 +84,8 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
     private route: ActivatedRoute,
     private router: Router,
     private utilService: AppUtilityService,
-    public storage: StorageService) {
+    public storage: StorageService,
+    private modalService: BsModalService) {
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.activityCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.alertsCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
@@ -613,4 +615,32 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
     }, 200);
   }
 
+  @ViewChild('confirmLoadChatRef') confirmLoadChatRef: ElementRef;
+  modalRef: BsModalRef;
+
+  openConfirmLoadChat() {
+    if (this.selectedCondition.conversation_detail.conversation_id) {
+      this.modalRef = this.modalService.show(this.confirmLoadChatRef,
+        Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+    } else {
+      this.onLoadChat(false);
+    }
+  }
+
+  onLoadChat(loadHistory: boolean) {
+    this.modalRef && this.modalRef.hide();
+    const queryParams: any = {};
+    if (this.selectedCondition.conversation_detail.conversation_id) {
+      queryParams.conversation_id = this.selectedCondition.conversation_detail.conversation_id;
+    }
+    if (this.selectedCondition.conversation_detail.title && this.selectedCondition.conversation_detail.title.trim() !== '') {
+      queryParams.title = this.selectedCondition.conversation_detail.title;
+    }
+    queryParams.load_history = loadHistory;
+
+    this.router.navigate(
+      [`/unity-copilot/network-ai-agent/conditions/${this.selectedCondition.id}/${this.conditionUuid}/investigate`],
+      Object.keys(queryParams).length ? { queryParams } : {}
+    );
+  }
 }

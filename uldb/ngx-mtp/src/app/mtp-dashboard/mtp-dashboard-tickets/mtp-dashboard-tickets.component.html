@@ -1,0 +1,205 @@
+<ng-container>
+    <ng-template #ticketAssignToRef>
+        <div class="card mb-0">
+            <div class="card-header p-1">
+                <table-search-box [searchValue]="searchValue" (searched)="onSearched($event)">
+                </table-search-box>
+            </div>
+            <div class="card-body px-2 py-1">
+                <div class="mb-1 pointer-link" *ngFor="let tmpl of filteredTemplates; let i = index"
+                    (click)="selectTemplate(i)">
+                    <span class="fas fa-check text-success"
+                        [style.visibility]="tmpl.isSelected ? 'visible' : 'hidden'"></span>
+                    <span class="ml-2">{{tmpl.template_name}}</span>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <div class="card round-edge mb-0 w-100 equalize-card" style="min-height:200px;">
+        <app-spinner [name]="'dashboard-tickets'"></app-spinner>
+        <div class="card-header bg-transparent px-3 py-2 d-flex justify-content-between align-items-center">
+            <div class="font-500">Recent Tickets</div>
+            <div class="d-flex align-items-center">
+                <form class="form-inline" [formGroup]="filterForm" *ngIf="filterForm">
+                    <div class="row w-100 mx-0">
+                        <div class="col-3 pl-0">
+                            <div class="form-group">
+                                <select id="period" class="form-control w-100" formControlName="period">
+                                    <option [value]="durationRange.LAST_24_HOURS">Last 24 Hours</option>
+                                    <option [value]="durationRange.LAST_WEEK">Last Week</option>
+                                    <option [value]="durationRange.LAST_MONTH">Last Month</option>
+                                    <option [value]="durationRange.CUSTOM">Custom</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col px-0">
+                            <div class="input-group">
+                                <owl-date-time #from [hour12Timer]="true"></owl-date-time>
+                                <input class="form-control rounded-left" formControlName="from"
+                                    [owlDateTimeTrigger]="from" [owlDateTime]="from" type="text" name="from"
+                                    placeholder="from" [max]="now">
+                                <div class="input-group-append " [owlDateTimeTrigger]="from">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col pr-0">
+                            <div class="input-group">
+                                <owl-date-time #to [hour12Timer]="true"></owl-date-time>
+                                <input class="form-control rounded-left" formControlName="to" [owlDateTimeTrigger]="to"
+                                    [owlDateTime]="to" type="text" name="to" placeholder="to"
+                                    [min]="filterForm.controls.from.value" [max]="now">
+                                <div class="input-group-append " [owlDateTimeTrigger]="to">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <a (click)="onSubmit()" class="action-icons fas fa-filter pt-2 pl-2 ml-2" tooltip="Filter Data"></a>
+                <a (click)="downloadReport()" class="action-icons fas fa-download pt-2 pl-2 ml-2"
+                    tooltip="Download"></a>
+                <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                <button class="btn btn-primary btn-sm ml-2" (click)="goToTickets()" accessControl moduleName="Ticket Management"
+                accessType="read" elementType="btn">View More</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-3">
+                    <div class="card equalize-card mb-0" style="min-height: 150px;">
+                        <app-spinner [name]="'dashboard-state-chart'"></app-spinner>
+                        <div class="card-header bg-transparent py-2">Tickets By State</div>
+                        <div class="card-body p-2 d-flex justify-content-center align-items-center">
+                            <canvas *ngIf="ticketByStatusChartData" baseChart [chartType]="ticketByStatusChartData.type"
+                                [labels]="ticketByStatusChartData.lables" [data]="ticketByStatusChartData.piedata"
+                                [options]="ticketByStatusChartData.options" [plugins]="ticketByStatusChartData.plugins"
+                                [legend]="ticketByStatusChartData.legend" [colors]="ticketByStatusChartData.colors"
+                                height="150"></canvas>
+                            <div *ngIf="!ticketByStatusChartData">
+                                <div class="text-center text-muted">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card equalize-card mb-0">
+                        <app-spinner [name]="'dashboard-priority-chart'"></app-spinner>
+                        <div class="card-header bg-transparent py-2">Tickets By Priority</div>
+                        <div class="card-body p-2 d-flex justify-content-center align-items-center">
+                            <canvas *ngIf="ticketByPriorityChartData" baseChart
+                                [chartType]="ticketByPriorityChartData.type" [labels]="ticketByPriorityChartData.lables"
+                                [data]="ticketByPriorityChartData.piedata" [options]="ticketByPriorityChartData.options"
+                                [plugins]="ticketByPriorityChartData.plugins"
+                                [legend]="ticketByPriorityChartData.legend" [colors]="ticketByPriorityChartData.colors"
+                                height="150"></canvas>
+                            <div *ngIf="!ticketByPriorityChartData">
+                                <div class="text-center text-muted">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card equalize-card mb-0">
+                        <app-spinner [name]="'dashboard-response-sla-chart'"></app-spinner>
+                        <div class="card-header bg-transparent py-2">Tickets By Tenant</div>
+                        <div class="card-body p-2 d-flex justify-content-center align-items-center">
+                            <canvas *ngIf="ticketByTenantChartData" baseChart [chartType]="ticketByTenantChartData.type"
+                                [labels]="ticketByTenantChartData.lables" [data]="ticketByTenantChartData.piedata"
+                                [options]="ticketByTenantChartData.options" [plugins]="ticketByTenantChartData.plugins"
+                                [legend]="ticketByTenantChartData.legend" [colors]="ticketByTenantChartData.colors"
+                                height="150"></canvas>
+                            <div *ngIf="!ticketByTenantChartData">
+                                <div class="text-center text-muted">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card equalize-card mb-0">
+                        <app-spinner [name]="'dashboard-resolution-sla-chart'"></app-spinner>
+                        <div class="card-header bg-transparent py-2">Open Tickets By Response Time</div>
+                        <div class="card-body p-2 d-flex justify-content-center align-items-center">
+                            <canvas *ngIf="ticketByresponseTimeChartData" baseChart
+                                [chartType]="ticketByresponseTimeChartData.type"
+                                [labels]="ticketByresponseTimeChartData.lables"
+                                [data]="ticketByresponseTimeChartData.piedata"
+                                [options]="ticketByresponseTimeChartData.options"
+                                [plugins]="ticketByresponseTimeChartData.plugins"
+                                [legend]="ticketByresponseTimeChartData.legend"
+                                [colors]="ticketByresponseTimeChartData.colors" height="150"></canvas>
+                            <div *ngIf="!ticketByresponseTimeChartData">
+                                <div class="text-center text-muted">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table text-left mt-3 font-sm">
+                <thead>
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Tenant Name</th>
+                        <th>Type</th>
+                        <th>Title</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Assigned To</th>
+                        <th>Next SLA Warning</th>
+                        <th>Next SLA Failure</th>
+                        <th>Created On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of viewData">
+                        <td class="text-primary">
+                            <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                (click)="goToDetails(view)">{{view.ticketNumber}}</button>
+                        </td>
+                        <td class="tdw-15">
+                            <div>{{view.customerName}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div>{{view.ticketTypeName}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div>{{view.title}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div>{{view.priorityName}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div>{{view.statusReasonName}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div>
+                                <span *ngIf="view.assignee">{{view.assignee}}</span>
+                                <span *ngIf="!view.assignee">NA</span>
+                                <!-- <button *ngIf="!view.assignee" class="action-icons fas fa-plus" (click)="getContacts(view)"
+                                    containerClass="modalPopover" [popover]="ticketAssignToRef" placement="top"
+                                    container="body" [outsideClick]="true"
+                                    (onHidden)="updateSelectedTemplates()"></button> -->
+                                <!-- <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                    *ngIf="!view.assignee" (click)="assignTicket(view)">Not Yet Assigned</button> -->
+                            </div>
+                        </td>
+                        <td class="tdw-15">
+                            <div [class]="view.responseTimeClass">{{view.responseTime}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div [class]="view.resolutionTimeClass">{{view.resolutionTime}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div>{{view.createdOn}}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center text-muted py-5" *ngIf="!viewData.length">No tickets avaialble.</div>
+        </div>
+    </div>
+</ng-container>

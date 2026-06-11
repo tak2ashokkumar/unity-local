@@ -55,8 +55,24 @@ $unity-chatbot-panel-width: 420px;
   }
 
   body.unity-chatbot-expanded .app-body>.main {
+    --unity-chatbot-panel-width: 0 !important;
     overflow: hidden !important;
   }
+
+  body.unity-chatbot-open.unity-chatbot-expanded .app-header.navbar {
+    right: 0 !important;
+    width: 100% !important;
+  }
+}
+
+body:not(.sidebar-minimized) #chatbotPopUp.expanded {
+  left: 225px !important;
+  width: calc(100vw - 225px) !important;
+}
+
+body.sidebar-minimized #chatbotPopUp.expanded {
+  left: 50px !important;
+  width: calc(100vw - 50px) !important;
 }
 
 .equalize-card {
@@ -899,7 +915,7 @@ td a.table-column-btn {
   overflow: hidden;
 }
 
-.custom-tooltip-hide{
+.custom-tooltip-hide {
   .tooltip .tooltip-inner {
     display: none;
   }

@@ -151,7 +151,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
   }
 
   getUsageData() {
-    if (this.platformType != PlatFormMapping.CUSTOM && this.platformType != PlatFormMapping.HYPER_V) {
+    if (this.platformType != PlatFormMapping.CUSTOM) {
       this.summaryService.getUsageData(this.pcId, this.cloudForAPI).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: UsageData) => {
         this.usageData = this.summaryService.convertToUsageViewData(data);
         this.statsPercent = this.utilService.getStatsPercent(data);

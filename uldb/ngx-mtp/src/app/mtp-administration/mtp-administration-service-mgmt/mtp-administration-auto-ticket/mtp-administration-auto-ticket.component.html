@@ -1,0 +1,204 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white pl-0 py-2">
+                <div class="row">
+                    <div class="col-3">
+                        <span class="badge bg-secondary user-count font-weight-bold ml-2 mr-1 mt-1 rounded-3">{{count}}</span>
+                        <span class="ml-1 h5">Auto Ticketing</span>
+                    </div>
+                    <div class="col">
+                        <data-refresh-btn [page]="currentCriteria.pageNo"
+                            (refresh)="refreshData($event)"></data-refresh-btn>
+                        <!-- <button class="btn btn-sm btn-primary pull-right" (click)="manageStatus()"
+                            *ngIf="selectedAll">Manage</button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-2">
+                <div class="row mb-2">
+                    <div class="col-2">
+                        <!-- <table-search-box></table-search-box> -->
+                    </div>
+                    <div class="col-10">
+                        <div class="row justify-content-end">
+                            <!-- <div class="col-2">
+                                <select class="form-control form-control-sm" type="text">
+                                    <option [value]="''">ITSM Instance</option>
+                                    <option [value]="'A'">A</option>
+                                    <option [value]="'B'">B</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control form-control-sm" type="text">
+                                    <option [value]="''">Severity</option>
+                                    <option [value]="'enabled'">Enabled</option>
+                                    <option [value]="'disabled'">Disabled</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control form-control-sm" type="text">
+                                    <option [value]="''">Status</option>
+                                    <option [value]="'enabled'">Enabled</option>
+                                    <option [value]="'disabled'">Disabled</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                        [settings]="dcSettings"></multiselect-dropdown>
+                                </div>
+                            </div> -->
+                            <div class="mx-2">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <!-- <th scope="col" style="font-size:1rem;" (click)="$event.stopPropagation()">
+                                <span class=" ml-2 text-primary">
+                                    <i class="far" [ngClass]="selectedAll? 'fa-check-square':'fa-square'"></i>
+                                </span>
+                            </th> -->
+                            <th>Tenant</th>
+                            <th>Status</th>
+                            <th>Default ITSM Instance</th>
+                            <th>Severity</th>
+                            <th>Delay (in Sec)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of viewData; let i = index">
+                            <ng-container [formGroup]="view.form" *ngIf="view.form">
+                                <!-- <td class="w-3" (click)="$event.stopPropagation()" style="font-size:1rem;">
+                                    <span class=" ml-2 text-primary">
+                                        <i class="far fa-square"></i>
+                                    </span>
+                                </td> -->
+                                <td>{{view.tanantName}}</td>
+                                <td>
+                                    <div class="d-inline-block" accessControl moduleName="Service Management"
+                                        accessType="write" elementType="div">
+                                        <ul class="d-flex px-0 mb-0">
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="view.settings.auto_ticketing_enabled">
+                                                    <input type="radio" [value]="true"
+                                                        formControlName="auto_ticketing_enabled"
+                                                        (change)="toggleSettings(i)">
+                                                    <span class="font-sm">Enable</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="!view.settings.auto_ticketing_enabled">
+                                                    <input type="radio" [value]="false" (change)="toggleSettings(i)"
+                                                        formControlName="auto_ticketing_enabled">
+                                                    <span class="font-sm">Disable</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group mb-0">
+                                        <select class="form-control" type="text" formControlName="ticketing_instance"
+                                            accessControl moduleName="Service Management" accessType="write"
+                                            elementType="formelem">
+                                            <option [value]="null" diasbled>Select ITSM Instance</option>
+                                            <option *ngFor="let instance of view.ticketInstances"
+                                                [value]="instance.uuid">
+                                                {{instance.name}} - {{instance.type}}</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group mb-0">
+                                        <multiselect-dropdown [options]="severityOptions"
+                                            [settings]="severityTypeSettings" class="form-control p-1"
+                                            style="height:auto;" formControlName="auto_ticketing_severity"
+                                            [ngClass]="{'is-invalid' : formErrors.auto_ticketing_severity}"
+                                            accessControl moduleName="Service Management" accessType="write"
+                                            elementType="div"></multiselect-dropdown>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group mb-0">
+                                        <input class="form-control rounded" type="number" min="0"
+                                            formControlName="auto_ticketing_delay" accessControl
+                                            moduleName="Service Management" accessType="write" elementType="formelem">
+                                    </div>
+                                </td>
+                            </ng-container>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count">
+                </table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-5" *ngIf="!viewData.length">No Tenant settings found.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #manage>
+    <div class="card mb-0">
+        <div class="card-header">
+            Manage Status
+            <div class="card-header-actions">
+                <a class="card-header-action" (click)="modalRef.hide()">
+                    <l class="fas fa-times"></l>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class=" form-group col-4 ">
+                    <label for="" class="form-col-form-label text-muted ">Status <em>*</em> :</label>
+                    <div class="d-inline-block">
+                        <ul class="authentication-button d-flex px-0">
+                            <li>
+                                <input type="radio" name="toggle" id="enable" class="toggle-radio" checked>
+                                <label for="enable" class="toggle-label">Enable</label>
+                            </li>
+                            <li>
+                                <input type="radio" name="toggle" id="disable" class="toggle-radio">
+                                <label for="disable" class="toggle-label">Disable</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <label for="" class="form-col-form-label">Default ITSM Instace <em>*</em></label>
+                    <select name="" id="" class="form-control form-control-sm">
+                        <option value="" disabled>select</option>
+                    </select>
+                </div>
+                <div class="form-group col-12">
+                    <label for="" class="form-col-form-label">Severity <em>*</em></label>
+                    <!-- <multiselect-dropdown id="" [options]="" [settings]="defaultItsmSettings" style="height:auto;"
+                        class="form-control form-control-sm p-0"></multiselect-dropdown> -->
+                </div>
+                <div class="form-group col-3">
+                    <label for="" class="form-col-form-label">Delay <span class="text-muted font-xs">(in sec)
+                            <em>*</em></span></label>
+                    <input type="number" min="0" class="form-control form-control-sm">
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-outline-danger ml-2 pull-right w-15" (click)="modalRef.hide()">Cancel</button>
+            <button class="btn btn-sm btn-primary pull-right w-15">Create</button>
+        </div>
+    </div>
+</ng-template>

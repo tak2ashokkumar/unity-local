@@ -14,14 +14,14 @@ import { HttpErrorResponse } from '@angular/common/http';
   selector: 'condition-investigation-zabbix-graphs',
   templateUrl: './condition-investigation-zabbix-graphs.component.html',
   styleUrls: ['./condition-investigation-zabbix-graphs.component.scss'],
-  providers:[ConditionInvestigationZabbixGraphsService]
+  providers: [ConditionInvestigationZabbixGraphsService]
 })
 export class ConditionInvestigationZabbixGraphsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
 
   @Input('deviceData') deviceData: any;
   // @Input('monitoringType') monitoringType: string;
-  @Input('index') index: number;
+  @Input('messageInfo') messageInfo: any;
 
   spinnerName: string;
   filterForm: FormGroup;
@@ -63,7 +63,7 @@ export class ConditionInvestigationZabbixGraphsComponent implements OnInit, OnDe
     private spinner: AppSpinnerService) { }
 
   ngOnInit(): void {
-    this.spinnerName = `zabbixGraphs-${this.index}`;
+    this.spinnerName = `zabbixGraphs-${this.messageInfo?.chat_message_id}`;
     const device = this.deviceData?.device;
     if (!(device && device?.customer_id && device?.device_id && device?.device_ct)) {
       return;
@@ -76,7 +76,7 @@ export class ConditionInvestigationZabbixGraphsComponent implements OnInit, OnDe
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
-getItemsList() {
+  getItemsList() {
     this.svc.getItemsList(this.deviceData).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.graphList = res;
       this.buildForm();
@@ -87,13 +87,13 @@ getItemsList() {
   }
 
   buildForm() {
-    this.dateRange = this.svc.getDateRangeByPeriod(this.graphRange.LAST_24_HOURS);
+    this.dateRange = this.svc.getDateRangeByPeriod(this.graphRange.LAST_24_HOURS, this.messageInfo?.created_at);
     this.filterForm = this.svc.buildForm(this.dateRange);
     this.formErrors = this.svc.resetFormErrors();
     this.validationMessages = this.svc.validationMessages;
 
     const graphs = [...this.graphList].slice(0, 3);
-    this.viewData = this.svc.convertItemsToViewData(graphs, this.index);
+    this.viewData = this.svc.convertItemsToViewData(graphs, this.messageInfo?.chat_message_id);
     this.filterForm.get('graph_list').setValue(graphs);
 
     this.filterForm.get('period').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: ZabbixGraphTimeRange) => {
@@ -101,7 +101,7 @@ getItemsList() {
         this.filterForm.get('from').enable({ emitEvent: false });
         this.filterForm.get('to').enable({ emitEvent: false });
       } else {
-        this.dateRange = this.svc.getDateRangeByPeriod(val);
+        this.dateRange = this.svc.getDateRangeByPeriod(val, this.messageInfo?.created_at);
         if (this.dateRange) {
           this.filterForm.get('from').patchValue(new Date(this.dateRange.from))
           this.filterForm.get('to').patchValue(new Date(this.dateRange.to))
@@ -123,7 +123,7 @@ getItemsList() {
       return;
     } else {
       this.formErrors = this.svc.resetFormErrors();
-      this.viewData = this.svc.convertItemsToViewData(this.filterForm.get('graph_list').value, this.index);
+      this.viewData = this.svc.convertItemsToViewData(this.filterForm.get('graph_list').value, this.messageInfo?.chat_message_id);
       this.getGraph();
     }
   }

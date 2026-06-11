@@ -1,0 +1,85 @@
+<ng-container>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Create Ticket</span>
+            <div>
+                <button class="btn btn-pill btn-warning btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                        class="fa fa-arrow-left"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="ticketForm" [formGroup]="ticketForm">
+                <div class="form-group">
+                    <label for="subject">Subject<em>*</em></label>
+                    <input class="form-control" id="subject" type="text" formControlName="subject" placeholder="Subject"
+                        [ngClass]="{'is-invalid' : formErrors.subject}">
+                    <div class="invalid-feedback" *ngIf="formErrors.subject">{{formErrors.subject}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="collaborators">CC</label>
+                    <input class="form-control" id="cc" type="text" formControlName="collaborators"
+                        placeholder="example@unity.com" [ngClass]="{'is-invalid' : formErrors.collaborators}">
+                </div>
+                <div class="form-group">
+                    <label for="tenant">Tenant<em>*</em></label>
+                    <select class="form-control text-capitalize" id="tenant" name="tenant" formControlName="tenant"
+                        [ngClass]="{'is-invalid' : formErrors.tenant}">
+                        <option [value]="''" disabled>Select Tenant</option>
+                        <option [value]="t.account_uuid" *ngFor="let t of tenants">{{t.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.type">{{formErrors.type}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="type">Type<em>*</em></label>
+                    <select class="form-control text-capitalize" id="type" name="type" formControlName="type"
+                        [ngClass]="{'is-invalid' : formErrors.type}">
+                        <option [value]="''" disabled>Select Ticket Type</option>
+                        <option *ngFor="let ticketType of ticketTypeList" [value]="ticketType.value">
+                            {{ticketType.display_name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.type">{{formErrors.type}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="priority">Priority<em>*</em></label>
+                    <select class="form-control text-capitalize" id="priority" name="priority"
+                        formControlName="priority" [ngClass]="{'is-invalid' : formErrors.priority}">
+                        <option [value]="''" disabled>Select Priority</option>
+                        <option *ngFor="let prt of ticketPriorityList" [value]="prt.value">{{prt.display_name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.priority">{{formErrors.priority}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description<em>*</em></label>
+                    <textarea class="form-control" id="description" name="description" rows="5"
+                        formControlName="description" [ngClass]="{'is-invalid' : formErrors.description}"
+                        placeholder="Describe your issue here"></textarea>
+                    <div class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}</div>
+                </div>
+                <!-- <div class="form-group">
+                    <label for="metadata">Metadata (Uneditable)</label>
+                    <textarea class="form-control" id="metadata" name="metadata" formControlName="metadata"
+                        readonly></textarea>
+                </div> -->
+            </form>
+            <form *ngIf="attachmentForm" [formGroup]="attachmentForm">
+                <div class="row form-group mb-0">
+                    <div class="col-12 p-3 d-flex align-items-center">
+                        <label class="col-form-label" for="file-multiple-input">Attachments :</label>
+                        <input class="ml-3" id="file-multiple-input" multiple name="file-multiple-input" type="file"
+                            onclick="this.value = null" (change)="detectFiles($event.target.files)">
+                    </div>
+                </div>
+                <span *ngFor="let attachment of attachments">
+                    <span class="btn btn-primary mb-1 mr-1 btn-sm">
+                        {{attachment}}<i class="fas fa-times ml-1" (click)="removeFiles(attachment)"></i>
+                    </span>
+                </span>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Create
+                Ticket</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button" (click)="reset()">Reset</button>
+        </div>
+    </div>
+</ng-container>

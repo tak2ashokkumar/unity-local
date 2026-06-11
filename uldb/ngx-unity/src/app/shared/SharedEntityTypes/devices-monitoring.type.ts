@@ -37,6 +37,12 @@ export interface DeviceMonitoringType {
     enabled: boolean;
 }
 
+export interface DeviceMonitoringResponseType {
+  monitoring: DeviceMonitoringType;
+  os_type: string;
+  management_ip: string;
+}
+
 export interface DeviceZabbixMonitoringGraph {
     graph_id: number;
     name: string;

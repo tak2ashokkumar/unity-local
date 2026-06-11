@@ -1,3 +1,4 @@
+import { TitleCasePipe } from '@angular/common';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as echarts from 'echarts';
@@ -11,7 +12,6 @@ import { CustomDateRangeType } from 'src/app/shared/SharedEntityTypes/unity-util
 import { UnityChartConfigService, UnityChartDataType, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { DateRange } from '../../aiml-summary/aiml-summary.service';
 import { ExecutionsByEfficiency, ExecutionsBySuccessRate, ExecutionsOverview, OrchestrationExecutionCountSummary, OrchestrationRecentFailureExecutionsType, OrchestrationSummaryAverageExecutionTimeType, OrchestrationSummaryExecutionsByUserType, OrchestrationSummaryExecutionType, OrchestrationSummaryTaskWidgetScriptsType, OrchestrationSummaryTaskWidgetStatusType, OrchestrationSummaryTaskWidgetTargetType, OrchestrationSummaryTaskWidgetType, OrchestrationSummaryWorkflowWidgetCategoryType, OrchestrationSummaryWorkflowWidgetStatusType, OrchestrationSummaryWorkflowWidgetTargetType, OrchestrationSummaryWorkflowWidgetType, OrchestrationUpcomingExecutionsType } from './orchestration-summary.type';
-import { TitleCasePipe } from '@angular/common';
 @Injectable()
 export class OrchestrationSummaryService {
   dateRange: DateRange;

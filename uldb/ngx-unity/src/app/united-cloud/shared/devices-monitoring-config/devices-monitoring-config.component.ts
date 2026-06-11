@@ -64,6 +64,10 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
   formButtons: boolean = true;
   collectors: DeviceDiscoveryAgentConfigurationType[] = [];
   onPublicCloudVmConfig: boolean = false;
+  isWmiSshOptionRequired: boolean = false;
+
+  credentialList: any[] = [];
+  platformType: string;
   constructor(private configSvc: DevicesMonitoringConfigService,
     private route: ActivatedRoute,
     private utilService: AppUtilityService,
@@ -103,6 +107,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.isAPIOptionRequired = apiDeviceTypes.has(this.device?.deviceType) || this.device?.hasPureOs;
     this.isAgentOptionRequired = !(this.device?.isCluster || this.device?.hasPureOs || this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT || this.device?.deviceType == DeviceMapping.SENSOR || this.device?.deviceType == DeviceMapping.SMART_PDU || this.device?.deviceType == DeviceMapping.RFID_READER);
     this.isSNMPOptionRequired = !(this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT);
+    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE ||  this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
 
     /** THIS IS BC FOR STATS DRILLDOWN
     *   OBSERVIUM server.uuid is used and zabbix bms.uuid is used
@@ -156,6 +161,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.spinnerService.start('main');
     this.configSvc.getDeviceMonitoring(this.itemId, this.device.deviceType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.monitoring = res.monitoring;
+      this.platformType = res.os_type || '';
       this.getMonitoringDetails();
     }, err => {
       this.spinnerService.stop('main');
@@ -166,8 +172,9 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
   getMonitoringDetails() {
     this.configSvc.getMonitoringConfig(this.itemId, this.device.deviceType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.monitoringDetails = res;
-      if (this.device.deviceType == DeviceMapping.CONTAINER_CONTROLLER) {
-        this.monitoringDetails.connection_type = 'Agent';
+      if (res?.mon_connection_type) {
+        this.monitoringDetails.connection_type = res.mon_connection_type;
+        this.monitoringDetails.ip_address = res.ip_address;
       }
       this.spinnerService.stop('main');
       this.buildForm();
@@ -195,7 +202,16 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.form = this.configSvc.buildForm(this.monitoringDetails, this.device.deviceType, this.onPublicCloudVmConfig);
     this.formErrors = this.configSvc.resetFormErrors();
     this.formValidationMessages = this.configSvc.switchValidationMessages;
-    if (this.form.get('connection_type').value == "API") {
+    const connectionTypeValue = this.form.get('connection_type')?.value;
+    if ((connectionTypeValue === 'SSH' || connectionTypeValue === 'WinRM') && this.isWmiSshOptionRequired) {
+      this.formButtons = true;
+      if (this.monitoringDetails?.mon_credential_mode === 'local') {
+        const type = connectionTypeValue === 'SSH' ? 'SSH' : 'Windows';
+        this.loadCredentials(type, () => {
+          this.form.patchValue({ mon_credential_id: this.monitoringDetails.mon_credential_id });
+        });
+      }
+    } else if (this.form.get('connection_type').value == "API") {
       this.form.removeControl('ip_address');
       this.form.removeControl('mtp_templates');
       this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs;
@@ -221,25 +237,59 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     }
     this.form.get('connection_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
       if (val == 'SNMP') {
+        this.configSvc.clearSshWinRmFields();
         this.onPublicCloudVmConfig && this.addCollectorField();
         this.formButtons = true;
         this.configSvc.setSnmpFields();
         this.subscribeToSnmpVerionChanges();
+        if (this.monitoringDetails?.ip_address) {     // ← add
+          this.form.get('ip_address')?.setValue(this.monitoringDetails.ip_address);
+        }
+        if (this.monitoringDetails?.snmp_version) {   // ← add
+          this.form.get('snmp_version')?.setValue(this.monitoringDetails.snmp_version);
+        }
+        // this.subscribeToSnmpVerionChanges();
       } else if (val == 'HTTP') {
+        this.configSvc.clearSshWinRmFields();
         this.onPublicCloudVmConfig && this.form.removeControl('collector');
         this.formButtons = true;
         this.configSvc.setHTTPField();
       } else if (val == 'Agent') {
+        this.configSvc.clearSshWinRmFields();
         this.onPublicCloudVmConfig && this.addCollectorField();
         this.formButtons = true;
         this.configSvc.setAgentField();
       } else if (val == 'API') {
+        this.configSvc.clearSshWinRmFields();
         this.onPublicCloudVmConfig && this.form.removeControl('collector');
         this.configSvc.setAPIField();
         this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs;
         this.showSNMPTrap = false;
+      } else if ((val === 'SSH' || val === 'WinRM') && this.isWmiSshOptionRequired) {
+        this.configSvc.setSshWinRmFields(val);
+        this.form.patchValue({
+          host_ip: this.monitoringDetails?.ip_address || '',
+          mon_credential_mode: 'local',
+          mon_credential_id: '',
+          mon_username: '',
+          mon_password: ''
+        });
+        const type = val === 'SSH' ? 'SSH' : 'Windows';
+        this.loadCredentials(type);
+        this.formButtons = true;
       }
     });
+    this.form.get('mon_credential_mode')?.valueChanges
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((mode) => {
+        if (mode === 'local') {
+          const type = this.form.get('connection_type')?.value === 'SSH' ? 'SSH' : 'Windows';
+          this.loadCredentials(type);
+          this.form.patchValue({ mon_username: '', mon_password: '' });
+        } else {
+          this.form.patchValue({ mon_credential_id: '' });
+        }
+      });
     if (this.form.get('snmp_version')) {
       this.subscribeToSnmpVerionChanges();
     }
@@ -323,6 +373,39 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       this.form.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
         .subscribe((data: any) => { this.formErrors = this.utilService.validateForm(this.form, this.formValidationMessages, this.formErrors); });
     } else {
+      const connectionType = this.form.get('connection_type')?.value;
+      if ((connectionType === 'SSH' || connectionType === 'WinRM') && this.isWmiSshOptionRequired) {
+        let payload: any = { ...this.form.getRawValue() };
+        payload.mon_connection_type = connectionType;
+        if (payload.mon_credential_mode === 'local') {
+          delete payload.mon_username;
+          delete payload.mon_password;
+        } else {
+          delete payload.mon_credential_id;
+        }
+        delete payload.connection_type;
+        delete payload.ip_address;
+
+        this.spinnerService.start('main');
+        if (this.monitoring?.configured && this.monitoringDetails) {
+          this.configSvc.updateMonitoring(this.itemId, this.device.deviceType, payload)
+            .pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+              this.spinnerService.stop('main');
+              this.notification.success(new Notification('Monitoring details updated successfully.'));
+              this.getTemplates();
+            }, (err: HttpErrorResponse) => { this.handleError(err.error); });
+        } else {
+          this.configSvc.enableMonitoring(this.itemId, this.device.deviceType, payload)
+            .pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+              this.form = null;
+              this.resetConfig(true);
+              this.spinnerService.stop('main');
+              this.notification.success(new Notification('Monitoring enabled successfully.'));
+              this.getTemplates();
+            }, (err: HttpErrorResponse) => { this.handleError(err.error); });
+        }
+        return;
+      }
       let arr = [DeviceMapping.AZURE_VIRTUAL_MACHINE, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.VCLOUD, DeviceMapping.HYPER_V,
       DeviceMapping.ESXI, DeviceMapping.OPENSTACK_VIRTUAL_MACHINE, DeviceMapping.CUSTOM_VIRTUAL_MACHINE, DeviceMapping.HYPERVISOR,
       DeviceMapping.STORAGE_DEVICES, DeviceMapping.CONTAINER_CONTROLLER]
@@ -415,5 +498,16 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       this.notification.error(new Notification(`Failed to ${this.monitoringDetails.is_snmptrap_enabled ? 'disable' : 'enable'} SNMP Trap`));
       this.spinnerService.stop('main');
     });
+  }
+
+  loadCredentials(type: 'SSH' | 'Windows', callback?: () => void) {
+    this.configSvc.getCredentials(type)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        this.credentialList = res || [];
+        if (callback) callback();
+      }, err => {
+        this.credentialList = [];
+      });
   }
 }

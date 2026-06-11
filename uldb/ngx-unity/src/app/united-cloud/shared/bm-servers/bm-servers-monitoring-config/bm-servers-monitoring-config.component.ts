@@ -66,6 +66,8 @@ export class BmServersMonitoringConfigComponent implements OnInit {
   fieldsToFilterOn: string[] = ['template_name'];
   selectedTemplates: MonitoringTemplate[] = [];
   searchValue: string = '';
+  credentialList: any[] = [];
+  platformType: string = '';
   constructor(private configSvc: BmServersMonitoringConfigService,
     private route: ActivatedRoute,
     private utilService: AppUtilityService,
@@ -111,6 +113,7 @@ export class BmServersMonitoringConfigComponent implements OnInit {
     this.configSvc.getDeviceMonitoring(this.deviceId, this.device.deviceType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.bmServer = res;
       this.monitoring = res.monitoring;
+      this.platformType = res.server?.os?.platform_type || '';
       this.getMonitoringDetails();
     }, err => {
       this.spinnerService.stop('main');
@@ -121,12 +124,19 @@ export class BmServersMonitoringConfigComponent implements OnInit {
   getMonitoringDetails() {
     this.configSvc.getMonitoringConfig(this.deviceId, this.device.deviceType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.monitoringDetails = res;
+      if (res?.mon_connection_type) {
+        this.monitoringDetails.connection_type = res.mon_connection_type;
+        this.monitoringDetails.ip_address = res.ip_address; // used as host_ip later
+      }
       this.spinnerService.stop('main');
+      console.log('monitoringDetails BEFORE buildForm:', this.monitoringDetails);
       this.buildForm();
+      console.log(this.form.getRawValue(), 'form after getting monitong details');
     }, err => {
       this.monitoringDetails = null;
       this.spinnerService.stop('main');
       this.buildForm();
+      console.log(this.form.getRawValue(), 'when monitoing detials are null');
     });
   }
 
@@ -178,16 +188,77 @@ export class BmServersMonitoringConfigComponent implements OnInit {
       this.createOtherForm(bmcType);
     });
     this.form.get('connection_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
-      if (val == 'SNMP') {
+      if (val === 'SNMP') {
+        this.configSvc.clearSshWinRmFields();   // ← remove SSH/WinRM controls first
         this.configSvc.setSnmpFields();
         this.subscribeToSnmpVerionChanges();
-      } else if (val == 'Agent') {
+        if (this.monitoringDetails?.snmp_version) {
+          this.form.get('snmp_version')?.setValue(this.monitoringDetails.snmp_version);
+        }
+        // this.subscribeToSnmpVerionChanges();
+      } else if (val === 'Agent') {
+        this.configSvc.clearSshWinRmFields();   // ← remove SSH/WinRM controls first
         this.configSvc.setAgentField();
+      } else if (val === 'SSH' || val === 'WinRM') {
+        this.configSvc.setSshWinRmFields(val);  // ← dynamically add SSH/WinRM controls
+        this.form.patchValue({
+          host_ip: this.monitoringDetails?.ip_address || '',
+          mon_credential_mode: 'local',
+          mon_credential_id: '',
+          mon_username: '',
+          mon_password: ''
+        });
+        const type = val === 'SSH' ? 'SSH' : 'Windows';
+        this.loadCredentials(type);
       }
     });
+    this.form.get('mon_credential_mode')?.valueChanges
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((mode) => {
+
+        if (mode === 'local') {
+          const type = this.form.get('connection_type')?.value === 'SSH' ? 'SSH' : 'Windows';
+          this.loadCredentials(type);
+
+          // clear manual creds
+          this.form.patchValue({
+            mon_username: '',
+            mon_password: ''
+          });
+
+        } else {
+          // clear dropdown
+          this.form.patchValue({
+            mon_credential_id: ''
+          });
+        }
+      });
+    if (this.monitoringDetails?.mon_credential_mode === 'local') {
+      const type = this.form.get('connection_type')?.value === 'SSH' ? 'SSH' : 'Windows';
+
+      this.loadCredentials(type, () => {
+        this.form.patchValue({
+          mon_credential_id: this.monitoringDetails.mon_credential_id
+        });
+      });
+    }
     if (this.form.get('snmp_version')) {
       this.subscribeToSnmpVerionChanges();
     }
+  }
+
+  loadCredentials(type: 'SSH' | 'Windows', callback?: () => void) {
+    this.configSvc.getCredentials(type) // <-- you need this API in service
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        this.credentialList = res || [];
+
+        if (callback) {
+          callback();
+        }
+      }, err => {
+        this.credentialList = [];
+      });
   }
 
   subscribeToSnmpVerionChanges() {
@@ -244,24 +315,31 @@ export class BmServersMonitoringConfigComponent implements OnInit {
   confirmMonitoringConfiguration(data: any) {
     this.spinnerService.start('main');
     let obj = Object.assign({}, data);
+    console.log(obj, 'object');
+    console.log(this.form.getRawValue(), 'form raw value be fore submit');
+
     if (this.monitoring.configured && this.monitoringDetails) {
-      this.configSvc.updateMonitoring(this.deviceId, this.device.deviceType, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-        this.spinnerService.stop('main');
-        this.notification.success(new Notification('Monitoring details updated successfully.'));
-        this.getDeviceMonitoring();
-      }, (err: HttpErrorResponse) => {
-        this.handleError(err.error);
-      });
+      this.configSvc.updateMonitoring(this.deviceId, this.device.deviceType, obj)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(data => {
+          this.spinnerService.stop('main');
+          this.notification.success(new Notification('Monitoring details updated successfully.'));
+          this.getDeviceMonitoring();
+        }, (err: HttpErrorResponse) => {
+          this.handleError(err.error);
+        });
     } else {
-      this.configSvc.enableMonitoring(this.deviceId, this.device.deviceType, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-        this.form = null;
-        this.resetConfig(true);
-        this.spinnerService.stop('main');
-        this.notification.success(new Notification('Monitoring enabled successfully.'));
-        this.getDeviceMonitoring();
-      }, (err: HttpErrorResponse) => {
-        this.handleError(err.error);
-      });
+      this.configSvc.enableMonitoring(this.deviceId, this.device.deviceType, obj)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(data => {
+          this.form = null;
+          this.resetConfig(true);
+          this.spinnerService.stop('main');
+          this.notification.success(new Notification('Monitoring enabled successfully.'));
+          this.getDeviceMonitoring();
+        }, (err: HttpErrorResponse) => {
+          this.handleError(err.error);
+        });
     }
   }
 
@@ -270,28 +348,68 @@ export class BmServersMonitoringConfigComponent implements OnInit {
       let templatesSelected = this.selectedTemplates.map(t => t.template_id);
       this.form.get('mtp_templates').setValue(templatesSelected);
       this.form.get('mtp_templates').setValidators([Validators.required]);
+      this.form.get('mtp_templates').updateValueAndValidity();
     } else {
       this.form.removeControl('mtp_templates');
     }
-    this.form.updateValueAndValidity();
 
+    this.form.updateValueAndValidity();
+    this.formErrors = this.configSvc.resetFormErrors();
+    this.nonFieldErr = '';
     if (this.form.invalid) {
       this.formErrors = this.utilService.validateForm(this.form, this.formValidationMessages, this.formErrors);
       this.form.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((data: any) => { this.formErrors = this.utilService.validateForm(this.form, this.formValidationMessages, this.formErrors); });
+        .subscribe((data: any) => {
+          this.formErrors = this.utilService.validateForm(this.form, this.formValidationMessages, this.formErrors);
+        });
     }
+
     if (this.IPMIorDRACForm && this.IPMIorDRACForm.invalid) {
       this.IPMIorDRACFormErrors = this.utilService.validateForm(this.IPMIorDRACForm, this.IPMIorDRACFormValidationMessages, this.IPMIorDRACFormErrors);
       this.IPMIorDRACForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((data: any) => { this.IPMIorDRACFormErrors = this.utilService.validateForm(this.IPMIorDRACForm, this.IPMIorDRACFormValidationMessages, this.IPMIorDRACFormErrors); });
+        .subscribe((data: any) => {
+          this.IPMIorDRACFormErrors = this.utilService.validateForm(this.IPMIorDRACForm, this.IPMIorDRACFormValidationMessages, this.IPMIorDRACFormErrors);
+        });
     }
 
-    if (this.form.valid) {
+    const ipmiValid = !this.IPMIorDRACForm || this.IPMIorDRACForm.valid;
+
+    if (this.form.valid && ipmiValid) {
+      let payload: any;
+
       if (this.IPMIorDRACForm && this.IPMIorDRACForm.valid) {
-        this.confirmMonitoringConfiguration(_merge({}, this.form.getRawValue(), this.bmcTypeForm.getRawValue(), this.IPMIorDRACForm.getRawValue()));
+        payload = _merge({}, this.form.getRawValue(), this.bmcTypeForm.getRawValue(), this.IPMIorDRACForm.getRawValue());
       } else {
-        this.confirmMonitoringConfiguration(_merge({}, this.form.getRawValue(), this.bmcTypeForm.getRawValue()));
+        payload = _merge({}, this.form.getRawValue(), this.bmcTypeForm.getRawValue());
       }
+
+      const connectionType = this.form.get('connection_type')?.value;
+
+      if (connectionType === 'SSH' || connectionType === 'WinRM') {
+        payload.mon_connection_type = connectionType;
+
+        if (payload.mon_credential_mode === 'local') {
+          delete payload.mon_username;
+          delete payload.mon_password;
+        } else {
+          delete payload.mon_credential_id;
+        }
+
+        delete payload.connection_type;
+        delete payload.ip_address;
+
+      } else {
+        // SNMP / Agent — strip all SSH/WinRM fields
+        delete payload.host_ip;
+        delete payload.mon_connection_type;
+        delete payload.mon_port;
+        delete payload.mon_credential_mode;
+        delete payload.mon_credential_id;
+        delete payload.mon_username;
+        delete payload.mon_password;
+      }
+
+      this.confirmMonitoringConfiguration(payload);
     }
   }
 

@@ -14,7 +14,6 @@ import { AILLMModel } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-mode
 
 @Injectable()
 export class UserProfileSettingsService {
-
   constructor(private http: HttpClient,
     private utilSvc: AppUtilityService,
     private builder: FormBuilder) { }

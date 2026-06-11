@@ -1,0 +1,126 @@
+<div class="card round-edge">
+    <div class="card-header bg-white rounded-3 py-2">
+        <span class="font-lg font-weight-bold">Customize Email</span>
+        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                class="fa fa-arrow-left"></i></button>
+    </div>
+    <div class="card-body">
+        <form *ngIf="form" [formGroup]="form">
+            <div class="form-group">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+            </div>
+            <div class="form-group row">
+                <div class="col-2 text-right">Notification Email<em>*</em> : </div>
+                <div class="col">
+                    <input id="email_list" class="form-control" autocomplete="off" placeholder="Type username or email"
+                        [class.is-invalid]="formErrors.email_list" formControlName="email_list" [typeahead]="userList"
+                        typeaheadOptionField="full_name" (typeaheadOnSelect)="typeaheadOnSelect($event)"
+                        (typeaheadNoResults)="typeaheadNoResults($event)">
+                    <div class="alert alert-secondary" *ngIf="noUsers">No Results Found</div>
+                    <div *ngIf="selectedUsers.length">
+                        <span *ngFor="let user of selectedUsers; let i = index;"
+                            class="badge badge-pill badge-secondary font-xs py-1 my-2 mx-1">
+                            {{user['full_name']}}
+                            <span class="fas fa-times pointer-link pl-1" (click)="manageSelectedUsers(i)"></span>
+                        </span>
+                    </div>
+                    <small class="invalid-feedback" *ngIf="formErrors.email_list">{{formErrors.email_list}}
+                    </small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class=" col-2 text-right">Subject<em>*</em> : </div>
+                <div class="col">
+                    <div class="card mb-1" [ngClass]="{'border-danger': formErrors.subject_list}">
+                        <div class="card-body p-2">
+                            <span *ngIf="selectedAttributes.length">
+                                <span *ngFor="let attribute of selectedAttributes; let i = index;"
+                                    class="badge badge-pill badge-secondary font-xs py-2 mb-2 mr-2">
+                                    {{attribute.name}}
+                                    <span class="fas fa-times pointer-link pl-1" (click)="unSelectAttribute(i)"></span>
+                                </span>
+                            </span>
+                            <button class="action-icons fas fa-plus" containerClass="modalPopover"
+                                [popover]="subjectRef" placement="bottom" container="body" [outsideClick]="true"
+                                (onHidden)="updateSelectedAttributes()"></button>
+                        </div>
+                    </div>
+                    <small class="text-danger" *ngIf="formErrors.subject_list">{{formErrors.subject_list}}
+                    </small>
+                </div>
+            </div>
+            <div class="row border rounded p-4 position-relative mt-2 mx-0" [ngClass]="{'border-danger': formErrors.email_content}">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">Email Body<em>*</em></div>
+                <div class="col">
+                    <div class="card-body p-2">
+                        <button class="action-icons fas fa-plus pull-right add-button" containerClass="modalPopover"
+                            [popover]="EmailBodyRef" placement="bottom" container="body" [outsideClick]="true"
+                            (onHidden)="updateSelectedEmails()"></button>
+                        <div class="card border-0">
+                            <span *ngIf="selectedEmails.length">
+                                <div *ngFor="let email of selectedEmails; let i = index;" class="row mt-2">
+                                    <div class=" col-2 text-right align-self-center">{{email.name}} : </div>
+                                    <div class="col-3">
+                                        <input class="form-control" type="text" [value]="email.value" disabled>
+                                    </div>
+                                    <div class="col-1">
+                                        <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                            (click)="unSelectEmail(i)"></button>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <small class="text-danger" *ngIf="formErrors.email_content">{{formErrors.email_content}}
+            </small>
+            <div class="form-group mt-4 ml-4">
+                <span>
+                    <input class="form-check-input form-check-input-lg" type="checkbox" formControlName="flag">
+                </span>
+                <span>
+                    <textarea class="form-control" type="text" formControlName="custom_message"
+                        placeholder="Enter custom text which will be embedded with the email"></textarea>
+                </span>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-3">
+        <button class="btn btn-primary" type="button" (click)="onSubmit()">Submit</button>
+        <button class="btn btn-outline-danger ml-3" type="button" (click)="goBack()">Cancel</button>
+    </div>
+</div>
+
+<ng-template #subjectRef>
+    <div class="card mb-0">
+        <div class="card-header p-1">
+            <table-search-box [searchValue]="searchValue" (searched)="onSearched($event)">
+            </table-search-box>
+        </div>
+        <div class="card-body px-2 py-1">
+            <div class="mb-1 pointer-link" *ngFor="let attribute of filteredAttributes; let i = index"
+                (click)="selectAttribute(i)">
+                <span class="fas fa-check text-success"
+                    [style.visibility]="attribute.isSelected ? 'visible' : 'hidden'"></span>
+                <span class="ml-2">{{attribute.name}}</span>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #EmailBodyRef>
+    <div class="card mb-0">
+        <div class="card-header p-1">
+            <table-search-box [searchValue]="searchEmailBodyValue" (searched)="onEmailBodySearched($event)">
+            </table-search-box>
+        </div>
+        <div class="card-body px-2 py-1">
+            <div class="mb-1 pointer-link" *ngFor="let email of filteredEmails; let i = index" (click)="selectEmail(i)">
+                <span class="fas fa-check text-success"
+                    [style.visibility]="email.isSelected ? 'visible' : 'hidden'"></span>
+                <span class="ml-2">{{email.name}}</span>
+            </div>
+        </div>
+    </div>
+</ng-template>

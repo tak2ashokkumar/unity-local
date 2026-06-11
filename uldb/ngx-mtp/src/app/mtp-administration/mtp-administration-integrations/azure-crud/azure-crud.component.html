@@ -1,0 +1,64 @@
+<ng-template #createacc>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{actionMessage}} Azure Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="form" [formGroup]="form">
+                <div class="form-group">
+                    <label class="form-col-form-label"> Client ID<em>* </em></label>
+                    <input id="client_id" class="form-control" type="text" formControlName="client_id"
+                        [ngClass]="{'is-invalid' : formErrors.client_id}">
+                    <div class="invalid-feedback" *ngIf="formErrors.client_id">
+                        {{formErrors.client_id}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label"> Client Secret<em>* </em></label>
+                    <input id="client_secret" class="form-control" type="text" formControlName="client_secret"
+                        [ngClass]="{'is-invalid' : formErrors.client_secret}">
+                    <div class="invalid-feedback" *ngIf="formErrors.client_secret">
+                        {{formErrors.client_secret}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="form-col-form-label"> Tenant ID<em>*</em></label>
+                    <input id="tenant_id" class="form-control" type="text" formControlName="tenant_id"
+                        [ngClass]="{'is-invalid' : formErrors.tenant_id}">
+                    <div class="invalid-feedback" *ngIf="formErrors.tenant_id">
+                        {{formErrors.tenant_id}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-primary pull-right ml-1" type="button"
+                (click)="confirmAzureAccountCreate()">Submit</button>
+            <button class="btn btn-sm btn-outline-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteAzureModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Azure account will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-primary pull-right ml-1" type="button"
+                (click)="confirmDeleteAzureAccount()">Yes</button>
+            <button class="btn btn-sm btn-outline-danger pull-right" (click)="deleteAzureModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

@@ -17,6 +17,7 @@ export interface UsageData {
     disk_utilization: UsageDataValueUnitType;
 
     alert_count: number;
+    month_to_date_cost:number;
 }
 
 export interface UsageDataValueUnitType {

@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Subscription, timer } from 'rxjs';
 import { ConditionDetailsViewData, ConditionInvestigationService, PromptResultViewData } from './condition-investigation.service';
 import { FormGroup } from '@angular/forms';
 import { PAGE_SIZES, SearchCriteria } from '../table-functionality/search-criteria';
@@ -30,6 +30,9 @@ import { ConditionInvestigationTerminalWindowRegistryService } from './condition
 })
 export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
+  private scrollMode: 'none' | 'toBottom' | 'preserve' = 'none';
+  private prevScrollTopBeforeHistoryPrepend: number | null = null;
+  private prevScrollHeightBeforeHistoryPrepend: number | null = null;
 
   conditionId: string;
   conditionUuid: string;
@@ -55,6 +58,7 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   isTerminalReady = false;
 
   @ViewChild('chatResponsHistoryScrollContainer') chatResponsHistoryScrollContainer: ElementRef;
+  @ViewChild('chatResponseHistoryCardBody') chatResponseHistoryCardBody: ElementRef;
   @ViewChildren('chatResponseHistory') chatResponseHistory: QueryList<ElementRef>;
 
   initialChatResponseData: any[] = [];
@@ -76,11 +80,33 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   confirmSaveAsModalRef: BsModalRef;
   promptName: string = '';
 
+  private timerSub: Subscription;
+  waitMessage: string = '';
+
+  readonly dots = [
+    { color: '#7F77DD', delay: '0ms' },
+    { color: '#1D9E75', delay: '160ms' },
+    { color: '#378ADD', delay: '320ms' },
+    { color: '#EF9F27', delay: '480ms' },
+  ];
+
   conversationId: string = '';
+  conversationIdByQueryParam: string = null;
+  loadHistory: string;
+  isInitialChatResponseHistoryLoad: boolean = false;
+  loadChatHistory: boolean = false;
+  hasMoreChats: boolean = false;
+  isUserScrolling: boolean = false;
+  userScrollTimer: ReturnType<typeof setTimeout> | null = null;
+  loadedChatsHistoryCount: number = 0;
+  private scrollResizeObserver: ResizeObserver | null = null;
+  private scrollResizeTimer: ReturnType<typeof setTimeout> | null = null;
+  isProgrammaticScroll: boolean = false;
 
   @ViewChild('executeCommand') executeCommand: ElementRef;
   confirmExecutionModalRef: BsModalRef;
   command: string = '';
+
   constructor(private svc: ConditionInvestigationService,
     @Inject(DOCUMENT) private document,
     private renderer: Renderer2,
@@ -101,6 +127,10 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
       this.conditionId = params.get('conditionId');
       this.conditionUuid = params.get('conditionUuid');
     });
+    this.route.queryParams.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
+      this.conversationIdByQueryParam = params['conversation_id'] || null;
+      this.loadHistory = params['load_history'] || 'false';
+    });
     this.activityCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.promptCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.registryChannel.onmessage = (e) => {
@@ -116,37 +146,142 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.minimizeLeftPanel();
-    setTimeout(() => {
-      // this.spinner.start('conditionDetailsSpinner');
-      this.spinner.start('conditionSummarySpinner');
-    }, 5);
+    if (this.loadHistory == 'false') {
+      this.startWaitMessages();
+    } else {
+      setTimeout(() => {
+        this.spinner.start('conditionInitialHistoryLoadSpinner');
+      }, 0)
+    }
     this.getConditionDetails();
     // this.getActivities();
   }
 
   ngAfterViewInit() {
     this.chatResponseHistory.changes.pipe(takeUntil(this.ngUnsubscribe)).subscribe((change) => {
-      if (this.chatResponseHistory?.length > 1) {
+      if (!this.chatResponseHistory?.length) {
+        return;
+      }
+      if (this.scrollMode === 'toBottom') {
         this.scrollToLastChatResponseHistory();
+      } else if (this.scrollMode === 'preserve') {
+        this.restoreScrollPositionAfterHistoryPrepend();
       }
     });
   }
 
-  scrollToLastChatResponseHistory() {
-    setTimeout(() => {
-      const parent = this.chatResponsHistoryScrollContainer.nativeElement;
-      const last = this.chatResponseHistory.last?.nativeElement;
-      // added gap=100, When scrolling to the last chat history response,it will leave 100px space above it in the viewport, so some part of previous chat response history also show
-      const gap = 100;
-      parent.scrollTop += (last.getBoundingClientRect().top - parent.getBoundingClientRect().top) - gap;
-    }, 2);
-  }
-
   ngOnDestroy(): void {
     this.spinner.stop('main');
+    clearTimeout(this.userScrollTimer);
+    this.cleanupScrollPositionTracking();
     this.maximizeLeftPanel();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+  }
+
+  startWaitMessages() {
+    this.timerSub = timer(0, 1000).subscribe(sec => {
+      if (sec < 3) {
+        this.waitMessage = 'Preparing Investigation Plan';
+      } else if (sec < 7) {
+        this.waitMessage = 'Making Plan Ready';
+      } else {
+        this.waitMessage = 'Please hold it is taking longer than usual';
+      }
+    });
+  }
+
+  cleanupWaitMessages() {
+    this.timerSub?.unsubscribe();
+    this.waitMessage = '';
+  }
+
+  private scrollToLastChatResponseHistory() {
+    setTimeout(() => {
+      const parent = this.chatResponsHistoryScrollContainer.nativeElement;
+      const last = this.chatResponseHistory.last?.nativeElement;
+      if (!parent || !last) {
+        this.scrollMode = 'none';
+        return;
+      }
+      // added gap=100, When scrolling to the last chat history response,it will leave 100px space above it in the viewport(visible container of workspace chats), so some part of previous chat response history also show
+      const gap = 100;
+      // parent.scrollTop += (last.getBoundingClientRect().top - parent.getBoundingClientRect().top) - gap;
+      parent.scrollTop = last.offsetTop - gap;
+      this.scrollMode = 'none';
+
+      if (this.loadHistory == 'true' && this.isInitialChatResponseHistoryLoad) {
+        this.preserveScrollPositionOnResize(parent, 'anchorToLast');
+      }
+    }, 2);
+  }
+
+  private restoreScrollPositionAfterHistoryPrepend() {
+    setTimeout(() => {
+      const parent = this.chatResponsHistoryScrollContainer?.nativeElement;
+      if (!parent || this.prevScrollTopBeforeHistoryPrepend == null || this.prevScrollHeightBeforeHistoryPrepend == null) {
+        this.scrollMode = 'none';
+        this.prevScrollTopBeforeHistoryPrepend = null;
+        this.prevScrollHeightBeforeHistoryPrepend = null;
+        return;
+      }
+      const newScrollHeight = parent.scrollHeight;
+      const heightDelta = newScrollHeight - this.prevScrollHeightBeforeHistoryPrepend;
+      parent.scrollTop = this.prevScrollTopBeforeHistoryPrepend + heightDelta;
+      this.scrollMode = 'none';
+      this.prevScrollTopBeforeHistoryPrepend = null;
+      this.prevScrollHeightBeforeHistoryPrepend = null;
+
+      this.preserveScrollPositionOnResize(parent, 'preserve');
+    }, 0);
+  }
+
+  private preserveScrollPositionOnResize(parent: HTMLElement, mode: 'preserve' | 'anchorToLast') {
+    this.cleanupScrollPositionTracking();
+
+    const last = this.chatResponseHistory.last?.nativeElement;
+    let parentLastScrollHeight = parent.scrollHeight;
+
+    let lastItemOffsetTop = last?.offsetTop ?? 0;
+
+    this.scrollResizeObserver = new ResizeObserver(() => {
+      const delta = parent.scrollHeight - parentLastScrollHeight;
+      parentLastScrollHeight = parent.scrollHeight;
+      if (delta <= 0 || this.isUserScrolling) return;
+      if (mode == 'anchorToLast') {
+        // anchor to last item — track its offsetTop
+        const currentOffsetTop = last?.offsetTop ?? 0;
+        const itemDelta = currentOffsetTop - lastItemOffsetTop;
+        lastItemOffsetTop = currentOffsetTop;
+        if (itemDelta > 0) {
+          this.isProgrammaticScroll = true;
+          parent.scrollTop += itemDelta;
+          requestAnimationFrame(() => {
+            this.isProgrammaticScroll = false;
+          });
+        }
+      } else {
+        // anchor current viewport — growth above
+        this.isProgrammaticScroll = true;
+        parent.scrollTop += delta;
+        requestAnimationFrame(() => {
+          this.isProgrammaticScroll = false;
+        });
+      }
+    });
+
+    this.scrollResizeObserver.observe(this.chatResponseHistoryCardBody.nativeElement);
+
+    this.scrollResizeTimer = setTimeout(() => {
+      this.cleanupScrollPositionTracking()
+    }, 10000);
+  }
+
+  private cleanupScrollPositionTracking() {
+    this.scrollResizeObserver?.disconnect();
+    this.scrollResizeObserver = null;
+    clearTimeout(this.scrollResizeTimer);
+    this.scrollResizeTimer = null;
   }
 
   minimizeLeftPanel() {
@@ -172,7 +307,7 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
       this.conditionDetailsViewData = this.svc.convertToConditionDetailsViewdata(res);
       // this.spinner.stop('conditionDetailsSpinner');
     }, (err: HttpErrorResponse) => {
-      this.spinner.stop('conditionDetailsSpinner');
+      // this.spinner.stop('conditionDetailsSpinner');
       this.notification.error(new Notification('Error whlie getting condition details'));
     });
   }
@@ -334,10 +469,32 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   //   }
   // }
 
+  onScroll() {
+    if (this.isProgrammaticScroll) {
+      return;
+    }
+
+    const el = this.chatResponsHistoryScrollContainer.nativeElement;
+
+    this.isUserScrolling = true;
+    clearTimeout(this.userScrollTimer);
+    this.userScrollTimer = setTimeout(() => {
+      this.isUserScrolling = false;
+    }, 10);
+
+    if (el.scrollTop <= 40 && !this.loadChatHistory && this.hasMoreChats) {
+      this.prevScrollTopBeforeHistoryPrepend = el.scrollTop;
+      this.prevScrollHeightBeforeHistoryPrepend = el.scrollHeight;
+      setTimeout(() => {
+        this.loadChatHistory = true;
+      }, 0);
+    }
+  }
+
   handleChatResponse(res: any | null) {
     if (this.initialChatResponseData?.length == 0) {
       this.initialChatResponseData.push(res);
-      this.spinner.stop('conditionSummarySpinner');
+      this.cleanupWaitMessages();
     }
     // if (res == null || res?.answer?.phase == 'General') { return; }
     if (res == null) { return; }
@@ -352,6 +509,8 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
       return;
     }
     const modifiedRes = { ...res, workSpaceData: workSpaceData };
+    this.scrollMode = 'toBottom';
+    this.isInitialChatResponseHistoryLoad = false;
     this.chatResponseHistoryData.push(modifiedRes);
 
     // const { stageKey, componentType } = this.resolveStep(res);
@@ -372,7 +531,75 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     // if (res?.answer?.stage == "Stage 0") {
     //   this.conditionOverviewViewData = this.svc.convertToConditionOverviewData(res.answer);
     // }
-    this.spinner.stop('main');
+  }
+
+  handleChatHistoryResponse(res: any | null) {
+    this.loadChatHistory = false;
+
+    if (this.initialChatResponseData?.length == 0) {
+      this.initialChatResponseData.push(res);
+      this.spinner.stop('conditionInitialHistoryLoadSpinner');
+    }
+
+    if (res == null) { return; }
+
+    this.isTerminalReady = true;
+    if (this.conversationIdByQueryParam) {
+      this.conversationId = this.conversationIdByQueryParam;
+      this.newTerminalService.setConversationId(this.conversationId);
+    }
+
+    const reversed = [...res.results].reverse();
+    const hadExistingWorkspaceHistory = this.chatResponseHistoryData.length > 0;
+    const parent = this.chatResponsHistoryScrollContainer?.nativeElement;
+    if (hadExistingWorkspaceHistory && parent && this.prevScrollTopBeforeHistoryPrepend == null && this.prevScrollHeightBeforeHistoryPrepend == null) {
+      this.prevScrollTopBeforeHistoryPrepend = parent.scrollTop;
+      this.prevScrollHeightBeforeHistoryPrepend = parent.scrollHeight;
+    }
+    let historyData = [];
+    // convert the backend api data to UI structure as like in streaming api structure for storing inside this.chatResponseHistoryData.
+    for (let result of reversed) {
+      if (result.role == 'Assistant') {
+        let obj: any = {};
+        let workSpaceData: string;
+
+        obj.answer = result.content;
+        obj.meta = result.metadata;
+        obj.meta.message_info = {
+          id: result.id,
+          chat_message_id: result.chat_message_id,
+          created_at: result.created_at,
+        }
+        workSpaceData = result?.content?.split('sectionBreak')[1];
+        if (!workSpaceData && !obj?.meta?.device_data?.monitoring_type) {
+          continue;
+        }
+        const modifiedRes = { ...obj, workSpaceData: workSpaceData };
+        historyData.push(modifiedRes);
+      }
+    }
+    this.loadedChatsHistoryCount = this.loadedChatsHistoryCount + res.results.length;
+    this.hasMoreChats = this.loadedChatsHistoryCount < res.count;
+
+    if (!historyData.length) {
+      this.scrollMode = 'none';
+      this.prevScrollTopBeforeHistoryPrepend = null;
+      this.prevScrollHeightBeforeHistoryPrepend = null;
+      return;
+    }
+
+    if (hadExistingWorkspaceHistory) {
+      this.isInitialChatResponseHistoryLoad = false;
+      this.scrollMode = 'preserve';
+    } else {
+      this.isInitialChatResponseHistoryLoad = true;
+      this.scrollMode = 'toBottom';
+    }
+    this.chatResponseHistoryData = [...historyData, ...this.chatResponseHistoryData];
+  }
+
+  trackByChatId(index: number, item: any) {
+    return item.meta?.message_info?.chat_message_id;
   }
 
   togglePromptTuning() {

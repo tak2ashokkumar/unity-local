@@ -1,0 +1,59 @@
+div.vis-network {
+  div.vis-navigation {
+    div.vis-button {
+      background-image: inherit !important;
+
+      &:after {
+        // font-size: 2em;
+        color: gray;
+      }
+      &:hover {
+        box-shadow: none !important;
+        &::after {
+          color: lightgray;
+        }
+      }
+
+      &.vis-up,
+      &.vis-down,
+      &.vis-left,
+      &.vis-right {
+        display: none;
+      }
+
+      &.action-icons {
+        width: 2rem !important;
+        height: 2rem !important;
+        border-radius: 50% !important;
+        &.fa:before {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
+
+      //   &.vis-zoomIn {
+      //     background-image: none !important;
+      //     &:after {
+      //       content: "+";
+      //       font-weight: bold;
+      //     }
+      //   }
+      //   &.vis-zoomOut {
+      //     background-image: none !important;
+      //     &:after {
+      //       content: "−";
+      //       font-weight: bold;
+      //     }
+      //   }
+      //   &.vis-zoomExtends {
+      //     background-image: none !important;
+      //     &:after {
+      //       content: "⤧";
+      //       font-weight: bold;
+      //     }
+      //   }
+    }
+  }
+}

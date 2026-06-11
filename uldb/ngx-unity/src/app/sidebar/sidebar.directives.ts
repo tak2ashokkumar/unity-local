@@ -72,7 +72,9 @@ export class SidebarMinimizeDirective {
         const body = this.document.body;
         if (body.classList.contains('sidebar-minimized')) {
             this.renderer.removeClass(body, 'sidebar-minimized');
-            this.chatbotService.onSidebarExpand();
+            if (!body.classList.contains('unity-chatbot-expanded')) {
+                this.chatbotService.onSidebarExpand();
+            }
         } else {
             this.renderer.addClass(body, 'sidebar-minimized');
         }

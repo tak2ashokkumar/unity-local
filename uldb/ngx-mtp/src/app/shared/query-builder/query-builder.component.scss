@@ -1,0 +1,213 @@
+@import "variables";
+
+:host {
+  display: block;
+  width: 100%;
+
+  .list-group {
+    padding-left: revert;
+
+    .list-group-item {
+      &:first-child,
+      &.has-query-builder + .list-group-item {
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+      }
+      &.next-is-ruleset,
+      &:last-child:not(.has-query-builder) {
+        margin-bottom: 0;
+        border-bottom-right-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+      }
+    }
+  }
+
+  .q-arrow-icon-button {
+    float: left;
+    margin: 4px 6px 4px 0;
+    transform: rotate(90deg);
+    transition: linear 0.25s transform;
+    cursor: pointer;
+    &.q-collapsed {
+      transform: rotate(0);
+    }
+  }
+
+  .q-arrow-icon {
+    &::before {
+      content: "▶";
+    }
+  }
+
+  .q-switch-label,
+  .q-button {
+    float: left;
+    margin-bottom: 0;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: normal;
+    text-align: center;
+    text-shadow: none;
+    border: 1px solid $secondary;
+    box-sizing: border-box;
+
+    &:hover {
+      cursor: pointer;
+      background-color: $secondary;
+    }
+  }
+
+  .q-switch-label {
+    background-color: $light;
+    padding: 0 5px;
+  }
+
+  .q-switch-radio {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    width: 1px;
+    border: 0;
+    overflow: hidden;
+
+    &:checked + .q-switch-label {
+      border: 1px solid $primary;
+      background: $white;
+      color: $primary;
+    }
+
+    &:disabled + .q-switch-label {
+      display: none;
+    }
+
+    &:checked:disabled + .q-switch-label {
+      display: initial;
+      color: initial;
+      cursor: default;
+      border-color: transparent;
+    }
+  }
+
+  .q-invalid-ruleset {
+    border: 1px solid $danger-300 !important;
+    background: $danger !important;
+  }
+
+  .q-empty-warning {
+    color: $danger;
+    text-align: center;
+  }
+
+  .q-transition {
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -ms-transition: all 0.1s ease-in-out;
+    -o-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
+  }
+
+  .q-tree-container {
+    width: 100%;
+    overflow: hidden;
+    transition: ease-in 0.25s max-height;
+
+    &.q-collapsed {
+      max-height: 0 !important;
+    }
+  }
+
+  .q-tree {
+    list-style: none;
+    margin: 4px 0 2px;
+  }
+
+  .mid-rs-connector {
+    position: relative;
+    &::before {
+      content: "";
+      left: -11px;
+      border-color: $secondary;
+      border-style: dotted;
+      width: 9px;
+      position: absolute;
+      border-width: 0 0 2px 2px;
+      top: 50%;
+    }
+  }
+  .end-rs-connector {
+    position: relative;
+    &::before {
+      content: "";
+      left: -12px;
+      border-color: $secondary;
+      border-style: dotted;
+      width: 9px;
+      height: calc(50% + 0.75rem);
+      position: absolute;
+      top: -0.75rem;
+      border-width: 0 0 2px 2px;
+    }
+  }
+
+  .liq-connector {
+    position: relative;
+    &::after {
+      border-width: 0 0 2px 0;
+      content: "";
+      top: 50%;
+      width: 9px;
+      left: -12px;
+      border-color: $secondary;
+      border-style: dotted;
+      position: absolute;
+    }
+    &::before {
+      border-width: 0 0 2px 2px;
+      content: "";
+      left: -12px;
+      border-color: $secondary;
+      border-style: dotted;
+      height: calc(100% + 0.25rem);
+      position: absolute;
+      top: -0.25rem;
+    }
+
+    &.has-query-builder {
+      border: 1px solid transparent !important;
+      &::after {
+        content: none;
+      }
+    }
+    &:last-child::before {
+      height: calc(50% + 0.25rem);
+      width: 9px;
+      border-width: 0 0 0 2px;
+    }
+    &.last-child-no-query-builder {
+      &::before {
+        content: none;
+      }
+    }
+  }
+  .q-inline-block-display {
+    display: inline-block;
+    vertical-align: top;
+  }
+}
+
+.q-action-icons {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 1px solid $secondary;
+  background: $white;
+  cursor: pointer;
+  color: $primary;
+  outline: none;
+}
+
+.dropdown-item {
+  :active {
+    color: $white;
+  }
+}

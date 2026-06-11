@@ -1,0 +1,160 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white border-bottom-0 p-0 mt-2">
+            </div>
+            <div class="card-body pt-0">
+                <div class="row">
+                    <div class="col-2">
+                        <table-search-box></table-search-box>
+                    </div>
+                    <div class="col-10">
+                        <div class="row justify-content-end">
+                            <div class="col-2 mr-1">
+                                <button class="btn btn-sm bg-primary pull-right" type="button">Create
+                                    Trigger</button>
+                            </div>
+                            <div class="col-2 mr-1">
+                                <select class="form-control form-control-sm" type="text">
+                                    <option [value]="''">Severity</option>
+                                    <option [value]="'notcl'" (click)="filterTemplatesSeverity('notcl')">Not
+                                        Classified</option>
+                                    <option [value]="'info'" (click)="filterTemplatesSeverity('Information')">
+                                        Information
+                                    </option>
+                                    <option [value]="'warning'" (click)="filterTemplatesSeverity('Warning')">Warning
+                                    </option>
+                                    <option [value]="'avg'" (click)="filterTemplatesSeverity('Average')">Average
+                                    </option>
+                                    <option [value]="'high'" (click)="filterTemplatesSeverity('High')">High</option>
+                                    <option [value]="'disaster'" (click)="filterTemplatesSeverity('Disaster')">Disaster
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control form-control-sm" type="text">
+                                    <option [value]="''">Status</option>
+                                    <option [value]="'enabled'" (click)="filterTemplates('enabled')">Enabled</option>
+                                    <option [value]="'disabled'" (click)="filterTemplates('disabled')">Disabled</option>
+                                </select>
+                            </div>
+                            <div class="mx-2">
+                                <table-page-size class="float-left ml-1" [currentPageSize]="currentCriteria.pageSize"
+                                    [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table text-left">
+                    <thead class="bg-light">
+                        <tr setTableColumnWidth>
+                            <th>Name</th>
+                            <th>Severity</th>
+                            <th>Expression</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of viewData; let i = index" setTableColumnWidth>
+                            <td class="text-primary">
+                                {{view.name}}
+                            </td>
+
+                            <td [ngClass]="decideSeverityColor(view.severity)">
+                                {{view.severity}}
+                            </td>
+                            <td>
+                                <span class="text-truncate">
+                                    {{view.expression}}
+                                </span>
+
+                            </td>
+                            <td>
+                                <div class="d-inline-block">
+                                    <div class="btn-group rounded-pill border" style="border-radius: 50px;">
+                                        <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0"
+                                            type="button" (click)="toggle(view.triggerId, 'enabled')"
+                                            [ngClass]=" view.status==='enabled'? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                                            Enable
+                                        </button>
+                                        <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0"
+                                            type="button" (click)="toggle(view.triggerId, 'disabled')"
+                                            [ngClass]="view.status=='disabled' ? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                                            Disable
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="action-icons-column">
+                                <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                                    [ngClass]="{'action-icons-disabled':view.isDefault}"></button>
+                                <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                    [ngClass]="{'action-icons-disabled':view.isDefault}"
+                                    (click)="deletePanelDevice(view)"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p *ngIf="viewData.length==0" class="text-center">No records to display</p>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #create>
+    <div class="card mb-0">
+        <div class="card-header">
+            Add Trigger
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="form-group">
+                    <label class="form-col-form-label">Name <em>*</em></label>
+                    <input type="text" class="form-control form-control-sm" placeholder="Enter Name" />
+                </div>
+                <div class="form-group">
+                    <label for="" class="form-col-form-label">Severity <em>*</em></label>
+                    <select name="" id="" class="form-control form-control-sm">
+                        <option value="">Select</option>
+                        <option value="">Critical</option>
+                        <option value="">Warning</option>
+                        <option value="">Info</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="" class="form-col-form-label">Expression <em>*</em></label>
+                    <input type="text" class="form-control form-control-sm" placeholder="Enter Expression" />
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-sm btn-primary pull-right ml-2 w-15">Create</button>
+            <button type="button" class="btn btn-sm btn-outline-danger pull-right w-15"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="delModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,106 @@
+.card-body {
+    padding: 0px;
+    margin: 0px;
+}
+
+.card-header {
+    padding: 0px;
+    margin: 0px;
+    border-bottom: 1px solid #d5dade;
+    font-size: 17px;
+}
+
+.bordered-container {
+    border: 1px solid #d5dade;
+    border-radius: 5px;
+    padding: 20px;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.corner-text-container {
+    position: absolute;
+    top: -15px;
+    left: 20x;
+    padding: 5px 10px;
+    background-color: white;
+}
+
+.corner-text {
+    font-size: 14px;
+}
+
+.basic-details {
+    max-width: 40%;
+}
+
+.basic-details:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.info-style {
+    border-radius: 51%;
+    padding: 7px 12px;
+    border: 1px solid #d5dade;
+}
+
+.authentication-button {
+    padding-left: 0px;
+}
+
+ul {
+    list-style: none;
+}
+
+ul li {
+    text-align: center;
+    background: #f0f3f5;
+    cursor: pointer;
+    transition: all .2s ease;
+    border: 1px solid #c8ced3;
+}
+
+ul li:first-child {
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+    border-right: none !important;
+}
+
+ul li:last-child {
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    border-left: none !important;
+}
+
+ul li label {
+    border-radius: 25px;
+    width: 100%;
+    padding: 6px 14px;
+    display: inherit;
+    color: #73818f;
+    border-color: #73818f;
+    font-size: .765625rem;
+    line-height: 1.5;
+}
+
+.toggle-radio {
+    display: none;
+}
+
+.toggle-label {
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 0;
+}
+
+
+#enable:checked+.toggle-label {
+    background-color: #378ad8;
+    color: white;
+}
+
+#disable:checked+.toggle-label {
+    background-color: #378ad8;
+    color: white;
+}

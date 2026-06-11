@@ -2504,7 +2504,7 @@ export class UnifiedAiopsCommandCentreService {
       const flat = this.flattenPayload(item || {});
       const totalSourceEvents = this.getNumberFromPayload(flat, ['count', 'events', 'value']);
 
-      // Try severity fields — support multiple naming conventions from API
+      // Try severity fields  support multiple naming conventions from API
       const criticalCount = this.getNumberFromPayload(flat, ['critical', 'critical_events', 'criticalEvents', 'severity_critical']);
       const warningCount = this.getNumberFromPayload(flat, ['warning', 'warning_events', 'warningEvents', 'severity_warning']);
       const infoCount = this.getNumberFromPayload(flat, [
@@ -2513,7 +2513,7 @@ export class UnifiedAiopsCommandCentreService {
       const hasSeverity = criticalCount > 0 || warningCount > 0 || infoCount > 0;
 
       if (hasSeverity) {
-        // Scenario A: severity data present — 3 tiles per source (Critical, Warning, Info)
+        // Scenario A: severity data present  3 tiles per source (Critical, Warning, Info)
         const severityTotal = Math.max(criticalCount + warningCount + infoCount, 1);
         const clampedGroup = Math.min(Math.max(severityTotal, minGroupValue), maxGroupValue);
 
@@ -2537,7 +2537,7 @@ export class UnifiedAiopsCommandCentreService {
           links.push({ source: nodeName, target: 'Events', value: tileValue, lineStyle: { color, opacity: 0.35 } });
         });
       } else {
-        // Scenario B: no severity data — single node per source, gradient flow
+        // Scenario B: no severity data  single node per source, gradient flow
         const clampedValue = Math.min(Math.max(totalSourceEvents, minGroupValue), maxGroupValue);
         nodeTotals[sourceName] = totalSourceEvents;
         links.push({ source: sourceName, target: 'Events', value: clampedValue });

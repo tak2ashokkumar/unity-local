@@ -98,7 +98,8 @@ export class DatabaseDashboardService {
     // return this.databaseServersService.getAllDBServers(criteria).pipe(
     //   map(databases => this.getDatabaseFilterOptions(databases))
     // );
-    return this.http.get<any>('/customer/database_servers_fast/');
+    
+    return this.http.get<DatabaseDashboardFilterOption[]>('/customer/database_servers_fast/');
   }
 
   // getFallbackDatabases(): DatabaseDashboardFilterOption[] {
@@ -117,7 +118,7 @@ export class DatabaseDashboardService {
   //       options.set(value, { value, label });
   //     }
   //   });
-    
+
   //   console.log("database options, ", JSON.parse(JSON.stringify(options)));
 
   //   return options.size ? Array.from(options.values()) : []
@@ -125,7 +126,7 @@ export class DatabaseDashboardService {
   // }
 
   private convertFiltersToApiParams(criteria?: DatabaseDashboardFilterCriteria, sortColumn?: string, sortDirection?: string): HttpParams {
-    console.log("criteria", JSON.parse(JSON.stringify(criteria)), sortColumn, sortDirection);
+    // console.log("criteria", JSON.parse(JSON.stringify(criteria)), sortColumn, sortDirection);
     let params: HttpParams = new HttpParams();
     params = this.appendMultiValueParam(params, 'database', criteria?.databases);
     if (sortColumn) {
@@ -134,7 +135,7 @@ export class DatabaseDashboardService {
     if (sortDirection) {
       params = params.append('sort_order', sortDirection);
     }
-    console.log("params", JSON.parse(JSON.stringify(params)));
+    // console.log("params", JSON.parse(JSON.stringify(params)));
     return params;
   }
 
@@ -462,24 +463,24 @@ export class DatabaseDashboardService {
       let view = new DatabaseDashboardTop10UtilizationViewData();
       view.hostUUID = row.host_uuid ? row.host_uuid : null;
       view.dbUUID = row.db_uuid ? row.db_uuid : null;
-      view.name = row.name;
+      view.name = row.name ? row.name : "N/A";
 
-      view.cpuChartOptions = this.getSparklineOptions(row.cpu_trend, '#5d8df5', 'rgba(93, 141, 245, 0.28)'),
-      view.cpuUtilizationPercent = Number(row.cpu_usage_system_percent.toFixed(0));
-      view.cpuTone = this.getToneType(row.cpu_usage_system_percent);
+      view.cpuChartOptions = this.getSparklineOptions(row.cpu_trend ? row.cpu_trend : [], '#5d8df5', 'rgba(93, 141, 245, 0.28)');
+      view.cpuUtilizationPercent = Number(row.cpu_usage_system_percent ? row.cpu_usage_system_percent.toFixed(0) : 0);
+      view.cpuTone = this.getToneType(view.cpuUtilizationPercent);
 
-      view.memoryChartOptions = this.getSparklineOptions(row.memory_trend, '#6aa544', 'rgba(106, 165, 68, 0.28)'),
-      view.memoryUtilizationPercent = Number(row.memory_used_percent.toFixed(0));
-      view.memoryTone = this.getToneType(row.memory_used_percent);
+      view.memoryChartOptions = this.getSparklineOptions(row.memory_trend ? row.memory_trend : [], '#6aa544', 'rgba(106, 165, 68, 0.28)');
+      view.memoryUtilizationPercent = Number(row.memory_used_percent ? row.memory_used_percent.toFixed(0) : 0);
+      view.memoryTone = this.getToneType(view.memoryUtilizationPercent);
 
-      view.diskCapacityGB = row.disk_capacity;
-      view.diskUsedGB = row.disk_used;
-      view.diskFreePercent = Number(row.disk_usage_percent.toFixed(0));
-      view.diskUsedPercent = Math.ceil(100 - row.disk_usage_percent);
+      view.diskCapacityGB = Number(row.disk_capacity ? row.disk_capacity : 0);
+      view.diskUsedGB = Number(row.disk_used ? row.disk_used : 0);
+      view.diskUsedPercent = Number(row.disk_usage_percent ? row.disk_usage_percent.toFixed(0) : 0);
+      view.diskFreePercent = Math.ceil(100 - view.diskUsedPercent);
       view.diskTone = this.getToneType(view.diskUsedPercent);
 
-      view.diskRops = Number(row.disk_read_ops.toFixed(0));
-      view.diskWops = Number(row.disk_read_ops.toFixed(0));
+      view.diskRops = Number(row.disk_read_ops ? row.disk_read_ops : 0);
+      view.diskWops = Number(row.disk_write_ops ? row.disk_write_ops : 0);
       const diskIops = view.diskRops + view.diskWops;
       view.diskIops = Number(diskIops.toFixed(0));
       view.diskIopsPercent = diskIopsTotal ? Math.round((diskIops / diskIopsTotal) * 100) : 0;
@@ -511,7 +512,7 @@ export class DatabaseDashboardService {
       },
       series: [
         {
-          type: 'line',        
+          type: 'line',
           data: data.map(item => item.value),
           symbol: 'none',
           smooth: false,
@@ -814,15 +815,15 @@ export class DatabaseDashboardService {
   }
 
   private getProgressBarColor(value: number): string {
-    return value < 30 ? '#639922' : value >= 30 && value < 55 ? '#378ADD' : value >= 55 && value < 85 ? '#EF9F27' : '#E24B4A';
+    return value < 20 ? '#639922' : value > 20 && value < 50 ? '#378ADD' : value > 50 && value < 80 ? '#EF9F27' : '#E24B4A';
   }
 
   private getProgressBarInverseColor(value: number): string {
-    return value < 20 ? '#E24B4A' : value >= 20 && value < 50 ? '#EF9F27' : value >= 50 && value < 85 ? '#378ADD' : '#639922';
+    return value < 20 ? '#E24B4A' : value > 20 && value < 50 ? '#EF9F27' : value > 50 && value < 80 ? '#378ADD' : '#639922';
   }
 
   private getToneType(value: number): string {
-    return value < 65 ? 'success' : value >= 65 && value < 85 ? 'warning' : 'danger';
+    return value < 50 ? 'success' : value > 50 && value < 80 ? 'warning' : 'danger';
   }
 
   private getHorizontalProgressBarOptions(items: DatabaseDashboardBarItem[], reverseColors: boolean = false): EChartsOption {

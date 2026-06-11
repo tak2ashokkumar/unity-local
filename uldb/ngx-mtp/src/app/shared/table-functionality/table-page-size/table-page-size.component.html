@@ -1,0 +1,12 @@
+<div class="pull-right">
+  <label for="table-page-size" class="mr-2 mt-1 mb-0">Show</label>
+  <select id="table-page-size" name="table-page-size" class="d-inline-block form-control form-control-sm" [ngModel]="currentPageSize"
+    (ngModelChange)="onChange($event)">
+    <option [value]="'10'">10</option>
+    <option [value]="'25'">25</option>
+    <option *ngIf="isLargeSize" [value]="'50'">50</option>
+    <option *ngIf="isLargeSize" [value]="'100'">100</option>
+    <option *ngIf="isLargeSize" [value]="'500'">500</option>
+    <!-- <option [value]="'all'">All</option> -->
+  </select>
+</div>

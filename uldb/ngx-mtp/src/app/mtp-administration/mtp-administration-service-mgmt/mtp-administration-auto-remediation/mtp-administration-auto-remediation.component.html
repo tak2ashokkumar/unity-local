@@ -1,0 +1,145 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white py-2 mr-1">
+                <div class="row">
+                    <div class="col">
+                        <span
+                            class="badge bg-secondary user-count font-weight-bold ml-2 mr-1 mt-1 rounded-3 p-2 ">{{count}}</span>
+                        <span class="ml-1 h5">Auto Remediation</span>
+                    </div>
+                    <div class="col-0 pull-right">
+                        <data-refresh-btn [page]="currentCriteria.pageNo"
+                            (refresh)="refreshData($event)"></data-refresh-btn>
+                        <button class="btn btn-sm btn-primary mr-1" *ngIf="(manageButton || selectedItems.length>0)"
+                            (click)="manageStatus()" accessControl moduleName="Service Management" accessType="write"
+                            elementType="btn">Manage</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-2">
+                        <table-search-box (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div class="col-10">
+                        <div class="row justify-content-end">
+                            <div class="col-2">
+                                <select class="form-control form-control-sm" type="text"
+                                    [(ngModel)]="currentCriteria.params[0].remediation_status"
+                                    (ngModelChange)="onFilterChange()">
+                                    <option [value]="''" disabled>Select Status</option>
+                                    <option [value]="'enable'">Enabled</option>
+                                    <option [value]="'disable'">Disabled</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                        [options]="tenants" [settings]="tenantListSettings"
+                                        [(ngModel)]="currentCriteria.multiValueParam.uuid"
+                                        [texts]="tenantSelectionTexts"
+                                        (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="mx-2">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th scope="col" style="font-size:1rem;" (click)="$event.stopPropagation();bulkSelect()">
+                                <span class=" ml-2 text-primary" *ngIf="viewData.length" accessControl
+                                    moduleName="Service Management" accessType="write" elementType="btn">
+                                    <i class="far" [ngClass]="bulkSelection? 'fa-check-square':'fa-square'"></i>
+                                </span>
+                            </th>
+                            <th>Tenant</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr setTableColumnWidth *ngFor="let view of viewData; let i= index;">
+                            <td class="w-3" (click)="$event.stopPropagation()" style="font-size:1rem;">
+                                <span class=" ml-2 text-primary" accessControl moduleName="Service Management"
+                                    accessType="write" elementType="btn">
+                                    <i class="far" [ngClass]="view.itemSelected? 'fa-check-square':'fa-square'"
+                                        (click)="selectItems(view)"></i>
+                                </span>
+                            </td>
+
+                            <td>{{view.organizationName}}</td>
+                            <td>
+                                <div class="d-inline-block" accessControl moduleName="Service Management"
+                                    accessType="write" elementType="div">
+                                    <div class="btn-group rounded-pill border" style="border-radius: 50px;">
+                                        <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0"
+                                            type="button" (click)="switchCategoryStatus(view)"
+                                            [ngClass]=" view.autoRemediationEnabled? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                                            Enable
+                                        </button>
+                                        <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0"
+                                            type="button" (click)="switchCategoryStatus(view)"
+                                            [ngClass]="!view.autoRemediationEnabled ? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                                            Disable
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count">
+                </table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-5" *ngIf="!viewData.length">No records to display</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #manage>
+    <div class="card mb-0">
+        <div class="card-header">
+            Manage Status
+            <div class="card-header-actions">
+                <a class="card-header-action" (click)="modalRef.hide()">
+                    <l class="fas fa-times"></l>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class=" form-group col-4 ">
+                    <label for="" class="form-col-form-label text-muted ">Status <em>*</em> :</label>
+                    <div class="d-inline-block">
+                        <div class="btn-group rounded-pill border" style="border-radius: 50px;">
+                            <button class="btn btn-pill btn-sm rounded-pill border-0" type="button"
+                                [ngClass]=" bulkautoRemediation? 'active btn-outline-primary' : 'btn-outline-secondary' "
+                                (click)="bulktoggleAutoRemediation(true)">
+                                Enable
+                            </button>
+                            <button class="btn btn-pill btn-sm rounded-pill border-0" type="button"
+                                [ngClass]=" !bulkautoRemediation? 'active btn-outline-primary' : 'btn-outline-secondary' "
+                                (click)="bulktoggleAutoRemediation(false)">
+                                Disable
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-outline-danger ml-2 pull-right w-15" (click)="modalRef.hide()">Cancel</button>
+            <button class="btn btn-sm btn-primary pull-right w-15" (click)="toggleAutoRemiApply()">Apply</button>
+        </div>
+    </div>
+</ng-template>

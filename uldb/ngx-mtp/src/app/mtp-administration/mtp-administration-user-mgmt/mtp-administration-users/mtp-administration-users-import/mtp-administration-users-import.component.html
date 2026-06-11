@@ -1,0 +1,53 @@
+<div class="card round-edge">
+    <div class="card-header bg-white p-1 pr-3 mt-1">
+        <span class="badge bg-secondary user-count font-weight-bold ml-3 mb-1 rounded-3">{{viewData.length}}</span>
+        <span class="ml-2 font-weight-bold">Users</span>
+        <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+        <button class="btn btn-pill btn-warning pull-right btn-sm mb-1" tooltip="Back" (click)="goBack()"><i
+                class="fa fa-arrow-left"></i></button>
+    </div>
+    <div class="card-body pt-0">
+        <div class="row my-2 justify-content-end">
+            <div class="col-3">
+                <select class="form-control form-control-sm" type="text" [(ngModel)]="selectedAccount"
+                    (ngModelChange)="getUsers(selectedAccount)">
+                    <option [value]="''" disabled>Select Account</option>
+                    <option *ngFor="let account of accounts" [value]="account.uuid">{{account.client_id}}</option>
+                </select>
+            </div>
+        </div>
+        <table class="table text-left">
+            <thead class="bg-light">
+                <tr>
+                    <th *ngIf="viewData.length" scope="col" style="font-size:1rem;"
+                        (click)="$event.stopPropagation();selectAll()">
+                        <span class=" ml-2 bg-white text-primary">
+                            <i class="far" [ngClass]="selectedAll? 'fa-check-square':'fa-square'"></i>
+                        </span>
+                    </th>
+                    <th>Email ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of viewData; let i = index" setTableColumnWidth>
+                    <td class="w-3" (click)="$event.stopPropagation();select(view);" style="font-size:1rem;">
+                        <span class=" ml-2 bg-white text-primary">
+                            <i class="far" [ngClass]="view.isSelected? 'fa-check-square':'fa-square'"></i>
+                        </span>
+                    </td>
+                    <td>{{view.email}}</td>
+                    <td>{{view.firstName}}</td>
+                    <td>{{view.lastName}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div *ngIf="!viewData.length" class="d-flex py-5 justify-content-center align-items-center">
+            No users available.
+        </div>
+    </div>
+    <div *ngIf="selectedUsers.length" class="card-footer bg-white border-top-0 d-flex justify-content-center pt-0 mb-3">
+        <button class="btn btn-primary" type="button" (click)="confirmImport()">Submit</button>
+    </div>
+</div>

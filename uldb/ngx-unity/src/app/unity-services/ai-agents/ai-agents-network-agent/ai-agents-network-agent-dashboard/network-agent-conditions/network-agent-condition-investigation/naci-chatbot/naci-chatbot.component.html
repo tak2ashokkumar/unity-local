@@ -10,7 +10,7 @@
     </div>
     <div class="card-body card-body-custom d-flex flex-column p-0">
         <div class="custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top">
-            <div #messagesContainer class="messages-container d-flex flex-column">
+            <div #messagesContainer class="messages-container d-flex flex-column" (scroll)="onScroll()">
                 <div class="d-flex flex-column w-100" style="max-width: 100%;">
                     <div *ngFor="let chat of chatHistoryData;let i = index" class="d-flex flex-column w-100"
                         style="max-width: 100%;">

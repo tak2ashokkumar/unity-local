@@ -1,0 +1,175 @@
+<div class="card">
+    <div class="card-header bg-white py-2">
+        <span *ngIf="isView">View</span>
+        <span *ngIf="ruleId && !isView">Edit</span>
+        <span *ngIf="!ruleId">Add</span> Rule
+        <button class="btn btn-square btn-sm btn-link text-warning text-decoration-none pull-right py-0" (click)="goBack()"><i
+                class="fa fa-arrow-left">&nbsp;</i>
+            To Suppression Rules</button>
+        <button class="btn btn-sm btn-warning btn-pill mr-2 pull-right" type="button" *ngIf="isView">Edit Rule</button>
+    </div>
+    <div class="card-body">
+        <form *ngIf="form" [formGroup]="form">
+            <div class="row">
+                <div class="form-group">
+                    <div class="invalid-feedback" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="name">Rule Name</label>
+                        <input class="form-control" id="name" type="text" placeholder="Rule 1" formControlName="name"
+                            [ngClass]="{'is-invalid' : formErrors.name}">
+                        <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.row-->
+            <table class="table mb-0" formArrayName="conditions">
+                <tr>
+                    <td class="border-0 p-0">&nbsp;</td>
+                    <td class="border-0 p-0">
+                        <div class="row">
+                            <div class="form-group col-2 mb-2">
+                                <label class="pl-2 mb-0">Attribute</label>
+                            </div>
+                            <div class="form-group col-2 mb-2">
+                                <label class="mb-0 pl-2">Operator</label>
+                            </div>
+                            <div class="form-group col-4 mb-2">
+                                <label class="mb-0 pl-2">Keyword</label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <ng-container *ngFor="let condition of conditions.controls; let i = index; let first = first; let last = last;">
+                    <tr [formGroupName]="i">
+                        <td class="border-0 w-10">Condition {{i + 1}}<em>*</em></td>
+                        <td class="border-0 p-0">
+                            <div class="row">
+                                <div class="form-group col-2">
+                                    <select class="form-control" id="attribute-{{i}}" formControlName="attribute"
+                                        [class.is-invalid]="formErrors.conditions[i].attribute">
+                                        <option [value]="''" disabled>Select Attribute</option>
+                                        <!-- <option [value]="'name'">Name</option>
+                                        <option>IP</option>
+                                        <option>Description</option>
+                                        <option>Severity</option>
+                                        <option>Source</option>
+                                        <option>Category</option> -->
+                                        <option *ngFor="let conditionData of conditionDropdownData" [value]="conditionData.key">{{conditionData.attribute}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.conditions[i].attribute">
+                                        {{formErrors.conditions[i].attribute}}</div>
+                                </div>
+                                <div class="form-group col-2">
+                                    <select class="form-control" id="operator-{{i}}" formControlName="operator"
+                                        [class.is-invalid]="formErrors.conditions[i].operator">
+                                        <option [value]="''" disabled>Select Operator</option>
+                                        <!-- <option>is</option>
+                                        <option>contains</option> -->
+                                        <option *ngFor="let opr of condition.controls.operatorOptions.value" [value]="opr.operator">{{opr.operator}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.conditions[i].operator">
+                                        {{formErrors.conditions[i].operator}}</div>
+                                </div>
+                                <div class="form-group col-5">
+                                    <select *ngIf="condition.controls.valueType.value == 'select'" class="form-control"
+                                        id="value-{{i}}" formControlName="value" [class.is-invalid]="formErrors.conditions[i].value">
+                                        <option [value]="''" disabled>Select Keywords</option>
+                                        <option *ngFor="let opt of condition.controls.valueOptions.value" [value]="opt">{{opt}}</option>
+                                    </select>
+                                    <multiselect-dropdown *ngIf="condition.controls.valueType.value == 'multi-select'"
+                                        id="value-{{i}}" [settings]="valueFieldSettings" [options]="condition.controls.valueOptions.value"
+                                        class="form-control p-0" style="height:auto;" formControlName="value"
+                                        [class.is-invalid]="formErrors.conditions[i].value"></multiselect-dropdown>
+                                    <input *ngIf="condition.controls.valueType.value == 'text' || condition.controls.valueType.value == 'single-text'"
+                                        class="form-control" id="value-{{i}}" type="text" placeholder="Enter keyword"
+                                        formControlName="value" [class.is-invalid]="formErrors.conditions[i].value">
+                                    <input *ngIf="condition.controls.valueType.value == 'multi-text'" class="form-control"
+                                        id="value-{{i}}" type="text" placeholder="Enter keywords (comma separated)"
+                                        formControlName="value" [class.is-invalid]="formErrors.conditions[i].value">
+                                    <!-- <input class="form-control" id="value-{{i}}" type="text" [placeholder]="getPlaceholder(i)"
+                                        formControlName="value" [class.is-invalid]="formErrors.conditions[i].value"> -->
+                                    <div class="invalid-feedback" *ngIf="formErrors.conditions[i].value">
+                                        {{formErrors.conditions[i].value}}</div>
+                                </div>
+                                <div class="form-group col-2" *ngIf="condition.controls.expression">
+                                    <select class="form-control" id="expression-{{i}}" formControlName="expression">
+                                        <option [value]="'AND'">AND</option>
+                                        <option [value]="'OR'">OR</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col">
+                                    <span class="form-control border-0 p-0">
+                                        <button tooltip="Remove Condition" *ngIf="conditions.controls.length > 1" class="action-icons mb-0 fas fa-minus font-sm ml-1"
+                                            (click)="removeCondition(i)"></button>
+                                        <button tooltip="Add Condition" *ngIf="last" class="action-icons mb-0 fas fa-plus font-sm ml-1"
+                                            (click)="addConditions(i)"></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </table>
+
+            <div class="row">
+                <div class="col">
+                    <textarea class="form-control" rows="6" id="textarea-input" name="textarea-input" placeholder="Content.."
+                        formControlName="description" readonly></textarea>
+                </div>
+            </div>
+
+            <!-- <div class="row mt-3">
+                <div class="form-group col-2">olp
+                    <label>&nbsp;</label>
+                    <div class="form-check checkbox"><input id="timeline" type="checkbox" class="form-check-input mt-0"
+                            style="width: 20px;height: 20px;" formControlName="timeline">
+                        <label for="timeline" class="form-check-label ml-2">Timeline</label>
+                    </div>
+                </div>
+                <div class="form-group col-4" *ngIf="this.form.get('timeline').value">
+                    <label for="start_date" class="form-col-form-label">Schedule Date Time<em>*</em></label>
+                    <div class="input-group">
+                        <owl-date-time #start_date [hour12Timer]="true"></owl-date-time>
+                        <input class="form-control rounded-left" name="start_date" formControlName="start_date"
+                            [owlDateTimeTrigger]="start_date" [owlDateTime]="start_date" type="text"
+                            [ngClass]="{'is-invalid' : formErrors.start_date}">
+                        <div class="input-group-append " [owlDateTimeTrigger]="start_date">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback" *ngIf="formErrors.start_date">{{formErrors.start_date}}</div>
+                </div>
+                <div class="form-group col-4" *ngIf="this.form.get('timeline').value">
+                    <label class="form-col-form-label" for="end_date">End Date Time<em>*</em></label>
+                    <div class="input-group">
+                        <owl-date-time #end_date [hour12Timer]="true"></owl-date-time>
+                        <input class="form-control rounded-left" name="end_date" formControlName="end_date"
+                            [owlDateTimeTrigger]="end_date" [owlDateTime]="end_date" type="text"
+                            [ngClass]="{'is-invalid' : formErrors.end_date}">
+                        <div class="input-group-append " [owlDateTimeTrigger]="end_date">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback" *ngIf="formErrors.end_date">{{formErrors.end_date}}</div>
+                </div>
+                <div class="form-group col-12">
+                    <div class="invalid-feedback d-block" *ngIf="formErrors.fromAfterTo">Start date cannot be
+                        after end date</div>
+                </div>
+            </div> -->
+        </form>
+    </div>
+    <div class="card-footer d-flex justify-content-center bg-white border-top-0 mt-4 pb-5 mb-5" *ngIf="!isView">
+        <button class="btn btn-sm btn-primary mr-2" type="button" (click)="onSubmit()" *ngIf="!ruleId">Create</button>
+        <button class="btn btn-sm btn-primary mr-2" type="button" (click)="onSubmit()" *ngIf="ruleId">Update</button>
+        <button class="btn btn-sm btn-outline-danger" type="button" (click)="reset()">Reset</button>
+    </div>
+</div>

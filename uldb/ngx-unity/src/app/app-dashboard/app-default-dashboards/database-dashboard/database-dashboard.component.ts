@@ -41,6 +41,7 @@ import moment from 'moment';
 })
 export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
+  private appliedDatabaseFilterKey: string = '';
   refreshedText: string = '';
   filterForm: FormGroup;
   databaseOptions: DatabaseDashboardFilterOption[] = [];
@@ -117,7 +118,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   multiselectSettings: IMultiSelectSettings = {
     isSimpleArray: false,
     lableToDisplay: 'name',
-    // enableSearch: false,
+    enableSearch: false,
     checkedStyle: 'fontawesome',
     buttonClasses: 'btn btn-default btn-sm btn-block shadow-none',
     dynamicTitleMaxItems: 2,
@@ -141,6 +142,13 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   sortColumn: string = 'cpu_usage_system_percent';
   sortDirection: string = 'asc';
+  utilizationSortOptions = [
+    { label: 'CPU', value: 'cpu_usage_system_percent' },
+    { label: 'Memory', value: 'memory_used_percent' },
+    { label: 'Disk', value: 'disk_usage_percent' },
+    { label: 'Disk IOPS', value: 'disk_iops' },
+    { label: 'Up Time', value: 'system_uptime_seconds' }
+  ];
 
   constructor(private svc: DatabaseDashboardService,
     private router: Router,
@@ -164,22 +172,24 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   /** Loads database options first, then creates the filter form and starts widget loading. */
   loadHeaderInfo() {
     this.svc.getHeaderInfo().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      console.log("header info, ", JSON.parse(JSON.stringify(res)));
       this.refreshedText = this.convertLastRefreshTime(res?.refresh_time);
     }, () => {
       this.refreshedText = this.convertLastRefreshTime();
     });
   }
 
-  // /** Applies the current filter form output to every database dashboard widget request. */
-  // applyFilters() {
-  //   this.loadData();
-  // }
+  /** Applies selected database filters to every database dashboard widget request. */
+  applyFilters() {
+    const selectedDatabaseKey = this.getSelectedValues('databases').join('|');
+    if (selectedDatabaseKey === this.appliedDatabaseFilterKey) {
+      return;
+    }
+    this.loadData();
+  }
 
   /** Reloads database filter options and rebuilds the dashboard after the filter form is ready. */
   refreshData() {
     this.loadFilterOptionsAndDashboard();
-    setTimeout(() => this.loadData(), 0);
   }
 
   // /** Reloads all filter options and recreates the filter form only after database data is ready. */
@@ -192,13 +202,11 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     this.resetFilterState();
     // this.refreshedText = this.getCurrentRefreshedText();
     this.svc.getDatabases().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      console.log("getDatabases res, ", JSON.parse(JSON.stringify(res)));
       this.databaseOptions = res || [];
       this.buildFilterForm();
       this.loadData();
     }, () => {
       this.databaseOptions = [];
-      console.log("getFallbackDatabases res, ", JSON.parse(JSON.stringify(this.databaseOptions)));
       this.buildFilterForm();
       this.loadData();
     });
@@ -206,13 +214,15 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   /** Creates the filter form with all currently loaded database options selected by default. */
   private buildFilterForm() {
-    this.filterForm = this.svc.buildFilterForm(this.databaseOptions);
+    const selectedDatabases = this.databaseOptions.slice();
+    this.filterForm = this.svc.buildFilterForm(selectedDatabases);
   }
 
   /** Clears existing filter form/options so a fresh filter loading sequence can run. */
   private resetFilterState() {
     this.filterForm = null;
     this.databaseOptions = [];
+    this.appliedDatabaseFilterKey = '';
   }
 
   /** Reads selected option values from a filter form control. */
@@ -263,7 +273,6 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   }
 
   onSorted($event: SearchCriteria) {
-    console.log('sort clicked', $event)
     this.sortColumn = $event.sortColumn;
     this.sortDirection = $event.sortDirection;
     this.getWorkloadInsightsTop10UtilData(this.getFilterFormOutput());
@@ -275,6 +284,16 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   isSortedColumn(columnName: string): boolean {
     return !!this.getSortDirection(columnName);
+  }
+
+  onUtilizationSortChange(sortColumn: string): void {
+    if (!sortColumn || sortColumn === this.sortColumn) {
+      return;
+    }
+
+    this.sortColumn = sortColumn;
+    this.sortDirection = this.sortDirection || 'asc';
+    this.getWorkloadInsightsTop10UtilData(this.getFilterFormOutput());
   }
 
   private convertLastRefreshTime(refreshTime?: string): string {
@@ -301,6 +320,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     //   return;
     // }
     const filterFormOutput = this.getFilterFormOutput();
+    this.appliedDatabaseFilterKey = filterFormOutput.databases.join('|');
     setTimeout(() => {
       this.getInventoryOverviewWidgetData(filterFormOutput);
       this.getWorkloadInsightsTop10UtilData(filterFormOutput);
@@ -566,14 +586,12 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   onTop10QueryRespChartInit(chartInstance: any) {
     this.bindChartClick(chartInstance, params => {
-      console.log("params, ",params)
       this.openRouteInNewTab(`/unitycloud/devices/databases/${params.data.db_uuid}/details`);
     });
   }
 
   onGrowthInsightsChartInit(chartInstance: any) {
     this.bindChartClick(chartInstance, params => {
-      console.log("params, ",params)
       this.openRouteInNewTab(`/unitycloud/devices/databases/${params.data.db_uuid}/details`);
     });
   }

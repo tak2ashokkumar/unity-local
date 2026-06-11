@@ -1,0 +1,153 @@
+<div class="card">
+    <div class="card-header bg-transparent">
+        <span class="badge bg-secondary user-count font-weight-bold ml-1 mt-1 rounded-3">{{count}}</span>
+        <span class="ml-2 font-weight-bold">Activity Log</span>
+        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                class="fa fa-arrow-left"></i></button>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-2 pull-left">
+                <table-search-box (searched)="onSearched($event)"></table-search-box>
+            </div>
+            <div class="col-2 ml-auto">
+                <div class="input-group-append " [owlDateTimeTrigger]="from">
+                </div>
+                <owl-date-time #from [hour12Timer]="true" [pickerType]="'calendar'"></owl-date-time>
+                <input class="form-control rounded-left text-center" [owlDateTimeTrigger]="from" [owlDateTime]="from"
+                    type="text" name="from" placeholder="from" [(ngModel)]="logDateRange" [max]="maxDate"
+                    [selectMode]="'range'" (dateTimeInput)="setDates()">
+            </div>
+            <div class="col-0">
+                <a [href]="downloadUrl" class="action-icons fas fa-download pull-right pt-2 pl-2"
+                    tooltip="Download"></a>
+            </div>
+            <div class="col-0 mr-1">
+                <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+            </div>
+            <div class="col-0 mr-3">
+                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+            </div>
+        </div>
+        <table class="table mt-2" *ngIf="viewDataActivity?.length">
+            <thead class="thead-light">
+                <tr>
+                    <th>Entity Type</th>
+                    <th>Entity Name</th>
+                    <th>User </th>
+                    <th>Action</th>
+                    <th>source IP</th>
+                    <th>Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let log of viewDataActivity">
+                    <td>
+                        <div [tooltip]="log.content_type.readable_model_name">
+                            {{log.content_type.readable_model_name}}</div>
+                    </td>
+                    <td>
+                        <div [tooltip]="log.object_repr">{{log.object_repr}}</div>
+                    </td>
+                    <td>
+                        <div [tooltip]="log.actor_email">{{log.actor_email}}</div>
+                    </td>
+                    <td>
+                        <div [tooltip]="log.action">{{log.action}}</div>
+                    </td>
+                    <td>
+                        <div [tooltip]="log.remote_addr">{{log.remote_addr}}</div>
+                    </td>
+                    <td>
+                        <div [tooltip]="log.timestamp">{{log.timestamp}}</div>
+                    </td>
+                    <td class="action-icons-column">
+                        <button class="action-icons mb-0 fa fa fa-info-circle font-sm ml-1" tooltip="Show changes"
+                            (click)="showInfo(log)"></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="count">
+        </table-entries>
+        <table-pager *ngIf="viewDataActivity.length" [pageNo]="currentCriteria.pageNo"
+            [pageSize]="currentCriteria.pageSize" [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted" *ngIf="!viewDataActivity.length">No records to display</div>
+    </div>
+</div>
+
+<ng-template #loginfo>
+    <div class="card mb-0">
+        <div class="card-header p-2">
+            Log details
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td class="h6">ModelName</td>
+                                <td>{{log.content_type.readable_model_name}}</td>
+                            </tr>
+                            <tr>
+                                <td class="h6">User</td>
+                                <td>{{ log.actor_email }}</td>
+                            </tr>
+                            <tr *ngIf="log.hijacker">
+                                <td class="h6">Impersonated By</td>
+                                <td>{{ log.hijacker.email }}</td>
+                            </tr>
+                            <tr>
+                                <td class="h6">Action</td>
+                                <td>{{ log.action }}</td>
+                            </tr>
+                            <tr *ngIf="log.additional_data">
+                                <td class="h6">Additional Actions</td>
+                                <td><span *ngFor="let action of log.additional_data">{{ action }}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="card">
+                        <div class="card-header p-2">
+                            Change Details <span
+                                class="badge badge-pill badge-secondary float-right"><b>{{log.changes_log_keys.length}}</b></span>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th *ngIf="log.action === 'Updated'">Old Value</th>
+                                        <th *ngIf="log.action === 'Updated'">New Value</th>
+                                        <th *ngIf="log.action !== 'Updated'">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let c of log.changes_log | keyvalue" class="text-wrap">
+                                        <td>{{ c.key }}</td>
+                                        <td [tooltip]="c.value[0]" container="body">{{c.value[0]| slice:0:30}}</td>
+                                        <td *ngIf="log.action === 'Updated'" [tooltip]="c.value[1]" container="body">
+                                            {{ c.value[1]| slice:0:30 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <span class="text-left">*Time is in GMT.
+                <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+            </span>
+        </div>
+    </div>
+</ng-template>

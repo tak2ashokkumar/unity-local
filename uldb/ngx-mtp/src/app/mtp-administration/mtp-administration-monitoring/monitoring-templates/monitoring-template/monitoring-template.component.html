@@ -1,0 +1,64 @@
+<div class="row d-flex justify-content-between align-items-center mx-0">
+    <div class="d-flex justify-content-between w-70">
+        <!-- <div class="w-30">
+            <select class="form-control border" type="text" [(ngModel)]="templateId" (change)="goToTemplate()">
+                <option [value]="null" disabled>Select Template</option>
+                <option *ngFor="let template of templates" [value]="template.template_id">{{template.template_name}}
+                </option>
+            </select>
+        </div>
+        <div class="px-2 w-30">
+            <select class="form-control border" type="text" [(ngModel)]="componentId" (change)="goToComponent()">
+                <option [ngValue]="null">Select Component</option>
+                <option *ngFor="let component of components" [value]="component.discovery_rule_id">
+                    {{component.discovery_rule_name}}
+                </option>
+            </select>
+        </div> -->
+        <div class="w-40">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-tab" [ngClass]="isActive('metrics')" type="button" (click)="goTo('metrics')">
+                        <span class="badge badge-light font-xs-sm"
+                            *ngIf="componentId">{{activeComponent?.item_count}}</span>
+                        <span class="badge badge-light font-xs-sm"
+                            *ngIf="!componentId">{{activeTemplate?.template_data?.metrics}}</span>
+                        <span class="ml-1">Metrics</span>
+                    </button>
+                    <button class="btn btn-tab" [ngClass]="isActive('triggers')" type="button"
+                        (click)="goTo('triggers')">
+                        <span class="badge badge-light font-xs-sm"
+                            *ngIf="componentId">{{activeComponent?.trigger_count}}</span>
+                        <span class="badge badge-light font-xs-sm"
+                            *ngIf="!componentId">{{activeTemplate?.template_data?.triggers}}</span>
+                        <span class="ml-1">Triggers</span>
+                    </button>
+                    <button class="btn btn-tab" [ngClass]="isActive('graphs')" type="button" (click)="goTo('graphs')">
+                        <span class="badge badge-light font-xs-sm"
+                            *ngIf="componentId">{{activeComponent?.graph_count}}</span>
+                        <span class="badge badge-light font-xs-sm"
+                            *ngIf="!componentId">{{activeTemplate?.template_data?.graphs}}</span>
+                        <span class="ml-1">Graphs</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="row mx-0 d-flex justify-content-end">
+            <div class="ml-2">
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                    (click)="goBackNavigation()"><i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="ml-2">
+                <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-12">
+        <router-outlet></router-outlet>
+    </div>
+</div>

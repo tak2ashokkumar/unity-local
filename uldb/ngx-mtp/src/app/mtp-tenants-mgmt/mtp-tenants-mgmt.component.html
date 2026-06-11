@@ -1,0 +1,158 @@
+<div class="row">
+    <div class="col-3">
+        <h5 class="text-dark mb-2">Tenants</h5>
+    </div>
+    <div class="col">
+        <button *ngIf="groups.length" class="btn btn-primary btn-sm pull-right mb-2 ml-2" (click)="addTenant()"
+            accessControl moduleName="Tenant Management" accessType="write" elementType="btn">
+            <i class="fas fa-user-plus"></i> &nbsp;Add Tenant </button>
+        <div>
+            <button class="btn btn-primary btn-sm pull-right mb-2"
+                (click)="addGroup();$event.stopPropagation();$event.preventDefault();" [popover]="createGroupRef"
+                [outsideClick]="false" triggers="" [isOpen]="isOpen" accessControl moduleName="Tenant Management"
+                accessType="write" elementType="btn">
+                <i class="fas fa fa-users"></i> &nbsp;Add Group </button>
+        </div>
+    </div>
+</div>
+
+<div class="card" *ngIf="!groups.length">
+    <div class="card-body">
+        <div class="row text-center py-5 mt-2">
+            <div class="col py-5">
+                <div class="clearfix pt-5">
+                    <h2 class="display-5 mr-4">No Tenant Groups Added</h2>
+                    <h4 class="pt-3">You have no tenant groups added yet. Click below to create a group</h4>
+                </div>
+                <div class="error-actions text-white mt-5 pb-5">
+                    <button class="btn btn-primary btn-lg mr-2" type="button" (click)="addGroup(true)" accessControl
+                        moduleName="Tenant Management" accessType="write" elementType="btn">
+                        <i class="fas fa-users"></i> Add Group
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" *ngIf="groups.length">
+    <div class="col-3">
+        <div class="card round-edge">
+            <!-- <div class="card-header bg-white border-bottom-0 py-0">
+                <div class="row">
+                    <div class="col">
+                        <table-search-box class="mx-2 my-0"></table-search-box>
+                    </div>
+                </div>
+            </div> -->
+            <div class="card-body mt-1">
+                <div class="card rouded" *ngFor="let group of groups; let i=index">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center px-2 py-2">
+                        <div class="text-truncate">{{group.name}}</div>
+                        <div class="w-50 d-flex justify-content-end position-relative">
+
+                            <div class="mr-3">
+                                <!-- Show spinner only when tenants are loading -->
+                                <span *ngIf="group.isTenantsLoading">
+                                    <span style="width:100%; display:inline-block"><i
+                                            class="fa fa-spinner fa-2x fa-spin text-primary"></i></span>
+                                </span>
+                            </div>
+
+                            <!-- Show action buttons only when loading is complete -->
+                            <div *ngIf="!group.isTenantsLoading">
+                                <button class="action-icons fas fa-pencil-alt font-sm" tooltip="Edit"
+                                    (click)="editGroup(group)" accessControl moduleName="Tenant Management"
+                                    accessType="write" elementType="btn"></button>
+
+                                <button class="action-icons fas fa-trash-alt font-sm mx-1"
+                                    [ngClass]="{'action-icons-disabled':!group.deleteButtonEnabled}"
+                                    [tooltip]="group.deleteButtonTooltipMessage" (click)="deleteGroup(group)"
+                                    accessControl moduleName="Tenant Management" accessType="write"
+                                    elementType="btn"></button>
+
+                                <button class="action-icons fas fa-angle-down font-sm pull-right mr-2"
+                                    [tooltip]="group.isOpen ? 'Minimize' : 'Expand'" (click)="toggleGroup(i)"
+                                    [attr.aria-expanded]="group.isOpen"></button>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="card-body py-2" [collapse]="!group.isOpen">
+                        <!-- <app-spinner [name]="group.name"></app-spinner> -->
+                        <div class="row">
+                            <div class="col-12 p-0" [ngClass]="l ? 'mb-0' : 'mb-2'"
+                                *ngFor="let tenant of group.tenants; let l=last;">
+                                <button type="button" class="btn btn-block border text-left font-sm py-1"
+                                    [class.custom-bg-blue]="tenant.uuid == selectedTenantId"
+                                    (click)="gotoTenant(tenant.uuid)">
+                                    <div class="d-flex align-items-center">
+                                        <img *ngIf="tenant.logo; else noTenantLogo" class="tenant-logo-thumb mt-1 mr-2"
+                                            [src]="tenant.logo" alt="logo">
+                                        <ng-template #noTenantLogo>
+                                            <span class="tenant-logo-thumb mt-1 mr-1 tenant-logo-placeholder"
+                                                aria-label="No logo">
+                                                <!-- <i class="fa-image fas font-4xl text-gray-200"></i> -->
+                                            </span>
+                                        </ng-template>
+                                        <span class="flex-grow-1">{{tenant.name}}</span>
+                                        <button class="action-icons fas fa-eye font-sm"
+                                            [tooltip]="tenant.is_tenant_active ? 'Manage Tenant': 'Tenant is disabled'"
+                                            [disabled]="tenant.is_tenant_active ? false : true"
+                                            [ngClass]="{'action-icons-disabled':tenant.is_tenant_active ? false : true}"
+                                            (click)="impersonateTenant(tenant)" accessControl moduleName="Impersonation"
+                                            accessType="write" elementType="btn"></button>
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="col-12 text-center py-4" *ngIf="!group.tenants.length">
+                                <span class="font-sm text-muted">No Tenants added.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-9">
+        <router-outlet></router-outlet>
+    </div>
+</div>
+
+<ng-template #createGroupRef>
+    <div class="card mb-0">
+        <div class="card-body">
+            <form *ngIf="form" [formGroup]="form">
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label for="group_name" class="form-col-form-label">Group Name <em>*</em></label>
+                        <input id="group_name" type="text" class="form-control form-control-sm" placeholder="Enter Name"
+                            formControlName="name" [class.is-invalid]="formErrors.name">
+                        <div class="invalid-feedback" *ngIf="formErrors.name">
+                            {{formErrors.name}}
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="col-12 d-flex justify-content-center">
+                <button class="btn btn-sm btn-primary pull-right mr-2" (click)="submit()">Save</button>
+                <button class="btn btn-sm btn-outline-danger pull-right p-1" (click)="cancelGroup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deleteGroupRef>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to delete Tenant group ?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="deleteGroupModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

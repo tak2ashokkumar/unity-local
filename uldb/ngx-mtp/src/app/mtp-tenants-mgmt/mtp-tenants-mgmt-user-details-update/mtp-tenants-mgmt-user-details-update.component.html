@@ -1,0 +1,78 @@
+<div class="row">
+    <div class="col-3">
+        <h5 class="h5 text-dark">Update User Details</h5>
+    </div>
+    <div class="col">
+        <div class="pull-right nav-item">
+            <a class="nav-link py-1 text-right text-warning mb-2" (click)="goBack()">
+                <i class="fa fa-arrow-left">&nbsp;</i>
+                <span> To Tenant Details</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card rounded-edge">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <form *ngIf="form" [formGroup]="form">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">Email <em>*</em></label>
+                            <input type="text" class="form-control forn-control-sm" placeholder="Enter Email"
+                                formControlName="email" [ngClass]="{'is-invalid' : formErrors.email}">
+                            <div class="invalid-feedback" *ngIf="formErrors.email">
+                                {{formErrors.email}}</div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">First Name <em>*</em></label>
+                            <input type="text" class="form-control forn-control-sm" placeholder="Enter First Name"
+                                formControlName="first_name" [ngClass]="{'is-invalid' : formErrors.first_name}">
+                            <div class="invalid-feedback" *ngIf="formErrors.first_name">
+                                {{formErrors.first_name}}</div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="last_name" class="form-col-form-label">Last Name <em>*</em></label>
+                            <input type="text" class="form-control forn-control-sm" placeholder="Enter Last Name"
+                                formControlName="last_name" [ngClass]="{'is-invalid' : formErrors.last_name}">
+                            <div class="invalid-feedback" *ngIf="formErrors.last_name">
+                                {{formErrors.last_name}}</div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">User Role</label>
+                            <multiselect-dropdown class="form-control p-0" style="height:auto;" [options]="userRoles"
+                                [settings]="roleListSettings" formControlName="user_roles"
+                                [ngClass]="{'is-invalid' : formErrors.user_roles}"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.user_roles">
+                                {{formErrors.user_roles}}</div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">Phone </label>
+                            <input type="number" class="form-control forn-control-sm" placeholder="Enter Phone Number"
+                                formControlName="phone_number" [ngClass]="{'is-invalid' : formErrors.phone_number}">
+                            <div class="invalid-feedback" *ngIf="formErrors.phone_number">
+                                {{formErrors.phone_number}}</div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="" class="form-col-form-label">Carrier</label>
+                            <select name="" id="" class="form-control" formControlName="carrier"
+                                [ngClass]="{'is-invalid' : formErrors.carrier}">
+                                <option [ngValue]="''">Select Carrier</option>
+                                <option *ngFor="let c of carriers" [ngValue]="c.id">{{c.carrier_name}}</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.carrier">{{formErrors.carrier}}</div>
+                        </div>
+                        <div class="col-12 d-flex justify-content-center mt-4 mb-2">
+                            <button class="btn btn-sm btn-primary mr-2 w-5" (click)="submit()">Submit</button>
+                            <button class="btn btn-sm btn-outline-danger w-5" (click)="goBack()">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

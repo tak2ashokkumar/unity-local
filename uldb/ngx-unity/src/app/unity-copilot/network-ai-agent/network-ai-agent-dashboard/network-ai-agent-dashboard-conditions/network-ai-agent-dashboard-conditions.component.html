@@ -323,7 +323,7 @@
                                     <!-- <router-outlet></router-outlet> -->
                                 </div>
                                 <div class="col-3 d-flex justify-content-end align-items-center">
-                                    <button class="btn btn-md btn-sm bg-primary py-2 px-3" (click)="goToInvestigate()"
+                                    <button class="btn btn-md btn-sm bg-primary py-2 px-3" (click)="openConfirmLoadChat()"
                                         accessControl moduleName="AIML Event Management"
                                         accessType="Manage AIML Event Management" elementType="actionbtn"
                                         *ngIf="!viewData[selectedConditionIndex].isStatusResolved"><i
@@ -914,6 +914,24 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmLoadChatRef>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Would you like to load previous chat history for <strong>{{selectedCondition?.description}}</strong>?</div>
+            <div class="text-muted font-sm-xs mt-2">
+                <i class="fas fa-info-circle mr-1"></i>
+                If you choose No, the previous chat history will be lost.
+            </div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-success mr-2 px-4" type="button"
+                (click)="onLoadChat(true)">Yes</button>
+            <button class="btn btn-sm btn-pill btn-outline-secondary" type="button"
+                (click)="onLoadChat(false)">No</button>
         </div>
     </div>
 </ng-template>

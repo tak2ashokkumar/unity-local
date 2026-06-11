@@ -1,0 +1,24 @@
+a {
+  outline: none !important;
+}
+
+button.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-toggle .caret {
+  margin-left: 4px;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.btn.disabled,
+.btn:disabled {
+  cursor: no-drop;
+  background-color: #e4e7ea;
+  opacity: 1;
+}
+
+

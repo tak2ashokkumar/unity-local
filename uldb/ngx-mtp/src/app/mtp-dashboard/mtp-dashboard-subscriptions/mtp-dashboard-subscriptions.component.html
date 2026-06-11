@@ -1,0 +1,37 @@
+<div class="card round-edge mb-0 w-100 equalize-card">
+    <app-spinner [name]="'dashboard-subscriptions'"></app-spinner>
+    <div class="card-header bg-transparent px-3 d-flex justify-content-between"
+        [ngClass]="tenants.length ? 'py-1' : 'py-2'">
+        <span class="d-flex align-items-center font-weight-bold">Subscriptions</span>
+        <form [formGroup]="tenantForm" *ngIf="tenantForm" class="w-30">
+            <div class="form-group mb-0">
+                <select id="tenant" class="form-control form-control-sm" formControlName="tenant">
+                    <option *ngFor="let t of tenants" [ngValue]="t.uuid">{{t.name}}</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    <div class="card-body px-2 py-0" style="min-height:400px;max-height:450px;overflow-y: auto;overflow-x: hidden;">
+        <div *ngIf="view">
+            <div class="row mt-2 px-2 mb-2" *ngIf="view.subscribed_modules">
+                <span
+                    class="badge bg-secondary font-weight-bold p-2 ml-2 mr-1 rounded-circle">{{view.subscribed_modules.length}}</span>
+                <span class="subscription-subtitle">Subscriptions</span>
+            </div>
+            <div class="row d-flex px-3 pb-2">
+                <button class="btn btn-sm btn-primary btn-pill mr-2 mb-2 font-xs-sm"
+                    *ngFor="let sp of view.subscribed_modules">{{sp.module_name}}</button>
+            </div>
+            <div class="row mt-2 px-2 mb-2" *ngIf="view.not_subscribed_modules">
+                <span
+                    class="badge bg-secondary font-weight-bold p-2 ml-2 mr-1 rounded-circle">{{view.not_subscribed_modules.length}}</span>
+                <span class="npsubscription-subtitle">Non Purchased Subscriptions</span>
+            </div>
+            <div class="row d-flex px-3 pb-2 mt-2">
+                <button class="btn btn-sm secondary-lighter btn-pill mr-2 mb-2 font-xs-sm"
+                    *ngFor="let sp of view.not_subscribed_modules">{{sp.module_name}}</button>
+            </div>
+        </div>
+        <div *ngIf="!view" class="d-flex h-100 justify-content-center align-items-center"> No data available </div>
+    </div>
+</div>

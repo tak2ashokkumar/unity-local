@@ -1,31 +1,31 @@
 @import "variables";
 
 .condition-detail {
-    .event-severity {
-        height: 20px;
+  .event-severity {
+    height: 20px;
+  }
+
+  .event-data {
+    width: 75%;
+
+    .event-name {
+      min-width: 10%;
+      max-width: 75%;
     }
 
-    .event-data {
-        width: 75%;
-
-        .event-name {
-            min-width: 10%;
-            max-width: 75%;
-        }
-
-        .event-time {
-            max-width: 25%;
-        }
+    .event-time {
+      max-width: 25%;
     }
+  }
 
-    .source-count {
-        height: 20px;
-        width: 20px;
-        text-align: center;
-        border-radius: 50% !important;
-        background-color: $gray-200;
-        color: $gray-600;
-    }
+  .source-count {
+    height: 20px;
+    width: 20px;
+    text-align: center;
+    border-radius: 50% !important;
+    background-color: $gray-200;
+    color: $gray-600;
+  }
 }
 
 .wizard {
@@ -47,6 +47,7 @@
   .step {
     padding: 15px 0;
     position: relative;
+
     .line {
       top: 47px;
       left: 15px;
@@ -67,4 +68,38 @@
 
 :host ::ng-deep markdown code:hover {
   cursor: pointer !important;
+}
+
+
+// thinking dot spinner
+
+.tds-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tds-track {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.tds-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: tds-bounce 1.4s ease-in-out infinite;
+}
+
+@keyframes tds-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0) scale(1);
+  }
+
+  40% {
+    transform: translateY(-14px) scale(1.1);
+  }
 }

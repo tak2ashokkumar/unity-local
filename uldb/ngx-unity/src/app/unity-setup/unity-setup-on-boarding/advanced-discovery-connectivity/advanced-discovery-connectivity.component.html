@@ -112,11 +112,11 @@
     <div class="card-header bg-transparent py-2">
       <div class="d-flex justify-content-between align-items-center">
         <div class="text-left">
-          <h5 class="mb-0 font-500">Access Requests</h5>
-          <small class="text-muted">Collectors requested through the access flow</small>
+          <h5 class="mb-0 font-500">List of Collectors</h5>
+          <small class="text-muted">Collectors configured through the download wizard</small>
         </div>
         <button class="btn btn-outline-warning btn-sm btn-pill" type="button" (click)="requestAccess()" accessControl
-          moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="btn">Request Access</button>
+          moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="btn">Add Collector</button>
       </div>
     </div>
     <div class="card-body pt-0">
@@ -154,7 +154,7 @@
           </tr>
         </tbody>
       </table>
-      <p *ngIf="!accessViewData.length" class="text-center text-muted py-3 mb-0">No access requests available.</p>
+      <p *ngIf="!accessViewData.length" class="text-center text-muted py-3 mb-0">No collectors available.</p>
     </div>
   </div>
 

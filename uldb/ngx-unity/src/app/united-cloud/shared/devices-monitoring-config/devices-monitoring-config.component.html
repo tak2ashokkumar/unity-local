@@ -33,6 +33,8 @@
                   <option [value]="'Agent'" *ngIf="isAgentOptionRequired">Agent</option>
                   <option [value]="'SNMP'" *ngIf="isSNMPOptionRequired">SNMP</option>
                   <option [value]="'HTTP'" *ngIf="device?.isCluster">HTTP</option>
+                  <option [value]="'SSH'" *ngIf="isWmiSshOptionRequired && (platformType === 'Linux' || !platformType)">SSH</option>
+                  <option [value]="'WinRM'" *ngIf="isWmiSshOptionRequired  && (platformType === 'Windows' || !platformType)">WinRM</option>
                 </select>
                 <div class="invalid-feedback" *ngIf="formErrors.connection_type">{{formErrors.connection_type}}</div>
               </div>
@@ -46,6 +48,12 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'SNMP'">
                   <ng-container *ngTemplateOutlet="SNMP_TEMPL"></ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'SSH'">
+                  <ng-container *ngTemplateOutlet="SSH_WINRM_TEMPL"></ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'WinRM'">
+                  <ng-container *ngTemplateOutlet="SSH_WINRM_TEMPL"></ng-container>
                 </ng-container>
 
                 <ng-template #AGENT_TEMPL>
@@ -251,6 +259,62 @@
                       {{formErrors.collector.uuid}}</div>
                   </div>
                 </ng-template>
+
+                <ng-template #SSH_WINRM_TEMPL>
+                  <div class="form-group col-4">
+                    <label>Host IP<em>*</em></label>
+                    <input class="form-control" formControlName="host_ip" [class.is-invalid]="formErrors.host_ip">
+                    <div class="invalid-feedback" *ngIf="formErrors.host_ip">{{formErrors.host_ip}}</div>
+                  </div>
+                  <div class="form-group col-4">
+                    <label>Port</label>
+                    <input class="form-control" type="number" formControlName="mon_port">
+                  </div>
+                  <div class="form-group row align-items-start mt-2">
+                    <label class="col-form-label ml-4 mr-2">Credentials<em>*</em> :</label>
+
+                    <div class="custom-control custom-radio mt-2">
+                      <input id="cred_local" type="radio" class="custom-control-input" value="local"
+                        formControlName="mon_credential_mode">
+                      <label class="custom-control-label" for="cred_local">Local</label>
+                    </div>
+
+                    <div class="col-4" *ngIf="form.get('mon_credential_mode')?.value === 'local'">
+                      <select formControlName="mon_credential_id" class="form-control"
+                        [ngClass]="{'is-invalid': formErrors.mon_credential_id}">
+                        <option value="" disabled>Select Credential</option>
+                        <option *ngFor="let cred of credentialList" [value]="cred.uuid">{{cred.name}}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="formErrors.mon_credential_id">
+                        {{formErrors.mon_credential_id}}
+                      </div>
+                    </div>
+
+                    <div class="custom-control custom-radio ml-3 mt-2">
+                      <input id="cred_my" type="radio" class="custom-control-input" value="my_cred"
+                        formControlName="mon_credential_mode">
+                      <label class="custom-control-label" for="cred_my">My Credential</label>
+                    </div>
+
+                    <div class="col-2" *ngIf="form.get('mon_credential_mode')?.value === 'my_cred'">
+                      <input class="form-control" type="text" formControlName="mon_username"
+                        [class.is-invalid]="formErrors.mon_username" placeholder="Enter Username">
+                      <div class="invalid-feedback" *ngIf="formErrors.mon_username">
+                        {{formErrors.mon_username}}
+                      </div>
+                    </div>
+
+                    <div class="col-2" *ngIf="form.get('mon_credential_mode')?.value === 'my_cred'">
+                      <custom-password-field formControlName="mon_password"
+                        [options]="{errors: formErrors.mon_password, placeholder: 'Enter Password'}"
+                        [isDisabled]="form.get('mon_password')?.disabled">
+                      </custom-password-field>
+                      <div class="invalid-feedback" *ngIf="formErrors.mon_password">
+                        {{formErrors.mon_password}}
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
               </ng-container>
               <!-- <div class="form-group col" *ngIf="form.controls.is_snmptrap_enabled">
                 <label class="form-col-form-label">SNMP Trap <em>*</em></label>
@@ -270,7 +334,7 @@
                 </ul>
               </div> -->
               <div class="form-group col-12"
-                *ngIf="isTenantOrg && ['SNMP', 'Agent', 'HTTP'].includes(form.controls.connection_type.value)">
+                *ngIf="isTenantOrg && ['SNMP', 'Agent', 'HTTP', 'SSH', 'WinRM'].includes(form.controls.connection_type.value)">
                 <label class="form-col-form-label">Templates <em>*</em></label>
                 <span class="text-danger ml-2" *ngIf="formErrors.mtp_templates">{{formErrors.mtp_templates}}</span>
                 <div class="card">

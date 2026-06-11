@@ -1,0 +1,39 @@
+@use "sass:math";
+
+// If you want to override variables do it here
+@import "variables";
+
+// Import styles
+@import "~@coreui/coreui/scss/coreui";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/solid.scss";
+@import "~@fortawesome/fontawesome-free/scss/regular.scss";
+@import "~@fortawesome/fontawesome-free/scss/brands.scss";
+
+@import "~simple-line-icons/scss/simple-line-icons";
+@import "~@coreui/icons/scss/coreui-icons";
+
+// If you want to add something do it here
+@import "custom";
+@import "custom-vis-network";
+@import "~@busacca/ng-pick-datetime/assets/style/picker.min.css";
+@import "~angular-calendar/css/angular-calendar.css";
+@import url(https://unpkg.com/ngx-bootstrap/datepicker/bs-datepicker.css);
+
+@for $i from 0 through 100 {
+    .w-#{$i} {
+        width: $i * 1% !important;
+    }
+}
+
+@for $i from 0 through 100 {
+    .mw-#{$i} {
+        min-width: $i * 1% !important;
+    }
+}
+
+@for $i from 1 through 12 {
+    .col-#{$i}-w {
+        width: math.div(100 * $i, 12) * 1% !important;
+    }
+}

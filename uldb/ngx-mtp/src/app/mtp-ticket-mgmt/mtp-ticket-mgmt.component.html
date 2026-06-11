@@ -1,0 +1,236 @@
+<div class="card round-edge mb-0 w-100 equalize-card" style="min-height:200px;">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-3">
+                <div class="card equalize-card mb-0" style="min-height: 200px;">
+                    <div class="card-header bg-transparent py-2">Tickets by State</div>
+                    <div class="card-body p-2 d-flex justify-content-center align-items-center">
+                        <canvas *ngIf="ticketByStatusChartData" baseChart [chartType]="ticketByStatusChartData.type"
+                            [labels]="ticketByStatusChartData.lables" [data]="ticketByStatusChartData.piedata"
+                            [options]="ticketByStatusChartData.options" [plugins]="ticketByStatusChartData.plugins"
+                            [legend]="ticketByStatusChartData.legend" [colors]="ticketByStatusChartData.colors"
+                            height="150"></canvas>
+                        <div *ngIf="!ticketByStatusChartData">
+                            <div class="text-center text-muted">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card equalize-card mb-0">
+                    <div class="card-header bg-transparent py-2">Tickets by Priority</div>
+                    <div class="card-body p-2 d-flex justify-content-center align-items-center">
+                        <canvas *ngIf="ticketByPriorityChartData" baseChart [chartType]="ticketByPriorityChartData.type"
+                            [labels]="ticketByPriorityChartData.lables" [data]="ticketByPriorityChartData.piedata"
+                            [options]="ticketByPriorityChartData.options" [plugins]="ticketByPriorityChartData.plugins"
+                            [legend]="ticketByPriorityChartData.legend" [colors]="ticketByPriorityChartData.colors"
+                            height="150"></canvas>
+                        <div *ngIf="!ticketByPriorityChartData">
+                            <div class="text-center text-muted">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card equalize-card mb-0">
+                    <div class="card-header bg-transparent py-2">Tickets By Tenant</div>
+                    <div class="card-body p-2 d-flex justify-content-center align-items-center">
+                        <canvas *ngIf="ticketByTenantChartData" baseChart [chartType]="ticketByTenantChartData.type"
+                            [labels]="ticketByTenantChartData.lables" [data]="ticketByTenantChartData.piedata"
+                            [options]="ticketByTenantChartData.options" [plugins]="ticketByTenantChartData.plugins"
+                            [legend]="ticketByTenantChartData.legend" [colors]="ticketByTenantChartData.colors"
+                            height="150"></canvas>
+                        <div *ngIf="!ticketByTenantChartData">
+                            <div class="text-center text-muted">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card equalize-card mb-0">
+                    <div class="card-header bg-transparent py-2">Open tickets by Response Time</div>
+                    <div class="card-body p-2 d-flex justify-content-center align-items-center">
+                        <canvas *ngIf="ticketByresponseTimeChartData" baseChart
+                            [chartType]="ticketByresponseTimeChartData.type"
+                            [labels]="ticketByresponseTimeChartData.lables"
+                            [data]="ticketByresponseTimeChartData.piedata"
+                            [options]="ticketByresponseTimeChartData.options"
+                            [plugins]="ticketByresponseTimeChartData.plugins"
+                            [legend]="ticketByresponseTimeChartData.legend"
+                            [colors]="ticketByresponseTimeChartData.colors" height="150"></canvas>
+                        <div *ngIf="!ticketByresponseTimeChartData">
+                            <div class="text-center text-muted">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card mt-2 mb-0 w-100">
+                    <div class="card-header bg-transparent px-3 py-2">
+                        <div class="d-flex justify-content-between">
+                            <div class="font-500 d-flex align-items-center">
+                                <span class="badge badge-secondary font-lg">{{count}}</span>
+                                <span class="ml-1">Tickets</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <a (click)="downloadReport()" class="action-icons fas fa-download pt-2 pl-2 ml-2"
+                                    tooltip="Download"></a>
+                                <button class="btn btn-warning ml-2" type="button" (click)="syncAttributes()"
+                                    accessControl moduleName="Ticket Management" accessType="write"
+                                    elementType="btn">Sync
+                                    Attributes</button>
+                                <button class="btn btn-primary ml-2" (click)="createTicket()" accessControl
+                                    moduleName="Ticket Management" accessType="write" elementType="btn">Create
+                                    Ticket</button>
+                                <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <div class="w-92">
+                                <form class="form-inline w-100" [formGroup]="filterForm" *ngIf="filterForm">
+                                    <div class="d-flex w-100">
+                                        <div class="w-15 pr-2">
+                                            <table-search-box [searchValue]="currentCriteria.params[0].search_key"
+                                                (searched)="onSearched($event)"></table-search-box>
+                                        </div>
+                                        <div class="form-group w-11 pr-2">
+                                            <select class="form-control form-control-sm text-capitalize w-100"
+                                                id="tenant" name="tenant" formControlName="tenant">
+                                                <option [value]="''" disabled>Select Tenant</option>
+                                                <option *ngFor="let t of tenants" [value]="t.account_uuid">
+                                                    {{t.name}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group w-11 pr-2">
+                                            <select class="form-control form-control-sm w-100" formControlName="status">
+                                                <option [value]="''" disabled>Select Status</option>
+                                                <option *ngFor="let state of ticketStatusList" [value]="state.value">
+                                                    {{state.display_name}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group w-11 pr-2">
+                                            <select class="form-control form-control-sm w-100"
+                                                formControlName="priority">
+                                                <option [value]="''" disabled>Select Priority</option>
+                                                <option *ngFor="let prt of ticketPriorityList" [value]="prt.value">
+                                                    {{prt.display_name}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group w-11 pr-2">
+                                            <select class="form-control form-control-sm w-100" formControlName="period">
+                                                <option [value]="durationRange.LAST_24_HOURS">Last 24 Hours</option>
+                                                <option [value]="durationRange.LAST_WEEK">Last Week</option>
+                                                <option [value]="durationRange.LAST_MONTH">Last Month</option>
+                                                <option [value]="durationRange.CUSTOM">Custom</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-group w-19 pr-2">
+                                            <label for="from">From :&nbsp;</label>
+                                            <owl-date-time #from [hour12Timer]="true"></owl-date-time>
+                                            <input class="form-control form-control-sm rounded-left"
+                                                formControlName="from" [owlDateTimeTrigger]="from" [owlDateTime]="from"
+                                                type="text" name="from" placeholder="from" [max]="now">
+                                            <div class="input-group-append " [owlDateTimeTrigger]="from">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="input-group w-18 pr-2">
+                                            <label for="to">To :&nbsp;</label>
+                                            <owl-date-time #to [hour12Timer]="true"></owl-date-time>
+                                            <input class="form-control form-control-sm rounded-left"
+                                                formControlName="to" [owlDateTimeTrigger]="to" [owlDateTime]="to"
+                                                type="text" name="to" placeholder="to"
+                                                [min]="filterForm.controls.from.value" [max]="now">
+                                            <div class="input-group-append " [owlDateTimeTrigger]="to">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="w-3">
+                                            <a (click)="filterTickets()"
+                                                class="action-icons fas fa-filter pt-2 pl-2 ml-2"
+                                                tooltip="Filter Data"></a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div>
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)" class="ml-2"></table-page-size>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table text-left font-sm" sortableTable (sorted)="onSorted($event)">
+                            <thead>
+                                <tr>
+                                    <th sortable-column="ticket_number">Ticket Number</th>
+                                    <th>Tenant</th>
+                                    <th>Type</th>
+                                    <th>Title</th>
+                                    <th sortable-column="priority">Priority</th>
+                                    <th sortable-column="status">Status</th>
+                                    <th>Assignee</th>
+                                    <th>Next SLA Warning</th>
+                                    <th>Next SLA Failure</th>
+                                    <th sortable-column="created_on">Created On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData">
+                                    <td class="tdw-15">
+                                        <button class="btn btn-link text-decoration-none p-0 table-column-btn"
+                                            type="button" (click)="goToDetails(view)">{{view.ticketNumber}}</button>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div>{{view.customerName}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div>{{view.ticketTypeName}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div>{{view.title}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div>{{view.priorityName}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div>{{view.statusReasonName}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div>{{view.assignee || 'NA'}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [class]="view.responseTimeClass">{{view.responseTime}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [class]="view.resolutionTimeClass">{{view.resolutionTime}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div>{{view.createdOn}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" *ngIf="!viewData.length">No tickets avaialble.</div>
+                        <div class="px-2">
+                            <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="count">
+                            </table-entries>
+                            <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                                [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                (pageChange)="pageChange($event)"></table-pager>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

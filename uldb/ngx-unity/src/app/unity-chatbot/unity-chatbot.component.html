@@ -3,8 +3,8 @@
     <i class="fas fa-comments comments-icon"></i>
 </button>
 
-<div *ngIf="hasChatbotAccess() && isOpen && isExpanded" class="chatbot-expanded-backdrop"
-    [style.z-index]="backdropZIndex"></div>
+<!-- <div *ngIf="hasChatbotAccess() && isOpen && isExpanded" class="chatbot-expanded-backdrop"
+    [style.z-index]="backdropZIndex"></div> -->
 
 <div *ngIf="hasChatbotAccess()" id="chatbotPopUp" class="chatbot-pop-up m-2"
     [ngClass]="{'open': isOpen, 'expanded': isExpanded}" [style.z-index]="chatbotZIndex">
