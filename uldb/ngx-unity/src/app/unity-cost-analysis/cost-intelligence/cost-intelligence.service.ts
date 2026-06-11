@@ -5,17 +5,15 @@ import { Observable } from 'rxjs';
 import { UNITY_FONT_FAMILY, UNITY_TEXT_DEFAULT_COLOR } from 'src/app/app-constants';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { CustomDateRangeType } from 'src/app/shared/SharedEntityTypes/unity-utils.type';
-import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
-import { BudgetAnomalyWidget, BudgetDetailsByDevice, CostAlerts, CostAnomalyType, CostByApplicationWidget, CostByBusinessUnitWidget, CostByCostCenterWidget, CostByDeviceTypeWidget, CostByDeviceTypeWidgetData, CostByOSWidget, CostByVMWidget, CostUtilizationByMetrics, CostUtilizationDataByMetric, CostUtilizationDataPoints, DeviceCountWidget, FixedCostByService, IdleVMSWidget, MetricAndRateValue, MetricDistribution, MetricRateFrequency, OperationalCostByService, TotalCostWidget } from './cost-intelligence.type';
+import { BudgetAnomalyWidget, BudgetDetailsByDevice, CostAlerts, CostAnomalyType, CostByApplicationWidget, CostByBusinessUnitWidget, CostByCostCenterWidget, CostByDeviceTypeWidget, CostByDeviceTypeWidgetData, CostByOSWidget, CostByVMWidget, CostUtilizationByMetrics, CostUtilizationDataByMetric, CostUtilizationDataPoints, DeviceCountWidget, FixedCostByService, IdleVMSWidget, OperationalCostByService, TotalCostWidget } from './cost-intelligence.type';
 
 @Injectable()
 export class CostIntelligenceService {
 
   constructor(private http: HttpClient,
-    private tableService: TableApiServiceService,
     private chartConfigSvc: UnityChartConfigService,
-    private utilSvc: AppUtilityService,) { }
+    private utilSvc: AppUtilityService) { }
 
   getDateDropdownOptions(): DateDropdownOptionsData {
     let view = new DateDropdownOptionsData();
@@ -96,7 +94,7 @@ export class CostIntelligenceService {
 
   convertToCostByDeviceTypeViewData(data: CostByDeviceTypeWidgetData[]): CostByDeviceTypeWidgetViewData[] {
     let viewdata: CostByDeviceTypeWidgetViewData[] = [];
-    data.map(d => {
+    data.forEach(d => {
       let view = new CostByDeviceTypeWidgetViewData();
       view.deviceType = d.device_type;
       view.label = d.label;
@@ -114,7 +112,7 @@ export class CostIntelligenceService {
 
   convertToCostByCostCenterViewData(data: CostByCostCenterWidget[]): CostByCostCenterWidgetViewData[] {
     let viewdata: CostByCostCenterWidgetViewData[] = [];
-    data.map(d => {
+    data.forEach(d => {
       let view = new CostByCostCenterWidgetViewData();
       view.currentCost = `$${d.total_cost}`;
       view.potentialSavings = `$${d.potential_saving}`;
@@ -131,7 +129,7 @@ export class CostIntelligenceService {
 
   convertToCostPerVMViewData(data: CostByVMWidget[]): CostPerVMViewData[] {
     let viewData: CostPerVMViewData[] = [];
-    data.map(d => {
+    data.forEach(d => {
       let view: CostPerVMViewData = new CostPerVMViewData();
       view.vmName = d.device_name;
       view.allocated = d.allocated;
@@ -149,7 +147,7 @@ export class CostIntelligenceService {
     return this.http.get<CostByBusinessUnitWidget[]>(`/customer/finops/building-block-costs/cost_by_business_unit/`, { params: params });
   }
   convertToCostByBUChartData(data: CostByBusinessUnitWidget[]): UnityChartDetails {
-    if (!data || data.length == 0) return;
+    if (!data || data.length === 0) return;
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getNightingalePieChartWithHorizontalLegendsOptions();
@@ -196,9 +194,9 @@ export class CostIntelligenceService {
   }
 
   convertToCostByApplicationViewData(data: CostByApplicationWidget[]): CostByApplicationsViewData[] {
-    if (!data || data.length == 0) return [];
+    if (!data || data.length === 0) return [];
     let viewData: CostByApplicationsViewData[] = [];
-    data.map(d => {
+    data.forEach(d => {
       let view: CostByApplicationsViewData = new CostByApplicationsViewData();
       view.applicationName = d.application;
       // view.allocated = d.allocated;
@@ -219,7 +217,7 @@ export class CostIntelligenceService {
   }
 
   convertToCostByOSChartData(data: CostByOSWidget[]): UnityChartDetails {
-    if (!data || data.length == 0) return;
+    if (!data || data.length === 0) return;
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getNightingalePieChartWithHorizontalLegendsOptions();
@@ -344,7 +342,7 @@ export class CostIntelligenceService {
 
   convertToBudgetAnomaliesViewData(data: BudgetAnomalyWidget[]): BudgetAnomalyViewData[] {
     let viewData: BudgetAnomalyViewData[] = [];
-    data.map(d => {
+    data.forEach(d => {
       let view: BudgetAnomalyViewData = new BudgetAnomalyViewData();
       view.name = d.device_name;
       view.overUsed = d.over_budget;
@@ -376,7 +374,7 @@ export class CostIntelligenceService {
     const now = new Date();
     const intervals: string[] = [];
 
-    const formatDate = (d: Date, withTime: boolean = false) => {
+    const formatDate = (d: Date) => {
       const day = d.getDate().toString().padStart(2, '0');
       const month = (d.getMonth() + 1).toString().padStart(2, '0'); // numeric month
       const year = d.getFullYear().toString(); // last 4 digits
@@ -400,7 +398,7 @@ export class CostIntelligenceService {
         for (let i = 0; i < 24; i++) {
           const d = new Date(now);
           d.setHours(now.getHours() - i);
-          intervals.push(formatDate(d, true));
+          intervals.push(formatDate(d));
         }
         break;
 
@@ -515,13 +513,13 @@ export class CostIntelligenceService {
   }
 
   getCostAlertsData(frequency: string): Observable<CostAlerts[]> {
-    let params: HttpParams = new HttpParams().set('frequency', frequency);
-    return this.http.get<CostAlerts[]>(`/customer/finops/building_blocks/cost_alerts/`);
+    const params: HttpParams = new HttpParams().set('frequency', frequency);
+    return this.http.get<CostAlerts[]>(`/customer/finops/building_blocks/cost_alerts/`, { params });
   }
 
   convertToCostAlertsViewData(data: CostAlerts[]): CostAlertsViewData[] {
     let viewData: CostAlertsViewData[] = [];
-    data.map(d => {
+    data.forEach(d => {
       let view: CostAlertsViewData = new CostAlertsViewData();
       view.alertId = d.alert_id;
       view.alertName = d.alert_name;
@@ -531,10 +529,10 @@ export class CostIntelligenceService {
       view.actualValue = d.actual_value;
       view.alertTime = d.alert_triggered_on ? this.utilSvc.toUnityOneDateFormat(new Date(d.alert_triggered_on).toISOString()) : 'N/A';;
       view.severity = d.severity;
-      if (d.severity == 'high') {
+      if (d.severity === 'high') {
         view.severityClass = 'text-danger';
         view.severityIcon = 'fa-exclamation-circle text-danger';
-      } else if (d.severity == 'medium') {
+      } else if (d.severity === 'medium') {
         view.severityClass = 'text-warning';
         view.severityIcon = 'fa-exclamation-circle text-warning';
       } else {
@@ -553,8 +551,8 @@ export class CostIntelligenceService {
 
   convertToBudgetDetailsByDeviceViewData(data: BudgetDetailsByDevice[]): BudgetDetailsByDeviceViewData[] {
     let viewData: BudgetDetailsByDeviceViewData[] = [];
-    data.map(d => {
-      let view: BudgetDetailsByDeviceViewData = new BudgetDetailsByDeviceViewData();
+    data.forEach(d => {
+      const view: BudgetDetailsByDeviceViewData = new BudgetDetailsByDeviceViewData();
       view.deviceName = d.device_name;
       view.managementIP = d.management_ip;
       view.applicationOrService = d.application_service;
@@ -564,9 +562,9 @@ export class CostIntelligenceService {
 
       if (d.budget_utilization) {
         view.budgetUtilization = new BudgetUtilizationByDeviceData();
-        view.budgetUtilization.used = <number><unknown>d.budget_utilization.used.split('%')[0];
+        view.budgetUtilization.used = parseInt(d.budget_utilization.used.split('%')[0], 10);
         view.budgetUtilization.usedPercentage = d.budget_utilization.used;
-        view.budgetUtilization.available = <number><unknown>d.budget_utilization.free.split('%')[0];
+        view.budgetUtilization.available = parseInt(d.budget_utilization.free.split('%')[0], 10);
         view.budgetUtilization.availablePercentage = d.budget_utilization.free;
         view.budgetUtilization.usedBarColor = view.budgetUtilization.used < 65 ? 'bg-success' : view.budgetUtilization.used >= 65 && view.budgetUtilization.used < 85 ? 'bg-warning' : 'bg-danger';
       }
@@ -577,7 +575,7 @@ export class CostIntelligenceService {
 
   getCostAnomalyData(frequency: string): Observable<CostAnomalyType[]> {
     let params: HttpParams = new HttpParams().set('frequency', frequency);
-    return this.http.get<CostAnomalyType[]>(`customer/finops/building-block-costs/cost_anomaly/`, { params: params });
+    return this.http.get<CostAnomalyType[]>(`/customer/finops/building-block-costs/cost_anomaly/`, { params });
   }
 
   convertToCostAnomalyViewData(data: CostAnomalyType[]): CostAnomalyViewData[] {

@@ -164,7 +164,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let view of costByDeviceTypeWidgetViewData" truncateText>
+          <tr *ngFor="let view of costByDeviceTypeWidgetViewData; trackBy: trackByIndex" truncateText>
             <td class="tdw-30">
               <!-- <div [tooltip]="view.deviceType" (click)="goToDetails(view)">{{view.deviceType}}</div> -->
               <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
@@ -204,7 +204,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let view of costByCostCenterWidgetViewData" truncateText>
+          <tr *ngFor="let view of costByCostCenterWidgetViewData; trackBy: trackByIndex" truncateText>
             <td class="tdw-30">
               <div [tooltip]="view.costCenter">{{view.costCenter}}</div>
             </td>
@@ -234,15 +234,15 @@
     </div>
     <div class="card-body d-flex flex-column p-2 justify-content-around"
       style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
-      <div class="d-flex justify-content-around align-items-center" *ngFor="let view of costPerVMViewData">
+      <div class="d-flex justify-content-around align-items-center" *ngFor="let view of costPerVMViewData; trackBy: trackByIndex">
         <div class="w-30 text-right text-truncate pr-1 text-primary font-sm font-500">{{view?.vmName}}</div>
         <div class="w-55">
           <div class="progress" [style.height.rem]="1.5">
             <div class="progress-bar bg-primary" role="progressbar" [style.width.%]="view?.allocatedPercentage"
-              aria-valuenow="percentData.active" aria-valuemin="0" aria-valuemax="100"></div>
+              [attr.aria-valuenow]="view?.allocatedPercentage" aria-valuemin="0" aria-valuemax="100"></div>
 
             <div class="progress-bar bg-warning" role="progressbar" [style.width.%]="view?.overUsedPercentage"
-              aria-valuenow="percentData.unknown" aria-valuemin="0" aria-valuemax="100"></div>
+              [attr.aria-valuenow]="view?.overUsedPercentage" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
         </div>
         <div class="w-15 text-warning pl-1 font-sm font-500">{{view.overUsed}}%</div>
@@ -287,16 +287,16 @@
               <span class="font-500 text-center my-2 py-1">Top 5 Applications By Cost</span>
               <div class="d-flex flex-column justify-content-between h-100" *ngIf="costByApplicationViewData.length">
                 <div class="d-flex justify-content-around align-items-center"
-                  *ngFor="let view of costByApplicationViewData">
+                  *ngFor="let view of costByApplicationViewData; trackBy: trackByIndex">
                   <div class="w-30 text-right text-truncate pr-1 text-primary font-sm font-500">
                     {{view?.applicationName}}</div>
                   <div class="w-55">
                     <div class="progress" [style.height.rem]="1.5">
                       <div class="progress-bar bg-primary" role="progressbar"
-                        [style.width.%]="view?.allocatedPercentage" aria-valuenow="percentData.active" aria-valuemin="0"
+                        [style.width.%]="view?.allocatedPercentage" [attr.aria-valuenow]="view?.allocatedPercentage" aria-valuemin="0"
                         aria-valuemax="100"></div>
                       <div class="progress-bar bg-warning" role="progressbar" [style.width.%]="view?.overUsedPercentage"
-                        aria-valuenow="percentData.unknown" aria-valuemin="0" aria-valuemax="100"></div>
+                        [attr.aria-valuenow]="view?.overUsedPercentage" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                   </div>
                   <div class="w-15 text-warning pl-1 font-sm font-500">{{view.overUsedPercentage}}%</div>
@@ -372,14 +372,14 @@
             <div class="card-body p-0 d-flex flex-column justify-content-around">
               <span class="font-500 text-center">Budget Anomalies</span>
               <div class="d-flex justify-content-around align-items-center mb-1"
-                *ngFor="let view of budgetAnomalyViewData">
+                *ngFor="let view of budgetAnomalyViewData; trackBy: trackByIndex">
                 <div class="w-30 text-right text-truncate pr-1 text-primary font-sm font-500">{{view?.name}}</div>
                 <div class="w-55">
                   <div class="progress" [style.height.rem]="1.5">
                     <div class="progress-bar bg-primary" role="progressbar" [style.width.%]="view?.allocatedPercentage"
-                      aria-valuenow="percentData.active" aria-valuemin="0" aria-valuemax="100"></div>
+                      [attr.aria-valuenow]="view?.allocatedPercentage" aria-valuemin="0" aria-valuemax="100"></div>
                     <div class="progress-bar bg-warning" role="progressbar" [style.width.%]="view?.overUsedPercentage"
-                      aria-valuenow="percentData.unknown" aria-valuemin="0" aria-valuemax="100"></div>
+                      [attr.aria-valuenow]="view?.overUsedPercentage" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
                 </div>
                 <div class="w-15 text-warning pl-1 font-sm font-500">{{view.overUsed}}%</div>
@@ -490,7 +490,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let view of costAlerts; let i = index" truncateText>
+          <tr *ngFor="let view of costAlerts; let i = index; trackBy: trackByIndex" truncateText>
             <td class="tdw-10">
               <div [tooltip]="view.alertId">{{view.alertId}}</div>
             </td>
@@ -526,7 +526,7 @@
 
 <ng-template #deviceDetailsWidgetRef>
   <div class="card round-edge equalize-card">
-    <app-spinner [name]="'budgetDetailsByDevice'"></app-spinner>
+    <app-spinner [name]="'budgetDetailsByDeviceLoader'"></app-spinner>
     <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
       <span class="font-lg font-500">Device Details</span>
     </div>
@@ -544,7 +544,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let view of budgetDetailsByDevice; let i = index;" truncateText>
+          <tr *ngFor="let view of budgetDetailsByDevice; let i = index; trackBy: trackByIndex" truncateText>
             <td class="tdw-15">
               <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
             </td>
@@ -569,11 +569,11 @@
                 <div class="col-12">
                   <div class="progress progress-xs">
                     <div class="progress-bar" [ngClass]="view?.budgetUtilization?.usedBarColor" role="progressbar"
-                      [style.width.%]="view?.budgetUtilization?.used" aria-valuenow="percentData.active"
+                      [style.width.%]="view?.budgetUtilization?.used" [attr.aria-valuenow]="view?.budgetUtilization?.used"
                       aria-valuemin="0" aria-valuemax="100"></div>
 
                     <div class="progress-bar bg-secondary" role="progressbar"
-                      [style.width.%]="view?.budgetUtilization?.available" aria-valuenow="percentData.unknown"
+                      [style.width.%]="view?.budgetUtilization?.available" [attr.aria-valuenow]="view?.budgetUtilization?.available"
                       aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
                 </div>
@@ -615,7 +615,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let view of costAnomalyViewData; let i = index;" truncateText>
+          <tr *ngFor="let view of costAnomalyViewData; let i = index; trackBy: trackByIndex" truncateText>
             <td class="tdw-15">
               <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
             </td>

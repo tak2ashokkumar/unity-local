@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -17,6 +17,7 @@ import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { FirewallCRUDManufacturer, FirewallCRUDModel } from '../../entities/firewall-crud.type';
 import { FirewallCRUDFormData, FirewallCrudService } from './firewalls-crud.service';
+import { CONFIRM_MODAL_CONFIG } from 'src/app/shared/shared.const';
 
 @Component({
   selector: 'firewalls-crud',
@@ -26,17 +27,18 @@ import { FirewallCRUDFormData, FirewallCrudService } from './firewalls-crud.serv
 export class FirewallsCrudComponent implements OnInit, OnDestroy {
   @Output('onCrud') onCrud = new EventEmitter<CRUDActionTypes>();
 
-  private ngUnsubscribe = new Subject();
+  private readonly ngUnsubscribe = new Subject<void>();
+  private revalidateBound = false;
   fireWallId: string;
-  nonFieldErr: string = '';
+  nonFieldErr = '';
   action: 'Add' | 'Edit';
-  managementEnabled: boolean = false;
+  managementEnabled = false;
 
   deviceType: DeviceMapping = DeviceMapping.FIREWALL;
   SNMPVersionPlatFormMappingEnum = SNMPVersionMapping;
   AuthLevelPlatFormMappingEnum = AuthLevelMapping;
 
-  @ViewChild('firewallFormRef') firewallFormRef: ElementRef;
+  @ViewChild('firewallFormRef') firewallFormRef: TemplateRef<void>;
   firewallModelRef: BsModalRef;
   firewallForm: FormGroup;
   firewallFormErrors: any;
@@ -49,7 +51,7 @@ export class FirewallsCrudComponent implements OnInit, OnDestroy {
   privateclouds: Array<DeviceCRUDPrivateCloudFast> = [];
   tagsAutocompleteItems: string[] = [];
   collectors: DeviceDiscoveryAgentConfigurationType[] = [];
-  @ViewChild('confirmdelete') confirmdelete: ElementRef;
+  @ViewChild('confirmdelete') confirmdelete: TemplateRef<void>;
   confirmFirewallDeleteModalRef: BsModalRef;
 
   cloudSettings: IMultiSelectSettings = {
@@ -76,14 +78,19 @@ export class FirewallsCrudComponent implements OnInit, OnDestroy {
     allSelected: 'All Selected',
   };
 
-  constructor(private crudService: FirewallCrudService,
+  constructor(private svc: FirewallCrudService,
     private caSvc: UnityDevicesCustomAttributesCrudService,
-    private modalService: BsModalService,
-    private utilService: AppUtilityService,
-    private spinnerService: AppSpinnerService,
-    private notification: AppNotificationService,
-    private appService: AppLevelService) {
-    this.crudService.addOrEditAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(fireWallId => {
+    private modalSvc: BsModalService,
+    private utilSvc: AppUtilityService,
+    private spinnerSvc: AppSpinnerService,
+    private notificationSvc: AppNotificationService,
+    private appSvc: AppLevelService) { }
+
+  ngOnInit(): void {
+    this.getManufacturers();
+    this.getDatacenters();
+    this.getCollectors();
+    this.svc.addOrEditAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(fireWallId => {
       this.fireWallId = fireWallId;
       this.action = this.fireWallId ? 'Edit' : 'Add';
       this.nonFieldErr = '';
@@ -91,33 +98,27 @@ export class FirewallsCrudComponent implements OnInit, OnDestroy {
       this.getTags();
       this.buildAddEditForm(fireWallId);
     });
-    this.crudService.deleteAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(fireWallId => {
+    this.svc.deleteAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(fireWallId => {
       this.fireWallId = fireWallId;
-      this.confirmFirewallDeleteModalRef = this.modalService.show(this.confirmdelete, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+      this.confirmFirewallDeleteModalRef = this.modalSvc.show(this.confirmdelete, CONFIRM_MODAL_CONFIG);
     });
   }
 
-  ngOnInit() {
-    this.getManufacturers();
-    this.getDatacenters();
-    this.getCollectors();
-  }
-
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
 
-  getManufacturers() {
+  getManufacturers(): void {
     this.manufacturers = [];
-    this.crudService.getManufacturers().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.getManufacturers().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.manufacturers = res;
     });
   }
 
-  getModels(manufacturer: string, patchValue: boolean) {
+  getModels(manufacturer: string, patchValue: boolean): void {
     this.models = [];
-    this.crudService.getModels(manufacturer).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.getModels(manufacturer).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.models = res;
       if (patchValue) {
         this.firewallForm.patchValue({ model: { id: '' } });
@@ -125,25 +126,25 @@ export class FirewallsCrudComponent implements OnInit, OnDestroy {
     });
   }
 
-  getDatacenters() {
+  getDatacenters(): void {
     this.datacenters = [];
-    this.crudService.getDatacenters().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.getDatacenters().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.datacenters = res;
     });
   }
 
-  getCollectors() {
-    this.crudService.getCollectors().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+  getCollectors(): void {
+    this.svc.getCollectors().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.collectors = res;
     });
   }
 
-  getCabinets(dcId: string, patchValue: boolean) {
+  getCabinets(dcId: string, patchValue: boolean): void {
     if (!dcId) {
       return;
     }
     this.cabinets = [];
-    this.crudService.getCabinets(dcId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.getCabinets(dcId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.cabinets = res;
       if (patchValue) {
         this.firewallForm.patchValue({ cabinet: { id: '' } });
@@ -151,40 +152,40 @@ export class FirewallsCrudComponent implements OnInit, OnDestroy {
     });
   }
 
-  getPrivateClouds(dcId: string, patchValue: boolean) {
+  getPrivateClouds(dcId: string, patchValue: boolean): void {
     if (!dcId) {
       return;
     }
     this.privateclouds = [];
-    this.crudService.getPrivateClouds(dcId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.getPrivateClouds(dcId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.privateclouds = res;
       if (patchValue) {
         this.firewallForm.patchValue({ cloud: [] });
       } else {
-        let clouds = (<DeviceCRUDPrivateCloudFast[]>this.firewallForm.get('cloud').value).map(c => c.uuid);
+        const clouds = (this.firewallForm.get('cloud').value as DeviceCRUDPrivateCloudFast[]).map(c => c.uuid);
         this.firewallForm.get('cloud').setValue(this.privateclouds.filter(pc => clouds.includes(pc.uuid)));
       }
     });
   }
 
-  getTags() {
+  getTags(): void {
     this.tagsAutocompleteItems = [];
-    this.appService.getTags().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.appSvc.getTags().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.tagsAutocompleteItems = res;
     });
   }
 
-  buildAddEditForm(fireWallId?: string) {
-    this.crudService.createFirewallForm(fireWallId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(form => {
+  buildAddEditForm(fireWallId?: string): void {
+    this.svc.createFirewallForm(fireWallId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(form => {
       this.firewallForm = form;
-      this.firewallFormErrors = this.crudService.resetFirewallFormErrors();
-      this.firewallFormValidationMessages = this.crudService.firewallValidationMessages;
+      this.firewallFormErrors = this.svc.resetFirewallFormErrors();
+      this.firewallFormValidationMessages = this.svc.firewallValidationMessages;
       if (fireWallId) {
         this.getModels(this.firewallForm.get('manufacturer').value, false);
         this.getCabinets(this.firewallForm.get('datacenter.uuid').value, false);
         this.getPrivateClouds(this.firewallForm.get('datacenter.uuid').value, false);
       }
-      this.firewallModelRef = this.modalService.show(this.firewallFormRef, Object.assign({}, { class: 'modal-lg', keyboard: true, ignoreBackdropClick: true }));
+      this.firewallModelRef = this.modalSvc.show(this.firewallFormRef, { ...CONFIRM_MODAL_CONFIG, class: 'modal-lg' });
       this.firewallForm.get('manufacturer').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
         this.getModels(val, true);
       });
@@ -203,64 +204,77 @@ export class FirewallsCrudComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleError(err: any) {
-    this.firewallFormErrors = this.crudService.resetFirewallFormErrors();
+  handleError(err: any): void {
+    this.firewallFormErrors = this.svc.resetFirewallFormErrors();
+    if (!err) {
+      this.firewallModelRef.hide();
+      this.notificationSvc.error(new Notification('Something went wrong!! Please try again.'));
+      return;
+    }
     if (err.non_field_errors) {
       this.nonFieldErr = err.non_field_errors[0];
-    } else if (err) {
+    } else {
       for (const field in err) {
         if (field in this.firewallForm.controls) {
           this.firewallFormErrors[field] = err[field][0];
         }
       }
-    } else {
-      this.firewallModelRef.hide();
-      this.notification.error(new Notification('Something went wrong!! Please try again.'));
     }
-    this.spinnerService.stop('main');
   }
 
-  confirmFirewallCreate() {
+  confirmFirewallCreate(): void {
     this.caSvc.submit();
     if (this.firewallForm.invalid || this.caSvc.isInvalid()) {
-      this.firewallFormErrors = this.utilService.validateForm(this.firewallForm, this.firewallFormValidationMessages, this.firewallFormErrors);
-      this.firewallForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: any) => {
-        this.firewallFormErrors = this.utilService.validateForm(this.firewallForm, this.firewallFormValidationMessages, this.firewallFormErrors);
-        this.caSvc.submit();
-      });
-    } else {
-      let obj = <FirewallCRUDFormData>Object.assign({}, this.firewallForm.getRawValue(), { 'custom_attribute_data': this.caSvc.getFormData() });
-      this.spinnerService.start('main');
-      if (this.fireWallId) {
-        this.crudService.updateFirewall(obj, this.fireWallId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      this.firewallFormErrors = this.utilSvc.validateForm(this.firewallForm, this.firewallFormValidationMessages, this.firewallFormErrors);
+      this.bindRevalidationOnChanges();
+      return;
+    }
+    const obj = Object.assign({}, this.firewallForm.getRawValue(), { 'custom_attribute_data': this.caSvc.getFormData() }) as FirewallCRUDFormData;
+    this.spinnerSvc.start('main');
+    if (this.fireWallId) {
+      this.svc.updateFirewall(obj, this.fireWallId)
+        .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.spinnerSvc.stop('main')))
+        .subscribe(() => {
           this.firewallModelRef.hide();
-          this.spinnerService.stop('main');
-          this.notification.success(new Notification('Firewall updated successfully.'));
+          this.notificationSvc.success(new Notification('Firewall updated successfully.'));
           this.onCrud.emit(CRUDActionTypes.UPDATE);
         }, (err: HttpErrorResponse) => {
           this.handleError(err.error);
         });
-      } else {
-        this.crudService.createFirewall(obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+    } else {
+      this.svc.createFirewall(obj)
+        .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.spinnerSvc.stop('main')))
+        .subscribe(() => {
           this.firewallModelRef.hide();
-          this.spinnerService.stop('main');
-          this.notification.success(new Notification('Firewall Created successfully.'));
+          this.notificationSvc.success(new Notification('Firewall Created successfully.'));
           this.onCrud.emit(CRUDActionTypes.ADD);
         }, (err: HttpErrorResponse) => {
           this.handleError(err.error);
         });
-      }
     }
   }
 
-  confirmFirewallDelete() {
-    this.crudService.deleteFirewall(this.fireWallId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+  // Re-validate (and re-run custom-attribute validation) on every change once the
+  // user has attempted submit. Bound once so repeated invalid submits do not stack.
+  private bindRevalidationOnChanges(): void {
+    if (this.revalidateBound) {
+      return;
+    }
+    this.revalidateBound = true;
+    this.firewallForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+      this.firewallFormErrors = this.utilSvc.validateForm(this.firewallForm, this.firewallFormValidationMessages, this.firewallFormErrors);
+      this.caSvc.submit();
+    });
+  }
+
+  confirmFirewallDelete(): void {
+    this.svc.deleteFirewall(this.fireWallId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
       this.confirmFirewallDeleteModalRef.hide();
-      this.notification.success(new Notification('Firewall deleted successfully.'));
+      this.notificationSvc.success(new Notification('Firewall deleted successfully.'));
       this.onCrud.emit(CRUDActionTypes.DELETE);
-    }, err => {
+    }, () => {
       this.confirmFirewallDeleteModalRef.hide();
-      this.notification.error(new Notification('Firewall could not be deleted!!'));
+      this.notificationSvc.error(new Notification('Firewall could not be deleted!!'));
     });
   }
 }

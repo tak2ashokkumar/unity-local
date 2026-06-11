@@ -35,6 +35,13 @@ function buildPageUrl(req, page, pageSize) {
 
 function paginateArray(req, data) {
   const query = req.query || {};
+
+  // Only paginate when the client actually asks for it. Endpoints that expect a
+  // raw array (no page / page_size params) get the array back untouched.
+  if (query.page === undefined && query.page_size === undefined) {
+    return data;
+  }
+
   const rawPageSize = Number(query.page_size);
   const rawPage = Number(query.page || 1);
 

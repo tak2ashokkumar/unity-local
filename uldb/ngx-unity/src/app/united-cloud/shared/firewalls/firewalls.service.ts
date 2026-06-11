@@ -34,22 +34,21 @@ export class FirewallsService {
     return this.http.get<BulkUpdateFieldType[]>(`/customer/device_editable_fields?device_type=firewall`)
   }
 
-  deleteMultipleFirewalls(uuids: string[]) {
+  deleteMultipleFirewalls(uuids: string[]): Observable<unknown> {
     let params: HttpParams = new HttpParams();
-    uuids.map(uuid => params = params.append('uuids', uuid));
-    return this.http.get(`/customer/firewalls/bulk_delete/`, { params: params });
+    uuids.forEach(uuid => params = params.append('uuids', uuid));
+    return this.http.get(`/customer/firewalls/bulk_delete/`, { params });
   }
 
-  updateMultipleFirewalls(uuids: string[], obj: any) {
+  updateMultipleFirewalls(uuids: string[], obj: Record<string, unknown>): Observable<unknown> {
     let params: HttpParams = new HttpParams();
     uuids.forEach(uuid => params = params.append('uuids', uuid));
     return this.http.patch(`/customer/firewalls/bulk_update/`, obj, { params });
   }
 
   convertToViewData(data: Firewall[]): FirewallViewData[] {
-    let viewData: FirewallViewData[] = [];
-    data.map(s => {
-      let a: FirewallViewData = new FirewallViewData();
+    return data.map(s => {
+      const a = new FirewallViewData();
       a.deviceId = s.uuid;
       a.name = s.name;
       a.cloud = s.cloud.map(c => c.name);
@@ -98,9 +97,8 @@ export class FirewallsService {
         a.isNewTabEnabled = false;
       }
 
-      viewData.push(a);
+      return a;
     });
-    return viewData;
   }
 
   private setShared(device: FirewallViewData) {
@@ -108,7 +106,7 @@ export class FirewallsService {
     device.statsTooltipMessage = 'Non Manageable Shared Device';
   }
 
-  getDeviceData(device: FirewallViewData) {
+  getDeviceData(device: FirewallViewData): Observable<FirewallViewData> {
     if (!device.monitoring.configured) {
       if (!device.deviceStatus) {
         device.deviceStatus = 'Not Configured';

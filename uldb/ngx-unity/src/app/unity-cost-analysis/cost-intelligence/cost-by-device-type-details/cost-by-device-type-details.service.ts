@@ -18,7 +18,7 @@ export class CostByDeviceTypeDetailsService {
 
   convertToCostByDeviceTypeViewData(data: CostDetailsByDeviceTypeData[]): CostDetailsByDeviceTypeViewData[] {
     let viewdata: CostDetailsByDeviceTypeViewData[] = [];
-    data.map(d => {
+    data.forEach(d => {
       let view = new CostDetailsByDeviceTypeViewData();
       view.deviceName = d.device_name;
       view.deviceType = d.device_type;

@@ -156,7 +156,7 @@
                       class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.successfulWorkflows}}</span>
                   </div>
                   <div>
-                    <span class="fa fa fa-exclamation-circle text-danger" tooltip="Failed"></span>
+                    <span class="fa fa-exclamation-circle text-danger" tooltip="Failed"></span>
                     <span
                       class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.failedWorkflows}}</span>
                   </div>
@@ -195,29 +195,29 @@
                         </div>
                       </div>
                       <div class="col-12 bar-chart d-flex mt-1">
-                        <div class="bar text-center text-white"
-                          [ngStyle]="{'background-color': '#83DFAE', 'width': 25 + '%' }"
+                        <div class="bar text-center text-white w-25"
+                          [ngStyle]="{'background-color': '#83DFAE' }"
                           [title]="'0min-5min: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['0min-5min'] + '%'">
                           <span class="bar-text">
                             {{ executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['0min-5min'] }}%
                           </span>
                         </div>
-                        <div class="bar text-center text-white"
-                          [ngStyle]="{'background-color': '#29945B', 'width': 25 + '%' }"
+                        <div class="bar text-center text-white w-25"
+                          [ngStyle]="{'background-color': '#29945B' }"
                           [title]="'5min-30min: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['5min-30min'] + '%'">
                           <span class="bar-text">
                             {{ executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['5min-30min'] }}%
                           </span>
                         </div>
-                        <div class="bar text-center text-white"
-                          [ngStyle]="{'background-color': '#FF8800', 'width': 25 + '%' }"
+                        <div class="bar text-center text-white w-25"
+                          [ngStyle]="{'background-color': '#FF8800' }"
                           [title]="'30min-1hr: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['30min-1hr'] + '%'">
                           <span class="bar-text">
                             {{ executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['30min-1hr'] }}%
                           </span>
                         </div>
-                        <div class="bar text-center text-white"
-                          [ngStyle]="{'background-color': '#CC0000', 'width': 25 + '%' }"
+                        <div class="bar text-center text-white w-25"
+                          [ngStyle]="{'background-color': '#CC0000' }"
                           [title]="'>1hr: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['>1hr'] + '%'">
                           <span class="bar-text">
                             {{ executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['>1hr'] }}%
@@ -236,29 +236,29 @@
                         </div>
                       </div>
                       <div class="col-12 bar-chart d-flex mt-1">
-                        <div class="bar text-center text-white"
-                          [ngStyle]="{'background-color': '#83DFAE', 'width': 25 + '%' }"
+                        <div class="bar text-center text-white w-25"
+                          [ngStyle]="{'background-color': '#83DFAE' }"
                           [title]="'0min-5min: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['0min-5min'] + '%'">
                           <span class="bar-text">
                             {{ executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['0min-5min'] }}%
                           </span>
                         </div>
-                        <div class="bar text-center text-white"
-                          [ngStyle]="{'background-color': '#29945B', 'width': 25 + '%' }"
+                        <div class="bar text-center text-white w-25"
+                          [ngStyle]="{'background-color': '#29945B' }"
                           [title]="'5min-30min: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['5min-30min'] + '%'">
                           <span class="bar-text">
                             {{ executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['5min-30min'] }}%
                           </span>
                         </div>
-                        <div class="bar text-center text-white"
-                          [ngStyle]="{'background-color': '#FF8800', 'width': 25 + '%' }"
+                        <div class="bar text-center text-white w-25"
+                          [ngStyle]="{'background-color': '#FF8800' }"
                           [title]="'30min-1hr: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['30min-1hr'] + '%'">
                           <span class="bar-text">
                             {{ executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['30min-1hr'] }}%
                           </span>
                         </div>
-                        <div class="bar text-center text-white"
-                          [ngStyle]="{'background-color': '#CC0000', 'width': 25 + '%' }"
+                        <div class="bar text-center text-white w-25"
+                          [ngStyle]="{'background-color': '#CC0000' }"
                           [title]="'>1hr: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['>1hr'] + '%'">
                           <span class="bar-text">
                             {{ executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['>1hr'] }}%
@@ -361,7 +361,7 @@
             </tr>
           </thead>
           <tbody class="font-xs-sm">
-            <tr *ngFor="let data of recentFailureViewData" truncateText>
+            <tr *ngFor="let data of recentFailureViewData; trackBy: trackByFailure" truncateText>
               <td class="text-primary pointer-link tdw-20 cursor">
                 <div class="text-truncate" (click)="redirectToExecutionPage(data)" [tooltip]="data.id">{{data.id}}
                 </div>
@@ -383,8 +383,8 @@
               </td>
               <td class="action-icons-column text-center tdw-10">
                 <button class="action-icons action-icons-off mb-0 fas fa-play font-sm ml-1" tooltip="Execute"
-                  (click)="execute(data)" accessControl moduleName="DevOps Automation" accessType="Execute Tasks"
-                  elementType="actionbtn" container="body"></button>
+                  aria-label="Execute" (click)="execute(data)" accessControl moduleName="DevOps Automation"
+                  accessType="Execute Tasks" elementType="actionbtn" container="body"></button>
               </td>
             </tr>
           </tbody>
@@ -413,7 +413,7 @@
             </tr>
           </thead>
           <tbody class="font-xs-sm">
-            <tr *ngFor="let data of upcomingExecutionViewData" truncateText>
+            <tr *ngFor="let data of upcomingExecutionViewData; trackBy: trackByUpcoming" truncateText>
               <td class="text-primary pointer-link tdw-15 cursor">
                 <div class="text-truncate" [tooltip]="data.name" (click)="redirectToTaskOrWorkflowEdit(data)">
                   {{data.name}}</div>
@@ -435,8 +435,8 @@
               </td>
               <td class="action-icons-column text-center">
                 <button class="action-icons action-icons-off mb-0 fas fa-calendar-alt font-sm ml-1" tooltip="Schedule"
-                  (click)="schedule(data)" accessControl moduleName="DevOps Automation" accessType="Manage Tasks"
-                  elementType="actionbtn" container="body"></button>
+                  aria-label="Schedule" (click)="schedule(data)" accessControl moduleName="DevOps Automation"
+                  accessType="Manage Tasks" elementType="actionbtn" container="body"></button>
               </td>
             </tr>
           </tbody>

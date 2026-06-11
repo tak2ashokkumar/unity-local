@@ -53,7 +53,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let user of viewData; let i = index;" truncateText>
+                        <tr *ngFor="let user of viewData; let i = index; trackBy: trackByUser" truncateText>
                             <td class="tdw-30">
                                 <div [tooltip]="user.email">
                                     <span>{{user.email}}</span>
@@ -73,23 +73,24 @@
                                 <i class="fa" [ngClass]="user.activeIcon"></i>
                             </td>
                             <td class="action-icons-column">
-                                <button class="action-icons mb-0 fa fa-pencil-alt font-sm ml-1"
+                                <button class="action-icons mb-0 fa fa-pencil-alt font-sm ml-1" aria-label="Edit user"
                                     [tooltip]="user.editTooltipMessage" [ngClass]="user.editButtonEnabled"
                                     (click)="goToEditUser(i)" accessControl moduleName="User Management"
                                     accessType="Manage Users" elementType="actionbtn"></button>
-                                <button class="action-icons mb-0 fa font-sm ml-1" [tooltip]="user.activateStatusTooltip"
+                                <button class="action-icons mb-0 fa font-sm ml-1" aria-label="Activate or deactivate user"
+                                    [tooltip]="user.activateStatusTooltip"
                                     [ngClass]="[user.activateIcon, user.activateButtonEnabled]"
                                     (click)="confirmToggle(i)" accessControl moduleName="User Management"
                                     accessType="Manage Users" elementType="actionbtn"></button>
-                                <button class="action-icons mb-0 fas fa-envelope font-sm ml-1"
+                                <button class="action-icons mb-0 fas fa-envelope font-sm ml-1" aria-label="Invite user"
                                     [tooltip]="user.inviteUserTooltipMessage" [ngClass]="user.inviteUserButtonClass"
                                     (click)="inviteUser(i)" accessControl moduleName="User Management"
                                     accessType="Manage Users" elementType="actionbtn"></button>
-                                <button class="action-icons mb-0 fa fa-undo font-sm ml-1"
+                                <button class="action-icons mb-0 fa fa-undo font-sm ml-1" aria-label="Reset password"
                                     [tooltip]="user.resetTooltipMessage" [ngClass]="user.resetButtonClass"
                                     (click)="confirmPasswordToggle(i)" accessControl moduleName="User Management"
                                     accessType="Manage Users" elementType="actionbtn"></button>
-                                <button class="action-icons mb-0 fa fa-trash-alt font-sm ml-1"
+                                <button class="action-icons mb-0 fa fa-trash-alt font-sm ml-1" aria-label="Delete user"
                                     [tooltip]="user.deleteTooltipMessage" [ngClass]="user.deleteButtonEnabled"
                                     (click)="confirmDeleteUser(i)" accessControl moduleName="User Management"
                                     accessType="Manage Users" elementType="actionbtn"></button>
@@ -129,7 +130,7 @@
     </div>
 </ng-template>
 
-<ng-template #password_reset>
+<ng-template #passwordReset>
     <div class="card mb-0">
         <div class="card-header">
             {{confirmInput?.confirmTitle}}
@@ -150,7 +151,7 @@
     </div>
 </ng-template>
 
-<ng-template #delete_confirm>
+<ng-template #deleteConfirm>
     <div class="card mb-0">
         <div class="card-header">
             {{confirmInput?.confirmTitle}}

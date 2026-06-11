@@ -23,12 +23,16 @@ export class UsumUsersService {
   }
 
   getAzureAccounts(): Observable<AzureManageAccountsType[]> {
-    let params: HttpParams = new HttpParams().set('page_size', 0);
-    return this.http.get<AzureManageAccountsType[]>(GET_AZURE_ACCOUNTS(), { params: params });
+    const params: HttpParams = new HttpParams().set('page_size', 0);
+    return this.http.get<AzureManageAccountsType[]>(GET_AZURE_ACCOUNTS(), { params });
+  }
+
+  convertToViewData(data: UnitySetupUser[]): UserViewData[] {
+    return data.map(s => this.convert(s));
   }
 
   convert(s: UnitySetupUser): UserViewData {
-    let a: UserViewData = new UserViewData();
+    const a: UserViewData = new UserViewData();
     a.email = s.email;
     a.firstName = s.first_name;
     a.lastName = s.last_name;
@@ -65,7 +69,7 @@ export class UsumUsersService {
       a.activateStatusTooltip = s.is_active ? 'Deactivate' : 'Activate';
       a.activateButtonEnabled = '';
 
-      a.canReset = !s.is_active ? false : (s.password_reset_link_pending ? false : true);
+      a.canReset = s.is_active && !s.password_reset_link_pending;
       a.resetButtonClass = a.canReset ? 'action-icons' : 'action-icons-disabled';
       a.resetTooltipMessage = !s.is_active ? 'Account Deactivated' : (!s.password_reset_link_pending ? 'Reset Password' : "Password reset link sent to user's email address.");
 
@@ -88,18 +92,6 @@ export class UsumUsersService {
     return a;
   }
 
-  convertToViewData(data: UnitySetupUser[]): UserViewData[] {
-    let viewData: UserViewData[] = [];
-    data.map(s => {
-      viewData.push(this.convert(s));
-    });
-    return viewData;
-  }
-
-  // manageUser(uuid: string, activeFlag: boolean): Observable<UnitySetupUser> {
-  //   return this.http.put<UnitySetupUser>(UPDATE_USER(uuid), { is_active: activeFlag });
-  // }
-  
   toggleUser(uuid: string): Observable<UnitySetupUser> {
     return this.http.get<UnitySetupUser>(TOGGLE_USER(uuid));
   }
@@ -112,10 +104,8 @@ export class UsumUsersService {
     return this.http.delete<string>(UPDATE_USER(uuid));
   }
 
-  inviteUser(userId: string) {
-    let params: HttpParams = new HttpParams();
-    params.set('user_id', userId);
-    return this.http.get<any>(INVITE_USER(userId), { params: params });
+  inviteUser(userId: string): Observable<string> {
+    return this.http.get<string>(INVITE_USER(userId));
   }
 
 }
@@ -135,7 +125,6 @@ export class UserViewData {
 
   canActivate: boolean;
   activateIcon: string;
-  activateIconEnabled: boolean;
   activateButtonEnabled: string;
   activateStatusTooltip: string;
 

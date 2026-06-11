@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { AvailabilityCostInsightsService } from './availability-cost-insights.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
@@ -14,47 +12,54 @@ import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
   selector: 'availability-cost-insights',
   templateUrl: './availability-cost-insights.component.html',
   styleUrls: ['./availability-cost-insights.component.scss'],
-  providers: [AvailabilityCostInsightsService]
+  providers: [AvailabilityCostInsightsService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AvailabilityCostInsightsComponent implements OnInit {
-  private ngUnsubscribe = new Subject();
+export class AvailabilityCostInsightsComponent implements OnInit, OnDestroy {
+  private readonly ngUnsubscribe = new Subject<void>();
   currentCriteria: SearchCriteria;
   costBycloudChartViewData: UnityChartDetails;
   hourlyLineChartViewData: UnityChartDetails;
   costVsBudgetChartViewData: UnityChartDetails;
 
   constructor(private svc: AvailabilityCostInsightsService,
-    private notification: AppNotificationService,
-    private spinner: AppSpinnerService,
-    private router: Router,
-    private route: ActivatedRoute) {
-    this.currentCriteria = { searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
-  }
+    private notificationSvc: AppNotificationService,
+    private spinnerSvc: AppSpinnerService,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
+    this.currentCriteria = { searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.getCostBycloudChartData();
     this.getAvailabilityMetricsTrend();
     this.getCostAnomalityOverview();
   }
 
-  getCostBycloudChartData() {
-    this.spinner.start('CostByCloudTypeChartLoader');
-    this.svc.getCostBycloudTypeChartData(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.costBycloudChartViewData = this.svc.convertToCostBycloudChartData(res);
-      console.log(this.costBycloudChartViewData, 'costBycloudChartViewData');
-      this.spinner.stop('CostByCloudTypeChartLoader');
-    }, err => {
-      this.spinner.stop('CostByCloudTypeChartLoader');
-      this.notification.error(new Notification('Failed to get cost by cloud type data'));
-    });
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
-  getAvailabilityMetricsTrend(){
+  getCostBycloudChartData(): void {
+    this.spinnerSvc.start('CostByCloudTypeChartLoader');
+    this.svc.getCostBycloudTypeChartData(this.currentCriteria)
+      .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopLoader('CostByCloudTypeChartLoader')))
+      .subscribe(res => {
+        this.costBycloudChartViewData = this.svc.convertToCostBycloudChartData(res);
+      }, () => {
+        this.notificationSvc.error(new Notification('Failed to get cost by cloud type data'));
+      });
+  }
+
+  getAvailabilityMetricsTrend(): void {
     this.hourlyLineChartViewData = this.svc.convertToHourlyLineChartData();
   }
 
-  getCostAnomalityOverview(){
+  getCostAnomalityOverview(): void {
     this.costVsBudgetChartViewData = this.svc.convertToCostVsBudgetChartData();
   }
 
+  private stopLoader(loader: string): void {
+    this.spinnerSvc.stop(loader);
+    this.cdr.markForCheck();
+  }
 }

@@ -1,28 +1,75 @@
 {
   "exec_count_summary": {
-    "total": {},
-    "workflow": {},
-    "task": {}
+    "total": {
+      "Failed": 31,
+      "Success": 269
+    },
+    "workflow": {
+      "Success": 64
+    },
+    "task": {
+      "Failed": 31,
+      "Success": 205
+    }
   },
   "execution_by_type": {
-    "data": [],
+    "data": [
+      {
+        "workflow_counts": 15,
+        "range": "Thu",
+        "task_counts": 64
+      },
+      {
+        "workflow_counts": 4,
+        "range": "Fri",
+        "task_counts": 2
+      },
+      {
+        "workflow_counts": 2,
+        "range": "Wed",
+        "task_counts": 8
+      },
+      {
+        "workflow_counts": 37,
+        "range": "Mon",
+        "task_counts": 24
+      },
+      {
+        "workflow_counts": 6,
+        "range": "Tue",
+        "task_counts": 17
+      }
+    ],
     "grouping": "day"
   },
   "average_workflow_percentage": {
     "average_taskflow": {
-      "0min-5min": 0,
-      "5min-30min": 0,
-      "30min-1hr": 0,
-      ">1hr": 0,
-      "avg_exec_time": "0:00:00"
+      "0min-5min": 100.0,
+      "5min-30min": 0.0,
+      "30min-1hr": 0.0,
+      ">1hr": 0.0,
+      "avg_exec_time": "0:00:12.442290"
     },
     "average_workflow": {
-      "0min-5min": 0,
-      "5min-30min": 0,
-      "30min-1hr": 0,
-      ">1hr": 0,
-      "avg_exec_time": "0:00:00"
+      "0min-5min": 100.0,
+      "5min-30min": 0.0,
+      "30min-1hr": 0.0,
+      ">1hr": 0.0,
+      "avg_exec_time": "0:00:20.734261"
     }
   },
-  "execution_by_user": []
+  "execution_by_user": [
+    {
+      "username": "UnityOne Demo",
+      "count": 259
+    },
+    {
+      "username": "John Doe",
+      "count": 31
+    },
+    {
+      "username": "UPC Demo",
+      "count": 10
+    }
+  ]
 }

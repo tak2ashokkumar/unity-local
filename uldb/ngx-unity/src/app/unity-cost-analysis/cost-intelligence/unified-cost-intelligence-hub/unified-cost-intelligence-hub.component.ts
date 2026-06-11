@@ -1,94 +1,94 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CostByServicesItemViewData, UnifiedCostIntelligenceHubService } from './unified-cost-intelligence-hub.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'unified-cost-intelligence-hub',
   templateUrl: './unified-cost-intelligence-hub.component.html',
   styleUrls: ['./unified-cost-intelligence-hub.component.scss'],
-  providers: [UnifiedCostIntelligenceHubService]
+  providers: [UnifiedCostIntelligenceHubService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UnifiedCostIntelligenceHubComponent implements OnInit {
-  private ngUnsubscribe = new Subject();
+export class UnifiedCostIntelligenceHubComponent implements OnInit, OnDestroy {
+  private readonly ngUnsubscribe = new Subject<void>();
   currentCriteria: SearchCriteria;
   currentServiceCriteria: SearchCriteria;
-  costByServicesFilter: string = 'All';
+  costByServicesFilter = 'All';
   costBycloudChartViewData: UnityChartDetails;
   costBySubscriptionChartViewData: UnityChartDetails;
   costByServiceViewData: CostByServicesItemViewData[] = [];
 
   constructor(private svc: UnifiedCostIntelligenceHubService,
-    private spinner: AppSpinnerService,
-    private notification: AppNotificationService,
-    private router: Router,
-    private storageService: StorageService,
-    private route: ActivatedRoute) {
-    this.currentCriteria = { searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ cloud: '', month: '' }], multiValueParam: { region: [], cloud_type: [] } };
-    this.currentServiceCriteria = { multiValueParam: { cloud_type: [] } };
-  }
+    private spinnerSvc: AppSpinnerService,
+    private notificationSvc: AppNotificationService,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    // this.getCostSummary();
-    this.getSummaryData();
+    this.currentCriteria = { searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ cloud: '', month: '' }], multiValueParam: { region: [], cloud_type: [] } };
+    this.currentServiceCriteria = { multiValueParam: { cloud_type: [] } };
     this.getCostBycloudChartData();
     this.getCostBySubscriptionChartData();
     this.getCostByService();
-    // this.getTrailingTwelveMonthData();
-    // this.getCostByCloudTypeSummaryData();
   }
 
-  onServiceFilterChange() {
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
+  onServiceFilterChange(): void {
     this.getCostByService();
   }
 
-  getSummaryData() {
-
+  getCostBycloudChartData(): void {
+    this.spinnerSvc.start('CostByCloudTypeChartLoader');
+    this.svc.getCostBycloudTypeChartData(this.currentCriteria)
+      .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopLoader('CostByCloudTypeChartLoader')))
+      .subscribe(res => {
+        this.costBycloudChartViewData = this.svc.convertToCostBycloudChartData(res);
+      }, () => {
+        this.notificationSvc.error(new Notification('Failed to get cost by cloud type data'));
+      });
   }
 
-  getCostBycloudChartData() {
-    this.spinner.start('CostByCloudTypeChartLoader');
-    this.svc.getCostBycloudTypeChartData(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.costBycloudChartViewData = this.svc.convertToCostBycloudChartData(res);
-      this.spinner.stop('CostByCloudTypeChartLoader');
-    }, err => {
-      this.spinner.stop('CostByCloudTypeChartLoader');
-      this.notification.error(new Notification('Failed to get cost by cloud type data'));
-    });
+  getCostBySubscriptionChartData(): void {
+    this.spinnerSvc.start('CostBySubscriptionChartLoader');
+    this.svc.getCostBySubscriptionChartData(this.currentCriteria)
+      .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopLoader('CostBySubscriptionChartLoader')))
+      .subscribe(res => {
+        this.costBySubscriptionChartViewData = this.svc.convertToCostBySubscriptionChartData(res);
+      }, () => {
+        this.notificationSvc.error(new Notification('Failed to get cost by cloud subscription data'));
+      });
   }
 
-  getCostBySubscriptionChartData() {
-    this.spinner.start('CostBySubscriptionChartLoader');
-    this.svc.getCostBySubscriptionChartData(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.costBySubscriptionChartViewData = this.svc.convertToCostBySubscriptionChartData(res);
-      this.spinner.stop('CostBySubscriptionChartLoader');
-    }, err => {
-      this.spinner.stop('CostBySubscriptionChartLoader');
-      this.notification.error(new Notification('Failed to get cost by cloud subscription data'));
-    });
+  getCostByService(): void {
+    this.spinnerSvc.start('CostByServicesTableLoader');
+    this.svc.getCostByService(this.costByServicesFilter)
+      .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopLoader('CostByServicesTableLoader')))
+      .subscribe(data => {
+        this.costByServiceViewData = this.svc.convertToCostByServicesViewData(data);
+      }, () => {
+        this.notificationSvc.error(new Notification('Failed to get cost by cloud services data'));
+      });
   }
 
-  getCostByService() {
-    this.spinner.start('CostByServicesTableLoader');
-    this.svc.getCostByService(this.costByServicesFilter).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-      this.costByServiceViewData = this.svc.convertToCostByServicesViewData(data);
-      this.spinner.stop('CostByServicesTableLoader');
-    }, (err: HttpErrorResponse) => {
-      this.spinner.stop('CostByServicesTableLoader');
-      this.notification.error(new Notification('Failed to get cost by cloud services data'));
-    });
-  };
-
-  openRow(view: CostByServicesItemViewData) {
+  openRow(view: CostByServicesItemViewData): void {
     view.isOpen = !view.isOpen;
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  private stopLoader(loader: string): void {
+    this.spinnerSvc.stop(loader);
+    this.cdr.markForCheck();
+  }
 }

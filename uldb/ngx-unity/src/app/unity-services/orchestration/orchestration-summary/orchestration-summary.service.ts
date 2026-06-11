@@ -27,7 +27,7 @@ export class OrchestrationSummaryService {
   }
 
   convertToTaskByStatusChartsData(graphData: OrchestrationSummaryTaskWidgetStatusType) {
-    let view: UnityChartDetails = new UnityChartDetails();
+    const view: UnityChartDetails = new UnityChartDetails();
     let colors = [
       { name: 'Enabled', color: '#378AD8' },
       { name: 'Disabled', color: '#FF8800' }
@@ -70,7 +70,7 @@ export class OrchestrationSummaryService {
   }
 
   convertToTaskByTargetTypeChartsData(graphData: OrchestrationSummaryTaskWidgetTargetType) {
-    let view: UnityChartDetails = new UnityChartDetails();
+    const view: UnityChartDetails = new UnityChartDetails();
     let colors = [
       { name: 'host', color: '#378AD8' },
       { name: 'cloud', color: '#FF8800' },
@@ -114,7 +114,7 @@ export class OrchestrationSummaryService {
   }
 
   convertToTaskByScriptTypeChartData(graphData: OrchestrationSummaryTaskWidgetScriptsType[]) {
-    let view: UnityChartDetails = new UnityChartDetails();
+    const view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getNightingalePieChartWithHorizontalLegendsOptions();
     view.options.targetEntity = 'Task';
@@ -179,7 +179,7 @@ export class OrchestrationSummaryService {
   }
 
   convertToWorkflowByStatusChartsData(graphData: OrchestrationSummaryWorkflowWidgetStatusType) {
-    let view: UnityChartDetails = new UnityChartDetails();
+    const view: UnityChartDetails = new UnityChartDetails();
     let colors = [
       { name: 'Enabled', color: '#378AD8' },
       { name: 'Disabled', color: '#FF8800' }
@@ -222,7 +222,7 @@ export class OrchestrationSummaryService {
   }
 
   convertToWorkflowByTargetTypeChartsData(graphData: OrchestrationSummaryWorkflowWidgetTargetType) {
-    let view: UnityChartDetails = new UnityChartDetails();
+    const view: UnityChartDetails = new UnityChartDetails();
     let colors = [
       { name: 'host', color: '#378AD8' },
       { name: 'cloud', color: '#FF8800' },
@@ -266,7 +266,7 @@ export class OrchestrationSummaryService {
   }
 
   convertToWorkflowByCategoryChartData(graphData: OrchestrationSummaryWorkflowWidgetCategoryType) {
-    let view: UnityChartDetails = new UnityChartDetails();
+    const view: UnityChartDetails = new UnityChartDetails();
     let colors = [
       { name: WorkflowCategory.PROVISIONING, color: '#376DF7' },
       { name: WorkflowCategory.OPERATIONAL, color: '#53B997' },
@@ -332,7 +332,7 @@ export class OrchestrationSummaryService {
       { label: 'Last 60 Days', value: 'last_60_days' },
       { label: 'Last 90 Days', value: 'last_90_days' },
     ];
-    view.defaultSelected = view.dropdownOptions.find(opt => opt.value == 'last_7_days').value;
+    view.defaultSelected = view.dropdownOptions.find(opt => opt.value === 'last_7_days').value;
     return view;
   }
 
@@ -372,17 +372,15 @@ export class OrchestrationSummaryService {
     if (!data.execution_by_type || !data.execution_by_type.data || !data.execution_by_type.data.length) {
       return;
     }
-    let view: UnityChartDetails = new UnityChartDetails();
+    const view: UnityChartDetails = new UnityChartDetails();
     let xAxisData = this.getXAxisValueBasedOnFilter(data.execution_by_type.grouping);
     let data1: number[] = [];
     let data2: number[] = [];
     if (data.execution_by_type.data) {
       for (let i = 0; i < data.execution_by_type.data.length; i++) {
-        for (let j = 0; j < xAxisData.length; j++) {
-          let indexToPush = xAxisData.findIndex(ind => ind === data.execution_by_type.data[i].range);
-          data1[indexToPush] = data.execution_by_type.data[i].task_counts;
-          data2[indexToPush] = data.execution_by_type.data[i].workflow_counts;
-        }
+        const indexToPush = xAxisData.findIndex(ind => ind === data.execution_by_type.data[i].range);
+        data1[indexToPush] = data.execution_by_type.data[i].task_counts;
+        data2[indexToPush] = data.execution_by_type.data[i].workflow_counts;
       }
     }
     view.type = UnityChartTypes.BAR;
@@ -445,10 +443,10 @@ export class OrchestrationSummaryService {
   }
 
   convertToAvgExecutionTimeData(d: OrchestrationSummaryExecutionType) {
-    if (!d.execution_by_user || !d.execution_by_user.length) {
+    if (!d.average_workflow_percentage) {
       return;
     }
-    let data = d.average_workflow_percentage;
+    const data = d.average_workflow_percentage;
     let avgExecTimeViewData: OrchestrationSummaryAverageExecutionTimeType = {
       average_taskflow: { ...data.average_taskflow },
       average_workflow: { ...data.average_workflow }
@@ -462,8 +460,8 @@ export class OrchestrationSummaryService {
     if (!data || !data.length) {
       return;
     }
-    let view: UnityChartDetails = new UnityChartDetails();
-    let colors = ['#294680', '#00827F', '#376DF7', '#53B997', '#E883B9', '#F8C41', '#68B2FF', '#7A4388', '#6750AA', '#FC7E7E'];
+    const view: UnityChartDetails = new UnityChartDetails();
+    let colors = ['#294680', '#00827F', '#376DF7', '#53B997', '#E883B9', '#F8C541', '#68B2FF', '#7A4388', '#6750AA', '#FC7E7E'];
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getNightingalePieChartWithHorizontalLegendsOptions();
     view.options.targetEntity = 'Execution';
@@ -523,7 +521,7 @@ export class OrchestrationSummaryService {
       { label: 'Last 60 Days', value: 'last_60_days' },
       { label: 'Last 90 Days', value: 'last_90_days' },
     ];
-    view.defaultSelected = view.dropdownOptions.find(opt => opt.value == 'last_7_days').value;
+    view.defaultSelected = view.dropdownOptions.find(opt => opt.value === 'last_7_days').value;
     return view;
   }
 
@@ -543,12 +541,13 @@ export class OrchestrationSummaryService {
       }));
   }
 
-  getBubbleSize(size: number) {
+  getBubbleSize(size: number): number {
     if (size > 50) {
       return 50;
     } else if (size < 4) {
       return 15;
     }
+    return size;
   }
 
   secondsToTime(seconds: number): string {
@@ -584,13 +583,13 @@ export class OrchestrationSummaryService {
 
 
 
-  convertToExecutionsBySuccessRateChartData(formData: any, data: ExecutionsBySuccessRate) {
+  convertToExecutionsBySuccessRateChartData(data: ExecutionsBySuccessRate): UnityChartDetails {
     if (!data.success_data.length && !data.failure_data.length) {
       return null;
     }
     let successData: any[] = [];
     let failureData: any[] = [];
-    data.success_data.map(d => {
+    data.success_data.forEach(d => {
       let sd: any[] = [];
       sd.push(d.created_at);
       sd.push(d.execution_duration);
@@ -599,7 +598,7 @@ export class OrchestrationSummaryService {
       sd.push('Success');
       successData.push(sd);
     })
-    data.failure_data.map(d => {
+    data.failure_data.forEach(d => {
       let fd: any[] = [];
       fd.push(d.created_at);
       fd.push(d.execution_duration);
@@ -609,7 +608,7 @@ export class OrchestrationSummaryService {
       failureData.push(fd);
     })
 
-    let view = new UnityChartDetails();
+    const view = new UnityChartDetails();
     view.options = this.chartConfigSvc.getScatterChartOptions();
     view.options.targetEntity = 'Execution';
     view.options.chartName = ChartNames.EXECUTIONS_BY_SUCCESS_RATE;
@@ -652,13 +651,13 @@ export class OrchestrationSummaryService {
       formatter: function (value: number) {
         if (value > 86400) {
           const days = Math.floor(value / 86400); // Get the integer part of days
-          return `${days} ${days == 1 ? 'day' : 'days'}`;
+          return `${days} ${days === 1 ? 'day' : 'days'}`;
         } else if (value > 3600) {
           const hours = Math.floor(value / 3600); // Get the integer part of hours
-          return `${hours} ${hours == 1 ? 'hr' : 'hrs'}`;
+          return `${hours} ${hours === 1 ? 'hr' : 'hrs'}`;
         } else if (value > 60) {
           const minutes = Math.floor(value / 60); //Get the integer part of minutes
-          return `${minutes} ${minutes == 1 ? 'min' : 'mins'}`;
+          return `${minutes} ${minutes === 1 ? 'min' : 'mins'}`;
         } else {
           return `${value} secs`;
         }
@@ -703,22 +702,22 @@ export class OrchestrationSummaryService {
     view.options.dataZoom = this.chartConfigSvc.setDataZoom('both', 'right');
     view.options.dataZoom[0] = {
       ...view.options.dataZoom[0],
-      labelFormatter: function (value, valueStr) {
+      labelFormatter: function (value) {
         return echarts.time.format(value, '{MMM} {dd}, {yyyy}', false);
       }
     }
     view.options.dataZoom[1] = {
       ...view.options.dataZoom[1],
-      labelFormatter: function (value, valueStr) {
+      labelFormatter: function (value) {
         if (value > 86400) {
           const days = Math.floor(value / 86400); // Get the integer part of days
-          return `${days} ${days == 1 ? 'day' : 'days'}`;
+          return `${days} ${days === 1 ? 'day' : 'days'}`;
         } else if (value > 3600) {
           const hours = Math.floor(value / 3600); // Get the integer part of hours
-          return `${hours} ${hours == 1 ? 'hr' : 'hrs'}`;
+          return `${hours} ${hours === 1 ? 'hr' : 'hrs'}`;
         } else if (value > 60) {
           const minutes = Math.floor(value / 60); //Get the integer part of minutes
-          return `${minutes} ${minutes == 1 ? 'min' : 'mins'}`;
+          return `${minutes} ${minutes === 1 ? 'min' : 'mins'}`;
         } else {
           return `${value} secs`;
         }
@@ -733,7 +732,7 @@ export class OrchestrationSummaryService {
     return view;
   }
 
-  convertToExecutionsByEfficiencyChartData(formData: any, data: ExecutionsByEfficiency) {
+  convertToExecutionsByEfficiencyChartData(data: ExecutionsByEfficiency): UnityChartDetails {
     if (!data.task_data.length && !data.workflow_data.length) {
       return null;
     }
@@ -758,7 +757,7 @@ export class OrchestrationSummaryService {
       workflowData.push(td);
     })
 
-    let view = new UnityChartDetails();
+    const view = new UnityChartDetails();
     view.options = this.chartConfigSvc.getScatterChartOptions();
     view.options.targetEntity = 'Execution';
     view.options.chartName = ChartNames.EXECUTIONS_BY_EFFICIENCY;
@@ -786,13 +785,13 @@ export class OrchestrationSummaryService {
       formatter: function (value: number) {
         if (value > 86400) {
           const days = Math.floor(value / 86400); // Get the integer part of days
-          return `${days} ${days == 1 ? 'day' : 'days'}`;
+          return `${days} ${days === 1 ? 'day' : 'days'}`;
         } else if (value > 3600) {
           const hours = Math.floor(value / 3600); // Get the integer part of hours
-          return `${hours} ${hours == 1 ? 'hr' : 'hrs'}`;
+          return `${hours} ${hours === 1 ? 'hr' : 'hrs'}`;
         } else if (value > 60) {
           const minutes = Math.floor(value / 60); //Get the integer part of minutes
-          return `${minutes} ${minutes == 1 ? 'min' : 'mins'}`;
+          return `${minutes} ${minutes === 1 ? 'min' : 'mins'}`;
         } else {
           return `${value} secs`;
         }
@@ -851,16 +850,16 @@ export class OrchestrationSummaryService {
     view.options.dataZoom = this.chartConfigSvc.setDataZoom('both', 'right');
     view.options.dataZoom[1] = {
       ...view.options.dataZoom[1],
-      labelFormatter: function (value, valueStr) {
+      labelFormatter: function (value) {
         if (value > 86400) {
           const days = Math.floor(value / 86400); // Get the integer part of days
-          return `${days} ${days == 1 ? 'day' : 'days'}`;
+          return `${days} ${days === 1 ? 'day' : 'days'}`;
         } else if (value > 3600) {
           const hours = Math.floor(value / 3600); // Get the integer part of hours
-          return `${hours} ${hours == 1 ? 'hr' : 'hrs'}`;
+          return `${hours} ${hours === 1 ? 'hr' : 'hrs'}`;
         } else if (value > 60) {
           const minutes = Math.floor(value / 60); //Get the integer part of minutes
-          return `${minutes} ${minutes == 1 ? 'min' : 'mins'}`;
+          return `${minutes} ${minutes === 1 ? 'min' : 'mins'}`;
         } else {
           return `${value} secs`;
         }
@@ -881,7 +880,7 @@ export class OrchestrationSummaryService {
 
   convertToRecentFailureViewData(data: OrchestrationRecentFailureExecutionsType[]) {
     let viewData: RecentFailureViewModel[] = [];
-    data.map(val => {
+    data.forEach(val => {
       let rf: RecentFailureViewModel = new RecentFailureViewModel();
       rf.id = val.run_id;
       rf.uuid = val.uuid;
@@ -918,7 +917,7 @@ export class OrchestrationSummaryService {
 
   convertToUpcomingExecutionViewData(data: OrchestrationUpcomingExecutionsType[]) {
     let viewData: UpccomingExecutionViewModel[] = [];
-    data.map(val => {
+    data.forEach(val => {
       let ue: UpccomingExecutionViewModel = new UpccomingExecutionViewModel();
       ue.name = val.name;
       ue.target = val.target;
@@ -962,10 +961,12 @@ export class OrchestrationSummaryService {
     }
   }
 
-  formatDuration(dur: string) {
-    let modifiedDuration;
-    let initialDuration = dur?.split('.')[0];
-    let initialDurArr = initialDuration?.split(':');
+  formatDuration(dur: string): string {
+    if (!dur) {
+      return '';
+    }
+    const initialDurArr = dur.split('.')[0].split(':');
+    let modifiedDuration: string;
     if ((initialDurArr[0] === '00' || initialDurArr[0] === '0') && (initialDurArr[1] === '00' || initialDurArr[1] === '0')) {
       modifiedDuration = `${initialDurArr[2]}secs`;
     } else if ((initialDurArr[0] === '00' || initialDurArr[0] === '0') && (initialDurArr[1] !== '00' && initialDurArr[2] !== '00')) {

@@ -38,7 +38,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr *ngFor="let view of detailsViewData; let i = index;" setTableColumnWidth truncateText>
+                        <tr *ngFor="let view of detailsViewData; let i = index; trackBy: trackByIndex" setTableColumnWidth truncateText>
                           <td class="tdw-20">
                             <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
                           </td>

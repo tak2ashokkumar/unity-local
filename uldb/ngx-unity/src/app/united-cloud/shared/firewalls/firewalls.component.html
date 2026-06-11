@@ -55,7 +55,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let view of viewData" setTableColumnWidth>
+            <tr *ngFor="let view of viewData; trackBy: trackByFirewall" setTableColumnWidth>
               <td class="checkbox-column">
                 <span class="bg-white mr-1 text-primary" (click)="$event.stopPropagation();select(view);" accessControl
                   moduleName="Datacenter" accessType="Manage Datacenter" elementType="div-hide"
@@ -88,25 +88,6 @@
                 <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
               </td>
               <td class="action-icons-column">
-                <!-- <span dropdown placement="bottom right" container="body">
-                  <button class="action-icons action-icons-disabled mb-0 fas fa-external-link-square-alt font-sm ml-1"
-                    (click)="false" [tooltip]="view.sameTabTootipMessage" container="body"
-                    *ngIf="!view.isSameTabEnabled"></button>
-
-                  <button id="button-container" class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
-                    *ngIf="view.isSameTabEnabled" data-toggle="dropdown" aria-controls="dropdown-container"
-                    dropdownToggle (click)="false" [tooltip]="view.sameTabTootipMessage" container="body"
-                    [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"></button>
-                  <div id="dropdown-container" class="dropdown-menu dropdown-menu-right" *dropdownMenu
-                    aria-labelledby="button-container">
-                    <a class="dropdown-item"
-                      [ngClass]="view.sameTabConsoleAccessUrl?'text-primary':'text-secondary disabled'"
-                      (click)="consoleSameTab(view)">
-                      Console Access
-                    </a>
-                  </div>
-                </span> -->
-
                 <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
                   [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
                   (click)="consoleSameTab(view)" accessControl moduleName="Datacenter" accessType="Remote Management"

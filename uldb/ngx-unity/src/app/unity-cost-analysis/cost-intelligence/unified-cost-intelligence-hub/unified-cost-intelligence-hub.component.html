@@ -90,7 +90,7 @@
                 <div class="scrollit">
                     <table class="table table-sm table-borderless text-left">
                         <tbody>
-                            <ng-container *ngFor="let view of costByServiceViewData;">
+                            <ng-container *ngFor="let view of costByServiceViewData; trackBy: trackByIndex">
                                 <tr class="border-bottom">
                                     <td style="width: 40px">
                                         <img class="w-100" [src]="view.cloudImg" [alt]="view.cloud"
@@ -314,7 +314,7 @@
 
 <ng-template #serviceDetails let-view="view">
     <table class="table table-sm table-borderless mb-0 text-left">
-        <tr *ngFor="let v of view;" class="d-flex justify-content-between">
+        <tr *ngFor="let v of view; trackBy: trackByIndex" class="d-flex justify-content-between">
             <td class="text-primary">{{v?.deviceName}}</td>
             <td>${{v?.cost}}</td>
         </tr>
