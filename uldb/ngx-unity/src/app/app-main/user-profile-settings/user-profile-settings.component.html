@@ -2,334 +2,345 @@
 </app-main-tab>
 <div class="container-fluid">
     <div class="animated fadeIn">
-        <div class="row" *ngIf="orgSettings">
-            <div class="col-12 px-0" *ngIf="monitoringPermissionSet.view"
-                [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
-                <div class="card mb-0">
-                    <div class="card-header bg-transparent font-500 py-2">
-                        <div class="row">
-                            <div class="col-10 font-lg-xl">
-                                Auto Remediation
-                            </div>
-                            <div class="col">
-                                <span class="ml-2 float-right align-middle" style="height: 10px;">
-                                    <div class="autoRemediation-switch-container">
-                                        <input type="checkbox" id="check" (click)="toggleRemediationSwitch()"
-                                            [checked]="orgSettings.auto_remediation_enabled">
-                                        <label for="check" class="autoRemediation-toggle-button"></label>
-                                    </div>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="col-12 px-0 mt-2" *ngIf="aimlPermissionSet.view"
-                [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
-                <div class="card mb-2">
-                    <div
-                        class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
-                        <span class="font-lg-xl">Auto Ticketing</span>
-                        <div class="d-flex" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
-                            elementType="div-hide">
-                            <button *ngIf="orgSettings.auto_ticketing_enabled" class="btn btn-pill btn-sm btn-warning"
-                                type="button" (click)="resetToDefaultAutoTicketingSettings()">Reset to default
-                                settings</button>
-                            <span class="ml-2 float-right align-middle">
-                                <div class="autoTicketing-switch-container">
-                                    <input type="checkbox" id="autoTicketingCheck"
-                                        [checked]="orgSettings.auto_ticketing_enabled"
-                                        (click)="toggleTicketingSwitch()">
-                                    <label for="autoTicketingCheck" class="autoTicketing-toggle-button"></label>
+        <!-- Row 1: Profile identity + Access -->
+        <div class="row mb-3">
+            <div class="col-12 col-lg-6 px-0 pr-lg-2">
+                <div class="card shadow-sm h-100 mb-0">
+                    <div class="card-body py-3 d-flex flex-column">
+                        <div class="d-flex align-items-center">
+                            <div
+                                class="profile-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mr-3">
+                                <span class="font-lg-xl font-500">{{user.fullName | slice:0:1}}</span>
+                            </div>
+                            <div>
+                                <h4 class="card-title font-lg-xl font-500 mb-0">{{user.fullName}}</h4>
+                                <div class="text-muted my-1">{{user.email}}</div>
+                                <div class="text-muted font-sm" *ngIf="orgSettings?.organization_name">
+                                    <i class="fas fa-building mr-1"></i>{{orgSettings.organization_name}}
                                 </div>
-                            </span>
+                            </div>
+                            <button class="btn btn-warning btn-sm btn-pill ml-auto flex-shrink-0"
+                                (click)="changePasswordBuildForm()">Change Password</button>
                         </div>
-                    </div>
-                    <div class="card-body" *ngIf="orgSettings.auto_ticketing_enabled">
-                        <form *ngIf="autoTicketingForm" [formGroup]="autoTicketingForm">
-                            <div class="row">
-                                <div class="form-group col-4">
-                                    <label for="ticketing_instance" class="font-lg">Default ITSM
-                                        Instance<em>*</em></label>
-                                    <select class="form-control" id="ticketing_instance"
-                                        [compareWith]="compareInstances" formControlName="ticketing_instance"
-                                        name="ticketing_instance"
-                                        [ngClass]="{'is-invalid' : autoTicketingFormErrors.ticketing_instance}">
-                                        <option [value]="null" disabled>Select ITSM Instance</option>
-                                        <option *ngFor="let ins of itsmInstances" [ngValue]="ins">
-                                            {{ins.name }}</option>
-                                    </select>
-                                    <div class="invalid-feedback" *ngIf="autoTicketingFormErrors.ticketing_instance">
-                                        {{autoTicketingFormErrors.ticketing_instance}}
+                        <div class="row mt-3 flex-grow-1">
+                            <div class="col-sm-6 mb-2">
+                                <div
+                                    class="bg-light rounded p-3 h-100 d-flex justify-content-between align-items-center">
+                                    <div class="mr-2">
+                                        <div class="text-uppercase text-muted font-xs-sm font-500">Timezone
+                                            Settings</div>
+                                        <div class="font-lg">{{user.userTimeZone}}</div>
                                     </div>
+                                    <button class="btn btn-warning btn-sm btn-pill flex-shrink-0"
+                                        (click)="changeTimeZone()">Change Timezone</button>
                                 </div>
-                                <div class="form-group col-4">
-                                    <label class="severity font-lg">Severity<em>*</em></label>
-                                    <multiselect-dropdown [options]="severityOptions" [settings]="severityTypeSettings"
-                                        class="form-control p-1" style="height:auto;"
-                                        formControlName="auto_ticketing_severity"
-                                        [ngClass]="{'is-invalid' : autoTicketingFormErrors.auto_ticketing_severity}">
-                                    </multiselect-dropdown>
-                                    <div class="invalid-feedback"
-                                        *ngIf="autoTicketingFormErrors.auto_ticketing_severity">
-                                        {{autoTicketingFormErrors.auto_ticketing_severity}}</div>
-                                </div>
-                                <div class="form-group col-4">
-                                    <label for="delay" class="font-lg">Delay<em>*</em></label>
-                                    <input class="form-control" type="text" formControlName="auto_ticketing_delay"
-                                        [ngClass]="{'is-invalid' : autoTicketingFormErrors.auto_ticketing_delay}" />
-                                    <div class="invalid-feedback" *ngIf="autoTicketingFormErrors.auto_ticketing_delay">
-                                        {{autoTicketingFormErrors.auto_ticketing_delay}}
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <div
+                                    class="bg-light rounded p-3 h-100 d-flex justify-content-between align-items-center">
+                                    <div class="mr-2">
+                                        <div class="text-uppercase text-muted font-xs-sm font-500">Two-Factor
+                                            Authentication</div>
+                                        <div class="font-lg">{{user.twoFactorAuth}}</div>
                                     </div>
+                                    <button routerLink="/settings/twofactor"
+                                        class="btn btn-warning btn-sm btn-pill flex-shrink-0">Manage</button>
                                 </div>
-                                <div class="form-group col-4">
-                                    <label for="delay" class="font-lg">Ticket Subject Format</label>
-                                    <input class="form-control" type="text" [placeholder]="'{{ example }}'"
-                                        formControlName="ticket_subject_format"
-                                        [ngClass]="{'is-invalid' : autoTicketingFormErrors.ticket_subject_format}" />
-                                    <div class="invalid-feedback" *ngIf="autoTicketingFormErrors.ticket_subject_format">
-                                        {{autoTicketingFormErrors.ticket_subject_format}}
+                            </div>
+                            <div class="col-sm-6 mb-2 mb-sm-0">
+                                <div class="bg-light rounded p-3 h-100 d-flex align-items-center">
+                                    <div>
+                                        <div class="text-uppercase text-muted font-xs-sm font-500">Last Login
+                                        </div>
+                                        <div class="font-lg">{{user.lastLogin}}</div>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                        <div class="row">
-                            <button class="btn btn-pill btn-md btn-warning ml-2" type="button" (click)="saveSettings()"
-                                accessControl moduleName="Ticket Management" accessType="Manage Tickets"
-                                elementType="btn">Save Changes</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card mb-2">
-                    <div
-                        class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
-                        <span class="font-lg-xl">RCA AI Analysis</span>
-                        <div class="rcaAI-switch-container">
-                            <input type="checkbox" id="rca" (click)="toggleRcaAISwitch()"
-                                [checked]="orgSettings.attach_rca_to_ticket">
-                            <label for="rca" class="rcaAI-toggle-button"></label>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="">
-                            <span>Automatically include an AI-generated RCA report to the ITSM ticket. </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card mb-2">
-                    <div
-                        class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
-                        <span class="font-lg-xl">AI Agent to KB Injection</span>
-                        <div class="rcaAI-switch-container">
-                            <input type="checkbox" id="aiAgentKb" (click)="toggleaiAgentKbSwitch()"
-                                [checked]="orgSettings.auto_publish_condition_to_kb">
-                            <label for="aiAgentKb" class="rcaAI-toggle-button"></label>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="">
-                            <span>Automatic injection of remediation documents into the Knowledge Base.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col px-0">
-                <div class="card mb-2">
-                    <div class="card-header bg-transparent ml-0 card-title font-lg">
-                        <div class="row"> 
-                            <div class="col-8">
-                                <h4 class="card-title d-inline font-lg mb-0">{{user.fullName}}
-                                </h4>
-                            </div>
-                            <div class="col-4">
-                                <button class="btn btn-warning btn-sm btn-pill float-right align-middle"
-                                    (click)="changePasswordBuildForm()">Change
-                                    Password</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                {{user.email}}
-                            </div>
-                            <div class="col-4">
-                                <!-- Zendesk Integration Status - <small class="text-muted font-sm">{{user.zendeskStatus}}</small> -->
-                            </div>
-                            <div class="col-4">
-                                <div class="float-right">Last Login - <small
-                                        class="text-muted font-sm">{{user.lastLogin}}</small></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body py-2">
-                        <div class="row">
-                            <div class="col-6">
-                                <table class="user-profile-table">
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <h4 class="card-title font-lg mb-0 align-middle">Timezone Settings</h4>
-                                            </td>
-                                            <td rowspan="2">
-                                                <button class="btn btn-warning btn-sm btn-pill float-right align-middle"
-                                                    (click)="changeTimeZone()">Change
-                                                    Timezone</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                {{user.userTimeZone}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col-6">
-                                <table class="user-profile-table">
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <h4 class="card-title font-lg mb-0 align-middle">Two-Factor
-                                                    Authentication</h4>
-                                            </td>
-                                            <td rowspan="2">
-                                                <button routerLink="/settings/twofactor"
-                                                    class="btn btn-warning btn-sm btn-pill float-right align-middle">Manage</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                {{user.twoFactorAuth}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="col-sm-6">
+                                <div class="bg-light rounded p-3 h-100 d-flex align-items-center">
+                                    <div>
+                                        <div class="text-uppercase text-muted font-xs-sm font-500">Default
+                                            Ticketing Instance</div>
+                                        <ng-container *ngIf="orgSettings?.ticketing_instance; else noTicketingInstance">
+                                            <div class="font-lg">
+                                                <span class="font-lg">{{orgSettings.ticketing_instance.name}}</span>
+                                                <span
+                                                    class="text-muted font-sm ml-2">({{orgSettings.ticketing_instance.type}})</span>
+                                            </div>
+                                        </ng-container>
+                                        <ng-template #noTicketingInstance>
+                                            <div class="font-lg">NA</div>
+                                        </ng-template>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-6 px-0">
-                <div class="card mb-2">
-                    <div class="card-header py-2">Roles</div>
-                    <div class="card-body">
-                        <div *ngFor="let role of user.roles">
-                            {{role}}
+            <div class="col-12 col-lg-3 px-0 d-flex flex-column">
+                <div class="card shadow-sm mb-0 flex-grow-equal">
+                    <div class="card-header bg-transparent font-500 py-2">Roles</div>
+                    <div class="card-body p-2 card-body-scroll slim-scroll">
+                        <div class="d-flex flex-wrap" *ngIf="user.roles.length">
+                            <span
+                                class="badge badge-pill badge-light border font-500 mr-2 mb-1 text-nowrap font-xs-sm p-2"
+                                *ngFor="let role of user.roles; trackBy: trackByRole">{{role}}</span>
                         </div>
-                        <div *ngIf="!user.roles.length">
+                        <div class="text-center text-muted font-xs-sm py-2" *ngIf="!user.roles.length">
                             No Roles Assigned
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-6 pr-0">
-                <div class="card mb-2">
-                    <div class="card-header py-2">Groups</div>
-                    <div class="card-body">
-                        <div *ngFor="let group of user.groups">
-                            {{group.name}}
+                <div class="card shadow-sm mt-2 mb-0 flex-grow-equal">
+                    <div class="card-header bg-transparent font-500 py-2">Groups</div>
+                    <div class="card-body p-2 card-body-scroll slim-scroll">
+                        <div class="d-flex flex-wrap" *ngIf="user.groups.length">
+                            <span
+                                class="badge badge-pill badge-light border font-500 mr-2 mb-1 text-nowrap font-xs-sm p-2"
+                                *ngFor="let group of user.groups; trackBy: trackByGroup">{{group.name}}</span>
                         </div>
-                        <div *ngIf="!user.groups.length">
+                        <div class="text-center text-muted font-xs-sm py-2" *ngIf="!user.groups.length">
                             No Groups Assigned
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6 px-0">
-                <div class="card mb-2">
-                    <div class="card-header py-2">Access Types Granted</div>
-                    <div class="card-body">
-                        <div class="row mb-2" *ngFor="let type of user.accessTypes">
-                            <div class="col-4">
-                                {{type.name}}
-                            </div>
-                            <div class="col-8">
-                                {{type.description}}
+            <div class="col-12 col-lg-3 px-0 pl-lg-2 d-flex flex-column">
+                <div class="card shadow-sm mb-0 flex-grow-equal">
+                    <div class="card-header bg-transparent font-500 py-2">Access Types Granted</div>
+                    <div class="card-body p-2 card-body-scroll slim-scroll">
+                        <div class="d-flex flex-wrap" *ngIf="user.accessTypes.length">
+                            <div class="access-type-item bg-light rounded mr-2 mb-1 font-xs-sm p-2"
+                                *ngFor="let type of user.accessTypes; trackBy: trackByAccessType">
+                                <div class="font-500 text-truncate" [tooltip]="type.name">
+                                    {{type.name}}</div>
+                                <div class="text-muted font-xs">{{type.description}}</div>
                             </div>
                         </div>
-                        <div *ngIf="!user.accessTypes.length">
+                        <div class="text-center text-muted font-xs-sm py-2" *ngIf="!user.accessTypes.length">
                             No Access Types Granted
                         </div>
                     </div>
                 </div>
-                <div class="card mb-2">
-                    <div class="card-header d-flex justify-content-between align-items-center py-2">
-                        <span class="fw-semibold">LLM Model Configuration</span>
+            </div>
+        </div>
+
+        <!-- Row 2: Organization Automation -->
+        <ng-container *ngIf="orgSettings">
+            <div class="text-uppercase text-muted font-sm font-500 mb-2"
+                *ngIf="monitoringPermissionSet.view || aimlPermissionSet.view">Organization Automation</div>
+            <div class="row">
+                <div class="col-12 col-md px-0 pr-md-2 mb-2" *ngIf="monitoringPermissionSet.view"
+                    [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
+                    <div class="card shadow-sm h-100 mb-0">
+                        <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                            <span class="font-lg-xl font-500">Auto Remediation</span>
+                            <div class="unity-switch-container ml-3">
+                                <input type="checkbox" id="check" (click)="toggleRemediationSwitch()"
+                                    [checked]="orgSettings.auto_remediation_enabled">
+                                <label for="check" class="unity-toggle-button"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="aimlPermissionSet.view">
+                    <div class="col-12 col-md px-0 mb-2"
+                        [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
+                        <div class="card shadow-sm h-100 mb-0">
+                            <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="font-lg-xl font-500">RCA AI Analysis</div>
+                                    <span class="text-muted">Automatically include an AI-generated RCA report to the
+                                        ITSM ticket. </span>
+                                </div>
+                                <div class="unity-switch-container ml-3">
+                                    <input type="checkbox" id="rca" (click)="toggleRcaAISwitch()"
+                                        [checked]="orgSettings.attach_rca_to_ticket">
+                                    <label for="rca" class="unity-toggle-button"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md px-0 pl-md-2 mb-2"
+                        [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
+                        <div class="card shadow-sm h-100 mb-0">
+                            <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="font-lg-xl font-500">AI Agent to KB Injection</div>
+                                    <span class="text-muted">Automatic injection of remediation documents into the
+                                        Knowledge Base.</span>
+                                </div>
+                                <div class="unity-switch-container ml-3">
+                                    <input type="checkbox" id="aiAgentKb" (click)="toggleaiAgentKbSwitch()"
+                                        [checked]="orgSettings.auto_publish_condition_to_kb">
+                                    <label for="aiAgentKb" class="unity-toggle-button"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="row" *ngIf="aimlPermissionSet.view">
+                <div class="col-12 px-0" [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
+                    <div class="card shadow-sm mb-3">
+                        <div
+                            class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
+                            <span class="font-lg-xl">Auto Ticketing</span>
+                            <div class="d-flex align-items-center" accessControl moduleName="Ticket Management"
+                                accessType="Manage Tickets" elementType="div-hide">
+                                <button *ngIf="orgSettings.auto_ticketing_enabled"
+                                    class="btn btn-pill btn-sm btn-warning" type="button"
+                                    (click)="resetToDefaultAutoTicketingSettings()">Reset to default
+                                    settings</button>
+                                <div class="unity-switch-container ml-3">
+                                    <input type="checkbox" id="autoTicketingCheck"
+                                        [checked]="orgSettings.auto_ticketing_enabled"
+                                        (click)="toggleTicketingSwitch()">
+                                    <label for="autoTicketingCheck" class="unity-toggle-button"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body" *ngIf="orgSettings.auto_ticketing_enabled">
+                            <form *ngIf="autoTicketingForm" [formGroup]="autoTicketingForm">
+                                <div class="row">
+                                    <div class="form-group col-md-6 col-xl-3">
+                                        <label for="ticketing_instance" class="font-lg">Default ITSM
+                                            Instance<em>*</em></label>
+                                        <select class="form-control" id="ticketing_instance"
+                                            [compareWith]="compareInstances" formControlName="ticketing_instance"
+                                            name="ticketing_instance"
+                                            [ngClass]="{'is-invalid' : autoTicketingFormErrors.ticketing_instance}">
+                                            <option [value]="null" disabled>Select ITSM Instance</option>
+                                            <option *ngFor="let ins of itsmInstances; trackBy: trackByInstance"
+                                                [ngValue]="ins">
+                                                {{ins.name }}</option>
+                                        </select>
+                                        <div class="invalid-feedback"
+                                            *ngIf="autoTicketingFormErrors.ticketing_instance">
+                                            {{autoTicketingFormErrors.ticketing_instance}}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6 col-xl-3">
+                                        <label class="severity font-lg">Severity<em>*</em></label>
+                                        <multiselect-dropdown [options]="severityOptions"
+                                            [settings]="severityTypeSettings" class="form-control p-1"
+                                            style="height:auto;" formControlName="auto_ticketing_severity"
+                                            [ngClass]="{'is-invalid' : autoTicketingFormErrors.auto_ticketing_severity}">
+                                        </multiselect-dropdown>
+                                        <div class="invalid-feedback"
+                                            *ngIf="autoTicketingFormErrors.auto_ticketing_severity">
+                                            {{autoTicketingFormErrors.auto_ticketing_severity}}</div>
+                                    </div>
+                                    <div class="form-group col-md-6 col-xl-3">
+                                        <label for="delay" class="font-lg">Delay<em>*</em></label>
+                                        <input class="form-control" type="text" formControlName="auto_ticketing_delay"
+                                            [ngClass]="{'is-invalid' : autoTicketingFormErrors.auto_ticketing_delay}" />
+                                        <div class="invalid-feedback"
+                                            *ngIf="autoTicketingFormErrors.auto_ticketing_delay">
+                                            {{autoTicketingFormErrors.auto_ticketing_delay}}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6 col-xl-3">
+                                        <label for="delay" class="font-lg">Ticket Subject Format</label>
+                                        <input class="form-control" type="text" [placeholder]="'{{ example }}'"
+                                            formControlName="ticket_subject_format"
+                                            [ngClass]="{'is-invalid' : autoTicketingFormErrors.ticket_subject_format}" />
+                                        <div class="invalid-feedback"
+                                            *ngIf="autoTicketingFormErrors.ticket_subject_format">
+                                            {{autoTicketingFormErrors.ticket_subject_format}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-pill btn-md btn-warning" type="button" (click)="saveSettings()"
+                                    accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+                                    elementType="btn">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- Row 3: Personalization -->
+        <div class="text-uppercase text-muted font-sm font-500 mb-2">Personalization</div>
+        <div class="row">
+            <div class="col-12 col-lg-8 px-0 pr-lg-2 mb-3">
+                <div class="card shadow-sm h-100 mb-0">
+                    <div
+                        class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
+                        <span>LLM Model Configuration</span>
                         <button class="btn btn-warning btn-sm btn-pill" (click)="goToAddModel()">
                             Add Model
                         </button>
                     </div>
                     <div class="card-body p-0">
-                        <div class="table-responsive" *ngIf="userOwnedLlms?.length">
-                            <table class="table mb-0 align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Provider</th>
-                                        <th>Model Name</th>
-                                        <th>Description</th>
-                                        <th>Active for</th>
-                                        <th class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let model of userOwnedLlms">
-                                        <td class="float-left">
-                                            <div class="d-flex flex-column align-items-center">
-                                                <img *ngIf="providerImages[model.provider]"
-                                                    [src]="providerImages[model.provider]" width="20" height="20"
-                                                    class="mx-2" />
-                                                <div class="text-capitalize">{{ model.provider }}</div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {{ model.modelName }}
-                                        </td>
-                                        <td>
-                                            {{ model.description }}
-                                        </td>
-                                        <td class="w-30">
-                                            {{ model.activeFor.join(', ') }}
-                                        </td>
-                                        <td class="text-center w-17">
-                                            <button class="action-icons btn btn-sm fas fa-pen mr-2"
-                                                tooltip="Edit"                                                
-                                                (click)="editModel(model)">
-                                            </button>
-                                            <button class="action-icons btn btn-sm fas fa-trash"
-                                                [tooltip]="model.activeFor.length ? 'Active model cannot be deleted' : 'Delete'"
-                                                [ngClass]="{'action-icons-disabled': model.activeFor.length}"
-                                                (click)="!model.activeFor.length && deleteModel(model)"
-                                                container="body">
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <table class="table table-sm text-left mb-0 align-middle" *ngIf="userOwnedLlms?.length">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Model Name</th>
+                                    <th>Description</th>
+                                    <th>Active for</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let model of userOwnedLlms; trackBy: trackByModel" truncateText>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="model.provider" class="d-flex align-items-center">
+                                            <img *ngIf="providerImages[model.provider]"
+                                                [src]="providerImages[model.provider]" width="20" height="20"
+                                                class="mr-2" />
+                                            <span class="text-capitalize">{{ model.provider }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="model.modelName">{{ model.modelName }}</div>
+                                    </td>
+                                    <td class="tdw-35">
+                                        <div [tooltip]="model.description">{{ model.description }}</div>
+                                    </td>
+                                    <td class="tdw-30">
+                                        <div [tooltip]="model.activeFor.join(', ')">{{ model.activeFor.join(', ') }}
+                                        </div>
+                                    </td>
+                                    <td class="action-icons-column">
+                                        <button class="action-icons btn btn-sm fas fa-pen mr-2" tooltip="Edit"
+                                            (click)="editModel(model)">
+                                        </button>
+                                        <button class="action-icons btn btn-sm fas fa-trash"
+                                            [tooltip]="model.activeFor.length ? 'Active model cannot be deleted' : 'Delete'"
+                                            [ngClass]="{'action-icons-disabled': model.activeFor.length}"
+                                            (click)="!model.activeFor.length && deleteModel(model)" container="body">
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                         <div class="text-center py-3 text-muted" *ngIf="!userOwnedLlms?.length">
                             No User-Owned Models Found
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6 pr-0">
-                <div class="card mb-2">
-                    <div class="card-header py-2">My Dashboards</div>
+            <div class="col-12 col-lg-4 px-0 mb-3">
+                <div class="card shadow-sm h-100 mb-0">
+                    <div class="card-header bg-transparent font-500 py-2">My Dashboards</div>
                     <div class="card-body p-0">
-                        <ul class="list-group" *ngIf="dashboardList?.length">
-                            <ng-container *ngFor="let db of dashboardList">
-                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                        <ul class="list-group list-group-flush" *ngIf="dashboardList?.length">
+                            <ng-container *ngFor="let db of dashboardList; trackBy: trackByDashboard">
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-2">
                                     <span class="text-truncate">{{db.name}}</span>
-                                    <div *ngIf="db.is_default" class="pr-3">
+                                    <div *ngIf="db.is_default" class="flex-shrink-0 ml-2">
                                         <i class="fas fa-check-circle text-success"></i>
                                         <span class="text-muted font-sm-xs ml-1">(Default)</span>
                                     </div>
                                     <button *ngIf="!db.is_default"
-                                        class="btn btn-warning btn-sm btn-pill float-right align-middle"
+                                        class="btn btn-warning btn-sm btn-pill flex-shrink-0 ml-2"
                                         (click)="setDefaultDashboard(db)">Set as Default</button>
                                 </li>
                             </ng-container>
@@ -344,6 +355,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -411,7 +423,8 @@
                     <label for="timezone">Timezone<em>*</em></label>
                     <select class="form-control text-capitalize" id="timezone" name="timezone"
                         formControlName="timezone">
-                        <option *ngFor="let timeZone of timeZoneList" [ngValue]="timeZone">{{timeZone}}</option>
+                        <option *ngFor="let timeZone of timeZoneList; trackBy: trackByTimezone" [ngValue]="timeZone">
+                            {{timeZone}}</option>
                     </select>
                 </div>
             </form>
@@ -460,82 +473,3 @@
         </div>
     </div>
 </ng-template>
-
-
-<!--
-     DO NOT DELETE THIS.
-     UNCOMMENT TO CONTINUE WORK ON NEW PROFIL PAGE DESIGN
---->
-
-<!-- <div class="container-fluid">
-    <div class="animated fadeIn">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header bg-white" [ngClass]="{'border-bottom-0':profileCollapsed}">
-                        <h4 class="card-title font-lg mb-0 align-middle d-inline">Profile</h4>
-                        <div class="card-header-actions">
-                            <button class="action-icons mb-0 fas font-sm ml-1"
-                                [ngClass]="profileCollapsed ? 'fa-chevron-down':'fa-chevron-up'"
-                                [tooltip]="profileCollapsed? 'Expand':'Minimize'"
-                                (click)="profileCollapsed = !profileCollapsed" [attr.aria-expanded]="!profileCollapsed">
-                            </button>
-                        </div>
-                    </div>
-                    <div [collapse]="profileCollapsed" [isAnimated]="true">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-4">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5>
-                                                UL Customer
-                                            </h5>
-                                            <small class="text-muted font-sm mb-2 d-block">
-                                                {{user.email}}
-                                            </small>
-                                            <button class="btn btn-ghost-warning align-middle"
-                                                (click)="changePasswordBuildForm()">Change
-                                                Password</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-4">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5>
-                                                TimeZone Settings
-                                            </h5>
-                                            <small class="text-muted font-sm mb-2 d-block">
-                                                {{user.userTimeZone}}
-                                            </small>
-                                            <button class="btn btn-ghost-warning align-middle"
-                                                (click)="changeTimeZone()">Change
-                                                Timezone</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-4">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5>
-                                                Two-Factor Authentication
-                                            </h5>
-                                            <small class="text-muted font-sm mb-2 d-block">
-                                                {{user.twoFactorAuth}}
-                                            </small>
-                                            <button class="btn btn-ghost-warning align-middle"
-                                                routerLink="/settings/twofactor">Manage</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->

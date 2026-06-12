@@ -1,33 +1,97 @@
-[
-  {
-    "id": 4,
-    "organization": 365,
-    "user": 1392,
-    "model_name": "gpt-4o",
-    "provider": "openai",
-    "description": "OpenAI's reliable model",
-    "endpoint_url": "",
-    "context_window": null,
-    "is_default": false,
-    "created_at": "2026-03-14T08:16:41.426886-07:00",
-    "updated_at": "2026-03-14T08:16:41.426934-07:00",
-    "active_for_applications": []
-  },
-  {
-    "id": 2,
-    "organization": 365,
-    "user": 1392,
-    "model_name": "gpt-5.2",
-    "provider": "openai",
-    "description": "OpenAI's recent model",
-    "endpoint_url": "",
-    "context_window": null,
-    "is_default": false,
-    "created_at": "2026-03-13T08:07:06.423939-07:00",
-    "updated_at": "2026-03-13T08:07:06.423984-07:00",
-    "active_for_applications": [
-      "assistant",
-      "network_agent"
-    ]
-  }
-]
+{
+  "count": 6,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 14,
+      "organization": 417,
+      "user": 2219,
+      "model_name": "gpt-4.1",
+      "provider": "openai",
+      "description": "OpenAI's advanced model",
+      "endpoint_url": "",
+      "context_window": null,
+      "is_default": false,
+      "created_at": "2026-06-09T00:25:54.867805-07:00",
+      "updated_at": "2026-06-09T00:25:54.867832-07:00",
+      "active_for_applications": [
+        "apm",
+        "network_agent"
+      ]
+    },
+    {
+      "id": 13,
+      "organization": 417,
+      "user": 2219,
+      "model_name": "claude-haiku-4-5",
+      "provider": "anthropic",
+      "description": "Claude's best model",
+      "endpoint_url": "",
+      "context_window": null,
+      "is_default": false,
+      "created_at": "2026-06-03T00:57:47.461548-07:00",
+      "updated_at": "2026-06-04T10:14:41.757413-07:00",
+      "active_for_applications": [
+        "workflow_agent",
+        "assistant"
+      ]
+    },
+    {
+      "id": 12,
+      "organization": 417,
+      "user": 2219,
+      "model_name": "gpt-4o",
+      "provider": "openai",
+      "description": "OpenAI's reliable model",
+      "endpoint_url": "",
+      "context_window": null,
+      "is_default": false,
+      "created_at": "2026-04-30T11:48:17.735378-07:00",
+      "updated_at": "2026-05-18T07:29:50.645052-07:00",
+      "active_for_applications": []
+    },
+    {
+      "id": 11,
+      "organization": 417,
+      "user": 2142,
+      "model_name": "claude-opus-4-6",
+      "provider": "anthropic",
+      "description": "Claude's recent model",
+      "endpoint_url": "",
+      "context_window": null,
+      "is_default": false,
+      "created_at": "2026-04-24T09:45:35.174052-07:00",
+      "updated_at": "2026-04-24T09:45:35.174075-07:00",
+      "active_for_applications": []
+    },
+    {
+      "id": 10,
+      "organization": 417,
+      "user": 2219,
+      "model_name": "gpt-5.1",
+      "provider": "openai",
+      "description": "OpenAI's best model",
+      "endpoint_url": "",
+      "context_window": null,
+      "is_default": false,
+      "created_at": "2026-04-22T03:17:10.462499-07:00",
+      "updated_at": "2026-05-18T07:30:05.866949-07:00",
+      "active_for_applications": []
+    },
+    {
+      "id": 3,
+      "organization": 417,
+      "user": 1637,
+      "model_name": "gpt-5.2",
+      "provider": "openai",
+      "description": "OpenAI's recent model",
+      "endpoint_url": "",
+      "context_window": null,
+      "is_default": false,
+      "created_at": "2026-03-27T05:19:06.510430-07:00",
+      "updated_at": "2026-05-18T07:29:33.268173-07:00",
+      "active_for_applications": []
+    }
+  ]
+}

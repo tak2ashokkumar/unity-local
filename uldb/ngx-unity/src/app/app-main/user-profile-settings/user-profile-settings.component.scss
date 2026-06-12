@@ -1,51 +1,7 @@
 @import "variables";
 
-.user-profile-table {
-	width: 100%;
-}
-
-.autoRemediation-toggle-button {
-	background-color: $gray-200;
-	border: 2px solid #a8b2ba;
-	width: 45px;
-	height: 25px;
-	border-radius: 20px;
-	cursor: pointer;
-	position: relative;
-
-	&::before {
-		position: absolute;
-		content: '';
-		background-color: $gray-500;
-		color: $gray-500;
-		width: 19px;
-		height: 18px;
-		border-radius: 10px;
-		margin: 1.5px;
-		transition: 0.3s;
-	}
-}
-
-.autoRemediation-switch-container {
-	input {
-		&:checked+.autoRemediation-toggle-button {
-			background-color: $success-100;
-			border-color: $success;
-			color: $success;
-
-			&::before {
-				background-color: $success-500;
-				border-color: $success;
-				color: $success;
-				transform: translateX(100%);
-			}
-		}
-
-		display: none;
-	}
-}
-
-.autoTicketing-toggle-button {
+// Shared on/off switch used by the automation setting cards
+.unity-toggle-button {
 	background-color: $gray-200;
 	border: 2px solid #a8b2ba;
 	width: 45px;
@@ -69,11 +25,11 @@
 	}
 }
 
-.autoTicketing-switch-container {
+.unity-switch-container {
 	input {
 		display: none;
 
-		&:checked+.autoTicketing-toggle-button {
+		&:checked+.unity-toggle-button {
 			background-color: $success-100;
 			border-color: $success;
 			color: $success;
@@ -88,51 +44,63 @@
 	}
 }
 
-.rcaAI-toggle-button {
-	background-color: $gray-200;
-	border: 2px solid #a8b2ba;
-	width: 45px;
-	height: 25px;
-	border-radius: 20px;
-	cursor: pointer;
-	position: relative;
-	margin-bottom: 0px;
+// Profile identity avatar (fixed pixel size cannot be achieved with utilities)
+.profile-avatar {
+	width: 56px;
+	height: 56px;
+	background-color: rgba($primary-500, 0.15);
+	color: $primary-500;
+}
 
-	&::before {
-		position: absolute;
-		content: '';
-		background-color: $gray-500;
-		color: $gray-500;
-		width: 19px;
-		height: 18px;
-		border-radius: 10px;
-		margin: 1.5px;
-		margin-bottom: 0px;
-		transition: 0.3s;
+// Access type tile inside the horizontal scroll strip (pixel width caps so
+// long descriptions wrap instead of stretching the row)
+.access-type-item {
+	min-width: 180px;
+	max-width: 240px;
+}
+
+// Equal-height stretch for the access cards sitting beside the profile hero.
+// Applied only on lg+ where the columns are side by side (flex-basis 0 keeps
+// these cards from driving the row height); below lg they keep natural height.
+@media (min-width: 992px) {
+	.flex-grow-equal {
+		flex: 1 1 0;
+		min-height: 0;
 	}
 }
 
-.rcaAI-switch-container {
-	input {
-		display: none;
+// Scrollable card body inside a height-bounded card
+.card-body-scroll {
+	overflow-y: auto;
+	min-height: 0;
+}
 
-		&:checked+.rcaAI-toggle-button {
-			background-color: $success-100;
-			border-color: $success;
-			color: $success;
+// Slim scrollbar for the scrollable strips and card bodies
+.slim-scroll {
+	scrollbar-width: thin;
+	scrollbar-color: $gray-300 transparent;
 
-			&::before {
-				background-color: $success;
-				border-color: $success;
-				color: $success;
-				transform: translateX(100%);
-			}
+	&::-webkit-scrollbar {
+		width: 4px;
+		height: 4px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background-color: $gray-300;
+		border-radius: 4px;
+
+		&:hover {
+			background-color: $gray-500;
 		}
 	}
 }
 
 
-// ── Theme picker ─────────────────────────────────────────────────────────────
+// ---- Theme picker ----
 
 .unity-theme-options {
 	display: flex;
@@ -256,4 +224,4 @@
 	border-radius: 2px;
 }
 
-// ── /Theme picker ─────────────────────────────────────────────────────────────
+// ---- /Theme picker ----

@@ -14,6 +14,7 @@ export interface OrgZabbixAlertConfigUser {
 export interface UnityOrganizationSettings {
     id: number;
     uuid: string;
+    organization_name: string;
     auto_remediation_enabled: boolean;
     auto_ticketing_enabled: boolean;
     attach_rca_to_ticket: boolean;

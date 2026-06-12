@@ -15,7 +15,7 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { TabData } from 'src/app/shared/tabdata';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { LlmConfigViewData, providerImages, UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
+import { LlmConfigViewData, providerImages, UserProfileGroupViewData, UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
 import { UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
 import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
 import { UnityModules, UnityPermissionSet } from 'src/app/shared/unity-rbac-permissions/unity-permission-set';
@@ -428,6 +428,34 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
 
   goToAddModel() {
     this.router.navigate(['add-model'], { relativeTo: this.route })
+  }
+
+  trackByRole(index: number, role: string): string {
+    return role;
+  }
+
+  trackByGroup(index: number, group: UserProfileGroupViewData): string {
+    return group.name;
+  }
+
+  trackByAccessType(index: number, type: { name: string; description: string }): string {
+    return type.name;
+  }
+
+  trackByModel(index: number, model: LlmConfigViewData): number {
+    return model.id;
+  }
+
+  trackByDashboard(index: number, dashboard: AppDashboardListType): string {
+    return dashboard.uuid;
+  }
+
+  trackByTimezone(index: number, timeZone: string): string {
+    return timeZone;
+  }
+
+  trackByInstance(index: number, instance: TicketMgmtList): string {
+    return instance.uuid;
   }
 }
 
