@@ -1,11 +1,154 @@
-{
-  "message": "Auto-generated mock file",
-  "endpoint": "/customer/hyperv/vms/",
-  "method": "GET",
-  "query": {
-    "platform_type": "Hyper-V",
-    "cloud_id": "59294972-bae8-4f95-aa7a-463b4c4fa618"
+[
+  {
+    "id": 9101,
+    "uuid": "a1f25c3e-7b41-4f0a-9c2d-5e8b1a6f3c01",
+    "cloud": {
+      "id": 301,
+      "name": "HyperV-Cluster-01",
+      "uuid": "59294972-bae8-4f95-aa7a-463b4c4fa618",
+      "platform_type": "Hyper-V"
+    },
+    "vm_id": "8F4E2A10-93B7-4C55-A1D2-0E6B7C8D9F01",
+    "vm_name": "hv-ubuntu-app-01",
+    "name": "hv-ubuntu-app-01",
+    "node_name": "hyperv-node-01",
+    "os_type": "Linux",
+    "os": "Ubuntu 22.04 LTS",
+    "ssr_os": "linux",
+    "cpu": 4,
+    "memory": "8 GB",
+    "storage": "120 GB",
+    "status": "Running",
+    "cluster": 1,
+    "management_ip": "10.20.30.11",
+    "actions_in_progress": {
+      "power_on": false,
+      "clone": false,
+      "power_off": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false
+    },
+    "tags": ["app", "production"],
+    "monitoring": {
+      "zabbix": true,
+      "observium": false,
+      "configured": true,
+      "enabled": true
+    }
   },
-  "body": {},
-  "data": []
-}
+  {
+    "id": 9102,
+    "uuid": "b2e36d4f-8c52-4a1b-8d3e-6f9c2b7a4d02",
+    "cloud": {
+      "id": 301,
+      "name": "HyperV-Cluster-01",
+      "uuid": "59294972-bae8-4f95-aa7a-463b4c4fa618",
+      "platform_type": "Hyper-V"
+    },
+    "vm_id": "7D3C1B29-82A6-4E44-B0C1-1F5A6B7C8E02",
+    "vm_name": "hv-win-sql-01",
+    "name": "hv-win-sql-01",
+    "node_name": "hyperv-node-01",
+    "os_type": "Windows",
+    "os": "Microsoft Windows Server 2019 Standard",
+    "ssr_os": "windows",
+    "cpu": 8,
+    "memory": "16 GB",
+    "storage": "500 GB",
+    "status": "Running",
+    "cluster": 1,
+    "management_ip": "10.20.30.12",
+    "actions_in_progress": {
+      "power_on": false,
+      "clone": false,
+      "power_off": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false
+    },
+    "tags": ["database"],
+    "monitoring": {
+      "zabbix": true,
+      "observium": false,
+      "configured": true,
+      "enabled": false
+    }
+  },
+  {
+    "id": 9103,
+    "uuid": "c3f47e5a-9d63-4b2c-9e4f-7a0d3c8b5e03",
+    "cloud": {
+      "id": 301,
+      "name": "HyperV-Cluster-01",
+      "uuid": "59294972-bae8-4f95-aa7a-463b4c4fa618",
+      "platform_type": "Hyper-V"
+    },
+    "vm_id": "6C2B0A38-7195-4D33-C2B0-2E4F5A6B7D03",
+    "vm_name": "hv-centos-batch-01",
+    "name": "hv-centos-batch-01",
+    "node_name": "hyperv-node-02",
+    "os_type": "Linux",
+    "os": "CentOS Stream 9",
+    "ssr_os": "linux",
+    "cpu": 2,
+    "memory": "4 GB",
+    "storage": "80 GB",
+    "status": "Running",
+    "cluster": 1,
+    "management_ip": null,
+    "actions_in_progress": {
+      "power_on": false,
+      "clone": false,
+      "power_off": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false
+    },
+    "tags": [],
+    "monitoring": {
+      "zabbix": false,
+      "observium": false,
+      "configured": false,
+      "enabled": false
+    }
+  },
+  {
+    "id": 9104,
+    "uuid": "d4a58f6b-0e74-4c3d-af5a-8b1e4d9c6f04",
+    "cloud": {
+      "id": 301,
+      "name": "HyperV-Cluster-01",
+      "uuid": "59294972-bae8-4f95-aa7a-463b4c4fa618",
+      "platform_type": "Hyper-V"
+    },
+    "vm_id": "5B1A9C47-6084-4F22-D3A9-3D2E4F5C6B04",
+    "vm_name": "hv-debian-archive-01",
+    "name": "hv-debian-archive-01",
+    "node_name": "hyperv-node-02",
+    "os_type": "Linux",
+    "os": "Debian GNU/Linux 12",
+    "ssr_os": "linux",
+    "cpu": 2,
+    "memory": "4 GB",
+    "storage": "200 GB",
+    "status": "Off",
+    "cluster": 1,
+    "management_ip": "10.20.30.14",
+    "actions_in_progress": {
+      "power_on": false,
+      "clone": false,
+      "power_off": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false
+    },
+    "tags": ["archive"],
+    "monitoring": {
+      "zabbix": false,
+      "observium": false,
+      "configured": false,
+      "enabled": false
+    }
+  }
+]

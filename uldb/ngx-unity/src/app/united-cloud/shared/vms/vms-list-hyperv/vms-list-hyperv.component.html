@@ -57,6 +57,13 @@
             <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
           </td>
           <td class="action-icons-column">
+            <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
+              [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
+              (click)="consoleSameTab(view)" accessControl moduleName="Private Cloud" accessType="Remote Management"
+              elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1" [tooltip]="view.newTabToolipMessage"
+              [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}" (click)="consoleNewTab(view)" accessControl
+              moduleName="Private Cloud" accessType="Remote Management" elementType="actionbtn"></button>
             <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
               [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring" accessType="View Monitoring"
               elementType="actionbtn">

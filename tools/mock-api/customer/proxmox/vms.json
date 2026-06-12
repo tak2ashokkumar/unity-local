@@ -1,0 +1,172 @@
+[
+  {
+    "id": 9201,
+    "uuid": "e5b69a7c-1f85-4d4e-b06b-9c2f5e0d7a05",
+    "cloud": {
+      "id": 401,
+      "name": "Proxmox-Cluster-01",
+      "uuid": "7a8b9c0d-1e2f-4a3b-8c4d-5e6f7a8b9c0d",
+      "platform_type": "Proxmox"
+    },
+    "vm_id": "101",
+    "vm_name": "pmx-ubuntu-web-01",
+    "host_name": "proxmox-node-01",
+    "os_type": "Linux",
+    "os": "Ubuntu 22.04 LTS",
+    "ssr_os": "linux",
+    "cpu": 4,
+    "memory": "8 GB",
+    "disk": "100 GB",
+    "status": "running",
+    "ip_address": "192.168.50.11",
+    "cluster": 1,
+    "is_template": false,
+    "actions_in_progress": {
+      "clone": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false,
+      "power_off": false,
+      "power_on": false
+    },
+    "management_ip": "192.168.50.11",
+    "last_reboot_time": "2026-06-01T08:15:00Z",
+    "tags": ["web", "production"]
+  },
+  {
+    "id": 9202,
+    "uuid": "f6c70b8d-2a96-4e5f-c17c-0d3a6f1e8b06",
+    "cloud": {
+      "id": 401,
+      "name": "Proxmox-Cluster-01",
+      "uuid": "7a8b9c0d-1e2f-4a3b-8c4d-5e6f7a8b9c0d",
+      "platform_type": "Proxmox"
+    },
+    "vm_id": "102",
+    "vm_name": "pmx-win-rds-01",
+    "host_name": "proxmox-node-01",
+    "os_type": "Windows",
+    "os": "Microsoft Windows Server 2022 Standard",
+    "ssr_os": "windows",
+    "cpu": 8,
+    "memory": "16 GB",
+    "disk": "250 GB",
+    "status": "running",
+    "ip_address": "192.168.50.12",
+    "cluster": 1,
+    "is_template": false,
+    "actions_in_progress": {
+      "clone": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false,
+      "power_off": false,
+      "power_on": false
+    },
+    "management_ip": "192.168.50.12",
+    "last_reboot_time": "2026-05-28T19:40:00Z",
+    "tags": ["rds"]
+  },
+  {
+    "id": 9203,
+    "uuid": "a7d81c9e-3b07-4f6a-d28d-1e4b7a2f9c07",
+    "cloud": {
+      "id": 401,
+      "name": "Proxmox-Cluster-01",
+      "uuid": "7a8b9c0d-1e2f-4a3b-8c4d-5e6f7a8b9c0d",
+      "platform_type": "Proxmox"
+    },
+    "vm_id": "103",
+    "vm_name": "pmx-rocky-ci-01",
+    "host_name": "proxmox-node-02",
+    "os_type": "Linux",
+    "os": "Rocky Linux 9",
+    "ssr_os": "linux",
+    "cpu": 2,
+    "memory": "4 GB",
+    "disk": "60 GB",
+    "status": "running",
+    "ip_address": "192.168.50.13",
+    "cluster": 1,
+    "is_template": false,
+    "actions_in_progress": {
+      "clone": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false,
+      "power_off": false,
+      "power_on": false
+    },
+    "management_ip": null,
+    "last_reboot_time": "2026-06-05T11:05:00Z",
+    "tags": ["ci"]
+  },
+  {
+    "id": 9204,
+    "uuid": "b8e92d0f-4c18-4a7b-e39e-2f5c8b3a0d08",
+    "cloud": {
+      "id": 401,
+      "name": "Proxmox-Cluster-01",
+      "uuid": "7a8b9c0d-1e2f-4a3b-8c4d-5e6f7a8b9c0d",
+      "platform_type": "Proxmox"
+    },
+    "vm_id": "104",
+    "vm_name": "pmx-debian-backup-01",
+    "host_name": "proxmox-node-02",
+    "os_type": "Linux",
+    "os": "Debian GNU/Linux 12",
+    "ssr_os": "linux",
+    "cpu": 2,
+    "memory": "4 GB",
+    "disk": "500 GB",
+    "status": "stopped",
+    "ip_address": "192.168.50.14",
+    "cluster": 1,
+    "is_template": false,
+    "actions_in_progress": {
+      "clone": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false,
+      "power_off": false,
+      "power_on": false
+    },
+    "management_ip": "192.168.50.14",
+    "last_reboot_time": "2026-04-19T02:30:00Z",
+    "tags": ["backup"]
+  },
+  {
+    "id": 9205,
+    "uuid": "c9f03e1a-5d29-4b8c-f40f-3a6d9c4b1e09",
+    "cloud": {
+      "id": 401,
+      "name": "Proxmox-Cluster-01",
+      "uuid": "7a8b9c0d-1e2f-4a3b-8c4d-5e6f7a8b9c0d",
+      "platform_type": "Proxmox"
+    },
+    "vm_id": "9000",
+    "vm_name": "pmx-ubuntu-template",
+    "host_name": "proxmox-node-01",
+    "os_type": "Linux",
+    "os": "Ubuntu 22.04 LTS",
+    "ssr_os": "linux",
+    "cpu": 2,
+    "memory": "2 GB",
+    "disk": "32 GB",
+    "status": "stopped",
+    "ip_address": "",
+    "cluster": 1,
+    "is_template": true,
+    "actions_in_progress": {
+      "clone": false,
+      "reboot": false,
+      "convert_to_template": false,
+      "delete": false,
+      "power_off": false,
+      "power_on": false
+    },
+    "management_ip": null,
+    "last_reboot_time": null,
+    "tags": ["template"]
+  }
+]

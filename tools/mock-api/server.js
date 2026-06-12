@@ -130,7 +130,11 @@ function readMockFile(filePath) {
 // back to the heuristic in candidateFieldsForParam(). Add an entry only when the
 // query param name differs from the field name carried by the data.
 const identityFieldMap = {
-  app_id: ["parent_app", "app_id"]
+  app_id: ["parent_app", "app_id"],
+  // cloud_id identifies the parent cloud, never the record itself. Without this
+  // entry the generic fallback also matches item id/uuid, which silently filters
+  // every VM out when a list is opened under a private cloud.
+  cloud_id: ["cloud_id"]
 };
 
 // True when a query param identifies a record (and should filter list results).

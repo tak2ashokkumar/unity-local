@@ -9,6 +9,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { StorageType } from 'src/app/shared/app-storage/storage-type';
 import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { CRUDActionTypes, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { HYPERV_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
@@ -221,6 +222,26 @@ export class VmsListHypervComponent implements OnInit {
   showInfo(view: HypervVMViewData) {
     this.info = view;
     this.modalRef = this.modalService.show(this.serverinfo, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  consoleSameTab(view: HypervVMViewData) {
+    if (!view.isSameTabEnabled) {
+      return;
+    }
+    let obj: ConsoleAccessInput = this.hyperVService.getConsoleAccessInput(this.deviceMapping, view);
+    obj.managementIp = view.managementIp;
+    this.termService.openTerminal(obj);
+  }
+
+  consoleNewTab(view: HypervVMViewData) {
+    if (!view.isNewTabEnabled) {
+      return;
+    }
+    let obj: ConsoleAccessInput = this.hyperVService.getConsoleAccessInput(this.deviceMapping, view);
+    obj.managementIp = view.managementIp;
+    obj.newTab = true;
+    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+    window.open(view.newTabConsoleAccessUrl);
   }
 
   createTicket(data: HypervVMViewData) {

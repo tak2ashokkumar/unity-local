@@ -3,9 +3,11 @@ import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
 import { DEVICE_DATA_BY_DEVICE_TYPE, GET_VM_LIST_BY_PLATFORM, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
@@ -42,6 +44,39 @@ export class VmsListHypervService {
     a.storage = vm.storage;
     a.tags = vm.tags.filter(tg => tg);
     a.monitoring = vm.monitoring;
+
+    if (this.user.isManagementEnabled) {
+      const isWindows: boolean = vm.os ? (vm.os.lastIndexOf('Microsoft', 0) == 0) : false;
+      const powerOn: boolean = vm.status == 'Running';
+      a.isSameTabEnabled = ((vm.management_ip ? true : false) && powerOn && !isWindows);
+      if (!vm.management_ip) {
+        a.sameTabTootipMessage = 'Management IP not Configured';
+      } else if (!powerOn) {
+        a.sameTabTootipMessage = 'VM is Down';
+      } else if (isWindows) {
+        a.sameTabTootipMessage = 'Open in Same tab option is not available for windows based machines';
+      } else {
+        a.sameTabTootipMessage = 'Open in same tab';
+      }
+
+      a.isNewTabEnabled = ((vm.management_ip ? true : false) && powerOn);
+      if (!vm.management_ip) {
+        a.newTabToolipMessage = 'Management IP not Configured';
+      } else if (!powerOn) {
+        a.newTabToolipMessage = 'VM is Down';
+      } else if (isWindows) {
+        a.newTabToolipMessage = 'Open In New Tab';
+        a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+      } else {
+        a.newTabToolipMessage = 'Open In New Tab';
+        a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
+      }
+    } else {
+      a.isSameTabEnabled = false;
+      a.sameTabTootipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
+      a.isNewTabEnabled = false;
+      a.newTabToolipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
+    }
     return a;
   }
 
@@ -51,6 +86,10 @@ export class VmsListHypervService {
       viewData.push(this.convertVMtoViewdata(vm));
     });
     return viewData;
+  }
+
+  getConsoleAccessInput(deviceMapping: DeviceMapping, view: HypervVMViewData): ConsoleAccessInput {
+    return { label: deviceMapping, deviceType: deviceMapping, deviceId: view.uuid, newTab: false, deviceName: view.name };
   }
 
   getDeviceData(device: HypervVMViewData) {
