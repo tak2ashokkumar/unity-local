@@ -41,11 +41,13 @@ export class MapService {
     return `https://maps.google.com/mapfiles/ms/icons/`;
   }
 
-  get icons(): { up: string, down: string, 'partially-up': string } {
+  get icons(): { up: string, down: string, 'partially-up': string, 'N/A': string, 'NA': string } {
     return {
       'up': `${this.iconBase}green-dot.png`,
       'down': `${this.iconBase}red-dot.png`,
-      'partially-up': `${this.iconBase}orange-dot.png`
+      'partially-up': `${this.iconBase}orange-dot.png`,
+      'N/A': `${this.iconBase}blue-dot.png`,
+      'NA': `${this.iconBase}blue-dot.png`
     };
   }
 
