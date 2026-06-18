@@ -22,12 +22,6 @@ const unityProxy = createProxyMiddleware({
   changeOrigin: true
 });
 
-/* MTP UI PROXY */
-const mtpProxy = createProxyMiddleware({
-  target: "http://localhost:8060",
-  changeOrigin: true
-});
-
 /* ADMIN PORTAL PROXY (Angular 1.x) */
 const adminProxy = createProxyMiddleware({
   target: "http://localhost:8095",
@@ -51,14 +45,6 @@ app.use((req, res, next) => {
     return mockProxy(req, res, next);
   }
 
-  // MTP UI Routing - Intercept everything needed for the MTP UI
-  const isMtpRequest = req.path.startsWith("/mtp");
-
-  if (isMtpRequest) {
-    console.log("→ MTP UI:", req.url);
-    return mtpProxy(req, res, next);
-  }
-
   // Admin Portal (Legacy) Routing - Intercept everything needed for the Admin UI
   const isAdminRequest = req.path.startsWith("/admin") ||
     req.path.startsWith("/api/scripts") ||
@@ -78,4 +64,37 @@ app.use((req, res, next) => {
 
 app.listen(8091, () => {
   console.log("Proxy running at http://localhost:8091");
+});
+
+/* MTP DEDICATED PROXY — :8061 */
+const mtpApp = express();
+
+const mtpStaticProxy = createProxyMiddleware({
+  target: "http://localhost:8060",
+  changeOrigin: true
+});
+
+mtpApp.use((req, res, next) => {
+  const isMockRequest =
+    req.url.startsWith("/customer") ||
+    req.url.startsWith("/rest") ||
+    req.url.startsWith("/orchestration") ||
+    req.url.startsWith("/chatbot") ||
+    req.url.startsWith("/task") ||
+    req.url.startsWith("/apm") ||
+    req.url.startsWith("/func") ||
+    req.url.startsWith("/mcp") ||
+    req.url.startsWith("/ssr");
+
+  if (isMockRequest) {
+    console.log("MTP → MOCK:", req.url);
+    return mockProxy(req, res, next);
+  }
+
+  console.log("MTP → STATIC:", req.url);
+  return mtpStaticProxy(req, res, next);
+});
+
+mtpApp.listen(8061, () => {
+  console.log("MTP proxy running at http://localhost:8061");
 });

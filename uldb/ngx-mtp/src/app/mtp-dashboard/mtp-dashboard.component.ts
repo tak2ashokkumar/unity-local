@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MapService } from '../map.service';
 
 @Component({
   selector: 'dashboard',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MtpDashboardComponent implements OnInit {
 
-  constructor() { }
+  constructor(public mapService: MapService) { }
 
   ngOnInit(): void {
   }

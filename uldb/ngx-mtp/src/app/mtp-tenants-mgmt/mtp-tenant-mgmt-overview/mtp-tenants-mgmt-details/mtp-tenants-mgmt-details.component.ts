@@ -11,6 +11,7 @@ import { takeUntil } from 'rxjs/operators';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { MTPSubscription } from 'src/app/shared/SharedEntityTypes/subscriptions.type';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MapService } from 'src/app/map.service';
 
 @Component({
   selector: 'mtp-tenants-mgmt-details',
@@ -63,7 +64,8 @@ export class MtpTenantsMgmtDetailsComponent implements OnInit {
   userView: TenantUserListViewData;
   subscription: number;
   moduleId: number;
-  constructor(private router: Router,
+  constructor(public mapService: MapService,
+    private router: Router,
     private route: ActivatedRoute,
     private modalService: BsModalService,
     private notification: AppNotificationService,

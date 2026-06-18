@@ -1,12 +1,15 @@
-import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+/// <reference types="google.maps" />
+
+import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MapService } from 'src/app/map.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { environment } from 'src/environments/environment';
 import { MtpDashboardMapService, WorldMapWidgetViewdata } from './mtp-dashboard-map.service';
-declare var MarkerClusterer: any;
 
 @Component({
   selector: 'mtp-dashboard-map',
@@ -14,48 +17,57 @@ declare var MarkerClusterer: any;
   styleUrls: ['./mtp-dashboard-map.component.scss'],
   providers: [MtpDashboardMapService]
 })
-export class MtpDashboardMapComponent implements OnInit, OnDestroy {
-  @ViewChild('map', { static: true }) mapElement: any;
-  map: google.maps.Map;
+export class MtpDashboardMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private ngUnsubscribe = new Subject();
-  @ViewChild('info') info: ElementRef;
-  private tilesLoaded: google.maps.MapsEventListener;
   viewdata: WorldMapWidgetViewdata[] = [];
   dcMap = null;
-  markers: google.maps.Marker[] = [];
+
+  isMapAvailable: boolean = false;
+  @ViewChild('map', { static: false }) mapElement!: ElementRef;
+  map: google.maps.Map;
+
   cluster: any;
-  iconBase = `https://maps.google.com/mapfiles/ms/icons/`;
-  icons = {
-    'up': `${this.iconBase}green-dot.png`,
-    'down': `${this.iconBase}red-dot.png`,
-    'partially-up': `${this.iconBase}orange-dot.png`
-  };
+  private clusterListeners: google.maps.MapsEventListener[] = [];
+  clusterInfoWindow: google.maps.InfoWindow;
+  private tilesLoaded: google.maps.MapsEventListener;
+
+  markers: google.maps.marker.AdvancedMarkerElement[] = [];
   zIndexMap: { [key: string]: number } = {};
   oldZIndex: number = null;
   initialZoom: number;
   INIT_ZOOM: number = 1.5;
-  INIT_CENTER: google.maps.LatLng = new google.maps.LatLng(25.738611, 0);
-  clusterInfoWindow = new google.maps.InfoWindow();
+  INIT_CENTER = { lat: 25.738611, lng: 0 };
 
   constructor(private mapWidgetService: MtpDashboardMapService,
+    private mapSvc: MapService,
     private notification: AppNotificationService,
     private ngZone: NgZone,
     private spinner: AppSpinnerService) { }
 
-  ngOnInit() {
-    this.drawMap();
-    setTimeout(() => {
-      this.getTenants();
-    }, 0);
+  ngOnInit() { }
+
+  async ngAfterViewInit() {
+    this.spinner.start('dashboard_map_widget');
+    await this.mapSvc.loadMap();
+
+    this.isMapAvailable = this.mapSvc.isAvailable();
+    if (!this.isMapAvailable) {
+      this.spinner.stop('dashboard_map_widget');
+      return;
+    }
+    this.getTenants();
   }
 
   ngOnDestroy() {
+    this.clusterListeners.forEach(l => l.remove());
+    if (this.tilesLoaded) {
+      this.tilesLoaded.remove();
+    }
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
 
   getTenants() {
-    this.spinner.start('dashboard_map_widget');
     this.mapWidgetService.getWidgetTenants().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       if (res) {
         this.viewdata = this.mapWidgetService.convertToViewdata(res);
@@ -64,7 +76,11 @@ export class MtpDashboardMapComponent implements OnInit, OnDestroy {
           dcm[view.location] = view.tenants;
         });
         this.dcMap = dcm;
-        this.addMarkers();
+        if (this.map) {
+          this.addMarkers();
+        } else {
+          this.drawMap();
+        }
       }
       this.spinner.stop('dashboard_map_widget');
     }, err => {
@@ -73,7 +89,17 @@ export class MtpDashboardMapComponent implements OnInit, OnDestroy {
     });
   }
 
-  drawMap() {
+  async drawMap() {
+    if (!this.mapElement?.nativeElement) {
+      return;
+    }
+    const mapsLibrary = await this.mapSvc.importMapsLibrary();
+    if (!mapsLibrary) {
+      this.isMapAvailable = false;
+      this.spinner.stop('dashboard_map_widget');
+      return;
+    }
+    const { Map } = mapsLibrary;
     this.ngZone.runOutsideAngular(() => {
       const mapProperties = {
         center: this.INIT_CENTER,
@@ -84,7 +110,8 @@ export class MtpDashboardMapComponent implements OnInit, OnDestroy {
         rotateControl: false,
         mapId: environment.gmId
       };
-      this.map = new google.maps.Map(this.mapElement.nativeElement, mapProperties);
+      this.map = new Map(this.mapElement.nativeElement, mapProperties);
+      this.clusterInfoWindow = new google.maps.InfoWindow();
       this.initialZoom = this.map.getZoom();
       this.addResetZoomControl();
       this.tilesLoaded = this.map.addListener('tilesloaded', () => {
@@ -130,25 +157,33 @@ export class MtpDashboardMapComponent implements OnInit, OnDestroy {
     });
   }
 
-  addMarkers() {
-    this.markers.map(marker => marker.setMap(null));
+  async addMarkers() {
+    if (!this.map) return;
+    this.markers.forEach(marker => marker.map = null);
     this.markers = [];
     if (this.cluster) {
       this.cluster.clearMarkers();
-      this.cluster.setMap(null);
+      this.cluster = null;
     }
+
+    const markerLibrary = await this.mapSvc.importMarkerLibrary();
+    if (!markerLibrary) return;
+    const { AdvancedMarkerElement } = markerLibrary;
     this.viewdata.map((loc, i) => {
-      const ll = new google.maps.LatLng(loc.lat, loc.long);
-      const marker = new google.maps.Marker({
+      const ll = { lat: Number(loc.lat), lng: Number(loc.long) };
+      const marker = new AdvancedMarkerElement({
         position: ll,
         map: this.map,
-        icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-        title: loc.location
+        title: loc.location,
+        content: this.createMarkerContent(),
       });
       let infoWindow = new google.maps.InfoWindow();
       infoWindow.setContent(this.mapWidgetService.createInfoWindowContent(loc));
       infoWindow.setPosition(ll);
-      infoWindow.open(this.map, marker);
+      infoWindow.open({
+        map: this.map,
+        anchor: marker
+      });
       this.markers.push(marker);
       let domready = infoWindow.addListener('domready', () => {
         this.popOvers(infoWindow);
@@ -158,24 +193,37 @@ export class MtpDashboardMapComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.cluster = new MarkerClusterer(this.map, this.markers, {
-      imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+    this.cluster = new MarkerClusterer({
+      map: this.map,
+      markers: this.markers
     });
 
-    google.maps.event.addListener(this.cluster, "mouseover", (cl) => {
-      this.openClusterPopOver(cl);
-    });
-    google.maps.event.addListener(this.cluster, "mouseout", (cl) => {
-      this.clusterInfoWindow.close();
-    });
-    google.maps.event.addListener(this.cluster, "click", (cl) => {
-      this.clusterInfoWindow.close();
-    });
+    this.clusterListeners.push(
+      this.cluster.addListener('mouseover', (cl: any) => {
+        this.openClusterPopOver(cl);
+      }),
+
+      this.cluster.addListener('mouseout', () => {
+        this.clusterInfoWindow.close();
+      }),
+
+      this.cluster.addListener('click', () => {
+        this.clusterInfoWindow.close();
+      })
+    )
+  }
+
+  createMarkerContent(): HTMLElement {
+    const img = document.createElement('img');
+    img.src = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+    img.style.width = '32px';
+    img.style.height = '32px';
+    return img;
   }
 
   openClusterPopOver(cl: any) {
     let contentString = '<div style="font-weight:500;">Available Tenants</div><br>';
-    cl.markers_.forEach((marker: any) => {
+    cl.markers.forEach((marker: any) => {
       let dcs: string[] = this.dcMap[marker.getTitle()];
       dcs.forEach(dc => {
         contentString = `${contentString}<span>${dc}</span><br>`;

@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  assetsUrl: 'static/mtpdist/assets/img/',
-  staticData: 'static/mtpdist/assets/static-data/',
+  assetsUrl: 'static/assets/images/',
+  staticData: 'static/assets/custom-data/',
   unityDateFormat: 'MMM dd, y, H:mm:ss',
   dateLocateForAngularDatePipe: 'en-US',
   pollingInterval: 3000,

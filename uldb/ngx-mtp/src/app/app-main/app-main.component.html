@@ -45,9 +45,9 @@
                 <a class="dropdown-item text-danger" (click)="stopImpersonating()" *ngIf="user.isImpersonated"><i
                         class="fa fa-lock"></i>
                     Stop Impersonating</a>
-                <a class="dropdown-item text-danger" (click)="mapService.toggleWorldMap()"
-                    *ngIf="user.isUserAdmin && mapService.showToggle()">
-                    <i class="fas fa-map-marked-alt"></i>{{mapService.action}}</a>
+                <a class="dropdown-item text-warning" (click)="mapService.toggleWorldMap()"
+                    *ngIf="mapService.showToggle()">
+                    <i class="fas fa-map-marked-alt" aria-hidden="true"></i> {{mapService.action}}</a>
             </div>
         </li>
     </ul>
