@@ -75,12 +75,12 @@ export function useMapFactory(service: MapService) { return () => service.loadMa
     provide: LocationStrategy,
     useClass: HashLocationStrategy
   },
-  {
-    provide: APP_INITIALIZER,
-    useFactory: useMapFactory,
-    deps: [MapService],
-    multi: true
-  },
+  // {
+  //   provide: APP_INITIALIZER,
+  //   useFactory: useMapFactory,
+  //   deps: [MapService],
+  //   multi: true
+  // },
   {
     provide: APP_INITIALIZER,
     useFactory: useStorageFactory,

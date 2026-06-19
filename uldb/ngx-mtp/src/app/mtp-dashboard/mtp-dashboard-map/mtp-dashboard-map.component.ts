@@ -30,10 +30,10 @@ export class MtpDashboardMapComponent implements OnInit, AfterViewInit, OnDestro
   private clusterListeners: google.maps.MapsEventListener[] = [];
   clusterInfoWindow: google.maps.InfoWindow;
   private tilesLoaded: google.maps.MapsEventListener;
+  private zoomChangedListener: google.maps.MapsEventListener;
 
   markers: google.maps.marker.AdvancedMarkerElement[] = [];
-  zIndexMap: { [key: string]: number } = {};
-  oldZIndex: number = null;
+  private maxZIndex = 0;
   initialZoom: number;
   INIT_ZOOM: number = 1.5;
   INIT_CENTER = { lat: 25.738611, lng: 0 };
@@ -62,6 +62,9 @@ export class MtpDashboardMapComponent implements OnInit, AfterViewInit, OnDestro
     this.clusterListeners.forEach(l => l.remove());
     if (this.tilesLoaded) {
       this.tilesLoaded.remove();
+    }
+    if (this.zoomChangedListener) {
+      this.zoomChangedListener.remove();
     }
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -112,6 +115,7 @@ export class MtpDashboardMapComponent implements OnInit, AfterViewInit, OnDestro
       };
       this.map = new Map(this.mapElement.nativeElement, mapProperties);
       this.clusterInfoWindow = new google.maps.InfoWindow();
+      this.zoomChangedListener = this.map.addListener('zoom_changed', () => this.clusterInfoWindow?.close());
       this.initialZoom = this.map.getZoom();
       this.addResetZoomControl();
       this.tilesLoaded = this.map.addListener('tilesloaded', () => {
@@ -177,38 +181,28 @@ export class MtpDashboardMapComponent implements OnInit, AfterViewInit, OnDestro
         title: loc.location,
         content: this.createMarkerContent(),
       });
-      let infoWindow = new google.maps.InfoWindow();
-      infoWindow.setContent(this.mapWidgetService.createInfoWindowContent(loc));
-      infoWindow.setPosition(ll);
+      const iwContent = document.createElement('div');
+      iwContent.innerHTML = this.mapWidgetService.createInfoWindowContent(loc);
+      iwContent.style.cursor = 'pointer';
+      let infoWindow = new google.maps.InfoWindow({ content: iwContent, position: ll });
+      this.bringToFront(infoWindow);
+      iwContent.addEventListener('click', () => this.bringToFront(infoWindow));
       infoWindow.open({
         map: this.map,
         anchor: marker
       });
       this.markers.push(marker);
-      let domready = infoWindow.addListener('domready', () => {
-        this.popOvers(infoWindow);
-        let id = `${infoWindow.getPosition().lat()}_${infoWindow.getPosition().lng()}`;
-        let currentIndex = (document.getElementById(id).closest('.gm-style-iw-a').parentElement as HTMLElement).style.getPropertyValue('z-index');
-        this.zIndexMap[id] = Number.parseInt(currentIndex);
-      });
     });
 
     this.cluster = new MarkerClusterer({
       map: this.map,
-      markers: this.markers
+      markers: this.markers,
+      onClusterClick: () => { } // suppress default zoom-on-click; the 'click' listener below opens the popover
     });
 
     this.clusterListeners.push(
-      this.cluster.addListener('mouseover', (cl: any) => {
+      this.cluster.addListener('click', (cl: any) => {
         this.openClusterPopOver(cl);
-      }),
-
-      this.cluster.addListener('mouseout', () => {
-        this.clusterInfoWindow.close();
-      }),
-
-      this.cluster.addListener('click', () => {
-        this.clusterInfoWindow.close();
       })
     )
   }
@@ -224,35 +218,22 @@ export class MtpDashboardMapComponent implements OnInit, AfterViewInit, OnDestro
   openClusterPopOver(cl: any) {
     let contentString = '<div style="font-weight:500;">Available Tenants</div><br>';
     cl.markers.forEach((marker: any) => {
-      let dcs: string[] = this.dcMap[marker.getTitle()];
-      dcs.forEach(dc => {
+      let dcs: string[] = this.dcMap[marker.title];
+      (dcs || []).forEach(dc => {
         contentString = `${contentString}<span>${dc}</span><br>`;
       });
     });
-    this.clusterInfoWindow.setContent(`${contentString}`);
-    this.clusterInfoWindow.setPosition(cl.getCenter());
+    const iwContent = document.createElement('div');
+    iwContent.innerHTML = contentString;
+    iwContent.style.cursor = 'pointer';
+    iwContent.addEventListener('click', () => this.bringToFront(this.clusterInfoWindow));
+    this.clusterInfoWindow.setContent(iwContent);
+    this.clusterInfoWindow.setPosition(cl.position);
     this.clusterInfoWindow.open(this.map);
+    this.bringToFront(this.clusterInfoWindow);
   }
 
-  popOvers(infoWindow: google.maps.InfoWindow) {
-    document.getElementById(`${infoWindow.getPosition().lat()}_${infoWindow.getPosition().lng()}`).addEventListener('mouseover', (e: MouseEvent) => {
-      let high = null;
-      for (const key in this.zIndexMap) {
-        if (this.zIndexMap.hasOwnProperty(key)) {
-          if (high != null) {
-            high = this.zIndexMap[key];
-            this.oldZIndex = high;
-          } else {
-            high = this.zIndexMap[key] > high ? this.zIndexMap[key] : high;
-          }
-        }
-      }
-      infoWindow.setZIndex(high + 1);
-    });
-
-    document.getElementById(`${infoWindow.getPosition().lat()}_${infoWindow.getPosition().lng()}`).addEventListener('mouseout', (e: MouseEvent) => {
-      infoWindow.setZIndex(this.oldZIndex);
-      this.oldZIndex = null;
-    });
+  private bringToFront(infoWindow: google.maps.InfoWindow): void {
+    infoWindow.setZIndex(++this.maxZIndex);
   }
 }
