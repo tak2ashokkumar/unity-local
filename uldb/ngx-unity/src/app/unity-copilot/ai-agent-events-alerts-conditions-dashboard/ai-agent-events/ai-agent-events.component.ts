@@ -1,34 +1,40 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { aimlEventsColumnMapping, AIMLEventsViewData, EventsFilterFormData, NetworkAiAgentDashboardEventsService } from './network-ai-agent-dashboard-events.service';
+import { AiAgentEventsService, aimlEventsColumnMapping, AiAgentEventsViewData, DeviceType, EventsFilterFormData } from './ai-agent-events.service';
 import { Subject } from 'rxjs';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { AIMLEventsSummary } from './network-ai-agent-dashboard-events.type';
+import { AiAgentEventsSummary } from './ai-agent-events.type';
 import { FormGroup } from '@angular/forms';
 import { TableColumnMapping } from 'src/app/shared/SharedEntityTypes/unity-utils.type';
-import { AppUtilityService, UnityDeviceType } from 'src/app/shared/app-utility/app-utility.service';
-import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
-import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntil } from 'rxjs/operators';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
+import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
+import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { cloneDeep as _clone } from 'lodash-es';
-import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
+import { AiAgentConfigType, AiAgentType } from '../ai-agent-events-alerts-conditions-dashboard.type';
+import { aiAgentConfigMap } from '../ai-agent-events-alerts-conditions-dashboard.component';
 
-/** this component is deprecated, use AiAgentEventsComponent instead */
+/** This component is used for Network and Compute AI agents. */
 @Component({
-  selector: 'network-ai-agent-dashboard-events',
-  templateUrl: './network-ai-agent-dashboard-events.component.html',
-  styleUrls: ['./network-ai-agent-dashboard-events.component.scss'],
-  providers: [NetworkAiAgentDashboardEventsService]
+  selector: 'ai-agent-events',
+  templateUrl: './ai-agent-events.component.html',
+  styleUrls: ['./ai-agent-events.component.scss'],
+  providers: [AiAgentEventsService]
 })
-export class NetworkAiAgentDashboardEventsComponent implements OnInit, OnDestroy {
+export class AiAgentEventsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
 
-  summaryViewData: AIMLEventsSummary;
+  aiAgentType: AiAgentType;
+  aiAgentConfig: AiAgentConfigType;
+
+  summaryViewData: AiAgentEventsSummary;
   count: number;
-  viewData: AIMLEventsViewData[] = [];
+  viewData: AiAgentEventsViewData[] = [];
   selectedViewIndex: number;
   hoveredIndex: number = -1;
   tooltipDirection: 'top' | 'bottom' = 'top';
@@ -46,7 +52,7 @@ export class NetworkAiAgentDashboardEventsComponent implements OnInit, OnDestroy
 
   @ViewChild('tooltipRef', { static: false }) tooltipElementRef: ElementRef;
 
-  deviceTypes: Array<UnityDeviceType> = [];
+  deviceTypes: Array<DeviceType> = [];
   deviceTypeSettings: IMultiSelectSettings = {
     isSimpleArray: false,
     lableToDisplay: 'type',
@@ -81,11 +87,14 @@ export class NetworkAiAgentDashboardEventsComponent implements OnInit, OnDestroy
     allSelected: 'All columns selected',
   };
 
-  constructor(private eventSvc: NetworkAiAgentDashboardEventsService,
+  constructor(private eventSvc: AiAgentEventsService,
     private utilService: AppUtilityService,
     private spinner: AppSpinnerService,
+    private router: Router,
+    private route: ActivatedRoute,
     private refreshService: DataRefreshBtnService,
     private notification: AppNotificationService) {
+    this.aiAgentType = this.route.snapshot.data.aiAgentType;
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.HUNDRED };
 
     this.refreshService.refreshAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
@@ -95,6 +104,7 @@ export class NetworkAiAgentDashboardEventsComponent implements OnInit, OnDestroy
 
   ngOnInit(): void {
     this.spinner.start('main');
+    this.aiAgentConfig = aiAgentConfigMap[this.aiAgentType];
     this.columnsSelected = this.tableColumns.filter(col => col.default);
     // this.getEventSummary();
     this.getDropDownData();
@@ -143,8 +153,8 @@ export class NetworkAiAgentDashboardEventsComponent implements OnInit, OnDestroy
   }
 
   getDropDownData() {
-    this.eventSvc.getDropdownData().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.deviceTypes = _clone(res[0]);
+    this.eventSvc.getDropdownData(this.aiAgentType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.deviceTypes = _clone(res);
       this.buildFilterForm();
     }, err => {
       this.deviceTypes = [];
@@ -177,7 +187,7 @@ export class NetworkAiAgentDashboardEventsComponent implements OnInit, OnDestroy
   }
 
   getEvents() {
-    this.eventSvc.getEvents(this.currentCriteria, this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.eventSvc.getEvents(this.currentCriteria, this.filterForm.getRawValue(), this.aiAgentConfig).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.spinner.stop('main');
       this.count = res.count;
       this.viewData = this.eventSvc.convertDetailsToViewdata(res.results);
@@ -259,7 +269,7 @@ export class NetworkAiAgentDashboardEventsComponent implements OnInit, OnDestroy
     this.acknowledgeFormValidationMessages = this.eventSvc.acknowledgeFormValidationMessages;
   }
 
-  resolve(view: AIMLEventsViewData) {
+  resolve(view: AiAgentEventsViewData) {
     if (view.isStatusResolved) {
       return;
     }

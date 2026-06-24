@@ -13,7 +13,7 @@ import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { ConnectionTestResult, DeviceDiscoveryAgentConfigurationType } from './agent-config.type';
-import { UpdateCollectorIpPayload, UpdateCollectorTtlPayload } from './advanced-discovery-connectivity.type';
+import { ConsoleResult, UpdateCollectorIpPayload, UpdateCollectorTtlPayload } from './advanced-discovery-connectivity.type';
 
 @Injectable()
 export class AdvancedDiscoveryConnectivityService {
@@ -157,19 +157,16 @@ export class AdvancedDiscoveryConnectivityService {
     }
   };
 
-  testPing(data: any, uuid: string): Observable<TaskStatus> {
-    return this.http.post<CeleryTask>(`/customer/agent/config/${uuid}/network_ping/`, data)
-      .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 3, 100).pipe(take(1))), take(1));
+  testPing(data: any, uuid: string): Observable<ConsoleResult> {
+    return this.http.post<ConsoleResult>(`/customer/agent/config/${uuid}/network_ping/`, data)
   }
 
-  testTelnet(data: any, uuid: string): Observable<TaskStatus> {
-    return this.http.post<CeleryTask>(`/customer/agent/config/${uuid}/network_telnet/`, data)
-      .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 3, 100).pipe(take(1))), take(1));
+  testTelnet(data: any, uuid: string): Observable<ConsoleResult> {
+    return this.http.post<ConsoleResult>(`/customer/agent/config/${uuid}/network_telnet/`, data)
   }
 
-  testTraceRoute(data: any, uuid: string): Observable<TaskStatus> {
-    return this.http.post<CeleryTask>(`/customer/agent/config/${uuid}/network_traceroute/`, data)
-      .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 3, 100).pipe(take(1))), take(1));
+  testTraceRoute(data: any, uuid: string): Observable<ConsoleResult> {
+    return this.http.post<ConsoleResult>(`/customer/agent/config/${uuid}/network_traceroute/`, data)
   }
 
   private toDisplayValue(value: any): string {

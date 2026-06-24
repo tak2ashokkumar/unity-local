@@ -47,7 +47,7 @@ export const AIOPS_DEVICE_TYPES: UnityDeviceType[] = [
   { type: 'Firewall', mapping: DeviceMapping.FIREWALL, key: 'firewall' },
   { type: 'Load Balancer', mapping: DeviceMapping.LOAD_BALANCER, key: 'load_balancer' },
   { type: 'Hypervisor', mapping: DeviceMapping.HYPERVISOR, key: 'hypervisor' },
-  { type: 'Bare Metal Server', mapping: DeviceMapping.BARE_METAL_SERVER, key: 'bms' },
+  { type: 'Bare Metal Server', mapping: DeviceMapping.BARE_METAL_SERVER, key: 'baremetal' },
   { type: 'Storage Device', mapping: DeviceMapping.STORAGE_DEVICES, key: 'storage' },
   { type: 'MAC Device', mapping: DeviceMapping.MAC_MINI, key: 'mac_device' },
   { type: 'Database Server', mapping: DeviceMapping.DB_SERVER, key: 'database' },

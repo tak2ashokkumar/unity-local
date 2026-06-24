@@ -26,7 +26,7 @@ export interface WSOption {
     user_id?: string;
     connection_type?: string;
     transport?: string;
-    shell?: string;   
+    shell?: string;
 }
 
 export class WSSHClient {
@@ -57,10 +57,11 @@ export class WSSHClient {
 
     isShellReady(data: string): boolean {
         const isLinux = data.includes('$') || data.includes('#');
+        const isMacMini = data.includes('%');
         const isCmd = data.includes('>') && /[A-Za-z]:\\/.test(data);
         const isPowershell = data.includes('PS ') && data.includes('>');
         const isWinRM = data.includes('>');
-        return isLinux || isCmd || isPowershell || isWinRM;
+        return isLinux || isMacMini || isCmd || isPowershell || isWinRM;
     }
 
     getHostUrl(): string {

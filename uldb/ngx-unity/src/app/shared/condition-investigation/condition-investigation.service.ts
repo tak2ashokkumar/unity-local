@@ -9,10 +9,7 @@ import { ConditionData, PromptResult } from './condition-investigation.type';
 import { PaginatedResult } from '../SharedEntityTypes/paginated.type';
 import { CeleryTask } from '../SharedEntityTypes/celery-task.type';
 import { map, switchMap, take } from 'rxjs/operators';
-import { NetworkAgentConditionActivityDetail } from 'src/app/unity-copilot/network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-conditions/network-ai-agent-dashboard-conditions.type';
 import { SearchCriteria } from '../table-functionality/search-criteria';
-import { NetworkAgentConditionActivityDetailViewData } from 'src/app/unity-copilot/network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-conditions/network-ai-agent-dashboard-conditions.service';
-import { Observable } from 'rxjs';
 import { GET_AIOPS_CONDITION_BY_ID } from '../api-endpoint.const';
 import { AnswerType } from './condition-investigation-chatbot/condition-investigation-chatbot.type';
 

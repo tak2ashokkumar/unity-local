@@ -36,41 +36,93 @@
         </div>
     </div>
     <div class="col-6">
-        <div class="card mb-2">
-            <div class="card-body py-2">
-                <div class="d-flex justify-content-center align-items-center">
-                    <div class="d-flex flex-column flex-fill pr-3">
-                        <span>Switch</span>
-                        <div>
-                            <span class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.switch
-                                ||
-                                0}}</span>
-                            <span class="text-muted font-sm-xs pl-1">Conditions</span>
-                        </div>
+        <ng-container [ngSwitch]="aiAgentType">
+            <ng-container *ngSwitchCase="'network'">
+                <ng-container *ngTemplateOutlet="networkSummaryWidget"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'compute'">
+                <ng-container *ngTemplateOutlet="computeSummaryWidget"></ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>
+
+<ng-template #networkSummaryWidget>
+    <div class="card mb-2">
+        <div class="card-body py-2">
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="d-flex flex-column flex-fill pr-3">
+                    <span>Switch</span>
+                    <div>
+                        <span class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.switch
+                            ||
+                            0}}</span>
+                        <span class="text-muted font-sm-xs pl-1">Conditions</span>
                     </div>
-                    <div class="d-flex flex-column flex-fill border-left px-3">
-                        <span>Firewall</span>
-                        <div>
-                            <span
-                                class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.firewall
-                                ||
-                                0}}</span><span class="text-muted font-sm-xs pl-1">Conditions</span>
-                        </div>
+                </div>
+                <div class="d-flex flex-column flex-fill border-left px-3">
+                    <span>Firewall</span>
+                    <div>
+                        <span class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.firewall
+                            ||
+                            0}}</span><span class="text-muted font-sm-xs pl-1">Conditions</span>
                     </div>
-                    <div class="d-flex flex-column flex-fill border-left px-3">
-                        <span>Load Balancer</span>
-                        <div>
-                            <span
-                                class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.loadBalancer
-                                || 0}}
-                            </span><span class="text-muted font-sm-xs pl-1">Conditions</span>
-                        </div>
+                </div>
+                <div class="d-flex flex-column flex-fill border-left px-3">
+                    <span>Load Balancer</span>
+                    <div>
+                        <span
+                            class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.loadBalancer
+                            || 0}}
+                        </span><span class="text-muted font-sm-xs pl-1">Conditions</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</ng-template>
+
+<ng-template #computeSummaryWidget>
+    <div class="card mb-2">
+        <div class="card-body py-2">
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="d-flex flex-column flex-fill pr-3">
+                    <span>Baremental</span>
+                    <div>
+                        <span class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.baremetal
+                            ||
+                            0}}</span>
+                        <span class="text-muted font-sm-xs pl-1">Conditions</span>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-fill border-left px-3">
+                    <span>Hypervisor</span>
+                    <div>
+                        <span class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.hypervisor
+                            ||
+                            0}}</span><span class="text-muted font-sm-xs pl-1">Conditions</span>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-fill border-left px-3">
+                    <span>MAC Device</span>
+                    <div>
+                        <span class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.macDevice
+                            || 0}}
+                        </span><span class="text-muted font-sm-xs pl-1">Conditions</span>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-fill border-left px-3">
+                    <span>VM</span>
+                    <div>
+                        <span class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.vm
+                            || 0}}
+                        </span><span class="text-muted font-sm-xs pl-1">Conditions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
 
 <div class="row">
     <div class="col-12">

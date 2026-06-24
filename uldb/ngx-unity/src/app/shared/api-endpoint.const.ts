@@ -148,13 +148,13 @@ export const DEVICE_LIST_BY_DEVICE_TYPE = (deviceType: DeviceMapping) => {
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/`;
         case DeviceMapping.SWITCHES: return `customer/switches/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `/rest/vmware/migrate/`;
+        case DeviceMapping.HYPER_V: return `customer/hyperv/vms/`;
         case DeviceMapping.CLOUD_CONTROLLER: return `customer/private_cloud/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/`;
         case DeviceMapping.PDU: return `customer/pdus/`;
         case DeviceMapping.MAC_MINI: return `customer/macdevices/`;
         case DeviceMapping.MOBILE_DEVICE: return `customer/mobiledevices/`;
         case DeviceMapping.DB_SERVER: return `customer/database_servers/`;
-        case DeviceMapping.HYPER_V: return `customer/hyperv/vms/`;
         default: console.error('Invalid device type : ', deviceType);
     }
 }
@@ -202,14 +202,13 @@ export const CHECK_AUTH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/check_auth/`;
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/check_auth/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
-        case DeviceMapping.ESXI:
-            return `rest/vmware_vms/${deviceId}/check_auth/`;
+        case DeviceMapping.ESXI: return `rest/vmware_vms/${deviceId}/check_auth/`;
+        case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/check_auth/`;
+        case DeviceMapping.PROXMOX: return `customer/proxmox/vms/${deviceId}/check_auth/`;
+        case DeviceMapping.G3_KVM: return `customer/g3_kvm/vms/${deviceId}/check_auth/`;
         case DeviceMapping.DEVOPS_CONTROLLER: return `rest/customer/devops_controllers/${deviceId}/check_auth/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${deviceId}/check_auth/`;
         case DeviceMapping.MAC_MINI: return `customer/macdevices/${deviceId}/check_auth/`;
-        case DeviceMapping.PROXMOX: return `customer/proxmox/vms/${deviceId}/check_auth/`;
-        case DeviceMapping.G3_KVM: return `customer/g3_kvm/vms/${deviceId}/check_auth/`;
-        case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/check_auth/`;
         case DeviceMapping.COLLECTOR: return `customer/agent/config/${deviceId}/check_agent_auth/`;
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `customer/managed/azure/resources/${deviceId}/check_auth/?azure=true`;
         default: console.error('Invalid device type : ', deviceType);
@@ -227,11 +226,10 @@ export const CONSOLE_ACCESS_DETAILS_BY_DEVICE_TYPE = (deviceType: DeviceMapping,
         // case DeviceMapping.OTHER_DEVICES: return `customer/bm_servers/${deviceId}/check_auth`;
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
-        case DeviceMapping.ESXI:
-            return `customer/vmware_vms/${deviceId}/get_vm_details/`;
+        case DeviceMapping.ESXI: return `customer/vmware_vms/${deviceId}/get_vm_details/`;
+        case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${deviceId}/`;
         case DeviceMapping.MAC_MINI: return `customer/macdevices/${deviceId}/`;
-        case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/`;
         default: console.error('Invalid device type : ', deviceType);
     }
 }

@@ -1,11 +1,9 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AnalysisLogos, NetworkAgentConditionAlertEventViewData, NetworkAgentConditionAlertsViewData, NetworkAgentConditionsSummaryViewData, NetworkAgentConditionsViewData, NetworkAiAgentDashboardConditionsService, tabData } from './network-ai-agent-dashboard-conditions.service';
+import { AiAgentConditionAlertEventViewData, AiAgentConditionAlertsViewData, AiAgentConditionsService, AiAgentConditionsSummaryViewData, AiAgentConditionsViewData, AnalysisLogos, tabData } from './ai-agent-conditions.service';
 import { Subject } from 'rxjs';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { NetworkAgentConditionDetails } from './network-ai-agent-dashboard-conditions.type';
 import { FormGroup } from '@angular/forms';
 import { TabData } from 'src/app/shared/tabdata';
-import { AimlConditionDetailsService } from 'src/app/unity-services/aiml-event-mgmt/aiml-condition-details/aiml-condition-details.service';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -13,31 +11,37 @@ import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refr
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppUtilityService, SERVICE_NOW_TICKET_TYPE, TICKET_MGMT_TYPE } from 'src/app/shared/app-utility/app-utility.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { takeUntil } from 'rxjs/operators';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { cloneDeep as _clone } from 'lodash-es';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { AiAgentConfigType, AiAgentType } from '../ai-agent-events-alerts-conditions-dashboard.type';
+import { aiAgentConfigMap } from '../ai-agent-events-alerts-conditions-dashboard.component';
+import { AiAgentConditionDetails } from './ai-agent-conditions.type';
 
-/** this component is deprecated, use AiAgentConditionsComponent instead */
+/** This component is used for Network and Compute AI agents. */
 @Component({
-  selector: 'network-ai-agent-dashboard-conditions',
-  templateUrl: './network-ai-agent-dashboard-conditions.component.html',
-  styleUrls: ['./network-ai-agent-dashboard-conditions.component.scss'],
-  providers: [NetworkAiAgentDashboardConditionsService]
+  selector: 'ai-agent-conditions',
+  templateUrl: './ai-agent-conditions.component.html',
+  styleUrls: ['./ai-agent-conditions.component.scss'],
+  providers: [AiAgentConditionsService]
 })
-export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDestroy {
+export class AiAgentConditionsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
 
-  conditionsSummaryViewdata: NetworkAgentConditionsSummaryViewData;
+  aiAgentType: AiAgentType;
+  aiAgentConfig: AiAgentConfigType;
+
+  conditionsSummaryViewdata: AiAgentConditionsSummaryViewData;
 
   conditionCount: number;
-  viewData: NetworkAgentConditionsViewData[] = [];
+  viewData: AiAgentConditionsViewData[] = [];
   selectedConditionIndex: number = 0;
   selectedConditionId: string;
   conditionUuid: string;
-  selectedCondition: NetworkAgentConditionDetails;
+  selectedCondition: AiAgentConditionDetails;
 
   completedApis: number = 0;
   isInitialLoad: boolean = true;
@@ -48,7 +52,7 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
 
   isBlinking = false;
   blinkInterval: any;
-  matchedAlert: NetworkAgentConditionAlertsViewData;
+  matchedAlert: AiAgentConditionAlertsViewData;
 
 
   tabItems: TabData[] = tabData;
@@ -60,11 +64,11 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
 
   alertsCurrentCriteria: SearchCriteria;
   alertsCount: number;
-  alerts: NetworkAgentConditionAlertsViewData[] = [];
-  view: NetworkAgentConditionAlertsViewData[] = [];
+  alerts: AiAgentConditionAlertsViewData[] = [];
+  view: AiAgentConditionAlertsViewData[] = [];
   hoveredIndex: number = -1;
   tooltipDirection: 'top' | 'bottom' = 'top';
-  selectedAlert: NetworkAgentConditionAlertsViewData;
+  selectedAlert: AiAgentConditionAlertsViewData;
   selectedAlertIndex: number;
   @ViewChild('tooltipRef', { static: false }) tooltipElementRef: ElementRef;
 
@@ -72,11 +76,11 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
   analysisLogos = AnalysisLogos;
   downloadUrl: string = '';
 
-  selectedEvent: NetworkAgentConditionAlertEventViewData;
+  selectedEvent: AiAgentConditionAlertEventViewData;
   alertEventsEle: any;
   @ViewChild('alertEventsElem', { static: true }) alertEventsElem: ElementRef;
 
-  constructor(private conditionSvc: NetworkAiAgentDashboardConditionsService,
+  constructor(private conditionSvc: AiAgentConditionsService,
     // private conditionDetailSvc: AimlConditionDetailsService,
     private alertDetailSvc: AimlAlertDetailsService,
     private spinner: AppSpinnerService,
@@ -87,18 +91,19 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
     private utilService: AppUtilityService,
     public storage: StorageService,
     private modalService: BsModalService) {
+    this.aiAgentType = this.route.snapshot.data.aiAgentType;
+
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.activityCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.alertsCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
-
     this.refreshService.refreshAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
-      console.log('inside conditions refreshannounce sub')
       this.refreshData();
     });
   }
 
   ngOnInit(): void {
     this.spinner.start('main');
+    this.aiAgentConfig = aiAgentConfigMap[this.aiAgentType];
     this.getConditions();
     this.getConditionsSummary();
   }
@@ -163,7 +168,7 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
   }
 
   getConditionsSummary() {
-    this.conditionSvc.getConditionsSummary().pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getConditionsSummary(this.aiAgentConfig).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.conditionsSummaryViewdata = this.conditionSvc.convertToConditionsSummaryViewData(res);
       this.handleSpinnerStopForConditionSummaryAndList();
     }, (err) => {
@@ -186,7 +191,7 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
   }
 
   getConditions() {
-    this.conditionSvc.getConditions(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getConditions(this.currentCriteria, this.aiAgentConfig).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.handleSpinnerStopForConditionSummaryAndList();
       this.conditionCount = res.count;
       this.viewData = this.conditionSvc.convertToConditionsViewdata(res.results);
@@ -261,7 +266,7 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
     });
   }
 
-  goToTicketDetails(view: NetworkAgentConditionsViewData) {
+  goToTicketDetails(view: AiAgentConditionsViewData) {
     switch (view.ticketingSystem) {
       case TICKET_MGMT_TYPE.CRM:
         if (view.accountId && view.ticketUuid) {
@@ -443,7 +448,7 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
     if (this.selectedCondition.conversation_detail.title && this.selectedCondition.conversation_detail.title.trim() !== '') {
       queryParams.title = this.selectedCondition.conversation_detail.title;
     }
-    return this.router.navigate([`/unity-copilot/network-ai-agent/conditions/${this.selectedCondition.id}/${this.conditionUuid}/investigate`],
+    return this.router.navigate([`${this.aiAgentConfig.routeBase}/conditions/${this.selectedCondition.id}/${this.conditionUuid}/investigate`],
       Object.keys(queryParams).length ? { queryParams } : {}
     );
   }
@@ -529,7 +534,7 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
     }, 0);
   }
 
-  resolveAlert(view: NetworkAgentConditionAlertsViewData) {
+  resolveAlert(view: AiAgentConditionAlertsViewData) {
     if (view.isStatusResolved) {
       return;
     }
@@ -640,7 +645,7 @@ export class NetworkAiAgentDashboardConditionsComponent implements OnInit, OnDes
     queryParams.load_history = loadHistory;
 
     this.router.navigate(
-      [`/unity-copilot/network-ai-agent/conditions/${this.selectedCondition.id}/${this.conditionUuid}/investigate`],
+      [`${this.aiAgentConfig.routeBase}/conditions/${this.selectedCondition.id}/${this.conditionUuid}/investigate`],
       Object.keys(queryParams).length ? { queryParams } : {}
     );
   }

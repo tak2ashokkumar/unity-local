@@ -527,6 +527,10 @@ const UNITY_AI_AGENTS_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
             url: '/unity-copilot/network-ai-agent',
         },
         {
+            name: 'Compute AI Agent',
+            url: '/unity-copilot/compute-ai-agent',
+        },
+        {
             name: `${finopsMenuName}`,
             url: '/unity-copilot/finops-ai-agent',
         },

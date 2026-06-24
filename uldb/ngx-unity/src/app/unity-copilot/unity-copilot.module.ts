@@ -15,6 +15,11 @@ import { NetworkAiAgentDashboardComponent } from './network-ai-agent/network-ai-
 import { NetworkAiAgentDashboardEventsComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-events/network-ai-agent-dashboard-events.component';
 import { NetworkAiAgentDashboardAlertsComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-alerts/network-ai-agent-dashboard-alerts.component';
 import { NetworkAiAgentDashboardConditionsComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-conditions/network-ai-agent-dashboard-conditions.component';
+import { AiAgentEventsAlertsConditionsDashboardComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events-alerts-conditions-dashboard.component';
+import { AiAgentAlertsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-alerts/ai-agent-alerts.component';
+import { AiAgentEventsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events/ai-agent-events.component';
+import { ComputeAiAgentComponent } from './compute-ai-agent/compute-ai-agent.component';
+import { AiAgentConditionsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-conditions/ai-agent-conditions.component';
 
 
 @NgModule({
@@ -27,6 +32,11 @@ import { NetworkAiAgentDashboardConditionsComponent } from './network-ai-agent/n
     NetworkAiAgentDashboardEventsComponent,
     NetworkAiAgentDashboardAlertsComponent,
     NetworkAiAgentDashboardConditionsComponent,
+    ComputeAiAgentComponent,
+    AiAgentEventsAlertsConditionsDashboardComponent,
+    AiAgentEventsComponent,
+    AiAgentAlertsComponent,
+    AiAgentConditionsComponent
   ],
   imports: [
     // CommonModule,

@@ -116,6 +116,11 @@ export class ServiceCatalogOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
+  onOrderTypeChange() {
+    this.currentCriteria.pageNo = 1;
+    this.getOrders();
+  }
+
   goBack() {
     this.router.navigate(['../../catalog'], { relativeTo: this.route });
   }

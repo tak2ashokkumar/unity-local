@@ -31,6 +31,9 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   @Output() chatResponse = new EventEmitter<NetworkAgentsChatResponseType>();
   @Output() chatHistory = new EventEmitter<PaginatedResult<UnityAssistantChatHistory>>();
 
+  aiAgentType: string;
+  application: string;
+
   chatHistoryData: Array<ChatHistoryData> = [];
   form: FormGroup;
   isTyping: boolean = false;
@@ -62,15 +65,17 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     private newTerminalService: ConditionInvestigationNewTerminalService) {
     this.route.queryParams.subscribe(params => {
       this.loadHistory = params['load_history'] || 'false';
-      this.conversationId = this.loadHistory ? params['conversation_id'] : null;
+      this.conversationId = this.loadHistory == 'true' ? params['conversation_id'] : null;
       this.title = params['title'] || '';
     });
+    this.aiAgentType = this.route.snapshot.data.aiAgentType;
+    this.application = this.service.getApplicationByRouteData(this.aiAgentType);
     this.chatCurrentCriteria = {
       searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.TEN,
       params: [{
         'org_id': userInfoService.userOrgId,
         'user_id': userInfoService.userDetails.id,
-        'application': 'Network Agent',
+        'application': `${this.application}`,
         'conversation_id': this.conversationId
       }]
     }
@@ -100,9 +105,9 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['loadChatHistory'] && changes['loadChatHistory'].currentValue === true) {
-      this.chatCurrentCriteria.pageNo++;
-      if(!this.isLoadingChats && this.hasMoreChats){
+    if (changes['loadChatHistory'] && changes['loadChatHistory'].currentValue === true && this.loadHistory != 'true') {
+      if (!this.isLoadingChats && this.hasMoreChats) {
+        this.chatCurrentCriteria.pageNo++;
         this.getChats();
       }
     }
@@ -114,6 +119,9 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   isFirstLoad = true;
   @Input() loadChatHistory: boolean;
   onScroll() {
+    if (this.loadHistory != 'true') {
+      return
+    }
     const el = this.messagesContainer.nativeElement;
     if (el.scrollTop <= 40 && !this.isLoadingChats && this.hasMoreChats) {
       this.chatCurrentCriteria.pageNo++;
@@ -242,7 +250,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       org_id: this.userInfoService.userOrgId,
       user_id: `${this.userInfoService.userDetails.id}`,
       condition_id: Number(this.conditionId),
-      application: 'Network Agent',
+      application: `${this.application}`,
       count: 0,
       conversation_id: this.conversationId,
       role: 'User',
@@ -438,7 +446,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.llmModels = res;
       this.llmModels.forEach(m => {
-        if (m.active_for_applications?.includes('network_agent')) {
+        if (m.active_for_applications?.includes(this.service.serverSideApplicationMapping(this.application))) {
           this.activeModel = m;
         }
       })
@@ -459,10 +467,11 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     }
 
     if (model.is_user_owned) {
+      const serversideAppName: string = this.service.serverSideApplicationMapping(this.application);
       if (this.activeModel) {
-        this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'network_agent');
+        this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != serversideAppName);
       }
-      model.active_for_applications.push('network_agent');
+      model.active_for_applications.push(serversideAppName);
       this.changeActiveModelToSelected(model);
     } else {
       // this.goToConfig(model);
@@ -472,7 +481,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
 
   changeActiveModelToSelected(model: SupportedLLMConfigData) {
     this.showModelDropdown = false;
-    this.service.changeActiveModel('Network Agent', model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.service.changeActiveModel(this.application, model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.activeModel = model;
     }, err => {
 

@@ -13,11 +13,10 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { COLLECTOR_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
-import { Result } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { AdvancedDiscoveryConnectivityCrudService } from './advanced-discovery-connectivity-crud/advanced-discovery-connectivity-crud.service';
 import { AdvancedDiscoveryConnectivityService, AgentConfigurationViewData } from './advanced-discovery-connectivity.service';
-import { CollectorUpdateAction } from './advanced-discovery-connectivity.type';
+import { CollectorUpdateAction, ConsoleResult } from './advanced-discovery-connectivity.type';
 
 @Component({
   selector: 'advanced-discovery-connectivity',
@@ -38,7 +37,7 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit {
   testNetworkFormValidationMessages: any;
   testNetworkForm: FormGroup;
   collectorUuid: string;
-  consoleResult: Result;
+  consoleResult: ConsoleResult;
   updateCollectorForm: FormGroup;
   updateCollectorFormErrors: any;
   updateCollectorValidationMessages: any;
@@ -203,7 +202,7 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit {
       let formObj = this.testNetworkForm.getRawValue();
       if (this.networkAction == 'ping') {
         this.agentService.testPing(formObj, this.collectorUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-          this.consoleResult = res?.result;
+          this.consoleResult = res;
           this.spinner.stop('main');
         }, err => {
           this.testNetworkFormModalRef.hide();
@@ -213,7 +212,7 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit {
       }
       else if (this.networkAction == 'telnet') {
         this.agentService.testTelnet(formObj, this.collectorUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-          this.consoleResult = res?.result;
+          this.consoleResult = res;
           this.spinner.stop('main');
         }, err => {
           this.testNetworkFormModalRef.hide();
@@ -223,7 +222,7 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit {
       }
       else {
         this.agentService.testTraceRoute(formObj, this.collectorUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-          this.consoleResult = res?.result;
+          this.consoleResult = res;
           this.spinner.stop('main');
         }, err => {
           this.testNetworkFormModalRef.hide();

@@ -175,15 +175,16 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     clearTimeout(this.userScrollTimer);
     this.cleanupScrollPositionTracking();
     this.maximizeLeftPanel();
+    this.cleanupWaitMessages();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
 
   startWaitMessages() {
     this.timerSub = timer(0, 1000).subscribe(sec => {
-      if (sec < 3) {
+      if (sec < 15) {
         this.waitMessage = 'Preparing Investigation Plan';
-      } else if (sec < 7) {
+      } else if (sec < 30) {
         this.waitMessage = 'Making Plan Ready';
       } else {
         this.waitMessage = 'Please hold it is taking longer than usual';

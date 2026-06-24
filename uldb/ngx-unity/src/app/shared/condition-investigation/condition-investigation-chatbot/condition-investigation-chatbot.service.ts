@@ -21,6 +21,14 @@ export class ConditionInvestigationChatbotService {
     return this.http.post(`${environment.networkAgentHostUrl}v1/investigate/`, data);
   }
 
+  getApplicationByRouteData(aiAgentType: string): string {
+    switch (aiAgentType) {
+      case 'network': return 'Network Agent';
+      case 'compute': return 'Compute Agent';
+      default: '';
+    }
+  }
+
   getStreamingResponse(data: any): Observable<any> {
     return new Observable(observer => {
       fetch(`${environment.networkAgentHostUrl}v1/investigate/chat_sse_new`, {
@@ -141,14 +149,24 @@ export class ConditionInvestigationChatbotService {
   }
 
   changeActiveModel(selectedApplication: string, model: SupportedLLMConfigData) {
-    let app: string;
-    switch (selectedApplication) {
-      case 'Assistant': app = 'assistant'; break;
-      case 'Network Agent': app = 'network_agent'; break;
-      case 'Workflow Agent': app = 'workflow_agent'; break;
-      default: app = 'assistant';
-    }
-    let data = { 'active_model': model.id, 'application': app };
+    // let app: string;
+    // switch (selectedApplication) {
+    //   case 'Assistant': app = 'assistant'; break;
+    //   case 'Network Agent': app = 'network_agent'; break;
+    //   case 'Workflow Agent': app = 'workflow_agent'; break;
+    //   default: app = 'assistant';
+    // }
+    let data = { 'active_model': model.id, 'application': this.serverSideApplicationMapping(selectedApplication) };
     return this.http.post(`mcp/user-session-config/`, data);
+  }
+
+  serverSideApplicationMapping(application: string): string {
+    switch (application) {
+      case 'Assistant': return 'assistant';
+      case 'Network Agent': return 'network_agent';
+      case 'Compute Agent': return 'compute_agent';
+      case 'Workflow Agent': return 'workflow_agent';
+      default: return 'assistant';
+    }
   }
 }

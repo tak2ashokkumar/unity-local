@@ -3,6 +3,7 @@ import { Subject, Subscription } from 'rxjs';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 
+/** this component is deprecated, use AiAgentEventsAlertsConditionsDashboardComponent instead */
 @Component({
   selector: 'network-ai-agent-dashboard',
   templateUrl: './network-ai-agent-dashboard.component.html',

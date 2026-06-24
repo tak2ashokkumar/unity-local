@@ -9,6 +9,11 @@ import { NetworkAiAgentDashboardAlertsComponent } from './network-ai-agent/netwo
 import { NetworkAiAgentDashboardEventsComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-events/network-ai-agent-dashboard-events.component';
 import { NetworkAiAgentDashboardComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard.component';
 import { NetworkAiAgentComponent } from './network-ai-agent/network-ai-agent.component';
+import { ComputeAiAgentComponent } from './compute-ai-agent/compute-ai-agent.component';
+import { AiAgentEventsAlertsConditionsDashboardComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events-alerts-conditions-dashboard.component';
+import { AiAgentAlertsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-alerts/ai-agent-alerts.component';
+import { AiAgentEventsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events/ai-agent-events.component';
+import { AiAgentConditionsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-conditions/ai-agent-conditions.component';
 
 const routes: Routes = [
   {
@@ -32,7 +37,7 @@ const routes: Routes = [
         children: [
           {
             path: 'dashboard',
-            component: NetworkAiAgentDashboardComponent,
+            component: AiAgentEventsAlertsConditionsDashboardComponent,
             data: {
               breadcrumb: {
                 title: 'Dashboard',
@@ -42,32 +47,35 @@ const routes: Routes = [
             children: [
               {
                 path: 'events',
-                component: NetworkAiAgentDashboardEventsComponent,
+                component: AiAgentEventsComponent,
                 data: {
                   breadcrumb: {
                     title: 'Events',
                     stepbackCount: 0
-                  }
+                  },
+                  aiAgentType: 'network'
                 }
               },
               {
                 path: 'alerts',
-                component: NetworkAiAgentDashboardAlertsComponent,
+                component: AiAgentAlertsComponent,
                 data: {
                   breadcrumb: {
                     title: 'Alerts',
                     stepbackCount: 0
-                  }
+                  },
+                  aiAgentType: 'network'
                 }
               },
               {
                 path: 'conditions',
-                component: NetworkAiAgentDashboardConditionsComponent,
+                component: AiAgentConditionsComponent,
                 data: {
                   breadcrumb: {
                     title: 'Conditions',
                     stepbackCount: 0
-                  }
+                  },
+                  aiAgentType: 'network'
                 }
               },
             ]
@@ -81,7 +89,76 @@ const routes: Routes = [
           breadcrumb: {
             title: 'Investigate',
             stepbackCount: 0
+          },
+          aiAgentType: 'network'
+        },
+      },
+      {
+        path: 'compute-ai-agent',
+        component: ComputeAiAgentComponent,
+        data: {
+          breadcrumb: {
+            title: 'Compute AI Agent',
+            stepbackCount: 0
           }
+        },
+        children: [
+          {
+            path: 'dashboard',
+            component: AiAgentEventsAlertsConditionsDashboardComponent,
+            data: {
+              breadcrumb: {
+                title: 'Dashboard',
+                stepbackCount: 0
+              }
+            },
+            children: [
+              {
+                path: 'events',
+                component: AiAgentEventsComponent,
+                data: {
+                  breadcrumb: {
+                    title: 'Events',
+                    stepbackCount: 0
+                  },
+                  aiAgentType: 'compute'
+                }
+              },
+              {
+                path: 'alerts',
+                component: AiAgentAlertsComponent,
+                data: {
+                  breadcrumb: {
+                    title: 'Alerts',
+                    stepbackCount: 0
+                  },
+                  aiAgentType: 'compute'
+                }
+              },
+              {
+                path: 'conditions',
+                component: AiAgentConditionsComponent,
+                data: {
+                  breadcrumb: {
+                    title: 'Conditions',
+                    stepbackCount: 0
+                  },
+                  aiAgentType: 'compute'
+                }
+              },
+            ]
+          },
+        ]
+      },
+      {
+        path: 'compute-ai-agent/conditions/:conditionId/:conditionUuid/investigate',
+        component: ConditionInvestigationComponent,
+        data: {
+          breadcrumb: {
+            title: 'Investigate',
+            stepbackCount: 0
+          },
+          aiAgentType: 'compute'
         },
       },
       {

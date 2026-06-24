@@ -105,7 +105,7 @@
                     <div class="d-flex justify-content-end w-80">
                         <div class="w-15 mx-2" *ngIf="!catalogId">
                             <select class="form-control form-control-sm"
-                                [(ngModel)]="currentCriteria.params[0].order_type" (ngModelChange)="getOrders()">
+                                [(ngModel)]="currentCriteria.params[0].order_type" (ngModelChange)="onOrderTypeChange()">
                                 <option [value]="''">Order Type</option>
                                 <option [value]="'Draft'">Draft</option>
                                 <option [value]="'Ordered'">Ordered</option>

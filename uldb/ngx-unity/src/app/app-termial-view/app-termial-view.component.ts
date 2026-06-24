@@ -32,7 +32,7 @@ export class AppTermialViewComponent implements OnInit, OnDestroy {
   }
   ngOnInit() {
     if (this.user.logo) {
-      this.unityLogo = 'data:image/png;base64,' + this.user.logo;
+      this.unityLogo = this.user.logo.includes('data:image') ? this.user.logo : 'data:image/png;base64,' + this.user.logo;
     }
   }
 

@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { cloneDeep as _clone } from 'lodash-es';
 
+/** this component is deprecated, use AiAgentAlertsComponent instead */
 @Component({
   selector: 'network-ai-agent-dashboard-alerts',
   templateUrl: './network-ai-agent-dashboard-alerts.component.html',

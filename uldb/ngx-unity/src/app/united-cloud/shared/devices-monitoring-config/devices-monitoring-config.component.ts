@@ -107,7 +107,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.isAPIOptionRequired = apiDeviceTypes.has(this.device?.deviceType) || this.device?.hasPureOs;
     this.isAgentOptionRequired = !(this.device?.isCluster || this.device?.hasPureOs || this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT || this.device?.deviceType == DeviceMapping.SENSOR || this.device?.deviceType == DeviceMapping.SMART_PDU || this.device?.deviceType == DeviceMapping.RFID_READER);
     this.isSNMPOptionRequired = !(this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT);
-    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE ||  this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
+    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
 
     /** THIS IS BC FOR STATS DRILLDOWN
     *   OBSERVIUM server.uuid is used and zabbix bms.uuid is used
@@ -209,6 +209,16 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
         const type = connectionTypeValue === 'SSH' ? 'SSH' : 'Windows';
         this.loadCredentials(type, () => {
           this.form.patchValue({ mon_credential_id: this.monitoringDetails.mon_credential_id });
+        });
+      }
+      let templates = <number[]>this.form.get('mtp_templates')?.value || [];
+      if (templates.length) {
+        templates.forEach(tId => {
+          let template = this.filteredTemplates.find(tmpl => tmpl.template_id == tId);
+          if (template) {
+            template.isSelected = true;
+            this.selectedTemplates.push(template);
+          }
         });
       }
     } else if (this.form.get('connection_type').value == "API") {
