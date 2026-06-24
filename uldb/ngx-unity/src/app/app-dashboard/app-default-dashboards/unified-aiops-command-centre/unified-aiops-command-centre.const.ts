@@ -1,6 +1,7 @@
 import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import {
   UnifiedAiopsDeviceTypeOption,
+  UnifiedAiopsExecutiveSectionConfig,
   UnifiedAiopsFilterOption,
   UnifiedAiopsTone,
   UnifiedAiopsViewByOption
@@ -11,6 +12,12 @@ export const UNIFIED_AIOPS_ALERT_SEVERITY_COLORS = {
   critical: '#cc0000',
   warning: '#ff8800',
   info: '#378ad8'
+};
+
+// Device Discovery vs Monitoring coverage bars: Monitored vs Not Monitored.
+export const UNIFIED_AIOPS_DISCOVERY_COLORS = {
+  monitored: '#4f93e3',
+  notMonitored: '#d6dce2'
 };
 
 export const UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/executive-monitoring-summary/';
@@ -24,9 +31,6 @@ export const UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL = 'https://nam10.saf
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/private-cloud-infra-coverage/';
 export const UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/public-cloud-infra-coverage/';
 export const UNIFIED_AIOPS_DATACENTER_GEOGRAPHY_ENDPOINT = '/customer/aiops-dashboard/datacenter-geography/';
-export const UNIFIED_AIOPS_DATACENTER_INFRA_ENDPOINT = '/customer/aiops-dashboard/datacenter-infra/';
-export const UNIFIED_AIOPS_CONTAINER_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/container-summary/';
-export const UNIFIED_AIOPS_OBSERVABILITY_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/observability-summary/';
 export const UNIFIED_AIOPS_APPLICATION_OVERVIEW_ENDPOINT = '/customer/aiops-dashboard/application-overview/';
 export const UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT = '/customer/aiops-dashboard/services-overview/';
 export const UNIFIED_AIOPS_DATABASE_MONITORING_ENDPOINT = '/customer/aiops-dashboard/database-monitoring/';
@@ -63,10 +67,10 @@ export const UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS: UnifiedAiopsDeviceTypeOpti
 ];
 
 export const UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS: UnifiedAiopsViewByOption[] = [
-  { name: 'Device Type', key: 'device_type' },
+  // { name: 'Device Type', key: 'device_type' },
   { name: 'Event Source', key: 'event_source' },
-  { name: 'Datacenter', key: 'datacenter' },
-  { name: 'Cloud', key: 'private_cloud' },
+  // { name: 'Datacenter', key: 'datacenter' },
+  // { name: 'Cloud', key: 'private_cloud' },
   { name: 'Severity', key: 'severity' }
 ];
 
@@ -85,46 +89,91 @@ export const UNIFIED_AIOPS_DATACENTER_OPTIONS: UnifiedAiopsFilterOption[] = [
   { value: 'san-francisco-dc', label: 'San Francisco Datacenter' }
 ];
 
-export const UNIFIED_AIOPS_EXECUTIVE_SUMMARY_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[] }> = [
-  { label: 'Total Resources', tone: 'primary', keys: ['total_resources', 'totalResources', 'resources_total', 'resourcesTotal', 'resource_count', 'resourceCount', 'total'] },
-  { label: 'Devices Up', tone: 'success', keys: ['devices_up', 'devicesUp', 'device_up', 'deviceUp', 'up'] },
-  { label: 'Devices Down', tone: 'danger', keys: ['devices_down', 'devicesDown', 'device_down', 'deviceDown', 'down'] },
-  { label: 'Unknown', tone: 'muted', keys: ['unknown', 'unknown_devices', 'unknownDevices'] },
-  { label: 'Applications', tone: 'primary', keys: ['applications', 'application_count', 'applicationCount', 'apps'] },
-  { label: 'Databases', tone: 'primary', keys: ['databases', 'database_count', 'databaseCount', 'db'] },
-  { label: 'VM', tone: 'primary', keys: ['vm', 'vms', 'vm_count', 'vmCount', 'virtual_machines', 'virtualMachines'] },
-  { label: 'Orphaned Devices', keys: ['orphaned_devices', 'orphanedDevices', 'orphaned'] },
-  { label: 'Idle Devices', keys: ['idle_devices', 'idleDevices', 'idle'] }
-];
-
-export const UNIFIED_AIOPS_DATACENTER_INFRA_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; aggregateKeys?: string[] }> = [
-  { label: 'Bare Metal Servers', tone: 'primary', keys: ['bare_metal_servers', 'bareMetalServers', 'bare_metal', 'bareMetal', 'compute'] },
-  { label: 'Network Devices', tone: 'primary', keys: ['network_devices', 'networkDevices', 'network'], aggregateKeys: ['switch', 'switches', 'firewall', 'firewalls'] },
-  { label: 'Load Balancer', tone: 'primary', keys: ['load_balancer', 'loadBalancer'] },
-  { label: 'Storage Units', tone: 'primary', keys: ['storage_units', 'storageUnits', 'storage'] },
-  { label: 'PDU/Power', tone: 'primary', keys: ['pdu_power', 'pduPower', 'power'] },
-  { label: 'URLs Monitored', tone: 'primary', keys: ['urls_monitored', 'urlsMonitored', 'url'] },
-  { label: 'MAC Devices', tone: 'primary', keys: ['mac_devices', 'macDevices'] }
-];
-
-export const UNIFIED_AIOPS_KUBERNETES_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[] }> = [
-  { label: 'K8s Clusters', tone: 'primary', keys: ['kube_clusters', 'kubeClusters', 'k8s_clusters', 'k8sClusters'] },
-  { label: 'Nodes', tone: 'primary', keys: ['nodes'] },
-  { label: 'Namespaces', tone: 'primary', keys: ['namespaces'] },
-  { label: 'Pods Running', tone: 'primary', keys: ['running_pods', 'runningPods', 'pods_running', 'podsRunning'] },
-  { label: 'Docker Hosts', tone: 'primary', keys: ['docker_hosts', 'dockerHosts'] },
-  { label: 'Pod Restarts/Hr', tone: 'primary', keys: ['pod_restarts_hr', 'podRestartsHr', 'pod_restarts', 'podRestarts'] }
-];
-
-export const UNIFIED_AIOPS_AI_GPU_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; suffix?: string; threshold?: 'utilization' | 'warning' }> = [
-  { label: 'GPU Hosts', tone: 'primary', keys: ['gpu_count', 'gpuCount', 'gpu_hosts', 'gpuHosts'] },
-  { label: 'GPU Utilization', keys: ['avg_gpu_utilization', 'avgGpuUtilization', 'gpu_utilization', 'gpuUtilization'], suffix: '%', threshold: 'utilization' },
-  { label: 'GPU Memory', keys: ['avg_gpu_memory', 'avgGpuMemory', 'gpu_memory', 'gpuMemory'], suffix: '%', threshold: 'warning' },
-  { label: 'Avg Thermal', tone: 'primary', keys: ['avg_gpu_temperature', 'avgGpuTemperature', 'avg_thermal', 'avgThermal'] },
-  { label: 'LLM Workloads', tone: 'primary', keys: ['llm_counts', 'llmCounts', 'llm_workloads', 'llmWorkloads'] },
-  { label: 'Inference Latency', tone: 'primary', keys: ['llm_latency', 'llmLatency', 'inference_latency', 'inferenceLatency'], suffix: 'ms' },
-  { label: 'Vector DBs', tone: 'primary', keys: ['vectordb_count', 'vectorDbCount', 'vector_db_count', 'vectorDb'] },
-  { label: 'VDB Query Lat.', tone: 'primary', keys: ['vector_db_latency', 'vectorDbLatency', 'vdb_query_latency', 'vdbQueryLatency'], suffix: 'ms' }
+// Executive Summary is a single multi-section card. Each section reads one group object from
+// the executive-monitoring-summary response; metrics are either fixed (config below) or dynamic
+// (iterate the group's keys). A status object metric renders value + up/down/unknown trend; a
+// scalar renders a plain value (with optional suffix / threshold). `plain` forces a dark,
+// trend-less count even for a status object (Idle Devices, URL Monitored).
+export const UNIFIED_AIOPS_EXECUTIVE_SUMMARY_SECTIONS: UnifiedAiopsExecutiveSectionConfig[] = [
+  {
+    title: '',
+    column: 'full',
+    payloadKeys: ['summary', 'metrics', 'summary_metrics'],
+    metrics: [
+      { label: 'Total Discovered Resources', keys: ['total_discovered_resources', 'totalDiscoveredResources', 'total_discovered'], link: 'devices' },
+      { label: 'Total Monitored Resources', keys: ['total_monitored_resources', 'totalMonitoredResources', 'total_monitored'], link: 'devices' },
+      { label: 'Private Cloud Compute', keys: ['private_cloud_compute_resources', 'privateCloudComputeResources', 'private_cloud_compute'], link: 'pccloud' },
+      { label: 'Public Cloud Compute', keys: ['public_cloud_compute_resources', 'publicCloudComputeResources', 'public_cloud_compute'], link: 'publicCloud' },
+      { label: 'Bare Metal Servers', keys: ['baremetal_servers', 'baremetalServers', 'bare_metal_servers', 'bareMetalServers'], link: 'bmservers' },
+      { label: 'Idle Devices', keys: ['idle_device_count', 'idleDeviceCount', 'idle_devices', 'idle'], plain: true, link: 'devices' }
+    ]
+  },
+  {
+    title: 'Network & Others',
+    column: 'full',
+    payloadKeys: ['network_and_other', 'networkAndOther', 'network_and_others', 'network'],
+    metrics: [
+      { label: 'Switches', keys: ['switches', 'switch'], link: 'switches' },
+      { label: 'Firewalls', keys: ['firewalls', 'firewall'], link: 'firewalls' },
+      { label: 'Load Balancers', keys: ['load_balancers', 'loadBalancers', 'load_balancer'], link: 'loadbalancers' },
+      { label: 'PDUs', keys: ['pdus', 'pdu'] },
+      { label: 'Applications', keys: ['applications', 'application'], link: 'applications' },
+      { label: 'Databases', keys: ['databases', 'database'], link: 'databases' },
+      { label: 'URL Monitored', keys: ['urls', 'url', 'urls_monitored', 'urlsMonitored'], plain: true, link: 'otherDevices' }
+    ]
+  },
+  {
+    title: 'Kubernetes / Container',
+    column: 'full',
+    payloadKeys: ['containers', 'container_summary', 'containerSummary'],
+    metrics: [
+      { label: 'K8s Clusters', keys: ['k8cluster', 'k8s_clusters', 'k8sClusters', 'kube_clusters', 'kubeClusters'], link: 'kubernetes' },
+      { label: 'Nodes', keys: ['nodes'], link: 'kubernetes' },
+      { label: 'Docker Hosts', keys: ['docker_hosts', 'dockerHosts'], link: 'kubernetes' },
+      { label: 'Namespaces', keys: ['namespace_count', 'namespaceCount', 'namespaces'], link: 'kubernetes' },
+      { label: 'Pods Running', keys: ['pods_running_count', 'podsRunningCount', 'pods_running', 'running_pods'], link: 'kubernetes' },
+      { label: 'Pod Restarts/Hr', keys: ['pod_restarts_per_hour_count', 'podRestartsPerHourCount', 'pod_restarts_per_hour', 'pod_restarts'], link: 'kubernetes' }
+    ]
+  },
+  {
+    title: 'AI / GPU / LLM',
+    column: 'full',
+    payloadKeys: ['gpu_llm_ai', 'gpuLlmAi', 'observability_summary'],
+    metrics: [
+      { label: 'GPU Hosts', keys: ['gpu_hosts', 'gpuHosts', 'gpu_count', 'gpuCount'], link: 'gpu' },
+      { label: 'GPU Utilization', keys: ['gpu_utilization_percent', 'gpuUtilizationPercent', 'gpu_utilization', 'avg_gpu_utilization'], suffix: '%', threshold: 'utilization', link: 'gpu' },
+      { label: 'GPU Memory', keys: ['gpu_memory_percent', 'gpuMemoryPercent', 'gpu_memory', 'avg_gpu_memory'], suffix: '%', threshold: 'warning', link: 'gpu' },
+      { label: 'Avg Thermal', keys: ['avg_thermal_llm_temp', 'avgThermalLlmTemp', 'avg_gpu_temperature', 'avg_thermal'], link: 'gpu' },
+      { label: 'LLM Workloads', keys: ['llm_workloads', 'llmWorkloads', 'llm_counts'], link: 'llm' },
+      { label: 'Inference Latency', keys: ['inference_latency', 'inferenceLatency', 'llm_latency'], suffix: 'ms', link: 'llm' },
+      { label: 'Vector DBs', keys: ['vector_db_count', 'vectorDbCount', 'vectordb_count'], link: 'vectorDb' },
+      { label: 'VDB Query Lat.', keys: ['vector_db_query_latency', 'vectorDbQueryLatency', 'vdb_query_latency', 'vector_db_latency'], suffix: 'ms', link: 'vectorDb' }
+    ]
+  },
+  {
+    title: 'SD-WAN',
+    column: 'main',
+    payloadKeys: ['sdwan', 'sd_wan', 'sdWan'],
+    dynamic: true,
+    link: 'networkControllers',
+    labels: {
+      cisco_sdwan_resources: 'Cisco SD-WAN',
+      vmware_sdwan_resources: 'VMware SD-WAN',
+      fortinet_sdwan_resources: 'Fortinet Secure SD-WAN',
+      palo_alto_sdwan_resources: 'Palo Alto Networks SD-WAN'
+    }
+  },
+  {
+    title: 'Storage',
+    column: 'side',
+    payloadKeys: ['storage'],
+    dynamic: true,
+    link: 'storage',
+    labels: {
+      pure_storage: 'Pure',
+      netapp_storage: 'NetApp'
+    }
+  }
 ];
 
 export const UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; suffix?: string }> = [
@@ -132,6 +181,17 @@ export const UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG: Array<{ label: string; ton
   { label: 'Avg Memory', tone: 'primary', keys: ['avg_memory', 'avgMemory', 'average_memory', 'averageMemory', 'memory', 'memory_usage', 'memoryUsage'], suffix: '%' },
   { label: 'Avg Bandwidth Utilization', tone: 'primary', keys: ['avg_bandwidth_utilization', 'avgBandwidthUtilization', 'average_bandwidth_utilization', 'averageBandwidthUtilization', 'bandwidth_utilization', 'bandwidthUtilization'], suffix: '%' },
   { label: 'Total Storage Capacity', tone: 'primary', keys: ['total_storage_capacity', 'totalStorageCapacity', 'storage_capacity', 'storageCapacity', 'total_storage', 'totalStorage'] }
+];
+
+export const UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS = [
+  '#4a63d6',
+  '#7d5fc4',
+  '#f2a32a',
+  '#33a06a',
+  '#e8554e',
+  '#23a8a0',
+  '#3a9fe0',
+  '#d76aa6'
 ];
 
 export const UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS = [
@@ -151,3 +211,23 @@ export const UNIFIED_AIOPS_IDLE_DURATION_COLORS = [
   '#d63b3b',
   '#ff9aa2'
 ];
+
+// Public Cloud Infrastructure Coverage is rendered as three groups (Compute, Platform Services,
+// Other Services); each group shows one card per public cloud provider that has data.
+export const UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER = ['compute', 'platform_services', 'other_services'];
+
+export const UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_LABELS: { [key: string]: string } = {
+  compute: 'Compute',
+  platform_services: 'Platform Services - (Database, Storage & Network)',
+  other_services: 'Other Services'
+};
+
+export const UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_ORDER = ['aws', 'azure', 'gcp', 'oci'];
+
+// Provider card header logos (already shipped under static/assets/images/external-brand/).
+export const UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_LOGOS: { [key: string]: string } = {
+  aws: 'aws.svg',
+  azure: 'azure.svg',
+  gcp: 'gcp.svg',
+  oci: 'oracle.svg'
+};

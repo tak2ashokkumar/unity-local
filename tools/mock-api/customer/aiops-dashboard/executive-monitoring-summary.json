@@ -1,13 +1,207 @@
 {
   "summary": {
-    "total": 2243,
-    "up": 2180,
-    "down": 58,
-    "unknown": 5
+    "total_discovered_resources": 1000,
+    "total_monitored_resources": {
+      "monitored": 934,
+      "total": 934,
+      "up": 904,
+      "down": 25,
+      "unknown": 5
+    },
+    "private_cloud_compute_resources": {
+      "discovered": 21,
+      "monitored": 21,
+      "total": 21,
+      "up": 20,
+      "down": 1,
+      "unknown": 0
+    },
+    "public_cloud_compute_resources": {
+      "discovered": 39,
+      "monitored": 39,
+      "total": 39,
+      "up": 35,
+      "down": 3,
+      "unknown": 1
+    },
+    "baremetal_servers": {
+      "discovered": 82,
+      "monitored": 82,
+      "total": 82,
+      "up": 65,
+      "down": 15,
+      "unknown": 2
+    },
+    "idle_device_count": 23,
+    "total": 934,
+    "up": 904,
+    "down": 25,
+    "unknown": 5,
+    "application_count": 142,
+    "database_count": 86,
+    "vm_count": 127,
+    "idle": 23,
+    "orphaned": 6
   },
   "data": {
-    "gcp_resource": 1902,
-    "aws_resource": 207,
-    "vm": 134
+    "vm": 127,
+    "baremetal": 82,
+    "switch": 148
+  },
+  "network_and_other": {
+    "switches": {
+      "discovered": 148,
+      "monitored": 148,
+      "total": 148,
+      "up": 135,
+      "down": 10,
+      "unknown": 3
+    },
+    "firewalls": {
+      "discovered": 12,
+      "monitored": 12,
+      "total": 12,
+      "up": 10,
+      "down": 2,
+      "unknown": 0
+    },
+    "load_balancers": {
+      "discovered": 34,
+      "monitored": 34,
+      "total": 34,
+      "up": 30,
+      "down": 4,
+      "unknown": 0
+    },
+    "pdus": {
+      "discovered": 218,
+      "monitored": 218,
+      "total": 218,
+      "up": 205,
+      "down": 10,
+      "unknown": 3
+    },
+    "applications": {
+      "discovered": 142,
+      "monitored": 142,
+      "total": 142,
+      "up": 100,
+      "down": 40,
+      "unknown": 2
+    },
+    "databases": {
+      "discovered": 86,
+      "monitored": 86,
+      "total": 86,
+      "up": 80,
+      "down": 5,
+      "unknown": 1
+    },
+    "urls": {
+      "discovered": 23,
+      "monitored": 23,
+      "total": 23,
+      "up": 20,
+      "down": 2,
+      "unknown": 1
+    }
+  },
+  "containers": {
+    "k8cluster": {
+      "discovered": 6,
+      "monitored": 6,
+      "total": 6,
+      "up": 6,
+      "down": 0,
+      "unknown": 0
+    },
+    "nodes": {
+      "discovered": 48,
+      "monitored": 48,
+      "total": 48,
+      "up": 40,
+      "down": 4,
+      "unknown": 4
+    },
+    "docker_hosts": {
+      "discovered": 24,
+      "monitored": 24,
+      "total": 24,
+      "up": 21,
+      "down": 2,
+      "unknown": 1
+    },
+    "pods_running_count": 34,
+    "namespace_count": 84,
+    "pod_restarts_per_hour_count": 64
+  },
+  "gpu_llm_ai": {
+    "gpu_hosts": {
+      "discovered": 8,
+      "monitored": 8,
+      "total": 8,
+      "up": 6,
+      "down": 1,
+      "unknown": 1
+    },
+    "gpu_utilization_percent": 78,
+    "gpu_memory_percent": 82,
+    "avg_thermal_llm_temp": 42,
+    "llm_workloads": 14,
+    "inference_latency": 148,
+    "vector_db_count": 4,
+    "vector_db_query_latency": 12
+  },
+  "sdwan": {
+    "cisco_sdwan_resources": {
+      "discovered": 8,
+      "monitored": 8,
+      "total": 8,
+      "up": 6,
+      "down": 1,
+      "unknown": 1
+    },
+    "vmware_sdwan_resources": {
+      "discovered": 8,
+      "monitored": 8,
+      "total": 8,
+      "up": 6,
+      "down": 1,
+      "unknown": 1
+    },
+    "fortinet_sdwan_resources": {
+      "discovered": 6,
+      "monitored": 6,
+      "total": 6,
+      "up": 6,
+      "down": 0,
+      "unknown": 0
+    },
+    "palo_alto_sdwan_resources": {
+      "discovered": 48,
+      "monitored": 48,
+      "total": 48,
+      "up": 40,
+      "down": 4,
+      "unknown": 4
+    }
+  },
+  "storage": {
+    "pure_storage": {
+      "discovered": 8,
+      "monitored": 8,
+      "total": 8,
+      "up": 6,
+      "down": 1,
+      "unknown": 1
+    },
+    "netapp_storage": {
+      "discovered": 8,
+      "monitored": 8,
+      "total": 8,
+      "up": 6,
+      "down": 1,
+      "unknown": 1
+    }
   }
 }

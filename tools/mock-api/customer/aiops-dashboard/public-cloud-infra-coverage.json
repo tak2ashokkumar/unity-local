@@ -1,100 +1,275 @@
 {
-  "aws": {
-    "resource_types": {
-      "Subnet": 12,
-      "EC2Fleet": 4,
-      "NetworkAcl": 5,
-      "Service": 1,
-      "EIP": 3,
-      "NatGateway": 1,
-      "SubnetRouteTableAssociation": 7,
-      "SecurityGroup": 60,
-      "VPCEndpoint": 1,
-      "Instance": 4,
-      "Alias": 4,
-      "InternetGateway": 4,
-      "ResolverRuleAssociation": 5,
-      "Index": 1,
-      "EventBus": 1,
-      "LaunchTemplate": 1,
-      "Repository": 1,
-      "DBClusterSnapshot": 2,
-      "DHCPOptions": 1,
-      "Volume": 6,
-      "ResolverRule": 1,
-      "Mesh": 1,
-      "VPC": 5,
-      "Stack": 2,
-      "Addon": 1,
-      "VirtualService": 2,
-      "Key": 4,
-      "DBSnapshot": 2,
-      "Route": 2,
-      "CapacityProvider": 2,
-      "Bucket": 2,
-      "Rule": 3,
-      "NetworkInterface": 6,
-      "Keyspace": 4,
-      "DeploymentConfig": 17,
-      "LaunchConfiguration": 1,
-      "OptionGroup": 5,
-      "ResourceCompliance": 1,
-      "RouteTable": 11,
-      "HttpNamespace": 1,
-      "VirtualRouter": 2,
-      "DeploymentStrategy": 4,
-      "VirtualNode": 5,
-      "Cluster": 1,
-      "WorkGroup": 1
-    },
-    "total_resources": 210
+  "compute": {
+    "name": "Compute",
+    "total_resources": 3098,
+    "providers": {
+      "aws": {
+        "total_resources": 37,
+        "services": {
+          "EC2": 26,
+          "ECS": 5,
+          "EKS": 4,
+          "ServiceDiscovery": 2
+        },
+        "resource_types": {
+          "Instance": 10,
+          "EIP": 6,
+          "LaunchTemplate": 6,
+          "CapacityProvider": 4,
+          "EC2Fleet": 4,
+          "Cluster": 3,
+          "Addon": 2,
+          "DHCPOptions": 2
+        }
+      },
+      "azure": {
+        "total_resources": 22,
+        "services": {
+          "Compute": 21,
+          "ContainerService": 1
+        },
+        "resource_types": {
+          "sshPublicKeys": 10,
+          "virtualMachines": 7,
+          "galleries": 2,
+          "availabilitySets": 1,
+          "managedClusters": 1,
+          "virtualMachineScaleSets": 1
+        }
+      },
+      "gcp": {
+        "total_resources": 3039,
+        "services": {
+          "rbac": 1548,
+          "Compute": 1473,
+          "batch": 12,
+          "container": 6
+        },
+        "resource_types": {
+          "ClusterRole": 1073,
+          "ClusterRoleBinding": 1001,
+          "ReplicaSet": 293,
+          "ServiceAccount": 179,
+          "Pod": 135,
+          "Role": 56,
+          "DaemonSet": 54,
+          "Deployment": 47,
+          "VM instances": 38,
+          "HealthCheck": 27,
+          "Instance": 18,
+          "Job": 16,
+          "Cluster": 14,
+          "BackendService": 12,
+          "HorizontalPodAutoscaler": 12,
+          "UrlMap": 12,
+          "ValidatingWebhookConfiguration": 11,
+          "InstanceTemplate": 10,
+          "HttpHealthCheck": 9,
+          "TargetPool": 9,
+          "MutatingWebhookConfiguration": 7,
+          "Node": 4,
+          "NodePool": 2
+        }
+      },
+      "oci": {
+        "total_resources": 0,
+        "services": {},
+        "resource_types": {}
+      }
+    }
   },
-  "azure": {
-    "resource_types": {},
-    "total_resources": 0
+  "platform_services": {
+    "name": "Platform Services",
+    "total_resources": 801,
+    "providers": {
+      "aws": {
+        "total_resources": 285,
+        "services": {
+          "EC2": 243,
+          "RDS": 18,
+          "Route53Resolver": 12,
+          "AppMesh": 8,
+          "S3": 4
+        },
+        "resource_types": {
+          "SecurityGroup": 117,
+          "Subnet": 24,
+          "RouteTable": 22,
+          "NetworkInterface": 18,
+          "Volume": 16,
+          "SubnetRouteTableAssociation": 14,
+          "NetworkAcl": 10,
+          "ResolverRuleAssociation": 10,
+          "VPC": 10,
+          "OptionGroup": 9,
+          "InternetGateway": 8,
+          "Bucket": 4,
+          "DBClusterSnapshot": 4,
+          "DBSnapshot": 4,
+          "Route": 4,
+          "VirtualRouter": 4,
+          "NatGateway": 2,
+          "ResolverRule": 2,
+          "VPCEndpoint": 2,
+          "DBSecurityGroup": 1
+        }
+      },
+      "azure": {
+        "total_resources": 167,
+        "services": {
+          "Network": 147,
+          "Compute": 13,
+          "Storage": 6,
+          "Sql": 1
+        },
+        "resource_types": {
+          "virtualNetworks": 37,
+          "networkWatchers": 32,
+          "publicIPAddresses": 30,
+          "networkInterfaces": 22,
+          "networkSecurityGroups": 21,
+          "disks": 13,
+          "storageAccounts": 6,
+          "bastionHosts": 2,
+          "firewallPolicies": 2,
+          "loadBalancers": 1,
+          "servers": 1
+        }
+      },
+      "gcp": {
+        "total_resources": 349,
+        "services": {
+          "Compute": 329,
+          "Storage": 18,
+          "Observability": 2
+        },
+        "resource_types": {
+          "Route": 153,
+          "Disk": 99,
+          "Firewall": 62,
+          "StorageClass": 18,
+          "VpnTunnel": 9,
+          "Network": 3,
+          "TargetVpnGateway": 3,
+          "LogBucket": 2
+        }
+      },
+      "oci": {
+        "total_resources": 0,
+        "services": {},
+        "resource_types": {}
+      }
+    }
   },
-  "gcp": {
-    "resource_types": {
-      "UptimeCheckConfig": 3,
-      "Namespace": 233,
-      "Role": 61,
-      "DaemonSet": 55,
-      "HorizontalPodAutoscaler": 12,
-      "VM instances": 74,
-      "LogSink": 5,
-      "Node": 6,
-      "ClusterRoleBinding": 275,
-      "ProjectBillingInfo": 17,
-      "Job": 4,
-      "ValidatingWebhookConfiguration": 11,
-      "Deployment": 46,
-      "AlertPolicy": 15,
-      "Endpoint": 12,
-      "LogBucket": 2,
-      "ServiceAccount": 209,
-      "ClusterRole": 287,
-      "NodePool": 2,
-      "PodDisruptionBudget": 8,
-      "LogMetric": 1,
-      "ReplicaSet": 279,
-      "MutatingWebhookConfiguration": 7,
-      "Dataset": 1,
-      "Cluster": 8,
-      "Pod": 204,
-      "Disk": 139
-    },
-    "total_resources": 1976
+  "other_services": {
+    "name": "Other Services",
+    "total_resources": 749,
+    "providers": {
+      "aws": {
+        "total_resources": 124,
+        "services": {
+          "CodeDeploy": 34,
+          "AppMesh": 16,
+          "KMS": 16,
+          "CloudWatch": 10,
+          "AppConfig": 8,
+          "Cassandra": 8,
+          "Events": 7,
+          "SNS": 6,
+          "CloudFormation": 5,
+          "ServiceDiscovery": 4,
+          "Athena": 2,
+          "AutoScaling": 2,
+          "Config": 2,
+          "ECR": 2,
+          "ResourceExplorer2": 2
+        },
+        "resource_types": {
+          "DeploymentConfig": 34,
+          "Alarm": 10,
+          "VirtualNode": 10,
+          "Alias": 8,
+          "DeploymentStrategy": 8,
+          "Key": 8,
+          "Keyspace": 8,
+          "Rule": 6,
+          "Topic": 6,
+          "Stack": 5,
+          "VirtualService": 4,
+          "HttpNamespace": 2,
+          "Index": 2,
+          "LaunchConfiguration": 2,
+          "Mesh": 2,
+          "Repository": 2,
+          "ResourceCompliance": 2,
+          "Service": 2,
+          "WorkGroup": 2,
+          "EventBus": 1
+        }
+      },
+      "azure": {
+        "total_resources": 26,
+        "services": {
+          "OperationalInsights": 6,
+          "OperationsManagement": 6,
+          "microsoft.insights": 6,
+          "KeyVault": 2,
+          "Migrate": 2,
+          "RecoveryServices": 2,
+          "ManagedIdentity": 1,
+          "Purview": 1
+        },
+        "resource_types": {
+          "solutions": 6,
+          "workspaces": 6,
+          "dataCollectionRules": 4,
+          "vaults": 4,
+          "moveCollections": 2,
+          "accounts": 1,
+          "actiongroups": 1,
+          "metricalerts": 1,
+          "userAssignedIdentities": 1
+        }
+      },
+      "gcp": {
+        "total_resources": 599,
+        "services": {
+          "apps": 159,
+          "rbac": 150,
+          "Networking": 120,
+          "admissionregistration": 54,
+          "monitoring": 54,
+          "Management": 25,
+          "Observability": 24,
+          "container": 6,
+          "bigquery": 3,
+          "cloudbilling": 3,
+          "Analytics": 1
+        },
+        "resource_types": {
+          "DaemonSet": 159,
+          "Role": 150,
+          "Namespace": 110,
+          "AlertPolicy": 60,
+          "ValidatingWebhookConfiguration": 33,
+          "MutatingWebhookConfiguration": 21,
+          "ProjectBillingInfo": 20,
+          "Endpoint": 10,
+          "UptimeCheckConfig": 9,
+          "PodDisruptionBudget": 8,
+          "NodePool": 6,
+          "LogSink": 5,
+          "Dataset": 4,
+          "Snooze": 3,
+          "LogMetric": 1
+        }
+      },
+      "oci": {
+        "total_resources": 0,
+        "services": {},
+        "resource_types": {}
+      }
+    }
   },
-  "oci": {
-    "resource_types": {
-      "Dynamic routing gateway": 1,
-      "Buckets": 24,
-      "Compartments": 2,
-      "Instances": 2,
-      "Groups": 2,
-      "Alarm Definitions": 7
-    },
-    "total_resources": 38
-  },
-  "total_resources": 2224
+  "total_resources": 4648
 }

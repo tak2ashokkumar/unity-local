@@ -11,28 +11,24 @@ import {
   UNIFIED_AIOPS_ALERTS_ENDPOINT,
   UNIFIED_AIOPS_ALERT_SEVERITY_COLORS,
   UNIFIED_AIOPS_ALERT_SEGREGATION_BY_TYPE_ENDPOINT,
-  UNIFIED_AIOPS_AI_GPU_METRIC_CONFIG,
   UNIFIED_AIOPS_ALL_SELECTED_VALUE,
   UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT,
   UNIFIED_AIOPS_AVAILABILITY_BY_CATEGORY_ENDPOINT,
   UNIFIED_AIOPS_APPLICATION_OVERVIEW_ENDPOINT,
   UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT,
   UNIFIED_AIOPS_BUSINESS_SERVICES_ENDPOINT,
-  UNIFIED_AIOPS_CONTAINER_SUMMARY_ENDPOINT,
   UNIFIED_AIOPS_DATABASE_MONITORING_ENDPOINT,
-  UNIFIED_AIOPS_DATACENTER_INFRA_METRIC_CONFIG,
-  UNIFIED_AIOPS_DATACENTER_INFRA_ENDPOINT,
   UNIFIED_AIOPS_DATACENTER_OPTIONS,
+  UNIFIED_AIOPS_DISCOVERY_COLORS,
   UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT,
   UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT,
-  UNIFIED_AIOPS_EXECUTIVE_SUMMARY_METRIC_CONFIG,
+  UNIFIED_AIOPS_EXECUTIVE_SUMMARY_SECTIONS,
+  UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS,
   UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT,
   UNIFIED_AIOPS_IDLE_DEVICES_BY_DURATION_ENDPOINT,
   UNIFIED_AIOPS_IDLE_DEVICES_ENDPOINT,
   UNIFIED_AIOPS_IDLE_DURATION_COLORS,
   UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT,
-  UNIFIED_AIOPS_KUBERNETES_METRIC_CONFIG,
-  UNIFIED_AIOPS_OBSERVABILITY_SUMMARY_ENDPOINT,
   UNIFIED_AIOPS_OS_MONITORING_ENDPOINT,
   UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS,
   UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
@@ -42,10 +38,15 @@ import {
   UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT,
   UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT,
+  UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_LABELS,
+  UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER,
   UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT,
+  UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_LOGOS,
+  UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_ORDER,
   UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT,
   UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT
 } from './unified-aiops-command-centre.const';
+import { environment } from 'src/environments/environment';
 import {
   UnifiedAiopsAvailabilityCategoryRow,
   UnifiedAiopsAvailabilityCategorySummary,
@@ -53,9 +54,15 @@ import {
   UnifiedAiopsBusinessService,
   UnifiedAiopsCloudFilterOption,
   UnifiedAiopsCoverageCard,
+  UnifiedAiopsCoverageGroup,
+  UnifiedAiopsCoverageRow,
   UnifiedAiopsDashboardFilterCriteria,
+  UnifiedAiopsDiscoveryCoverageRow,
+  UnifiedAiopsDiscoverySummary,
+  UnifiedAiopsExecutiveMetricConfig,
+  UnifiedAiopsExecutiveSection,
   UnifiedAiopsFilterOption,
-  UnifiedAiopsHeatmapGroup,
+  UnifiedAiopsGeoCell,
   UnifiedAiopsIdleDeviceRow,
   UnifiedAiopsIdleDevicesResponse,
   UnifiedAiopsIdleDurationApiResponse,
@@ -64,7 +71,7 @@ import {
   UnifiedAiopsIdleDurationResponseItem,
   UnifiedAiopsIdleMetric,
   UnifiedAiopsIdleMetricResponse,
-  UnifiedAiopsLegendMetric,
+  UnifiedAiopsAlertSegregationSummary,
   UnifiedAiopsMetric,
   UnifiedAiopsOrphanedCategoryItem,
   UnifiedAiopsOrphanedCategoryResponseItem,
@@ -190,26 +197,64 @@ export class UnifiedAiopsCommandCentreService {
   /*
    * -----Start----- Executive Monitoring Summary Widget Related -------------------
    */
-  getSummaryMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT, criteria).pipe(map(res => this.getExecutiveSummaryMetrics(res)));
+  getSummaryMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsExecutiveSection[]> {
+    return this.getWidgetResponse(UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT, criteria).pipe(map(res => this.getExecutiveSummarySections(res)));
+  }
+
+  convertToExecutiveSummaryViewData(data: UnifiedAiopsExecutiveSection[]): UnifiedAiopsExecutiveSection[] {
+    return data || [];
   }
 
   convertToMetricsViewData(data: UnifiedAiopsMetric[]): UnifiedAiopsMetric[] {
     return data || [];
   }
 
-  private getExecutiveSummaryMetrics(response: any): UnifiedAiopsMetric[] {
-    const payload = this.getMetricPayload(response, ['summary', 'metrics', 'summary_metrics', 'data']);
-    if (!this.hasUsablePayloadValue(payload)) {
+  private getExecutiveSummarySections(response: any): UnifiedAiopsExecutiveSection[] {
+    if (!this.hasUsablePayloadValue(response)) {
       return [];
     }
-    const flatPayload = this.flattenPayload(payload || response);
+    return UNIFIED_AIOPS_EXECUTIVE_SUMMARY_SECTIONS
+      .map(section => {
+        const payload = this.getPayloadByKeys(response, section.payloadKeys) || {};
+        const metrics = section.dynamic
+          ? this.getExecutiveDynamicMetrics(payload, section.labels, section.link)
+          : (section.metrics || [])
+            .map(metric => this.getExecutiveMetric(metric, payload))
+            .filter((metric): metric is UnifiedAiopsMetric => !!metric);
+        return { title: section.title, column: section.column, metrics };
+      })
+      .filter(section => section.metrics.length > 0);
+  }
 
-    return UNIFIED_AIOPS_EXECUTIVE_SUMMARY_METRIC_CONFIG.map(metric => ({
-      label: metric.label,
-      value: this.formatNumber(this.getFirstMetricValue(flatPayload, metric.keys)),
-      tone: metric.tone
-    }));
+  private getExecutiveMetric(config: UnifiedAiopsExecutiveMetricConfig, payload: any): UnifiedAiopsMetric | null {
+    const raw = this.getFirstDefinedPayloadValue(payload, config.keys);
+    if (raw === undefined || raw === null) {
+      return null;
+    }
+    const metric = this.getStatusSummaryMetric(config.label, raw, config);
+    if (config.plain) {
+      // Idle Devices / URL Monitored render as a single dark count with no up/down/unknown trend.
+      metric.tone = undefined;
+      metric.up = undefined;
+      metric.down = undefined;
+      metric.unknown = undefined;
+    }
+    metric.link = config.link;
+    return metric;
+  }
+
+  private getExecutiveDynamicMetrics(payload: any, labels?: { [key: string]: string }, link?: string): UnifiedAiopsMetric[] {
+    return Object.keys(payload || {})
+      .filter(key => payload[key] && typeof payload[key] === 'object' && !Array.isArray(payload[key]))
+      .map(key => {
+        const metric = this.getStatusSummaryMetric(labels?.[key] || this.getReadableExecutiveLabel(key), payload[key], { tone: 'primary' });
+        metric.link = link;
+        return metric;
+      });
+  }
+
+  private getReadableExecutiveLabel(key: string): string {
+    return this.getReadableStackLabel(String(key || '').replace(/_(resources|storage|servers)$/i, ''));
   }
   /*
    * ******End ****** Executive Monitoring Summary Widget Related ********************
@@ -218,44 +263,102 @@ export class UnifiedAiopsCommandCentreService {
   /*
    * -----Start----- Device Discovery vs Monitoring Enablement Widget Related -------------------
    */
-  getDiscoveryItems(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsStackItem[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT, criteria).pipe(map(res => this.getDiscoveryStackItems(res)));
+  getDiscoveryRows(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsDiscoveryCoverageRow[]> {
+    return this.getWidgetResponse(UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT, criteria).pipe(map(res => this.getDiscoveryCoverageRows(res)));
   }
 
-  convertToDiscoveryOptions(data: UnifiedAiopsStackItem[]): EChartsOption {
-    return (data || []).length ? this.getDiscoveryOptions(data) : {};
-  }
-
-  private getDiscoveryOptions(items: UnifiedAiopsStackItem[]): EChartsOption {
-    return this.getStackedBarOptions(
-      items,
-      ['Monitored', 'Not Monitored'],
-      ['#16a052', '#dfe3e8'],
-      300
-    );
-  }
-
-  private getDiscoveryStackItems(response: any): UnifiedAiopsStackItem[] {
-    const payload = this.getMetricPayload(response, ['items', 'chart', 'discovery', 'discovery_items']);
-    const source = this.getArrayFromPayload<any>(payload);
-    const items = source.length
-      ? source.map(item => this.getDiscoveryStackItemFromPayload(item))
-      : Object.keys(payload || {}).map(key => this.getDiscoveryStackItemFromPayload(payload[key], key));
-
-    return this.getTopStackItems(items, 8);
-  }
-
-  private getDiscoveryStackItemFromPayload(payload: any, fallbackName?: string): UnifiedAiopsStackItem {
-    const flatPayload = this.flattenPayload(payload || {});
-    const monitored = this.getNumberFromPayload(flatPayload, ['monitored', 'monitoring_enabled', 'enabled']);
-    const total = this.getNumberFromPayload(flatPayload, ['total', 'total_count', 'totalCount']);
-    const directNotMonitored = this.getNumberFromPayload(flatPayload, ['not_monitored', 'notMonitored', 'not_monitoring_enabled']);
-    const notMonitored = total > 0 ? Math.max(total - monitored, 0) : directNotMonitored;
+  // Vertical 100%-stacked bar: per category, Monitored % (coverage) + Not Monitored % filling to 100.
+  convertToDiscoveryOptions(rows: UnifiedAiopsDiscoveryCoverageRow[]): EChartsOption {
+    const viewRows = rows || [];
+    if (!viewRows.length) {
+      return {};
+    }
+    const categories = viewRows.map(row => row.category);
 
     return {
-      name: this.getStackItemName(payload, fallbackName),
-      values: [monitored, notMonitored]
+      color: [UNIFIED_AIOPS_DISCOVERY_COLORS.monitored, UNIFIED_AIOPS_DISCOVERY_COLORS.notMonitored],
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const list = Array.isArray(params) ? params : [params];
+          const name = list[0]?.axisValueLabel || list[0]?.name || '';
+          const lines = list.map((item: any) => `${item.marker}${item.seriesName}: ${this.formatPercentage(this.getNumberValue(item.value))}`);
+          return [name, ...lines].join('<br/>');
+        }
+      },
+      legend: { bottom: 0, left: 'center', itemWidth: 14, itemHeight: 7, textStyle: { fontSize: 11, color: '#20272e' }, data: ['Monitored', 'Not Monitored'] },
+      grid: { left: 38, right: 12, top: 18, bottom: 64, containLabel: true },
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLabel: { fontSize: 11, color: '#5b6570', interval: 0, width: 84, overflow: 'break', lineHeight: 13 }
+      },
+      yAxis: { type: 'value', max: 100, axisLabel: { fontSize: 11, color: '#5b6570', formatter: '{value}' }, splitLine: { lineStyle: { color: '#d6dce2', type: 'dashed' } } },
+      series: [
+        { name: 'Monitored', type: 'bar', stack: 'discovery', barMaxWidth: 38, data: viewRows.map(row => ({ value: row.coverage, category: row.category })) },
+        { name: 'Not Monitored', type: 'bar', stack: 'discovery', barMaxWidth: 38, data: viewRows.map(row => ({ value: this.getNotMonitoredPercent(row.coverage), category: row.category })) }
+      ]
     };
+  }
+
+  convertToDiscoverySummary(rows: UnifiedAiopsDiscoveryCoverageRow[]): UnifiedAiopsDiscoverySummary {
+    const viewRows = rows || [];
+    const discovered = viewRows.reduce((total, row) => total + row.discovered, 0);
+    const monitored = viewRows.reduce((total, row) => total + row.monitored, 0);
+    const coverage = discovered > 0 ? (monitored / discovered) * 100 : 0;
+    return {
+      discovered: this.formatNumber(discovered),
+      monitored: this.formatNumber(monitored),
+      coverage: this.formatPercentage(coverage)
+    };
+  }
+
+  private getDiscoveryCoverageRows(response: any): UnifiedAiopsDiscoveryCoverageRow[] {
+    const payload = this.getMetricPayload(response, ['items', 'categories', 'discovery', 'discovery_items']);
+    const source = this.getArrayFromPayload<any>(payload);
+    const entries = source.length
+      ? source.map(item => ({ key: this.getFirstDefinedValue(item?.category, item?.name, item?.label, item?.resource, item?.type), value: item }))
+      : Object.keys(payload || {}).map(key => ({ key, value: payload[key] }));
+
+    return entries
+      .map((entry, index) => {
+        const flatPayload = this.flattenPayload(entry.value || {});
+        const category = String(entry.key || '').trim();
+        const discovered = this.getNumberFromPayload(flatPayload, ['discovered', 'total', 'total_count', 'totalCount', 'count']);
+        const monitored = this.getNumberFromPayload(flatPayload, ['monitored', 'monitoring_enabled', 'enabled']);
+        const coverageValue = this.getFirstDefinedPayloadValue(flatPayload, ['coverage', 'coverage_percent', 'coveragePercent', 'monitoring_coverage', 'monitoringCoverage']);
+        const coverage = coverageValue !== undefined
+          ? this.getNumberValue(coverageValue)
+          : (discovered > 0 ? (monitored / discovered) * 100 : 0);
+        const color = UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS[index % UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS.length];
+        return {
+          category,
+          discovered,
+          monitored,
+          coverage: Math.round(coverage * 10) / 10,
+          coverageLabel: this.formatPercentage(coverage),
+          color,
+          badgeBg: this.hexToRgba(color, 0.16)
+        };
+      })
+      .filter(row => !!row.category && row.discovered > 0)
+      .sort((first, second) => second.discovered - first.discovered);
+  }
+
+  private getNotMonitoredPercent(coverage: number): number {
+    return Math.round(Math.max(100 - coverage, 0) * 10) / 10;
+  }
+
+  private hexToRgba(hex: string, alpha: number): string {
+    const normalized = String(hex || '').replace('#', '');
+    const value = normalized.length === 3
+      ? normalized.split('').map(char => char + char).join('')
+      : normalized;
+    const red = parseInt(value.substring(0, 2), 16) || 0;
+    const green = parseInt(value.substring(2, 4), 16) || 0;
+    const blue = parseInt(value.substring(4, 6), 16) || 0;
+    return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
   }
   /*
    * ******End ****** Device Discovery vs Monitoring Enablement Widget Related ********************
@@ -264,12 +367,18 @@ export class UnifiedAiopsCommandCentreService {
   /*
    * -----Start----- Alert Segregation by Type Widget Related -------------------
    */
-  getAlertSegregationLegend(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsLegendMetric[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_ALERT_SEGREGATION_BY_TYPE_ENDPOINT, criteria).pipe(map(res => this.getAlertSegregationLegendMetrics(res)));
-  }
-
-  convertToLegendMetricsViewData(data: UnifiedAiopsLegendMetric[]): UnifiedAiopsLegendMetric[] {
-    return data || [];
+  convertToAlertSegregationSummary(items: UnifiedAiopsStackItem[]): UnifiedAiopsAlertSegregationSummary {
+    const totals = (items || []).reduce((result, item) => {
+      result.critical += item.values[0] || 0;
+      result.warning += item.values[1] || 0;
+      result.info += item.values[2] || 0;
+      return result;
+    }, { critical: 0, warning: 0, info: 0 });
+    return {
+      critical: this.formatNumber(totals.critical),
+      warning: this.formatNumber(totals.warning),
+      info: this.formatNumber(totals.info)
+    };
   }
 
   getAlertSegregationItems(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsStackItem[]> {
@@ -291,26 +400,6 @@ export class UnifiedAiopsCommandCentreService {
       ],
       22
     );
-  }
-
-  private getAlertSegregationLegendMetrics(response: any): UnifiedAiopsLegendMetric[] {
-    const summary = this.flattenPayload(this.getMetricPayload(response, ['legend', 'summary', 'metrics', 'alert_legend']));
-    const items = this.getAlertSegregationStackItems(response);
-    if (!items.length && !this.hasUsablePayloadValue(summary)) {
-      return [];
-    }
-    const totals = items.reduce((result, item) => {
-      result.critical += item.values[0] || 0;
-      result.warning += item.values[1] || 0;
-      result.info += item.values[2] || 0;
-      return result;
-    }, { critical: 0, warning: 0, info: 0 });
-
-    return [
-      { icon: 'fa-exclamation-triangle', value: this.formatNumber(this.getNumberFromPayload(summary, ['critical', 'critical_alerts'], totals.critical)), tone: 'danger' },
-      { icon: 'fa-exclamation-circle', value: this.formatNumber(this.getNumberFromPayload(summary, ['warning', 'warnings', 'warning_alerts'], totals.warning)), tone: 'warning' },
-      { icon: 'fa-info-circle', value: this.formatNumber(this.getNumberFromPayload(summary, ['info', 'informative', 'information', 'info_alerts'], totals.info)), tone: 'info' }
-    ];
   }
 
   private getAlertSegregationStackItems(response: any): UnifiedAiopsStackItem[] {
@@ -350,54 +439,6 @@ export class UnifiedAiopsCommandCentreService {
    * ******End ****** Alert Segregation by Type Widget Related ********************
    */
 
-  private getStackedBarOptions(items: UnifiedAiopsStackItem[], names: string[], colors: string[], max: number): EChartsOption {
-    const viewItems = items || [];
-    const categories = viewItems.map(item => item.name).reverse();
-    const reversedItems = [...viewItems].reverse();
-    const axisMax = this.getStackedBarMax(viewItems, max);
-
-    return {
-      color: colors,
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: {
-        bottom: 4,
-        itemGap: 18,
-        itemWidth: 10,
-        itemHeight: 7,
-        textStyle: { color: '#627283', fontSize: 10 }
-      },
-      grid: { left: 108, right: 22, top: 16, bottom: 56 },
-      xAxis: {
-        type: 'value',
-        max: axisMax,
-        axisLabel: { color: '#758394', fontSize: 9, margin: 12 },
-        splitLine: { lineStyle: { color: '#edf0f2' } }
-      },
-      yAxis: {
-        type: 'category',
-        data: categories,
-        axisLabel: { color: '#5e6b78', fontSize: 9 },
-        axisTick: { show: false },
-        axisLine: { show: false }
-      },
-      series: names.map((name, index) => ({
-        name,
-        type: 'bar',
-        stack: 'total',
-        barWidth: 18,
-        label: {
-          show: true,
-          position: 'inside',
-          color: index === 1 && names.length === 2 ? '#56616d' : '#ffffff',
-          fontSize: 8,
-          formatter: (params: any) => params.value ? params.value : ''
-        },
-        emphasis: { focus: 'series' },
-        data: reversedItems.map(item => item.values[index])
-      }))
-    };
-  }
-
   private getVerticalStackedBarOptions(items: UnifiedAiopsStackItem[], names: string[], colors: string[], max: number): EChartsOption {
     const viewItems = items || [];
     const categories = viewItems.map(item => item.name);
@@ -409,8 +450,9 @@ export class UnifiedAiopsCommandCentreService {
       legend: {
         bottom: 4,
         itemGap: 18,
+        icon: 'circle',
         itemWidth: 10,
-        itemHeight: 7,
+        itemHeight: 10,
         textStyle: { color: '#627283', fontSize: 10 }
       },
       grid: { left: 44, right: 18, top: 18, bottom: 82 },
@@ -437,13 +479,7 @@ export class UnifiedAiopsCommandCentreService {
         type: 'bar',
         stack: 'total',
         barWidth: 24,
-        label: {
-          show: true,
-          position: 'inside',
-          color: '#ffffff',
-          fontSize: 8,
-          formatter: (params: any) => params.value ? params.value : ''
-        },
+        label: { show: false },
         emphasis: { focus: 'series' },
         data: viewItems.map(item => item.values[index])
       }))
@@ -578,66 +614,33 @@ export class UnifiedAiopsCommandCentreService {
   /*
    * -----Start----- Geo Distribution / Global Operations Widget Related -------------------
    */
-  getGeoHeatmap(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsHeatmapGroup[]> {
+  getGeoHeatmap(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsGeoCell[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT, criteria).pipe(map(res => this.getGeoHeatmapGroups(res)));
   }
 
-  convertToGeoHeatmapOptions(data: UnifiedAiopsHeatmapGroup[]): EChartsOption {
+  convertToGeoHeatmapOptions(data: UnifiedAiopsGeoCell[]): EChartsOption {
     return (data || []).length ? this.getGeoHeatmapOptions(data) : {};
   }
 
-  private getGeoHeatmapOptions(groups: UnifiedAiopsHeatmapGroup[]): EChartsOption {
-    const cells = groups.reduce((items: any[], group) => {
-      (group.children || []).forEach(child => {
-        items.push({
-          name: child.name,
-          region: group.name,
-          value: [child.x, child.y, child.width, child.height],
-          usage: child.usage,
-          color: group.color,
-          textColor: this.getGeoDistributionTextColor(group.color),
-          total: child.value,
-          information: (child as any).information,
-          warning: (child as any).warning,
-          critical: (child as any).critical
-        });
-      });
-      return items;
-    }, []);
-    const labels = groups.map(group => ({
-      name: group.name,
-      value: [group.labelX, group.labelY]
-    }));
-    const usageLabels = cells
-      .filter(item => item.usage)
-      .map(item => ({
-        name: item.usage,
-        value: [item.value[0] + 3, item.value[1] - 1]
-      }));
-
+  private getGeoHeatmapOptions(cells: UnifiedAiopsGeoCell[]): EChartsOption {
     return {
       animation: false,
       tooltip: {
-        formatter: (info: any) => {
-          const data = info.data || {};
-          const region = data.region ? String(data.region).replace(/\n/g, ' ') : '';
-          if (data.total !== undefined) {
-            return [
-              region || data.name,
-              `Total: ${this.formatNumber(data.total)}`,
-              `Info: ${this.formatNumber(data.information || 0)}`,
-              `Warnings: ${this.formatNumber(data.warning || 0)}`,
-              `Critical: ${this.formatNumber(data.critical || 0)}`
-            ].join('<br/>');
-          }
-          return data.usage ? `${region}<br/>${data.name}<br/>${data.usage}` : `${region}<br/>${data.name}`;
-        }
+        trigger: 'item',
+        confine: true,
+        backgroundColor: '#ffffff',
+        borderColor: '#e2e7ec',
+        borderWidth: 1,
+        padding: 0,
+        textStyle: { color: '#55606b' },
+        extraCssText: 'box-shadow: 0 6px 18px rgba(28, 45, 65, 0.18); border-radius: 8px;',
+        formatter: (info: any) => this.getGeoDistributionTooltip(info.data)
       },
       grid: {
-        top: 12,
-        right: 14,
-        bottom: 12,
-        left: 14
+        top: 6,
+        right: 8,
+        bottom: 6,
+        left: 8
       },
       xAxis: {
         type: 'value',
@@ -652,158 +655,150 @@ export class UnifiedAiopsCommandCentreService {
         inverse: true,
         show: false
       },
-      series: [
-        {
-          type: 'custom',
-          coordinateSystem: 'cartesian2d',
-          clip: false,
-          renderItem: (params: any, api: any) => {
-            const item = cells[params.dataIndex];
-            const start = api.coord([item.value[0], item.value[1]]);
-            const end = api.coord([item.value[0] + item.value[2], item.value[1] + item.value[3]]);
-            const width = end[0] - start[0];
-            const height = end[1] - start[1];
+      series: [{
+        type: 'custom',
+        coordinateSystem: 'cartesian2d',
+        clip: false,
+        renderItem: (params: any, api: any) => {
+          const cell = cells[params.dataIndex];
+          const start = api.coord([cell.value[0], cell.value[1]]);
+          const end = api.coord([cell.value[0] + cell.value[2], cell.value[1] + cell.value[3]]);
+          const width = end[0] - start[0];
+          const height = end[1] - start[1];
+          const centerX = start[0] + width / 2;
+          const centerY = start[1] + height / 2;
+          const numberFontSize = Math.max(13, Math.min(24, Math.round(height * 0.3)));
+          const children: any[] = [{
+            type: 'rect',
+            shape: { x: start[0], y: start[1], width, height },
+            style: {
+              fill: cell.color,
+              stroke: '#ffffff',
+              lineWidth: 2,
+              shadowBlur: 4,
+              shadowColor: 'rgba(28, 45, 65, 0.16)'
+            }
+          }];
 
-            return {
-              type: 'group',
-              children: [
-                {
-                  type: 'rect',
-                  shape: {
-                    x: start[0],
-                    y: start[1],
-                    width,
-                    height
-                  },
-                  style: {
-                    fill: item.color,
-                    stroke: '#ffffff',
-                    lineWidth: 2,
-                    shadowBlur: 4,
-                    shadowColor: 'rgba(28, 45, 65, 0.16)'
-                  }
-                },
-                {
-                  type: 'text',
-                  silent: true,
-                  style: {
-                    text: this.getGeoCellText(item.name, item.total),
-                    x: start[0] + width / 2,
-                    y: start[1] + height / 2,
-                    fill: item.textColor,
-                    font: '600 12px Arial',
-                    textAlign: 'center',
-                    textVerticalAlign: 'middle',
-                    overflow: 'truncate',
-                    lineHeight: 17,
-                    width: Math.max(width - 14, 32)
-                  }
-                }
-              ]
-            };
-          },
-          data: cells
-        },
-        {
-          type: 'custom',
-          coordinateSystem: 'cartesian2d',
-          silent: true,
-          clip: false,
-          renderItem: (params: any, api: any) => {
-            const item = labels[params.dataIndex];
-            const point = api.coord(item.value);
-
-            return {
+          // Region name in the top-left corner (only when the tile is large enough to fit it).
+          if (width > 50 && height > 30) {
+            children.push({
               type: 'text',
+              silent: true,
               style: {
-                text: item.name,
-                x: point[0],
-                y: point[1],
-                fill: '#4b5f73',
-                font: '600 10px Arial',
+                text: cell.name,
+                x: start[0] + 10,
+                y: start[1] + 9,
+                fill: '#ffffff',
+                font: '600 11px Arial',
                 textAlign: 'left',
-                textVerticalAlign: 'top'
+                textVerticalAlign: 'top',
+                opacity: 0.95,
+                overflow: 'truncate',
+                width: Math.max(width - 18, 24),
+                textShadowColor: 'rgba(0, 0, 0, 0.18)',
+                textShadowBlur: 2
               }
-            };
-          },
-          data: labels
-        },
-        {
-          type: 'custom',
-          coordinateSystem: 'cartesian2d',
-          silent: true,
-          clip: false,
-          renderItem: (params: any, api: any) => {
-            const item = usageLabels[params.dataIndex];
-            const point = api.coord(item.value);
+            });
+          }
 
-            return {
-              type: 'group',
-              children: [
-                {
-                  type: 'rect',
-                  shape: {
-                    x: point[0],
-                    y: point[1] - 18,
-                    width: 88,
-                    height: 22,
-                    r: 2
-                  },
-                  style: {
-                    fill: '#e8edf5',
-                    shadowBlur: 2,
-                    shadowColor: 'rgba(0, 0, 0, 0.15)'
-                  }
-                },
-                {
-                  type: 'text',
-                  style: {
-                    text: item.name,
-                    x: point[0] + 8,
-                    y: point[1] - 7,
-                    fill: '#53606d',
-                    font: '10px Arial',
-                    textAlign: 'left',
-                    textVerticalAlign: 'middle'
-                  }
-                }
-              ]
-            };
-          },
-          data: usageLabels
-        }
-      ]
+          // Total Resources value centered as the headline number.
+          children.push({
+            type: 'text',
+            silent: true,
+            style: {
+              text: this.formatNumber(cell.totalResources),
+              x: centerX,
+              y: height > 44 ? centerY - 4 : centerY,
+              fill: '#ffffff',
+              font: `700 ${numberFontSize}px Arial`,
+              textAlign: 'center',
+              textVerticalAlign: 'middle',
+              textShadowColor: 'rgba(0, 0, 0, 0.18)',
+              textShadowBlur: 2
+            }
+          });
+
+          if (height > 44) {
+            children.push({
+              type: 'text',
+              silent: true,
+              style: {
+                text: 'Total Resources',
+                x: centerX,
+                y: centerY + 15,
+                fill: '#ffffff',
+                font: '400 11px Arial',
+                textAlign: 'center',
+                textVerticalAlign: 'middle',
+                opacity: 0.9
+              }
+            });
+          }
+
+          return { type: 'group', children };
+        },
+        data: cells
+      }]
     };
   }
 
-  private getGeoHeatmapGroups(response: any): UnifiedAiopsHeatmapGroup[] {
-    const payload = this.getMetricPayload(response, ['groups', 'heatmap', 'geo_distribution', 'geo_heatmap', 'locations', 'results', 'items', 'rows', 'data']);
-    const items = this.getGeoDistributionItems(payload || response);
-    const layouts = this.getGeoHeatmapLayouts(items.length);
+  // Rich hover popup: resources + alert severities (colored) + service breakdown for a region.
+  private getGeoDistributionTooltip(cell: UnifiedAiopsGeoCell): string {
+    if (!cell) {
+      return '';
+    }
+    const severityColors = UNIFIED_AIOPS_ALERT_SEVERITY_COLORS;
+    const neutralIconColor = '#7a8794';
+    const neutralValueColor = '#1f2a34';
+    const row = (icon: string, iconColor: string, label: string, value: number, valueColor: string) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
+          <i class="fa ${icon}" style="width:14px;text-align:center;font-size:12px;color:${iconColor};"></i>${label}
+        </span>
+        <span style="font-weight:600;color:${valueColor};">${this.formatNumber(value)}</span>
+      </div>`;
 
-    return items.slice(0, layouts.length).map((item, index) => {
-      const layout = layouts[index];
-      return {
-        name: this.getShortGeoLabel(item.name),
-        color: this.getGeoDistributionColor(item, index),
-        labelX: layout.labelX,
-        labelY: layout.labelY,
-        children: [{
-          name: item.name,
-          value: item.total,
-          x: layout.x,
-          y: layout.y,
-          width: layout.width,
-          height: layout.height,
-          information: item.information,
-          warning: item.warning,
-          critical: item.critical
-        } as any]
-      };
-    });
+    return `<div style="min-width:216px;padding:11px 13px;font:12px/1.4 Arial;color:#5b6671;">
+      <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:#23303c;margin-bottom:8px;">
+        <span style="width:9px;height:9px;border-radius:50%;background:${cell.color};display:inline-block;"></span>${cell.name}
+      </div>
+      ${row('fa-th-large', '#3aa76d', 'Total Resources', cell.totalResources, neutralValueColor)}
+      ${row('fa-bell', '#378ad8', 'Total Alerts', cell.totalAlerts, neutralValueColor)}
+      ${row('fa-times-circle', severityColors.critical, 'Critical Alerts', cell.critical, severityColors.critical)}
+      ${row('fa-exclamation-triangle', severityColors.warning, 'Warning Alerts', cell.warning, severityColors.warning)}
+      ${row('fa-info-circle', severityColors.info, 'Information Alerts', cell.information, severityColors.info)}
+      <div style="border-top:1px solid #e8edf1;margin:6px 0;"></div>
+      ${row('fa-desktop', neutralIconColor, 'Compute Count', cell.computeCount, neutralValueColor)}
+      ${row('fa-cubes', neutralIconColor, 'Platform Services', cell.platformServices, neutralValueColor)}
+      ${row('fa-clone', neutralIconColor, 'Other Services', cell.otherServices, neutralValueColor)}
+    </div>`;
   }
 
-  private getGeoDistributionItems(payload: any): Array<{ name: string; total: number; information: number; warning: number; critical: number }> {
+  private getGeoHeatmapGroups(response: any): UnifiedAiopsGeoCell[] {
+    const payload = this.getMetricPayload(response, ['groups', 'heatmap', 'geo_distribution', 'geo_heatmap', 'locations', 'results', 'items', 'rows', 'data']);
+    const items = this.getGeoDistributionItems(payload || response).slice(0, 12);
+    if (!items.length) {
+      return [];
+    }
+
+    const layout = this.getTreemapCells(items.map(item => item.totalResources), { x: 0, y: 0, width: 100, height: 100 });
+    return items.map((item, index) => ({
+      name: item.name,
+      color: UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS[index % UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS.length],
+      value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height],
+      totalResources: item.totalResources,
+      totalAlerts: item.totalAlerts,
+      critical: item.critical,
+      warning: item.warning,
+      information: item.information,
+      computeCount: item.computeCount,
+      platformServices: item.platformServices,
+      otherServices: item.otherServices
+    }));
+  }
+
+  private getGeoDistributionItems(payload: any): Array<{ name: string; totalResources: number; totalAlerts: number; critical: number; warning: number; information: number; computeCount: number; platformServices: number; otherServices: number }> {
     const source = Array.isArray(payload) ? payload : Object.keys(payload || {}).map(key => ({
       name: key,
       ...(payload[key] || {})
@@ -814,64 +809,89 @@ export class UnifiedAiopsCommandCentreService {
       .map(item => {
         const flatPayload = this.flattenPayload(item);
         const name = String(item.name || item.location || item.datacenter || item.region || item.city || 'Unknown');
-        const information = this.getNumberFromPayload(flatPayload, ['information', 'info', 'informative']);
-        const warning = this.getNumberFromPayload(flatPayload, ['warning', 'warnings']);
-        const critical = this.getNumberFromPayload(flatPayload, ['critical', 'critical_alerts']);
-        const total = this.getNumberFromPayload(flatPayload, ['total', 'count'], information + warning + critical);
+        const critical = this.getNumberFromPayload(flatPayload, ['critical_alerts', 'criticalAlerts', 'critical']);
+        const warning = this.getNumberFromPayload(flatPayload, ['warning_alerts', 'warningAlerts', 'warning', 'warnings']);
+        const information = this.getNumberFromPayload(flatPayload, ['information_alerts', 'informationAlerts', 'information', 'info', 'informative']);
+        const totalAlerts = this.getNumberFromPayload(flatPayload, ['total_alerts', 'totalAlerts'], critical + warning + information);
+        const computeCount = this.getNumberFromPayload(flatPayload, ['compute_count', 'computeCount', 'compute']);
+        const platformServices = this.getNumberFromPayload(flatPayload, ['platform_services', 'platformServices', 'platform']);
+        const otherServices = this.getNumberFromPayload(flatPayload, ['other_services', 'otherServices', 'other']);
+        const totalResources = this.getNumberFromPayload(flatPayload, ['total_resources', 'totalResources', 'total', 'count'], computeCount + platformServices + otherServices);
 
-        return { name, total, information, warning, critical };
+        return { name, totalResources, totalAlerts, critical, warning, information, computeCount, platformServices, otherServices };
       })
-      .filter(item => item.name && item.total > 0)
-      .sort((first, second) => second.total - first.total);
+      .filter(item => item.name && item.totalResources > 0)
+      .sort((first, second) => second.totalResources - first.totalResources);
   }
 
-  private getGeoHeatmapLayouts(count: number): Array<{ labelX: number; labelY: number; x: number; y: number; width: number; height: number }> {
-    if (count <= 1) {
-      return [
-        { labelX: 0, labelY: 0, x: 0, y: 12, width: 100, height: 82 }
-      ];
+  // Squarified treemap: lays cells (sized by weight) into the bounds, keeping aspect ratios close to square.
+  private getTreemapCells(weights: number[], bounds: { x: number; y: number; width: number; height: number }): Array<{ x: number; y: number; width: number; height: number }> {
+    const cells: Array<{ x: number; y: number; width: number; height: number }> = new Array(weights.length);
+    let remainingWeight = (weights || []).reduce((sum, weight) => sum + weight, 0);
+    let free = { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height };
+    let index = 0;
+
+    const worstRatio = (areas: number[], side: number): number => {
+      const sum = areas.reduce((total, area) => total + area, 0);
+      if (sum <= 0 || side <= 0) {
+        return Infinity;
+      }
+      const max = Math.max(...areas);
+      const min = Math.min(...areas);
+      return Math.max((side * side * max) / (sum * sum), (sum * sum) / (side * side * min));
+    };
+
+    while (index < weights.length && remainingWeight > 0) {
+      const freeArea = free.width * free.height;
+      if (freeArea <= 0) {
+        break;
+      }
+      const side = Math.min(free.width, free.height);
+      const rowAreas: number[] = [];
+      const rowIndices: number[] = [];
+      let cursor = index;
+
+      while (cursor < weights.length) {
+        const area = (weights[cursor] / remainingWeight) * freeArea;
+        if (rowAreas.length && worstRatio([...rowAreas, area], side) > worstRatio(rowAreas, side)) {
+          break;
+        }
+        rowAreas.push(area);
+        rowIndices.push(cursor);
+        cursor++;
+      }
+
+      const rowArea = rowAreas.reduce((total, area) => total + area, 0);
+      if (free.width >= free.height) {
+        const stripWidth = rowArea / free.height;
+        let offsetY = free.y;
+        rowIndices.forEach((itemIndex, position) => {
+          const cellHeight = (rowAreas[position] / rowArea) * free.height;
+          cells[itemIndex] = { x: free.x, y: offsetY, width: stripWidth, height: cellHeight };
+          offsetY += cellHeight;
+        });
+        free = { x: free.x + stripWidth, y: free.y, width: free.width - stripWidth, height: free.height };
+      } else {
+        const stripHeight = rowArea / free.width;
+        let offsetX = free.x;
+        rowIndices.forEach((itemIndex, position) => {
+          const cellWidth = (rowAreas[position] / rowArea) * free.width;
+          cells[itemIndex] = { x: offsetX, y: free.y, width: cellWidth, height: stripHeight };
+          offsetX += cellWidth;
+        });
+        free = { x: free.x, y: free.y + stripHeight, width: free.width, height: free.height - stripHeight };
+      }
+
+      rowIndices.forEach(itemIndex => { remainingWeight -= weights[itemIndex]; });
+      index = cursor;
     }
 
-    if (count === 2) {
-      return [
-        { labelX: 0, labelY: 0, x: 0, y: 12, width: 100, height: 39 },
-        { labelX: 0, labelY: 56, x: 0, y: 64, width: 100, height: 36 }
-      ];
+    for (let i = 0; i < weights.length; i++) {
+      if (!cells[i]) {
+        cells[i] = { x: free.x, y: free.y, width: 0, height: 0 };
+      }
     }
-
-    return [
-      { labelX: 0, labelY: 0, x: 0, y: 12, width: 52, height: 44 },
-      { labelX: 0, labelY: 58, x: 0, y: 68, width: 52, height: 32 },
-      { labelX: 69, labelY: 0, x: 69, y: 12, width: 31, height: 60 },
-      { labelX: 52, labelY: 6, x: 52, y: 12, width: 17, height: 44 },
-      { labelX: 69, labelY: 74, x: 69, y: 80, width: 31, height: 20 },
-      { labelX: 52, labelY: 62, x: 52, y: 68, width: 17, height: 32 }
-    ];
-  }
-
-  private getGeoDistributionColor(_item: { warning: number; critical: number }, index: number): string {
-    const colors = ['#5875c8', '#90cc74', '#ffca4d', '#5875c8', '#ffc64b', '#8ccd72'];
-    return colors[index % colors.length];
-  }
-
-  private getGeoDistributionTextColor(color: string): string {
-    const darkTextColors = ['#90cc74', '#ffca4d', '#ffc64b', '#8ccd72'];
-    return darkTextColors.includes(color) ? '#1e2a35' : '#ffffff';
-  }
-
-  private getShortGeoLabel(label: string): string {
-    return String(label || '')
-      .replace(', USA', '')
-      .replace(', United States', '')
-      .split(',')
-      .slice(0, 2)
-      .join('\n')
-      .trim();
-  }
-
-  private getGeoCellText(label: string, total: number): string {
-    const shortLabel = String(label || '').split(',')[0].trim();
-    return `${shortLabel}\n${this.formatNumber(total || 0)}`;
+    return cells;
   }
   /*
    * ******End ****** Geo Distribution / Global Operations Widget Related ********************
@@ -884,11 +904,17 @@ export class UnifiedAiopsCommandCentreService {
     return this.getWidgetResponse(UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT, criteria).pipe(map(res => this.getCoverageCards(res, this.getPrivateCloudCoverageLabels())));
   }
 
-  getPublicCloudCoverage(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsCoverageCard[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT, criteria).pipe(map(res => this.getCoverageCards(res, this.getPublicCloudCoverageLabels())));
+  // Public Cloud coverage is grouped (Compute / Platform Services / Other Services); each group holds
+  // one card per provider that has data, mirroring the Private Cloud single-card chart adaptation.
+  getPublicCloudCoverage(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsCoverageGroup[]> {
+    return this.getWidgetResponse(UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT, criteria).pipe(map(res => this.getCoverageGroups(res)));
   }
 
   convertToCoverageCardsViewData(data: UnifiedAiopsCoverageCard[]): UnifiedAiopsCoverageCard[] {
+    return data || [];
+  }
+
+  convertToCoverageGroupsViewData(data: UnifiedAiopsCoverageGroup[]): UnifiedAiopsCoverageGroup[] {
     return data || [];
   }
 
@@ -899,6 +925,122 @@ export class UnifiedAiopsCommandCentreService {
       return sum + cardTotal;
     }, 0);
     return this.formatNumber(total);
+  }
+
+  getCoverageGroupsResourceTotal(groups: UnifiedAiopsCoverageGroup[]): string {
+    const total = (groups || []).reduce((sum, group) => sum + this.getNumberValue(group.totalLabel), 0);
+    return this.formatNumber(total);
+  }
+
+  private getCoverageGroups(response: any): UnifiedAiopsCoverageGroup[] {
+    const containers = [response, response?.data, response?.result, response?.results]
+      .filter(container => container && typeof container === 'object' && !Array.isArray(container));
+    const container = containers.find(item => UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER.some(key => item[key])) || response;
+    if (!container || typeof container !== 'object') {
+      return [];
+    }
+
+    const labels = this.getPublicCloudCoverageLabels();
+    return UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER
+      .map(groupKey => this.getCoverageGroupFromPayload(groupKey, container[groupKey], labels))
+      .filter((group): group is UnifiedAiopsCoverageGroup => !!group && group.cards.length > 0);
+  }
+
+  private getCoverageGroupFromPayload(groupKey: string, groupPayload: any, labels: { [key: string]: string }): UnifiedAiopsCoverageGroup | null {
+    if (!groupPayload || typeof groupPayload !== 'object' || Array.isArray(groupPayload)) {
+      return null;
+    }
+    const providersPayload = groupPayload.providers || groupPayload.clouds || groupPayload;
+    const cards = UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_ORDER
+      .map(providerKey => this.getCoverageProviderCard(providerKey, providersPayload[providerKey], labels))
+      .filter((card): card is UnifiedAiopsCoverageCard => !!card);
+    if (!cards.length) {
+      return null;
+    }
+
+    const cardTotal = cards.reduce((sum, card) => sum + this.getNumberValue(card.totalResources), 0);
+    const total = this.getNumberFromPayload(groupPayload, ['total_resources', 'totalResources', 'total', 'count'], cardTotal);
+    return {
+      key: groupKey,
+      title: UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_LABELS[groupKey] || groupPayload.name || this.getReadableCoverageLabel(groupKey),
+      totalLabel: this.formatNumber(total),
+      cards,
+      showChart: cards.length === 1
+    };
+  }
+
+  private getCoverageProviderCard(providerKey: string, providerPayload: any, labels: { [key: string]: string }): UnifiedAiopsCoverageCard | null {
+    if (!providerPayload || typeof providerPayload !== 'object' || Array.isArray(providerPayload)) {
+      return null;
+    }
+    const rows = this.getCoverageServiceRows(providerKey, providerPayload.services || providerPayload.service_types || providerPayload.serviceTypes);
+    const rowTotal = rows.reduce((sum, row) => sum + this.getNumberValue(row.value), 0);
+    const total = this.getNumberFromPayload(providerPayload, ['total_resources', 'totalResources', 'total', 'count'], rowTotal);
+    // Drop providers with no data so a customer with fewer clouds (e.g. no OCI) shows fewer cards.
+    if (!rows.length && total <= 0) {
+      return null;
+    }
+    return {
+      title: labels[providerKey] || this.getReadableCoverageLabel(providerKey),
+      logo: this.getProviderLogo(providerKey),
+      rows,
+      totalResources: this.formatNumber(total),
+      chartOptions: this.getCoverageChartOptions(rows)
+    };
+  }
+
+  // A service entry is either a scalar count ("EC2": 26) or an object that also carries icon_path
+  // ("EC2": { count: 26, icon_path: "Compute/EC2" }). The icon renders only when icon_path is present.
+  private getCoverageServiceRows(providerKey: string, servicesPayload: any): UnifiedAiopsCoverageRow[] {
+    if (!servicesPayload || typeof servicesPayload !== 'object' || Array.isArray(servicesPayload)) {
+      return [];
+    }
+    return Object.keys(servicesPayload)
+      .map(key => {
+        const entry = servicesPayload[key];
+        const isObject = entry && typeof entry === 'object' && !Array.isArray(entry);
+        const count = isObject
+          ? this.getNumberFromPayload(entry, ['count', 'value', 'resource_count', 'resourceCount', 'total'])
+          : this.getNumberValue(entry);
+        const iconPath = isObject
+          ? this.getServiceIconPath(providerKey, this.getFirstStringValue(entry, ['icon_path', 'iconPath']))
+          : '';
+        const row: UnifiedAiopsCoverageRow = { label: this.getReadableCoverageLabel(key), value: this.formatNumber(count) };
+        if (iconPath) {
+          row.iconPath = iconPath;
+        }
+        return { row, count };
+      })
+      .filter(item => item.count > 0)
+      .sort((first, second) => second.count - first.count)
+      .map(item => item.row);
+  }
+
+  // Mirrors how the public cloud summary pages build service icons from the API icon_path.
+  private getServiceIconPath(providerKey: string, iconPath: string): string {
+    const normalizedIconPath = String(iconPath || '').trim();
+    if (!normalizedIconPath) {
+      return '';
+    }
+    const base = `${environment.assetsUrl}external-brand`;
+    switch (providerKey) {
+      case 'aws':
+        return `${base}/aws/${normalizedIconPath}.svg`;
+      case 'azure':
+        return `${base}/azure/Icons/${normalizedIconPath}.svg`;
+      case 'gcp':
+        return `${base}/gcp/${normalizedIconPath}.svg`;
+      case 'oci':
+        // Oracle icon_path values already include the file extension.
+        return `${base}/oracle/${normalizedIconPath}`;
+      default:
+        return '';
+    }
+  }
+
+  private getProviderLogo(providerKey: string): string {
+    const logo = UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_LOGOS[providerKey];
+    return logo ? `${environment.assetsUrl}external-brand/${logo}` : '';
   }
 
   private getCoverageCards(response: any, labelConfig: { [key: string]: string }): UnifiedAiopsCoverageCard[] {
@@ -1032,8 +1174,8 @@ export class UnifiedAiopsCommandCentreService {
     return {
       aws: 'Amazon Web Service',
       azure: 'Microsoft Azure',
-      gcp: 'Google Cloud Platform',
-      oci: 'Oracle Cloud'
+      gcp: 'Google Cloud',
+      oci: 'Oracle'
     };
   }
 
@@ -1068,117 +1210,8 @@ export class UnifiedAiopsCommandCentreService {
    */
 
   /*
-   * -----Start----- Data Center Infrastructure Widget Related -------------------
+   * -----Start----- Shared Status / Metric Helpers -------------------
    */
-  getDatacenterInfrastructureMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_DATACENTER_INFRA_ENDPOINT, criteria).pipe(map(res => this.getStatusSummaryMetrics(res, UNIFIED_AIOPS_DATACENTER_INFRA_METRIC_CONFIG, ['metrics', 'summary', 'datacenter_infra', 'data'])));
-  }
-  /*
-   * ******End ****** Data Center Infrastructure Widget Related ********************
-   */
-
-  /*
-   * -----Start----- Kubernetes / Container Widget Related -------------------
-   */
-  getKubernetesMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_CONTAINER_SUMMARY_ENDPOINT, criteria).pipe(
-      map(res => this.getStatusSummaryMetrics(res, UNIFIED_AIOPS_KUBERNETES_METRIC_CONFIG, ['metrics', 'summary', 'container_summary', 'data']))
-    );
-  }
-  /*
-   * ******End ****** Kubernetes / Container Widget Related ********************
-   */
-
-  /*
-   * -----Start----- AI / GPU / LLM Widget Related -------------------
-   */
-  getAiGpuMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_OBSERVABILITY_SUMMARY_ENDPOINT, criteria).pipe(
-      map(res => this.getStatusSummaryMetrics(res, UNIFIED_AIOPS_AI_GPU_METRIC_CONFIG, ['metrics', 'summary', 'observability_summary', 'data']))
-    );
-  }
-
-  private getStatusSummaryMetrics(response: any,
-    metricConfig: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; aggregateKeys?: string[]; suffix?: string; threshold?: 'utilization' | 'warning' }>,
-    payloadKeys: string[]): UnifiedAiopsMetric[] {
-    const payload = this.getMetricPayload(response, payloadKeys);
-    if (!this.hasUsablePayloadValue(payload)) {
-      return [];
-    }
-
-    if (Array.isArray(payload)) {
-      return payload.map(metric => this.getStatusSummaryMetric(metric?.label || metric?.name || '', metric, metric));
-    }
-
-    const usedKeys = new Set<string>();
-    const configuredMetrics = (metricConfig || []).reduce((metrics: UnifiedAiopsMetric[], config) => {
-      const value = this.getConfiguredMetricValue(payload, config, usedKeys);
-      if (value !== undefined && value !== null) {
-        metrics.push(this.getStatusSummaryMetric(config.label, value, config));
-      }
-      return metrics;
-    }, []);
-
-    const additionalMetrics = Object.keys(payload || {})
-      .filter(key => !usedKeys.has(this.normalizeKey(key)) && !this.isSummaryTotalKey(key))
-      .map(key => this.getStatusSummaryMetric(this.getReadableStackLabel(key), payload[key], { label: key, keys: [key] }));
-
-    return [...configuredMetrics, ...additionalMetrics];
-  }
-
-  private getConfiguredMetricValue(payload: any,
-    config: { keys: string[]; aggregateKeys?: string[] },
-    usedKeys: Set<string>): any {
-    const normalizedPayload = this.getNormalizedPayload(payload || {});
-    const directKeys = config.keys || [];
-    const aggregateKeys = config.aggregateKeys || [];
-    for (const key of directKeys) {
-      const normalizedKey = this.normalizeKey(key);
-      if (normalizedPayload[normalizedKey] !== undefined && normalizedPayload[normalizedKey] !== null) {
-        this.markMetricKeysUsed([...directKeys, ...aggregateKeys], usedKeys);
-        return normalizedPayload[normalizedKey];
-      }
-    }
-
-    const aggregatedValue = this.getAggregatedMetricValue(normalizedPayload, aggregateKeys);
-    if (aggregatedValue) {
-      this.markMetricKeysUsed([...directKeys, ...aggregateKeys], usedKeys);
-      return aggregatedValue;
-    }
-
-    return undefined;
-  }
-
-  private getAggregatedMetricValue(normalizedPayload: { [key: string]: any }, keys: string[]): any {
-    const values = (keys || [])
-      .map(key => normalizedPayload[this.normalizeKey(key)])
-      .filter(value => value !== undefined && value !== null);
-
-    if (!values.length) {
-      return undefined;
-    }
-
-    return values.reduce((result: { total: number; up: number; down: number; unknown: number }, value) => {
-      if (value && typeof value === 'object' && !Array.isArray(value)) {
-        const flatPayload = this.flattenPayload(value);
-        const up = this.getNumberFromPayload(flatPayload, ['up', 'online', 'healthy', 'active']);
-        const down = this.getNumberFromPayload(flatPayload, ['down', 'offline', 'unhealthy', 'critical']);
-        const unknown = this.getNumberFromPayload(flatPayload, ['unknown', 'unknowns', 'warning']);
-        result.up += up;
-        result.down += down;
-        result.unknown += unknown;
-        result.total += this.getNumberFromPayload(flatPayload, ['total', 'count', 'value'], up + down + unknown);
-      } else {
-        result.total += this.getNumberValue(value);
-      }
-      return result;
-    }, { total: 0, up: 0, down: 0, unknown: 0 });
-  }
-
-  private markMetricKeysUsed(keys: string[], usedKeys: Set<string>) {
-    (keys || []).forEach(key => usedKeys.add(this.normalizeKey(key)));
-  }
-
   private getStatusSummaryMetric(label: string,
     payload: any,
     config: { label?: string; keys?: string[]; tone?: UnifiedAiopsTone; suffix?: string; threshold?: 'utilization' | 'warning' }): UnifiedAiopsMetric {
@@ -1229,7 +1262,7 @@ export class UnifiedAiopsCommandCentreService {
     return ['total', 'totalcount', 'totalresources'].includes(this.normalizeKey(key));
   }
   /*
-   * ******End ****** AI / GPU / LLM Widget Related ********************
+   * ******End ****** Shared Status / Metric Helpers ********************
    */
 
   /*

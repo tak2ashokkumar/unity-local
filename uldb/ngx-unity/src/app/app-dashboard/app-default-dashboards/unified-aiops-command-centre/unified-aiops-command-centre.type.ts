@@ -46,11 +46,59 @@ export interface UnifiedAiopsMetric {
   down?: string;
   unknown?: string;
   hasData?: boolean;
+  link?: string;
 }
 
 export interface UnifiedAiopsStackItem {
   name: string;
   values: number[];
+}
+
+export interface UnifiedAiopsDiscoveryCoverageRow {
+  category: string;
+  discovered: number;
+  monitored: number;
+  coverage: number;
+  coverageLabel: string;
+  color: string;
+  badgeBg: string;
+}
+
+export interface UnifiedAiopsDiscoverySummary {
+  discovered: string;
+  monitored: string;
+  coverage: string;
+}
+
+export interface UnifiedAiopsAlertSegregationSummary {
+  critical: string;
+  warning: string;
+  info: string;
+}
+
+export interface UnifiedAiopsExecutiveMetricConfig {
+  label: string;
+  keys: string[];
+  suffix?: string;
+  threshold?: 'utilization' | 'warning';
+  plain?: boolean;
+  link?: string;
+}
+
+export interface UnifiedAiopsExecutiveSectionConfig {
+  title: string;
+  column: 'full' | 'main' | 'side';
+  payloadKeys: string[];
+  dynamic?: boolean;
+  labels?: { [key: string]: string };
+  link?: string;
+  metrics?: UnifiedAiopsExecutiveMetricConfig[];
+}
+
+export interface UnifiedAiopsExecutiveSection {
+  title: string;
+  column: 'full' | 'main' | 'side';
+  metrics: UnifiedAiopsMetric[];
 }
 
 export interface UnifiedAiopsAlertSource {
@@ -62,22 +110,18 @@ export interface UnifiedAiopsAlertSource {
   color: string;
 }
 
-export interface UnifiedAiopsHeatmapGroup {
+export interface UnifiedAiopsGeoCell {
   name: string;
   color: string;
-  labelX: number;
-  labelY: number;
-  children: UnifiedAiopsHeatmapItem[];
-}
-
-export interface UnifiedAiopsHeatmapItem {
-  name: string;
-  value: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  usage?: string;
+  value: number[];
+  totalResources: number;
+  totalAlerts: number;
+  critical: number;
+  warning: number;
+  information: number;
+  computeCount: number;
+  platformServices: number;
+  otherServices: number;
 }
 
 export interface UnifiedAiopsLegendMetric {
@@ -118,6 +162,7 @@ export interface UnifiedAiopsBusinessService {
 
 export interface UnifiedAiopsCoverageCard {
   title: string;
+  logo?: string;
   rows: UnifiedAiopsCoverageRow[];
   totalResources?: string;
   chartOptions?: EChartsOption;
@@ -126,6 +171,15 @@ export interface UnifiedAiopsCoverageCard {
 export interface UnifiedAiopsCoverageRow {
   label: string;
   value: string;
+  iconPath?: string;
+}
+
+export interface UnifiedAiopsCoverageGroup {
+  key: string;
+  title: string;
+  totalLabel: string;
+  cards: UnifiedAiopsCoverageCard[];
+  showChart: boolean;
 }
 
 export interface UnifiedAiopsTableRow {

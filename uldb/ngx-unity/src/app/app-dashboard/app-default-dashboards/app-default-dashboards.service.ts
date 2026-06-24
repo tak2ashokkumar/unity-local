@@ -35,7 +35,8 @@ export class AppDefaultDashboardsService {
   }
 
   getDefaultDashboardRouteSegment(name: string) {
-    switch ((name || '').trim().toLowerCase()) {
+    let dbname = (name || '').trim().toLowerCase();
+    switch (dbname) {
       case 'infrastructure overview':
         return 'infrastructure';
       case 'network overview':
@@ -54,6 +55,7 @@ export class AppDefaultDashboardsService {
         return 'public-cloud-compute';
       case 'database dashboard':
         return 'database';
+      case 'navigator central':
       case 'unified aiops command center':
       case 'unified aiops command center dashboard':
       case 'unified aiops command centre':
