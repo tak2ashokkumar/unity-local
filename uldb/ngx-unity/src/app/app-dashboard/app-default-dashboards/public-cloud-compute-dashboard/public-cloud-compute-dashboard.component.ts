@@ -11,10 +11,14 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { PublicCloudComputeDashboardService } from './public-cloud-compute-dashboard.service';
 import {
+  PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT,
+  PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_SORT_COLUMNS
+} from './public-cloud-compute-dashboard.const';
+import {
   PublicCloudAccountOption,
   PublicCloudAlertSummaryMetric,
-  PublicCloudComputeBreakdownProvider,
-  PublicCloudComputeBreakdownStat,
+  PublicCloudCoverageCard,
+  PublicCloudCoverageGroup,
   PublicCloudActiveDatabaseWorkloadViewData,
   PublicCloudDatabaseBarItem,
   PublicCloudDatabaseConsumerRow,
@@ -29,6 +33,7 @@ import {
   PublicCloudLockContentionRow,
   PublicCloudOrphanedCategoryItem,
   PublicCloudOrphanedDeviceRow,
+  PublicCloudPerformanceHotspotRow,
   PublicCloudProviderDistributionKey,
   PublicCloudProviderDistributionItem,
   PublicCloudQueueBacklogRow,
@@ -50,7 +55,9 @@ interface PublicCloudFilterScopeSummary {
 
 interface PublicCloudWidgetLoadingState {
   inventorySummary: boolean;
-  computeBreakdown: boolean;
+  geoDistribution: boolean;
+  publicCloudCoverage: boolean;
+  performanceHotspots: boolean;
   orphanedDevices: boolean;
   orphanedByCategory: boolean;
   idleDevices: boolean;
@@ -86,7 +93,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   private allAccountOptions: PublicCloudAccountOption[] = [];
   private readonly widgetLoadingKeys: Array<keyof PublicCloudWidgetLoadingState> = [
     'inventorySummary',
-    'computeBreakdown',
+    'geoDistribution',
+    'publicCloudCoverage',
+    'performanceHotspots',
     'orphanedDevices',
     'orphanedByCategory',
     'idleDevices',
@@ -113,7 +122,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     publicCloud: ['/unitycloud/publiccloud'],
     devices: ['/unitycloud/devices'],
     vmAll: ['/unitycloud/devices/vms/allvms'],
-    kubernetes: ['/unitycloud/devices/kubernetes'],
     alerts: ['/services/aiml-event-mgmt/alerts'],
     gpu: ['/services/ai-observability/gpu'],
     storage: ['/unitycloud/devices/storagedevices'],
@@ -149,7 +157,13 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   providerDistribution: PublicCloudProviderDistributionItem[] = [];
   providerDistributionOptions: EChartsOption = {};
   tags: PublicCloudTagItem[] = [];
-  computeBreakdown: PublicCloudComputeBreakdownProvider[] = [];
+  geoHeatmapOptions: EChartsOption = {};
+  publicCloudCoverageGroups: PublicCloudCoverageGroup[] = [];
+  publicCloudCoverageTotal = '0';
+  performanceHotspots: PublicCloudPerformanceHotspotRow[] = [];
+  performanceHotspotsSort = PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT;
+  performanceHotspotsSortColumns = PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_SORT_COLUMNS;
+  performanceHotspotsLoaded = false;
   orphanedDevices: PublicCloudOrphanedDeviceRow[] = [];
   orphanedDevicesTotal = 0;
   orphanedDevicesPageNo = 1;
@@ -191,7 +205,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   recentAlerts: PublicCloudRecentAlert[] = [];
   widgetLoading: PublicCloudWidgetLoadingState = {
     inventorySummary: false,
-    computeBreakdown: false,
+    geoDistribution: false,
+    publicCloudCoverage: false,
+    performanceHotspots: false,
     orphanedDevices: false,
     orphanedByCategory: false,
     idleDevices: false,
@@ -220,7 +236,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     summaryMetrics: 'publicCloudSummaryMetricsLoader',
     providerDistribution: 'publicCloudProviderDistributionLoader',
     tags: 'publicCloudTagsLoader',
-    computeBreakdown: 'publicCloudComputeBreakdownLoader',
+    geoDistribution: 'publicCloudGeoDistributionLoader',
+    publicCloudCoverage: 'publicCloudInfraCoverageLoader',
+    performanceHotspots: 'publicCloudPerformanceHotspotsLoader',
     orphanedDevices: 'publicCloudOrphanedDevicesLoader',
     orphanedDevicesByCategory: 'publicCloudOrphanedDevicesByCategoryLoader',
     idleDevices: 'publicCloudIdleDevicesLoader',
@@ -503,7 +521,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.startWidgetLoadingState();
     setTimeout(() => {
       this.getInventorySummary(filterFormOutput);
-      this.getComputeBreakdown(filterFormOutput);
+      this.getGeoDistribution(filterFormOutput);
+      this.getPublicCloudCoverage(filterFormOutput);
+      this.getPerformanceHotspots(filterFormOutput);
       this.getDatabaseHealthScore(filterFormOutput);
       this.getActiveDatabaseWorkload(filterFormOutput);
       this.getDatabaseLatencyOverview(filterFormOutput);
@@ -576,14 +596,57 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.tags = [];
   }
 
-  getComputeBreakdown(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.computeBreakdown = [];
-    this.widgetLoading.computeBreakdown = true;
-    this.loadWidget(this.loaderNames.computeBreakdown, this.svc.getComputeBreakdown(filterFormOutput), res => {
-      this.computeBreakdown = this.svc.convertToComputeBreakdownViewData(res, filterFormOutput);
+  getGeoDistribution(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.geoHeatmapOptions = {};
+    this.widgetLoading.geoDistribution = true;
+    this.loadWidget(this.loaderNames.geoDistribution, this.svc.getGeoDistribution(filterFormOutput), res => {
+      this.geoHeatmapOptions = this.svc.convertToGeoHeatmapOptions(res);
     }, () => {
-      this.computeBreakdown = [];
-    }, () => this.widgetLoading.computeBreakdown = false);
+      this.geoHeatmapOptions = {};
+    }, () => this.widgetLoading.geoDistribution = false);
+  }
+
+  getPublicCloudCoverage(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.publicCloudCoverageGroups = [];
+    this.publicCloudCoverageTotal = '0';
+    this.widgetLoading.publicCloudCoverage = true;
+    this.loadWidget(this.loaderNames.publicCloudCoverage, this.svc.getPublicCloudCoverage(filterFormOutput), res => {
+      this.publicCloudCoverageGroups = this.svc.convertToCoverageGroupsViewData(res);
+      this.publicCloudCoverageTotal = this.svc.getCoverageGroupsResourceTotal(this.publicCloudCoverageGroups);
+    }, () => {
+      this.publicCloudCoverageGroups = [];
+      this.publicCloudCoverageTotal = '0';
+    }, () => this.widgetLoading.publicCloudCoverage = false);
+  }
+
+  getPerformanceHotspots(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.performanceHotspots = [];
+    this.widgetLoading.performanceHotspots = true;
+    this.loadWidget(this.loaderNames.performanceHotspots, this.svc.getPerformanceHotspots(filterFormOutput, this.performanceHotspotsSort), res => {
+      this.performanceHotspots = res;
+    }, () => {
+      this.performanceHotspots = [];
+    }, () => {
+      this.widgetLoading.performanceHotspots = false;
+      this.performanceHotspotsLoaded = true;
+    });
+  }
+
+  sortPerformanceHotspots(sortKey: string) {
+    if (this.performanceHotspotsSort === sortKey) {
+      return;
+    }
+    this.performanceHotspotsSort = sortKey;
+    this.getPerformanceHotspots(this.appliedFilterCriteria);
+  }
+
+  isHotspotSortActive(sortKey: string): boolean {
+    return this.performanceHotspotsSort === sortKey;
+  }
+
+  get performanceHotspotsHeading(): string {
+    const activeColumn = this.performanceHotspotsSortColumns.find(column => column.key === this.performanceHotspotsSort);
+    return activeColumn ? `Performance Hotspots - ${activeColumn.label}` : 'Performance Hotspots';
   }
 
   getDatabaseHealthScore(filterFormOutput: PublicCloudDashboardFilterCriteria) {
@@ -897,7 +960,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   private clearDashboardViewData() {
     this.clearInventorySummaryViewData();
-    this.computeBreakdown = [];
+    this.geoHeatmapOptions = {};
+    this.publicCloudCoverageGroups = [];
+    this.publicCloudCoverageTotal = '0';
+    this.performanceHotspots = [];
+    this.performanceHotspotsLoaded = false;
     this.orphanedDevices = [];
     this.orphanedDevicesTotal = 0;
     this.orphanedByCategory = [];
@@ -955,15 +1022,41 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   }
 
   get hasProviderDistribution(): boolean {
-    return this.widgetLoading.inventorySummary || (this.providerDistribution || []).some(provider => Number(provider?.count || 0) > 0 || Number(provider?.value || 0) > 0);
+    return this.widgetLoading.inventorySummary || this.hasProviderDistributionData;
+  }
+
+  get hasProviderDistributionData(): boolean {
+    return (this.providerDistribution || []).some(provider => Number(provider?.count || 0) > 0 || Number(provider?.value || 0) > 0);
   }
 
   get hasTags(): boolean {
     return this.widgetLoading.inventorySummary || !!this.tags?.length;
   }
 
-  get hasComputeBreakdown(): boolean {
-    return this.widgetLoading.computeBreakdown || !!this.computeBreakdown?.length;
+  get hasGeoDistributionData(): boolean {
+    return !!Object.keys(this.geoHeatmapOptions || {}).length;
+  }
+
+  get hasGeoDistribution(): boolean {
+    return this.widgetLoading.geoDistribution || this.hasGeoDistributionData;
+  }
+
+  get hasPublicCloudCoverage(): boolean {
+    return this.widgetLoading.publicCloudCoverage ||
+      (this.publicCloudCoverageGroups || []).some(group => this.hasCoverageValues(group.cards));
+  }
+
+  get hasPerformanceHotspots(): boolean {
+    return this.widgetLoading.performanceHotspots || !!this.performanceHotspots?.length;
+  }
+
+  /** Keeps the widget visible after a load attempt so empty / failed responses show a message instead of vanishing. */
+  get showPerformanceHotspots(): boolean {
+    return this.widgetLoading.performanceHotspots || this.performanceHotspotsLoaded;
+  }
+
+  private hasCoverageValues(cards: PublicCloudCoverageCard[]): boolean {
+    return (cards || []).some(card => (card.rows || []).some(row => this.getNumericValue(row?.value) > 0));
   }
 
   get hasOrphanedDevices(): boolean {
@@ -1104,7 +1197,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return this.hasSummaryMetrics ||
       this.hasProviderDistribution ||
       this.hasTags ||
-      this.hasComputeBreakdown ||
+      this.hasGeoDistribution ||
+      this.hasPublicCloudCoverage ||
+      this.hasPerformanceHotspots ||
       this.hasCloudDatabasePerformanceSection ||
       this.hasCloudStorageHealthSection ||
       this.hasOrphanedDevices ||
@@ -1116,7 +1211,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   }
 
   get hasInventoryWidgets(): boolean {
-    return this.hasSummaryMetrics || this.hasProviderDistribution || this.hasTags;
+    return this.hasSummaryMetrics || this.hasProviderDistribution || this.hasTags || this.hasGeoDistribution;
   }
 
   private hasMetricValues(metrics: Array<{ value?: string | number }>): boolean {
@@ -1175,7 +1270,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       vms: this.linkRoutes.vmAll,
       services: this.linkRoutes.publicCloud,
       running_resources: this.linkRoutes.publicCloud,
-      stopped_resources: this.linkRoutes.publicCloud
+      stopped_resources: this.linkRoutes.publicCloud,
+      orphaned_vms: this.linkRoutes.vmAll,
+      idle_vms: this.linkRoutes.vmAll
     };
     this.openRouteInNewTab(routes[metric.key] || this.linkRoutes.publicCloud);
   }
@@ -1190,16 +1287,25 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  openComputeProvider(provider: PublicCloudComputeBreakdownProvider) {
-    this.openRouteInNewTab(this.getProviderRoute(provider.name));
+  onGeoDistributionChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openRouteInNewTab(this.linkRoutes.publicCloud));
   }
 
-  openComputeStat(provider: PublicCloudComputeBreakdownProvider, stat: PublicCloudComputeBreakdownStat) {
-    if (stat.key === 'virtual_machine') {
-      this.openRouteInNewTab(this.getProviderVmRoute(provider.name));
-      return;
-    }
-    this.openRouteInNewTab(this.linkRoutes.kubernetes);
+  /** Public Cloud coverage links the provider total and each service count to that provider's public cloud page. */
+  openPublicCloudProvider(provider?: PublicCloudCoverageCard) {
+    this.openRouteInNewTab(this.getProviderRoute(provider?.title || ''));
+  }
+
+  canOpenPublicCloudProvider(provider?: PublicCloudCoverageCard): boolean {
+    return !!provider?.title;
+  }
+
+  hasChartData(options?: EChartsOption): boolean {
+    return !!options && !!Object.keys(options).length;
+  }
+
+  openHotspotInstance(row: PublicCloudPerformanceHotspotRow) {
+    this.openRouteInNewTab(this.getProviderVmRoute(row?.cloud || ''));
   }
 
   openOrphanedDevices() {

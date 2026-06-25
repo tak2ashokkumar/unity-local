@@ -1,14 +1,21 @@
-import { environment } from 'src/environments/environment';
 import {
-  PublicCloudComputeBreakdownProviderKey,
-  PublicCloudComputeBreakdownStatKey,
   PublicCloudInventorySummaryKey,
   PublicCloudProviderDistributionKey,
   PublicCloudTagItem
 } from './public-cloud-compute-dashboard.type';
 
 export const PUBLIC_CLOUD_INVENTORY_SUMMARY_ENDPOINT = '/customer/public-cloud-widgets/inventory_summary/';
-export const PUBLIC_CLOUD_COMPUTE_BREAKDOWN_ENDPOINT = '/customer/public-cloud-widgets/compute_breakdown/';
+// Public Cloud Infrastructure Coverage reuses the existing Navigator Central (Unified AIOPS) dashboard endpoint.
+export const PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/public-cloud-infra-coverage/';
+export const PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_ENDPOINT = '/customer/public-cloud-widgets/performance_hotspots/';
+// Sortable columns send their key as the `sort` query param; CPU Utilization is the default.
+export const PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT = 'cpu_utilization';
+export const PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_SORT_COLUMNS: Array<{ key: string, label: string }> = [
+  { key: 'cpu_utilization', label: 'CPU Utilization' },
+  { key: 'available_memory', label: 'Available Memory' },
+  { key: 'disk_size', label: 'Disk Size' },
+  { key: 'network_traffic', label: 'Network Traffic' }
+];
 export const PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT = '/customer/public-cloud-widgets/orphaned_devices/';
 export const PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT = '/customer/public-cloud-widgets/orphaned_devices_by_category/';
 export const PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT = '/customer/public-cloud-widgets/idle_devices/';
@@ -30,6 +37,8 @@ export const PUBLIC_CLOUD_STORAGE_DISTRIBUTION_ENDPOINT = '/customer/public-clou
 export const PUBLIC_CLOUD_LATENCY_HEATMAP_ENDPOINT = '/customer/public-cloud-widgets/latency_heatmap/';
 export const PUBLIC_CLOUD_QUEUE_BACKLOG_MONITOR_ENDPOINT = '/customer/public-cloud-widgets/queue_backlog_monitor/';
 export const PUBLIC_CLOUD_FILTERS_ENDPOINT = '/customer/public-cloud-widgets/public_cloud_filters/';
+// Geo Distribution reuses the existing Navigator Central (Unified AIOPS) dashboard endpoint.
+export const PUBLIC_CLOUD_GEO_DISTRIBUTION_ENDPOINT = '/customer/aiops-dashboard/geo-distribution-global-ops/';
 export const PUBLIC_CLOUD_ALL_SELECTED_VALUE = 'all';
 
 export const PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG: Array<{ key: PublicCloudInventorySummaryKey, label: string }> = [
@@ -38,7 +47,9 @@ export const PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG: Array<{ key: PublicCloudInvento
   { key: 'vms', label: 'VM' },
   { key: 'services', label: 'Services' },
   { key: 'running_resources', label: 'Running Resources' },
-  { key: 'stopped_resources', label: 'Stopped Resources' }
+  { key: 'stopped_resources', label: 'Stopped Resources' },
+  { key: 'orphaned_vms', label: 'Orphaned VMs' },
+  { key: 'idle_vms', label: 'Idle VMs' }
 ];
 
 export const PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG: Record<PublicCloudProviderDistributionKey, { name: string, color: string }> = {
@@ -56,48 +67,40 @@ export const PUBLIC_CLOUD_TAG_STYLE_CONFIG: PublicCloudTagItem[] = [
   { name: 'Other', count: '', textColor: '#6f7782', backgroundColor: '#eceff2' }
 ];
 
-export const PUBLIC_CLOUD_COMPUTE_BREAKDOWN_PROVIDER_CONFIG: Array<{
-  key: PublicCloudComputeBreakdownProviderKey,
-  name: string,
-  displayName: string,
-  brandClass: string,
-  logoPath: string
-}> = [
-  {
-    key: 'google_cloud',
-    name: 'gcp',
-    displayName: 'Google Cloud',
-    brandClass: 'gcp',
-    logoPath: `${environment.assetsUrl}external-brand/logos/Google_Cloud_Platform-Logo 1.svg`
-  },
-  {
-    key: 'azure',
-    name: 'azure',
-    displayName: 'Azure',
-    brandClass: 'azure',
-    logoPath: `${environment.assetsUrl}external-brand/logos/Microsoft_Azure_Logo 1.svg`
-  },
-  {
-    key: 'aws',
-    name: 'aws',
-    displayName: 'amazon web services',
-    brandClass: 'aws',
-    logoPath: `${environment.assetsUrl}external-brand/logos/amazon-web-services.svg`
-  },
-  {
-    key: 'oracle',
-    name: 'oracle',
-    displayName: 'ORACLE Cloud Infrastructure',
-    brandClass: 'oracle',
-    logoPath: `${environment.assetsUrl}external-brand/logos/Oracle-cloud 1.svg`
-  }
-];
+// Public Cloud Infrastructure Coverage is rendered as three groups (Compute, Platform Services,
+// Other Services); each group shows one card per public cloud provider that has data.
+export const PUBLIC_CLOUD_COVERAGE_GROUP_ORDER = ['compute', 'platform_services', 'other_services'];
 
-export const PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG: Array<{ key: PublicCloudComputeBreakdownStatKey, name: string }> = [
-  { key: 'virtual_machine', name: 'Virtual Machine' },
-  { key: 'containers', name: 'Containers' },
-  { key: 'kubernetes', name: 'Kubernetes' }
-];
+export const PUBLIC_CLOUD_COVERAGE_GROUP_LABELS: { [key: string]: string } = {
+  compute: 'Compute',
+  platform_services: 'Platform Services - (Database, Storage & Network)',
+  other_services: 'Other Services'
+};
+
+export const PUBLIC_CLOUD_COVERAGE_PROVIDER_ORDER = ['aws', 'azure', 'gcp', 'oci'];
+
+// Coverage cards use the compact brand marks (paired with the provider name text in the header).
+export const PUBLIC_CLOUD_COVERAGE_PROVIDER_LOGOS: { [key: string]: string } = {
+  aws: 'logos/AWS.svg',
+  azure: 'logos/Azure-short.svg',
+  gcp: 'logos/GCP.svg',
+  oci: 'logos/Oracle.svg'
+};
+
+// Performance Hotspots Cloud column uses the full provider logos (mark + wordmark).
+export const PUBLIC_CLOUD_HOTSPOT_PROVIDER_LOGOS: { [key: string]: string } = {
+  aws: 'aws.svg',
+  azure: 'azure.svg',
+  gcp: 'gcp.svg',
+  oci: 'oracle.svg'
+};
+
+export const PUBLIC_CLOUD_COVERAGE_PROVIDER_LABELS: { [key: string]: string } = {
+  aws: 'Amazon Web Service',
+  azure: 'Microsoft Azure',
+  gcp: 'Google Cloud',
+  oci: 'Oracle'
+};
 
 export const PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS = [
   '#6b7ff5',
@@ -177,6 +180,24 @@ export const PUBLIC_CLOUD_STORAGE_DISTRIBUTION_COLORS: Record<string, string> = 
   'file storage': '#28a878',
   'queue storage': '#c77f13',
   'table storage': '#5e4bd0'
+};
+
+// Geo Distribution tile palette (cycled by region index) and tooltip alert-severity colors.
+export const PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS = [
+  '#4a63d6',
+  '#7d5fc4',
+  '#f2a32a',
+  '#33a06a',
+  '#e8554e',
+  '#23a8a0',
+  '#3a9fe0',
+  '#d76aa6'
+];
+
+export const PUBLIC_CLOUD_GEO_ALERT_SEVERITY_COLORS = {
+  critical: '#cc0000',
+  warning: '#ff8800',
+  info: '#378ad8'
 };
 
 // Latency Heatmap cell colors by threshold: <20ms low, 20-80ms medium, >80ms high.

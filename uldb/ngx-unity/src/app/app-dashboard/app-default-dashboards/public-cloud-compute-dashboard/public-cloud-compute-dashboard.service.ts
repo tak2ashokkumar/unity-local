@@ -5,18 +5,26 @@ import { EChartsOption } from 'echarts';
 import * as moment from 'moment';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 import {
   PUBLIC_CLOUD_ACTIVE_DATABASE_WORKLOAD_ENDPOINT,
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
-  PUBLIC_CLOUD_COMPUTE_BREAKDOWN_ENDPOINT,
-  PUBLIC_CLOUD_COMPUTE_BREAKDOWN_PROVIDER_CONFIG,
-  PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG,
+  PUBLIC_CLOUD_COVERAGE_GROUP_LABELS,
+  PUBLIC_CLOUD_COVERAGE_GROUP_ORDER,
+  PUBLIC_CLOUD_COVERAGE_PROVIDER_LABELS,
+  PUBLIC_CLOUD_COVERAGE_PROVIDER_LOGOS,
+  PUBLIC_CLOUD_COVERAGE_PROVIDER_ORDER,
+  PUBLIC_CLOUD_HOTSPOT_PROVIDER_LOGOS,
+  PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT,
   PUBLIC_CLOUD_DATABASE_HEALTH_METRIC_COLORS,
   PUBLIC_CLOUD_DATABASE_HEALTH_SCORE_ENDPOINT,
   PUBLIC_CLOUD_DATABASE_LATENCY_COLORS,
   PUBLIC_CLOUD_DATABASE_LATENCY_OVERVIEW_ENDPOINT,
   PUBLIC_CLOUD_DATABASE_WIDGET_COLORS,
   PUBLIC_CLOUD_FILTERS_ENDPOINT,
+  PUBLIC_CLOUD_GEO_ALERT_SEVERITY_COLORS,
+  PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS,
+  PUBLIC_CLOUD_GEO_DISTRIBUTION_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DURATION_COLORS,
@@ -28,6 +36,7 @@ import {
   PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS,
   PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
   PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT,
+  PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_ENDPOINT,
   PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG,
   PUBLIC_CLOUD_OBJECT_FILE_GROWTH_TREND_ENDPOINT,
   PUBLIC_CLOUD_READ_VS_WRITE_TRAFFIC_ENDPOINT,
@@ -58,14 +67,15 @@ import {
   PublicCloudDatabaseHealthScoreViewData,
   PublicCloudDatabaseMetricItem,
   PublicCloudDatabaseWidgetResponse,
-  PublicCloudComputeBreakdownProvider,
-  PublicCloudComputeBreakdownProviderKey,
+  PublicCloudCoverageCard,
+  PublicCloudCoverageGroup,
+  PublicCloudCoverageRow,
   PublicCloudDashboardFilterCriteria,
   PublicCloudDashboardFilterOptions,
   PublicCloudFilterOption,
   PublicCloudFiltersResponse,
   PublicCloudFilterAccountResponseItem,
-  PublicCloudComputeBreakdownResponse,
+  PublicCloudGeoCell,
   PublicCloudLockContentionResponse,
   PublicCloudLockContentionResponseItem,
   PublicCloudLockContentionRow,
@@ -89,6 +99,10 @@ import {
   PublicCloudOrphanedDevicesByCategoryApiResponse,
   PublicCloudOrphanedDevicesByCategoryResponse,
   PublicCloudOrphanedDevicesResponse,
+  PublicCloudPerformanceHotspotDisk,
+  PublicCloudPerformanceHotspotReadWrite,
+  PublicCloudPerformanceHotspotRow,
+  PublicCloudPerformanceHotspotsResponse,
   PublicCloudProviderDistributionKey,
   PublicCloudPlatform,
   PublicCloudProviderDistributionItem,
@@ -349,48 +363,642 @@ export class PublicCloudComputeDashboardService {
    */
 
   /*
-   * -----Start----- Compute Breakdown Widget Related -------------------
+   * -----Start----- Geo Distribution Widget Related -------------------
    */
-  getComputeBreakdown(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudComputeBreakdownResponse> {
-    return this.http.get<PublicCloudComputeBreakdownResponse>(PUBLIC_CLOUD_COMPUTE_BREAKDOWN_ENDPOINT, {
+  getGeoDistribution(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudGeoCell[]> {
+    return this.http.get(PUBLIC_CLOUD_GEO_DISTRIBUTION_ENDPOINT, {
       params: this.convertFiltersToApiParams(criteria)
-    });
+    }).pipe(map(res => this.getGeoDistributionCells(res)));
   }
 
-  convertToComputeBreakdownViewData(data: PublicCloudComputeBreakdownResponse, criteria?: PublicCloudDashboardFilterCriteria): PublicCloudComputeBreakdownProvider[] {
-    const selectedProviderKeys = this.getComputeBreakdownProviderKeys(criteria);
-    return PUBLIC_CLOUD_COMPUTE_BREAKDOWN_PROVIDER_CONFIG.filter(provider =>
-      (!selectedProviderKeys.length || selectedProviderKeys.includes(provider.key)) &&
-      this.hasComputeBreakdownProviderData(data, provider.key)
-    ).map(provider => ({
-      key: provider.key,
-      name: provider.name,
-      displayName: provider.displayName,
-      brandClass: provider.brandClass,
-      logoPath: provider.logoPath,
-      stats: PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG.map(stat => ({
-        key: stat.key,
-        name: stat.name,
-        value: Number(data?.[provider.key]?.[stat.key] || 0)
-      }))
+  convertToGeoHeatmapOptions(data: PublicCloudGeoCell[]): EChartsOption {
+    return (data || []).length ? this.getGeoHeatmapOptions(data) : {};
+  }
+
+  private getGeoHeatmapOptions(cells: PublicCloudGeoCell[]): EChartsOption {
+    return {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        confine: true,
+        backgroundColor: '#ffffff',
+        borderColor: '#e2e7ec',
+        borderWidth: 1,
+        padding: 0,
+        textStyle: { color: '#55606b' },
+        extraCssText: 'box-shadow: 0 6px 18px rgba(28, 45, 65, 0.18); border-radius: 8px;',
+        formatter: (info: any) => this.getGeoDistributionTooltip(info.data)
+      },
+      grid: {
+        top: 6,
+        right: 8,
+        bottom: 6,
+        left: 8
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        show: false
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        inverse: true,
+        show: false
+      },
+      series: [{
+        type: 'custom',
+        coordinateSystem: 'cartesian2d',
+        clip: false,
+        renderItem: (params: any, api: any) => {
+          const cell = cells[params.dataIndex];
+          const start = api.coord([cell.value[0], cell.value[1]]);
+          const end = api.coord([cell.value[0] + cell.value[2], cell.value[1] + cell.value[3]]);
+          const width = end[0] - start[0];
+          const height = end[1] - start[1];
+          const centerX = start[0] + width / 2;
+          const centerY = start[1] + height / 2;
+          const numberFontSize = Math.max(13, Math.min(24, Math.round(height * 0.3)));
+          const children: any[] = [{
+            type: 'rect',
+            shape: { x: start[0], y: start[1], width, height },
+            style: {
+              fill: cell.color,
+              stroke: '#ffffff',
+              lineWidth: 2,
+              shadowBlur: 4,
+              shadowColor: 'rgba(28, 45, 65, 0.16)'
+            }
+          }];
+
+          // Region name in the top-left corner (only when the tile is large enough to fit it).
+          if (width > 50 && height > 30) {
+            children.push({
+              type: 'text',
+              silent: true,
+              style: {
+                text: cell.name,
+                x: start[0] + 10,
+                y: start[1] + 9,
+                fill: '#ffffff',
+                font: '600 11px Arial',
+                textAlign: 'left',
+                textVerticalAlign: 'top',
+                opacity: 0.95,
+                overflow: 'truncate',
+                width: Math.max(width - 18, 24),
+                textShadowColor: 'rgba(0, 0, 0, 0.18)',
+                textShadowBlur: 2
+              }
+            });
+          }
+
+          // Total Resources value centered as the headline number.
+          children.push({
+            type: 'text',
+            silent: true,
+            style: {
+              text: this.formatNumber(cell.totalResources),
+              x: centerX,
+              y: height > 44 ? centerY - 4 : centerY,
+              fill: '#ffffff',
+              font: `700 ${numberFontSize}px Arial`,
+              textAlign: 'center',
+              textVerticalAlign: 'middle',
+              textShadowColor: 'rgba(0, 0, 0, 0.18)',
+              textShadowBlur: 2
+            }
+          });
+
+          if (height > 44) {
+            children.push({
+              type: 'text',
+              silent: true,
+              style: {
+                text: 'Total Resources',
+                x: centerX,
+                y: centerY + 15,
+                fill: '#ffffff',
+                font: '400 11px Arial',
+                textAlign: 'center',
+                textVerticalAlign: 'middle',
+                opacity: 0.9
+              }
+            });
+          }
+
+          return { type: 'group', children };
+        },
+        data: cells
+      }]
+    };
+  }
+
+  // Rich hover popup: resources + alert severities (colored) + service breakdown for a region.
+  private getGeoDistributionTooltip(cell: PublicCloudGeoCell): string {
+    if (!cell) {
+      return '';
+    }
+    const severityColors = PUBLIC_CLOUD_GEO_ALERT_SEVERITY_COLORS;
+    const neutralIconColor = '#7a8794';
+    const neutralValueColor = '#1f2a34';
+    const row = (icon: string, iconColor: string, label: string, value: number, valueColor: string) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
+          <i class="fa ${icon}" style="width:14px;text-align:center;font-size:12px;color:${iconColor};"></i>${label}
+        </span>
+        <span style="font-weight:600;color:${valueColor};">${this.formatNumber(value)}</span>
+      </div>`;
+
+    return `<div style="min-width:216px;padding:11px 13px;font:12px/1.4 Arial;color:#5b6671;">
+      <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:#23303c;margin-bottom:8px;">
+        <span style="width:9px;height:9px;border-radius:50%;background:${cell.color};display:inline-block;"></span>${cell.name}
+      </div>
+      ${row('fa-th-large', '#3aa76d', 'Total Resources', cell.totalResources, neutralValueColor)}
+      ${row('fa-bell', '#378ad8', 'Total Alerts', cell.totalAlerts, neutralValueColor)}
+      ${row('fa-times-circle', severityColors.critical, 'Critical Alerts', cell.critical, severityColors.critical)}
+      ${row('fa-exclamation-triangle', severityColors.warning, 'Warning Alerts', cell.warning, severityColors.warning)}
+      ${row('fa-info-circle', severityColors.info, 'Information Alerts', cell.information, severityColors.info)}
+      <div style="border-top:1px solid #e8edf1;margin:6px 0;"></div>
+      ${row('fa-desktop', neutralIconColor, 'Compute Count', cell.computeCount, neutralValueColor)}
+      ${row('fa-cubes', neutralIconColor, 'Platform Services', cell.platformServices, neutralValueColor)}
+      ${row('fa-clone', neutralIconColor, 'Other Services', cell.otherServices, neutralValueColor)}
+    </div>`;
+  }
+
+  private getGeoDistributionCells(response: any): PublicCloudGeoCell[] {
+    const payload = this.getGeoDistributionPayload(response);
+    const items = this.getGeoDistributionItems(payload).slice(0, 12);
+    if (!items.length) {
+      return [];
+    }
+
+    const layout = this.getTreemapCells(items.map(item => item.totalResources), { x: 0, y: 0, width: 100, height: 100 });
+    return items.map((item, index) => ({
+      name: item.name,
+      color: PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS[index % PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS.length],
+      value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height],
+      totalResources: item.totalResources,
+      totalAlerts: item.totalAlerts,
+      critical: item.critical,
+      warning: item.warning,
+      information: item.information,
+      computeCount: item.computeCount,
+      platformServices: item.platformServices,
+      otherServices: item.otherServices
     }));
   }
 
-  private getComputeBreakdownProviderKeys(criteria?: PublicCloudDashboardFilterCriteria): PublicCloudComputeBreakdownProviderKey[] {
-    return this.getSelectedValues(criteria?.platforms || []).map(platform => {
-      const normalizedPlatform = this.normalizePlatformValue(platform);
-      if (normalizedPlatform === 'gcp') {
-        return 'google_cloud';
+  private getGeoDistributionPayload(response: any): any {
+    const containerKeys = ['groups', 'heatmap', 'geo_distribution', 'geo_heatmap', 'locations', 'results', 'items', 'rows', 'data'];
+    if (response && typeof response === 'object' && !Array.isArray(response)) {
+      const matchedKey = containerKeys.find(key => response[key] !== undefined && response[key] !== null);
+      if (matchedKey) {
+        return response[matchedKey];
       }
-      return normalizedPlatform === 'oci' ? 'oracle' : normalizedPlatform;
-    }) as PublicCloudComputeBreakdownProviderKey[];
+    }
+    return response;
   }
 
-  private hasComputeBreakdownProviderData(data: PublicCloudComputeBreakdownResponse, providerKey: PublicCloudComputeBreakdownProviderKey): boolean {
-    return PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG.some(stat => Number(data?.[providerKey]?.[stat.key] || 0) > 0);
+  private getGeoDistributionItems(payload: any): Array<{ name: string; totalResources: number; totalAlerts: number; critical: number; warning: number; information: number; computeCount: number; platformServices: number; otherServices: number }> {
+    const source = Array.isArray(payload) ? payload : Object.keys(payload || {}).map(key => ({
+      name: key,
+      ...(payload[key] || {})
+    }));
+
+    return source
+      .filter(item => item && typeof item === 'object')
+      .map(item => {
+        const name = String(item.name || item.location || item.datacenter || item.region || item.city || 'Unknown');
+        const critical = this.getNumberFromPayload(item, ['critical_alerts', 'criticalAlerts', 'critical']);
+        const warning = this.getNumberFromPayload(item, ['warning_alerts', 'warningAlerts', 'warning', 'warnings']);
+        const information = this.getNumberFromPayload(item, ['information_alerts', 'informationAlerts', 'information', 'info', 'informative']);
+        const totalAlerts = this.getNumberFromPayload(item, ['total_alerts', 'totalAlerts'], critical + warning + information);
+        const computeCount = this.getNumberFromPayload(item, ['compute_count', 'computeCount', 'compute']);
+        const platformServices = this.getNumberFromPayload(item, ['platform_services', 'platformServices', 'platform']);
+        const otherServices = this.getNumberFromPayload(item, ['other_services', 'otherServices', 'other']);
+        const totalResources = this.getNumberFromPayload(item, ['total_resources', 'totalResources', 'total', 'count'], computeCount + platformServices + otherServices);
+
+        return { name, totalResources, totalAlerts, critical, warning, information, computeCount, platformServices, otherServices };
+      })
+      .filter(item => item.name && item.totalResources > 0)
+      .sort((first, second) => second.totalResources - first.totalResources);
+  }
+
+  // Squarified treemap: lays cells (sized by weight) into the bounds, keeping aspect ratios close to square.
+  private getTreemapCells(weights: number[], bounds: { x: number; y: number; width: number; height: number }): Array<{ x: number; y: number; width: number; height: number }> {
+    const cells: Array<{ x: number; y: number; width: number; height: number }> = new Array(weights.length);
+    let remainingWeight = (weights || []).reduce((sum, weight) => sum + weight, 0);
+    let free = { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height };
+    let index = 0;
+
+    const worstRatio = (areas: number[], side: number): number => {
+      const sum = areas.reduce((total, area) => total + area, 0);
+      if (sum <= 0 || side <= 0) {
+        return Infinity;
+      }
+      const max = Math.max(...areas);
+      const min = Math.min(...areas);
+      return Math.max((side * side * max) / (sum * sum), (sum * sum) / (side * side * min));
+    };
+
+    while (index < weights.length && remainingWeight > 0) {
+      const freeArea = free.width * free.height;
+      if (freeArea <= 0) {
+        break;
+      }
+      const side = Math.min(free.width, free.height);
+      const rowAreas: number[] = [];
+      const rowIndices: number[] = [];
+      let cursor = index;
+
+      while (cursor < weights.length) {
+        const area = (weights[cursor] / remainingWeight) * freeArea;
+        if (rowAreas.length && worstRatio([...rowAreas, area], side) > worstRatio(rowAreas, side)) {
+          break;
+        }
+        rowAreas.push(area);
+        rowIndices.push(cursor);
+        cursor++;
+      }
+
+      const rowArea = rowAreas.reduce((total, area) => total + area, 0);
+      if (free.width >= free.height) {
+        const stripWidth = rowArea / free.height;
+        let offsetY = free.y;
+        rowIndices.forEach((itemIndex, position) => {
+          const cellHeight = (rowAreas[position] / rowArea) * free.height;
+          cells[itemIndex] = { x: free.x, y: offsetY, width: stripWidth, height: cellHeight };
+          offsetY += cellHeight;
+        });
+        free = { x: free.x + stripWidth, y: free.y, width: free.width - stripWidth, height: free.height };
+      } else {
+        const stripHeight = rowArea / free.width;
+        let offsetX = free.x;
+        rowIndices.forEach((itemIndex, position) => {
+          const cellWidth = (rowAreas[position] / rowArea) * free.width;
+          cells[itemIndex] = { x: offsetX, y: free.y, width: cellWidth, height: stripHeight };
+          offsetX += cellWidth;
+        });
+        free = { x: free.x, y: free.y + stripHeight, width: free.width, height: free.height - stripHeight };
+      }
+
+      rowIndices.forEach(itemIndex => { remainingWeight -= weights[itemIndex]; });
+      index = cursor;
+    }
+
+    for (let i = 0; i < weights.length; i++) {
+      if (!cells[i]) {
+        cells[i] = { x: free.x, y: free.y, width: 0, height: 0 };
+      }
+    }
+    return cells;
+  }
+
+  /*
+   * ******End ****** Geo Distribution Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Public Cloud Infrastructure Coverage Widget Related -------------------
+   */
+  getPublicCloudCoverage(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudCoverageGroup[]> {
+    return this.http.get(PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    }).pipe(map(res => this.getCoverageGroups(res)));
+  }
+
+  convertToCoverageGroupsViewData(data: PublicCloudCoverageGroup[]): PublicCloudCoverageGroup[] {
+    return data || [];
+  }
+
+  getCoverageGroupsResourceTotal(groups: PublicCloudCoverageGroup[]): string {
+    const total = (groups || []).reduce((sum, group) => sum + this.getNumberValue(group.totalLabel), 0);
+    return this.formatNumber(total);
+  }
+
+  private getCoverageGroups(response: any): PublicCloudCoverageGroup[] {
+    const containers = [response, response?.data, response?.result, response?.results]
+      .filter(container => container && typeof container === 'object' && !Array.isArray(container));
+    const container = containers.find(item => PUBLIC_CLOUD_COVERAGE_GROUP_ORDER.some(key => item[key])) || response;
+    if (!container || typeof container !== 'object') {
+      return [];
+    }
+    return PUBLIC_CLOUD_COVERAGE_GROUP_ORDER
+      .map(groupKey => this.getCoverageGroupFromPayload(groupKey, container[groupKey]))
+      .filter((group): group is PublicCloudCoverageGroup => !!group && group.cards.length > 0);
+  }
+
+  private getCoverageGroupFromPayload(groupKey: string, groupPayload: any): PublicCloudCoverageGroup | null {
+    if (!groupPayload || typeof groupPayload !== 'object' || Array.isArray(groupPayload)) {
+      return null;
+    }
+    const providersPayload = groupPayload.providers || groupPayload.clouds || groupPayload;
+    const cards = PUBLIC_CLOUD_COVERAGE_PROVIDER_ORDER
+      .map(providerKey => this.getCoverageProviderCard(providerKey, providersPayload[providerKey]))
+      .filter((card): card is PublicCloudCoverageCard => !!card);
+    if (!cards.length) {
+      return null;
+    }
+
+    const cardTotal = cards.reduce((sum, card) => sum + this.getNumberValue(card.totalResources), 0);
+    const total = this.getNumberFromPayload(groupPayload, ['total_resources', 'totalResources', 'total', 'count'], cardTotal);
+    return {
+      key: groupKey,
+      title: PUBLIC_CLOUD_COVERAGE_GROUP_LABELS[groupKey] || groupPayload.name || this.getReadableCoverageLabel(groupKey),
+      totalLabel: this.formatNumber(total),
+      cards,
+      showChart: cards.length === 1
+    };
+  }
+
+  private getCoverageProviderCard(providerKey: string, providerPayload: any): PublicCloudCoverageCard | null {
+    if (!providerPayload || typeof providerPayload !== 'object' || Array.isArray(providerPayload)) {
+      return null;
+    }
+    const rows = this.getCoverageServiceRows(providerKey, providerPayload.services || providerPayload.service_types || providerPayload.serviceTypes);
+    const rowTotal = rows.reduce((sum, row) => sum + this.getNumberValue(row.value), 0);
+    const total = this.getNumberFromPayload(providerPayload, ['total_resources', 'totalResources', 'total', 'count'], rowTotal);
+    // Drop providers with no data so a customer with fewer clouds (e.g. no OCI) shows fewer cards.
+    if (!rows.length && total <= 0) {
+      return null;
+    }
+    return {
+      title: PUBLIC_CLOUD_COVERAGE_PROVIDER_LABELS[providerKey] || this.getReadableCoverageLabel(providerKey),
+      logo: this.getCoverageProviderLogo(providerKey),
+      rows,
+      totalResources: this.formatNumber(total),
+      chartOptions: this.getCoverageChartOptions(rows)
+    };
+  }
+
+  // A service entry is either a scalar count ("EC2": 26) or an object that also carries icon_path
+  // ("EC2": { count: 26, icon_path: "Compute/EC2" }). The icon renders only when icon_path is present.
+  private getCoverageServiceRows(providerKey: string, servicesPayload: any): PublicCloudCoverageRow[] {
+    if (!servicesPayload || typeof servicesPayload !== 'object' || Array.isArray(servicesPayload)) {
+      return [];
+    }
+    return Object.keys(servicesPayload)
+      .map(key => {
+        const entry = servicesPayload[key];
+        const isObject = entry && typeof entry === 'object' && !Array.isArray(entry);
+        const count = isObject
+          ? this.getNumberFromPayload(entry, ['count', 'value', 'resource_count', 'resourceCount', 'total'])
+          : this.getNumberValue(entry);
+        const iconPath = isObject
+          ? this.getCoverageServiceIconPath(providerKey, this.getFirstStringValue(entry, ['icon_path', 'iconPath']))
+          : '';
+        const row: PublicCloudCoverageRow = { label: this.getReadableCoverageLabel(key), value: this.formatNumber(count) };
+        if (iconPath) {
+          row.iconPath = iconPath;
+        }
+        return { row, count };
+      })
+      .filter(item => item.count > 0)
+      .sort((first, second) => second.count - first.count)
+      .map(item => item.row);
+  }
+
+  // Mirrors how the public cloud summary pages build service icons from the API icon_path.
+  private getCoverageServiceIconPath(providerKey: string, iconPath: string): string {
+    const normalizedIconPath = String(iconPath || '').trim();
+    if (!normalizedIconPath) {
+      return '';
+    }
+    const base = `${environment.assetsUrl}external-brand`;
+    switch (providerKey) {
+      case 'aws':
+        return `${base}/aws/${normalizedIconPath}.svg`;
+      case 'azure':
+        return `${base}/azure/Icons/${normalizedIconPath}.svg`;
+      case 'gcp':
+        return `${base}/gcp/${normalizedIconPath}.svg`;
+      case 'oci':
+        // Oracle icon_path values already include the file extension.
+        return `${base}/oracle/${normalizedIconPath}`;
+      default:
+        return '';
+    }
+  }
+
+  private getCoverageProviderLogo(providerKey: string): string {
+    const logo = PUBLIC_CLOUD_COVERAGE_PROVIDER_LOGOS[providerKey];
+    return logo ? `${environment.assetsUrl}external-brand/${logo}` : '';
+  }
+
+  private getCoverageChartOptions(rows: Array<{ label: string; value: string }>): EChartsOption {
+    const data = (rows || [])
+      .map((row, index) => ({
+        name: row.label,
+        value: this.getNumberValue(row.value),
+        itemStyle: { color: PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS[index % PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS.length] }
+      }))
+      .filter(item => item.value > 0);
+
+    if (!data.length) {
+      return {};
+    }
+
+    const categoryLabels = data.map(item => item.name);
+    // Keep bars readable: when there are many resource types, show a window with a scroll/zoom slider.
+    const visibleBarCount = 12;
+    const enableZoom = data.length > visibleBarCount;
+    const zoomEndPercent = Math.min(100, (visibleBarCount / data.length) * 100);
+
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: '{b}: {c}'
+      },
+      grid: { left: 8, right: 16, top: 18, bottom: enableZoom ? 30 : 8, containLabel: true },
+      dataZoom: enableZoom ? [
+        { type: 'inside', start: 0, end: zoomEndPercent },
+        { type: 'slider', start: 0, end: zoomEndPercent, height: 14, bottom: 4, brushSelect: false }
+      ] : undefined,
+      xAxis: {
+        type: 'category',
+        data: categoryLabels,
+        axisLabel: {
+          fontSize: 11,
+          color: '#5b6570',
+          interval: 0,
+          rotate: categoryLabels.length > 4 ? 30 : 0
+        }
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: { fontSize: 11, color: '#5b6570' },
+        splitLine: { lineStyle: { color: '#d6dce2', type: 'dashed' } }
+      },
+      series: [
+        {
+          name: 'Resource Distribution',
+          type: 'bar',
+          barMaxWidth: 34,
+          data,
+          itemStyle: { borderRadius: [3, 3, 0, 0] }
+        }
+      ]
+    };
+  }
+
+  private getReadableCoverageLabel(label: string): string {
+    const labelMap: { [key: string]: string } = {
+      vm: 'VMs',
+      hypervisor: 'Hyper-V Hosts',
+      database: 'Databases',
+      vpc: 'VPC',
+      vcn: 'VCN',
+      eip: 'EIP',
+      dbclustersnapshot: 'DB Cluster Snapshot',
+      dbsnapshot: 'DB Snapshot',
+      dhcpoptions: 'DHCP Options'
+    };
+    const normalizedLabel = this.normalizeKey(label);
+
+    if (labelMap[normalizedLabel]) {
+      return labelMap[normalizedLabel];
+    }
+
+    return String(label || '')
+      .replace(/_/g, ' ')
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, letter => letter.toUpperCase());
+  }
+
+  private getNumberFromPayload(payload: { [key: string]: any }, keys: string[], fallback = 0): number {
+    const normalizedPayload = this.getNormalizedPayload(payload || {});
+    for (const key of keys) {
+      const normalizedKey = this.normalizeKey(key);
+      if (normalizedPayload[normalizedKey] !== undefined && normalizedPayload[normalizedKey] !== null) {
+        return this.getNumberValue(normalizedPayload[normalizedKey], fallback);
+      }
+    }
+    return fallback;
+  }
+
+  private getFirstStringValue(payload: { [key: string]: any }, keys: string[]): string {
+    const normalizedPayload = this.getNormalizedPayload(payload || {});
+    for (const key of keys || []) {
+      const normalizedKey = this.normalizeKey(key);
+      if (normalizedPayload[normalizedKey] !== undefined && normalizedPayload[normalizedKey] !== null && normalizedPayload[normalizedKey] !== '') {
+        return String(normalizedPayload[normalizedKey]);
+      }
+    }
+    return '';
+  }
+
+  private getNumberValue(value: any, fallback = 0): number {
+    const normalizedValue = typeof value === 'string' ? value.replace(/,/g, '') : value;
+    const numericValue = Number(normalizedValue);
+    if (!isNaN(numericValue)) {
+      return numericValue;
+    }
+    const displayNumericValue = typeof value === 'string' ? Number(value.replace(/[^0-9.-]/g, '')) : NaN;
+    return isNaN(displayNumericValue) ? fallback : displayNumericValue;
+  }
+
+  private getNormalizedPayload(payload: { [key: string]: any }): { [key: string]: any } {
+    return Object.keys(payload || {}).reduce((result: { [key: string]: any }, key) => {
+      result[this.normalizeKey(key)] = payload[key];
+      return result;
+    }, {});
+  }
+
+  private normalizeKey(key: string): string {
+    return String(key || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
   }
   /*
-   * ******End ****** Compute Breakdown Widget Related ********************
+   * ******End ****** Public Cloud Infrastructure Coverage Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Performance Hotspots Widget Related -------------------
+   */
+  getPerformanceHotspots(criteria: PublicCloudDashboardFilterCriteria | undefined, sort: string): Observable<PublicCloudPerformanceHotspotRow[]> {
+    const params = this.convertFiltersToApiParams(criteria).set('sort', sort);
+    return this.http.get<PublicCloudPerformanceHotspotsResponse>(PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_ENDPOINT, { params })
+      .pipe(map(res => this.convertToPerformanceHotspotRows(res)));
+  }
+
+  convertToPerformanceHotspotRows(data: PublicCloudPerformanceHotspotsResponse): PublicCloudPerformanceHotspotRow[] {
+    const rows = data?.data || data?.results || data?.items || [];
+    return (rows || []).map(item => {
+      const cloud = this.getFirstValue(item.cloud, item.provider, item.cloud_type);
+      const cpu = this.getFirstNumericValue(item.cpu_utilization, item.cpu_vcpus) || 0;
+      const memory = this.getFirstNumericValue(item.available_memory, item.available_memory_gb) || 0;
+      return {
+        instanceName: this.getFirstValue(item.name, item.instance_name, item.instanceName),
+        cloud,
+        cloudLogo: this.getHotspotCloudLogo(cloud),
+        cpuLabel: `${this.formatNumber(cpu)} vCPUs`,
+        memoryLabel: `${this.formatNumber(memory)} GB`,
+        disk: this.convertToHotspotDisk(item.disk_utilization || item.disk_size),
+        dataDiskBytes: this.getHotspotReadWrite(item.data_disk_read_write_bytes?.read, item.data_disk_read_write_bytes?.write, 'Read: ', 'Write: ', ''),
+        dataDiskRates: this.getHotspotReadWrite(item.data_disk_read_write_rates?.read_ops, item.data_disk_read_write_rates?.write_ops, 'Read Ops: ', 'Write Ops: ', ' /s'),
+        networkTraffic: this.getFirstValue(item.avg_network_traffic, item.network_traffic)
+      };
+    }).filter(row => !!row.instanceName);
+  }
+
+  private convertToHotspotDisk(disk?: { capacity?: string | number; used?: string | number; free?: string | number }): PublicCloudPerformanceHotspotDisk | null {
+    if (!disk || typeof disk !== 'object') {
+      return null;
+    }
+    const capacity = this.getFirstValue(disk.capacity);
+    const used = this.getFirstValue(disk.used);
+    const freeValue = this.getFirstNumericValue(disk.free);
+    if (!capacity && !used && freeValue === null) {
+      return null;
+    }
+    const free = freeValue === null ? 0 : Math.max(Math.min(freeValue, 100), 0);
+    const usedPercent = Math.max(Math.min(100 - free, 100), 0);
+    return {
+      capacityLabel: capacity,
+      usedLabel: used,
+      freeLabel: `${this.formatNumber(free)}%`,
+      usedPercent,
+      tone: this.getHotspotDiskTone(usedPercent)
+    };
+  }
+
+  private getHotspotReadWrite(read: string | number | undefined, write: string | number | undefined, readPrefix: string, writePrefix: string, suffix: string): PublicCloudPerformanceHotspotReadWrite | null {
+    const readValue = this.getFirstValue(read);
+    const writeValue = this.getFirstValue(write);
+    if (!readValue && !writeValue) {
+      return null;
+    }
+    return {
+      readLabel: readValue ? `${readPrefix}${this.formatHotspotMetric(readValue)}${suffix}` : '',
+      writeLabel: writeValue ? `${writePrefix}${this.formatHotspotMetric(writeValue)}${suffix}` : ''
+    };
+  }
+
+  // Thousands-separate bare numbers (e.g. ops counts); leave values that already carry units as-is.
+  private formatHotspotMetric(value: string | number): string {
+    const numericValue = this.getFirstNumericValue(value);
+    return numericValue !== null && !/[a-z%/]/i.test(String(value)) ? this.formatNumber(numericValue) : this.getFirstValue(value);
+  }
+
+  private getHotspotCloudLogo(cloud: string): string {
+    const logo = PUBLIC_CLOUD_HOTSPOT_PROVIDER_LOGOS[this.normalizePlatformValue(cloud)];
+    return logo ? `${environment.assetsUrl}external-brand/${logo}` : '';
+  }
+
+  private getHotspotDiskTone(usedPercent: number): PublicCloudStatusTone {
+    if (usedPercent <= 50) {
+      return 'success';
+    }
+    return usedPercent <= 80 ? 'warning' : 'danger';
+  }
+  /*
+   * ******End ****** Performance Hotspots Widget Related ********************
    */
 
   /*

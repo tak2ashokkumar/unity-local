@@ -1,3 +1,5 @@
+import { EChartsOption } from 'echarts';
+
 export type PublicCloudPlatform = 'aws' | 'azure' | 'gcp' | 'oracle' | 'oci';
 export type PublicCloudStatusTone = 'primary' | 'success' | 'warning' | 'danger' | 'muted';
 
@@ -46,7 +48,7 @@ export interface PublicCloudSummaryMetric {
   tone?: PublicCloudStatusTone;
 }
 
-export type PublicCloudInventorySummaryKey = 'cloud_accounts' | 'active_regions' | 'vms' | 'services' | 'running_resources' | 'stopped_resources';
+export type PublicCloudInventorySummaryKey = 'cloud_accounts' | 'active_regions' | 'vms' | 'services' | 'running_resources' | 'stopped_resources' | 'orphaned_vms' | 'idle_vms';
 export type PublicCloudProviderDistributionKey = 'aws' | 'azure' | 'gcp' | 'oci';
 
 export interface PublicCloudInventorySummaryResponse {
@@ -76,23 +78,97 @@ export interface PublicCloudTagItem {
   backgroundColor: string;
 }
 
-export type PublicCloudComputeBreakdownProviderKey = 'google_cloud' | 'azure' | 'aws' | 'oracle';
-export type PublicCloudComputeBreakdownStatKey = 'virtual_machine' | 'containers' | 'kubernetes';
-export type PublicCloudComputeBreakdownResponse = Partial<Record<PublicCloudComputeBreakdownProviderKey, Partial<Record<PublicCloudComputeBreakdownStatKey, number>>>>;
-
-export interface PublicCloudComputeBreakdownProvider {
-  key: PublicCloudComputeBreakdownProviderKey;
+export interface PublicCloudGeoCell {
   name: string;
-  displayName: string;
-  brandClass: string;
-  logoPath: string;
-  stats: PublicCloudComputeBreakdownStat[];
+  color: string;
+  value: number[];
+  totalResources: number;
+  totalAlerts: number;
+  critical: number;
+  warning: number;
+  information: number;
+  computeCount: number;
+  platformServices: number;
+  otherServices: number;
 }
 
-export interface PublicCloudComputeBreakdownStat {
-  key: PublicCloudComputeBreakdownStatKey;
-  name: string;
-  value: number;
+export interface PublicCloudCoverageRow {
+  label: string;
+  value: string;
+  iconPath?: string;
+}
+
+export interface PublicCloudCoverageCard {
+  title: string;
+  logo?: string;
+  rows: PublicCloudCoverageRow[];
+  totalResources?: string;
+  chartOptions?: EChartsOption;
+}
+
+export interface PublicCloudCoverageGroup {
+  key: string;
+  title: string;
+  totalLabel: string;
+  cards: PublicCloudCoverageCard[];
+  showChart: boolean;
+}
+
+export interface PublicCloudPerformanceHotspotReadWrite {
+  readLabel: string;
+  writeLabel: string;
+}
+
+export interface PublicCloudPerformanceHotspotDisk {
+  capacityLabel: string;
+  usedLabel: string;
+  freeLabel: string;
+  usedPercent: number;
+  tone: PublicCloudStatusTone;
+}
+
+export interface PublicCloudPerformanceHotspotRow {
+  instanceName: string;
+  cloud: string;
+  cloudLogo: string;
+  cpuLabel: string;
+  memoryLabel: string;
+  disk: PublicCloudPerformanceHotspotDisk | null;
+  dataDiskBytes: PublicCloudPerformanceHotspotReadWrite | null;
+  dataDiskRates: PublicCloudPerformanceHotspotReadWrite | null;
+  networkTraffic: string;
+}
+
+export interface PublicCloudPerformanceHotspotDiskResponse {
+  capacity?: string | number;
+  used?: string | number;
+  free?: string | number;
+}
+
+export interface PublicCloudPerformanceHotspotResponseItem {
+  name?: string;
+  instance_name?: string;
+  instanceName?: string;
+  cloud?: string;
+  provider?: string;
+  cloud_type?: string;
+  cpu_utilization?: string | number;
+  cpu_vcpus?: string | number;
+  available_memory?: string | number;
+  available_memory_gb?: string | number;
+  disk_utilization?: PublicCloudPerformanceHotspotDiskResponse;
+  disk_size?: PublicCloudPerformanceHotspotDiskResponse;
+  data_disk_read_write_bytes?: { read?: string | number; write?: string | number };
+  data_disk_read_write_rates?: { read_ops?: string | number; write_ops?: string | number };
+  avg_network_traffic?: string | number;
+  network_traffic?: string | number;
+}
+
+export interface PublicCloudPerformanceHotspotsResponse {
+  data?: PublicCloudPerformanceHotspotResponseItem[];
+  results?: PublicCloudPerformanceHotspotResponseItem[];
+  items?: PublicCloudPerformanceHotspotResponseItem[];
+  selected_metric?: string;
 }
 
 export interface PublicCloudDatabaseMetricItem {

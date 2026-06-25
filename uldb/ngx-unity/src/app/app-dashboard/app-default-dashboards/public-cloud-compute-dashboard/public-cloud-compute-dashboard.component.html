@@ -80,7 +80,10 @@
     <div class="dashboard-content" *ngIf="filterForm && !filtersUnavailable">
         <div class="dashboard-no-data-state" *ngIf="!hasAnyDashboardWidget">No data available</div>
         <ng-container *ngIf="hasAnyDashboardWidget">
-        <div class="section-title" *ngIf="hasInventoryWidgets">Executive Summary / Cloud Inventory</div>
+        <div class="inventory-section-header" *ngIf="hasInventoryWidgets">
+            <div class="section-title mb-0">Executive Summary / Cloud Inventory</div>
+            <div class="inventory-note">*The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring Within The Selected Time Range</div>
+        </div>
         <div class="dashboard-card inventory-card" *ngIf="hasInventoryWidgets">
             <div class="summary-metrics" *ngIf="hasSummaryMetrics">
                 <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
@@ -90,50 +93,210 @@
                     <div class="metric-value" [ngClass]="{'metric-primary': first}">{{metric.value}}</div>
                 </div>
             </div>
-            <div class="inventory-grid" *ngIf="hasProviderDistribution || hasTags">
+            <div class="inventory-grid">
                 <div class="provider-panel">
-                    <div class="provider-distribution-panel" *ngIf="hasProviderDistribution">
+                    <div class="provider-distribution-panel">
                         <app-spinner [name]="loaderNames.providerDistribution" [width]="0"></app-spinner>
                         <div class="widget-title">Cloud Provider Distribution</div>
-                        <div echarts [options]="providerDistributionOptions" (chartInit)="onProviderDistributionChartInit($event)"
-                            class="provider-chart chart-click-target"></div>
-                        <div class="provider-legend">
-                            <button type="button" class="legend-item legend-link"
-                                *ngFor="let provider of providerDistribution; trackBy: trackByIndex"
-                                (click)="openProviderDistribution(provider)"
-                                [tooltip]="'Open linked page'" container="body">
-                                <span class="legend-dot" [style.background]="provider.color"></span>
-                                {{provider.name}} {{provider.value}}%
-                            </button>
-                        </div>
+                        <ng-container *ngIf="hasProviderDistributionData; else providerNoData">
+                            <div echarts [options]="providerDistributionOptions" (chartInit)="onProviderDistributionChartInit($event)"
+                                class="provider-chart chart-click-target"></div>
+                            <div class="provider-legend">
+                                <button type="button" class="legend-item legend-link"
+                                    *ngFor="let provider of providerDistribution; trackBy: trackByIndex"
+                                    (click)="openProviderDistribution(provider)"
+                                    [tooltip]="'Open linked page'" container="body">
+                                    <span class="legend-dot" [style.background]="provider.color"></span>
+                                    {{provider.name}} {{provider.value}}%
+                                </button>
+                            </div>
+                        </ng-container>
+                        <ng-template #providerNoData>
+                            <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No Cloud Provider Distribution data available</div>
+                        </ng-template>
                     </div>
-                    <div class="tags-panel" *ngIf="hasTags">
+                    <div class="tags-panel">
                         <app-spinner [name]="loaderNames.tags" [width]="0"></app-spinner>
                         <div class="tags-title">Tags</div>
-                        <div class="tag-list" *ngIf="tags.length">
-                            <span class="tag-chip" *ngFor="let tag of tags; trackBy: trackByIndex"
-                                [style.color]="tag.textColor" [style.background]="tag.backgroundColor">
-                                {{tag.name}} {{tag.count}}
-                            </span>
+                        <ng-container *ngIf="tags.length; else tagsNoData">
+                            <div class="tag-list">
+                                <span class="tag-chip" *ngFor="let tag of tags; trackBy: trackByIndex"
+                                    [style.color]="tag.textColor" [style.background]="tag.backgroundColor">
+                                    {{tag.name}} {{tag.count}}
+                                </span>
+                            </div>
+                        </ng-container>
+                        <ng-template #tagsNoData>
+                            <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No Tags data available for Tags</div>
+                        </ng-template>
+                    </div>
+                </div>
+                <div class="inventory-geo-panel">
+                    <app-spinner [name]="loaderNames.geoDistribution" [width]="0"></app-spinner>
+                    <div class="widget-title">Geo Distribution</div>
+                    <ng-container *ngIf="hasGeoDistributionData; else geoNoData">
+                        <div echarts [options]="geoHeatmapOptions" (chartInit)="onGeoDistributionChartInit($event)"
+                            class="geo-chart chart-click-target"></div>
+                    </ng-container>
+                    <ng-template #geoNoData>
+                        <div class="inventory-widget-empty" *ngIf="!widgetLoading.geoDistribution">No Region wise data available for Geo Distribution</div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title" *ngIf="hasPublicCloudCoverage">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources</div>
+        <div class="dashboard-card public-coverage-card" *ngIf="hasPublicCloudCoverage">
+            <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
+            <div class="coverage-group" *ngFor="let group of publicCloudCoverageGroups; trackBy: trackByIndex">
+                <div class="coverage-group-header">
+                    <span class="coverage-group-badge">{{group.totalLabel}}</span>
+                    <span class="coverage-group-title">{{group.title}}</span>
+                </div>
+                <div class="coverage-grid public-grid">
+                    <div class="coverage-card" *ngFor="let provider of group.cards; trackBy: trackByIndex"
+                        [ngClass]="{'coverage-card-with-chart': group.showChart}">
+                        <div class="coverage-card-head d-flex align-items-center">
+                            <img class="coverage-provider-logo" *ngIf="provider.logo" [src]="provider.logo"
+                                [alt]="provider.title" />
+                            <span class="coverage-provider-name">{{provider.title}}</span>
+                            <button type="button" class="btn btn-link p-0 coverage-link coverage-provider-total"
+                                *ngIf="canOpenPublicCloudProvider(provider); else publicCoverageTotalText"
+                                (click)="openPublicCloudProvider(provider)" [tooltip]="'Open linked page'"
+                                placement="top" container="body">
+                                {{provider.totalResources}}
+                            </button>
+                            <ng-template #publicCoverageTotalText>
+                                <span class="coverage-provider-total">{{provider.totalResources}}</span>
+                            </ng-template>
+                        </div>
+                        <div class="d-flex coverage-card-body">
+                            <div class="coverage-rows-col">
+                                <div class="coverage-col-head">
+                                    <span>Service Name</span>
+                                    <span>Resource Count</span>
+                                </div>
+                                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
+                                    <span class="coverage-row-label">
+                                        <img class="coverage-row-icon" *ngIf="row.iconPath" [src]="row.iconPath"
+                                            [alt]="row.label" />
+                                        <span class="coverage-row-name">{{row.label}}</span>
+                                    </span>
+                                    <button type="button" class="btn btn-link p-0 coverage-link coverage-row-count"
+                                        *ngIf="canOpenPublicCloudProvider(provider); else publicCoverageCountText"
+                                        (click)="openPublicCloudProvider(provider)" [tooltip]="'Open linked page'"
+                                        placement="top" container="body">
+                                        {{row.value}}
+                                    </button>
+                                    <ng-template #publicCoverageCountText>
+                                        <strong class="coverage-row-count">{{row.value}}</strong>
+                                    </ng-template>
+                                </div>
+                            </div>
+                            <div class="coverage-chart-col"
+                                *ngIf="group.showChart && hasChartData(provider.chartOptions)">
+                                <div echarts [options]="provider.chartOptions" class="coverage-resource-chart">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="section-title" *ngIf="hasComputeBreakdown">Compute Breakdown</div>
-        <div class="dashboard-card compute-card" *ngIf="hasComputeBreakdown">
-            <app-spinner [name]="loaderNames.computeBreakdown" [width]="0"></app-spinner>
-            <div class="compute-provider" *ngFor="let provider of computeBreakdown; trackBy: trackByIndex">
-                <div class="provider-brand" [ngClass]="provider.brandClass">
-                    <img class="provider-logo" [src]="provider.logoPath" [alt]="provider.displayName">
-                </div>
-                <div class="compute-row" *ngFor="let stat of provider.stats; trackBy: trackByIndex">
-                    <button type="button" class="stat-link" (click)="openComputeStat(provider, stat)"
-                        [tooltip]="'Open linked page'" container="body">{{stat.name}}</button>
-                    <span>{{stat.value}}</span>
-                </div>
+        <div class="section-title" *ngIf="showPerformanceHotspots">{{performanceHotspotsHeading}}</div>
+        <div class="dashboard-card performance-hotspots-card" *ngIf="showPerformanceHotspots">
+            <app-spinner [name]="loaderNames.performanceHotspots" [width]="0"></app-spinner>
+            <ng-container *ngIf="performanceHotspots.length; else hotspotsNoData">
+            <div class="hotspots-legend">
+                <span><i class="hotspot-legend-dot legend-success"></i>Healthy / Low Utilization (0&ndash;50%)</span>
+                <span><i class="hotspot-legend-dot legend-warning"></i>Warning / Moderate Utilization (51&ndash;80%)</span>
+                <span><i class="hotspot-legend-dot legend-danger"></i>Critical / High Utilization (81&ndash;100%)</span>
             </div>
+            <div class="hotspots-table-wrap">
+                <table class="table table-sm performance-hotspots-table mb-0">
+                    <colgroup>
+                        <col class="hotspot-instance-col">
+                        <col class="hotspot-cloud-col">
+                        <col class="hotspot-metric-col">
+                        <col class="hotspot-metric-col">
+                        <col class="hotspot-disk-col">
+                        <col class="hotspot-rw-col">
+                        <col class="hotspot-rw-col">
+                        <col class="hotspot-network-col">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Instance Name</th>
+                            <th>Cloud</th>
+                            <th class="sortable-col" [class.sort-active]="isHotspotSortActive('cpu_utilization')"
+                                (click)="sortPerformanceHotspots('cpu_utilization')">
+                                CPU Utilization <i class="fas fa-caret-down" *ngIf="isHotspotSortActive('cpu_utilization')"></i>
+                            </th>
+                            <th class="sortable-col" [class.sort-active]="isHotspotSortActive('available_memory')"
+                                (click)="sortPerformanceHotspots('available_memory')">
+                                Available Memory <i class="fas fa-caret-down" *ngIf="isHotspotSortActive('available_memory')"></i>
+                            </th>
+                            <th class="sortable-col" [class.sort-active]="isHotspotSortActive('disk_size')"
+                                (click)="sortPerformanceHotspots('disk_size')">
+                                Disk Size <i class="fas fa-caret-down" *ngIf="isHotspotSortActive('disk_size')"></i>
+                            </th>
+                            <th>Data Disk Read/Write Bytes</th>
+                            <th>Data Disk Read/Write Rates</th>
+                            <th class="sortable-col" [class.sort-active]="isHotspotSortActive('network_traffic')"
+                                (click)="sortPerformanceHotspots('network_traffic')">
+                                Network Traffic <i class="fas fa-caret-down" *ngIf="isHotspotSortActive('network_traffic')"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of performanceHotspots; trackBy: trackByIndex">
+                            <td>
+                                <button type="button" class="btn btn-link p-0 table-link" (click)="openHotspotInstance(row)"
+                                    [tooltip]="'Open linked page'" container="body">{{row.instanceName}}</button>
+                            </td>
+                            <td>
+                                <img class="hotspot-cloud-logo" *ngIf="row.cloudLogo" [src]="row.cloudLogo" [alt]="row.cloud">
+                            </td>
+                            <td>{{row.cpuLabel}}</td>
+                            <td>{{row.memoryLabel}}</td>
+                            <td>
+                                <ng-container *ngIf="row.disk; else hotspotDiskNa">
+                                    <div class="hotspot-disk-capacity">Capacity: {{row.disk.capacityLabel}}</div>
+                                    <div class="hotspot-disk-track">
+                                        <div class="hotspot-disk-fill" [ngClass]="getStatusClass(row.disk.tone)"
+                                            [style.width.%]="row.disk.usedPercent"></div>
+                                    </div>
+                                    <div class="hotspot-disk-meta">
+                                        <span>Used: {{row.disk.usedLabel}}</span>
+                                        <span>Free: {{row.disk.freeLabel}}</span>
+                                    </div>
+                                </ng-container>
+                                <ng-template #hotspotDiskNa>NA</ng-template>
+                            </td>
+                            <td>
+                                <ng-container *ngIf="row.dataDiskBytes; else hotspotBytesNa">
+                                    <div class="hotspot-rw-read" *ngIf="row.dataDiskBytes.readLabel">{{row.dataDiskBytes.readLabel}}</div>
+                                    <div class="hotspot-rw-write" *ngIf="row.dataDiskBytes.writeLabel">{{row.dataDiskBytes.writeLabel}}</div>
+                                </ng-container>
+                                <ng-template #hotspotBytesNa>NA</ng-template>
+                            </td>
+                            <td>
+                                <ng-container *ngIf="row.dataDiskRates; else hotspotRatesNa">
+                                    <div class="hotspot-rw-read" *ngIf="row.dataDiskRates.readLabel">{{row.dataDiskRates.readLabel}}</div>
+                                    <div class="hotspot-rw-write" *ngIf="row.dataDiskRates.writeLabel">{{row.dataDiskRates.writeLabel}}</div>
+                                </ng-container>
+                                <ng-template #hotspotRatesNa>NA</ng-template>
+                            </td>
+                            <td>{{row.networkTraffic}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </ng-container>
+            <ng-template #hotspotsNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.performanceHotspots">No data available</div>
+            </ng-template>
         </div>
 
         <div class="dashboard-card cloud-database-card" *ngIf="hasCloudDatabasePerformanceSection">
