@@ -1,8 +1,10 @@
 import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import {
   UnifiedAiopsDeviceTypeOption,
+  UnifiedAiopsDiscoveryCategory,
   UnifiedAiopsExecutiveSectionConfig,
   UnifiedAiopsFilterOption,
+  UnifiedAiopsStatusLegendItem,
   UnifiedAiopsTone,
   UnifiedAiopsViewByOption
 } from './unified-aiops-command-centre.type';
@@ -14,11 +16,61 @@ export const UNIFIED_AIOPS_ALERT_SEVERITY_COLORS = {
   info: '#378ad8'
 };
 
+// Curated muted palette for the Event & Alert Analytics sankey nodes (source severity tiles keep the
+// severity colors above; links are gradients between their two node colors).
+export const UNIFIED_AIOPS_SANKEY_NODE_COLORS: { [name: string]: string } = {
+  // Left chart: Source -> Events -> Alerts / Dedupe / Suppressed -> Conditions -> Ticket / No Ticket
+  Events: '#b3a0d6',
+  Alerts: '#8f9bb8',
+  'Dedupe Events': '#86c7c0',
+  'Suppressed Events': '#c5cdd6',
+  Conditions: '#9aa7bd',
+  'Ticket Generated': '#6fbf95',
+  'No Ticket Generated': '#e2909f',
+  // Right chart: Condition -> Open / Resolved -> Acknowledged / Auto Healed / Auto Remediation -> durations
+  Condition: '#5fb9bf',
+  Open: '#efa766',
+  Resolved: '#7cbf8e',
+  Acknowledged: '#e6c39a',
+  'Auto Healed': '#7cbf8e',
+  'Auto Remediation': '#8fcf9f',
+  '5 Min': '#62c2a8',
+  '30 Min': '#7badc7',
+  '> 30 Min': '#df9090'
+};
+
 // Device Discovery vs Monitoring coverage bars: Monitored vs Not Monitored.
 export const UNIFIED_AIOPS_DISCOVERY_COLORS = {
   monitored: '#4f93e3',
   notMonitored: '#d6dce2'
 };
+
+// Fixed set of Device Discovery categories (dropdown always lists all of these). The API resource-type
+// keys are matched to a category by 'key' (slug of the label) or an alias; clean labels are shown on screen.
+// Unmatched API keys are dropped (NOT bucketed into 'Others' - 'Others' is its own real category).
+export const UNIFIED_AIOPS_DISCOVERY_CATEGORIES: UnifiedAiopsDiscoveryCategory[] = [
+  { key: 'application', label: 'Application' },
+  { key: 'baremetals', label: 'Baremetals' },
+  { key: 'container', label: 'Container' },
+  { key: 'database', label: 'Database', aliases: ['database_server'] },
+  { key: 'gpu', label: 'GPU' },
+  { key: 'network', label: 'Network', aliases: ['network_device'] },
+  { key: 'private_cloud_compute', label: 'Private Cloud Compute' },
+  { key: 'public_cloud_compute', label: 'Public Cloud Compute' },
+  { key: 'platform_services', label: 'Platform Services' },
+  { key: 'sensors', label: 'Sensors' },
+  { key: 'storage', label: 'Storage' },
+  { key: 'sd_wan', label: 'SD-WAN' },
+  { key: 'others', label: 'Others' }
+];
+
+// Status key shown in the Business Services widget header (icons reuse getStatusIcon/getToneClass).
+export const UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND: UnifiedAiopsStatusLegendItem[] = [
+  { tone: 'success', label: 'Healthy / Up' },
+  { tone: 'warning', label: 'Warning / Degraded' },
+  { tone: 'danger', label: 'Critical / Down' },
+  { tone: 'muted', label: 'No Data / Unknown' }
+];
 
 export const UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/executive-monitoring-summary/';
 export const UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT = '/customer/aiops-dashboard/discovery-vs-monitoring/';
@@ -68,10 +120,17 @@ export const UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS: UnifiedAiopsDeviceTypeOpti
 
 export const UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS: UnifiedAiopsViewByOption[] = [
   // { name: 'Device Type', key: 'device_type' },
-  { name: 'Event Source', key: 'event_source' },
+  { name: 'Source', key: 'event_source' },
   // { name: 'Datacenter', key: 'datacenter' },
   // { name: 'Cloud', key: 'private_cloud' },
   { name: 'Severity', key: 'severity' }
+];
+
+// Severity Type multiselect shown when "View By" is Severity. Source Type options come from the API.
+export const UNIFIED_AIOPS_ALERT_SEVERITY_TYPE_OPTIONS: UnifiedAiopsFilterOption[] = [
+  { value: 'critical', label: 'Critical' },
+  { value: 'warning', label: 'Warning' },
+  { value: 'information', label: 'Information' }
 ];
 
 export const UNIFIED_AIOPS_ALERT_DURATION_OPTIONS: DateRangeOption[] = [
@@ -226,8 +285,8 @@ export const UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_ORDER = ['aws', 'azure', 'gcp',
 
 // Provider card header logos (already shipped under static/assets/images/external-brand/).
 export const UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_LOGOS: { [key: string]: string } = {
-  aws: 'aws.svg',
-  azure: 'azure.svg',
-  gcp: 'gcp.svg',
-  oci: 'oracle.svg'
+  aws: 'logos/AWS.svg',
+  azure: 'logos/Azure-short.svg',
+  gcp: 'logos/GCP.svg',
+  oci: 'logos/Oracle.svg'
 };

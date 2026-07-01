@@ -243,6 +243,15 @@
   text-decoration: none;
 }
 
+/* Cell content wrappers can receive a truncateText-computed width wider than their
+   (table-layout: fixed) column; cap them to the cell so text truncates in place
+   instead of spilling into the neighbouring column. */
+.dashboard-table td > div,
+.orphaned-table td > div,
+.idle-devices-table td > div {
+  max-width: 100%;
+}
+
 .linked-widget:hover .metric-value,
 .linked-widget-title:hover,
 .table-link:hover {
@@ -387,6 +396,7 @@
 }
 
 .executive-summary-card {
+  min-height: 260px;
   padding: 0;
   overflow: hidden;
 }
@@ -714,6 +724,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  align-items: start;
 }
 
 .two-column-grid.single-widget-grid,
@@ -756,14 +767,14 @@
 }
 
 .monitoring-table-card {
-  height: 424px;
-  min-height: 424px;
+  height: 386px;
+  min-height: 386px;
 }
 
 .application-overview-card,
 .services-overview-card {
-  height: 450px;
-  min-height: 450px;
+  height: 412px;
+  min-height: 412px;
 }
 
 .monitoring-table-scroll {
@@ -806,7 +817,7 @@
   .compact-table {
     th,
     td {
-      height: 48px;
+      height: 42px;
     }
   }
 }
@@ -1001,6 +1012,38 @@
 
   .empty-table-cell {
     height: 210px;
+  }
+}
+
+.business-services-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin: 2px 0 10px;
+
+  .section-title {
+    margin: 0;
+  }
+}
+
+.business-services-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 13px;
+  color: #5f6d7b;
+}
+
+.business-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  i {
+    font-size: 14px;
   }
 }
 
@@ -1274,7 +1317,7 @@
 
 .coverage-provider-name {
   color: #1f2a34;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   flex: 1 1 auto;
   min-width: 0;
@@ -1530,10 +1573,6 @@
   font-size: 14px;
   font-weight: 500;
   border-bottom: 1px solid #cfd6dc;
-}
-
-.service-title-row {
-  align-items: flex-end;
 }
 
 .mini-filter {
@@ -1808,14 +1847,26 @@
   overflow: hidden;
 }
 
+.alerts-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 2px 0 10px;
+
+  .section-title {
+    margin: 0;
+  }
+}
+
 .alerts-filter-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: flex-end;
   gap: 8px;
-  padding: 8px 12px;
-  border-bottom: 1px solid #d8dee3;
+  flex: 1 1 auto;
 
   .mini-filter {
     min-width: 150px;
@@ -1852,23 +1903,23 @@
 .sankey-grid {
   display: grid;
   grid-template-columns: 1.45fr 1fr;
-  gap: 20px;
-  padding: 0 24px 18px 20px;
+  gap: 12px;
+  padding: 0 10px 8px 12px;
 }
 
 .sankey-panel {
-  min-height: 250px;
+  min-height: 300px;
   display: flex;
   flex-direction: column;
 }
 
 .sankey-chart {
-  height: 250px;
+  height: 300px;
 }
 
 .sankey-empty {
   flex: 1 1 auto;
-  min-height: 250px;
+  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1879,6 +1930,46 @@
   display: grid;
   grid-template-columns: minmax(0, 1.85fr) minmax(360px, 1fr);
   gap: 10px;
+}
+
+.orphaned-widget-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.orphaned-widget-title {
+  margin: 0 0 8px;
+  color: #1f2a34;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Both widget cards fill their (grid-stretched, equal-height) columns so the two cards match height. */
+.orphaned-widget-col > .dashboard-card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.orphaned-widget-col .orphaned-table-wrap {
+  flex: 1 1 auto;
+}
+
+.orphaned-widget-col .orphaned-category-body {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.orphaned-widget-col .idle-table-wrap {
+  flex: 1 1 auto;
+}
+
+.orphaned-widget-col .idle-duration-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .orphaned-device-card,
@@ -1913,13 +2004,21 @@
   overflow-x: hidden;
 }
 
+.orphaned-footer-note {
+  padding: 6px 0 2px;
+  color: #7b8794;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 15px;
+}
+
 .device-status-legend {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px 14px;
-  padding: 10px 8px 14px;
+  padding: 5px 5px 9px;
   color: #20272e;
   font-size: 13px;
   line-height: 18px;
@@ -1941,19 +2040,23 @@
   width: 100%;
 
   .orphaned-name-col {
-    width: 28%;
+    width: 24%;
   }
 
   .orphaned-status-col {
-    width: 15%;
+    width: 10%;
+  }
+
+  .orphaned-type-col {
+    width: 20%;
   }
 
   .orphaned-last-seen-col {
-    width: 25%;
+    width: 22%;
   }
 
   .orphaned-datacenter-col {
-    width: 32%;
+    width: 24%;
   }
 
   th,
@@ -2238,7 +2341,7 @@
 
 .recent-alerts-card {
   position: relative;
-  padding: 24px 18px 24px;
+  padding: 10px 0px 0px;
   overflow: hidden;
 }
 

@@ -218,11 +218,20 @@
                 </div>
             </ng-container>
 
-            <div class="section-title mt-3" *ngIf="hasBusinessServices">
-                <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
-                    (click)="openBusinessServices()" [tooltip]="'Open linked page'" placement="top" container="body">
-                    Business Services <i class="fa fa-link"></i>
-                </button>
+            <div class="business-services-header mt-3" *ngIf="hasBusinessServices">
+                <div class="section-title mb-0">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openBusinessServices()" [tooltip]="'Open linked page'" placement="top"
+                        container="body">
+                        Business Services <i class="fa fa-link"></i>
+                    </button>
+                </div>
+                <div class="business-services-legend">
+                    <span class="business-legend-item"
+                        *ngFor="let item of businessServiceLegend; trackBy: trackByIndex">
+                        <i class="fa" [ngClass]="[getStatusIcon(item.tone), getToneClass(item.tone)]"></i>{{item.label}}
+                    </span>
+                </div>
             </div>
             <div class="dashboard-card table-card" *ngIf="hasBusinessServices">
                 <app-spinner [name]="loaderNames.businessServices" [width]="0"></app-spinner>
@@ -237,21 +246,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let row of businessServices; trackBy: trackByIndex">
-                            <td>
-                                <button type="button" class="btn btn-link p-0 table-link"
-                                    *ngIf="canOpenBusinessService(row); else businessServiceNameText"
-                                    (click)="openBusinessService(row)" [tooltip]="'Open linked page'" placement="top"
-                                    container="body">
-                                    {{row.serviceName}}
-                                </button>
-                                <ng-template #businessServiceNameText>{{row.serviceName}}</ng-template>
+                        <tr *ngFor="let row of businessServices; trackBy: trackByIndex" truncateText>
+                            <td class="tdw-34">
+                                <div [tooltip]="row.serviceName"
+                                    [ngClass]="{'text-primary pointer-link': canOpenBusinessService(row)}"
+                                    (click)="openBusinessService(row)">{{row.serviceName}}</div>
                             </td>
                             <td><i class="fa status-icon"
                                     [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"
                                     [tooltip]="row.statusLabel || row.status" container="body"></i></td>
-                            <td>{{row.uptime}}</td>
-                            <td>{{row.degraded}}</td>
+                            <td class="tdw-22">{{row.uptime}}</td>
+                            <td class="tdw-18">{{row.degraded}}</td>
                             <td><span class="count-chip" [ngClass]="getToneClass(row.alertTone)">{{row.alerts}}</span>
                             </td>
                         </tr>
@@ -368,65 +373,64 @@
 
             <div class="two-column-grid mt-3" *ngIf="hasApplicationServiceSection"
                 [ngClass]="{'single-widget-grid': !(hasApplicationRows && hasServiceRows)}">
-                <div class="dashboard-card table-card application-overview-card" *ngIf="hasApplicationRows">
-                    <app-spinner [name]="loaderNames.applications" [width]="0"></app-spinner>
-                    <div class="card-title-row">
+                <div class="orphaned-widget-col" *ngIf="hasApplicationRows">
+                    <div class="subsection-title orphaned-widget-title">
                         <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
                             (click)="openApplicationDashboard()" [tooltip]="'Open linked page'" placement="top"
                             container="body">
                             Application Overview <i class="fa fa-link"></i>
                         </button>
                     </div>
-                    <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
-                    <div class="monitoring-table-scroll">
-                        <table class="dashboard-table compact-table application-overview-table"
-                            *ngIf="applicationRows.length">
-                            <colgroup>
-                                <col class="application-name-col">
-                                <col class="application-throughput-col">
-                                <col class="application-availability-col">
-                                <col class="application-response-col">
-                                <col class="application-status-col">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Avg Throughput (rps)</th>
-                                    <th>Avg Availability(%)</th>
-                                    <th>Avg Response Time (ms)</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of applicationRows; trackBy: trackByIndex">
-                                    <td>
-                                        <button type="button" class="btn btn-link p-0 table-link"
-                                            *ngIf="canOpenApplicationRow(row); else applicationNameText"
-                                            (click)="openApplicationRow(row)" [tooltip]="'Open linked page'"
-                                            placement="top" container="body">
-                                            {{row.name}}
-                                        </button>
-                                        <ng-template #applicationNameText>{{row.name}}</ng-template>
-                                    </td>
-                                    <td>{{row.throughput}}</td>
-                                    <td>{{row.availability}}</td>
-                                    <td>{{row.responseTime}}</td>
-                                    <td><i class="fa status-icon"
-                                            [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="dashboard-card table-card application-overview-card">
+                        <app-spinner [name]="loaderNames.applications" [width]="0"></app-spinner>
+                        <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
+                        <div class="monitoring-table-scroll">
+                            <table class="dashboard-table compact-table application-overview-table"
+                                *ngIf="applicationRows.length">
+                                <colgroup>
+                                    <col class="application-name-col">
+                                    <col class="application-throughput-col">
+                                    <col class="application-availability-col">
+                                    <col class="application-response-col">
+                                    <col class="application-status-col">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Application Name</th>
+                                        <th>Avg Throughput (rps)</th>
+                                        <th>Avg Availability(%)</th>
+                                        <th>Avg Response Time (ms)</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of applicationRows; trackBy: trackByIndex" truncateText>
+                                        <td class="tdw-20">
+                                            <div [tooltip]="row.name"
+                                                [ngClass]="{'text-primary pointer-link': canOpenApplicationRow(row)}"
+                                                (click)="openApplicationRow(row)">{{row.name}}</div>
+                                        </td>
+                                        <td class="tdw-20">{{row.throughput}}</td>
+                                        <td class="tdw-20">{{row.availability}}</td>
+                                        <td class="tdw-25">{{row.responseTime}}</td>
+                                        <td class="tdw-15"><i class="fa status-icon"
+                                                [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-                <div class="dashboard-card table-card services-overview-card" *ngIf="hasServiceRows">
-                    <app-spinner [name]="loaderNames.services" [width]="0"></app-spinner>
-                    <app-spinner [name]="loaderNames.serviceApplications" [width]="0"></app-spinner>
-                    <div class="card-title-row service-title-row">
-                        <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
-                            (click)="openServicesOverview()" [tooltip]="'Open linked page'" placement="top"
-                            container="body">
-                            Services Overview <i class="fa fa-link"></i>
-                        </button>
+                <div class="orphaned-widget-col" *ngIf="hasServiceRows">
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <div class="subsection-title orphaned-widget-title mb-0">
+                            <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                                (click)="openServicesOverview()" [tooltip]="'Open linked page'" placement="top"
+                                container="body">
+                                Services Overview <i class="fa fa-link"></i>
+                            </button>
+                        </div>
                         <div class="mini-filter">
                             <select class="form-control form-control-sm" [value]="selectedServiceApplicationId"
                                 (change)="onServiceApplicationChange($event)"
@@ -436,109 +440,116 @@
                             </select>
                         </div>
                     </div>
-                    <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
-                    <div class="monitoring-table-scroll">
-                        <table class="dashboard-table compact-table services-overview-table" *ngIf="serviceRows.length">
-                            <colgroup>
-                                <col class="service-name-col">
-                                <col class="service-throughput-col">
-                                <col class="service-availability-col">
-                                <col class="service-response-col">
-                                <col class="service-status-col">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Service Name</th>
-                                    <th>Throughput (rps)</th>
-                                    <th>Availability (%)</th>
-                                    <th>Response Time (ms)</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of serviceRows; trackBy: trackByIndex">
-                                    <td>
-                                        <button type="button" class="btn btn-link p-0 table-link"
-                                            *ngIf="canOpenServiceRow(row); else serviceNameText"
-                                            (click)="openServiceRow(row)" [tooltip]="'Open linked page'" placement="top"
-                                            container="body">
-                                            {{row.name}}
-                                        </button>
-                                        <ng-template #serviceNameText>{{row.name}}</ng-template>
-                                    </td>
-                                    <td>{{row.throughput}}</td>
-                                    <td>{{row.availability}}</td>
-                                    <td>{{row.responseTime}}</td>
-                                    <td><i class="fa status-icon"
-                                            [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="dashboard-card table-card services-overview-card">
+                        <app-spinner [name]="loaderNames.services" [width]="0"></app-spinner>
+                        <app-spinner [name]="loaderNames.serviceApplications" [width]="0"></app-spinner>
+                        <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
+                        <div class="monitoring-table-scroll">
+                            <table class="dashboard-table compact-table services-overview-table"
+                                *ngIf="serviceRows.length">
+                                <colgroup>
+                                    <col class="service-name-col">
+                                    <col class="service-throughput-col">
+                                    <col class="service-availability-col">
+                                    <col class="service-response-col">
+                                    <col class="service-status-col">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Service Name</th>
+                                        <th>Throughput (rps)</th>
+                                        <th>Availability (%)</th>
+                                        <th>Response Time (ms)</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of serviceRows; trackBy: trackByIndex" truncateText>
+                                        <td class="tdw-22">
+                                            <div [tooltip]="row.name"
+                                                [ngClass]="{'text-primary pointer-link': canOpenServiceRow(row)}"
+                                                (click)="openServiceRow(row)">{{row.name}}</div>
+                                        </td>
+                                        <td class="tdw-20">{{row.throughput}}</td>
+                                        <td class="tdw-20">{{row.availability}}</td>
+                                        <td class="tdw-23">{{row.responseTime}}</td>
+                                        <td class="tdw-15"><i class="fa status-icon"
+                                                [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="two-column-grid mt-2" *ngIf="hasMonitoringTableSection"
                 [ngClass]="{'single-widget-grid': !(hasDatabaseRows && hasOsRows)}">
-                <div class="dashboard-card table-card monitoring-table-card database-monitoring-card"
-                    *ngIf="hasDatabaseRows">
-                    <app-spinner [name]="loaderNames.databases" [width]="0"></app-spinner>
-                    <div class="card-title-row">
+                <div class="orphaned-widget-col" *ngIf="hasDatabaseRows">
+                    <div class="subsection-title orphaned-widget-title">
                         <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
                             (click)="openDatabaseMonitoring()" [tooltip]="'Open linked page'" placement="top"
                             container="body">
                             Database Monitoring <i class="fa fa-link"></i>
                         </button>
                     </div>
-                    <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
-                    <div class="monitoring-table-scroll">
-                        <table class="dashboard-table compact-table" *ngIf="databaseRows.length">
-                            <thead>
-                                <tr>
-                                    <th>Database Type</th>
-                                    <th>Count</th>
-                                    <th>Status</th>
-                                    <th>Queries/a</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of databaseRows; trackBy: trackByIndex">
-                                    <td>
-                                        <button type="button" class="btn btn-link p-0 table-link"
-                                            (click)="openDatabaseMonitoring()" [tooltip]="'Open linked page'"
-                                            placement="top" container="body">
-                                            {{row.name}}
-                                        </button>
-                                    </td>
-                                    <td>{{row.count}}</td>
-                                    <td><i class="fa status-icon"
-                                            [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
-                                    <td>{{row.queries}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="dashboard-card table-card monitoring-table-card database-monitoring-card">
+                        <app-spinner [name]="loaderNames.databases" [width]="0"></app-spinner>
+                        <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
+                        <div class="monitoring-table-scroll">
+                            <table class="dashboard-table compact-table" *ngIf="databaseRows.length">
+                                <thead>
+                                    <tr>
+                                        <th>Database Type</th>
+                                        <th>Count</th>
+                                        <th>Status</th>
+                                        <th>Queries/a</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of databaseRows; trackBy: trackByIndex" truncateText>
+                                        <td class="tdw-42">
+                                            <div class="text-primary pointer-link" [tooltip]="row.name"
+                                                (click)="openDatabaseMonitoring()">{{row.name}}</div>
+                                        </td>
+                                        <td class="tdw-16">{{row.count}}</td>
+                                        <td class="tdw-14"><i class="fa status-icon"
+                                                [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i>
+                                        </td>
+                                        <td class="tdw-28">{{row.queries}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-                <div class="dashboard-card table-card monitoring-table-card os-monitoring-card" *ngIf="hasOsRows">
-                    <app-spinner [name]="loaderNames.os" [width]="0"></app-spinner>
-                    <div class="card-title-row">OS Monitoring</div>
-                    <div class="monitoring-table-scroll">
-                        <table class="dashboard-table compact-table" *ngIf="osRows.length">
-                            <thead>
-                                <tr>
-                                    <th>OS Type</th>
-                                    <th>Count</th>
-                                    <th>EOL Date <i class="fa fa-sort"></i></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of osRows; trackBy: trackByIndex">
-                                    <td>{{row.name}}</td>
-                                    <td>{{row.count}}</td>
-                                    <td>{{row.eolDate}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="orphaned-widget-col" *ngIf="hasOsRows">
+                    <div class="subsection-title orphaned-widget-title">OS Monitoring</div>
+                    <div class="dashboard-card table-card monitoring-table-card os-monitoring-card">
+                        <app-spinner [name]="loaderNames.os" [width]="0"></app-spinner>
+                        <div class="monitoring-table-scroll">
+                            <table class="dashboard-table compact-table" *ngIf="osRows.length">
+                                <thead>
+                                    <tr>
+                                        <th>OS Type</th>
+                                        <th>Count</th>
+                                        <th>EOL Date <i class="fa fa-sort"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of osRows; trackBy: trackByIndex" truncateText>
+                                        <td class="tdw-45">
+                                            <div [tooltip]="row.name" container="body">{{row.name}}</div>
+                                        </td>
+                                        <td class="tdw-20">{{row.count}}</td>
+                                        <td class="tdw-35">
+                                            <div [tooltip]="row.eolDate" container="body">{{row.eolDate}}</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -619,21 +630,13 @@
                         <div class="chart-title text-left">Availability By Category %</div>
                         <div class="analytics-control-row">
                             <div class="analytics-control">
-                                <label>Availability Monitor</label>
-                                <select class="form-control form-control-sm" [value]="selectedAvailabilityMonitor"
-                                    (change)="onAvailabilityMonitorChange($event)">
-                                    <option *ngFor="let option of availabilityMonitorOptions; trackBy: trackByIndex"
-                                        [value]="option" [selected]="option === selectedAvailabilityMonitor">{{option}}
+                                <label>Device Category</label>
+                                <select class="form-control form-control-sm" [value]="selectedAvailabilityCategory"
+                                    (change)="onAvailabilityCategoryChange($event)">
+                                    <option
+                                        *ngFor="let option of availabilityCategoryFilterOptions; trackBy: trackByIndex"
+                                        [value]="option" [selected]="option === selectedAvailabilityCategory">{{option}}
                                     </option>
-                                </select>
-                            </div>
-                            <div class="analytics-control">
-                                <label>Time range</label>
-                                <select class="form-control form-control-sm" [value]="selectedAvailabilityTimeRange"
-                                    (change)="onAvailabilityTimeRangeChange($event)">
-                                    <option *ngFor="let option of availabilityTimeRangeOptions; trackBy: trackByIndex"
-                                        [value]="option" [selected]="option === selectedAvailabilityTimeRange">
-                                        {{option}}</option>
                                 </select>
                             </div>
                         </div>
@@ -657,9 +660,9 @@
                             (chartInit)="onAvailabilityCategoryChartInit($event)"
                             class="availability-category-chart linked-chart"></div>
                         <div class="availability-category-list">
-                            <div class="availability-category-title">{{availabilityCategoryListTitle}}</div>
+                            <div class="availability-category-title">Device Category</div>
                             <div class="availability-category-row"
-                                *ngFor="let row of availabilityCategoryRows; trackBy: trackByIndex">
+                                *ngFor="let row of availabilityCategoryDisplayRows; trackBy: trackByIndex">
                                 <span class="availability-category-dot" [ngClass]="getToneClass(row.tone)"></span>
                                 <span class="availability-category-name">{{row.label}}</span>
                                 <span class="availability-category-badge"
@@ -683,15 +686,15 @@
                 </div>
                 <div class="alert-segregation-summary">
                     <div class="alert-segregation-kpi">
-                        <div class="alert-segregation-kpi-label">Critical</div>
+                        <div class="alert-segregation-kpi-label tone-danger">Critical</div>
                         <div class="alert-segregation-kpi-value tone-danger">{{alertSegregationSummary.critical}}</div>
                     </div>
                     <div class="alert-segregation-kpi">
-                        <div class="alert-segregation-kpi-label">Warning</div>
+                        <div class="alert-segregation-kpi-label tone-warning">Warning</div>
                         <div class="alert-segregation-kpi-value tone-warning">{{alertSegregationSummary.warning}}</div>
                     </div>
                     <div class="alert-segregation-kpi">
-                        <div class="alert-segregation-kpi-label">Info</div>
+                        <div class="alert-segregation-kpi-label tone-info">Info</div>
                         <div class="alert-segregation-kpi-value tone-info">{{alertSegregationSummary.info}}</div>
                     </div>
                 </div>
@@ -711,45 +714,60 @@
                     class="top-chart linked-chart" *ngIf="hasChartData(alertSegregationOptions)"></div>
             </div>
 
-            <div class="section-title mt-3" *ngIf="hasAlertsSection">
-                <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
-                    (click)="openAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
-                    Event & Alert Analytics <i class="fa fa-link"></i>
-                </button>
-            </div>
-            <div class="dashboard-card alerts-card" *ngIf="hasAlertsSection">
-                <app-spinner [name]="loaderNames.alertReduction" [width]="0"></app-spinner>
-                <app-spinner [name]="loaderNames.alertResponse" [width]="0"></app-spinner>
-                <app-spinner [name]="loaderNames.alertSourceSankey" [width]="0"></app-spinner>
-                <app-spinner [name]="loaderNames.alertLifecycleSankey" [width]="0"></app-spinner>
+            <div class="alerts-header mt-3" *ngIf="hasAlertsSection">
+                <div class="section-title mb-0">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        Event and Alert Analytics
+                    </button>
+                </div>
                 <div class="alerts-filter-row" *ngIf="alertsFilterForm" [formGroup]="alertsFilterForm">
+                    <div class="mini-filter">
+                        <label>View By</label>
+                        <select class="form-control form-control-sm" formControlName="viewBy" (change)="reloadAlerts()">
+                            <option *ngFor="let option of alertsViewByOptions; trackBy: trackByIndex"
+                                [value]="option.key">{{option.name}}</option>
+                        </select>
+                    </div>
+                    <div class="mini-filter multi-filter-control" *ngIf="alertsSelectedViewBy === 'event_source'">
+                        <label>Source Type</label>
+                        <multiselect-dropdown [options]="alertsSourceTypeOptions" [settings]="multiselectSettings"
+                            [texts]="alertsSourceTypeTexts" class="form-control p-0 dashboard-multiselect"
+                            formControlName="sourceTypes" (dropdownOpened)="onAlertsFilterOpen()"
+                            (dropdownClosed)="onAlertsFilterClose()">
+                        </multiselect-dropdown>
+                    </div>
+                    <div class="mini-filter multi-filter-control" *ngIf="alertsSelectedViewBy === 'severity'">
+                        <label>Severity Type</label>
+                        <multiselect-dropdown [options]="alertsSeverityTypeOptions" [settings]="multiselectSettings"
+                            [texts]="alertsSeverityTypeTexts" class="form-control p-0 dashboard-multiselect"
+                            formControlName="severityTypes" (dropdownOpened)="onAlertsFilterOpen()"
+                            (dropdownClosed)="onAlertsFilterClose()">
+                        </multiselect-dropdown>
+                    </div>
                     <div class="mini-filter multi-filter-control">
                         <label>Datacenter</label>
                         <multiselect-dropdown [options]="datacenterOptions" [settings]="multiselectSettings"
-                            [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
-                            formControlName="datacenters">
+                            [texts]="alertsDatacenterTexts" class="form-control p-0 dashboard-multiselect"
+                            formControlName="datacenters" (dropdownOpened)="onAlertsFilterOpen()"
+                            (dropdownClosed)="onAlertsFilterClose()">
                         </multiselect-dropdown>
                     </div>
                     <div class="mini-filter multi-filter-control">
                         <label>Cloud</label>
                         <multiselect-dropdown [options]="cloudOptions" [settings]="multiselectSettings"
-                            [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
-                            formControlName="clouds">
+                            [texts]="alertsCloudTexts" class="form-control p-0 dashboard-multiselect"
+                            formControlName="clouds" (dropdownOpened)="onAlertsFilterOpen()"
+                            (dropdownClosed)="onAlertsFilterClose()">
                         </multiselect-dropdown>
                     </div>
                     <div class="mini-filter multi-filter-control">
                         <label>Devices</label>
                         <multiselect-dropdown [options]="alertsDeviceTypeOptions" [settings]="alertsDeviceTypeSettings"
-                            [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
-                            formControlName="deviceTypes">
+                            [texts]="alertsDeviceTexts" class="form-control p-0 dashboard-multiselect"
+                            formControlName="deviceTypes" (dropdownOpened)="onAlertsFilterOpen()"
+                            (dropdownClosed)="onAlertsFilterClose()">
                         </multiselect-dropdown>
-                    </div>
-                    <div class="mini-filter">
-                        <label>View By</label>
-                        <select class="form-control form-control-sm" formControlName="viewBy">
-                            <option *ngFor="let option of alertsViewByOptions; trackBy: trackByIndex"
-                                [value]="option.key">{{option.name}}</option>
-                        </select>
                     </div>
                     <div class="mini-filter">
                         <label>Duration</label>
@@ -758,6 +776,12 @@
                         </custom-date-dropdown>
                     </div>
                 </div>
+            </div>
+            <div class="dashboard-card alerts-card" *ngIf="hasAlertsSection">
+                <app-spinner [name]="loaderNames.alertReduction" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.alertResponse" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.alertSourceSankey" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.alertLifecycleSankey" [width]="0"></app-spinner>
                 <div class="alert-metric-row" *ngIf="alertReductionMetrics.length || alertResponseMetrics.length">
                     <div class="summary-metric linked-widget"
                         *ngFor="let metric of alertReductionMetrics; trackBy: trackByIndex" (click)="openAlerts()"
@@ -825,17 +849,30 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let alert of recentAlerts; trackBy: trackByIndex">
-                                <td><button type="button" class="btn btn-link p-0 table-link"
-                                        (click)="showAlertDetails(alert)" [tooltip]="'Open alert details'"
-                                        placement="top" container="body">{{alert.id}}</button></td>
-                                <td>{{alert.deviceName}}</td>
-                                <td><i class="fa fa-exclamation-circle status-icon"
-                                        [ngClass]="getToneClass(getRecentAlertSeverityTone(alert.severity))"></i></td>
-                                <td>{{alert.description}}</td>
-                                <td>{{alert.source}}</td>
-                                <td>{{alert.acknowledged}}</td>
-                                <td>{{alert.duration}}</td>
+                            <tr *ngFor="let alert of recentAlerts; trackBy: trackByIndex" truncateText>
+                                <td class="tdw-5">
+                                    <div class="text-primary pointer-link" [tooltip]="alert.id"
+                                        (click)="showAlertDetails(alert)">{{alert.id}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="alert.deviceName">{{alert.deviceName}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <i class="fa fa-exclamation-circle status-icon"
+                                        [ngClass]="getToneClass(getRecentAlertSeverityTone(alert.severity))"></i>
+                                </td>
+                                <td class="tdw-30">
+                                    <div [tooltip]="alert.description">{{alert.description}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="alert.source">{{alert.source}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="alert.acknowledged">{{alert.acknowledged}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="alert.duration">{{alert.duration}}</div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -844,84 +881,92 @@
 
             <div class="orphaned-widgets-grid mt-3" *ngIf="hasOrphanedDevices || hasOrphanedByCategory"
                 [ngClass]="{'single-widget-grid': !(hasOrphanedDevices && hasOrphanedByCategory)}">
-                <div class="dashboard-card orphaned-device-card" *ngIf="hasOrphanedDevices">
-                    <div class="orphaned-widget-header">
-                        <div class="subsection-title mb-0">
-                            <span class="badge badge-secondary orphaned-count-badge">{{orphanedDevicesTotal}}</span>
-                            Orphaned device list
-                        </div>
+                <div class="orphaned-widget-col" *ngIf="hasOrphanedDevices">
+                    <div class="subsection-title orphaned-widget-title">
+                        <span class="badge badge-secondary orphaned-count-badge">{{orphanedDevicesTotal}}</span>
+                        Orphaned Device List
                     </div>
-                    <div class="orphaned-table-wrap">
-                        <app-spinner [name]="loaderNames.orphanedDevices" [width]="0"></app-spinner>
-                        <div class="device-status-legend" *ngIf="orphanedDevices.length">
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-check-circle text-success"></i>
-                                Device Is Active / Reachable
-                            </span>
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-exclamation-circle text-warning"></i>
-                                Partially Reachable / Warning State
-                            </span>
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-exclamation-triangle text-danger"></i>
-                                Offline / Critical / Unreachable
-                            </span>
+                    <div class="dashboard-card orphaned-device-card">
+                        <div class="orphaned-table-wrap">
+                            <app-spinner [name]="loaderNames.orphanedDevices" [width]="0"></app-spinner>
+                            <div class="device-status-legend" *ngIf="orphanedDevices.length">
+                                <span class="device-status-legend-item">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    Active / Reachable
+                                </span>
+                                <span class="device-status-legend-item">
+                                    <i class="fas fa-exclamation-circle text-warning"></i>
+                                    Partially Reachable / Warning State
+                                </span>
+                                <span class="device-status-legend-item">
+                                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                                    Offline / Critical / Unreachable
+                                </span>
+                            </div>
+                            <table class="table table-sm orphaned-table mb-0" *ngIf="orphanedDevices.length">
+                                <colgroup>
+                                    <col class="orphaned-name-col">
+                                    <col class="orphaned-status-col">
+                                    <col class="orphaned-type-col">
+                                    <col class="orphaned-last-seen-col">
+                                    <col class="orphaned-datacenter-col">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Device Name</th>
+                                        <th>Status</th>
+                                        <th>Type</th>
+                                        <th>Last Seen <i class="fas fa-sort ml-1"></i></th>
+                                        <th>Datacenter</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let device of orphanedDevices; trackBy: trackByIndex" truncateText>
+                                        <td class="tdw-35">
+                                            <div class="text-primary pointer-link" [tooltip]="device.name"
+                                                (click)="openOrphanedDevice(device)">{{device.name}}</div>
+                                        </td>
+                                        <td class="tdw-10">
+                                            <i [ngClass]="getIdleStatusIconClass(device.status)"></i>
+                                        </td>
+                                        <td class="tdw-15">
+                                            <div [tooltip]="device.resourceType">{{device.resourceType}}</div>
+                                        </td>
+                                        <td class="tdw-20">
+                                            <div [tooltip]="device.lastSeen">{{device.lastSeen}}</div>
+                                        </td>
+                                        <td class="tdw-20">
+                                            <div [tooltip]="device.datacenter">{{device.datacenter}}</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <table class="table table-sm orphaned-table mb-0" *ngIf="orphanedDevices.length">
-                            <colgroup>
-                                <col class="orphaned-name-col">
-                                <col class="orphaned-status-col">
-                                <col class="orphaned-last-seen-col">
-                                <col class="orphaned-datacenter-col">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Status</th>
-                                    <th>Last Seen <i class="fas fa-sort ml-1"></i></th>
-                                    <th>Datacenter</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let device of orphanedDevices; trackBy: trackByIndex">
-                                    <td><span>{{device.name}}</span></td>
-                                    <td><i [ngClass]="getIdleStatusIconClass(device.status)"></i></td>
-                                    <td>{{device.lastSeen}}</td>
-                                    <td>{{device.datacenter}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
-                        <div class="orphaned-page-size">
-                            <span>Show</span>
-                            <select class="form-control form-control-sm" [value]="orphanedDevicesPageSize"
-                                (change)="orphanedDevicesPageSizeChange($event)">
-                                <option [value]="10">10</option>
-                                <option [value]="25">25</option>
-                                <option [value]="50">50</option>
-                            </select>
+                        <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
+                            <div class="orphaned-footer-note">Devices With
+                                Lifecycle Stages Classified As Retired, Disposed, Or Donated Are Considered
+                                Orphaned Devices.</div>
+                            <table-pager [compact]="true" [pageNo]="orphanedDevicesPageNo"
+                                [pageSize]="orphanedDevicesPageSize" [totalCount]="orphanedDevicesTotal"
+                                (pageChange)="orphanedDevicesPageChange($event)"></table-pager>
                         </div>
-                        <table-pager [compact]="true" [pageNo]="orphanedDevicesPageNo"
-                            [pageSize]="orphanedDevicesPageSize" [totalCount]="orphanedDevicesTotal"
-                            (pageChange)="orphanedDevicesPageChange($event)"></table-pager>
                     </div>
                 </div>
 
-                <div class="dashboard-card orphaned-category-card" *ngIf="hasOrphanedByCategory">
-                    <div class="orphaned-widget-header">
-                        <div class="subsection-title mb-0">Orphaned by Category</div>
-                    </div>
-                    <div class="orphaned-category-body">
-                        <app-spinner [name]="loaderNames.orphanedDevicesByCategory" [width]="0"></app-spinner>
-                        <div echarts [options]="orphanedByCategoryOptions" class="orphaned-category-chart"
-                            *ngIf="orphanedByCategoryHasData"></div>
-                        <div class="orphaned-category-legend" *ngIf="orphanedByCategoryHasData">
-                            <div class="orphaned-category-legend-item"
-                                *ngFor="let item of orphanedByCategory; trackBy: trackByIndex">
-                                <span class="legend-dot" [style.background]="item.color"></span>
-                                <span>{{item.category}}</span>
-                                <strong>{{item.count}} ({{item.percentage}}%)</strong>
+                <div class="orphaned-widget-col" *ngIf="hasOrphanedByCategory">
+                    <div class="subsection-title orphaned-widget-title">Orphaned by Category</div>
+                    <div class="dashboard-card orphaned-category-card">
+                        <div class="orphaned-category-body">
+                            <app-spinner [name]="loaderNames.orphanedDevicesByCategory" [width]="0"></app-spinner>
+                            <div echarts [options]="orphanedByCategoryOptions" class="orphaned-category-chart"
+                                *ngIf="orphanedByCategoryHasData"></div>
+                            <div class="orphaned-category-legend" *ngIf="orphanedByCategoryHasData">
+                                <div class="orphaned-category-legend-item"
+                                    *ngFor="let item of orphanedByCategory; trackBy: trackByIndex">
+                                    <span class="legend-dot" [style.background]="item.color"></span>
+                                    <span>{{item.category}}</span>
+                                    <strong>{{item.count}} ({{item.percentage}}%)</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -930,181 +975,181 @@
 
             <div class="idle-widgets-grid mt-3" *ngIf="hasIdleDevices || hasIdleDuration"
                 [ngClass]="{'single-widget-grid': !(hasIdleDevices && hasIdleDuration)}">
-                <div class="dashboard-card idle-device-card" *ngIf="hasIdleDevices">
-                    <div class="orphaned-widget-header">
-                        <div class="subsection-title mb-0">
-                            <span class="badge badge-secondary orphaned-count-badge">{{idleDevicesTotal}}</span>
-                            Idle device analysis
+                <div class="orphaned-widget-col" *ngIf="hasIdleDevices">
+                    <div class="subsection-title orphaned-widget-title">
+                        <span class="badge badge-secondary orphaned-count-badge">{{idleDevicesTotal}}</span>
+                        Idle Device Analysis
+                    </div>
+                    <div class="dashboard-card idle-device-card">
+                        <div class="idle-table-wrap">
+                            <app-spinner [name]="loaderNames.idleDevices" [width]="0"></app-spinner>
+                            <div class="device-status-legend" *ngIf="idleDevices.length">
+                                <span class="device-status-legend-item">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    Active / Reachable
+                                </span>
+                                <span class="device-status-legend-item">
+                                    <i class="fas fa-exclamation-circle text-warning"></i>
+                                    Partially Reachable / Warning State
+                                </span>
+                                <span class="device-status-legend-item">
+                                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                                    Offline / Critical / Unreachable
+                                </span>
+                            </div>
+                            <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
+                                <colgroup>
+                                    <col class="idle-device-name-col">
+                                    <col class="idle-resource-col">
+                                    <col class="idle-metric-col">
+                                    <col class="idle-metric-col">
+                                    <col class="idle-network-col">
+                                    <col class="idle-duration-col">
+                                    <col class="idle-status-col">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Device Name</th>
+                                        <th>Resource Type</th>
+                                        <th>Avg CPU %</th>
+                                        <th>Avg Mem %</th>
+                                        <th>Network I/O</th>
+                                        <th>Idle Duration</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let device of idleDevices; trackBy: trackByIndex">
+                                        <td>
+                                            <div class="text-primary pointer-link" [tooltip]="device.deviceName"
+                                                (click)="openIdleDevice(device)">{{device.deviceName}}</div>
+                                        </td>
+                                        <td>{{device.resourceType}}</td>
+                                        <td>
+                                            <div class="progress-track">
+                                                <div class="progress-fill" [ngClass]="getToneClass(device.avgCpu.tone)"
+                                                    [style.width.%]="device.avgCpu.percent"></div>
+                                            </div>
+                                            <div class="storage-meta">
+                                                <span>Used: {{device.avgCpu.used}}</span>
+                                                <span>Free: {{device.avgCpu.free}}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="progress-track">
+                                                <div class="progress-fill" [ngClass]="getToneClass(device.avgMem.tone)"
+                                                    [style.width.%]="device.avgMem.percent"></div>
+                                            </div>
+                                            <div class="storage-meta">
+                                                <span>Used: {{device.avgMem.used}}</span>
+                                                <span>Free: {{device.avgMem.free}}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{device.networkIO}}</td>
+                                        <td>{{device.idleDuration}}</td>
+                                        <td><i [ngClass]="getIdleStatusIconClass(device.status)"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="idle-pagination-row" *ngIf="idleDevices.length">
+                            <div class="orphaned-footer-note">*Device With <20% Memory And <5% CPU Utilization,
+                                    Indicating Low Activity.</div>
+                                    <table-pager [compact]="true" [pageNo]="idleDevicesPageNo"
+                                        [pageSize]="idleDevicesPageSize" [totalCount]="idleDevicesTotal"
+                                        (pageChange)="idleDevicesPageChange($event)"></table-pager>
+                            </div>
                         </div>
                     </div>
-                    <div class="idle-table-wrap">
-                        <app-spinner [name]="loaderNames.idleDevices" [width]="0"></app-spinner>
-                        <div class="device-status-legend" *ngIf="idleDevices.length">
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-check-circle text-success"></i>
-                                Active / Reachable
-                            </span>
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-exclamation-circle text-warning"></i>
-                                Partially Reachable / Warning State
-                            </span>
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-exclamation-triangle text-danger"></i>
-                                Offline / Critical / Unreachable
-                            </span>
-                        </div>
-                        <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
-                            <colgroup>
-                                <col class="idle-device-name-col">
-                                <col class="idle-resource-col">
-                                <col class="idle-metric-col">
-                                <col class="idle-metric-col">
-                                <col class="idle-network-col">
-                                <col class="idle-duration-col">
-                                <col class="idle-status-col">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Device Name</th>
-                                    <th>Resource Type</th>
-                                    <th>Avg CPU %</th>
-                                    <th>Avg Mem %</th>
-                                    <th>Network I/O</th>
-                                    <th>Idle Duration</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let device of idleDevices; trackBy: trackByIndex">
-                                    <td>{{device.deviceName}}</td>
-                                    <td>{{device.resourceType}}</td>
-                                    <td>
-                                        <div class="progress-track">
-                                            <div class="progress-fill" [ngClass]="getToneClass(device.avgCpu.tone)"
-                                                [style.width.%]="device.avgCpu.percent"></div>
-                                        </div>
-                                        <div class="storage-meta">
-                                            <span>Used: {{device.avgCpu.used}}</span>
-                                            <span>Free: {{device.avgCpu.free}}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="progress-track">
-                                            <div class="progress-fill" [ngClass]="getToneClass(device.avgMem.tone)"
-                                                [style.width.%]="device.avgMem.percent"></div>
-                                        </div>
-                                        <div class="storage-meta">
-                                            <span>Used: {{device.avgMem.used}}</span>
-                                            <span>Free: {{device.avgMem.free}}</span>
-                                        </div>
-                                    </td>
-                                    <td>{{device.networkIO}}</td>
-                                    <td>{{device.idleDuration}}</td>
-                                    <td><i [ngClass]="getIdleStatusIconClass(device.status)"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="idle-pagination-row" *ngIf="idleDevices.length">
-                        <div class="idle-page-size">
-                            <span>Show</span>
-                            <select class="form-control form-control-sm" [value]="idleDevicesPageSize"
-                                (change)="idleDevicesPageSizeChange($event)">
-                                <option [value]="10">10</option>
-                                <option [value]="25">25</option>
-                                <option [value]="50">50</option>
-                            </select>
-                        </div>
-                        <table-pager [compact]="true" [pageNo]="idleDevicesPageNo" [pageSize]="idleDevicesPageSize"
-                            [totalCount]="idleDevicesTotal" (pageChange)="idleDevicesPageChange($event)"></table-pager>
-                    </div>
-                </div>
 
-                <div class="dashboard-card idle-duration-card" *ngIf="hasIdleDuration">
-                    <div class="orphaned-widget-header">
-                        <div class="subsection-title mb-0">Idle duration distribution</div>
-                    </div>
-                    <div class="idle-duration-body">
-                        <app-spinner [name]="loaderNames.idleDuration" [width]="0"></app-spinner>
-                        <div class="idle-duration-content" *ngIf="idleDurationHasData">
-                            <div class="idle-duration-bars">
-                                <div class="idle-duration-row"
-                                    *ngFor="let item of idleDurationRows; trackBy: trackByIndex">
-                                    <div class="idle-duration-label">{{item.duration}}</div>
-                                    <div class="idle-duration-track">
-                                        <div class="idle-duration-fill" [style.width.%]="item.percent"
-                                            [style.background]="item.color">
-                                            <span>{{item.count}}</span>
+                    <div class="orphaned-widget-col" *ngIf="hasIdleDuration">
+                        <div class="subsection-title orphaned-widget-title">Idle Duration Distribution</div>
+                        <div class="dashboard-card idle-duration-card">
+                            <div class="idle-duration-body">
+                                <app-spinner [name]="loaderNames.idleDuration" [width]="0"></app-spinner>
+                                <div class="idle-duration-content" *ngIf="idleDurationHasData">
+                                    <div class="idle-duration-bars">
+                                        <div class="idle-duration-row"
+                                            *ngFor="let item of idleDurationRows; trackBy: trackByIndex">
+                                            <div class="idle-duration-label">{{item.duration}}</div>
+                                            <div class="idle-duration-track">
+                                                <div class="idle-duration-fill" [style.width.%]="item.percent"
+                                                    [style.background]="item.color">
+                                                    <span>{{item.count}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="idle-duration-value">{{item.count}}</div>
                                         </div>
                                     </div>
-                                    <div class="idle-duration-value">{{item.count}}</div>
+                                    <div echarts [options]="idleDurationOptions" class="idle-duration-chart"></div>
                                 </div>
                             </div>
-                            <div echarts [options]="idleDurationOptions" class="idle-duration-chart"></div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="section-title mt-3" *ngIf="hasRemediationSection">
-                <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
-                    (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top" container="body">
-                    Auto-Remediation Summary <i class="fa fa-link"></i>
-                </button>
-            </div>
-            <div class="dashboard-card remediation-card adaptive-widget-grid" *ngIf="hasRemediationSection">
-                <app-spinner [name]="loaderNames.remediationDonut" [width]="0"></app-spinner>
-                <app-spinner [name]="loaderNames.remediationActions" [width]="0"></app-spinner>
-                <app-spinner [name]="loaderNames.remediationSummary" [width]="0"></app-spinner>
-                <app-spinner [name]="loaderNames.remediationMetrics" [width]="0"></app-spinner>
-                <div class="remediation-left" *ngIf="hasRemediationDonut || hasRemediationSummary"
-                    [ngClass]="{'single-widget-grid': !(hasRemediationDonut && hasRemediationSummary)}">
-                    <div class="remediation-donut-wrap" *ngIf="hasRemediationDonut">
-                        <div echarts [options]="remediationDonutOptions" (chartInit)="onRemediationChartInit($event)"
-                            class="remediation-donut linked-chart" *ngIf="hasChartData(remediationDonutOptions)"></div>
+                <div class="section-title mt-3" *ngIf="hasRemediationSection">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        Auto-Remediation Summary <i class="fa fa-link"></i>
+                    </button>
+                </div>
+                <div class="dashboard-card remediation-card adaptive-widget-grid" *ngIf="hasRemediationSection">
+                    <app-spinner [name]="loaderNames.remediationDonut" [width]="0"></app-spinner>
+                    <app-spinner [name]="loaderNames.remediationActions" [width]="0"></app-spinner>
+                    <app-spinner [name]="loaderNames.remediationSummary" [width]="0"></app-spinner>
+                    <app-spinner [name]="loaderNames.remediationMetrics" [width]="0"></app-spinner>
+                    <div class="remediation-left" *ngIf="hasRemediationDonut || hasRemediationSummary"
+                        [ngClass]="{'single-widget-grid': !(hasRemediationDonut && hasRemediationSummary)}">
+                        <div class="remediation-donut-wrap" *ngIf="hasRemediationDonut">
+                            <div echarts [options]="remediationDonutOptions"
+                                (chartInit)="onRemediationChartInit($event)" class="remediation-donut linked-chart"
+                                *ngIf="hasChartData(remediationDonutOptions)"></div>
+                        </div>
+                        <div class="remediation-summary" *ngIf="hasRemediationSummary">
+                            <div class="remediation-legend">
+                                <span class="remediation-legend-item linked-widget"
+                                    *ngFor="let metric of remediationSummary | slice:0:2; trackBy: trackByIndex"
+                                    (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top"
+                                    container="body">
+                                    <span class="remediation-legend-swatch"
+                                        [ngClass]="metric.tone === 'danger' ? 'remediation-legend-swatch-danger' : 'remediation-legend-swatch-success'"></span>
+                                    {{metric.label}} {{metric.value}}
+                                </span>
+                            </div>
+                            <div class="remediation-run-summary linked-widget" (click)="openAutoRemediation()"
+                                [tooltip]="'Open linked page'" placement="top" container="body">
+                                <span *ngIf="remediationSummary[2] as totalMetric">{{totalMetric.label}}:
+                                    {{totalMetric.value}}</span>
+                                <span class="remediation-summary-separator"
+                                    *ngIf="remediationSummary[2] && remediationSummary[3]">|</span>
+                                <span *ngIf="remediationSummary[3] as durationMetric">{{durationMetric.label}}:
+                                    {{durationMetric.value}}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="remediation-summary" *ngIf="hasRemediationSummary">
-                        <div class="remediation-legend">
-                            <span class="remediation-legend-item linked-widget"
-                                *ngFor="let metric of remediationSummary | slice:0:2; trackBy: trackByIndex"
+                    <div class="remediation-actions" *ngIf="hasRemediationActions">
+                        <div class="chart-title">
+                            <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
                                 (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top"
                                 container="body">
-                                <span class="remediation-legend-swatch"
-                                    [ngClass]="metric.tone === 'danger' ? 'remediation-legend-swatch-danger' : 'remediation-legend-swatch-success'"></span>
-                                {{metric.label}} {{metric.value}}
-                            </span>
+                                Top Auto-Remediation Actions <i class="fa fa-link"></i>
+                            </button>
                         </div>
-                        <div class="remediation-run-summary linked-widget" (click)="openAutoRemediation()"
-                            [tooltip]="'Open linked page'" placement="top" container="body">
-                            <span *ngIf="remediationSummary[2] as totalMetric">{{totalMetric.label}}:
-                                {{totalMetric.value}}</span>
-                            <span class="remediation-summary-separator"
-                                *ngIf="remediationSummary[2] && remediationSummary[3]">|</span>
-                            <span *ngIf="remediationSummary[3] as durationMetric">{{durationMetric.label}}:
-                                {{durationMetric.value}}</span>
+                        <div echarts [options]="remediationActionsOptions" (chartInit)="onRemediationChartInit($event)"
+                            class="remediation-chart linked-chart" *ngIf="hasChartData(remediationActionsOptions)">
                         </div>
                     </div>
-                </div>
-                <div class="remediation-actions" *ngIf="hasRemediationActions">
-                    <div class="chart-title">
-                        <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                    <div class="remediation-metric-card" *ngIf="hasRemediationMetrics">
+                        <div class="remediation-metric linked-widget"
+                            *ngFor="let metric of remediationMetrics; trackBy: trackByIndex"
                             (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top"
                             container="body">
-                            Top Auto-Remediation Actions <i class="fa fa-link"></i>
-                        </button>
-                    </div>
-                    <div echarts [options]="remediationActionsOptions" (chartInit)="onRemediationChartInit($event)"
-                        class="remediation-chart linked-chart" *ngIf="hasChartData(remediationActionsOptions)"></div>
-                </div>
-                <div class="remediation-metric-card" *ngIf="hasRemediationMetrics">
-                    <div class="remediation-metric linked-widget"
-                        *ngFor="let metric of remediationMetrics; trackBy: trackByIndex" (click)="openAutoRemediation()"
-                        [tooltip]="'Open linked page'" placement="top" container="body">
-                        <div class="metric-label">{{metric.label}}</div>
-                        <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+                            <div class="metric-label">{{metric.label}}</div>
+                            <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
         </ng-container>
     </div>
 </div>

@@ -26,7 +26,9 @@ import {
   UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY,
   UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS,
   UNIFIED_AIOPS_ALERT_DURATION_OPTIONS,
+  UNIFIED_AIOPS_ALERT_SEVERITY_TYPE_OPTIONS,
   UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS,
+  UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND,
   UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL
 } from './unified-aiops-command-centre.const';
 import {
@@ -109,7 +111,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
   private isDestroyed = false;
   private readonly recentAlertsDisplayLimit = 10;
-  private readonly discoveryCategoryLimit = 13;
   private datacenterGeographyMapElementRef: ElementRef<HTMLElement> | null = null;
   private datacenterGeographyMap: google.maps.Map | null = null;
   private datacenterGeographyCluster: MarkerClusterer | null = null;
@@ -203,17 +204,17 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   alertsFilterForm: FormGroup;
   readonly alertsDeviceTypeOptions: UnifiedAiopsDeviceTypeOption[] = UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS;
   readonly alertsViewByOptions: UnifiedAiopsViewByOption[] = UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS;
+  readonly alertsSeverityTypeOptions: UnifiedAiopsFilterOption[] = UNIFIED_AIOPS_ALERT_SEVERITY_TYPE_OPTIONS;
+  alertsSourceTypeOptions: UnifiedAiopsFilterOption[] = [];
+  private alertsSourceTypesSeeded = false;
+  private alertsFilterSnapshot = '';
   readonly alertsDurationOptions = UNIFIED_AIOPS_ALERT_DURATION_OPTIONS;
   readonly alertsDefaultViewBy = UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY;
   alertsDuration: string = UNIFIED_AIOPS_ALERT_DEFAULT_DURATION;
   private alertsDateRange: UnifiedAiopsAlertsDateRange | null = null;
-  readonly availabilityMonitorOptions = ['Datacenter', 'Compute', 'Containers', 'Applications', 'Database', 'Storage'];
-  readonly availabilityTimeRangeOptions = ['1 Hour', '24 Hour', '7 Days', '30 Days', '60 Days', '90 Days'];
   datacenterOptions: UnifiedAiopsFilterOption[] = [];
   cloudOptions: UnifiedAiopsCloudFilterOption[] = [];
   refreshedText = '';
-  selectedAvailabilityMonitor = 'Datacenter';
-  selectedAvailabilityTimeRange = '30 Days';
   appliedFilterCriteria: UnifiedAiopsDashboardFilterCriteria = {
     datacenters: [],
     clouds: []
@@ -224,15 +225,18 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   discoveryDisplayRows: UnifiedAiopsDiscoveryCoverageRow[] = [];
   discoverySummary: UnifiedAiopsDiscoverySummary = { discovered: '0', monitored: '0', coverage: 'NA' };
   discoveryOptions: EChartsOption = {};
+  // Dropdown lists only the categories actually present in the API response (plus All Category),
+  // so a user can never pick an empty category that would blank the widget.
   discoveryCategoryOptions: string[] = ['All Category'];
   selectedDiscoveryCategory = 'All Category';
   alertSegregationItems: UnifiedAiopsStackItem[] = [];
   alertSegregationDisplayItems: UnifiedAiopsStackItem[] = [];
   alertSegregationOptions: EChartsOption = {};
   alertSegregationSummary: UnifiedAiopsAlertSegregationSummary = { critical: '0', warning: '0', info: '0' };
-  alertSegregationCategoryOptions: string[] = ['All'];
-  selectedAlertSegregationCategory = 'All';
+  alertSegregationCategoryOptions: string[] = ['All Category'];
+  selectedAlertSegregationCategory = 'All Category';
   businessServices: UnifiedAiopsBusinessService[] = [];
+  readonly businessServiceLegend = UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND;
   geoHeatmapOptions: EChartsOption = {};
   privateCloudCoverage: UnifiedAiopsCoverageCard[] = [];
   publicCloudCoverageGroups: UnifiedAiopsCoverageGroup[] = [];
@@ -259,6 +263,10 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     unknown: 'NA'
   };
   availabilityCategoryRows: UnifiedAiopsAvailabilityCategoryRow[] = [];
+  availabilityCategoryDisplayRows: UnifiedAiopsAvailabilityCategoryRow[] = [];
+  // Dropdown lists only the categories present in the response (plus All Category); client-side filter like Discovery.
+  availabilityCategoryFilterOptions: string[] = ['All Category'];
+  selectedAvailabilityCategory = 'All Category';
   alertTrendOptions: EChartsOption = {};
   alertReductionMetrics: UnifiedAiopsMetric[] = [];
   alertResponseMetrics: UnifiedAiopsMetric[] = [];
@@ -401,6 +409,13 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     maxHeight: '240px'
   };
 
+  // Per-filter "All X" summary text for the Alerts widget multiselects (matches the design).
+  alertsSourceTypeTexts: IMultiSelectTexts = { ...this.multiselectTexts, defaultTitle: 'All Source', allSelected: 'All Source' };
+  alertsSeverityTypeTexts: IMultiSelectTexts = { ...this.multiselectTexts, defaultTitle: 'All Severity', allSelected: 'All Severity' };
+  alertsDatacenterTexts: IMultiSelectTexts = { ...this.multiselectTexts, defaultTitle: 'All Datacenter', allSelected: 'All Datacenter' };
+  alertsCloudTexts: IMultiSelectTexts = { ...this.multiselectTexts, defaultTitle: 'All Cloud', allSelected: 'All Cloud' };
+  alertsDeviceTexts: IMultiSelectTexts = { ...this.multiselectTexts, defaultTitle: 'All Devices', allSelected: 'All Devices' };
+
   constructor(private svc: UnifiedAiopsCommandCentreService,
     private dashboardMapWidgetService: DashboardMapWidgetService,
     public mapSvc: MapService,
@@ -531,15 +546,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     };
   }
 
-  /** Builds the criteria for the Availability By Category widget; time range is sent as the `duration` param. */
-  private getAvailabilityCategoryCriteria(): UnifiedAiopsDashboardFilterCriteria {
-    return {
-      ...this.appliedFilterCriteria,
-      availabilityMonitor: this.selectedAvailabilityMonitor,
-      duration: this.selectedAvailabilityTimeRange
-    };
-  }
-
   /** Stores the filter set currently driving the rendered widget data. */
   private updateAppliedFilterCriteria() {
     this.appliedFilterCriteria = this.getFilterFormOutput();
@@ -550,53 +556,95 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     return !!this.filterForm;
   }
 
-  onAvailabilityMonitorChange(event: Event) {
-    this.selectedAvailabilityMonitor = String((event.target as HTMLSelectElement)?.value || 'Datacenter');
-    this.reloadAvailabilityCategory();
+  onAvailabilityCategoryChange(event: Event) {
+    this.selectedAvailabilityCategory = String((event.target as HTMLSelectElement)?.value || 'All Category');
+    this.applyAvailabilityCategorySelection();
   }
 
-  onAvailabilityTimeRangeChange(event: Event) {
-    this.selectedAvailabilityTimeRange = String((event.target as HTMLSelectElement)?.value || '30 Days');
-    this.reloadAvailabilityCategory();
-  }
-
-  /** Reloads only the Availability By Category widget; Device Availability and Alert Trend are untouched. */
-  private reloadAvailabilityCategory() {
-    if (!this.hasFilterFormData()) {
-      return;
-    }
-    this.getAvailabilityCategory(this.getAvailabilityCategoryCriteria());
+  /** Client-side filter: 'All Category' shows every mapped category; a specific pick narrows the chart, list and KPIs to it. */
+  private applyAvailabilityCategorySelection() {
+    this.availabilityCategoryDisplayRows = this.selectedAvailabilityCategory === 'All Category'
+      ? this.availabilityCategoryRows
+      : this.availabilityCategoryRows.filter(row => row.label === this.selectedAvailabilityCategory);
+    this.availabilityCategoryOptions = this.svc.convertToAvailabilityCategoryOptions(this.availabilityCategoryDisplayRows);
+    this.availabilityCategorySummary = this.svc.convertToAvailabilityCategorySummary(this.availabilityCategoryDisplayRows);
   }
 
   /** Builds (first load) or re-syncs (on global apply) the Alerts widget's local filters from the page-level scope. */
   private setupAlertsFilters() {
     const datacenters = this.clonePageSelection('datacenters');
     const clouds = this.clonePageSelection('clouds');
+    // Severity Type defaults to every severity selected so the "All Severity" label matches the checked options.
+    const severityTypes = [...this.alertsSeverityTypeOptions];
     if (!this.alertsFilterForm) {
       this.alertsFilterForm = this.svc.buildAlertsFilterForm(datacenters, clouds, [], this.alertsDefaultViewBy);
-      this.alertsFilterForm.valueChanges
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(() => this.reloadAlerts());
-      return;
+      this.alertsFilterForm.get('severityTypes')?.setValue(severityTypes, { emitEvent: false });
+    } else {
+      this.alertsFilterForm.patchValue({
+        datacenters,
+        clouds,
+        deviceTypes: [],
+        viewBy: this.alertsDefaultViewBy,
+        sourceTypes: [],
+        severityTypes
+      });
     }
-    this.alertsFilterForm.patchValue({
-      datacenters,
-      clouds,
-      deviceTypes: [],
-      viewBy: this.alertsDefaultViewBy
-    });
+    // Source Type options load from the API; pre-select them all once they arrive (see getAlertSourceTypeOptions).
+    this.alertsSourceTypesSeeded = false;
+    // The Alerts widget reloads only when a multiselect closes or View By/Duration changes
+    // (NOT on every option toggle), so trigger the initial / re-synced load explicitly here.
+    this.reloadAlerts();
   }
 
-  /** Reloads only the Alerts widget APIs using the widget-local filter selections. */
-  private reloadAlerts() {
+  /** Reloads only the Alerts widget APIs using the widget-local filter selections. Called on multiselect close / View By / Duration change. */
+  reloadAlerts() {
     if (!this.hasFilterFormData() || !this.alertsFilterForm) {
       return;
     }
     const alertsCriteria = this.getAlertsCriteria();
+    if (this.alertsSelectedViewBy === 'event_source') {
+      this.getAlertSourceTypeOptions(alertsCriteria);
+    }
     this.getAlertReductionMetrics(alertsCriteria);
     this.getAlertResponseMetrics(alertsCriteria);
     this.getAlertSourceSankey(alertsCriteria);
     this.getAlertLifecycleSankey(alertsCriteria);
+  }
+
+  /** Snapshots the Alerts filter selection when a multiselect opens, so a real change can be detected on close. */
+  onAlertsFilterOpen() {
+    this.alertsFilterSnapshot = this.getAlertsCriteriaKey(this.getAlertsCriteria());
+  }
+
+  /** Reloads the Alerts widget only when the selection actually changed while the multiselect was open. */
+  onAlertsFilterClose() {
+    if (this.getAlertsCriteriaKey(this.getAlertsCriteria()) !== this.alertsFilterSnapshot) {
+      this.reloadAlerts();
+    }
+  }
+
+  /** Loads the Source Type multiselect options from the alerts response (full source list, ignoring any source/severity selection). */
+  private getAlertSourceTypeOptions(criteria: UnifiedAiopsDashboardFilterCriteria) {
+    const optionsCriteria: UnifiedAiopsDashboardFilterCriteria = { ...criteria, sourceTypes: [], severityTypes: [] };
+    this.svc.getAlertSourceOptions(optionsCriteria)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(options => {
+        const sourceOptions = options || [];
+        // The multiselect matches selection by object reference, and these options are re-created on
+        // every load. Seed every source on first load, then remap the existing selection (by value)
+        // onto the new option objects so the checked state stays in sync with the live options.
+        const selectedValues = this.alertsSourceTypesSeeded
+          ? this.getValuesFromOptions(this.alertsFilterForm?.get('sourceTypes')?.value || [])
+          : sourceOptions.map(option => option.value);
+        this.alertsSourceTypesSeeded = true;
+        this.alertsSourceTypeOptions = sourceOptions;
+        this.alertsFilterForm?.get('sourceTypes')?.setValue(
+          sourceOptions.filter(option => selectedValues.indexOf(option.value) > -1),
+          { emitEvent: false }
+        );
+      }, () => {
+        this.alertsSourceTypeOptions = [];
+      });
   }
 
   /** Reads the Alerts widget-local filter form into the criteria sent to the Alerts APIs. */
@@ -604,8 +652,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     const datacenters = this.getValuesFromOptions(this.alertsFilterForm?.get('datacenters')?.value || []);
     const clouds = this.getValuesFromOptions(this.alertsFilterForm?.get('clouds')?.value || []);
     const deviceTypes = ((this.alertsFilterForm?.get('deviceTypes')?.value as string[]) || []).filter(value => !!value);
-    const viewBy = this.alertsFilterForm?.get('viewBy')?.value || this.alertsDefaultViewBy;
-    return {
+    const viewBy = this.alertsSelectedViewBy;
+    const criteria: UnifiedAiopsDashboardFilterCriteria = {
       datacenters,
       clouds,
       deviceTypes,
@@ -614,6 +662,32 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       startDate: this.alertsDateRange?.from || '',
       endDate: this.alertsDateRange?.to || ''
     };
+    if (viewBy === 'event_source') {
+      criteria.sourceTypes = this.getValuesFromOptions(this.alertsFilterForm?.get('sourceTypes')?.value || []);
+    } else if (viewBy === 'severity') {
+      criteria.severityTypes = this.getValuesFromOptions(this.alertsFilterForm?.get('severityTypes')?.value || []);
+    }
+    return criteria;
+  }
+
+  /** Builds an order-independent key for the Alerts criteria so a reload can be skipped when nothing changed. */
+  private getAlertsCriteriaKey(criteria: UnifiedAiopsDashboardFilterCriteria): string {
+    const sortedCsv = (values?: string[]) => [...(values || [])].sort().join(',');
+    return [
+      sortedCsv(criteria.datacenters),
+      sortedCsv(criteria.clouds),
+      sortedCsv(criteria.deviceTypes),
+      sortedCsv(criteria.sourceTypes),
+      sortedCsv(criteria.severityTypes),
+      criteria.viewBy || '',
+      criteria.duration || '',
+      criteria.startDate || '',
+      criteria.endDate || ''
+    ].join('|');
+  }
+
+  get alertsSelectedViewBy(): string {
+    return this.alertsFilterForm?.get('viewBy')?.value || this.alertsDefaultViewBy;
   }
 
   /** Handles the Alerts duration dropdown selection (named period or custom range) and reloads the Alerts widget. */
@@ -649,10 +723,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   get cloudScopeSummary(): UnifiedAiopsFilterScopeSummary {
     return this.getScopeSummary(this.cloudOptions, this.appliedFilterCriteria.clouds, 'No clouds');
-  }
-
-  get availabilityCategoryListTitle(): string {
-    return this.selectedAvailabilityMonitor === 'Datacenter' ? 'Datacentre' : this.selectedAvailabilityMonitor;
   }
 
   private getScopeSummary(options: UnifiedAiopsFilterOption[], selectedValues: string[], emptyLabel: string): UnifiedAiopsFilterScopeSummary {
@@ -699,7 +769,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
     const filterFormOutput = this.appliedFilterCriteria;
-    const availabilityCategoryCriteria = this.getAvailabilityCategoryCriteria();
     this.startWidgetLoadingState();
     this.setupAlertsFilters();
     setTimeout(() => {
@@ -720,7 +789,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.getPlatformPerformance(filterFormOutput);
       this.getPerformanceMetrics(filterFormOutput);
       this.getDeviceAvailability(filterFormOutput);
-      this.getAvailabilityCategory(availabilityCategoryCriteria);
+      this.getAvailabilityCategory(filterFormOutput);
       this.getAlertTrend(filterFormOutput);
       this.getOrphanedDevices(filterFormOutput);
       this.getOrphanedDevicesByCategory(filterFormOutput);
@@ -761,11 +830,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.applyDiscoveryCategorySelection();
   }
 
-  /** Client-side filter: 'All Category' shows every category; a specific pick narrows the chart, list and KPIs to it. */
+  /** Client-side filter: 'All Category' shows every mapped category; a specific pick narrows the chart, list and KPIs to it. */
   private applyDiscoveryCategorySelection() {
     if (this.selectedDiscoveryCategory === 'All Category') {
-      // Chart/list cap to the top categories by discovered; KPIs stay the grand total of every category.
-      this.discoveryDisplayRows = this.discoveryRows.slice(0, this.discoveryCategoryLimit);
+      // Show every mapped category in canonical order; KPIs are the grand total across them.
+      this.discoveryDisplayRows = this.discoveryRows;
       this.discoverySummary = this.svc.convertToDiscoverySummary(this.discoveryRows);
     } else {
       this.discoveryDisplayRows = this.discoveryRows.filter(row => row.category === this.selectedDiscoveryCategory);
@@ -787,8 +856,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.resetAlertSegregationState();
     this.loadWidget(this.loaderNames.alertSegregation, this.svc.getAlertSegregationItems(filterFormOutput), res => {
       this.alertSegregationItems = res || [];
-      this.alertSegregationCategoryOptions = ['All', ...this.alertSegregationItems.map(item => item.name)];
-      this.selectedAlertSegregationCategory = 'All';
+      this.alertSegregationCategoryOptions = ['All Category', ...this.alertSegregationItems.map(item => item.name)];
+      this.selectedAlertSegregationCategory = 'All Category';
       this.applyAlertSegregationCategorySelection();
     }, () => {
       this.resetAlertSegregationState();
@@ -796,13 +865,13 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   onAlertSegregationCategoryChange(event: Event) {
-    this.selectedAlertSegregationCategory = String((event.target as HTMLSelectElement)?.value || 'All');
+    this.selectedAlertSegregationCategory = String((event.target as HTMLSelectElement)?.value || 'All Category');
     this.applyAlertSegregationCategorySelection();
   }
 
-  /** Client-side filter: 'All' aggregates every category; a specific pick narrows the chart and recomputes the severity totals. */
+  /** Client-side filter: 'All Category' aggregates every category; a specific pick narrows the chart and recomputes the severity totals. */
   private applyAlertSegregationCategorySelection() {
-    this.alertSegregationDisplayItems = this.selectedAlertSegregationCategory === 'All'
+    this.alertSegregationDisplayItems = this.selectedAlertSegregationCategory === 'All Category'
       ? this.alertSegregationItems
       : this.alertSegregationItems.filter(item => item.name === this.selectedAlertSegregationCategory);
     this.alertSegregationOptions = this.svc.convertToAlertSegregationOptions(this.alertSegregationDisplayItems);
@@ -813,8 +882,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.alertSegregationItems = [];
     this.alertSegregationDisplayItems = [];
     this.alertSegregationOptions = {};
-    this.alertSegregationCategoryOptions = ['All'];
-    this.selectedAlertSegregationCategory = 'All';
+    this.alertSegregationCategoryOptions = ['All Category'];
+    this.selectedAlertSegregationCategory = 'All Category';
     this.alertSegregationSummary = { critical: '0', warning: '0', info: '0' };
   }
 
@@ -1270,18 +1339,24 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   getAvailabilityCategory(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.availabilityCategoryOptions = {};
-    this.availabilityCategorySummary = this.getEmptyAvailabilityCategorySummary();
-    this.availabilityCategoryRows = [];
+    this.resetAvailabilityCategoryState();
     this.loadWidget(this.loaderNames.availabilityCategory, this.svc.getAvailabilityCategory(filterFormOutput), res => {
-      this.availabilityCategoryOptions = this.svc.convertToAvailabilityCategoryOptions(res);
-      this.availabilityCategorySummary = this.svc.convertToAvailabilityCategorySummary(res);
-      this.availabilityCategoryRows = this.svc.convertToAvailabilityCategoryRows(res);
+      this.availabilityCategoryRows = res || [];
+      this.availabilityCategoryFilterOptions = ['All Category', ...this.availabilityCategoryRows.map(row => row.label)];
+      this.selectedAvailabilityCategory = 'All Category';
+      this.applyAvailabilityCategorySelection();
     }, () => {
-      this.availabilityCategoryOptions = {};
-      this.availabilityCategorySummary = this.getEmptyAvailabilityCategorySummary();
-      this.availabilityCategoryRows = [];
+      this.resetAvailabilityCategoryState();
     }, 'availabilityCategory');
+  }
+
+  private resetAvailabilityCategoryState() {
+    this.availabilityCategoryRows = [];
+    this.availabilityCategoryDisplayRows = [];
+    this.availabilityCategoryOptions = {};
+    this.availabilityCategoryFilterOptions = ['All Category'];
+    this.selectedAvailabilityCategory = 'All Category';
+    this.availabilityCategorySummary = this.getEmptyAvailabilityCategorySummary();
   }
 
   getAlertTrend(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1364,10 +1439,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.getOrphanedDevices(this.appliedFilterCriteria);
   }
 
-  orphanedDevicesPageSizeChange(event: Event) {
-    this.orphanedDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
-    this.orphanedDevicesPageNo = 1;
-    this.getOrphanedDevices(this.appliedFilterCriteria);
+  openOrphanedDevice(device: UnifiedAiopsOrphanedDeviceRow) {
+    this.openRouteInNewTab(this.getCategoryRoute(device?.resourceType, device?.provider) || this.linkRoutes.devices);
+  }
+
+  openIdleDevice(device: UnifiedAiopsIdleDeviceRow) {
+    this.openRouteInNewTab(this.getCategoryRoute(device?.resourceType, device?.provider) || this.linkRoutes.devices);
   }
 
   getIdleDevices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1402,12 +1479,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
     this.idleDevicesPageNo = pageNo;
-    this.getIdleDevices(this.appliedFilterCriteria);
-  }
-
-  idleDevicesPageSizeChange(event: Event) {
-    this.idleDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
-    this.idleDevicesPageNo = 1;
     this.getIdleDevices(this.appliedFilterCriteria);
   }
 

@@ -2,6 +2,11 @@ import { EChartsOption } from 'echarts';
 
 export type UnifiedAiopsTone = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'muted';
 
+export interface UnifiedAiopsStatusLegendItem {
+  tone: UnifiedAiopsTone;
+  label: string;
+}
+
 export interface UnifiedAiopsFilterOption {
   value: string;
   label: string;
@@ -19,9 +24,9 @@ export interface UnifiedAiopsCloudFilterOption extends UnifiedAiopsFilterOption 
 export interface UnifiedAiopsDashboardFilterCriteria {
   datacenters: string[];
   clouds: string[];
-  availabilityMonitor?: string;
-  availabilityTimeRange?: string;
   deviceTypes?: string[];
+  sourceTypes?: string[];
+  severityTypes?: string[];
   viewBy?: string;
   duration?: string;
   startDate?: string;
@@ -68,6 +73,15 @@ export interface UnifiedAiopsDiscoverySummary {
   discovered: string;
   monitored: string;
   coverage: string;
+}
+
+export interface UnifiedAiopsDiscoveryCategory {
+  // Canonical API resource-type key (slug of the display label, e.g. 'private_cloud_compute').
+  key: string;
+  // Clean, human-readable name shown in the chart, list and dropdown.
+  label: string;
+  // Legacy / alternate API keys that also resolve to this category.
+  aliases?: string[];
 }
 
 export interface UnifiedAiopsAlertSegregationSummary {
@@ -138,15 +152,11 @@ export interface UnifiedAiopsAvailabilityCategorySummary {
 
 export interface UnifiedAiopsAvailabilityCategoryRow {
   label: string;
+  up: number;
+  down: number;
+  unknown: number;
   upLabel: string;
-  upValue: number;
   tone: UnifiedAiopsTone;
-}
-
-export interface UnifiedAiopsAvailabilityCategoryViewData {
-  options: EChartsOption;
-  summary: UnifiedAiopsAvailabilityCategorySummary;
-  rows: UnifiedAiopsAvailabilityCategoryRow[];
 }
 
 export interface UnifiedAiopsBusinessService {
@@ -213,9 +223,11 @@ export interface UnifiedAiopsOrphanedDeviceResponseItem {
   resource_type?: string;
   resourceType?: string;
   type?: string;
+  device_type?: string;
   status?: string;
   lastSeen?: string;
   last_seen?: string;
+  last_availability_time?: string;
   datacenter?: string;
   datacenter_name?: string;
   cloud?: string;
