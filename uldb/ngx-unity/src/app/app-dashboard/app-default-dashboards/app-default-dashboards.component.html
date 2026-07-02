@@ -31,11 +31,13 @@
                             <tbody>
                                 <tr *ngFor="let view of viewData" truncateText>
                                     <td class="tdw-25">
-                                        <button class="btn btn-link text-decoration-none p-0 table-column-btn"
-                                            type="button" [tooltip]="view.name" (click)="goToDefaultDashboard(view)"
+                                        <a *ngIf="view.defaultDashboardUrl"
+                                            class="btn btn-link text-decoration-none p-0 table-column-btn"
+                                            [routerLink]="[view.defaultDashboardUrl]" [tooltip]="view.name"
                                             accessControl moduleName="Dashboard" accessType="View Dashboard"
                                             elementType="div"
-                                            [modulePermissions]="view.applicableModulePermissions">{{view.name}}</button>
+                                            [modulePermissions]="view.applicableModulePermissions">{{view.name}}</a>
+                                        <span *ngIf="!view.defaultDashboardUrl" [tooltip]="view.name">{{view.name}}</span>
                                     </td>
                                     <td class="tdw-15">
                                         <div [tooltip]="view.type">{{view.type}}</div>

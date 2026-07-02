@@ -171,6 +171,7 @@ export class AppDashboardCollectionsViewService {
         return 'public-cloud-compute';
       case 'database dashboard':
         return 'database';
+      case 'navigator central':
       case 'unified aiops command center':
       case 'unified aiops command center dashboard':
       case 'unified aiops command centre':

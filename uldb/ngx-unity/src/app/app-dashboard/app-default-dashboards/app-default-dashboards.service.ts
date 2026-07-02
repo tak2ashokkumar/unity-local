@@ -60,7 +60,7 @@ export class AppDefaultDashboardsService {
       case 'unified aiops command center dashboard':
       case 'unified aiops command centre':
       case 'unified aiops command centre dashboard':
-        return 'unified-aiops-command-centre';
+        return 'navigator-central';
     }
   }
 }

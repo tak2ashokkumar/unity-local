@@ -372,11 +372,11 @@ export const DEFAULT_DASHBOARD_ROUTES: Routes = [
         },
     },
     {
-        path: 'default/unified-aiops-command-centre',
+        path: 'default/navigator-central',
         component: UnifiedAiopsCommandCentreComponent,
         data: {
             breadcrumb: {
-                title: 'Unified AIOps Command Center',
+                title: 'Navigator Central',
                 stepbackCount: 1
             }
         },
