@@ -1,0 +1,14 @@
+{
+  "cloud": "all",
+  "hours": 24,
+  "count": 10,
+  "summary": {
+    "total_latency": 9.4,
+    "total_latency_display": "9.4 ms",
+    "breakdown": [
+      { "name": "Success Server Time", "key": "success_server_time", "value": 5.7, "unit": "ms", "display_value": "5.7 ms", "percentage": 61 },
+      { "name": "Network / Queue Delay", "key": "network_queue_delay", "value": 3.7, "unit": "ms", "display_value": "3.7 ms", "percentage": 39 },
+      { "name": "Client/Other Time", "key": "client_other_time", "value": 0.2, "unit": "ms", "display_value": "0.2 ms", "percentage": 2 }
+    ]
+  }
+}

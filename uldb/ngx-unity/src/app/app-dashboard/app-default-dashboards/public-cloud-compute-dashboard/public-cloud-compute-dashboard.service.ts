@@ -3,12 +3,26 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { EChartsOption } from 'echarts';
 import * as moment from 'moment';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import {
   PUBLIC_CLOUD_ACTIVE_DATABASE_WORKLOAD_ENDPOINT,
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
+  PUBLIC_CLOUD_DATABASE_OVERVIEW_ENDPOINT,
+  PUBLIC_CLOUD_DATABASE_OVERVIEW_KPI_CONFIG,
+  PUBLIC_CLOUD_DATABASE_WRITE_TREND_ENDPOINT,
+  PUBLIC_CLOUD_DATABASE_READ_TREND_ENDPOINT,
+  PUBLIC_CLOUD_DATABASE_CAPACITY_RESOURCES_ENDPOINT,
+  PUBLIC_CLOUD_DATABASE_SPACE_CONSUMPTION_ENDPOINT,
+  PUBLIC_CLOUD_DATABASE_SPACE_KPI_CONFIG,
+  PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS,
+  PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS,
+  PUBLIC_CLOUD_STORAGE_RESOURCES_ENDPOINT,
+  PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_ENDPOINT,
+  PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS,
+  PUBLIC_CLOUD_LATENCY_BREAKDOWN_ENDPOINT,
+  PUBLIC_CLOUD_LATENCY_BREAKDOWN_COLORS,
   PUBLIC_CLOUD_COVERAGE_GROUP_LABELS,
   PUBLIC_CLOUD_COVERAGE_GROUP_ORDER,
   PUBLIC_CLOUD_COVERAGE_PROVIDER_LABELS,
@@ -57,6 +71,23 @@ import {
 } from './public-cloud-compute-dashboard.const';
 import {
   PublicCloudAccountOption,
+  PublicCloudDatabaseKpi,
+  PublicCloudDatabaseOverviewResponse,
+  PublicCloudDatabaseOverviewRow,
+  PublicCloudDatabaseCapacityResponse,
+  PublicCloudDatabaseSpaceConsumptionResponse,
+  PublicCloudDatabaseSpaceRow,
+  PublicCloudDatabaseTrendResponse,
+  PublicCloudDatabaseTrendSeriesItem,
+  PublicCloudStoragePerformanceCard,
+  PublicCloudStorageMetricResponse,
+  PublicCloudStorageHighLatencyResponse,
+  PublicCloudStorageResourceRow,
+  PublicCloudStorageResourcesResponse,
+  PublicCloudWritePerformanceResponse,
+  PublicCloudWritePerformanceViewData,
+  PublicCloudLatencyBreakdownResponse,
+  PublicCloudLatencyBreakdownViewData,
   PublicCloudActiveDatabaseWorkloadViewData,
   PublicCloudAlertSummaryMetric,
   PublicCloudDatabaseBarItem,
@@ -1947,6 +1978,499 @@ export class PublicCloudComputeDashboardService {
   }
   /*
    * ******End ****** Cloud Storage Health Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Cloud Database Performance (redesigned) Widget Related -------------------
+   */
+  getDatabaseOverview(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseOverviewResponse> {
+    return this.http.get<PublicCloudDatabaseOverviewResponse>(PUBLIC_CLOUD_DATABASE_OVERVIEW_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToDatabaseOverviewKpis(data: PublicCloudDatabaseOverviewResponse): PublicCloudDatabaseKpi[] {
+    const rows = data?.data || [];
+    return PUBLIC_CLOUD_DATABASE_OVERVIEW_KPI_CONFIG.map(item => {
+      const values = rows
+        .map(row => this.getFirstNumericValue((row as unknown as Record<string, string | number>)[item.field]))
+        .filter((value): value is number => value !== null);
+      const aggregate = !values.length ? null :
+        item.agg === 'max' ? Math.max(...values) : values.reduce((sum, value) => sum + value, 0) / values.length;
+      const unit = this.getFirstValue((rows[0] as unknown as Record<string, string>)?.[item.unitField]);
+      return this.convertToDatabaseKpi(item.label, aggregate === null ? '' : aggregate, unit);
+    });
+  }
+
+  convertToDatabaseOverviewRows(data: PublicCloudDatabaseOverviewResponse): PublicCloudDatabaseOverviewRow[] {
+    return (data?.data || []).map(item => ({
+      instance: this.getFirstValue(item.database_instance),
+      uuid: this.getFirstValue(item.uuid),
+      writeThroughput: this.getNumericValue(item.write_throughput),
+      writeLatency: this.getNumericValue(item.write_latency),
+      writeIops: this.getNumericValue(item.write_iops),
+      readThroughput: this.getNumericValue(item.read_throughput),
+      readLatency: this.getNumericValue(item.read_latency),
+      readIops: this.getNumericValue(item.read_iops),
+      queueDepth: this.getNumericValue(item.queue_depth)
+    })).filter(row => !!row.instance);
+  }
+
+  getDatabaseWriteTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseTrendResponse> {
+    return this.http.get<PublicCloudDatabaseTrendResponse>(PUBLIC_CLOUD_DATABASE_WRITE_TREND_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getDatabaseReadTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseTrendResponse> {
+    return this.http.get<PublicCloudDatabaseTrendResponse>(PUBLIC_CLOUD_DATABASE_READ_TREND_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToDatabaseWritePerformanceOptions(data: PublicCloudDatabaseTrendResponse): EChartsOption {
+    return this.buildDatabaseTrendOptions(data, [
+      { key: 'write_throughput', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.throughput, axis: 0 },
+      { key: 'write_iops', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.iops, axis: 0 },
+      { key: 'write_latency', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.latency, axis: 1 }
+    ]);
+  }
+
+  convertToDatabaseReadPerformanceOptions(data: PublicCloudDatabaseTrendResponse): EChartsOption {
+    return this.buildDatabaseTrendOptions(data, [
+      { key: 'read_throughput', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.throughput, axis: 0 },
+      { key: 'read_iops', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.iops, axis: 0 },
+      { key: 'read_latency', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.latency, axis: 1 },
+      { key: 'queue_depth', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.queue_depth, axis: 1 }
+    ]);
+  }
+
+  hasDatabaseTrendSeries(data: PublicCloudDatabaseTrendResponse): boolean {
+    const series = this.getDatabaseTrendSeries(data);
+    return Object.keys(series).some(key => !!(series[key]?.points || []).length);
+  }
+
+  private getDatabaseTrendSeries(data: PublicCloudDatabaseTrendResponse): Record<string, PublicCloudDatabaseTrendSeriesItem> {
+    return ((data?.data || [])[0]?.series || {}) as Record<string, PublicCloudDatabaseTrendSeriesItem>;
+  }
+
+  private buildDatabaseTrendOptions(data: PublicCloudDatabaseTrendResponse, configs: Array<{ key: string, color: string, axis: number }>): EChartsOption {
+    const series = this.getDatabaseTrendSeries(data);
+    const activeConfigs = configs.filter(config => !!(series[config.key]?.points || []).length);
+    const labels = this.getDatabaseTrendLabels(activeConfigs.length ? series[activeConfigs[0].key].points : []);
+    const chartSeries = activeConfigs.map(config => ({
+      name: this.getFirstValue(series[config.key].label) || config.key,
+      color: config.color,
+      values: (series[config.key].points || []).map(point => this.getNumericValue(point?.value)),
+      axis: config.axis
+    }));
+    const throughputUnit = this.getFirstValue(series[configs[0].key]?.unit) || 'Bps';
+    const iopsUnit = this.getFirstValue(series[configs.find(config => config.key.endsWith('iops'))?.key || '']?.unit) || 'RPS';
+    const latencyUnit = this.getFirstValue(series[configs.find(config => config.key.endsWith('latency'))?.key || '']?.unit) || 'ms';
+    const leftName = `Throughput (${throughputUnit}) / IOPS (${iopsUnit})`;
+    const rightName = configs.some(config => config.key === 'queue_depth') ? `Latency (${latencyUnit}) / Queue Depth` : `Latency (${latencyUnit})`;
+    return this.getDatabaseTrendOptions(labels, chartSeries, leftName, rightName);
+  }
+
+  private getDatabaseTrendLabels(points?: Array<{ clock?: number; value?: number | string }>): string[] {
+    return (points || []).map(point => {
+      const clock = this.getNumericValue(point?.clock);
+      return clock ? moment.unix(clock).format('HH:mm') : '';
+    });
+  }
+
+  getDatabaseSpaceConsumption(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseSpaceConsumptionResponse> {
+    return this.http.get<PublicCloudDatabaseSpaceConsumptionResponse>(PUBLIC_CLOUD_DATABASE_SPACE_CONSUMPTION_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToDatabaseSpaceKpis(data: PublicCloudDatabaseSpaceConsumptionResponse): PublicCloudDatabaseKpi[] {
+    const summary = (data?.summary || {}) as unknown as Record<string, string | number>;
+    return PUBLIC_CLOUD_DATABASE_SPACE_KPI_CONFIG.map(item =>
+      this.convertToDatabaseKpi(item.label, summary[item.key], this.getFirstValue(summary[item.unitKey])));
+  }
+
+  getDatabaseCapacityResources(criteria: PublicCloudDashboardFilterCriteria | undefined, sortBy: string): Observable<PublicCloudDatabaseCapacityResponse> {
+    const params = this.convertFiltersToApiParams(criteria).set('sort_by', sortBy);
+    return this.http.get<PublicCloudDatabaseCapacityResponse>(PUBLIC_CLOUD_DATABASE_CAPACITY_RESOURCES_ENDPOINT, { params });
+  }
+
+  convertToDatabaseCapacityRows(data: PublicCloudDatabaseCapacityResponse): PublicCloudDatabaseSpaceRow[] {
+    return (data?.data || []).map(item => ({
+      instance: this.getFirstValue(item.database_instance, item.db_instance),
+      uuid: this.getFirstValue(item.uuid),
+      maxAllocatedLabel: this.getFirstValue(item.max_allocated_display) || this.formatDatabaseStorage(item.max_allocated),
+      maxAllocated: this.getNumericValue(item.max_allocated),
+      allocatedLabel: this.getFirstValue(item.allocated_display) || this.formatDatabaseStorage(item.allocated),
+      allocated: this.getNumericValue(item.allocated),
+      spaceFreeLabel: this.getFirstValue(item.space_free_display) || this.formatDatabaseStorage(item.space_free),
+      spaceFree: this.getNumericValue(item.space_free),
+      utilization: this.getNumericValue(item.utilization)
+    })).filter(row => !!row.instance);
+  }
+
+  private convertToDatabaseKpi(label: string, value?: string | number, unit?: string): PublicCloudDatabaseKpi {
+    const numericValue = this.getFirstNumericValue(value);
+    return {
+      label,
+      value: numericValue !== null ? this.formatMeasureValue(numericValue) : this.getFirstValue(value),
+      unit: this.getFirstValue(unit)
+    };
+  }
+
+  private formatDatabaseStorage(value?: string | number, unit?: string): string {
+    const numericValue = this.getFirstNumericValue(value);
+    const formatted = numericValue !== null ? this.formatDecimalNumber(numericValue) : this.getFirstValue(value);
+    return unit ? `${formatted} ${unit}` : formatted;
+  }
+
+  private formatMeasureValue(value: number): string {
+    return (Math.round(value * 100) / 100).toFixed(2);
+  }
+
+  private getDatabaseTrendOptions(labels: string[], series: Array<{ name: string, color: string, values: number[], axis: number }>, leftName: string, rightName: string): EChartsOption {
+    const activeSeries = series.filter(item => !!(item.values || []).length);
+    return {
+      color: activeSeries.map(item => item.color),
+      legend: {
+        top: 0,
+        left: 'center',
+        icon: 'circle',
+        itemWidth: 10,
+        itemHeight: 10,
+        textStyle: { color: '#555555', fontSize: 11 }
+      },
+      grid: {
+        left: 52,
+        right: 52,
+        top: 34,
+        bottom: 26
+      },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: labels,
+        axisLine: { lineStyle: { color: '#c7ced6' } },
+        axisTick: { show: false },
+        axisLabel: { color: '#6f7782', fontSize: 11 }
+      },
+      yAxis: [
+        {
+          type: 'value',
+          name: leftName,
+          nameLocation: 'middle',
+          nameGap: 38,
+          nameTextStyle: { color: '#8a94a2', fontSize: 10 },
+          splitLine: { lineStyle: { color: '#eef1f5' } },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: { color: '#6f7782', fontSize: 11 }
+        },
+        {
+          type: 'value',
+          name: rightName,
+          nameLocation: 'middle',
+          nameGap: 40,
+          nameTextStyle: { color: '#8a94a2', fontSize: 10 },
+          position: 'right',
+          splitLine: { show: false },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: { color: '#6f7782', fontSize: 11 }
+        }
+      ],
+      series: activeSeries.map(item => ({
+        name: item.name,
+        type: 'line',
+        yAxisIndex: item.axis,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: { width: 2, color: item.color },
+        itemStyle: { color: item.color },
+        data: item.values
+      }))
+    };
+  }
+  /*
+   * ******End ****** Cloud Database Performance (redesigned) Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Cloud Storage Health (redesigned) Widget Related -------------------
+   */
+  // Each Storage Performance card has its own endpoint. The trend and high-latency responses have
+  // different shapes; the two converters below each read only their own fields, so one getter serves both.
+  getStoragePerformanceMetric(endpoint: string, criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageMetricResponse & PublicCloudStorageHighLatencyResponse> {
+    return this.http.get<PublicCloudStorageMetricResponse & PublicCloudStorageHighLatencyResponse>(endpoint, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToStorageTrendCard(data: PublicCloudStorageMetricResponse, color: string): PublicCloudStoragePerformanceCard {
+    const points = data?.points || [];
+    const labels = points.map(point => this.getFirstValue(point?.time));
+    const values = points.map(point => this.getNumericValue(point?.value));
+    const unit = this.getFirstValue(data?.unit);
+    const changeValue = this.getFirstValue(data?.change_percent);
+    const direction = this.normalizeDeltaDirection(data?.trend_direction);
+    return {
+      key: this.getFirstValue(data?.metric),
+      title: this.getFirstValue(data?.title),
+      valueLabel: this.getFirstValue(data?.value),
+      unit,
+      deltaLabel: changeValue ? `${changeValue}%` : '',
+      deltaDirection: direction,
+      deltaTone: this.getStorageTrendDeltaTone(direction),
+      subtitle: '',
+      chartType: 'area',
+      options: this.getStorageCardAreaOptions(values, labels, color, unit)
+    };
+  }
+
+  convertToStorageHighLatencyCard(data: PublicCloudStorageHighLatencyResponse, color: string): PublicCloudStoragePerformanceCard {
+    const values = (data?.data || []).map(device => this.getNumericValue(device?.p95_latency));
+    return {
+      key: 'high_latency_devices',
+      title: 'High Latency Devices',
+      valueLabel: this.getFirstValue(data?.value),
+      unit: '',
+      deltaLabel: '',
+      deltaDirection: '',
+      deltaTone: 'muted',
+      subtitle: this.getFirstValue(data?.threshold_display),
+      chartType: 'bar',
+      options: this.getStorageCardBarOptions(values, color)
+    };
+  }
+
+  getStorageResources(criteria: PublicCloudDashboardFilterCriteria | undefined, sortBy: string): Observable<PublicCloudStorageResourcesResponse> {
+    const params = this.convertFiltersToApiParams(criteria).set('sort_by', sortBy);
+    return this.http.get<PublicCloudStorageResourcesResponse>(PUBLIC_CLOUD_STORAGE_RESOURCES_ENDPOINT, { params });
+  }
+
+  convertToStorageResourceRows(data: PublicCloudStorageResourcesResponse): PublicCloudStorageResourceRow[] {
+    return (data?.data || []).map(item => {
+      const cloud = this.getFirstValue(item.cloud);
+      const region = this.getFirstValue(item.region);
+      return {
+        deviceName: this.getFirstValue(item.device_name, item.name),
+        uuid: this.getFirstValue(item.uuid),
+        type: this.getFirstValue(item.type),
+        cloud,
+        cloudRegion: this.getFirstValue(item.cloud_region) || [cloud, region].filter(value => !!value).join('/'),
+        capacity: this.getFirstValue(item.capacity_display, item.capacity),
+        capacityValue: this.getNumericValue(item.capacity),
+        e2eLatency: this.getNumericValue(item.e2e_latency),
+        successServerLatency: this.getNumericValue(item.success_server_latency),
+        networkQueueDelay: this.getNumericValue(item.network_queue_delay),
+        latencyHealthScore: this.getNumericValue(item.latency_health_score),
+        status: this.getFirstValue(item.status)
+      };
+    }).filter(row => !!row.deviceName);
+  }
+
+  private normalizeDeltaDirection(value?: string): 'up' | 'down' | '' {
+    const normalized = String(value || '').toLowerCase();
+    if (normalized === 'up' || normalized === 'down') {
+      return normalized;
+    }
+    return '';
+  }
+
+  // The trend endpoints expose only a direction (no tone), so tone is derived: rising -> warning, falling -> improving.
+  private getStorageTrendDeltaTone(direction: 'up' | 'down' | ''): PublicCloudStatusTone {
+    if (direction === 'up') {
+      return 'warning';
+    }
+    if (direction === 'down') {
+      return 'success';
+    }
+    return 'muted';
+  }
+
+  private getStorageCardAreaOptions(values: number[], labels: string[], color: string, unit: string): EChartsOption {
+    return {
+      grid: { left: 40, right: 10, top: 8, bottom: 20 },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: labels,
+        axisTick: { show: false },
+        axisLine: { lineStyle: { color: '#e4e9ef' } },
+        axisLabel: {
+          color: '#9aa6b2',
+          fontSize: 10,
+          interval: this.getStoragePerformanceLabelInterval(labels)
+        },
+        splitLine: { show: false }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { lineStyle: { color: '#eef1f5' } },
+        axisLabel: {
+          color: '#9aa6b2',
+          fontSize: 10,
+          formatter: (value: number) => `${value}${unit}`
+        }
+      },
+      series: [
+        {
+          type: 'line',
+          smooth: true,
+          showSymbol: false,
+          lineStyle: { width: 2, color },
+          itemStyle: { color },
+          areaStyle: { color: this.getStorageCardAreaColor(color) },
+          data: values
+        }
+      ]
+    };
+  }
+
+  private getStorageCardBarOptions(values: number[], color: string): EChartsOption {
+    return {
+      grid: { left: 6, right: 6, top: 10, bottom: 6 },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category',
+        show: false,
+        data: values.map((entry, index) => String(index))
+      },
+      yAxis: { type: 'value', show: false },
+      series: [
+        {
+          type: 'bar',
+          barWidth: '55%',
+          itemStyle: { color, borderRadius: [2, 2, 0, 0] },
+          data: values
+        }
+      ]
+    };
+  }
+
+  private getStoragePerformanceLabelInterval(labels: string[]): number {
+    const length = (labels || []).length;
+    return length > 6 ? Math.ceil(length / 5) - 1 : 0;
+  }
+
+  private getStorageCardAreaColor(color: string): string {
+    const normalized = String(color || '').replace('#', '');
+    if (normalized.length !== 6) {
+      return 'rgba(63, 140, 255, 0.15)';
+    }
+    const r = parseInt(normalized.slice(0, 2), 16);
+    const g = parseInt(normalized.slice(2, 4), 16);
+    const b = parseInt(normalized.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.15)`;
+  }
+
+  getWritePerformanceTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudWritePerformanceResponse> {
+    return this.http.get<PublicCloudWritePerformanceResponse>(PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToWritePerformanceViewData(data: PublicCloudWritePerformanceResponse): PublicCloudWritePerformanceViewData {
+    const source = this.getObjectResponseData(data) as PublicCloudWritePerformanceResponse;
+    const labels = (source?.time_buckets || []).map(bucket => this.getFirstValue(bucket));
+    const rows = (source?.data || []).map(item => ({
+      name: this.getFirstValue(item.device_name, item.name),
+      cells: (item.values || []).map(entry => {
+        const value = this.getNumericValue(entry?.value);
+        return { value, color: this.getWritePerformanceColor(value, this.getFirstValue(entry?.status)) };
+      })
+    })).filter(row => !!row.name && row.cells.length);
+    return { labels, rows };
+  }
+
+  // Cell colour is driven by the per-cell status; falls back to write-latency thresholds
+  // (<=10 healthy, <=20 warning, >20 critical) when a status is not supplied.
+  private getWritePerformanceColor(value: number, status?: string): string {
+    switch (String(status || '').toLowerCase()) {
+      case 'healthy':
+        return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.low;
+      case 'warning':
+        return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.medium;
+      case 'critical':
+        return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.high;
+      case 'unknown':
+        return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.unknown;
+      default:
+        break;
+    }
+    if (value <= 10) {
+      return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.low;
+    }
+    return value <= 20 ? PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.medium : PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.high;
+  }
+
+  getLatencyBreakdown(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudLatencyBreakdownResponse> {
+    return this.http.get<PublicCloudLatencyBreakdownResponse>(PUBLIC_CLOUD_LATENCY_BREAKDOWN_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToLatencyBreakdownViewData(data: PublicCloudLatencyBreakdownResponse): PublicCloudLatencyBreakdownViewData {
+    const source = this.getObjectResponseData(data) as PublicCloudLatencyBreakdownResponse;
+    const summary = source?.summary;
+    const breakdown = summary?.breakdown || source?.segments || [];
+    const total = this.getFirstNumericValue(summary?.total_latency, source?.total);
+    const unit = this.getFirstValue(breakdown[0]?.unit, source?.unit) || 'ms';
+    const segments = breakdown.map((segment, index) => {
+      const value = this.getFirstNumericValue(segment?.value);
+      const percent = this.getFirstNumericValue(segment?.percentage, segment?.percent);
+      return {
+        label: this.getFirstValue(segment?.name, segment?.label),
+        valueLabel: this.getFirstValue(segment?.display_value) || (value !== null ? `${this.formatDecimalNumber(value)} ${unit}` : ''),
+        percent: percent !== null ? percent : 0,
+        percentLabel: percent !== null ? `(${this.formatNumber(percent)}%)` : '',
+        color: segment?.color || PUBLIC_CLOUD_LATENCY_BREAKDOWN_COLORS[index % PUBLIC_CLOUD_LATENCY_BREAKDOWN_COLORS.length]
+      };
+    }).filter(segment => !!segment.label);
+    return {
+      totalLabel: total !== null ? this.formatDecimalNumber(total) : this.getFirstValue(summary?.total_latency_display),
+      unit,
+      segments,
+      hasData: segments.length > 0
+    };
+  }
+
+  convertToLatencyBreakdownOptions(data: PublicCloudLatencyBreakdownViewData): EChartsOption {
+    const segments = data?.segments || [];
+    return {
+      color: segments.map(segment => segment.color),
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params.name}: ${params.data.valueLabel} ${params.data.percentLabel}`
+      },
+      legend: { show: false },
+      series: [
+        {
+          type: 'pie',
+          radius: ['62%', '86%'],
+          center: ['50%', '50%'],
+          avoidLabelOverlap: true,
+          label: { show: false },
+          labelLine: { show: false },
+          data: segments.map(segment => ({
+            name: segment.label,
+            value: segment.percent,
+            valueLabel: segment.valueLabel,
+            percentLabel: segment.percentLabel,
+            itemStyle: { color: segment.color }
+          }))
+        }
+      ]
+    };
+  }
+  /*
+   * ******End ****** Cloud Storage Health (redesigned) Widget Related ********************
    */
 
   /*

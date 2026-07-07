@@ -213,3 +213,146 @@ export const PUBLIC_CLOUD_QUEUE_BACKLOG_COLORS = {
   medium: '#e0a51e',
   high: '#ec6b6b'
 };
+
+/*
+ * ------ Cloud Database Performance (redesigned) ------
+ */
+export const PUBLIC_CLOUD_DATABASE_OVERVIEW_ENDPOINT = '/customer/public-cloud-widgets/top_database_performance_summary/';
+export const PUBLIC_CLOUD_DATABASE_WRITE_TREND_ENDPOINT = '/customer/public-cloud-widgets/write_performance_trend/';
+export const PUBLIC_CLOUD_DATABASE_READ_TREND_ENDPOINT = '/customer/public-cloud-widgets/read_performance_trend/';
+export const PUBLIC_CLOUD_DATABASE_SPACE_CONSUMPTION_ENDPOINT = '/customer/public-cloud-widgets/space_consumption/';
+export const PUBLIC_CLOUD_DATABASE_CAPACITY_RESOURCES_ENDPOINT = '/customer/public-cloud-widgets/top_capacity_resources/';
+export const PUBLIC_CLOUD_DATABASE_CAPACITY_DEFAULT_SORT = 'max_allocated';
+
+// Database Overview KPI strip - each KPI is aggregated from the Top 10 performance rows
+// (field + aggregation); the unit is read from the matching *_unit field on the rows.
+export const PUBLIC_CLOUD_DATABASE_OVERVIEW_KPI_CONFIG: Array<{ label: string, field: string, unitField: string, agg: 'avg' | 'max' }> = [
+  { label: 'Write Throughput(avg)', field: 'write_throughput', unitField: 'write_throughput_unit', agg: 'avg' },
+  { label: 'Write Latency(avg)', field: 'write_latency', unitField: 'write_latency_unit', agg: 'avg' },
+  { label: 'Write IOPS(avg)', field: 'write_iops', unitField: 'write_iops_unit', agg: 'avg' },
+  { label: 'Peak Write Throughput', field: 'write_throughput', unitField: 'write_throughput_unit', agg: 'max' },
+  { label: 'Read Throughput(avg)', field: 'read_throughput', unitField: 'read_throughput_unit', agg: 'avg' },
+  { label: 'Read Latency(avg)', field: 'read_latency', unitField: 'read_latency_unit', agg: 'avg' },
+  { label: 'Read IOPS(avg)', field: 'read_iops', unitField: 'read_iops_unit', agg: 'avg' },
+  { label: 'Average Queue Depth', field: 'queue_depth', unitField: 'queue_depth_unit', agg: 'avg' }
+];
+
+// Space Consumption KPI strip - labels in display order; values map from the `summary` object.
+export const PUBLIC_CLOUD_DATABASE_SPACE_KPI_LABELS = {
+  totalMaxAllocated: 'Total Max Allocated',
+  maxAllocatedAvg: 'Max Allocated(Avg)',
+  totalAllocated: 'Total Allocated',
+  allocatedAvg: 'Allocated(Avg)',
+  totalSpaceFree: 'Total Space Free',
+  spaceFreeAvg: 'Space Free(Avg)',
+  avgUtilization: 'Avg. Utilization'
+};
+
+// Space Consumption KPI strip - each KPI maps to a field on the response `summary` object,
+// with its unit read from the matching unit field on the same summary.
+export const PUBLIC_CLOUD_DATABASE_SPACE_KPI_CONFIG: Array<{ key: string, label: string, unitKey: string }> = [
+  { key: 'max_allocated_storage', label: 'Total Max Allocated', unitKey: 'storage_unit' },
+  { key: 'total_allocated', label: 'Total Allocated', unitKey: 'storage_unit' },
+  { key: 'average_allocated', label: 'Allocated (Avg)', unitKey: 'storage_unit' },
+  { key: 'total_free_space', label: 'Total Space Free', unitKey: 'storage_unit' },
+  { key: 'average_free_space', label: 'Space Free (Avg)', unitKey: 'storage_unit' },
+  { key: 'average_utilization', label: 'Avg. Utilization', unitKey: 'utilization_unit' }
+];
+
+// Top 10 Performance Summary sortable columns; key maps to the view-model row field.
+export const PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS: Array<{ key: string, label: string, numeric: boolean }> = [
+  { key: 'instance', label: 'DB Instance', numeric: false },
+  { key: 'writeThroughput', label: 'Write Throughput (kbps)', numeric: true },
+  { key: 'writeLatency', label: 'Write Latency (ms)', numeric: true },
+  { key: 'writeIops', label: 'Write IOPS (RPS)', numeric: true },
+  { key: 'readThroughput', label: 'Read Throughput (Bps)', numeric: true },
+  { key: 'readLatency', label: 'Read Latency (ms)', numeric: true },
+  { key: 'readIops', label: 'Read IOPS (RPS)', numeric: true },
+  { key: 'queueDepth', label: 'Queue Depth', numeric: true }
+];
+
+// Top 10 Capacity Per Resource sortable columns; sortKey is the server-side `sort_by` value.
+export const PUBLIC_CLOUD_DATABASE_SPACE_SORT_COLUMNS: Array<{ key: string, label: string, numeric: boolean, sortKey?: string }> = [
+  { key: 'instance', label: 'DB Instance', numeric: false },
+  { key: 'maxAllocated', label: 'Max Allocated', numeric: true, sortKey: 'max_allocated' },
+  { key: 'allocated', label: 'Allocated', numeric: true, sortKey: 'allocated' },
+  { key: 'spaceFree', label: 'Space Free', numeric: true, sortKey: 'space_free' },
+  { key: 'utilization', label: 'Utilization', numeric: true, sortKey: 'utilization' }
+];
+
+// Trend Chart series colors (Write and Read performance line charts).
+export const PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS: Record<string, string> = {
+  throughput: '#3f8cff',
+  latency: '#ff8a3d',
+  iops: '#3fb950'
+};
+
+export const PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS: Record<string, string> = {
+  throughput: '#3f8cff',
+  latency: '#ff8a3d',
+  iops: '#3fb950',
+  queue_depth: '#8b5cf6'
+};
+
+/*
+ * ------ Cloud Storage Health (redesigned) ------
+ */
+// Storage Performance cards: one endpoint per metric. The five trend endpoints share the
+// trend-metric response shape; storage_high_latency_devices returns the devices response.
+export const PUBLIC_CLOUD_STORAGE_E2E_LATENCY_TREND_ENDPOINT = '/customer/public-cloud-widgets/storage_e2e_latency_trend/';
+export const PUBLIC_CLOUD_STORAGE_SUCCESS_SERVER_LATENCY_TREND_ENDPOINT = '/customer/public-cloud-widgets/storage_success_server_latency_trend/';
+export const PUBLIC_CLOUD_STORAGE_NETWORK_QUERY_DELAY_TREND_ENDPOINT = '/customer/public-cloud-widgets/storage_network_query_delay_trend/';
+export const PUBLIC_CLOUD_STORAGE_AVG_QUEUE_DEPTH_TREND_ENDPOINT = '/customer/public-cloud-widgets/storage_avg_queue_depth_trend/';
+export const PUBLIC_CLOUD_STORAGE_UTILIZATION_TREND_ENDPOINT = '/customer/public-cloud-widgets/storage_utilization_trend/';
+export const PUBLIC_CLOUD_STORAGE_HIGH_LATENCY_DEVICES_ENDPOINT = '/customer/public-cloud-widgets/storage_high_latency_devices/';
+
+// Storage Performance card definitions (render order + colour + card kind). 'trend' cards
+// render an area chart from the metric points; 'highLatency' renders a bar chart of per-device P95.
+export const PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS: Array<{ key: string, endpoint: string, color: string, kind: 'trend' | 'highLatency' }> = [
+  { key: 'e2e_latency', endpoint: PUBLIC_CLOUD_STORAGE_E2E_LATENCY_TREND_ENDPOINT, color: '#3f8cff', kind: 'trend' },
+  { key: 'success_server_latency', endpoint: PUBLIC_CLOUD_STORAGE_SUCCESS_SERVER_LATENCY_TREND_ENDPOINT, color: '#8b5cf6', kind: 'trend' },
+  { key: 'network_query_delay', endpoint: PUBLIC_CLOUD_STORAGE_NETWORK_QUERY_DELAY_TREND_ENDPOINT, color: '#ff8a3d', kind: 'trend' },
+  { key: 'avg_queue_depth', endpoint: PUBLIC_CLOUD_STORAGE_AVG_QUEUE_DEPTH_TREND_ENDPOINT, color: '#ff8a3d', kind: 'trend' },
+  { key: 'utilization', endpoint: PUBLIC_CLOUD_STORAGE_UTILIZATION_TREND_ENDPOINT, color: '#3fb950', kind: 'trend' },
+  { key: 'high_latency_devices', endpoint: PUBLIC_CLOUD_STORAGE_HIGH_LATENCY_DEVICES_ENDPOINT, color: '#ec4b3f', kind: 'highLatency' }
+];
+
+export const PUBLIC_CLOUD_STORAGE_RESOURCES_ENDPOINT = '/customer/public-cloud-widgets/top_storage_resource/';
+export const PUBLIC_CLOUD_STORAGE_RESOURCE_DEFAULT_SORT = 'latency_health_score';
+
+// Top 10 Storage Resource columns; sortKey is the server-side `sort_by` value (columns without it are not sortable).
+export const PUBLIC_CLOUD_STORAGE_RESOURCE_SORT_COLUMNS: Array<{ key: string, label: string, numeric: boolean, sortKey?: string }> = [
+  { key: 'deviceName', label: 'Device Name', numeric: false },
+  { key: 'type', label: 'Type', numeric: false },
+  { key: 'cloudRegion', label: 'Cloud/Region', numeric: false },
+  { key: 'capacityValue', label: 'Capacity', numeric: true, sortKey: 'capacity' },
+  { key: 'e2eLatency', label: 'E2E Latency', numeric: true, sortKey: 'e2e_latency' },
+  { key: 'successServerLatency', label: 'Success Server Latency', numeric: true, sortKey: 'success_server_latency' },
+  { key: 'networkQueueDelay', label: 'Network/Queue Delay', numeric: true, sortKey: 'network_queue_delay' },
+  { key: 'latencyHealthScore', label: 'Latency Health Score', numeric: true, sortKey: 'latency_health_score' },
+  { key: 'status', label: 'Status', numeric: false, sortKey: 'status' }
+];
+
+// Top 10 Storage Resource status legend (icon tone driven by the shared status-icon helper).
+export const PUBLIC_CLOUD_STORAGE_STATUS_LEGEND: Array<{ status: string, label: string }> = [
+  { status: 'healthy', label: 'Healthy / Up' },
+  { status: 'warning', label: 'Warning / Degraded' },
+  { status: 'critical', label: 'Critical / Down' },
+  { status: 'unknown', label: 'No Data / Unknown' }
+];
+
+// ----- Latency Metric widgets (Write Performance Trend heatmap + Latency Breakdown donut) -----
+export const PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_ENDPOINT = '/customer/public-cloud-widgets/write_performance_trend_latency/';
+export const PUBLIC_CLOUD_LATENCY_BREAKDOWN_ENDPOINT = '/customer/public-cloud-widgets/latency_breakdown/';
+
+// Write Performance Trend cell colours driven by the per-cell status (healthy/warning/critical/unknown);
+// falls back to write-latency thresholds (<=10 healthy, <=20 warning, >20 critical). Pastel fills, dark text.
+export const PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS = {
+  low: '#cdebc5',
+  medium: '#f7e08c',
+  high: '#f4a7a1',
+  unknown: '#e4e8ec'
+};
+
+// Latency Breakdown donut segment colours (in the order the API returns them).
+export const PUBLIC_CLOUD_LATENCY_BREAKDOWN_COLORS = ['#1f7ed0', '#f59220', '#2fae5f'];

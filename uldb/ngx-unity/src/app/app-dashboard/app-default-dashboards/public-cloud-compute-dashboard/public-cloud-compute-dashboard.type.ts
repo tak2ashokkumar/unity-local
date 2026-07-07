@@ -756,3 +756,328 @@ export interface PublicCloudQueueBacklogRow {
   color: string;
   tone: string;
 }
+
+/*
+ * ------ Cloud Database Performance (redesigned) ------
+ */
+export interface PublicCloudDatabaseKpi {
+  label: string;
+  value: string;
+  unit: string;
+  tone?: PublicCloudStatusTone;
+}
+
+export interface PublicCloudSortState {
+  key: string;
+  direction: 'asc' | 'desc';
+}
+
+// top_database_performance_summary response (drives Database Overview KPI strip + Top 10 table).
+export interface PublicCloudDatabaseOverviewRowResponse {
+  uuid?: string;
+  database_instance?: string;
+  cloud?: string;
+  cloud_key?: string;
+  region?: string;
+  write_throughput?: string | number;
+  write_throughput_unit?: string;
+  write_latency?: string | number;
+  write_latency_unit?: string;
+  write_iops?: string | number;
+  write_iops_unit?: string;
+  read_throughput?: string | number;
+  read_throughput_unit?: string;
+  read_latency?: string | number;
+  read_latency_unit?: string;
+  read_iops?: string | number;
+  read_iops_unit?: string;
+  queue_depth?: string | number;
+  queue_depth_unit?: string | null;
+}
+
+export interface PublicCloudDatabaseOverviewResponse {
+  cloud?: string;
+  hours?: number;
+  count?: number;
+  data?: PublicCloudDatabaseOverviewRowResponse[];
+}
+
+export interface PublicCloudDatabaseOverviewRow {
+  instance: string;
+  uuid: string;
+  writeThroughput: number;
+  writeLatency: number;
+  writeIops: number;
+  readThroughput: number;
+  readLatency: number;
+  readIops: number;
+  queueDepth: number;
+}
+
+// write_performance_trend / read_performance_trend response (per-resource metric series over time).
+export interface PublicCloudDatabaseTrendPoint {
+  clock?: number;
+  value?: number | string;
+}
+
+export interface PublicCloudDatabaseTrendSeriesItem {
+  label?: string;
+  unit?: string;
+  points?: PublicCloudDatabaseTrendPoint[];
+}
+
+export interface PublicCloudDatabaseTrendResourceItem {
+  uuid?: string;
+  database_instance?: string;
+  series?: Record<string, PublicCloudDatabaseTrendSeriesItem>;
+}
+
+export interface PublicCloudDatabaseTrendResponse {
+  cloud?: string;
+  hours?: number;
+  count?: number;
+  data?: PublicCloudDatabaseTrendResourceItem[];
+}
+
+// space_consumption response (drives Space Consumption KPI strip + Top 10 Capacity table).
+export interface PublicCloudDatabaseSpaceSummaryResponse {
+  database_count?: string | number;
+  max_allocated_storage?: string | number;
+  total_allocated?: string | number;
+  average_allocated?: string | number;
+  total_free_space?: string | number;
+  average_free_space?: string | number;
+  average_utilization?: string | number;
+  storage_unit?: string;
+  utilization_unit?: string;
+}
+
+export interface PublicCloudDatabaseSpaceRowResponse {
+  uuid?: string;
+  database_instance?: string;
+  cloud?: string;
+  cloud_key?: string;
+  region?: string;
+  max_allocated_storage?: string | number;
+  max_allocated_storage_unit?: string;
+  allocated_storage?: string | number;
+  allocated_storage_unit?: string;
+  free_storage_space?: string | number;
+  free_storage_space_unit?: string;
+  utilization_percent?: string | number;
+}
+
+export interface PublicCloudDatabaseSpaceConsumptionResponse {
+  cloud?: string;
+  count?: number;
+  summary?: PublicCloudDatabaseSpaceSummaryResponse;
+  data?: PublicCloudDatabaseSpaceRowResponse[];
+}
+
+export interface PublicCloudDatabaseSpaceRow {
+  instance: string;
+  uuid: string;
+  maxAllocatedLabel: string;
+  maxAllocated: number;
+  allocatedLabel: string;
+  allocated: number;
+  spaceFreeLabel: string;
+  spaceFree: number;
+  utilization: number;
+}
+
+// top_capacity_resources response (Top 10 Capacity table; server-sorted via sort_by).
+export interface PublicCloudDatabaseCapacityRowResponse {
+  uuid?: string;
+  db_instance?: string;
+  database_instance?: string;
+  max_allocated?: string | number;
+  max_allocated_display?: string;
+  allocated?: string | number;
+  allocated_display?: string;
+  space_free?: string | number;
+  space_free_display?: string;
+  utilization?: string | number;
+  utilization_display?: string;
+}
+
+export interface PublicCloudDatabaseCapacityResponse {
+  cloud?: string;
+  sort_by?: string;
+  count?: number;
+  data?: PublicCloudDatabaseCapacityRowResponse[];
+}
+
+/*
+ * ------ Cloud Storage Health (redesigned) ------
+ */
+export interface PublicCloudStorageMetricPoint {
+  clock?: number;
+  time?: string;
+  value?: number;
+}
+
+// Response for the five Storage Performance trend cards (E2E, Success Server, Network/Query,
+// Queue Depth, Utilization). Each renders an area chart from `points`.
+export interface PublicCloudStorageMetricResponse {
+  metric?: string;
+  title?: string;
+  value?: string | number;
+  unit?: string;
+  display_value?: string;
+  change_percent?: number;
+  trend_direction?: string;
+  points?: PublicCloudStorageMetricPoint[];
+}
+
+export interface PublicCloudStorageHighLatencyDevice {
+  device_name?: string;
+  name?: string;
+  p95_latency?: number;
+  p95_latency_display?: string;
+  is_high_latency?: boolean;
+}
+
+// Response for the High Latency Devices bar card (one bar per device P95 latency).
+export interface PublicCloudStorageHighLatencyResponse {
+  threshold?: number;
+  threshold_display?: string;
+  value?: string | number;
+  high_latency_count?: number;
+  total_devices?: number;
+  data?: PublicCloudStorageHighLatencyDevice[];
+}
+
+export interface PublicCloudStoragePerformanceCard {
+  key: string;
+  title: string;
+  valueLabel: string;
+  unit: string;
+  deltaLabel: string;
+  deltaDirection: 'up' | 'down' | '';
+  deltaTone: PublicCloudStatusTone;
+  subtitle: string;
+  chartType: 'area' | 'bar';
+  options: EChartsOption;
+}
+
+export interface PublicCloudStorageResourceRowResponse {
+  device_name?: string;
+  name?: string;
+  uuid?: string;
+  type?: string;
+  cloud?: string;
+  cloud_key?: string;
+  region?: string;
+  cloud_region?: string;
+  capacity?: string | number;
+  capacity_display?: string;
+  e2e_latency?: string | number;
+  e2e_latency_display?: string;
+  success_server_latency?: string | number;
+  success_server_latency_display?: string;
+  network_queue_delay?: string | number;
+  network_queue_delay_display?: string;
+  latency_health_score?: string | number;
+  status?: string;
+  status_icon?: string;
+}
+
+export interface PublicCloudStorageResourcesResponse {
+  cloud?: string;
+  hours?: number;
+  sort_by?: string;
+  count?: number;
+  data?: PublicCloudStorageResourceRowResponse[];
+}
+
+export interface PublicCloudStorageResourceRow {
+  deviceName: string;
+  uuid: string;
+  type: string;
+  cloud: string;
+  cloudRegion: string;
+  capacity: string;
+  capacityValue: number;
+  e2eLatency: number;
+  successServerLatency: number;
+  networkQueueDelay: number;
+  latencyHealthScore: number;
+  status: string;
+}
+
+export interface PublicCloudWritePerformanceCellResponse {
+  time?: string;
+  value?: number | string;
+  status?: string;
+}
+
+export interface PublicCloudWritePerformanceRowResponse {
+  device_name?: string;
+  name?: string;
+  values?: PublicCloudWritePerformanceCellResponse[];
+}
+
+export interface PublicCloudWritePerformanceResponse {
+  time_buckets?: string[];
+  legend?: { [key: string]: string };
+  data?: PublicCloudWritePerformanceRowResponse[];
+}
+
+export interface PublicCloudWritePerformanceCell {
+  value: number;
+  color: string;
+}
+
+export interface PublicCloudWritePerformanceRow {
+  name: string;
+  cells: PublicCloudWritePerformanceCell[];
+}
+
+export interface PublicCloudWritePerformanceViewData {
+  labels: string[];
+  rows: PublicCloudWritePerformanceRow[];
+}
+
+export interface PublicCloudLatencyBreakdownSegmentResponse {
+  name?: string;
+  label?: string;
+  key?: string;
+  value?: number | string;
+  unit?: string;
+  display_value?: string;
+  percent?: number | string;
+  percentage?: number | string;
+  color?: string;
+}
+
+export interface PublicCloudLatencyBreakdownSummaryResponse {
+  total_latency?: number | string;
+  total_latency_display?: string;
+  breakdown?: PublicCloudLatencyBreakdownSegmentResponse[];
+}
+
+export interface PublicCloudLatencyBreakdownResponse {
+  cloud?: string;
+  hours?: number;
+  count?: number;
+  summary?: PublicCloudLatencyBreakdownSummaryResponse;
+  total?: number | string;
+  unit?: string;
+  segments?: PublicCloudLatencyBreakdownSegmentResponse[];
+}
+
+export interface PublicCloudLatencyBreakdownSegment {
+  label: string;
+  valueLabel: string;
+  percent: number;
+  percentLabel: string;
+  color: string;
+}
+
+export interface PublicCloudLatencyBreakdownViewData {
+  totalLabel: string;
+  unit: string;
+  segments: PublicCloudLatencyBreakdownSegment[];
+  hasData: boolean;
+}

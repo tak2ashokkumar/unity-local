@@ -1,0 +1,135 @@
+{
+  "cloud": "all",
+  "hours": 24,
+  "bucket_hours": 2,
+  "count": 10,
+  "time_buckets": ["00:00", "02:00", "04:00", "06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"],
+  "legend": {
+    "healthy": "<= 10 ms",
+    "warning": "<= 20 ms",
+    "critical": "> 20 ms",
+    "unknown": "No data"
+  },
+  "data": [
+    {
+      "device_name": "db-volume-01", "name": "db-volume-01", "cloud": "Microsoft Azure", "cloud_key": "azure",
+      "avg_write_latency": 29, "max_write_latency": 34, "status": "critical", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 24, "status": "critical" }, { "time": "02:00", "value": 26, "status": "critical" },
+        { "time": "04:00", "value": 28, "status": "critical" }, { "time": "06:00", "value": 30, "status": "critical" },
+        { "time": "08:00", "value": 32, "status": "critical" }, { "time": "10:00", "value": 29, "status": "critical" },
+        { "time": "12:00", "value": 31, "status": "critical" }, { "time": "14:00", "value": 33, "status": "critical" },
+        { "time": "16:00", "value": 34, "status": "critical" }, { "time": "18:00", "value": 28, "status": "critical" },
+        { "time": "20:00", "value": 27, "status": "critical" }, { "time": "22:00", "value": 26, "status": "critical" }
+      ]
+    },
+    {
+      "device_name": "app-storage-02", "name": "app-storage-02", "cloud": "Amazon Web Services", "cloud_key": "aws",
+      "avg_write_latency": 13, "max_write_latency": 16, "status": "warning", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 11, "status": "warning" }, { "time": "02:00", "value": 12, "status": "warning" },
+        { "time": "04:00", "value": 13, "status": "warning" }, { "time": "06:00", "value": 12, "status": "warning" },
+        { "time": "08:00", "value": 14, "status": "warning" }, { "time": "10:00", "value": 12, "status": "warning" },
+        { "time": "12:00", "value": 13, "status": "warning" }, { "time": "14:00", "value": 15, "status": "warning" },
+        { "time": "16:00", "value": 16, "status": "warning" }, { "time": "18:00", "value": 13, "status": "warning" },
+        { "time": "20:00", "value": 12, "status": "warning" }, { "time": "22:00", "value": 11, "status": "warning" }
+      ]
+    },
+    {
+      "device_name": "backup-store-01", "name": "backup-store-01", "cloud": "Google Cloud", "cloud_key": "gcp",
+      "avg_write_latency": 5, "max_write_latency": 6, "status": "healthy", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 5, "status": "healthy" }, { "time": "02:00", "value": 4, "status": "healthy" },
+        { "time": "04:00", "value": 6, "status": "healthy" }, { "time": "06:00", "value": 6, "status": "healthy" },
+        { "time": "08:00", "value": 5, "status": "healthy" }, { "time": "10:00", "value": 6, "status": "healthy" },
+        { "time": "12:00", "value": 6, "status": "healthy" }, { "time": "14:00", "value": 5, "status": "healthy" },
+        { "time": "16:00", "value": 5, "status": "healthy" }, { "time": "18:00", "value": 5, "status": "healthy" },
+        { "time": "20:00", "value": 4, "status": "healthy" }, { "time": "22:00", "value": 6, "status": "healthy" }
+      ]
+    },
+    {
+      "device_name": "file-share-01", "name": "file-share-01", "cloud": "Microsoft Azure", "cloud_key": "azure",
+      "avg_write_latency": 4, "max_write_latency": 5, "status": "healthy", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 5, "status": "healthy" }, { "time": "02:00", "value": 4, "status": "healthy" },
+        { "time": "04:00", "value": 5, "status": "healthy" }, { "time": "06:00", "value": 3, "status": "healthy" },
+        { "time": "08:00", "value": 3, "status": "healthy" }, { "time": "10:00", "value": 3, "status": "healthy" },
+        { "time": "12:00", "value": 3, "status": "healthy" }, { "time": "14:00", "value": 3, "status": "healthy" },
+        { "time": "16:00", "value": 3, "status": "healthy" }, { "time": "18:00", "value": 3, "status": "healthy" },
+        { "time": "20:00", "value": 3, "status": "healthy" }, { "time": "22:00", "value": 3, "status": "healthy" }
+      ]
+    },
+    {
+      "device_name": "logs-volume-01", "name": "logs-volume-01", "cloud": "Amazon Web Services", "cloud_key": "aws",
+      "avg_write_latency": 4, "max_write_latency": 6, "status": "healthy", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 5, "status": "healthy" }, { "time": "02:00", "value": 3, "status": "healthy" },
+        { "time": "04:00", "value": 3, "status": "healthy" }, { "time": "06:00", "value": 3, "status": "healthy" },
+        { "time": "08:00", "value": 5, "status": "healthy" }, { "time": "10:00", "value": 3, "status": "healthy" },
+        { "time": "12:00", "value": 3, "status": "healthy" }, { "time": "14:00", "value": 3, "status": "healthy" },
+        { "time": "16:00", "value": 6, "status": "healthy" }, { "time": "18:00", "value": 3, "status": "healthy" },
+        { "time": "20:00", "value": 3, "status": "healthy" }, { "time": "22:00", "value": 5, "status": "healthy" }
+      ]
+    },
+    {
+      "device_name": "analytics-store-01", "name": "analytics-store-01", "cloud": "Google Cloud", "cloud_key": "gcp",
+      "avg_write_latency": 14, "max_write_latency": 18, "status": "warning", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 18, "status": "warning" }, { "time": "02:00", "value": 12, "status": "warning" },
+        { "time": "04:00", "value": 13, "status": "warning" }, { "time": "06:00", "value": 12, "status": "warning" },
+        { "time": "08:00", "value": 18, "status": "warning" }, { "time": "10:00", "value": 12, "status": "warning" },
+        { "time": "12:00", "value": 13, "status": "warning" }, { "time": "14:00", "value": 15, "status": "warning" },
+        { "time": "16:00", "value": 16, "status": "warning" }, { "time": "18:00", "value": 13, "status": "warning" },
+        { "time": "20:00", "value": 13, "status": "warning" }, { "time": "22:00", "value": 12, "status": "warning" }
+      ]
+    },
+    {
+      "device_name": "vm-disk-01", "name": "vm-disk-01", "cloud": "Oracle", "cloud_key": "oci",
+      "avg_write_latency": 9, "max_write_latency": 9, "status": "healthy", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 9, "status": "healthy" }, { "time": "02:00", "value": 9, "status": "healthy" },
+        { "time": "04:00", "value": 8, "status": "healthy" }, { "time": "06:00", "value": 9, "status": "healthy" },
+        { "time": "08:00", "value": 9, "status": "healthy" }, { "time": "10:00", "value": 9, "status": "healthy" },
+        { "time": "12:00", "value": 9, "status": "healthy" }, { "time": "14:00", "value": 9, "status": "healthy" },
+        { "time": "16:00", "value": 9, "status": "healthy" }, { "time": "18:00", "value": 9, "status": "healthy" },
+        { "time": "20:00", "value": 9, "status": "healthy" }, { "time": "22:00", "value": 9, "status": "healthy" }
+      ]
+    },
+    {
+      "device_name": "media-store-01", "name": "media-store-01", "cloud": "Microsoft Azure", "cloud_key": "azure",
+      "avg_write_latency": 15, "max_write_latency": 18, "status": "warning", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 15, "status": "warning" }, { "time": "02:00", "value": 15, "status": "warning" },
+        { "time": "04:00", "value": 13, "status": "warning" }, { "time": "06:00", "value": 13, "status": "warning" },
+        { "time": "08:00", "value": 15, "status": "warning" }, { "time": "10:00", "value": 13, "status": "warning" },
+        { "time": "12:00", "value": 15, "status": "warning" }, { "time": "14:00", "value": 15, "status": "warning" },
+        { "time": "16:00", "value": 18, "status": "warning" }, { "time": "18:00", "value": 15, "status": "warning" },
+        { "time": "20:00", "value": 18, "status": "warning" }, { "time": "22:00", "value": 18, "status": "warning" }
+      ]
+    },
+    {
+      "device_name": "archive-store-01", "name": "archive-store-01", "cloud": "Google Cloud", "cloud_key": "gcp",
+      "avg_write_latency": 22, "max_write_latency": 25, "status": "critical", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 18, "status": "warning" }, { "time": "02:00", "value": 20, "status": "warning" },
+        { "time": "04:00", "value": 22, "status": "critical" }, { "time": "06:00", "value": 24, "status": "critical" },
+        { "time": "08:00", "value": 23, "status": "critical" }, { "time": "10:00", "value": 21, "status": "critical" },
+        { "time": "12:00", "value": 20, "status": "warning" }, { "time": "14:00", "value": 22, "status": "critical" },
+        { "time": "16:00", "value": 25, "status": "critical" }, { "time": "18:00", "value": 23, "status": "critical" },
+        { "time": "20:00", "value": 22, "status": "critical" }, { "time": "22:00", "value": 21, "status": "critical" }
+      ]
+    },
+    {
+      "device_name": "cache-store-01", "name": "cache-store-01", "cloud": "Amazon Web Services", "cloud_key": "aws",
+      "avg_write_latency": 2, "max_write_latency": 3, "status": "healthy", "unit": "ms",
+      "values": [
+        { "time": "00:00", "value": 2, "status": "healthy" }, { "time": "02:00", "value": 2, "status": "healthy" },
+        { "time": "04:00", "value": 3, "status": "healthy" }, { "time": "06:00", "value": 2, "status": "healthy" },
+        { "time": "08:00", "value": 3, "status": "healthy" }, { "time": "10:00", "value": 2, "status": "healthy" },
+        { "time": "12:00", "value": 2, "status": "healthy" }, { "time": "14:00", "value": 3, "status": "healthy" },
+        { "time": "16:00", "value": 2, "status": "healthy" }, { "time": "18:00", "value": 2, "status": "healthy" },
+        { "time": "20:00", "value": 2, "status": "healthy" }, { "time": "22:00", "value": 2, "status": "healthy" }
+      ]
+    }
+  ]
+}

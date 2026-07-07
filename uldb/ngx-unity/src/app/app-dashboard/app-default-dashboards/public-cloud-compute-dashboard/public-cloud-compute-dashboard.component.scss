@@ -2151,3 +2151,375 @@ button.legend-link {
   }
 
 }
+
+/* ------ Cloud Database Performance (redesigned) ------ */
+.cloud-database-subsection-title {
+  color: #202a33;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  margin: 18px 4px 12px;
+}
+
+.database-kpi-strip {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 4px 6px 14px;
+}
+
+.database-kpi {
+  flex: 1 1 0;
+  min-width: 140px;
+  padding: 0 18px;
+}
+
+.database-kpi + .database-kpi {
+  border-left: 1px solid #e4e9ef;
+}
+
+.database-kpi-label {
+  color: #6f7f91;
+  font-size: 13px;
+  line-height: 18px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.database-kpi-value {
+  color: #202a33;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 25px;
+  white-space: nowrap;
+}
+
+.database-kpi-unit {
+  color: #8a94a2;
+  font-size: 12px;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.database-table-title {
+  color: #202a33;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  margin: 6px 4px 8px;
+}
+
+.database-table-widget {
+  position: relative;
+  padding: 0 4px 8px;
+}
+
+.database-scroll-table {
+  max-height: 232px;
+  overflow-y: auto;
+}
+
+.database-metric-table {
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #f2f5f8;
+    color: #46525f;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-top: none;
+  }
+
+  td {
+    color: #333f4a;
+    font-size: 13px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+
+  i {
+    margin-left: 6px;
+    color: #9aa6b2;
+    font-size: 11px;
+  }
+}
+
+.database-trend-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 28px;
+  padding: 0 4px 10px;
+}
+
+.database-trend-widget {
+  min-height: 260px;
+}
+
+.database-trend-chart {
+  height: 244px;
+  width: 100%;
+}
+
+/* ------ Cloud Storage Health (redesigned) ------ */
+.storage-performance-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 4px 6px 14px;
+}
+
+.storage-performance-card {
+  border: 1px solid #e4e9ef;
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #ffffff;
+}
+
+.storage-performance-card-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.storage-performance-card-title {
+  color: #46525f;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 17px;
+}
+
+.storage-performance-card-badge {
+  margin-left: auto;
+  color: #8a94a2;
+  font-size: 11px;
+}
+
+.storage-performance-card-delta {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+
+  i {
+    margin-right: 3px;
+  }
+}
+
+.storage-performance-card-value {
+  color: #202a33;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+  margin-bottom: 4px;
+}
+
+.storage-performance-card-unit {
+  color: #8a94a2;
+  font-size: 12px;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.storage-performance-card-chart {
+  height: 118px;
+  width: 100%;
+}
+
+.storage-resource-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  justify-content: center;
+  padding: 4px 6px 12px;
+
+  span {
+    color: #46525f;
+    font-size: 12px;
+  }
+
+  i {
+    margin-right: 6px;
+  }
+}
+
+.latency-metric-title {
+  color: #3a4651;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  padding: 14px 20px 8px;
+}
+
+.latency-metric-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: 24px;
+  padding: 0 24px 18px;
+  align-items: start;
+}
+
+.latency-metric-widget {
+  position: relative;
+  min-height: 200px;
+}
+
+.latency-metric-widget-title {
+  color: #46525f;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  margin-bottom: 14px;
+}
+
+.latency-breakdown-widget {
+  border-left: 1px solid #e4e9ef;
+  padding-left: 24px;
+}
+
+.write-perf-scroll {
+  border: 1px solid #e6eaef;
+  border-radius: 6px;
+  padding: 2px 6px 4px;
+}
+
+.write-perf-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 3px;
+
+  th {
+    color: #6a7682;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    padding: 1px 0 4px;
+    white-space: nowrap;
+  }
+}
+
+.write-perf-name-col {
+  width: 94px;
+}
+
+.write-perf-name {
+  color: #46525f;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 8px;
+}
+
+.write-perf-cell {
+  height: 22px;
+  min-width: 26px;
+  border-radius: 3px;
+  text-align: center;
+  color: #3a4651;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.latency-breakdown-body {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.latency-breakdown-chart-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  width: 150px;
+  height: 150px;
+}
+
+.latency-breakdown-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.latency-breakdown-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.latency-breakdown-total-label {
+  color: #7b8794;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.latency-breakdown-total-value {
+  color: #202a33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.latency-breakdown-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  flex: 0 1 auto;
+  min-width: 190px;
+  max-width: 250px;
+}
+
+.latency-breakdown-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #46525f;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.latency-breakdown-dot {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.latency-breakdown-legend-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.latency-breakdown-legend-value {
+  flex: 0 0 auto;
+  color: #5b6671;
+  white-space: nowrap;
+}
+
+@media (max-width: 1199px) {
+  .database-trend-grid,
+  .storage-performance-grid,
+  .latency-metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .latency-breakdown-widget {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid #e4e9ef;
+    padding-top: 16px;
+  }
+}

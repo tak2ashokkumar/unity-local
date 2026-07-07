@@ -4,46 +4,49 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
-import { Observable, Subject } from 'rxjs';
+import { forkJoin, Observable, Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { PublicCloudComputeDashboardService } from './public-cloud-compute-dashboard.service';
 import {
+  PUBLIC_CLOUD_DATABASE_CAPACITY_DEFAULT_SORT,
+  PUBLIC_CLOUD_STORAGE_RESOURCE_DEFAULT_SORT,
+  PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS,
+  PUBLIC_CLOUD_DATABASE_SPACE_SORT_COLUMNS,
   PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT,
-  PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_SORT_COLUMNS
+  PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_SORT_COLUMNS,
+  PUBLIC_CLOUD_STORAGE_RESOURCE_SORT_COLUMNS,
+  PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS,
+  PUBLIC_CLOUD_STORAGE_STATUS_LEGEND
 } from './public-cloud-compute-dashboard.const';
 import {
   PublicCloudAccountOption,
   PublicCloudAlertSummaryMetric,
   PublicCloudCoverageCard,
   PublicCloudCoverageGroup,
-  PublicCloudActiveDatabaseWorkloadViewData,
-  PublicCloudDatabaseBarItem,
-  PublicCloudDatabaseConsumerRow,
-  PublicCloudDatabaseHealthScoreViewData,
   PublicCloudDashboardFilterCriteria,
   PublicCloudDashboardFilterOptions,
+  PublicCloudDatabaseKpi,
+  PublicCloudDatabaseOverviewRow,
+  PublicCloudDatabaseSpaceRow,
   PublicCloudFilterOption,
   PublicCloudIdleDeviceRow,
   PublicCloudIdleDurationItem,
   PublicCloudInventorySummaryKey,
-  PublicCloudLatencyHeatmapRow,
-  PublicCloudLockContentionRow,
   PublicCloudOrphanedCategoryItem,
   PublicCloudOrphanedDeviceRow,
   PublicCloudPerformanceHotspotRow,
   PublicCloudProviderDistributionKey,
   PublicCloudProviderDistributionItem,
-  PublicCloudQueueBacklogRow,
   PublicCloudRecentAlert,
   PublicCloudRegionOption,
-  PublicCloudStorageBarItem,
-  PublicCloudStorageConsumerRow,
-  PublicCloudStorageDistributionItem,
-  PublicCloudStorageKpi,
-  PublicCloudStorageTrendViewData,
+  PublicCloudSortState,
+  PublicCloudStoragePerformanceCard,
+  PublicCloudStorageResourceRow,
+  PublicCloudWritePerformanceViewData,
+  PublicCloudLatencyBreakdownViewData,
   PublicCloudSummaryMetric,
   PublicCloudTagItem
 } from './public-cloud-compute-dashboard.type';
@@ -63,22 +66,14 @@ interface PublicCloudWidgetLoadingState {
   idleDevices: boolean;
   idleDuration: boolean;
   recentAlerts: boolean;
-  databaseHealthScore: boolean;
-  activeDatabaseWorkload: boolean;
-  databaseLatencyOverview: boolean;
-  topLockContention: boolean;
-  topMemoryConsumers: boolean;
-  topStorageConsumers: boolean;
-  cloudStorageHealth: boolean;
-  storageUtilizationByCloud: boolean;
-  readVsWriteTraffic: boolean;
-  cloudStorageTopConsumers: boolean;
-  transactionVolumeTrend: boolean;
-  objectFileGrowthTrend: boolean;
-  storageServicesVisibility: boolean;
-  cloudStorageDistribution: boolean;
-  latencyHeatmap: boolean;
-  queueBacklogMonitor: boolean;
+  databaseOverview: boolean;
+  databasePerformanceTrend: boolean;
+  databaseSpaceConsumption: boolean;
+  databaseCapacityResources: boolean;
+  storagePerformance: boolean;
+  storageResources: boolean;
+  writePerformanceTrend: boolean;
+  latencyBreakdown: boolean;
 }
 
 @Component({
@@ -101,22 +96,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     'idleDevices',
     'idleDuration',
     'recentAlerts',
-    'databaseHealthScore',
-    'activeDatabaseWorkload',
-    'databaseLatencyOverview',
-    'topLockContention',
-    'topMemoryConsumers',
-    'topStorageConsumers',
-    'cloudStorageHealth',
-    'storageUtilizationByCloud',
-    'readVsWriteTraffic',
-    'cloudStorageTopConsumers',
-    'transactionVolumeTrend',
-    'objectFileGrowthTrend',
-    'storageServicesVisibility',
-    'cloudStorageDistribution',
-    'latencyHeatmap',
-    'queueBacklogMonitor'
+    'databaseOverview',
+    'databasePerformanceTrend',
+    'databaseSpaceConsumption',
+    'databaseCapacityResources',
+    'storagePerformance',
+    'storageResources',
+    'writePerformanceTrend',
+    'latencyBreakdown'
   ];
   private readonly linkRoutes = {
     publicCloud: ['/unitycloud/publiccloud'],
@@ -125,6 +112,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     alerts: ['/services/aiml-event-mgmt/alerts'],
     gpu: ['/services/ai-observability/gpu'],
     storage: ['/unitycloud/devices/storagedevices'],
+    databases: ['/unitycloud/devices/databases'],
     bmservers: ['/unitycloud/devices/bmservers'],
     provider: {
       aws: ['/unitycloud/publiccloud/aws'],
@@ -178,29 +166,25 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   idleDurationRows: PublicCloudIdleDurationItem[] = [];
   idleDurationOptions: EChartsOption = {};
   idleDurationHasData = false;
-  databaseHealthScore: PublicCloudDatabaseHealthScoreViewData = null;
-  activeDatabaseWorkload: PublicCloudActiveDatabaseWorkloadViewData = null;
-  activeDatabaseWorkloadOptions: EChartsOption = {};
-  databaseLatencyRows: PublicCloudDatabaseBarItem[] = [];
-  databaseLatencyOptions: EChartsOption = {};
-  topLockContentionRows: PublicCloudLockContentionRow[] = [];
-  topMemoryConsumerRows: PublicCloudDatabaseConsumerRow[] = [];
-  topStorageConsumerRows: PublicCloudDatabaseConsumerRow[] = [];
-  cloudStorageHealthMetrics: PublicCloudStorageKpi[] = [];
-  storageUtilizationRows: PublicCloudStorageBarItem[] = [];
-  storageUtilizationOptions: EChartsOption = {};
-  readVsWriteTrend: PublicCloudStorageTrendViewData = null;
-  readVsWriteOptions: EChartsOption = {};
-  cloudStorageTopConsumerRows: PublicCloudStorageConsumerRow[] = [];
-  transactionVolumeTrend: PublicCloudStorageTrendViewData = null;
-  transactionVolumeTrendOptions: EChartsOption = {};
-  objectFileGrowthTrend: PublicCloudStorageTrendViewData = null;
-  objectFileGrowthTrendOptions: EChartsOption = {};
-  storageServicesVisibilityMetrics: PublicCloudStorageKpi[] = [];
-  cloudStorageDistributionRows: PublicCloudStorageDistributionItem[] = [];
-  cloudStorageDistributionOptions: EChartsOption = {};
-  latencyHeatmapRows: PublicCloudLatencyHeatmapRow[] = [];
-  queueBacklogRows: PublicCloudQueueBacklogRow[] = [];
+  databaseOverviewKpis: PublicCloudDatabaseKpi[] = [];
+  databaseOverviewRows: PublicCloudDatabaseOverviewRow[] = [];
+  databaseOverviewSort: PublicCloudSortState = { key: 'writeThroughput', direction: 'desc' };
+  databaseOverviewSortColumns = PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS;
+  databaseWritePerformanceOptions: EChartsOption = {};
+  databaseReadPerformanceOptions: EChartsOption = {};
+  databaseTrendHasData = false;
+  databaseSpaceKpis: PublicCloudDatabaseKpi[] = [];
+  databaseSpaceRows: PublicCloudDatabaseSpaceRow[] = [];
+  databaseSpaceSortColumns = PUBLIC_CLOUD_DATABASE_SPACE_SORT_COLUMNS;
+  databaseCapacitySort = PUBLIC_CLOUD_DATABASE_CAPACITY_DEFAULT_SORT;
+  storagePerformanceCards: PublicCloudStoragePerformanceCard[] = [];
+  storageResources: PublicCloudStorageResourceRow[] = [];
+  storageResourceSortColumns = PUBLIC_CLOUD_STORAGE_RESOURCE_SORT_COLUMNS;
+  storageResourcesSort = PUBLIC_CLOUD_STORAGE_RESOURCE_DEFAULT_SORT;
+  storageStatusLegend = PUBLIC_CLOUD_STORAGE_STATUS_LEGEND;
+  writePerformanceTrend: PublicCloudWritePerformanceViewData = { labels: [], rows: [] };
+  latencyBreakdown: PublicCloudLatencyBreakdownViewData = null;
+  latencyBreakdownOptions: EChartsOption = {};
   recentAlertSummaryMetrics: PublicCloudAlertSummaryMetric[] = [];
   recentAlerts: PublicCloudRecentAlert[] = [];
   widgetLoading: PublicCloudWidgetLoadingState = {
@@ -213,22 +197,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     idleDevices: false,
     idleDuration: false,
     recentAlerts: false,
-    databaseHealthScore: false,
-    activeDatabaseWorkload: false,
-    databaseLatencyOverview: false,
-    topLockContention: false,
-    topMemoryConsumers: false,
-    topStorageConsumers: false,
-    cloudStorageHealth: false,
-    storageUtilizationByCloud: false,
-    readVsWriteTraffic: false,
-    cloudStorageTopConsumers: false,
-    transactionVolumeTrend: false,
-    objectFileGrowthTrend: false,
-    storageServicesVisibility: false,
-    cloudStorageDistribution: false,
-    latencyHeatmap: false,
-    queueBacklogMonitor: false
+    databaseOverview: false,
+    databasePerformanceTrend: false,
+    databaseSpaceConsumption: false,
+    databaseCapacityResources: false,
+    storagePerformance: false,
+    storageResources: false,
+    writePerformanceTrend: false,
+    latencyBreakdown: false
   };
 
   loaderNames = {
@@ -243,22 +219,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     orphanedDevicesByCategory: 'publicCloudOrphanedDevicesByCategoryLoader',
     idleDevices: 'publicCloudIdleDevicesLoader',
     idleDuration: 'publicCloudIdleDurationLoader',
-    databaseHealthScore: 'publicCloudDatabaseHealthScoreLoader',
-    activeDatabaseWorkload: 'publicCloudActiveDatabaseWorkloadLoader',
-    databaseLatencyOverview: 'publicCloudDatabaseLatencyOverviewLoader',
-    topLockContention: 'publicCloudTopLockContentionLoader',
-    topMemoryConsumers: 'publicCloudTopMemoryConsumersLoader',
-    topStorageConsumers: 'publicCloudTopStorageConsumersLoader',
-    cloudStorageHealth: 'publicCloudStorageHealthLoader',
-    storageUtilizationByCloud: 'publicCloudStorageUtilizationByCloudLoader',
-    readVsWriteTraffic: 'publicCloudReadVsWriteTrafficLoader',
-    cloudStorageTopConsumers: 'publicCloudStorageTopConsumersLoader',
-    transactionVolumeTrend: 'publicCloudTransactionVolumeTrendLoader',
-    objectFileGrowthTrend: 'publicCloudObjectFileGrowthTrendLoader',
-    storageServicesVisibility: 'publicCloudStorageServicesVisibilityLoader',
-    cloudStorageDistribution: 'publicCloudStorageDistributionLoader',
-    latencyHeatmap: 'publicCloudLatencyHeatmapLoader',
-    queueBacklogMonitor: 'publicCloudQueueBacklogMonitorLoader',
+    databaseOverview: 'publicCloudDatabaseOverviewLoader',
+    databasePerformanceTrend: 'publicCloudDatabasePerformanceTrendLoader',
+    databaseSpaceConsumption: 'publicCloudDatabaseSpaceConsumptionLoader',
+    databaseCapacityResources: 'publicCloudDatabaseCapacityResourcesLoader',
+    storagePerformance: 'publicCloudStoragePerformanceLoader',
+    storageResources: 'publicCloudStorageResourcesLoader',
+    writePerformanceTrend: 'publicCloudWritePerformanceTrendLoader',
+    latencyBreakdown: 'publicCloudLatencyBreakdownLoader',
     recentAlertSummary: 'publicCloudRecentAlertSummaryLoader',
     recentAlerts: 'publicCloudRecentAlertsLoader'
   };
@@ -524,22 +492,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.getGeoDistribution(filterFormOutput);
       this.getPublicCloudCoverage(filterFormOutput);
       this.getPerformanceHotspots(filterFormOutput);
-      this.getDatabaseHealthScore(filterFormOutput);
-      this.getActiveDatabaseWorkload(filterFormOutput);
-      this.getDatabaseLatencyOverview(filterFormOutput);
-      this.getTopLockContention(filterFormOutput);
-      this.getTopMemoryConsumers(filterFormOutput);
-      this.getTopStorageConsumers(filterFormOutput);
-      this.getCloudStorageHealth(filterFormOutput);
-      this.getStorageUtilizationByCloud(filterFormOutput);
-      this.getReadVsWriteTraffic(filterFormOutput);
-      this.getCloudStorageTopConsumers(filterFormOutput);
-      this.getTransactionVolumeTrend(filterFormOutput);
-      this.getObjectFileGrowthTrend(filterFormOutput);
-      this.getStorageServicesVisibility(filterFormOutput);
-      this.getCloudStorageDistribution(filterFormOutput);
-      this.getLatencyHeatmap(filterFormOutput);
-      this.getQueueBacklogMonitor(filterFormOutput);
+      this.getDatabaseOverview(filterFormOutput);
+      this.getDatabasePerformanceTrend(filterFormOutput);
+      this.getDatabaseSpaceConsumption(filterFormOutput);
+      this.getDatabaseCapacityResources(filterFormOutput);
+      this.getStoragePerformance(filterFormOutput);
+      this.getStorageResources(filterFormOutput);
+      this.getWritePerformanceTrend(filterFormOutput);
+      this.getLatencyBreakdown(filterFormOutput);
       this.getOrphanedDevices(filterFormOutput);
       this.getOrphanedDevicesByCategory(filterFormOutput);
       this.getIdleDevices(filterFormOutput);
@@ -649,187 +609,164 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return activeColumn ? `Performance Hotspots - ${activeColumn.label}` : 'Performance Hotspots';
   }
 
-  getDatabaseHealthScore(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.databaseHealthScore = null;
-    this.widgetLoading.databaseHealthScore = true;
-    this.loadWidget(this.loaderNames.databaseHealthScore, this.svc.getDatabaseHealthScore(filterFormOutput), res => {
-      this.databaseHealthScore = this.svc.convertToDatabaseHealthScoreViewData(res);
+  getDatabaseOverview(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.databaseOverviewKpis = [];
+    this.databaseOverviewRows = [];
+    this.widgetLoading.databaseOverview = true;
+    this.loadWidget(this.loaderNames.databaseOverview, this.svc.getDatabaseOverview(filterFormOutput), res => {
+      this.databaseOverviewKpis = this.svc.convertToDatabaseOverviewKpis(res);
+      this.databaseOverviewRows = this.sortRows(this.svc.convertToDatabaseOverviewRows(res), this.databaseOverviewSort);
     }, () => {
-      this.databaseHealthScore = null;
-    }, () => this.widgetLoading.databaseHealthScore = false);
+      this.databaseOverviewKpis = [];
+      this.databaseOverviewRows = [];
+    }, () => this.widgetLoading.databaseOverview = false);
   }
 
-  getActiveDatabaseWorkload(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.activeDatabaseWorkload = null;
-    this.activeDatabaseWorkloadOptions = {};
-    this.widgetLoading.activeDatabaseWorkload = true;
-    this.loadWidget(this.loaderNames.activeDatabaseWorkload, this.svc.getActiveDatabaseWorkload(filterFormOutput), res => {
-      this.activeDatabaseWorkload = this.svc.convertToActiveDatabaseWorkloadViewData(res);
-      this.activeDatabaseWorkloadOptions = this.activeDatabaseWorkload?.rows?.length ?
-        this.svc.convertToActiveDatabaseWorkloadOptions(this.activeDatabaseWorkload.rows) : {};
+  getDatabasePerformanceTrend(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.databaseWritePerformanceOptions = {};
+    this.databaseReadPerformanceOptions = {};
+    this.databaseTrendHasData = false;
+    this.widgetLoading.databasePerformanceTrend = true;
+    const trend$ = forkJoin([this.svc.getDatabaseWriteTrend(filterFormOutput), this.svc.getDatabaseReadTrend(filterFormOutput)]);
+    this.loadWidget(this.loaderNames.databasePerformanceTrend, trend$, ([writeRes, readRes]) => {
+      const hasWrite = this.svc.hasDatabaseTrendSeries(writeRes);
+      const hasRead = this.svc.hasDatabaseTrendSeries(readRes);
+      this.databaseTrendHasData = hasWrite || hasRead;
+      this.databaseWritePerformanceOptions = hasWrite ? this.svc.convertToDatabaseWritePerformanceOptions(writeRes) : {};
+      this.databaseReadPerformanceOptions = hasRead ? this.svc.convertToDatabaseReadPerformanceOptions(readRes) : {};
     }, () => {
-      this.activeDatabaseWorkload = null;
-      this.activeDatabaseWorkloadOptions = {};
-    }, () => this.widgetLoading.activeDatabaseWorkload = false);
+      this.databaseWritePerformanceOptions = {};
+      this.databaseReadPerformanceOptions = {};
+      this.databaseTrendHasData = false;
+    }, () => this.widgetLoading.databasePerformanceTrend = false);
   }
 
-  getDatabaseLatencyOverview(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.databaseLatencyRows = [];
-    this.databaseLatencyOptions = {};
-    this.widgetLoading.databaseLatencyOverview = true;
-    this.loadWidget(this.loaderNames.databaseLatencyOverview, this.svc.getDatabaseLatencyOverview(filterFormOutput), res => {
-      this.databaseLatencyRows = this.svc.convertToDatabaseLatencyRows(res);
-      this.databaseLatencyOptions = this.databaseLatencyRows.length ? this.svc.convertToDatabaseLatencyOptions(this.databaseLatencyRows) : {};
+  getDatabaseSpaceConsumption(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.databaseSpaceKpis = [];
+    this.widgetLoading.databaseSpaceConsumption = true;
+    this.loadWidget(this.loaderNames.databaseSpaceConsumption, this.svc.getDatabaseSpaceConsumption(filterFormOutput), res => {
+      this.databaseSpaceKpis = this.svc.convertToDatabaseSpaceKpis(res);
     }, () => {
-      this.databaseLatencyRows = [];
-      this.databaseLatencyOptions = {};
-    }, () => this.widgetLoading.databaseLatencyOverview = false);
+      this.databaseSpaceKpis = [];
+    }, () => this.widgetLoading.databaseSpaceConsumption = false);
   }
 
-  getTopLockContention(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.topLockContentionRows = [];
-    this.widgetLoading.topLockContention = true;
-    this.loadWidget(this.loaderNames.topLockContention, this.svc.getTopLockContention(filterFormOutput), res => {
-      this.topLockContentionRows = this.svc.convertToTopLockContentionRows(res);
+  getDatabaseCapacityResources(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.databaseSpaceRows = [];
+    this.widgetLoading.databaseCapacityResources = true;
+    this.loadWidget(this.loaderNames.databaseCapacityResources, this.svc.getDatabaseCapacityResources(filterFormOutput, this.databaseCapacitySort), res => {
+      this.databaseSpaceRows = this.svc.convertToDatabaseCapacityRows(res);
     }, () => {
-      this.topLockContentionRows = [];
-    }, () => this.widgetLoading.topLockContention = false);
+      this.databaseSpaceRows = [];
+    }, () => this.widgetLoading.databaseCapacityResources = false);
   }
 
-  getTopMemoryConsumers(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.topMemoryConsumerRows = [];
-    this.widgetLoading.topMemoryConsumers = true;
-    this.loadWidget(this.loaderNames.topMemoryConsumers, this.svc.getTopMemoryConsumers(filterFormOutput), res => {
-      this.topMemoryConsumerRows = this.svc.convertToTopMemoryConsumersRows(res);
+  getStoragePerformance(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.storagePerformanceCards = [];
+    this.widgetLoading.storagePerformance = true;
+    const cards$ = forkJoin(
+      PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS.map(metric => this.svc.getStoragePerformanceMetric(metric.endpoint, filterFormOutput))
+    );
+    this.loadWidget(this.loaderNames.storagePerformance, cards$, results => {
+      this.storagePerformanceCards = results.map((res, index) => {
+        const metric = PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS[index];
+        return metric.kind === 'highLatency'
+          ? this.svc.convertToStorageHighLatencyCard(res, metric.color)
+          : this.svc.convertToStorageTrendCard(res, metric.color);
+      }).filter(card => !!card.title);
     }, () => {
-      this.topMemoryConsumerRows = [];
-    }, () => this.widgetLoading.topMemoryConsumers = false);
+      this.storagePerformanceCards = [];
+    }, () => this.widgetLoading.storagePerformance = false);
   }
 
-  getTopStorageConsumers(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.topStorageConsumerRows = [];
-    this.widgetLoading.topStorageConsumers = true;
-    this.loadWidget(this.loaderNames.topStorageConsumers, this.svc.getTopStorageConsumers(filterFormOutput), res => {
-      this.topStorageConsumerRows = this.svc.convertToTopStorageConsumersRows(res);
+  getStorageResources(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.storageResources = [];
+    this.widgetLoading.storageResources = true;
+    this.loadWidget(this.loaderNames.storageResources, this.svc.getStorageResources(filterFormOutput, this.storageResourcesSort), res => {
+      this.storageResources = this.svc.convertToStorageResourceRows(res);
     }, () => {
-      this.topStorageConsumerRows = [];
-    }, () => this.widgetLoading.topStorageConsumers = false);
+      this.storageResources = [];
+    }, () => this.widgetLoading.storageResources = false);
   }
 
-  getCloudStorageHealth(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.cloudStorageHealthMetrics = [];
-    this.widgetLoading.cloudStorageHealth = true;
-    this.loadWidget(this.loaderNames.cloudStorageHealth, this.svc.getCloudStorageHealth(filterFormOutput), res => {
-      this.cloudStorageHealthMetrics = this.svc.convertToCloudStorageHealthMetrics(res);
+  getWritePerformanceTrend(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.writePerformanceTrend = { labels: [], rows: [] };
+    this.widgetLoading.writePerformanceTrend = true;
+    this.loadWidget(this.loaderNames.writePerformanceTrend, this.svc.getWritePerformanceTrend(filterFormOutput), res => {
+      this.writePerformanceTrend = this.svc.convertToWritePerformanceViewData(res);
     }, () => {
-      this.cloudStorageHealthMetrics = [];
-    }, () => this.widgetLoading.cloudStorageHealth = false);
+      this.writePerformanceTrend = { labels: [], rows: [] };
+    }, () => this.widgetLoading.writePerformanceTrend = false);
   }
 
-  getStorageUtilizationByCloud(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.storageUtilizationRows = [];
-    this.storageUtilizationOptions = {};
-    this.widgetLoading.storageUtilizationByCloud = true;
-    this.loadWidget(this.loaderNames.storageUtilizationByCloud, this.svc.getStorageUtilizationByCloud(filterFormOutput), res => {
-      this.storageUtilizationRows = this.svc.convertToStorageUtilizationRows(res);
-      this.storageUtilizationOptions = this.storageUtilizationRows.length ? this.svc.convertToStorageUtilizationOptions(this.storageUtilizationRows) : {};
+  getLatencyBreakdown(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.latencyBreakdown = null;
+    this.latencyBreakdownOptions = {};
+    this.widgetLoading.latencyBreakdown = true;
+    this.loadWidget(this.loaderNames.latencyBreakdown, this.svc.getLatencyBreakdown(filterFormOutput), res => {
+      this.latencyBreakdown = this.svc.convertToLatencyBreakdownViewData(res);
+      this.latencyBreakdownOptions = this.latencyBreakdown.hasData ? this.svc.convertToLatencyBreakdownOptions(this.latencyBreakdown) : {};
     }, () => {
-      this.storageUtilizationRows = [];
-      this.storageUtilizationOptions = {};
-    }, () => this.widgetLoading.storageUtilizationByCloud = false);
+      this.latencyBreakdown = null;
+      this.latencyBreakdownOptions = {};
+    }, () => this.widgetLoading.latencyBreakdown = false);
   }
 
-  getReadVsWriteTraffic(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.readVsWriteTrend = null;
-    this.readVsWriteOptions = {};
-    this.widgetLoading.readVsWriteTraffic = true;
-    this.loadWidget(this.loaderNames.readVsWriteTraffic, this.svc.getReadVsWriteTraffic(filterFormOutput), res => {
-      this.readVsWriteTrend = this.svc.convertToReadVsWriteTrend(res);
-      this.readVsWriteOptions = this.hasStorageTrendData(this.readVsWriteTrend) ? this.svc.convertToReadVsWriteOptions(this.readVsWriteTrend) : {};
-    }, () => {
-      this.readVsWriteTrend = null;
-      this.readVsWriteOptions = {};
-    }, () => this.widgetLoading.readVsWriteTraffic = false);
+  sortDatabaseOverview(key: string) {
+    this.databaseOverviewSort = this.nextSortState(this.databaseOverviewSort, key);
+    this.databaseOverviewRows = this.sortRows(this.databaseOverviewRows, this.databaseOverviewSort);
   }
 
-  getCloudStorageTopConsumers(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.cloudStorageTopConsumerRows = [];
-    this.widgetLoading.cloudStorageTopConsumers = true;
-    this.loadWidget(this.loaderNames.cloudStorageTopConsumers, this.svc.getCloudStorageTopConsumers(filterFormOutput), res => {
-      this.cloudStorageTopConsumerRows = this.svc.convertToCloudStorageTopConsumersRows(res);
-    }, () => {
-      this.cloudStorageTopConsumerRows = [];
-    }, () => this.widgetLoading.cloudStorageTopConsumers = false);
+  sortDatabaseCapacity(sortBy?: string) {
+    if (!sortBy || this.databaseCapacitySort === sortBy) {
+      return;
+    }
+    this.databaseCapacitySort = sortBy;
+    this.getDatabaseCapacityResources(this.appliedFilterCriteria);
   }
 
-  getTransactionVolumeTrend(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.transactionVolumeTrend = null;
-    this.transactionVolumeTrendOptions = {};
-    this.widgetLoading.transactionVolumeTrend = true;
-    this.loadWidget(this.loaderNames.transactionVolumeTrend, this.svc.getTransactionVolumeTrend(filterFormOutput), res => {
-      this.transactionVolumeTrend = this.svc.convertToTransactionVolumeTrend(res);
-      this.transactionVolumeTrendOptions = this.hasStorageTrendData(this.transactionVolumeTrend) ? this.svc.convertToStorageTrendOptions(this.transactionVolumeTrend) : {};
-    }, () => {
-      this.transactionVolumeTrend = null;
-      this.transactionVolumeTrendOptions = {};
-    }, () => this.widgetLoading.transactionVolumeTrend = false);
+  isCapacitySortActive(sortBy?: string): boolean {
+    return !!sortBy && this.databaseCapacitySort === sortBy;
   }
 
-  getObjectFileGrowthTrend(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.objectFileGrowthTrend = null;
-    this.objectFileGrowthTrendOptions = {};
-    this.widgetLoading.objectFileGrowthTrend = true;
-    this.loadWidget(this.loaderNames.objectFileGrowthTrend, this.svc.getObjectFileGrowthTrend(filterFormOutput), res => {
-      this.objectFileGrowthTrend = this.svc.convertToObjectFileGrowthTrend(res);
-      this.objectFileGrowthTrendOptions = this.hasStorageTrendData(this.objectFileGrowthTrend) ? this.svc.convertToStorageTrendOptions(this.objectFileGrowthTrend) : {};
-    }, () => {
-      this.objectFileGrowthTrend = null;
-      this.objectFileGrowthTrendOptions = {};
-    }, () => this.widgetLoading.objectFileGrowthTrend = false);
+  sortStorageResources(sortBy?: string) {
+    if (!sortBy || this.storageResourcesSort === sortBy) {
+      return;
+    }
+    this.storageResourcesSort = sortBy;
+    this.getStorageResources(this.appliedFilterCriteria);
   }
 
-  getStorageServicesVisibility(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.storageServicesVisibilityMetrics = [];
-    this.widgetLoading.storageServicesVisibility = true;
-    this.loadWidget(this.loaderNames.storageServicesVisibility, this.svc.getStorageServicesVisibility(filterFormOutput), res => {
-      this.storageServicesVisibilityMetrics = this.svc.convertToStorageServicesVisibilityMetrics(res);
-    }, () => {
-      this.storageServicesVisibilityMetrics = [];
-    }, () => this.widgetLoading.storageServicesVisibility = false);
+  isStorageSortActive(sortBy?: string): boolean {
+    return !!sortBy && this.storageResourcesSort === sortBy;
   }
 
-  getCloudStorageDistribution(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.cloudStorageDistributionRows = [];
-    this.cloudStorageDistributionOptions = {};
-    this.widgetLoading.cloudStorageDistribution = true;
-    this.loadWidget(this.loaderNames.cloudStorageDistribution, this.svc.getCloudStorageDistribution(filterFormOutput), res => {
-      this.cloudStorageDistributionRows = this.svc.convertToCloudStorageDistributionRows(res);
-      this.cloudStorageDistributionOptions = this.cloudStorageDistributionRows.length ?
-        this.svc.convertToCloudStorageDistributionOptions(this.cloudStorageDistributionRows) : {};
-    }, () => {
-      this.cloudStorageDistributionRows = [];
-      this.cloudStorageDistributionOptions = {};
-    }, () => this.widgetLoading.cloudStorageDistribution = false);
+  getSortIconClass(sort: PublicCloudSortState, key: string): string {
+    if (sort.key !== key) {
+      return 'fas fa-sort';
+    }
+    return sort.direction === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
   }
 
-  getLatencyHeatmap(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.latencyHeatmapRows = [];
-    this.widgetLoading.latencyHeatmap = true;
-    this.loadWidget(this.loaderNames.latencyHeatmap, this.svc.getLatencyHeatmap(filterFormOutput), res => {
-      this.latencyHeatmapRows = this.svc.convertToLatencyHeatmapRows(res);
-    }, () => {
-      this.latencyHeatmapRows = [];
-    }, () => this.widgetLoading.latencyHeatmap = false);
+  private nextSortState(current: PublicCloudSortState, key: string): PublicCloudSortState {
+    if (current.key === key) {
+      return { key, direction: current.direction === 'asc' ? 'desc' : 'asc' };
+    }
+    return { key, direction: 'desc' };
   }
 
-  getQueueBacklogMonitor(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.queueBacklogRows = [];
-    this.widgetLoading.queueBacklogMonitor = true;
-    this.loadWidget(this.loaderNames.queueBacklogMonitor, this.svc.getQueueBacklogMonitor(filterFormOutput), res => {
-      this.queueBacklogRows = this.svc.convertToQueueBacklogRows(res);
-    }, () => {
-      this.queueBacklogRows = [];
-    }, () => this.widgetLoading.queueBacklogMonitor = false);
+  private sortRows<T>(rows: T[], sort: PublicCloudSortState): T[] {
+    const sorted = [...(rows || [])];
+    const factor = sort.direction === 'asc' ? 1 : -1;
+    sorted.sort((first, second) => {
+      const firstValue = (first as Record<string, unknown>)[sort.key];
+      const secondValue = (second as Record<string, unknown>)[sort.key];
+      if (typeof firstValue === 'number' && typeof secondValue === 'number') {
+        return (firstValue - secondValue) * factor;
+      }
+      return String(firstValue ?? '').localeCompare(String(secondValue ?? '')) * factor;
+    });
+    return sorted;
   }
 
   getOrphanedDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
@@ -981,32 +918,21 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   }
 
   private clearCloudDatabasePerformanceViewData() {
-    this.databaseHealthScore = null;
-    this.activeDatabaseWorkload = null;
-    this.activeDatabaseWorkloadOptions = {};
-    this.databaseLatencyRows = [];
-    this.databaseLatencyOptions = {};
-    this.topLockContentionRows = [];
-    this.topMemoryConsumerRows = [];
-    this.topStorageConsumerRows = [];
+    this.databaseOverviewKpis = [];
+    this.databaseOverviewRows = [];
+    this.databaseWritePerformanceOptions = {};
+    this.databaseReadPerformanceOptions = {};
+    this.databaseTrendHasData = false;
+    this.databaseSpaceKpis = [];
+    this.databaseSpaceRows = [];
   }
 
   private clearCloudStorageHealthViewData() {
-    this.cloudStorageHealthMetrics = [];
-    this.storageUtilizationRows = [];
-    this.storageUtilizationOptions = {};
-    this.readVsWriteTrend = null;
-    this.readVsWriteOptions = {};
-    this.cloudStorageTopConsumerRows = [];
-    this.transactionVolumeTrend = null;
-    this.transactionVolumeTrendOptions = {};
-    this.objectFileGrowthTrend = null;
-    this.objectFileGrowthTrendOptions = {};
-    this.storageServicesVisibilityMetrics = [];
-    this.cloudStorageDistributionRows = [];
-    this.cloudStorageDistributionOptions = {};
-    this.latencyHeatmapRows = [];
-    this.queueBacklogRows = [];
+    this.storagePerformanceCards = [];
+    this.storageResources = [];
+    this.writePerformanceTrend = { labels: [], rows: [] };
+    this.latencyBreakdown = null;
+    this.latencyBreakdownOptions = {};
   }
 
   private startWidgetLoadingState() {
@@ -1083,114 +1009,48 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return this.widgetLoading.recentAlerts || this.hasMetricValues(this.recentAlertSummaryMetrics);
   }
 
-  get hasDatabaseHealthScoreData(): boolean {
-    return !!this.databaseHealthScore?.hasData;
+  get hasDatabaseOverviewData(): boolean {
+    return this.widgetLoading.databaseOverview || this.hasMetricValues(this.databaseOverviewKpis) || !!this.databaseOverviewRows?.length;
   }
 
-  get hasActiveDatabaseWorkloadData(): boolean {
-    return !!this.activeDatabaseWorkload?.rows?.length;
+  get hasDatabaseTrendData(): boolean {
+    return this.widgetLoading.databasePerformanceTrend || this.databaseTrendHasData;
   }
 
-  get hasDatabaseLatencyOverviewData(): boolean {
-    return !!this.databaseLatencyRows?.length;
+  get hasDatabaseSpaceData(): boolean {
+    return this.widgetLoading.databaseSpaceConsumption || this.hasMetricValues(this.databaseSpaceKpis);
   }
 
-  get hasTopLockContentionData(): boolean {
-    return !!this.topLockContentionRows?.length;
-  }
-
-  get hasTopMemoryConsumersData(): boolean {
-    return !!this.topMemoryConsumerRows?.length;
-  }
-
-  get hasTopStorageConsumersData(): boolean {
-    return !!this.topStorageConsumerRows?.length;
-  }
-
-  get hasCloudDatabasePerformanceLoading(): boolean {
-    return this.widgetLoading.databaseHealthScore ||
-      this.widgetLoading.activeDatabaseWorkload ||
-      this.widgetLoading.databaseLatencyOverview ||
-      this.widgetLoading.topLockContention ||
-      this.widgetLoading.topMemoryConsumers ||
-      this.widgetLoading.topStorageConsumers;
+  get hasDatabaseCapacityData(): boolean {
+    return this.widgetLoading.databaseCapacityResources || !!this.databaseSpaceRows?.length;
   }
 
   get hasCloudDatabasePerformanceSection(): boolean {
-    return this.hasCloudDatabasePerformanceLoading ||
-      this.hasDatabaseHealthScoreData ||
-      this.hasActiveDatabaseWorkloadData ||
-      this.hasDatabaseLatencyOverviewData ||
-      this.hasTopLockContentionData ||
-      this.hasTopMemoryConsumersData ||
-      this.hasTopStorageConsumersData;
+    return this.hasDatabaseOverviewData || this.hasDatabaseTrendData || this.hasDatabaseSpaceData || this.hasDatabaseCapacityData;
   }
 
-  get hasCloudStorageHealthData(): boolean {
-    return this.hasMetricValues(this.cloudStorageHealthMetrics);
+  get hasStoragePerformanceData(): boolean {
+    return this.widgetLoading.storagePerformance || !!this.storagePerformanceCards?.length;
   }
 
-  get hasStorageUtilizationByCloudData(): boolean {
-    return !!this.storageUtilizationRows?.length;
+  get hasStorageResourcesData(): boolean {
+    return this.widgetLoading.storageResources || !!this.storageResources?.length;
   }
 
-  get hasReadVsWriteTrafficData(): boolean {
-    return this.hasStorageTrendData(this.readVsWriteTrend);
+  get hasWritePerformanceTrendData(): boolean {
+    return this.widgetLoading.writePerformanceTrend || !!this.writePerformanceTrend?.rows?.length;
   }
 
-  get hasCloudStorageTopConsumersData(): boolean {
-    return !!this.cloudStorageTopConsumerRows?.length;
+  get hasLatencyBreakdownData(): boolean {
+    return this.widgetLoading.latencyBreakdown || !!this.latencyBreakdown?.hasData;
   }
 
-  get hasTransactionVolumeTrendData(): boolean {
-    return this.hasStorageTrendData(this.transactionVolumeTrend);
-  }
-
-  get hasObjectFileGrowthTrendData(): boolean {
-    return this.hasStorageTrendData(this.objectFileGrowthTrend);
-  }
-
-  get hasStorageServicesVisibilityData(): boolean {
-    return this.hasMetricValues(this.storageServicesVisibilityMetrics);
-  }
-
-  get hasCloudStorageDistributionData(): boolean {
-    return !!this.cloudStorageDistributionRows?.length;
-  }
-
-  get hasLatencyHeatmapData(): boolean {
-    return !!this.latencyHeatmapRows?.length;
-  }
-
-  get hasQueueBacklogMonitorData(): boolean {
-    return !!this.queueBacklogRows?.length;
-  }
-
-  get hasCloudStorageHealthLoading(): boolean {
-    return this.widgetLoading.cloudStorageHealth ||
-      this.widgetLoading.storageUtilizationByCloud ||
-      this.widgetLoading.readVsWriteTraffic ||
-      this.widgetLoading.cloudStorageTopConsumers ||
-      this.widgetLoading.transactionVolumeTrend ||
-      this.widgetLoading.objectFileGrowthTrend ||
-      this.widgetLoading.storageServicesVisibility ||
-      this.widgetLoading.cloudStorageDistribution ||
-      this.widgetLoading.latencyHeatmap ||
-      this.widgetLoading.queueBacklogMonitor;
+  get hasLatencyMetricSection(): boolean {
+    return this.hasWritePerformanceTrendData || this.hasLatencyBreakdownData;
   }
 
   get hasCloudStorageHealthSection(): boolean {
-    return this.hasCloudStorageHealthLoading ||
-      this.hasCloudStorageHealthData ||
-      this.hasStorageUtilizationByCloudData ||
-      this.hasReadVsWriteTrafficData ||
-      this.hasCloudStorageTopConsumersData ||
-      this.hasTransactionVolumeTrendData ||
-      this.hasObjectFileGrowthTrendData ||
-      this.hasStorageServicesVisibilityData ||
-      this.hasCloudStorageDistributionData ||
-      this.hasLatencyHeatmapData ||
-      this.hasQueueBacklogMonitorData;
+    return this.hasStoragePerformanceData || this.hasStorageResourcesData || this.hasLatencyMetricSection;
   }
 
   get hasAnyDashboardWidget(): boolean {
@@ -1218,16 +1078,37 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return (metrics || []).some(metric => this.getNumericValue(metric?.value) > 0);
   }
 
-  private hasStorageTrendData(data: PublicCloudStorageTrendViewData): boolean {
-    return (data?.series || []).some(series => !!series?.values?.length);
-  }
-
   private getNumericValue(value: string | number | undefined | null): number {
     return Number(String(value || '').replace(/[^0-9.-]/g, '')) || 0;
   }
 
   getStatusClass(tone?: string): string {
     return `tone-${tone || 'muted'}`;
+  }
+
+  getDeltaIconClass(direction: string): string {
+    return direction === 'down' ? 'fas fa-caret-down' : 'fas fa-caret-up';
+  }
+
+  getStorageStatusIconClass(status: string): string {
+    switch ((status || '').toLowerCase()) {
+      case 'healthy':
+      case 'up':
+      case 'ok':
+      case 'success':
+        return 'fas fa-check-circle text-success font-xs-sm';
+      case 'warning':
+      case 'degraded':
+      case 'warn':
+        return 'fas fa-exclamation-circle text-warning font-xs-sm';
+      case 'critical':
+      case 'down':
+      case 'error':
+      case 'failed':
+        return 'fas fa-exclamation-triangle text-danger font-xs-sm';
+      default:
+        return 'fas fa-circle text-muted font-xs-sm';
+    }
   }
 
   getOrphanedStatusIconClass(status: string): string {
@@ -1306,6 +1187,18 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   openHotspotInstance(row: PublicCloudPerformanceHotspotRow) {
     this.openRouteInNewTab(this.getProviderVmRoute(row?.cloud || ''));
+  }
+
+  openDatabaseInstance(row: PublicCloudDatabaseOverviewRow | PublicCloudDatabaseSpaceRow) {
+    if (row?.instance) {
+      this.openRouteInNewTab(this.linkRoutes.databases);
+    }
+  }
+
+  openStorageResource(row: PublicCloudStorageResourceRow) {
+    if (row?.deviceName) {
+      this.openRouteInNewTab(this.linkRoutes.storage);
+    }
   }
 
   openOrphanedDevices() {
