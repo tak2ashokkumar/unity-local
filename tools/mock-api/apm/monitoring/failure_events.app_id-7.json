@@ -1,0 +1,77 @@
+{
+  "count": 193,
+  "previous": null,
+  "results": [
+    {
+      "count": 1814,
+      "timestamp": "2026-07-07T20:30:07.719365Z",
+      "monitored_app": 54,
+      "description": "Order parsing failed:",
+      "service": "accounting"
+    },
+    {
+      "count": 92,
+      "timestamp": "2026-06-02T13:31:42Z",
+      "monitored_app": null,
+      "description": "Docker: Failed to fetch info data (or no data for 30m)",
+      "service": "UnityOne events"
+    },
+    {
+      "count": 528,
+      "timestamp": "2026-05-04T14:35:02.326086Z",
+      "monitored_app": 166,
+      "description": "Failed to export logs to 10.192.25.18:4317, error code: StatusCode.UNAVAILABLE",
+      "service": "product-reviews"
+    },
+    {
+      "count": 191,
+      "timestamp": "2026-05-04T07:30:35.634538Z",
+      "monitored_app": 166,
+      "description": "Failed to export traces to 10.192.25.18:4317, error code: StatusCode.UNAVAILABLE",
+      "service": "product-reviews"
+    },
+    {
+      "count": 27,
+      "timestamp": "2026-05-03T23:43:39.298696Z",
+      "monitored_app": 64,
+      "description": "Failed to export metrics to 10.192.25.18:4317, error code: StatusCode.UNAVAILABLE",
+      "service": "recommendation"
+    },
+    {
+      "count": 12,
+      "timestamp": "2026-05-01T21:28:51Z",
+      "monitored_app": null,
+      "description": "sda: Disk read/write request responses are too high (read > 20 ms for 15m or write > 20 ms for 15m)",
+      "service": "UnityOne events"
+    },
+    {
+      "count": 20,
+      "timestamp": "2026-04-29T21:21:42Z",
+      "monitored_app": null,
+      "description": "Container /frontend-proxy: Health state container is not running",
+      "service": "UnityOne events"
+    },
+    {
+      "count": 7,
+      "timestamp": "2026-04-29T21:21:42Z",
+      "monitored_app": null,
+      "description": "Container /frontend-proxy: is not running",
+      "service": "UnityOne events"
+    },
+    {
+      "count": 6,
+      "timestamp": "2026-04-29T19:17:43Z",
+      "monitored_app": null,
+      "description": "Container /email: Health state container is not running",
+      "service": "UnityOne events"
+    },
+    {
+      "count": 9,
+      "timestamp": "2026-04-29T14:57:18Z",
+      "monitored_app": null,
+      "description": "Container /accounting: Health state container is not running",
+      "service": "UnityOne events"
+    }
+  ],
+  "next": "https://unity.unitedlayer.com/apm/monitoring/failure_events/?app_id=7&page=2&page_size=10"
+}

@@ -70,7 +70,8 @@ const queryIdentityParamNames = new Set([
   "key",
   "type",
   "app_id",
-  "graph_type"
+  "graph_type",
+  "device_category"
 ]);
 
 const ignoredQueryParamNames = new Set([
@@ -302,6 +303,10 @@ app.use((req, res) => {
   const exactFilePath = path.join(baseDir, normalizedUrlPath + ".json");
   const querySpecificFilePath = buildQuerySpecificFilePath(normalizedUrlPath, req.query);
 
+  const deviceCategory = Array.isArray(req.query && req.query.device_category)
+    ? req.query.device_category[0]
+    : (req.query && req.query.device_category);
+
   const sendMockResponse = parsed => {
     if (Array.isArray(parsed)) {
       const filtered = filterByIdentityParams(parsed, req.query);
@@ -318,6 +323,13 @@ app.use((req, res) => {
 
   if (querySpecificFilePath && fs.existsSync(querySpecificFilePath)) {
     return sendMockResponse(readMockFile(querySpecificFilePath));
+  }
+
+  // device_category is a drill-down: a category returns its own sub-level response, NOT a slice of the base.
+  // When no per-category mock exists, return empty so the widget shows its "no related data" state instead of
+  // falling back to the unfiltered high-level base data.
+  if (deviceCategory && querySpecificFilePath) {
+    return res.json({});
   }
 
   if (fs.existsSync(exactFilePath)) {

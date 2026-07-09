@@ -1,7 +1,6 @@
 import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import {
   UnifiedAiopsDeviceTypeOption,
-  UnifiedAiopsDiscoveryCategory,
   UnifiedAiopsExecutiveSectionConfig,
   UnifiedAiopsFilterOption,
   UnifiedAiopsStatusLegendItem,
@@ -45,23 +44,11 @@ export const UNIFIED_AIOPS_DISCOVERY_COLORS = {
   notMonitored: '#d6dce2'
 };
 
-// Fixed set of Device Discovery categories (dropdown always lists all of these). The API resource-type
-// keys are matched to a category by 'key' (slug of the label) or an alias; clean labels are shown on screen.
-// Unmatched API keys are dropped (NOT bucketed into 'Others' - 'Others' is its own real category).
-export const UNIFIED_AIOPS_DISCOVERY_CATEGORIES: UnifiedAiopsDiscoveryCategory[] = [
-  { key: 'application', label: 'Application' },
-  { key: 'baremetals', label: 'Baremetals' },
-  { key: 'container', label: 'Container' },
-  { key: 'database', label: 'Database', aliases: ['database_server'] },
-  { key: 'gpu', label: 'GPU' },
-  { key: 'network', label: 'Network', aliases: ['network_device'] },
-  { key: 'private_cloud_compute', label: 'Private Cloud Compute' },
-  { key: 'public_cloud_compute', label: 'Public Cloud Compute' },
-  { key: 'platform_services', label: 'Platform Services' },
-  { key: 'sensors', label: 'Sensors' },
-  { key: 'storage', label: 'Storage' },
-  { key: 'sd_wan', label: 'SD-WAN' },
-  { key: 'others', label: 'Others' }
+// Small acronym allowlist so the raw-name Title-caser keeps these upper (e.g. gpu -> GPU, os -> OS).
+// Generic and shared by all three category widgets - NOT a per-category map.
+export const UNIFIED_AIOPS_CATEGORY_ACRONYMS: string[] = [
+  'gpu', 'cpu', 'os', 'pdu', 'url', 'urls', 'vm', 'vms', 'db', 'ip',
+  'dns', 'vpn', 'ssd', 'nic', 'llm', 'vdb', 'ai', 'k8s'
 ];
 
 // Status key shown in the Business Services widget header (icons reuse getStatusIcon/getToneClass).

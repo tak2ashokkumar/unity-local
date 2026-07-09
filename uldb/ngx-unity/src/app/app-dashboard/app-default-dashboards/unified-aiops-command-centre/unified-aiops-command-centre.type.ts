@@ -31,6 +31,7 @@ export interface UnifiedAiopsDashboardFilterCriteria {
   duration?: string;
   startDate?: string;
   endDate?: string;
+  deviceCategory?: string;
 }
 
 export interface UnifiedAiopsViewByOption {
@@ -55,11 +56,15 @@ export interface UnifiedAiopsMetric {
 }
 
 export interface UnifiedAiopsStackItem {
+  // Raw API category slug (sent back as device_category to drill into sub-levels).
+  key?: string;
   name: string;
   values: number[];
 }
 
 export interface UnifiedAiopsDiscoveryCoverageRow {
+  // Raw API category slug (sent back as device_category to drill into sub-levels).
+  key?: string;
   category: string;
   discovered: number;
   monitored: number;
@@ -73,15 +78,6 @@ export interface UnifiedAiopsDiscoverySummary {
   discovered: string;
   monitored: string;
   coverage: string;
-}
-
-export interface UnifiedAiopsDiscoveryCategory {
-  // Canonical API resource-type key (slug of the display label, e.g. 'private_cloud_compute').
-  key: string;
-  // Clean, human-readable name shown in the chart, list and dropdown.
-  label: string;
-  // Legacy / alternate API keys that also resolve to this category.
-  aliases?: string[];
 }
 
 export interface UnifiedAiopsAlertSegregationSummary {
@@ -151,10 +147,16 @@ export interface UnifiedAiopsAvailabilityCategorySummary {
 }
 
 export interface UnifiedAiopsAvailabilityCategoryRow {
+  // Raw API category slug (sent back as device_category to drill into sub-levels).
+  key?: string;
   label: string;
+  // up / down / unknown are the avg percentages the bars use; *Count are the raw device counts (tooltip).
   up: number;
   down: number;
   unknown: number;
+  upCount?: number;
+  downCount?: number;
+  unknownCount?: number;
   upLabel: string;
   tone: UnifiedAiopsTone;
 }

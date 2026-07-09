@@ -172,13 +172,17 @@
                         <select class="form-control form-control-sm" [value]="selectedDiscoveryCategory"
                             (change)="onDiscoveryCategoryChange($event)">
                             <option *ngFor="let option of discoveryCategoryOptions; trackBy: trackByIndex"
-                                [value]="option" [selected]="option === selectedDiscoveryCategory">{{option}}</option>
+                                [value]="option.value" [selected]="option.value === selectedDiscoveryCategory">{{option.label}}</option>
                         </select>
                     </div>
                 </div>
                 <div class="dashboard-card discovery-card">
                     <app-spinner [name]="loaderNames.discovery" [width]="0"></app-spinner>
-                    <div class="discovery-main">
+                    <div class="dashboard-empty-state"
+                        *ngIf="!widgetLoading.discovery && !discoveryDisplayRows.length">
+                        No related data available
+                    </div>
+                    <div class="discovery-main" *ngIf="discoveryDisplayRows.length">
                         <div class="discovery-kpi-row">
                             <div class="discovery-kpi">
                                 <div class="metric-label">Discovered</div>
@@ -196,7 +200,7 @@
                         <div echarts [options]="discoveryOptions" (chartInit)="onDiscoveryChartInit($event)"
                             class="discovery-chart linked-chart" *ngIf="hasChartData(discoveryOptions)"></div>
                     </div>
-                    <div class="discovery-coverage-list">
+                    <div class="discovery-coverage-list" *ngIf="discoveryDisplayRows.length">
                         <div class="discovery-coverage-head">
                             <span>Device Category</span>
                             <span>Monitoring Coverage</span>
@@ -635,7 +639,7 @@
                                     (change)="onAvailabilityCategoryChange($event)">
                                     <option
                                         *ngFor="let option of availabilityCategoryFilterOptions; trackBy: trackByIndex"
-                                        [value]="option" [selected]="option === selectedAvailabilityCategory">{{option}}
+                                        [value]="option.value" [selected]="option.value === selectedAvailabilityCategory">{{option.label}}
                                     </option>
                                 </select>
                             </div>
@@ -660,7 +664,10 @@
                             (chartInit)="onAvailabilityCategoryChartInit($event)"
                             class="availability-category-chart linked-chart"></div>
                         <div class="availability-category-list">
-                            <div class="availability-category-title">Device Category</div>
+                            <div class="availability-category-title">
+                                <span>Device Type</span>
+                                <span>Availability Coverage</span>
+                            </div>
                             <div class="availability-category-row"
                                 *ngFor="let row of availabilityCategoryDisplayRows; trackBy: trackByIndex">
                                 <span class="availability-category-dot" [ngClass]="getToneClass(row.tone)"></span>
@@ -672,7 +679,7 @@
                     </div>
                     <div class="dashboard-empty-state analytics-category-empty"
                         *ngIf="!widgetLoading.availabilityCategory && !hasChartData(availabilityCategoryOptions)">
-                        No data available
+                        No related data available
                     </div>
                 </div>
             </div>
@@ -703,7 +710,7 @@
                     <select class="form-control form-control-sm" [value]="selectedAlertSegregationCategory"
                         (change)="onAlertSegregationCategoryChange($event)">
                         <option *ngFor="let option of alertSegregationCategoryOptions; trackBy: trackByIndex"
-                            [value]="option" [selected]="option === selectedAlertSegregationCategory">{{option}}
+                            [value]="option.value" [selected]="option.value === selectedAlertSegregationCategory">{{option.label}}
                         </option>
                     </select>
                 </div>
@@ -712,6 +719,10 @@
                 <app-spinner [name]="loaderNames.alertSegregation" [width]="0"></app-spinner>
                 <div echarts [options]="alertSegregationOptions" (chartInit)="onAlertSegregationChartInit($event)"
                     class="top-chart linked-chart" *ngIf="hasChartData(alertSegregationOptions)"></div>
+                <div class="dashboard-empty-state"
+                    *ngIf="!widgetLoading.alertSegregation && !alertSegregationDisplayItems.length">
+                    No related data available
+                </div>
             </div>
 
             <div class="alerts-header mt-3" *ngIf="hasAlertsSection">

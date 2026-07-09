@@ -55,7 +55,7 @@
   line-height: 16px;
 }
 
-.scope-popover-item + .scope-popover-item {
+.scope-popover-item+.scope-popover-item {
   margin-top: 4px;
 }
 
@@ -152,7 +152,7 @@
   opacity: 1;
 }
 
-:host ::ng-deep .unified-aiops-dashboard app-spinner .wave-spinner > div {
+:host ::ng-deep .unified-aiops-dashboard app-spinner .wave-spinner>div {
   background-color: #ff8900 !important;
 }
 
@@ -246,9 +246,9 @@
 /* Cell content wrappers can receive a truncateText-computed width wider than their
    (table-layout: fixed) column; cap them to the cell so text truncates in place
    instead of spilling into the neighbouring column. */
-.dashboard-table td > div,
-.orphaned-table td > div,
-.idle-devices-table td > div {
+.dashboard-table td>div,
+.orphaned-table td>div,
+.idle-devices-table td>div {
   max-width: 100%;
 }
 
@@ -272,21 +272,21 @@
   text-align: center;
 }
 
-.summary-card > .dashboard-empty-state,
-.metric-strip > .dashboard-empty-state,
-.compact-metric-grid > .dashboard-empty-state,
-.performance-metrics > .dashboard-empty-state,
-.remediation-metric-card > .dashboard-empty-state {
+.summary-card>.dashboard-empty-state,
+.metric-strip>.dashboard-empty-state,
+.compact-metric-grid>.dashboard-empty-state,
+.performance-metrics>.dashboard-empty-state,
+.remediation-metric-card>.dashboard-empty-state {
   grid-column: 1 / -1;
   border: 0;
 }
 
-.summary-card > .dashboard-empty-state,
-.performance-metrics > .dashboard-empty-state {
+.summary-card>.dashboard-empty-state,
+.performance-metrics>.dashboard-empty-state {
   min-height: 74px;
 }
 
-.coverage-grid > .dashboard-empty-state {
+.coverage-grid>.dashboard-empty-state {
   flex: 1 1 100%;
   min-height: 82px;
   background: #ffffff;
@@ -795,6 +795,7 @@
   }
 
   .compact-table {
+
     th,
     td {
       height: 42px;
@@ -815,6 +816,7 @@
   }
 
   .compact-table {
+
     th,
     td {
       height: 42px;
@@ -1266,7 +1268,7 @@
   padding: 12px;
 }
 
-.coverage-group + .coverage-group {
+.coverage-group+.coverage-group {
   margin-top: 16px;
 }
 
@@ -1732,16 +1734,22 @@
 
 .availability-kpi-row {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 0;
-  padding: 14px 0 16px;
+  padding: 0px 0px 5px 0px;
+  margin-top: -15px;
 }
 
 .availability-kpi {
-  min-width: 160px;
+  min-width: 0;
   padding: 0 28px;
-  text-align: center;
+  text-align: left;
   border-right: 1px solid #cbd3da;
+
+  &:first-child {
+    padding-left: 0;
+  }
 }
 
 .availability-kpi:last-child {
@@ -1751,6 +1759,7 @@
 .availability-category-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 250px;
+  grid-template-rows: minmax(0, 1fr);
   gap: 5px;
   align-items: stretch;
   flex: 1 1 auto;
@@ -1758,7 +1767,7 @@
 }
 
 .availability-category-chart {
-  height: 330px;
+  height: 100%;
   min-height: 0;
 }
 
@@ -1772,11 +1781,14 @@
   position: sticky;
   top: 0;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: #ffffff;
   padding-bottom: 6px;
   margin-bottom: 4px;
   color: #20272e;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   border-bottom: 1px solid #9aa7b3;
 }
@@ -1946,7 +1958,7 @@
 }
 
 /* Both widget cards fill their (grid-stretched, equal-height) columns so the two cards match height. */
-.orphaned-widget-col > .dashboard-card {
+.orphaned-widget-col>.dashboard-card {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;

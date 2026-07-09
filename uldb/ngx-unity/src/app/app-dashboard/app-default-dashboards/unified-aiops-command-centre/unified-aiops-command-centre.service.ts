@@ -19,7 +19,7 @@ import {
   UNIFIED_AIOPS_BUSINESS_SERVICES_ENDPOINT,
   UNIFIED_AIOPS_DATABASE_MONITORING_ENDPOINT,
   UNIFIED_AIOPS_DATACENTER_OPTIONS,
-  UNIFIED_AIOPS_DISCOVERY_CATEGORIES,
+  UNIFIED_AIOPS_CATEGORY_ACRONYMS,
   UNIFIED_AIOPS_DISCOVERY_COLORS,
   UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT,
   UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT,
@@ -308,7 +308,14 @@ export class UnifiedAiopsCommandCentreService {
         formatter: (params: any) => {
           const list = Array.isArray(params) ? params : [params];
           const name = list[0]?.axisValueLabel || list[0]?.name || '';
-          const lines = list.map((item: any) => `${item.marker}${item.seriesName}: ${this.formatPercentage(this.getNumberValue(item.value))}`);
+          // Show raw Monitored / Not Monitored counts (not the bar's percentage), plus a coverage % line.
+          const lines = list.map((item: any) => `${item.marker}${item.seriesName}: ${this.formatNumber(this.getNumberValue(item.data?.count))}`);
+          const coverageLabel = list[0]?.data?.coverageLabel || '';
+          if (coverageLabel) {
+            // Reuse the Monitored series marker so the coverage line shows the same colored dot.
+            const monitoredMarker = (list.find((item: any) => item.seriesName === 'Monitored') || list[0])?.marker || '';
+            lines.push(`${monitoredMarker}Monitoring Coverage: ${coverageLabel}`);
+          }
           return [name, ...lines].join('<br/>');
         }
       },
@@ -321,8 +328,8 @@ export class UnifiedAiopsCommandCentreService {
       },
       yAxis: { type: 'value', max: 100, axisLabel: { fontSize: 11, color: '#5b6570', formatter: '{value}' }, splitLine: { lineStyle: { color: '#d6dce2', type: 'dashed' } } },
       series: [
-        { name: 'Monitored', type: 'bar', stack: 'discovery', barMaxWidth: 38, data: viewRows.map(row => ({ value: row.coverage, category: row.category })) },
-        { name: 'Not Monitored', type: 'bar', stack: 'discovery', barMaxWidth: 38, data: viewRows.map(row => ({ value: this.getNotMonitoredPercent(row.coverage), category: row.category })) }
+        { name: 'Monitored', type: 'bar', stack: 'discovery', barMaxWidth: 38, data: viewRows.map(row => ({ value: row.coverage, category: row.category, count: row.monitored, coverageLabel: row.coverageLabel })) },
+        { name: 'Not Monitored', type: 'bar', stack: 'discovery', barMaxWidth: 38, data: viewRows.map(row => ({ value: this.getNotMonitoredPercent(row.coverage), category: row.category, count: Math.max(row.discovered - row.monitored, 0), coverageLabel: row.coverageLabel })) }
       ]
     };
   }
@@ -346,24 +353,12 @@ export class UnifiedAiopsCommandCentreService {
       ? source.map(item => ({ key: this.getFirstDefinedValue(item?.category, item?.name, item?.label, item?.resource, item?.type), value: item }))
       : Object.keys(payload || {}).map(key => ({ key, value: payload[key] }));
 
-    // Index the raw API entries by a normalized resource-type key so each fixed category can pull its data.
-    const entryByKey: Record<string, any> = {};
-    entries.forEach(entry => {
-      const key = this.normalizeDiscoveryKey(entry.key);
-      if (key && !(key in entryByKey)) {
-        entryByKey[key] = entry.value;
-      }
-    });
-
-    // Walk the fixed categories in their canonical order; show only the ones the API actually returned data for.
-    // Keys that match no category (e.g. an un-renamed 'compute') are simply left out - never forced into 'Others'.
+    // Render every entry the API returns as-is - high-level categories by default, sub-levels when a category
+    // is selected. No fixed taxonomy: the raw slug is carried on `key` (sent back as device_category) and the
+    // raw name is shown Title-cased.
     const rows: UnifiedAiopsDiscoveryCoverageRow[] = [];
-    UNIFIED_AIOPS_DISCOVERY_CATEGORIES.forEach((category, index) => {
-      const matchedKey = [category.key, ...(category.aliases || [])].find(key => key in entryByKey);
-      if (!matchedKey) {
-        return;
-      }
-      const flatPayload = this.flattenPayload(entryByKey[matchedKey] || {});
+    entries.forEach(entry => {
+      const flatPayload = this.flattenPayload(entry.value || {});
       const discovered = this.getNumberFromPayload(flatPayload, ['discovered', 'total', 'total_count', 'totalCount', 'count']);
       if (discovered <= 0) {
         return;
@@ -373,9 +368,10 @@ export class UnifiedAiopsCommandCentreService {
       const coverage = coverageValue !== undefined
         ? this.getNumberValue(coverageValue)
         : (monitored / discovered) * 100;
-      const color = UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS[index % UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS.length];
+      const color = UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS[rows.length % UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS.length];
       rows.push({
-        category: category.label,
+        key: this.normalizeDiscoveryKey(this.getFirstDefinedValue(entry.value?.category, entry.key)),
+        category: this.formatCategoryName(this.getFirstDefinedValue(entry.value?.resource_type, entry.value?.resourceType, entry.value?.label, entry.value?.name, entry.key)),
         discovered,
         monitored,
         coverage: Math.round(coverage * 10) / 10,
@@ -387,21 +383,28 @@ export class UnifiedAiopsCommandCentreService {
     return rows;
   }
 
-  // Normalizes an API resource-type key to the slug form used by UNIFIED_AIOPS_DISCOVERY_CATEGORIES.
+  // Converts a raw category key/name to a slug used as the device_category param value.
   private normalizeDiscoveryKey(key: any): string {
     return String(key || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
   }
 
-  // Resolves a raw API resource-type key/name to a fixed Device Category label, or null if it maps to none.
-  // Shared by Device Discovery, Availability By Category and Alert Segregation so all use one clean taxonomy.
-  resolveDiscoveryCategoryLabel(key: any): string | null {
-    const normalizedKey = this.normalizeDiscoveryKey(key);
-    if (!normalizedKey) {
-      return null;
+  // Title-cases a raw category name (snake_case / camelCase) for display, keeping known acronyms upper.
+  // Leaves already-clean names (including hyphenated ones like "SD-WAN") intact.
+  private formatCategoryName(value: any): string {
+    const normalized = String(value == null ? '' : value)
+      .replace(/_/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!normalized) {
+      return '';
     }
-    const category = UNIFIED_AIOPS_DISCOVERY_CATEGORIES.find(item =>
-      item.key === normalizedKey || (item.aliases || []).indexOf(normalizedKey) > -1);
-    return category ? category.label : null;
+    return normalized.split(' ').map(word => {
+      if (UNIFIED_AIOPS_CATEGORY_ACRONYMS.indexOf(word.toLowerCase()) > -1) {
+        return word.toUpperCase();
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
   }
 
   private getNotMonitoredPercent(coverage: number): number {
@@ -467,30 +470,19 @@ export class UnifiedAiopsCommandCentreService {
       ? source.map(item => this.getAlertSegregationStackItemFromPayload(item))
       : Object.keys(payload || {}).map(key => this.getAlertSegregationStackItemFromPayload(payload[key], key));
 
-    // Server sends data grouped into the 13 Device Categories; map each item to its clean label, drop unmatched.
-    const itemByLabel: Record<string, UnifiedAiopsStackItem> = {};
-    items.forEach(item => {
-      const label = this.resolveDiscoveryCategoryLabel(item.name);
-      if (label && !itemByLabel[label]) {
-        itemByLabel[label] = { name: label, values: item.values };
-      }
-    });
-
-    // Emit in the canonical category order, keeping only categories that actually have data.
-    const stackItems: UnifiedAiopsStackItem[] = [];
-    UNIFIED_AIOPS_DISCOVERY_CATEGORIES.forEach(category => {
-      const item = itemByLabel[category.label];
-      if (item && item.values.some(value => value > 0)) {
-        stackItems.push(item);
-      }
-    });
-    return stackItems;
+    // Render whatever the API returns (categories by default, sub-levels when a category is selected);
+    // keep only entries that actually carry data. Names are Title-cased and the raw slug is on `key`.
+    return items.filter(item => item.values.some(value => value > 0));
   }
 
   private getAlertSegregationStackItemFromPayload(payload: any, fallbackName?: string): UnifiedAiopsStackItem {
+    const rawName = this.getFirstDefinedValue(payload?.name, payload?.label, payload?.device_type, payload?.resource_type, payload?.type, fallbackName);
+    const key = this.normalizeDiscoveryKey(this.getFirstDefinedValue(payload?.category, payload?.device_type, rawName));
+    const name = this.formatCategoryName(rawName);
     if (payload?.values && Array.isArray(payload.values)) {
       return {
-        name: this.getStackItemName(payload, fallbackName),
+        key,
+        name,
         values: [
           this.getNumberValue(payload.values[0]),
           this.getNumberValue(payload.values[1]),
@@ -506,7 +498,8 @@ export class UnifiedAiopsCommandCentreService {
     const count = this.getNumberFromPayload(flatPayload, ['count', 'total']);
 
     return {
-      name: this.getStackItemName(payload, fallbackName),
+      key,
+      name,
       values: critical || warning || info ? [critical, warning, info] : [0, 0, count]
     };
   }
@@ -579,11 +572,6 @@ export class UnifiedAiopsCommandCentreService {
       return fallbackMax || 10;
     }
     return Math.ceil(maxValue * 1.12);
-  }
-
-  private getStackItemName(payload: any, fallbackName?: string): string {
-    const name = payload?.name || payload?.label || payload?.device_type || payload?.resource_type || payload?.type || fallbackName || '';
-    return this.getReadableStackLabel(name);
   }
 
   /*
@@ -1849,18 +1837,37 @@ export class UnifiedAiopsCommandCentreService {
       return {};
     }
     const categoryLabels = viewRows.map(row => row.label);
+    // Shrink the axis labels as the category count grows so they never overlap.
+    const labelCount = categoryLabels.length;
+    const axisFontSize = labelCount > 12 ? 9 : (labelCount > 8 ? 10 : 11);
+    const axisLabelWidth = labelCount > 12 ? 44 : (labelCount > 8 ? 56 : 80);
 
     return {
       color: ['#13bd77', UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical, '#5f6d7b'],
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const list = Array.isArray(params) ? params : [params];
+          const name = list[0]?.axisValueLabel || list[0]?.name || '';
+          // Show the raw UP / Down / Unknown device counts, then the availability coverage %.
+          const lines = list.map((item: any) => `${item.marker}${item.seriesName}: ${this.formatNumber(this.getNumberValue(item.data?.count))}`);
+          const coverageLabel = list[0]?.data?.coverageLabel || '';
+          if (coverageLabel) {
+            const upMarker = (list.find((item: any) => item.seriesName === 'UP') || list[0])?.marker || '';
+            lines.push(`${upMarker}Availability Coverage: ${coverageLabel}`);
+          }
+          return [name, ...lines].join('<br/>');
+        }
+      },
       legend: { bottom: 0, left: 'center', itemWidth: 14, itemHeight: 7, textStyle: { fontSize: 11, color: '#20272e' } },
-      grid: { left: 38, right: 12, top: 18, bottom: 44 },
-      xAxis: { type: 'category', data: categoryLabels, axisLabel: { fontSize: 11, color: '#5b6570', interval: 0, rotate: categoryLabels.length > 7 ? 20 : 0 } },
+      grid: { left: 4, right: 8, top: 12, bottom: 34, containLabel: true },
+      xAxis: { type: 'category', data: categoryLabels, axisLabel: { fontSize: axisFontSize, color: '#5b6570', interval: 0, width: axisLabelWidth, overflow: 'break', lineHeight: axisFontSize + 2 } },
       yAxis: { type: 'value', max: 100, axisLabel: { fontSize: 11, color: '#5b6570' }, splitLine: { lineStyle: { color: '#d6dce2', type: 'dashed' } } },
       series: [
-        { name: 'UP', type: 'bar', stack: 'availability', data: viewRows.map(row => row.up), barWidth: 34 },
-        { name: 'Down', type: 'bar', stack: 'availability', data: viewRows.map(row => row.down), barWidth: 34 },
-        { name: 'Unknown', type: 'bar', stack: 'availability', data: viewRows.map(row => row.unknown), barWidth: 34 }
+        { name: 'UP', type: 'bar', stack: 'availability', barMaxWidth: 20, data: viewRows.map(row => ({ value: row.up, count: row.upCount, coverageLabel: row.upLabel })) },
+        { name: 'Down', type: 'bar', stack: 'availability', barMaxWidth: 20, data: viewRows.map(row => ({ value: row.down, count: row.downCount, coverageLabel: row.upLabel })) },
+        { name: 'Unknown', type: 'bar', stack: 'availability', barMaxWidth: 20, data: viewRows.map(row => ({ value: row.unknown, count: row.unknownCount, coverageLabel: row.upLabel })) }
       ]
     };
   }
@@ -1884,38 +1891,35 @@ export class UnifiedAiopsCommandCentreService {
       return [];
     }
     const entries = Array.isArray(payload)
-      ? payload.map(item => ({ key: this.getFirstDefinedValue(item?.resource, item?.category, item?.name, item?.label, item?.type), value: item }))
+      ? payload.map(item => ({ key: this.getFirstDefinedValue(item?.category, item?.resource, item?.name, item?.label, item?.type), value: item }))
       : Object.keys(payload || {}).map(key => ({ key, value: payload[key] }));
 
-    // Server sends data grouped into the 13 Device Categories; map each key to its clean label, drop unmatched.
-    const dataByLabel: Record<string, { up: number; down: number; unknown: number }> = {};
-    entries.forEach(entry => {
-      const label = this.resolveDiscoveryCategoryLabel(entry.key);
-      if (!label || dataByLabel[label]) {
-        return;
-      }
-      const flatPayload = this.flattenPayload(entry.value || {});
-      dataByLabel[label] = {
-        up: this.getNumberFromPayload(flatPayload, ['avg_up', 'avgUp', 'up_percent', 'upPercent', 'up', 'online', 'healthy']),
-        down: this.getNumberFromPayload(flatPayload, ['avg_down', 'avgDown', 'down_percent', 'downPercent', 'down', 'offline', 'unhealthy']),
-        unknown: this.getNumberFromPayload(flatPayload, ['avg_unknown', 'avgUnknown', 'unknown_percent', 'unknownPercent', 'unknown', 'unknowns'])
-      };
-    });
-
-    // Emit in the canonical category order, keeping only categories that actually have data.
+    // Render every entry the API returns (categories by default, sub-levels when a category is selected);
+    // keep only entries that carry data. Labels are Title-cased and the raw slug is on `key`.
     const rows: UnifiedAiopsAvailabilityCategoryRow[] = [];
-    UNIFIED_AIOPS_DISCOVERY_CATEGORIES.forEach(category => {
-      const data = dataByLabel[category.label];
-      if (!data || (data.up <= 0 && data.down <= 0 && data.unknown <= 0)) {
+    entries.forEach(entry => {
+      const flatPayload = this.flattenPayload(entry.value || {});
+      const up = this.getNumberFromPayload(flatPayload, ['avg_up', 'avgUp', 'up_percent', 'upPercent', 'up', 'online', 'healthy']);
+      const down = this.getNumberFromPayload(flatPayload, ['avg_down', 'avgDown', 'down_percent', 'downPercent', 'down', 'offline', 'unhealthy']);
+      const unknown = this.getNumberFromPayload(flatPayload, ['avg_unknown', 'avgUnknown', 'unknown_percent', 'unknownPercent', 'unknown', 'unknowns']);
+      if (up <= 0 && down <= 0 && unknown <= 0) {
         return;
       }
+      // Raw device counts for the tooltip - up/down/unknown above are the avg percentages the bars use.
+      const upCount = this.getNumberFromPayload(flatPayload, ['up_count', 'upCount', 'up_devices', 'upDevices', 'up', 'online', 'healthy']);
+      const downCount = this.getNumberFromPayload(flatPayload, ['down_count', 'downCount', 'down_devices', 'downDevices', 'down', 'offline', 'unhealthy']);
+      const unknownCount = this.getNumberFromPayload(flatPayload, ['unknown_count', 'unknownCount', 'unknown_devices', 'unknownDevices', 'unknown', 'unknowns']);
       rows.push({
-        label: category.label,
-        up: data.up,
-        down: data.down,
-        unknown: data.unknown,
-        upLabel: `${this.formatPercentage(data.up)} Up`,
-        tone: this.getAvailabilityCategoryTone(data.up)
+        key: this.normalizeDiscoveryKey(this.getFirstDefinedValue(entry.value?.category, entry.key)),
+        label: this.formatCategoryName(this.getFirstDefinedValue(entry.value?.resource, entry.value?.resource_type, entry.value?.label, entry.value?.name, entry.key)),
+        up,
+        down,
+        unknown,
+        upCount,
+        downCount,
+        unknownCount,
+        upLabel: this.formatPercentage(up),
+        tone: this.getAvailabilityCategoryTone(up)
       });
     });
     return rows;
@@ -3124,6 +3128,9 @@ export class UnifiedAiopsCommandCentreService {
     }
     if (criteria?.severityTypes?.length) {
       params = params.set('severity_types', this.getCsvValue(criteria.severityTypes));
+    }
+    if (criteria?.deviceCategory) {
+      params = params.set('device_category', criteria.deviceCategory);
     }
     if (criteria?.viewBy) {
       params = params.set('view_by', criteria.viewBy);

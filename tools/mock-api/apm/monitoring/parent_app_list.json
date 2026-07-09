@@ -1,30 +1,46 @@
 {
-    "count": 3,
+    "count": 5,
     "next": null,
     "previous": null,
     "results": [
         {
-            "name": "easytrade",
-            "id": 16,
+            "name": "Flask-App",
+            "id": 6,
             "customer": 417,
             "throughput": "120.0 req/min",
-            "latency": "26.487 ms",
+            "latency": "603.145 ms",
             "status_code": "1"
         },
         {
             "name": "astronomy-shop",
-            "id": 8,
+            "id": 7,
             "customer": 417,
-            "throughput": "900.0 req/min",
-            "latency": "33.302 ms",
+            "throughput": "3540.0 req/min",
+            "latency": "97.022 ms",
+            "status_code": "1"
+        },
+        {
+            "name": "astronomy-shop-all",
+            "id": 27,
+            "customer": 417,
+            "throughput": "720.0 req/min",
+            "latency": "38.13 ms",
             "status_code": "1"
         },
         {
             "name": "bank-of-anthos",
-            "id": 17,
+            "id": 12,
             "customer": 417,
-            "throughput": "1140.0 req/min",
-            "latency": "17.335 ms",
+            "throughput": "60.0 req/min",
+            "latency": "0.958 ms",
+            "status_code": "1"
+        },
+        {
+            "name": "easytrade",
+            "id": 8,
+            "customer": 417,
+            "throughput": "240.0 req/min",
+            "latency": "4.682 ms",
             "status_code": "1"
         }
     ]

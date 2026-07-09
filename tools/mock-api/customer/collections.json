@@ -4,45 +4,83 @@
   "previous": null,
   "results": [
     {
-      "id": 2,
-      "uuid": "34f691b3-bef4-43b5-a200-ef94dd3992da",
-      "name": "col1",
-      "description": "col1 desc",
+      "id": 9,
+      "uuid": "84701aff-4ec7-4431-a220-58de0dfe931c",
+      "name": "My Dashboard Page",
+      "description": "",
       "status": "draft",
       "dashboards": [
         {
           "order": 0,
-          "id": 49,
-          "name": "Database Dashboard",
-          "uuid": "feed7730-c4e5-46a4-9ff4-5c35d7518423"
+          "id": 42,
+          "name": "Application Dashboard",
+          "uuid": "557c4cbe-d0e8-47ea-bf94-b58c8e227c5b"
         },
         {
           "order": 1,
-          "id": 46,
-          "name": "Private Cloud Compute Dashboard",
-          "uuid": "62c5c6f1-9d85-4aa2-86c2-c3db97517b18"
+          "id": 31,
+          "name": "Infrastructure Overview",
+          "uuid": "0eac9afc-79fd-416f-9db0-aec210b4c757"
         },
         {
           "order": 2,
-          "id": 47,
-          "name": "Public Cloud Compute Dashboard",
-          "uuid": "a2fc1109-4a06-4c01-a292-36e826749889"
+          "id": 67,
+          "name": "Private Cloud Compute Dashboard",
+          "uuid": "6545cf7c-7d68-4d12-bc88-8e51317a223c"
         },
         {
           "order": 3,
-          "id": 48,
-          "name": "Unified AIOps Command Centre Dashboard",
-          "uuid": "be7340e1-70f2-473f-aacf-40eb6f7a6035"
+          "id": 68,
+          "name": "Public Cloud Compute Dashboard",
+          "uuid": "3e99f0c6-6845-4db6-b867-1dd151386319"
+        },
+        {
+          "order": 4,
+          "id": 35,
+          "name": "Cloud Cost Overview",
+          "uuid": "3b3770af-cffa-489b-813d-e199e038a49b"
+        },
+        {
+          "order": 5,
+          "id": 70,
+          "name": "Database Dashboard",
+          "uuid": "d1d21e30-dcc3-44e8-90d5-9dce2d8aef69"
+        },
+        {
+          "order": 6,
+          "id": 33,
+          "name": "IoT Device Overview",
+          "uuid": "7135ec02-0809-492d-8d8a-c98adbd02e0f"
+        },
+        {
+          "order": 7,
+          "id": 32,
+          "name": "Network Overview",
+          "uuid": "7822f39b-1846-43be-8aee-44b535b220fc"
+        },
+        {
+          "order": 8,
+          "id": 34,
+          "name": "Task and Workflow Overview",
+          "uuid": "66573965-9323-45c1-861b-0e5d754fc569"
+        },
+        {
+          "order": 9,
+          "id": 90,
+          "name": "Navigator Central",
+          "uuid": "d0415b0f-234a-48dc-a267-392c333d8abd"
         }
       ],
       "roles": [
-        "Administrator",
-        "Dashboard user",
-        "Global Read-Only"
+        "Dashboard user"
       ],
-      "groups": [],
-      "created_at": "2026-04-29T04:07:36.763698-07:00",
-      "image_url": null
+      "groups": [
+        "test group"
+      ],
+      "created_at": "2026-06-18T06:46:46.931420-07:00",
+      "image_url": "https://unity.unitedlayer.com/media/collections/84701aff-4ec7-4431-a220-58de0dfe931c/image-11_Ifyy8zC.png",
+      "created_by": 2219,
+      "updated_at": "2026-07-08T10:07:46.243305-07:00"
     }
   ]
 }

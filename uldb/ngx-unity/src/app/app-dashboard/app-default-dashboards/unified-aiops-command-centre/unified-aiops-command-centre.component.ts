@@ -28,6 +28,7 @@ import {
   UNIFIED_AIOPS_ALERT_DURATION_OPTIONS,
   UNIFIED_AIOPS_ALERT_SEVERITY_TYPE_OPTIONS,
   UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS,
+  UNIFIED_AIOPS_ALL_SELECTED_VALUE,
   UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND,
   UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL
 } from './unified-aiops-command-centre.const';
@@ -225,16 +226,16 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   discoveryDisplayRows: UnifiedAiopsDiscoveryCoverageRow[] = [];
   discoverySummary: UnifiedAiopsDiscoverySummary = { discovered: '0', monitored: '0', coverage: 'NA' };
   discoveryOptions: EChartsOption = {};
-  // Dropdown lists only the categories actually present in the API response (plus All Category),
-  // so a user can never pick an empty category that would blank the widget.
-  discoveryCategoryOptions: string[] = ['All Category'];
-  selectedDiscoveryCategory = 'All Category';
+  // Dropdown options come from the default (All) response; value = raw API slug, label = Title-cased name.
+  // Selecting one re-fetches that category's sub-levels via the device_category param.
+  discoveryCategoryOptions: UnifiedAiopsFilterOption[] = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' }];
+  selectedDiscoveryCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   alertSegregationItems: UnifiedAiopsStackItem[] = [];
   alertSegregationDisplayItems: UnifiedAiopsStackItem[] = [];
   alertSegregationOptions: EChartsOption = {};
   alertSegregationSummary: UnifiedAiopsAlertSegregationSummary = { critical: '0', warning: '0', info: '0' };
-  alertSegregationCategoryOptions: string[] = ['All Category'];
-  selectedAlertSegregationCategory = 'All Category';
+  alertSegregationCategoryOptions: UnifiedAiopsFilterOption[] = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' }];
+  selectedAlertSegregationCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   businessServices: UnifiedAiopsBusinessService[] = [];
   readonly businessServiceLegend = UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND;
   geoHeatmapOptions: EChartsOption = {};
@@ -264,9 +265,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   };
   availabilityCategoryRows: UnifiedAiopsAvailabilityCategoryRow[] = [];
   availabilityCategoryDisplayRows: UnifiedAiopsAvailabilityCategoryRow[] = [];
-  // Dropdown lists only the categories present in the response (plus All Category); client-side filter like Discovery.
-  availabilityCategoryFilterOptions: string[] = ['All Category'];
-  selectedAvailabilityCategory = 'All Category';
+  // Dropdown options come from the default (All) response; value = raw API slug, label = Title-cased name.
+  availabilityCategoryFilterOptions: UnifiedAiopsFilterOption[] = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' }];
+  selectedAvailabilityCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   alertTrendOptions: EChartsOption = {};
   alertReductionMetrics: UnifiedAiopsMetric[] = [];
   alertResponseMetrics: UnifiedAiopsMetric[] = [];
@@ -557,17 +558,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   onAvailabilityCategoryChange(event: Event) {
-    this.selectedAvailabilityCategory = String((event.target as HTMLSelectElement)?.value || 'All Category');
-    this.applyAvailabilityCategorySelection();
+    this.selectedAvailabilityCategory = String((event.target as HTMLSelectElement)?.value || UNIFIED_AIOPS_ALL_SELECTED_VALUE);
+    this.loadAvailabilityCategoryRows(this.appliedFilterCriteria, false);
   }
 
-  /** Client-side filter: 'All Category' shows every mapped category; a specific pick narrows the chart, list and KPIs to it. */
-  private applyAvailabilityCategorySelection() {
-    this.availabilityCategoryDisplayRows = this.selectedAvailabilityCategory === 'All Category'
-      ? this.availabilityCategoryRows
-      : this.availabilityCategoryRows.filter(row => row.label === this.selectedAvailabilityCategory);
-    this.availabilityCategoryOptions = this.svc.convertToAvailabilityCategoryOptions(this.availabilityCategoryDisplayRows);
-    this.availabilityCategorySummary = this.svc.convertToAvailabilityCategorySummary(this.availabilityCategoryDisplayRows);
+  get isAvailabilityCategoryFiltered(): boolean {
+    return this.selectedAvailabilityCategory !== UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   }
 
   /** Builds (first load) or re-syncs (on global apply) the Alerts widget's local filters from the page-level scope. */
@@ -814,77 +810,101 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   getDiscoveryOptions(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.resetDiscoveryState();
-    this.loadWidget(this.loaderNames.discovery, this.svc.getDiscoveryRows(filterFormOutput), res => {
-      this.discoveryRows = res || [];
-      this.discoveryCategoryOptions = ['All Category', ...this.discoveryRows.map(row => row.category)];
-      this.selectedDiscoveryCategory = 'All Category';
-      this.applyDiscoveryCategorySelection();
-    }, () => {
-      this.resetDiscoveryState();
-    }, 'discovery');
+    this.selectedDiscoveryCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    this.loadDiscoveryRows(filterFormOutput, true);
   }
 
   onDiscoveryCategoryChange(event: Event) {
-    this.selectedDiscoveryCategory = String((event.target as HTMLSelectElement)?.value || 'All Category');
-    this.applyDiscoveryCategorySelection();
+    this.selectedDiscoveryCategory = String((event.target as HTMLSelectElement)?.value || UNIFIED_AIOPS_ALL_SELECTED_VALUE);
+    this.loadDiscoveryRows(this.appliedFilterCriteria, false);
   }
 
-  /** Client-side filter: 'All Category' shows every mapped category; a specific pick narrows the chart, list and KPIs to it. */
-  private applyDiscoveryCategorySelection() {
-    if (this.selectedDiscoveryCategory === 'All Category') {
-      // Show every mapped category in canonical order; KPIs are the grand total across them.
+  /**
+   * Loads discovery rows for the current selection. All Category fetches the high-level categories (and, on a
+   * global load, rebuilds the dropdown); a specific category re-fetches its sub-levels server-side via the
+   * device_category param (the selected raw slug) and keeps the existing high-level dropdown options.
+   */
+  private loadDiscoveryRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria, rebuildCategoryOptions: boolean) {
+    const criteria = this.selectedDiscoveryCategory === UNIFIED_AIOPS_ALL_SELECTED_VALUE
+      ? filterFormOutput
+      : { ...filterFormOutput, deviceCategory: this.selectedDiscoveryCategory };
+    this.resetDiscoveryData(rebuildCategoryOptions);
+    this.loadWidget(this.loaderNames.discovery, this.svc.getDiscoveryRows(criteria), res => {
+      this.discoveryRows = res || [];
+      if (rebuildCategoryOptions) {
+        this.discoveryCategoryOptions = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' },
+          ...this.discoveryRows.map(row => ({ value: row.key || '', label: row.category }))];
+      }
       this.discoveryDisplayRows = this.discoveryRows;
       this.discoverySummary = this.svc.convertToDiscoverySummary(this.discoveryRows);
-    } else {
-      this.discoveryDisplayRows = this.discoveryRows.filter(row => row.category === this.selectedDiscoveryCategory);
-      this.discoverySummary = this.svc.convertToDiscoverySummary(this.discoveryDisplayRows);
-    }
-    this.discoveryOptions = this.svc.convertToDiscoveryOptions(this.discoveryDisplayRows);
+      this.discoveryOptions = this.svc.convertToDiscoveryOptions(this.discoveryRows);
+    }, () => {
+      this.resetDiscoveryData(rebuildCategoryOptions);
+    }, 'discovery');
   }
 
-  private resetDiscoveryState() {
+  get isDiscoveryFiltered(): boolean {
+    return this.selectedDiscoveryCategory !== UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+  }
+
+  private resetDiscoveryData(resetCategoryOptions: boolean) {
     this.discoveryRows = [];
     this.discoveryDisplayRows = [];
     this.discoveryOptions = {};
-    this.discoveryCategoryOptions = ['All Category'];
-    this.selectedDiscoveryCategory = 'All Category';
     this.discoverySummary = { discovered: '0', monitored: '0', coverage: 'NA' };
+    if (resetCategoryOptions) {
+      this.discoveryCategoryOptions = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' }];
+      this.selectedDiscoveryCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    }
   }
 
   getAlertSegregation(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.resetAlertSegregationState();
-    this.loadWidget(this.loaderNames.alertSegregation, this.svc.getAlertSegregationItems(filterFormOutput), res => {
-      this.alertSegregationItems = res || [];
-      this.alertSegregationCategoryOptions = ['All Category', ...this.alertSegregationItems.map(item => item.name)];
-      this.selectedAlertSegregationCategory = 'All Category';
-      this.applyAlertSegregationCategorySelection();
-    }, () => {
-      this.resetAlertSegregationState();
-    }, 'alertSegregation');
+    this.selectedAlertSegregationCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    this.loadAlertSegregationItems(filterFormOutput, true);
   }
 
   onAlertSegregationCategoryChange(event: Event) {
-    this.selectedAlertSegregationCategory = String((event.target as HTMLSelectElement)?.value || 'All Category');
-    this.applyAlertSegregationCategorySelection();
+    this.selectedAlertSegregationCategory = String((event.target as HTMLSelectElement)?.value || UNIFIED_AIOPS_ALL_SELECTED_VALUE);
+    this.loadAlertSegregationItems(this.appliedFilterCriteria, false);
   }
 
-  /** Client-side filter: 'All Category' aggregates every category; a specific pick narrows the chart and recomputes the severity totals. */
-  private applyAlertSegregationCategorySelection() {
-    this.alertSegregationDisplayItems = this.selectedAlertSegregationCategory === 'All Category'
-      ? this.alertSegregationItems
-      : this.alertSegregationItems.filter(item => item.name === this.selectedAlertSegregationCategory);
-    this.alertSegregationOptions = this.svc.convertToAlertSegregationOptions(this.alertSegregationDisplayItems);
-    this.alertSegregationSummary = this.svc.convertToAlertSegregationSummary(this.alertSegregationDisplayItems);
+  /**
+   * Loads alert-segregation items for the current selection. All Category fetches the high-level categories
+   * (and, on a global load, rebuilds the dropdown); a specific category re-fetches its sub-levels server-side
+   * via the device_category param (the selected raw slug) and keeps the existing high-level dropdown options.
+   */
+  private loadAlertSegregationItems(filterFormOutput: UnifiedAiopsDashboardFilterCriteria, rebuildCategoryOptions: boolean) {
+    const criteria = this.selectedAlertSegregationCategory === UNIFIED_AIOPS_ALL_SELECTED_VALUE
+      ? filterFormOutput
+      : { ...filterFormOutput, deviceCategory: this.selectedAlertSegregationCategory };
+    this.resetAlertSegregationData(rebuildCategoryOptions);
+    this.loadWidget(this.loaderNames.alertSegregation, this.svc.getAlertSegregationItems(criteria), res => {
+      this.alertSegregationItems = res || [];
+      if (rebuildCategoryOptions) {
+        this.alertSegregationCategoryOptions = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' },
+          ...this.alertSegregationItems.map(item => ({ value: item.key || '', label: item.name }))];
+      }
+      this.alertSegregationDisplayItems = this.alertSegregationItems;
+      this.alertSegregationOptions = this.svc.convertToAlertSegregationOptions(this.alertSegregationItems);
+      this.alertSegregationSummary = this.svc.convertToAlertSegregationSummary(this.alertSegregationItems);
+    }, () => {
+      this.resetAlertSegregationData(rebuildCategoryOptions);
+    }, 'alertSegregation');
   }
 
-  private resetAlertSegregationState() {
+  get isAlertSegregationFiltered(): boolean {
+    return this.selectedAlertSegregationCategory !== UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+  }
+
+  private resetAlertSegregationData(resetCategoryOptions: boolean) {
     this.alertSegregationItems = [];
     this.alertSegregationDisplayItems = [];
     this.alertSegregationOptions = {};
-    this.alertSegregationCategoryOptions = ['All Category'];
-    this.selectedAlertSegregationCategory = 'All Category';
     this.alertSegregationSummary = { critical: '0', warning: '0', info: '0' };
+    if (resetCategoryOptions) {
+      this.alertSegregationCategoryOptions = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' }];
+      this.selectedAlertSegregationCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    }
   }
 
   getBusinessServices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1339,24 +1359,43 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   getAvailabilityCategory(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.resetAvailabilityCategoryState();
-    this.loadWidget(this.loaderNames.availabilityCategory, this.svc.getAvailabilityCategory(filterFormOutput), res => {
+    this.selectedAvailabilityCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    this.loadAvailabilityCategoryRows(filterFormOutput, true);
+  }
+
+  /**
+   * Loads availability-by-category rows for the current selection. All Category fetches the high-level
+   * categories (and, on a global load, rebuilds the dropdown); a specific category re-fetches its sub-levels
+   * server-side via the device_category param (the selected raw slug) and keeps the existing dropdown options.
+   */
+  private loadAvailabilityCategoryRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria, rebuildCategoryOptions: boolean) {
+    const criteria = this.selectedAvailabilityCategory === UNIFIED_AIOPS_ALL_SELECTED_VALUE
+      ? filterFormOutput
+      : { ...filterFormOutput, deviceCategory: this.selectedAvailabilityCategory };
+    this.resetAvailabilityCategoryData(rebuildCategoryOptions);
+    this.loadWidget(this.loaderNames.availabilityCategory, this.svc.getAvailabilityCategory(criteria), res => {
       this.availabilityCategoryRows = res || [];
-      this.availabilityCategoryFilterOptions = ['All Category', ...this.availabilityCategoryRows.map(row => row.label)];
-      this.selectedAvailabilityCategory = 'All Category';
-      this.applyAvailabilityCategorySelection();
+      if (rebuildCategoryOptions) {
+        this.availabilityCategoryFilterOptions = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' },
+          ...this.availabilityCategoryRows.map(row => ({ value: row.key || '', label: row.label }))];
+      }
+      this.availabilityCategoryDisplayRows = this.availabilityCategoryRows;
+      this.availabilityCategoryOptions = this.svc.convertToAvailabilityCategoryOptions(this.availabilityCategoryRows);
+      this.availabilityCategorySummary = this.svc.convertToAvailabilityCategorySummary(this.availabilityCategoryRows);
     }, () => {
-      this.resetAvailabilityCategoryState();
+      this.resetAvailabilityCategoryData(rebuildCategoryOptions);
     }, 'availabilityCategory');
   }
 
-  private resetAvailabilityCategoryState() {
+  private resetAvailabilityCategoryData(resetCategoryOptions: boolean) {
     this.availabilityCategoryRows = [];
     this.availabilityCategoryDisplayRows = [];
     this.availabilityCategoryOptions = {};
-    this.availabilityCategoryFilterOptions = ['All Category'];
-    this.selectedAvailabilityCategory = 'All Category';
     this.availabilityCategorySummary = this.getEmptyAvailabilityCategorySummary();
+    if (resetCategoryOptions) {
+      this.availabilityCategoryFilterOptions = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Category' }];
+      this.selectedAvailabilityCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    }
   }
 
   getAlertTrend(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1557,11 +1596,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   get hasDiscovery(): boolean {
-    return this.widgetLoading.discovery || !!this.discoveryDisplayRows.length;
+    return this.widgetLoading.discovery || !!this.discoveryDisplayRows.length || this.isDiscoveryFiltered;
   }
 
   get hasAlertSegregation(): boolean {
-    return this.widgetLoading.alertSegregation || !!this.alertSegregationDisplayItems.length;
+    return this.widgetLoading.alertSegregation || !!this.alertSegregationDisplayItems.length || this.isAlertSegregationFiltered;
   }
 
   get hasBusinessServices(): boolean {
@@ -1652,7 +1691,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   get hasAvailabilityCategory(): boolean {
-    return this.widgetLoading.availabilityCategory || this.hasChartData(this.availabilityCategoryOptions);
+    return this.widgetLoading.availabilityCategory || this.hasChartData(this.availabilityCategoryOptions) || this.isAvailabilityCategoryFiltered;
   }
 
   get hasAlertTrend(): boolean {
