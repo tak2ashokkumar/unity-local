@@ -204,8 +204,9 @@
             </div>
         </div>
 
-        <div class="section-title" *ngIf="showPerformanceHotspots">{{performanceHotspotsHeading}}</div>
-        <div class="dashboard-card performance-hotspots-card" *ngIf="showPerformanceHotspots">
+        <div class="section-title" *ngIf="showPerformanceHotspots">Performance Hotspots</div>
+        <div class="dashboard-card performance-hotspots-card" *ngIf="showPerformanceHotspots"
+            [class.hotspots-loading]="widgetLoading.performanceHotspots">
             <app-spinner [name]="loaderNames.performanceHotspots" [width]="0"></app-spinner>
             <ng-container *ngIf="performanceHotspots.length; else hotspotsNoData">
             <div class="hotspots-legend">
@@ -302,10 +303,11 @@
         <div class="dashboard-card cloud-database-card" *ngIf="hasCloudDatabasePerformanceSection">
             <div class="cloud-database-section-header">Cloud Database Performance</div>
 
+            <ng-container *ngIf="hasDatabaseOverviewData">
             <div class="cloud-database-subsection-title">Database Overview</div>
             <div class="database-kpi-strip">
                 <app-spinner [name]="loaderNames.databaseOverview" [width]="0"></app-spinner>
-                <ng-container *ngIf="hasDatabaseOverviewData; else databaseOverviewKpiNoData">
+                <ng-container *ngIf="hasDatabaseOverviewKpis; else databaseOverviewKpiNoData">
                     <div class="database-kpi" *ngFor="let kpi of databaseOverviewKpis; trackBy: trackByIndex">
                         <div class="database-kpi-label">{{kpi.label}}</div>
                         <div class="database-kpi-value" [ngClass]="getStatusClass(kpi.tone)">
@@ -327,6 +329,7 @@
                                 <tr>
                                     <th *ngFor="let column of databaseOverviewSortColumns; trackBy: trackByIndex"
                                         class="sortable-th" [class.text-right]="column.numeric"
+                                        [class.sort-active]="databaseOverviewSort.key === column.key"
                                         (click)="sortDatabaseOverview(column.key)">
                                         {{column.label}}
                                         <i [ngClass]="getSortIconClass(databaseOverviewSort, column.key)"></i>
@@ -355,25 +358,34 @@
                     <div class="widget-no-data" *ngIf="!widgetLoading.databaseOverview">No data available</div>
                 </ng-template>
             </div>
+            </ng-container>
 
+            <ng-container *ngIf="hasDatabaseTrendData">
             <div class="cloud-database-subsection-title">Trend Chart</div>
             <div class="database-trend-grid">
                 <app-spinner [name]="loaderNames.databasePerformanceTrend" [width]="0"></app-spinner>
-                <ng-container *ngIf="hasDatabaseTrendData; else databaseTrendNoData">
-                    <div class="database-trend-widget">
-                        <div class="database-widget-title">Write Performance Trend</div>
+                <div class="database-trend-widget">
+                    <div class="database-widget-title">Write Performance Trend</div>
+                    <ng-container *ngIf="hasDatabaseWriteTrend; else databaseWriteTrendNoData">
                         <div echarts [options]="databaseWritePerformanceOptions" class="database-trend-chart"></div>
-                    </div>
-                    <div class="database-trend-widget">
-                        <div class="database-widget-title">Read Performance Trend</div>
+                    </ng-container>
+                    <ng-template #databaseWriteTrendNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.databasePerformanceTrend">No data available</div>
+                    </ng-template>
+                </div>
+                <div class="database-trend-widget">
+                    <div class="database-widget-title">Read Performance Trend</div>
+                    <ng-container *ngIf="hasDatabaseReadTrend; else databaseReadTrendNoData">
                         <div echarts [options]="databaseReadPerformanceOptions" class="database-trend-chart"></div>
-                    </div>
-                </ng-container>
-                <ng-template #databaseTrendNoData>
-                    <div class="widget-no-data" *ngIf="!widgetLoading.databasePerformanceTrend">No data available</div>
-                </ng-template>
+                    </ng-container>
+                    <ng-template #databaseReadTrendNoData>
+                        <div class="widget-no-data" *ngIf="!widgetLoading.databasePerformanceTrend">No data available</div>
+                    </ng-template>
+                </div>
             </div>
+            </ng-container>
 
+            <ng-container *ngIf="hasDatabaseSpaceSection">
             <div class="cloud-database-subsection-title">Space Consumption</div>
             <div class="database-kpi-strip">
                 <app-spinner [name]="loaderNames.databaseSpaceConsumption" [width]="0"></app-spinner>
@@ -400,6 +412,7 @@
                                 <tr>
                                     <th *ngFor="let column of databaseSpaceSortColumns; trackBy: trackByIndex"
                                         [class.sortable-th]="column.sortKey" [class.text-right]="column.numeric"
+                                        [class.sort-active]="isCapacitySortActive(column.sortKey)"
                                         (click)="column.sortKey && sortDatabaseCapacity(column.sortKey)">
                                         {{column.label}}
                                         <i class="fas" [ngClass]="isCapacitySortActive(column.sortKey) ? 'fa-sort-down' : 'fa-sort'"
@@ -426,11 +439,13 @@
                     <div class="widget-no-data" *ngIf="!widgetLoading.databaseCapacityResources">No data available</div>
                 </ng-template>
             </div>
+            </ng-container>
         </div>
 
         <div class="dashboard-card cloud-storage-card mt-3" *ngIf="hasCloudStorageHealthSection">
             <div class="cloud-storage-section-header">Cloud Storage Health</div>
 
+            <ng-container *ngIf="hasStoragePerformanceData">
             <div class="cloud-database-subsection-title">Storage Performance</div>
             <div class="storage-performance-grid">
                 <app-spinner [name]="loaderNames.storagePerformance" [width]="0"></app-spinner>
@@ -454,7 +469,9 @@
                     <div class="widget-no-data" *ngIf="!widgetLoading.storagePerformance">No data available</div>
                 </ng-template>
             </div>
+            </ng-container>
 
+            <ng-container *ngIf="hasStorageResourcesData">
             <div class="cloud-database-subsection-title">Top 10 Storage Resource</div>
             <div class="storage-resource-legend">
                 <span *ngFor="let item of storageStatusLegend; trackBy: trackByIndex">
@@ -470,6 +487,7 @@
                                 <tr>
                                     <th *ngFor="let column of storageResourceSortColumns; trackBy: trackByIndex"
                                         [class.sortable-th]="column.sortKey" [class.text-right]="column.numeric"
+                                        [class.sort-active]="isStorageSortActive(column.sortKey)"
                                         (click)="column.sortKey && sortStorageResources(column.sortKey)">
                                         {{column.label}}
                                         <i class="fas" [ngClass]="isStorageSortActive(column.sortKey) ? 'fa-sort-down' : 'fa-sort'"
@@ -500,6 +518,7 @@
                     <div class="widget-no-data" *ngIf="!widgetLoading.storageResources">No data available</div>
                 </ng-template>
             </div>
+            </ng-container>
 
             <div class="latency-metric-title" *ngIf="hasLatencyMetricSection">Latency Metric</div>
             <div class="latency-metric-grid" *ngIf="hasLatencyMetricSection">

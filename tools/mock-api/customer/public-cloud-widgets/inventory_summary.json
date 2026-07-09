@@ -1,46 +1,2376 @@
 {
-  "summary": {
-    "services": 91,
-    "orphaned_vms": 32,
-    "running_resources": 32,
-    "idle_vms": 6,
-    "cloud_accounts": 8,
-    "active_regions": 70,
-    "stopped_resources": 6,
-    "vms": 53
-  },
+  "regions": [
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 2004
+      },
+      "name": "us-central1-a",
+      "active_accounts": 4,
+      "total_resources": 2004,
+      "region": "us-central1-a",
+      "raw_regions": [
+        "us-central1-a"
+      ],
+      "total_alerts": 0,
+      "value": 2004,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "9d27842d-2d70-4992-91ef-86b2daafc847",
+          "name": "My_GCP_Project"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "34f97642-d394-4b55-a54d-2ad081ddf4ab",
+          "name": "Tenant1-MTP-UnityDemo-GCP"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "6c5cdcc3-bb87-41a3-96e3-4585fd67ca85",
+          "name": "GCP Reources 12"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 944,
+      "other_services": 1043,
+      "platform_services": 17
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1585
+      },
+      "name": "us-east1-b",
+      "active_accounts": 4,
+      "total_resources": 1585,
+      "region": "us-east1-b",
+      "raw_regions": [
+        "us-east1-b"
+      ],
+      "total_alerts": 0,
+      "value": 1585,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "9d27842d-2d70-4992-91ef-86b2daafc847",
+          "name": "My_GCP_Project"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "34f97642-d394-4b55-a54d-2ad081ddf4ab",
+          "name": "Tenant1-MTP-UnityDemo-GCP"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "6c5cdcc3-bb87-41a3-96e3-4585fd67ca85",
+          "name": "GCP Reources 12"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 672,
+      "other_services": 903,
+      "platform_services": 10
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 20,
+        "gcp": 538
+      },
+      "name": "global",
+      "active_accounts": 7,
+      "total_resources": 558,
+      "region": "global",
+      "raw_regions": [
+        "global"
+      ],
+      "total_alerts": 0,
+      "value": 558,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "9d27842d-2d70-4992-91ef-86b2daafc847",
+          "name": "My_GCP_Project"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "34f97642-d394-4b55-a54d-2ad081ddf4ab",
+          "name": "Tenant1-MTP-UnityDemo-GCP"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 348,
+      "other_services": 46,
+      "platform_services": 164
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 148
+      },
+      "name": "eastus",
+      "active_accounts": 4,
+      "total_resources": 148,
+      "region": "eastus",
+      "raw_regions": [
+        "eastus"
+      ],
+      "total_alerts": 0,
+      "value": 148,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 29,
+      "other_services": 4,
+      "platform_services": 115
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 107
+      },
+      "name": "eastus2",
+      "active_accounts": 4,
+      "total_resources": 107,
+      "region": "eastus2",
+      "raw_regions": [
+        "eastus2"
+      ],
+      "total_alerts": 0,
+      "value": 107,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 6,
+      "other_services": 43,
+      "platform_services": 58
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 77
+      },
+      "name": "westus",
+      "active_accounts": 4,
+      "total_resources": 77,
+      "region": "westus",
+      "raw_regions": [
+        "westus"
+      ],
+      "total_alerts": 0,
+      "value": 77,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 28,
+      "other_services": 1,
+      "platform_services": 48
+    },
+    {
+      "warning_alerts": 54,
+      "clouds": {
+        "azure": 69
+      },
+      "name": "westus2",
+      "active_accounts": 4,
+      "total_resources": 69,
+      "region": "westus2",
+      "raw_regions": [
+        "westus2"
+      ],
+      "total_alerts": 58,
+      "value": 69,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 4,
+      "compute_count": 19,
+      "other_services": 0,
+      "platform_services": 50
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 53
+      },
+      "name": "centralus",
+      "active_accounts": 4,
+      "total_resources": 53,
+      "region": "centralus",
+      "raw_regions": [
+        "centralus"
+      ],
+      "total_alerts": 0,
+      "value": 53,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 5,
+      "other_services": 5,
+      "platform_services": 43
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 46
+      },
+      "name": "centralindia",
+      "active_accounts": 4,
+      "total_resources": 46,
+      "region": "centralindia",
+      "raw_regions": [
+        "centralindia"
+      ],
+      "total_alerts": 0,
+      "value": 46,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 12,
+      "other_services": 2,
+      "platform_services": 32
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 42
+      },
+      "name": "us-central1",
+      "active_accounts": 3,
+      "total_resources": 42,
+      "region": "us-central1",
+      "raw_regions": [
+        "us-central1"
+      ],
+      "total_alerts": 0,
+      "value": 42,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "9d27842d-2d70-4992-91ef-86b2daafc847",
+          "name": "My_GCP_Project"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "34f97642-d394-4b55-a54d-2ad081ddf4ab",
+          "name": "Tenant1-MTP-UnityDemo-GCP"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 32,
+      "other_services": 0,
+      "platform_services": 10
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 23
+      },
+      "name": "canadacentral",
+      "active_accounts": 4,
+      "total_resources": 23,
+      "region": "canadacentral",
+      "raw_regions": [
+        "canadacentral"
+      ],
+      "total_alerts": 0,
+      "value": 23,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 6,
+      "other_services": 2,
+      "platform_services": 15
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 18
+      },
+      "name": "japaneast",
+      "active_accounts": 4,
+      "total_resources": 18,
+      "region": "japaneast",
+      "raw_regions": [
+        "japaneast"
+      ],
+      "total_alerts": 0,
+      "value": 18,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 0,
+      "platform_services": 18
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 18
+      },
+      "name": "southindia",
+      "active_accounts": 3,
+      "total_resources": 18,
+      "region": "southindia",
+      "raw_regions": [
+        "southindia"
+      ],
+      "total_alerts": 0,
+      "value": 18,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 0,
+      "platform_services": 18
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 16
+      },
+      "name": "southeastasia",
+      "active_accounts": 4,
+      "total_resources": 16,
+      "region": "southeastasia",
+      "raw_regions": [
+        "southeastasia"
+      ],
+      "total_alerts": 0,
+      "value": 16,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 1,
+      "platform_services": 14
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 13
+      },
+      "name": "eastasia",
+      "active_accounts": 4,
+      "total_resources": 13,
+      "region": "eastasia",
+      "raw_regions": [
+        "eastasia"
+      ],
+      "total_alerts": 0,
+      "value": 13,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 2,
+      "other_services": 0,
+      "platform_services": 11
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 9
+      },
+      "name": "us-central1-f",
+      "active_accounts": 2,
+      "total_resources": 9,
+      "region": "us-central1-f",
+      "raw_regions": [
+        "us-central1-f"
+      ],
+      "total_alerts": 0,
+      "value": 9,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "6c5cdcc3-bb87-41a3-96e3-4585fd67ca85",
+          "name": "GCP Reources 12"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 9,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 9
+      },
+      "name": "us",
+      "active_accounts": 1,
+      "total_resources": 9,
+      "region": "us",
+      "raw_regions": [
+        "us"
+      ],
+      "total_alerts": 0,
+      "value": 9,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 9,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 9
+      },
+      "name": "us-east1",
+      "active_accounts": 3,
+      "total_resources": 9,
+      "region": "us-east1",
+      "raw_regions": [
+        "us-east1"
+      ],
+      "total_alerts": 0,
+      "value": 9,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "34f97642-d394-4b55-a54d-2ad081ddf4ab",
+          "name": "Tenant1-MTP-UnityDemo-GCP"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "9d27842d-2d70-4992-91ef-86b2daafc847",
+          "name": "My_GCP_Project"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 5,
+      "other_services": 0,
+      "platform_services": 4
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 8
+      },
+      "name": "southcentralus",
+      "active_accounts": 4,
+      "total_resources": 8,
+      "region": "southcentralus",
+      "raw_regions": [
+        "southcentralus"
+      ],
+      "total_alerts": 0,
+      "value": 8,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 1,
+      "platform_services": 7
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 7
+      },
+      "name": "japanwest",
+      "active_accounts": 4,
+      "total_resources": 7,
+      "region": "japanwest",
+      "raw_regions": [
+        "japanwest"
+      ],
+      "total_alerts": 0,
+      "value": 7,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 0,
+      "platform_services": 7
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 6
+      },
+      "name": "northcentralus",
+      "active_accounts": 4,
+      "total_resources": 6,
+      "region": "northcentralus",
+      "raw_regions": [
+        "northcentralus"
+      ],
+      "total_alerts": 0,
+      "value": 6,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 0,
+      "platform_services": 6
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 6
+      },
+      "name": "us-central1-b",
+      "active_accounts": 1,
+      "total_resources": 6,
+      "region": "us-central1-b",
+      "raw_regions": [
+        "us-central1-b"
+      ],
+      "total_alerts": 0,
+      "value": 6,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "6c5cdcc3-bb87-41a3-96e3-4585fd67ca85",
+          "name": "GCP Reources 12"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 6,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 6
+      },
+      "name": "northeurope",
+      "active_accounts": 4,
+      "total_resources": 6,
+      "region": "northeurope",
+      "raw_regions": [
+        "northeurope"
+      ],
+      "total_alerts": 0,
+      "value": 6,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 0,
+      "platform_services": 6
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 4
+      },
+      "name": "canadaeast",
+      "active_accounts": 4,
+      "total_resources": 4,
+      "region": "canadaeast",
+      "raw_regions": [
+        "canadaeast"
+      ],
+      "total_alerts": 0,
+      "value": 4,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 0,
+      "platform_services": 4
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 4
+      },
+      "name": "westeurope",
+      "active_accounts": 4,
+      "total_resources": 4,
+      "region": "westeurope",
+      "raw_regions": [
+        "westeurope"
+      ],
+      "total_alerts": 0,
+      "value": 4,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+          "name": "azure tenant1"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 0,
+      "platform_services": 4
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 4
+      },
+      "name": "US",
+      "active_accounts": 3,
+      "total_resources": 4,
+      "region": "US",
+      "raw_regions": [
+        "US"
+      ],
+      "total_alerts": 0,
+      "value": 4,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "9d27842d-2d70-4992-91ef-86b2daafc847",
+          "name": "My_GCP_Project"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "34f97642-d394-4b55-a54d-2ad081ddf4ab",
+          "name": "Tenant1-MTP-UnityDemo-GCP"
+        },
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 1,
+      "platform_services": 3
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "oci": 4
+      },
+      "name": "us-sanjose-1",
+      "active_accounts": 1,
+      "total_resources": 4,
+      "region": "us-sanjose-1",
+      "raw_regions": [
+        "us-sanjose-1"
+      ],
+      "total_alerts": 0,
+      "value": 4,
+      "accounts": [
+        {
+          "cloud_type": "oci",
+          "uuid": "cfc6c94a-5211-4e7a-9b6b-894052cee227",
+          "name": "UL OCI Account"
+        }
+      ],
+      "primary_cloud": "oci",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 2,
+      "platform_services": 1
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "azure": 3
+      },
+      "name": "westcentralus",
+      "active_accounts": 3,
+      "total_resources": 3,
+      "region": "westcentralus",
+      "raw_regions": [
+        "westcentralus"
+      ],
+      "total_alerts": 0,
+      "value": 3,
+      "accounts": [
+        {
+          "cloud_type": "azure",
+          "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+          "name": "New Azure"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+          "name": "test"
+        },
+        {
+          "cloud_type": "azure",
+          "uuid": "e4fe65e0-e065-42af-a3c5-0f3a7788a92d",
+          "name": "Azure Training Demo"
+        }
+      ],
+      "primary_cloud": "azure",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 0,
+      "other_services": 3,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west4",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west4",
+      "raw_regions": [
+        "europe-west4"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-east5",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-east5",
+      "raw_regions": [
+        "us-east5"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "Unknown",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "Unknown",
+      "raw_regions": [
+        null
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-south1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-south1",
+      "raw_regions": [
+        "us-south1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-southwest1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-southwest1",
+      "raw_regions": [
+        "europe-southwest1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-south2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-south2",
+      "raw_regions": [
+        "asia-south2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west3",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west3",
+      "raw_regions": [
+        "europe-west3"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-east7",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-east7",
+      "raw_regions": [
+        "us-east7"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "northamerica-south1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "northamerica-south1",
+      "raw_regions": [
+        "northamerica-south1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-east2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-east2",
+      "raw_regions": [
+        "asia-east2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-west8",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-west8",
+      "raw_regions": [
+        "us-west8"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-east1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-east1",
+      "raw_regions": [
+        "asia-east1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "africa-south1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "africa-south1",
+      "raw_regions": [
+        "africa-south1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-north1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-north1",
+      "raw_regions": [
+        "europe-north1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-north2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-north2",
+      "raw_regions": [
+        "europe-north2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "southamerica-west1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "southamerica-west1",
+      "raw_regions": [
+        "southamerica-west1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-east4",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-east4",
+      "raw_regions": [
+        "us-east4"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-southeast3",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-southeast3",
+      "raw_regions": [
+        "asia-southeast3"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "australia-southeast1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "australia-southeast1",
+      "raw_regions": [
+        "australia-southeast1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west10",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west10",
+      "raw_regions": [
+        "europe-west10"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west12",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west12",
+      "raw_regions": [
+        "europe-west12"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "me-west1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "me-west1",
+      "raw_regions": [
+        "me-west1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-west4",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-west4",
+      "raw_regions": [
+        "us-west4"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "northamerica-northeast1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "northamerica-northeast1",
+      "raw_regions": [
+        "northamerica-northeast1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west9",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west9",
+      "raw_regions": [
+        "europe-west9"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-west1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-west1",
+      "raw_regions": [
+        "us-west1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-west2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-west2",
+      "raw_regions": [
+        "us-west2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "us-west3",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "us-west3",
+      "raw_regions": [
+        "us-west3"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-northeast2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-northeast2",
+      "raw_regions": [
+        "asia-northeast2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-northeast3",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-northeast3",
+      "raw_regions": [
+        "asia-northeast3"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-northeast1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-northeast1",
+      "raw_regions": [
+        "asia-northeast1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-southeast2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-southeast2",
+      "raw_regions": [
+        "asia-southeast2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-central2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-central2",
+      "raw_regions": [
+        "europe-central2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west8",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west8",
+      "raw_regions": [
+        "europe-west8"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west2",
+      "raw_regions": [
+        "europe-west2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-southeast1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-southeast1",
+      "raw_regions": [
+        "asia-southeast1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west1",
+      "raw_regions": [
+        "europe-west1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "europe-west6",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "europe-west6",
+      "raw_regions": [
+        "europe-west6"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "me-central1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "me-central1",
+      "raw_regions": [
+        "me-central1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "me-central2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "me-central2",
+      "raw_regions": [
+        "me-central2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "asia-south1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "asia-south1",
+      "raw_regions": [
+        "asia-south1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "northamerica-northeast2",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "northamerica-northeast2",
+      "raw_regions": [
+        "northamerica-northeast2"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    },
+    {
+      "warning_alerts": 0,
+      "clouds": {
+        "gcp": 1
+      },
+      "name": "southamerica-east1",
+      "active_accounts": 1,
+      "total_resources": 1,
+      "region": "southamerica-east1",
+      "raw_regions": [
+        "southamerica-east1"
+      ],
+      "total_alerts": 0,
+      "value": 1,
+      "accounts": [
+        {
+          "cloud_type": "gcp",
+          "uuid": "d84256c0-a4ce-4763-8554-b4b0b4fc0d78",
+          "name": "tenant1-gcp"
+        }
+      ],
+      "primary_cloud": "gcp",
+      "information_alerts": 0,
+      "critical_alerts": 0,
+      "compute_count": 1,
+      "other_services": 0,
+      "platform_services": 0
+    }
+  ],
   "distribution": {
-    "aws": 6,
     "azure": 4,
-    "gcp": 3,
+    "gcp": 4,
+    "aws": 2,
     "oci": 1
   },
-  "distribution_percentages": {
-    "aws": "42",
-    "azure": "31",
-    "gcp": "19",
-    "oci": "8"
+  "tags": {
+    "finaltest2": 3,
+    "03242025": 4,
+    "Unknown": 542,
+    "DevOps": 1,
+    "Dev": 9,
+    "46f40029-a9c3-11f0-b443-9649f923bc04": 1,
+    "test-aks-aks": 2,
+    "unity": 15,
+    "lumi-platform": 72,
+    "New_testssh": 1
   },
-  "tags": [
-    {
-      "label": "ERP",
-      "count": 1241
-    },
-    {
-      "label": "CRM",
-      "count": 891
-    },
-    {
-      "label": "Analytics",
-      "count": 743
-    },
-    {
-      "label": "DevOps",
-      "count": 612
-    },
-    {
-      "label": "Other",
-      "count": 1354
-    }
-  ]
+  "summary": {
+    "services": 59,
+    "orphaned_vms": 0,
+    "running_resources": 46,
+    "idle_vms": 0,
+    "cloud_accounts": 11,
+    "active_regions": 71,
+    "stopped_resources": 11,
+    "vms": 81
+  }
 }

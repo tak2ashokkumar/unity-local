@@ -89,7 +89,7 @@ export const UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT = '/customer/private_clou
 export const UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT = '/customer/public_cloud_fast/';
 
 export const UNIFIED_AIOPS_ALERT_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
-export const UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY = 'event_source';
+export const UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY = 'source';
 export const UNIFIED_AIOPS_ALERT_DEFAULT_DURATION = 'last_week';
 
 export const UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS: UnifiedAiopsDeviceTypeOption[] = [
@@ -107,7 +107,7 @@ export const UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS: UnifiedAiopsDeviceTypeOpti
 
 export const UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS: UnifiedAiopsViewByOption[] = [
   // { name: 'Device Type', key: 'device_type' },
-  { name: 'Source', key: 'event_source' },
+  { name: 'Source', key: 'source' },
   // { name: 'Datacenter', key: 'datacenter' },
   // { name: 'Cloud', key: 'private_cloud' },
   { name: 'Severity', key: 'severity' }

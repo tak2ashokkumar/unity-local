@@ -598,7 +598,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
     const alertsCriteria = this.getAlertsCriteria();
-    if (this.alertsSelectedViewBy === 'event_source') {
+    if (this.alertsSelectedViewBy === 'source') {
       this.getAlertSourceTypeOptions(alertsCriteria);
     }
     this.getAlertReductionMetrics(alertsCriteria);
@@ -658,7 +658,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       startDate: this.alertsDateRange?.from || '',
       endDate: this.alertsDateRange?.to || ''
     };
-    if (viewBy === 'event_source') {
+    if (viewBy === 'source') {
       criteria.sourceTypes = this.getValuesFromOptions(this.alertsFilterForm?.get('sourceTypes')?.value || []);
     } else if (viewBy === 'severity') {
       criteria.severityTypes = this.getValuesFromOptions(this.alertsFilterForm?.get('severityTypes')?.value || []);

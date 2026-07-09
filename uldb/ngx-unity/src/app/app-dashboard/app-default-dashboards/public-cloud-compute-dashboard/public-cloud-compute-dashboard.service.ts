@@ -119,6 +119,8 @@ import {
   PublicCloudIdleMetric,
   PublicCloudIdleMetricResponse,
   PublicCloudInventorySummaryResponse,
+  PublicCloudInventoryTagResponse,
+  PublicCloudInventoryTags,
   PublicCloudLatencyHeatmapResponse,
   PublicCloudLatencyHeatmapRow,
   PublicCloudQueueBacklogResponse,
@@ -355,7 +357,7 @@ export class PublicCloudComputeDashboardService {
   }
 
   convertToTagsViewData(data: PublicCloudInventorySummaryResponse): PublicCloudTagItem[] {
-    return (data?.tags || []).map((tag, index) => {
+    return this.getInventoryTagEntries(data?.tags).map((tag, index) => {
       const style = this.getTagStyle(tag.label, index);
       return {
         name: tag.label,
@@ -364,6 +366,15 @@ export class PublicCloudComputeDashboardService {
         backgroundColor: style.backgroundColor
       };
     });
+  }
+
+  // Inventory tags arrive as a keyed map ({ tagName: count }) from the current response, or as an
+  // array ([{ label, count }]) from older responses; normalize both into label/count entries.
+  private getInventoryTagEntries(tags?: PublicCloudInventoryTags): PublicCloudInventoryTagResponse[] {
+    const entries: PublicCloudInventoryTagResponse[] = Array.isArray(tags)
+      ? (tags || []).map(tag => ({ label: this.getFirstValue(tag?.label), count: this.getNumericValue(tag?.count) }))
+      : Object.keys(tags || {}).map(key => ({ label: key, count: this.getNumericValue((tags as Record<string, string | number>)[key]) }));
+    return entries.filter(entry => !!entry.label);
   }
 
   private getProviderDistributionPercentage(data: PublicCloudInventorySummaryResponse, key: PublicCloudProviderDistributionKey): number {
@@ -713,12 +724,17 @@ export class PublicCloudComputeDashboardService {
   private getCoverageGroups(response: any): PublicCloudCoverageGroup[] {
     const containers = [response, response?.data, response?.result, response?.results]
       .filter(container => container && typeof container === 'object' && !Array.isArray(container));
-    const container = containers.find(item => PUBLIC_CLOUD_COVERAGE_GROUP_ORDER.some(key => item[key])) || response;
+    const container = containers.find(item => {
+      const normalized = this.getNormalizedPayload(item);
+      return PUBLIC_CLOUD_COVERAGE_GROUP_ORDER.some(key => normalized[this.normalizeKey(key)] !== undefined);
+    }) || response;
     if (!container || typeof container !== 'object') {
       return [];
     }
+    // Group keys arrive title-cased/spaced ("Platform Services"); match them via normalized keys.
+    const normalizedContainer = this.getNormalizedPayload(container);
     return PUBLIC_CLOUD_COVERAGE_GROUP_ORDER
-      .map(groupKey => this.getCoverageGroupFromPayload(groupKey, container[groupKey]))
+      .map(groupKey => this.getCoverageGroupFromPayload(groupKey, normalizedContainer[this.normalizeKey(groupKey)]))
       .filter((group): group is PublicCloudCoverageGroup => !!group && group.cards.length > 0);
   }
 
@@ -726,9 +742,11 @@ export class PublicCloudComputeDashboardService {
     if (!groupPayload || typeof groupPayload !== 'object' || Array.isArray(groupPayload)) {
       return null;
     }
+    // Providers ("AWS", "Azure", ...) sit directly on the group; match them via normalized keys.
     const providersPayload = groupPayload.providers || groupPayload.clouds || groupPayload;
+    const normalizedProviders = this.getNormalizedPayload(providersPayload);
     const cards = PUBLIC_CLOUD_COVERAGE_PROVIDER_ORDER
-      .map(providerKey => this.getCoverageProviderCard(providerKey, providersPayload[providerKey]))
+      .map(providerKey => this.getCoverageProviderCard(providerKey, normalizedProviders[this.normalizeKey(providerKey)]))
       .filter((card): card is PublicCloudCoverageCard => !!card);
     if (!cards.length) {
       return null;
@@ -749,7 +767,7 @@ export class PublicCloudComputeDashboardService {
     if (!providerPayload || typeof providerPayload !== 'object' || Array.isArray(providerPayload)) {
       return null;
     }
-    const rows = this.getCoverageServiceRows(providerKey, providerPayload.services || providerPayload.service_types || providerPayload.serviceTypes);
+    const rows = this.getCoverageServiceRows(providerKey, providerPayload.resources);
     const rowTotal = rows.reduce((sum, row) => sum + this.getNumberValue(row.value), 0);
     const total = this.getNumberFromPayload(providerPayload, ['total_resources', 'totalResources', 'total', 'count'], rowTotal);
     // Drop providers with no data so a customer with fewer clouds (e.g. no OCI) shows fewer cards.
@@ -765,31 +783,41 @@ export class PublicCloudComputeDashboardService {
     };
   }
 
-  // A service entry is either a scalar count ("EC2": 26) or an object that also carries icon_path
-  // ("EC2": { count: 26, icon_path: "Compute/EC2" }). The icon renders only when icon_path is present.
-  private getCoverageServiceRows(providerKey: string, servicesPayload: any): PublicCloudCoverageRow[] {
-    if (!servicesPayload || typeof servicesPayload !== 'object' || Array.isArray(servicesPayload)) {
+  // Each provider exposes a `resources` array; every entry is a resource type carrying its own count
+  // and icon_path. Entries are grouped by display name (the API repeats a name across
+  // resource_type_ids), summing counts and keeping the first available icon.
+  private getCoverageServiceRows(providerKey: string, resources: any): PublicCloudCoverageRow[] {
+    if (!Array.isArray(resources)) {
       return [];
     }
-    return Object.keys(servicesPayload)
-      .map(key => {
-        const entry = servicesPayload[key];
-        const isObject = entry && typeof entry === 'object' && !Array.isArray(entry);
-        const count = isObject
-          ? this.getNumberFromPayload(entry, ['count', 'value', 'resource_count', 'resourceCount', 'total'])
-          : this.getNumberValue(entry);
-        const iconPath = isObject
-          ? this.getCoverageServiceIconPath(providerKey, this.getFirstStringValue(entry, ['icon_path', 'iconPath']))
-          : '';
-        const row: PublicCloudCoverageRow = { label: this.getReadableCoverageLabel(key), value: this.formatNumber(count) };
-        if (iconPath) {
-          row.iconPath = iconPath;
-        }
-        return { row, count };
-      })
-      .filter(item => item.count > 0)
+    const grouped = resources.reduce((groups: Record<string, { label: string; count: number; iconPath: string }>, entry) => {
+      if (!entry || typeof entry !== 'object') {
+        return groups;
+      }
+      const label = this.getReadableCoverageLabel(this.getFirstValue(entry.name, entry.service));
+      const count = this.getNumberFromPayload(entry, ['count', 'value', 'resource_count', 'resourceCount', 'total']);
+      if (!label || count <= 0) {
+        return groups;
+      }
+      const iconPath = this.getCoverageServiceIconPath(providerKey, this.getFirstStringValue(entry, ['icon_path', 'iconPath']));
+      const group = groups[label] || (groups[label] = { label, count: 0, iconPath: '' });
+      group.count += count;
+      if (!group.iconPath && iconPath) {
+        group.iconPath = iconPath;
+      }
+      return groups;
+    }, {});
+
+    return Object.keys(grouped)
+      .map(key => grouped[key])
       .sort((first, second) => second.count - first.count)
-      .map(item => item.row);
+      .map(group => {
+        const row: PublicCloudCoverageRow = { label: group.label, value: this.formatNumber(group.count) };
+        if (group.iconPath) {
+          row.iconPath = group.iconPath;
+        }
+        return row;
+      });
   }
 
   // Mirrors how the public cloud summary pages build service icons from the API icon_path.
@@ -962,14 +990,14 @@ export class PublicCloudComputeDashboardService {
     const rows = data?.data || data?.results || data?.items || [];
     return (rows || []).map(item => {
       const cloud = this.getFirstValue(item.cloud, item.provider, item.cloud_type);
-      const cpu = this.getFirstNumericValue(item.cpu_utilization, item.cpu_vcpus) || 0;
-      const memory = this.getFirstNumericValue(item.available_memory, item.available_memory_gb) || 0;
+      const cpu = this.getFirstNumericValue(item.cpu_utilization_percent, item.cpu_utilization, item.cpu_vcpus);
+      const memory = this.getFirstNumericValue(item.available_memory, item.available_memory_gb);
       return {
         instanceName: this.getFirstValue(item.name, item.instance_name, item.instanceName),
         cloud,
-        cloudLogo: this.getHotspotCloudLogo(cloud),
-        cpuLabel: `${this.formatNumber(cpu)} vCPUs`,
-        memoryLabel: `${this.formatNumber(memory)} GB`,
+        cloudLogo: this.getHotspotCloudLogo(this.getFirstValue(item.cloud_key, cloud)),
+        cpuLabel: cpu === null ? 'NA' : `${this.formatNumber(cpu)}%`,
+        memoryLabel: memory === null ? 'NA' : `${this.formatNumber(memory)} GB`,
         disk: this.convertToHotspotDisk(item.disk_utilization || item.disk_size),
         dataDiskBytes: this.getHotspotReadWrite(item.data_disk_read_write_bytes?.read, item.data_disk_read_write_bytes?.write, 'Read: ', 'Write: ', ''),
         dataDiskRates: this.getHotspotReadWrite(item.data_disk_read_write_rates?.read_ops, item.data_disk_read_write_rates?.write_ops, 'Read Ops: ', 'Write Ops: ', ' /s'),

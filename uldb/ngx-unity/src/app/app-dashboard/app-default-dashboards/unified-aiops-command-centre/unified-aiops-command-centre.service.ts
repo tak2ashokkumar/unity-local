@@ -999,14 +999,19 @@ export class UnifiedAiopsCommandCentreService {
   private getCoverageGroups(response: any): UnifiedAiopsCoverageGroup[] {
     const containers = [response, response?.data, response?.result, response?.results]
       .filter(container => container && typeof container === 'object' && !Array.isArray(container));
-    const container = containers.find(item => UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER.some(key => item[key])) || response;
+    const container = containers.find(item => {
+      const normalized = this.getNormalizedPayload(item);
+      return UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER.some(key => normalized[this.normalizeKey(key)] !== undefined);
+    }) || response;
     if (!container || typeof container !== 'object') {
       return [];
     }
 
+    // Group keys arrive title-cased/spaced ("Platform Services"); match them via normalized keys.
     const labels = this.getPublicCloudCoverageLabels();
+    const normalizedContainer = this.getNormalizedPayload(container);
     return UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER
-      .map(groupKey => this.getCoverageGroupFromPayload(groupKey, container[groupKey], labels))
+      .map(groupKey => this.getCoverageGroupFromPayload(groupKey, normalizedContainer[this.normalizeKey(groupKey)], labels))
       .filter((group): group is UnifiedAiopsCoverageGroup => !!group && group.cards.length > 0);
   }
 
@@ -1014,9 +1019,11 @@ export class UnifiedAiopsCommandCentreService {
     if (!groupPayload || typeof groupPayload !== 'object' || Array.isArray(groupPayload)) {
       return null;
     }
+    // Providers ("AWS", "Azure", ...) sit directly on the group; match them via normalized keys.
     const providersPayload = groupPayload.providers || groupPayload.clouds || groupPayload;
+    const normalizedProviders = this.getNormalizedPayload(providersPayload);
     const cards = UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_ORDER
-      .map(providerKey => this.getCoverageProviderCard(providerKey, providersPayload[providerKey], labels))
+      .map(providerKey => this.getCoverageProviderCard(providerKey, normalizedProviders[this.normalizeKey(providerKey)], labels))
       .filter((card): card is UnifiedAiopsCoverageCard => !!card);
     if (!cards.length) {
       return null;
@@ -1037,7 +1044,7 @@ export class UnifiedAiopsCommandCentreService {
     if (!providerPayload || typeof providerPayload !== 'object' || Array.isArray(providerPayload)) {
       return null;
     }
-    const rows = this.getCoverageServiceRows(providerKey, providerPayload.services || providerPayload.service_types || providerPayload.serviceTypes);
+    const rows = this.getCoverageServiceRows(providerKey, providerPayload.resources);
     const rowTotal = rows.reduce((sum, row) => sum + this.getNumberValue(row.value), 0);
     const total = this.getNumberFromPayload(providerPayload, ['total_resources', 'totalResources', 'total', 'count'], rowTotal);
     // Drop providers with no data so a customer with fewer clouds (e.g. no OCI) shows fewer cards.
@@ -1053,31 +1060,41 @@ export class UnifiedAiopsCommandCentreService {
     };
   }
 
-  // A service entry is either a scalar count ("EC2": 26) or an object that also carries icon_path
-  // ("EC2": { count: 26, icon_path: "Compute/EC2" }). The icon renders only when icon_path is present.
-  private getCoverageServiceRows(providerKey: string, servicesPayload: any): UnifiedAiopsCoverageRow[] {
-    if (!servicesPayload || typeof servicesPayload !== 'object' || Array.isArray(servicesPayload)) {
+  // Each provider exposes a `resources` array; every entry is a resource type carrying its own count
+  // and icon_path. Entries are grouped by display name (the API repeats a name across
+  // resource_type_ids), summing counts and keeping the first available icon.
+  private getCoverageServiceRows(providerKey: string, resources: any): UnifiedAiopsCoverageRow[] {
+    if (!Array.isArray(resources)) {
       return [];
     }
-    return Object.keys(servicesPayload)
-      .map(key => {
-        const entry = servicesPayload[key];
-        const isObject = entry && typeof entry === 'object' && !Array.isArray(entry);
-        const count = isObject
-          ? this.getNumberFromPayload(entry, ['count', 'value', 'resource_count', 'resourceCount', 'total'])
-          : this.getNumberValue(entry);
-        const iconPath = isObject
-          ? this.getServiceIconPath(providerKey, this.getFirstStringValue(entry, ['icon_path', 'iconPath']))
-          : '';
-        const row: UnifiedAiopsCoverageRow = { label: this.getReadableCoverageLabel(key), value: this.formatNumber(count) };
-        if (iconPath) {
-          row.iconPath = iconPath;
-        }
-        return { row, count };
-      })
-      .filter(item => item.count > 0)
+    const grouped = resources.reduce((groups: Record<string, { label: string; count: number; iconPath: string }>, entry) => {
+      if (!entry || typeof entry !== 'object') {
+        return groups;
+      }
+      const label = this.getReadableCoverageLabel(this.getFirstStringValue(entry, ['name', 'service']));
+      const count = this.getNumberFromPayload(entry, ['count', 'value', 'resource_count', 'resourceCount', 'total']);
+      if (!label || count <= 0) {
+        return groups;
+      }
+      const iconPath = this.getServiceIconPath(providerKey, this.getFirstStringValue(entry, ['icon_path', 'iconPath']));
+      const group = groups[label] || (groups[label] = { label, count: 0, iconPath: '' });
+      group.count += count;
+      if (!group.iconPath && iconPath) {
+        group.iconPath = iconPath;
+      }
+      return groups;
+    }, {});
+
+    return Object.keys(grouped)
+      .map(key => grouped[key])
       .sort((first, second) => second.count - first.count)
-      .map(item => item.row);
+      .map(group => {
+        const row: UnifiedAiopsCoverageRow = { label: group.label, value: this.formatNumber(group.count) };
+        if (group.iconPath) {
+          row.iconPath = group.iconPath;
+        }
+        return row;
+      });
   }
 
   // Mirrors how the public cloud summary pages build service icons from the API icon_path.

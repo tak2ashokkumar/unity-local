@@ -81,11 +81,18 @@
     align-items: flex-end;
     justify-content: center;
     padding: 0 18px 22px;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.66) 0%,
+        rgba(0, 0, 0, 0.18) 45%,
+        rgba(0, 0, 0, 0) 100%
+    );
     color: #fff;
     font-size: 20px;
     font-weight: 600;
     line-height: 1.15;
     text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
 }
 
 .collection-dashboard-upload-btn {

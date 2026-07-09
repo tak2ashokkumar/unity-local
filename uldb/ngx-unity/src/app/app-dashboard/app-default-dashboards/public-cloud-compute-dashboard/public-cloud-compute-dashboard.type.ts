@@ -54,14 +54,18 @@ export type PublicCloudProviderDistributionKey = 'aws' | 'azure' | 'gcp' | 'oci'
 export interface PublicCloudInventorySummaryResponse {
   summary: Record<PublicCloudInventorySummaryKey, number>;
   distribution: Record<PublicCloudProviderDistributionKey, number>;
-  distribution_percentages: Record<PublicCloudProviderDistributionKey, string>;
-  tags: PublicCloudInventoryTagResponse[];
+  distribution_percentages?: Record<PublicCloudProviderDistributionKey, string>;
+  tags: PublicCloudInventoryTags;
 }
 
 export interface PublicCloudInventoryTagResponse {
   label: string;
   count: number;
 }
+
+// Inventory tags arrive as a keyed map ({ tagName: count }) from the current inventory_summary
+// response, or as an array ([{ label, count }]) from older responses.
+export type PublicCloudInventoryTags = PublicCloudInventoryTagResponse[] | Record<string, number>;
 
 export interface PublicCloudProviderDistributionItem {
   key: PublicCloudProviderDistributionKey;
@@ -150,8 +154,10 @@ export interface PublicCloudPerformanceHotspotResponseItem {
   instance_name?: string;
   instanceName?: string;
   cloud?: string;
+  cloud_key?: string;
   provider?: string;
   cloud_type?: string;
+  cpu_utilization_percent?: string | number;
   cpu_utilization?: string | number;
   cpu_vcpus?: string | number;
   available_memory?: string | number;

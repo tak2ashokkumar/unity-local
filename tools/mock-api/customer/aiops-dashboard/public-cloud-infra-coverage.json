@@ -1,275 +1,1122 @@
 {
-  "compute": {
-    "name": "Compute",
-    "total_resources": 3098,
-    "providers": {
-      "aws": {
-        "total_resources": 37,
-        "services": {
-          "EC2": 26,
-          "ECS": 5,
-          "EKS": 4,
-          "ServiceDiscovery": 2
-        },
-        "resource_types": {
-          "Instance": 10,
-          "EIP": 6,
-          "LaunchTemplate": 6,
-          "CapacityProvider": 4,
-          "EC2Fleet": 4,
-          "Cluster": 3,
-          "Addon": 2,
-          "DHCPOptions": 2
+  "Compute": {
+    "total_resources": 90,
+    "AWS": {
+      "total_resources": 8,
+      "resources": [
+        {
+          "name": "Instance",
+          "resource_type_id": 818,
+          "service": "EC2",
+          "count": 8,
+          "icon_path": "Compute/EC2"
         }
-      },
-      "azure": {
-        "total_resources": 22,
-        "services": {
-          "Compute": 21,
-          "ContainerService": 1
-        },
-        "resource_types": {
-          "sshPublicKeys": 10,
-          "virtualMachines": 7,
-          "galleries": 2,
-          "availabilitySets": 1,
-          "managedClusters": 1,
-          "virtualMachineScaleSets": 1
+      ]
+    },
+    "Azure": {
+      "total_resources": 35,
+      "resources": [
+        {
+          "name": "virtualMachines",
+          "resource_type_id": 93,
+          "service": "Compute",
+          "count": 35,
+          "icon_path": "compute/10021-icon-service-Virtual-Machine"
         }
-      },
-      "gcp": {
-        "total_resources": 3039,
-        "services": {
-          "rbac": 1548,
-          "Compute": 1473,
-          "batch": 12,
-          "container": 6
-        },
-        "resource_types": {
-          "ClusterRole": 1073,
-          "ClusterRoleBinding": 1001,
-          "ReplicaSet": 293,
-          "ServiceAccount": 179,
-          "Pod": 135,
-          "Role": 56,
-          "DaemonSet": 54,
-          "Deployment": 47,
-          "VM instances": 38,
-          "HealthCheck": 27,
-          "Instance": 18,
-          "Job": 16,
-          "Cluster": 14,
-          "BackendService": 12,
-          "HorizontalPodAutoscaler": 12,
-          "UrlMap": 12,
-          "ValidatingWebhookConfiguration": 11,
-          "InstanceTemplate": 10,
-          "HttpHealthCheck": 9,
-          "TargetPool": 9,
-          "MutatingWebhookConfiguration": 7,
-          "Node": 4,
-          "NodePool": 2
+      ]
+    },
+    "GCP": {
+      "total_resources": 46,
+      "resources": [
+        {
+          "name": "VM instances",
+          "resource_type_id": 330,
+          "service": "Compute",
+          "count": 46,
+          "icon_path": "Compute-Engine"
         }
-      },
-      "oci": {
-        "total_resources": 0,
-        "services": {},
-        "resource_types": {}
-      }
+      ]
+    },
+    "OCI": {
+      "total_resources": 1,
+      "resources": [
+        {
+          "name": "Instances",
+          "resource_type_id": 44,
+          "service": "Compute",
+          "count": 1,
+          "icon_path": "Compute/Virtual Machine.png"
+        }
+      ]
     }
   },
-  "platform_services": {
-    "name": "Platform Services",
-    "total_resources": 801,
-    "providers": {
-      "aws": {
-        "total_resources": 285,
-        "services": {
-          "EC2": 243,
-          "RDS": 18,
-          "Route53Resolver": 12,
-          "AppMesh": 8,
-          "S3": 4
+  "Platform Services": {
+    "total_resources": 1232,
+    "AWS": {
+      "total_resources": 299,
+      "resources": [
+        {
+          "name": "SecurityGroup",
+          "resource_type_id": 823,
+          "service": "Network",
+          "count": 117,
+          "icon_path": "Compute/EC2"
         },
-        "resource_types": {
-          "SecurityGroup": 117,
-          "Subnet": 24,
-          "RouteTable": 22,
-          "NetworkInterface": 18,
-          "Volume": 16,
-          "SubnetRouteTableAssociation": 14,
-          "NetworkAcl": 10,
-          "ResolverRuleAssociation": 10,
-          "VPC": 10,
-          "OptionGroup": 9,
-          "InternetGateway": 8,
-          "Bucket": 4,
-          "DBClusterSnapshot": 4,
-          "DBSnapshot": 4,
-          "Route": 4,
-          "VirtualRouter": 4,
-          "NatGateway": 2,
-          "ResolverRule": 2,
-          "VPCEndpoint": 2,
-          "DBSecurityGroup": 1
-        }
-      },
-      "azure": {
-        "total_resources": 167,
-        "services": {
-          "Network": 147,
-          "Compute": 13,
-          "Storage": 6,
-          "Sql": 1
+        {
+          "name": "Subnet",
+          "resource_type_id": 824,
+          "service": "Network",
+          "count": 24,
+          "icon_path": "Compute/EC2"
         },
-        "resource_types": {
-          "virtualNetworks": 37,
-          "networkWatchers": 32,
-          "publicIPAddresses": 30,
-          "networkInterfaces": 22,
-          "networkSecurityGroups": 21,
-          "disks": 13,
-          "storageAccounts": 6,
-          "bastionHosts": 2,
-          "firewallPolicies": 2,
-          "loadBalancers": 1,
-          "servers": 1
-        }
-      },
-      "gcp": {
-        "total_resources": 349,
-        "services": {
-          "Compute": 329,
-          "Storage": 18,
-          "Observability": 2
+        {
+          "name": "RouteTable",
+          "resource_type_id": 822,
+          "service": "Network",
+          "count": 22,
+          "icon_path": "Compute/EC2"
         },
-        "resource_types": {
-          "Route": 153,
-          "Disk": 99,
-          "Firewall": 62,
-          "StorageClass": 18,
-          "VpnTunnel": 9,
-          "Network": 3,
-          "TargetVpnGateway": 3,
-          "LogBucket": 2
+        {
+          "name": "NetworkInterface",
+          "resource_type_id": 821,
+          "service": "Network",
+          "count": 18,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "Volume",
+          "resource_type_id": 826,
+          "service": "Storage",
+          "count": 16,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "SubnetRouteTableAssociation",
+          "resource_type_id": 1096,
+          "service": "Network",
+          "count": 14,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "NetworkAcl",
+          "resource_type_id": 820,
+          "service": "Network",
+          "count": 10,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "VPC",
+          "resource_type_id": 827,
+          "service": "Network",
+          "count": 10,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "ResolverRuleAssociation",
+          "resource_type_id": 937,
+          "service": "Platform Services",
+          "count": 10,
+          "icon_path": "Networking-Content-Delivery/Route-53"
+        },
+        {
+          "name": "OptionGroup",
+          "resource_type_id": 1218,
+          "service": "Databases",
+          "count": 9,
+          "icon_path": "Database/RDS"
+        },
+        {
+          "name": "Keyspace",
+          "resource_type_id": 1113,
+          "service": "Databases",
+          "count": 8,
+          "icon_path": "Database/Keyspaces"
+        },
+        {
+          "name": "InternetGateway",
+          "resource_type_id": 819,
+          "service": "Network",
+          "count": 8,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "EIP",
+          "resource_type_id": 816,
+          "service": "Network",
+          "count": 6,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "DBClusterSnapshot",
+          "resource_type_id": 849,
+          "service": "Databases",
+          "count": 4,
+          "icon_path": "Database/RDS"
+        },
+        {
+          "name": "DBSnapshot",
+          "resource_type_id": 847,
+          "service": "Databases",
+          "count": 4,
+          "icon_path": "Database/RDS"
+        },
+        {
+          "name": "Route",
+          "resource_type_id": 1135,
+          "service": "Network",
+          "count": 4,
+          "icon_path": "Networking-Content-Delivery/App-Mesh"
+        },
+        {
+          "name": "VirtualRouter",
+          "resource_type_id": 1155,
+          "service": "Network",
+          "count": 4,
+          "icon_path": "Networking-Content-Delivery/App-Mesh"
+        },
+        {
+          "name": "Bucket",
+          "resource_type_id": 851,
+          "service": "Storage",
+          "count": 4,
+          "icon_path": "Storage/S3-on-Outposts"
+        },
+        {
+          "name": "NatGateway",
+          "resource_type_id": 831,
+          "service": "Network",
+          "count": 2,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "VPCEndpoint",
+          "resource_type_id": 833,
+          "service": "Network",
+          "count": 2,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "ResolverRule",
+          "resource_type_id": 936,
+          "service": "Platform Services",
+          "count": 2,
+          "icon_path": "Networking-Content-Delivery/Route-53"
+        },
+        {
+          "name": "DBSecurityGroup",
+          "resource_type_id": 846,
+          "service": "Databases",
+          "count": 1,
+          "icon_path": "Database/RDS"
         }
-      },
-      "oci": {
-        "total_resources": 0,
-        "services": {},
-        "resource_types": {}
-      }
+      ]
+    },
+    "Azure": {
+      "total_resources": 459,
+      "resources": [
+        {
+          "name": "publicIPAddresses",
+          "resource_type_id": 510,
+          "service": "Network",
+          "count": 84,
+          "icon_path": "networking/10068-icon-service-Public-IP-Addresses-(Classic)"
+        },
+        {
+          "name": "virtualNetworks",
+          "resource_type_id": 507,
+          "service": "Network",
+          "count": 84,
+          "icon_path": "networking/10075-icon-service-Virtual-Networks-(Classic)"
+        },
+        {
+          "name": "networkWatchers",
+          "resource_type_id": 525,
+          "service": "Network",
+          "count": 67,
+          "icon_path": "networking/10066-icon-service-Network-Watcher"
+        },
+        {
+          "name": "networkInterfaces",
+          "resource_type_id": 513,
+          "service": "Network",
+          "count": 65,
+          "icon_path": "networking/10080-icon-service-Network-Interfaces"
+        },
+        {
+          "name": "networkSecurityGroups",
+          "resource_type_id": 519,
+          "service": "Network",
+          "count": 53,
+          "icon_path": "networking/10067-icon-service-Network-Security-Groups"
+        },
+        {
+          "name": "disks",
+          "resource_type_id": 139,
+          "service": "Storage",
+          "count": 47,
+          "icon_path": "compute/10032-icon-service-Disks"
+        },
+        {
+          "name": "storageAccounts",
+          "resource_type_id": 377,
+          "service": "Storage",
+          "count": 28,
+          "icon_path": "storage/10087-icon-service-Storage-Accounts-(Classic)"
+        },
+        {
+          "name": "servers",
+          "resource_type_id": 599,
+          "service": "Databases",
+          "count": 4,
+          "icon_path": ""
+        },
+        {
+          "name": "bastionHosts",
+          "resource_type_id": 423,
+          "service": "Network",
+          "count": 4,
+          "icon_path": ""
+        },
+        {
+          "name": "firewallPolicies",
+          "resource_type_id": 435,
+          "service": "Network",
+          "count": 4,
+          "icon_path": ""
+        },
+        {
+          "name": "loadBalancers",
+          "resource_type_id": 518,
+          "service": "Network",
+          "count": 4,
+          "icon_path": ""
+        },
+        {
+          "name": "flexibleServers",
+          "resource_type_id": 2101,
+          "service": "Databases",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "applicationGatewayWebApplicationFirewallPolicies",
+          "resource_type_id": 420,
+          "service": "Network",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "applicationGateways",
+          "resource_type_id": 399,
+          "service": "Network",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "privateDnsZones",
+          "resource_type_id": 492,
+          "service": "Network",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "snapshots",
+          "resource_type_id": 140,
+          "service": "Storage",
+          "count": 3,
+          "icon_path": ""
+        }
+      ]
+    },
+    "GCP": {
+      "total_resources": 473,
+      "resources": [
+        {
+          "name": "Route",
+          "resource_type_id": 62,
+          "service": "Network",
+          "count": 153,
+          "icon_path": "Cloud-Router"
+        },
+        {
+          "name": "Namespace",
+          "resource_type_id": 470,
+          "service": "Network",
+          "count": 114,
+          "icon_path": "default"
+        },
+        {
+          "name": "Disk",
+          "resource_type_id": 336,
+          "service": "Storage",
+          "count": 79,
+          "icon_path": "Compute-Engine"
+        },
+        {
+          "name": "Firewall",
+          "resource_type_id": 41,
+          "service": "Network",
+          "count": 62,
+          "icon_path": "default"
+        },
+        {
+          "name": "Disk",
+          "resource_type_id": 46,
+          "service": "Storage",
+          "count": 22,
+          "icon_path": "Cloud-Storage"
+        },
+        {
+          "name": "StorageClass",
+          "resource_type_id": 81,
+          "service": "Storage",
+          "count": 18,
+          "icon_path": "default"
+        },
+        {
+          "name": "Endpoint",
+          "resource_type_id": 471,
+          "service": "Network",
+          "count": 11,
+          "icon_path": "default"
+        },
+        {
+          "name": "VpnTunnel",
+          "resource_type_id": 47,
+          "service": "Network",
+          "count": 9,
+          "icon_path": "Cloud-VPN"
+        },
+        {
+          "name": "TargetVpnGateway",
+          "resource_type_id": 51,
+          "service": "Network",
+          "count": 3,
+          "icon_path": "default"
+        },
+        {
+          "name": "LogBucket",
+          "resource_type_id": 484,
+          "service": "Storage",
+          "count": 2,
+          "icon_path": "Cloud-Logging"
+        }
+      ]
+    },
+    "OCI": {
+      "total_resources": 1,
+      "resources": [
+        {
+          "name": "Dynamic routing gateway",
+          "resource_type_id": 122,
+          "service": "Network",
+          "count": 1,
+          "icon_path": "Networking/Internet Gateway.png"
+        }
+      ]
     }
   },
-  "other_services": {
-    "name": "Other Services",
-    "total_resources": 749,
-    "providers": {
-      "aws": {
-        "total_resources": 124,
-        "services": {
-          "CodeDeploy": 34,
-          "AppMesh": 16,
-          "KMS": 16,
-          "CloudWatch": 10,
-          "AppConfig": 8,
-          "Cassandra": 8,
-          "Events": 7,
-          "SNS": 6,
-          "CloudFormation": 5,
-          "ServiceDiscovery": 4,
-          "Athena": 2,
-          "AutoScaling": 2,
-          "Config": 2,
-          "ECR": 2,
-          "ResourceExplorer2": 2
+  "Other Services": {
+    "total_resources": 4026,
+    "AWS": {
+      "total_resources": 139,
+      "resources": [
+        {
+          "name": "DeploymentConfig",
+          "resource_type_id": 928,
+          "service": "CodeDeploy",
+          "count": 34,
+          "icon_path": "Developer-Tools/CodeDeploy"
         },
-        "resource_types": {
-          "DeploymentConfig": 34,
-          "Alarm": 10,
-          "VirtualNode": 10,
-          "Alias": 8,
-          "DeploymentStrategy": 8,
-          "Key": 8,
-          "Keyspace": 8,
-          "Rule": 6,
-          "Topic": 6,
-          "Stack": 5,
-          "VirtualService": 4,
-          "HttpNamespace": 2,
-          "Index": 2,
-          "LaunchConfiguration": 2,
-          "Mesh": 2,
-          "Repository": 2,
-          "ResourceCompliance": 2,
-          "Service": 2,
-          "WorkGroup": 2,
-          "EventBus": 1
-        }
-      },
-      "azure": {
-        "total_resources": 26,
-        "services": {
-          "OperationalInsights": 6,
-          "OperationsManagement": 6,
-          "microsoft.insights": 6,
-          "KeyVault": 2,
-          "Migrate": 2,
-          "RecoveryServices": 2,
-          "ManagedIdentity": 1,
-          "Purview": 1
+        {
+          "name": "VirtualNode",
+          "resource_type_id": 1116,
+          "service": "AppMesh",
+          "count": 10,
+          "icon_path": "Networking-Content-Delivery/App-Mesh"
         },
-        "resource_types": {
-          "solutions": 6,
-          "workspaces": 6,
-          "dataCollectionRules": 4,
-          "vaults": 4,
-          "moveCollections": 2,
-          "accounts": 1,
-          "actiongroups": 1,
-          "metricalerts": 1,
-          "userAssignedIdentities": 1
-        }
-      },
-      "gcp": {
-        "total_resources": 599,
-        "services": {
-          "apps": 159,
-          "rbac": 150,
-          "Networking": 120,
-          "admissionregistration": 54,
-          "monitoring": 54,
-          "Management": 25,
-          "Observability": 24,
-          "container": 6,
-          "bigquery": 3,
-          "cloudbilling": 3,
-          "Analytics": 1
+        {
+          "name": "Alarm",
+          "resource_type_id": 860,
+          "service": "CloudWatch",
+          "count": 10,
+          "icon_path": "Management-Governance/CloudWatch"
         },
-        "resource_types": {
-          "DaemonSet": 159,
-          "Role": 150,
-          "Namespace": 110,
-          "AlertPolicy": 60,
-          "ValidatingWebhookConfiguration": 33,
-          "MutatingWebhookConfiguration": 21,
-          "ProjectBillingInfo": 20,
-          "Endpoint": 10,
-          "UptimeCheckConfig": 9,
-          "PodDisruptionBudget": 8,
-          "NodePool": 6,
-          "LogSink": 5,
-          "Dataset": 4,
-          "Snooze": 3,
-          "LogMetric": 1
+        {
+          "name": "DeploymentStrategy",
+          "resource_type_id": 1089,
+          "service": "AppConfig",
+          "count": 8,
+          "icon_path": "Management-Governance/AppConfig"
+        },
+        {
+          "name": "Alias",
+          "resource_type_id": 1213,
+          "service": "KMS",
+          "count": 8,
+          "icon_path": "Security-Identity-Compliance/Key-Management-Service"
+        },
+        {
+          "name": "Key",
+          "resource_type_id": 907,
+          "service": "KMS",
+          "count": 8,
+          "icon_path": "Security-Identity-Compliance/Key-Management-Service"
+        },
+        {
+          "name": "LaunchTemplate",
+          "resource_type_id": 930,
+          "service": "EC2",
+          "count": 6,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "Rule",
+          "resource_type_id": 1079,
+          "service": "Events",
+          "count": 6,
+          "icon_path": "Internet-of-Things/IoT-Events"
+        },
+        {
+          "name": "Topic",
+          "resource_type_id": 910,
+          "service": "SNS",
+          "count": 6,
+          "icon_path": "App-Integration/Simple-Notification-Service"
+        },
+        {
+          "name": "Stack",
+          "resource_type_id": 861,
+          "service": "CloudFormation",
+          "count": 5,
+          "icon_path": "Management-Governance/CloudFormation"
+        },
+        {
+          "name": "VirtualService",
+          "resource_type_id": 1117,
+          "service": "AppMesh",
+          "count": 4,
+          "icon_path": "Networking-Content-Delivery/App-Mesh"
+        },
+        {
+          "name": "EC2Fleet",
+          "resource_type_id": 1095,
+          "service": "EC2",
+          "count": 4,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "CapacityProvider",
+          "resource_type_id": 1196,
+          "service": "ECS",
+          "count": 4,
+          "icon_path": "Containers/Elastic-Container-Service"
+        },
+        {
+          "name": "Mesh",
+          "resource_type_id": 1189,
+          "service": "AppMesh",
+          "count": 2,
+          "icon_path": "Networking-Content-Delivery/App-Mesh"
+        },
+        {
+          "name": "WorkGroup",
+          "resource_type_id": 950,
+          "service": "Athena",
+          "count": 2,
+          "icon_path": "Analytics/Athena"
+        },
+        {
+          "name": "LaunchConfiguration",
+          "resource_type_id": 864,
+          "service": "AutoScaling",
+          "count": 2,
+          "icon_path": "Management-Governance/Application-Auto-Scaling"
+        },
+        {
+          "name": "ResourceCompliance",
+          "resource_type_id": 897,
+          "service": "Config",
+          "count": 2,
+          "icon_path": "Management-Governance/AppConfig"
+        },
+        {
+          "name": "DHCPOptions",
+          "resource_type_id": 1080,
+          "service": "EC2",
+          "count": 2,
+          "icon_path": "Compute/EC2"
+        },
+        {
+          "name": "Repository",
+          "resource_type_id": 916,
+          "service": "ECR",
+          "count": 2,
+          "icon_path": "Containers/Elastic-Container-Registry"
+        },
+        {
+          "name": "Addon",
+          "resource_type_id": 1029,
+          "service": "EKS",
+          "count": 2,
+          "icon_path": "Containers/Elastic-Kubernetes-Service"
+        },
+        {
+          "name": "Cluster",
+          "resource_type_id": 922,
+          "service": "EKS",
+          "count": 2,
+          "icon_path": "Containers/Elastic-Kubernetes-Service"
+        },
+        {
+          "name": "Index",
+          "resource_type_id": 1203,
+          "service": "ResourceExplorer2",
+          "count": 2,
+          "icon_path": "Management-Governance/Resource-Explorer"
+        },
+        {
+          "name": "HttpNamespace",
+          "resource_type_id": 982,
+          "service": "ServiceDiscovery",
+          "count": 2,
+          "icon_path": "Migration-Transfer/Application-Discovery-Service"
+        },
+        {
+          "name": "Instance",
+          "resource_type_id": 1180,
+          "service": "ServiceDiscovery",
+          "count": 2,
+          "icon_path": "Migration-Transfer/Application-Discovery-Service"
+        },
+        {
+          "name": "Service",
+          "resource_type_id": 974,
+          "service": "ServiceDiscovery",
+          "count": 2,
+          "icon_path": "Migration-Transfer/Application-Discovery-Service"
+        },
+        {
+          "name": "Cluster",
+          "resource_type_id": 917,
+          "service": "ECS",
+          "count": 1,
+          "icon_path": "Containers/Elastic-Container-Service"
+        },
+        {
+          "name": "EventBus",
+          "resource_type_id": 983,
+          "service": "Events",
+          "count": 1,
+          "icon_path": "Internet-of-Things/IoT-Events"
         }
-      },
-      "oci": {
-        "total_resources": 0,
-        "services": {},
-        "resource_types": {}
-      }
+      ]
+    },
+    "Azure": {
+      "total_resources": 155,
+      "resources": [
+        {
+          "name": "userAssignedIdentities",
+          "resource_type_id": 11,
+          "service": "ManagedIdentity",
+          "count": 34,
+          "icon_path": ""
+        },
+        {
+          "name": "workspaces",
+          "resource_type_id": 241,
+          "service": "OperationalInsights",
+          "count": 18,
+          "icon_path": "monitor/00009-icon-service-Log-Analytics-Workspaces"
+        },
+        {
+          "name": "sshPublicKeys",
+          "resource_type_id": 119,
+          "service": "Compute",
+          "count": 12,
+          "icon_path": "other/00412-icon-service-SSH-Keys"
+        },
+        {
+          "name": "dataCollectionRules",
+          "resource_type_id": 230,
+          "service": "microsoft.insights",
+          "count": 11,
+          "icon_path": ""
+        },
+        {
+          "name": "virtualMachineScaleSets",
+          "resource_type_id": 95,
+          "service": "Compute",
+          "count": 7,
+          "icon_path": ""
+        },
+        {
+          "name": "vaults",
+          "resource_type_id": 2584,
+          "service": "KeyVault",
+          "count": 7,
+          "icon_path": ""
+        },
+        {
+          "name": "profiles/afdendpoints",
+          "resource_type_id": 1574,
+          "service": "Cdn",
+          "count": 6,
+          "icon_path": ""
+        },
+        {
+          "name": "solutions",
+          "resource_type_id": 848,
+          "service": "OperationsManagement",
+          "count": 6,
+          "icon_path": ""
+        },
+        {
+          "name": "vaults",
+          "resource_type_id": 263,
+          "service": "RecoveryServices",
+          "count": 6,
+          "icon_path": "storage/00017-icon-service-Recovery-Services-Vaults"
+        },
+        {
+          "name": "galleries",
+          "resource_type_id": 132,
+          "service": "Compute",
+          "count": 4,
+          "icon_path": ""
+        },
+        {
+          "name": "managedClusters",
+          "resource_type_id": 33,
+          "service": "ContainerService",
+          "count": 4,
+          "icon_path": ""
+        },
+        {
+          "name": "moveCollections",
+          "resource_type_id": 885,
+          "service": "Migrate",
+          "count": 4,
+          "icon_path": ""
+        },
+        {
+          "name": "actiongroups",
+          "resource_type_id": 219,
+          "service": "microsoft.insights",
+          "count": 4,
+          "icon_path": ""
+        },
+        {
+          "name": "smartDetectorAlertRules",
+          "resource_type_id": 839,
+          "service": "AlertsManagement",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "redisEnterprise",
+          "resource_type_id": 1539,
+          "service": "Cache",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "profiles",
+          "resource_type_id": 1552,
+          "service": "Cdn",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "registries",
+          "resource_type_id": 1777,
+          "service": "ContainerRegistry",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "accounts",
+          "resource_type_id": 2909,
+          "service": "Monitor",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "accounts",
+          "resource_type_id": 3104,
+          "service": "Purview",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "namespaces",
+          "resource_type_id": 3331,
+          "service": "ServiceBus",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "serverFarms",
+          "resource_type_id": 3668,
+          "service": "Web",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "sites",
+          "resource_type_id": 3669,
+          "service": "Web",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "components",
+          "resource_type_id": 162,
+          "service": "microsoft.insights",
+          "count": 3,
+          "icon_path": ""
+        },
+        {
+          "name": "availabilitySets",
+          "resource_type_id": 92,
+          "service": "Compute",
+          "count": 1,
+          "icon_path": "compute/10025-icon-service-Availability-Sets"
+        },
+        {
+          "name": "metricalerts",
+          "resource_type_id": 199,
+          "service": "microsoft.insights",
+          "count": 1,
+          "icon_path": "management + governance/00002-icon-service-Alerts"
+        }
+      ]
+    },
+    "GCP": {
+      "total_resources": 3730,
+      "resources": [
+        {
+          "name": "ClusterRole",
+          "resource_type_id": 86,
+          "service": "rbac",
+          "count": 801,
+          "icon_path": "default"
+        },
+        {
+          "name": "ClusterRoleBinding",
+          "resource_type_id": 87,
+          "service": "rbac",
+          "count": 747,
+          "icon_path": "default"
+        },
+        {
+          "name": "ReplicaSet",
+          "resource_type_id": 355,
+          "service": "Compute",
+          "count": 428,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "ClusterRole",
+          "resource_type_id": 346,
+          "service": "Compute",
+          "count": 287,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "ClusterRoleBinding",
+          "resource_type_id": 348,
+          "service": "Compute",
+          "count": 275,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "ServiceAccount",
+          "resource_type_id": 349,
+          "service": "Compute",
+          "count": 200,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "Pod",
+          "resource_type_id": 351,
+          "service": "Compute",
+          "count": 179,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "DaemonSet",
+          "resource_type_id": 158,
+          "service": "apps",
+          "count": 159,
+          "icon_path": "default"
+        },
+        {
+          "name": "Role",
+          "resource_type_id": 85,
+          "service": "rbac",
+          "count": 150,
+          "icon_path": "default"
+        },
+        {
+          "name": "Role",
+          "resource_type_id": 347,
+          "service": "Compute",
+          "count": 61,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "DaemonSet",
+          "resource_type_id": 353,
+          "service": "Compute",
+          "count": 57,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "Deployment",
+          "resource_type_id": 354,
+          "service": "Compute",
+          "count": 49,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "AlertPolicy",
+          "resource_type_id": 147,
+          "service": "monitoring",
+          "count": 45,
+          "icon_path": "default"
+        },
+        {
+          "name": "ValidatingWebhookConfiguration",
+          "resource_type_id": 89,
+          "service": "admissionregistration",
+          "count": 33,
+          "icon_path": "default"
+        },
+        {
+          "name": "HealthCheck",
+          "resource_type_id": 49,
+          "service": "Compute",
+          "count": 27,
+          "icon_path": "default"
+        },
+        {
+          "name": "MutatingWebhookConfiguration",
+          "resource_type_id": 88,
+          "service": "admissionregistration",
+          "count": 21,
+          "icon_path": "default"
+        },
+        {
+          "name": "Instance",
+          "resource_type_id": 27,
+          "service": "Compute",
+          "count": 18,
+          "icon_path": "default"
+        },
+        {
+          "name": "ProjectBillingInfo",
+          "resource_type_id": 321,
+          "service": "Management",
+          "count": 17,
+          "icon_path": "Billing"
+        },
+        {
+          "name": "AlertPolicy",
+          "resource_type_id": 489,
+          "service": "Observability",
+          "count": 15,
+          "icon_path": "Cloud-Monitoring"
+        },
+        {
+          "name": "BackendService",
+          "resource_type_id": 25,
+          "service": "Compute",
+          "count": 12,
+          "icon_path": "default"
+        },
+        {
+          "name": "HorizontalPodAutoscaler",
+          "resource_type_id": 360,
+          "service": "Compute",
+          "count": 12,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "UrlMap",
+          "resource_type_id": 63,
+          "service": "Compute",
+          "count": 12,
+          "icon_path": "default"
+        },
+        {
+          "name": "Job",
+          "resource_type_id": 161,
+          "service": "batch",
+          "count": 12,
+          "icon_path": "Cloud-Run"
+        },
+        {
+          "name": "ValidatingWebhookConfiguration",
+          "resource_type_id": 359,
+          "service": "Compute",
+          "count": 11,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "InstanceTemplate",
+          "resource_type_id": 45,
+          "service": "Compute",
+          "count": 10,
+          "icon_path": "default"
+        },
+        {
+          "name": "HttpHealthCheck",
+          "resource_type_id": 43,
+          "service": "Compute",
+          "count": 9,
+          "icon_path": "default"
+        },
+        {
+          "name": "TargetPool",
+          "resource_type_id": 54,
+          "service": "Compute",
+          "count": 9,
+          "icon_path": "default"
+        },
+        {
+          "name": "Cluster",
+          "resource_type_id": 357,
+          "service": "Compute",
+          "count": 8,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "PodDisruptionBudget",
+          "resource_type_id": 315,
+          "service": "Management",
+          "count": 8,
+          "icon_path": "API"
+        },
+        {
+          "name": "MutatingWebhookConfiguration",
+          "resource_type_id": 358,
+          "service": "Compute",
+          "count": 7,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "Cluster",
+          "resource_type_id": 90,
+          "service": "container",
+          "count": 6,
+          "icon_path": "default"
+        },
+        {
+          "name": "NodePool",
+          "resource_type_id": 91,
+          "service": "container",
+          "count": 6,
+          "icon_path": "default"
+        },
+        {
+          "name": "UptimeCheckConfig",
+          "resource_type_id": 149,
+          "service": "monitoring",
+          "count": 6,
+          "icon_path": "default"
+        },
+        {
+          "name": "Node",
+          "resource_type_id": 350,
+          "service": "Compute",
+          "count": 5,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "LogSink",
+          "resource_type_id": 486,
+          "service": "Observability",
+          "count": 5,
+          "icon_path": "Cloud-Logging"
+        },
+        {
+          "name": "Job",
+          "resource_type_id": 370,
+          "service": "Compute",
+          "count": 4,
+          "icon_path": "Batch"
+        },
+        {
+          "name": "Network",
+          "resource_type_id": 48,
+          "service": "Compute",
+          "count": 3,
+          "icon_path": "default"
+        },
+        {
+          "name": "UptimeCheckConfig",
+          "resource_type_id": 490,
+          "service": "Observability",
+          "count": 3,
+          "icon_path": "Cloud-Monitoring"
+        },
+        {
+          "name": "Dataset",
+          "resource_type_id": 83,
+          "service": "bigquery",
+          "count": 3,
+          "icon_path": "default"
+        },
+        {
+          "name": "ProjectBillingInfo",
+          "resource_type_id": 72,
+          "service": "cloudbilling",
+          "count": 3,
+          "icon_path": "default"
+        },
+        {
+          "name": "Snooze",
+          "resource_type_id": 145,
+          "service": "monitoring",
+          "count": 3,
+          "icon_path": "default"
+        },
+        {
+          "name": "NodePool",
+          "resource_type_id": 356,
+          "service": "Compute",
+          "count": 2,
+          "icon_path": "Google-Kubernetes-Engine"
+        },
+        {
+          "name": "Dataset",
+          "resource_type_id": 393,
+          "service": "Analytics",
+          "count": 1,
+          "icon_path": "BigQuery"
+        },
+        {
+          "name": "LogMetric",
+          "resource_type_id": 485,
+          "service": "Observability",
+          "count": 1,
+          "icon_path": "Cloud-Logging"
+        }
+      ]
+    },
+    "OCI": {
+      "total_resources": 2,
+      "resources": [
+        {
+          "name": "Groups",
+          "resource_type_id": 161,
+          "service": "Observability & Management",
+          "count": 2,
+          "icon_path": "Identity & Security/User Group unisex.png"
+        }
+      ]
     }
   },
-  "total_resources": 4648
+  "total_resources": 5348
 }

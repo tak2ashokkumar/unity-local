@@ -678,6 +678,12 @@ button.legend-link {
   margin-top: 12px;
 }
 
+// While the widget is loading the table/legend are not yet rendered, so reserve a comfortable
+// height (matching the loaded card) instead of collapsing to a thin strip behind the spinner.
+.performance-hotspots-card.hotspots-loading {
+  min-height: 320px;
+}
+
 .hotspots-legend {
   display: flex;
   align-items: center;
@@ -751,9 +757,9 @@ button.legend-link {
     background: #eef1f3;
     border: 0;
     color: #27313b;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    padding: 10px;
+    padding: 6px 10px;
     vertical-align: middle;
   }
 
@@ -777,9 +783,15 @@ button.legend-link {
   white-space: nowrap;
 }
 
-.sortable-col.sort-active {
-  color: #1f7ed0;
-  background: #e8f2ff;
+.performance-hotspots-table thead th.sortable-col.sort-active {
+  color: #1a73e8;
+  background: #dceafc;
+  font-weight: 700;
+}
+
+.performance-hotspots-table thead th.sortable-col.sort-active .fa-caret-down {
+  margin-left: 4px;
+  color: #1a73e8;
 }
 
 .hotspot-cloud-logo {
@@ -2251,6 +2263,16 @@ button.legend-link {
     color: #9aa6b2;
     font-size: 11px;
   }
+}
+
+.database-metric-table thead th.sort-active {
+  color: #1a73e8;
+  background: #dceafc;
+  font-weight: 700;
+}
+
+.database-metric-table thead th.sort-active i {
+  color: #1a73e8;
 }
 
 .database-trend-grid {

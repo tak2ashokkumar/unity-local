@@ -493,11 +493,16 @@
 }
 
 .executive-summary-split-row {
-  display: grid;
-  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr);
+  display: flex;
+  align-items: stretch;
 }
 
+// Each split section is sized in proportion to its own metric count (flex-grow bound inline) so a
+// metric tile stays a uniform width across the row no matter how many SD-WAN vs Storage entries the
+// API returns - e.g. 2 SD-WAN + 3 Storage no longer over-spread / wrap out of alignment.
 .executive-summary-split-row .executive-summary-section {
+  flex: 1 1 0%;
+  min-width: 0;
   border-bottom: 0;
 }
 
@@ -532,6 +537,9 @@
 .discovery-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
+  // Hold the loaded height while filters reload so the card does not collapse to just the
+  // spinner and jump back when data returns (chart column drives the height).
+  min-height: 420px;
   padding: 0;
   overflow: hidden;
 }
@@ -607,6 +615,8 @@
 .discovery-coverage-scroll {
   flex: 1 1 auto;
   min-height: 0;
+  // Show ~7 category rows (36px each) up front; the rest scroll within the panel.
+  max-height: 264px;
   overflow-y: auto;
   padding: 6px 16px 10px;
 }
@@ -2745,7 +2755,7 @@
   }
 
   .executive-summary-split-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .executive-summary-split-row .split-main {

@@ -84,7 +84,8 @@
                 <div class="executive-summary-split-row" *ngIf="executiveSummarySplitSections.length">
                     <div class="executive-summary-section"
                         *ngFor="let section of executiveSummarySplitSections; trackBy: trackByIndex"
-                        [ngClass]="section.column === 'main' ? 'split-main' : 'split-side'">
+                        [ngClass]="section.column === 'main' ? 'split-main' : 'split-side'"
+                        [style.flex-grow]="section.metrics.length">
                         <div class="executive-section-title">{{section.title}}</div>
                         <ng-container
                             *ngTemplateOutlet="executiveMetricGrid; context: { section: section }"></ng-container>
@@ -740,7 +741,7 @@
                                 [value]="option.key">{{option.name}}</option>
                         </select>
                     </div>
-                    <div class="mini-filter multi-filter-control" *ngIf="alertsSelectedViewBy === 'event_source'">
+                    <div class="mini-filter multi-filter-control" *ngIf="alertsSelectedViewBy === 'source'">
                         <label>Source Type</label>
                         <multiselect-dropdown [options]="alertsSourceTypeOptions" [settings]="multiselectSettings"
                             [texts]="alertsSourceTypeTexts" class="form-control p-0 dashboard-multiselect"

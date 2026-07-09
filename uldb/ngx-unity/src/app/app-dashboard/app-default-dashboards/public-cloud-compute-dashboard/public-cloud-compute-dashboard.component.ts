@@ -16,7 +16,6 @@ import {
   PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS,
   PUBLIC_CLOUD_DATABASE_SPACE_SORT_COLUMNS,
   PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT,
-  PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_SORT_COLUMNS,
   PUBLIC_CLOUD_STORAGE_RESOURCE_SORT_COLUMNS,
   PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS,
   PUBLIC_CLOUD_STORAGE_STATUS_LEGEND
@@ -150,7 +149,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   publicCloudCoverageTotal = '0';
   performanceHotspots: PublicCloudPerformanceHotspotRow[] = [];
   performanceHotspotsSort = PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT;
-  performanceHotspotsSortColumns = PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_SORT_COLUMNS;
   performanceHotspotsLoaded = false;
   orphanedDevices: PublicCloudOrphanedDeviceRow[] = [];
   orphanedDevicesTotal = 0;
@@ -173,6 +171,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   databaseWritePerformanceOptions: EChartsOption = {};
   databaseReadPerformanceOptions: EChartsOption = {};
   databaseTrendHasData = false;
+  databaseWriteTrendHasData = false;
+  databaseReadTrendHasData = false;
   databaseSpaceKpis: PublicCloudDatabaseKpi[] = [];
   databaseSpaceRows: PublicCloudDatabaseSpaceRow[] = [];
   databaseSpaceSortColumns = PUBLIC_CLOUD_DATABASE_SPACE_SORT_COLUMNS;
@@ -604,11 +604,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return this.performanceHotspotsSort === sortKey;
   }
 
-  get performanceHotspotsHeading(): string {
-    const activeColumn = this.performanceHotspotsSortColumns.find(column => column.key === this.performanceHotspotsSort);
-    return activeColumn ? `Performance Hotspots - ${activeColumn.label}` : 'Performance Hotspots';
-  }
-
   getDatabaseOverview(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.databaseOverviewKpis = [];
     this.databaseOverviewRows = [];
@@ -626,18 +621,24 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.databaseWritePerformanceOptions = {};
     this.databaseReadPerformanceOptions = {};
     this.databaseTrendHasData = false;
+    this.databaseWriteTrendHasData = false;
+    this.databaseReadTrendHasData = false;
     this.widgetLoading.databasePerformanceTrend = true;
     const trend$ = forkJoin([this.svc.getDatabaseWriteTrend(filterFormOutput), this.svc.getDatabaseReadTrend(filterFormOutput)]);
     this.loadWidget(this.loaderNames.databasePerformanceTrend, trend$, ([writeRes, readRes]) => {
       const hasWrite = this.svc.hasDatabaseTrendSeries(writeRes);
       const hasRead = this.svc.hasDatabaseTrendSeries(readRes);
       this.databaseTrendHasData = hasWrite || hasRead;
+      this.databaseWriteTrendHasData = hasWrite;
+      this.databaseReadTrendHasData = hasRead;
       this.databaseWritePerformanceOptions = hasWrite ? this.svc.convertToDatabaseWritePerformanceOptions(writeRes) : {};
       this.databaseReadPerformanceOptions = hasRead ? this.svc.convertToDatabaseReadPerformanceOptions(readRes) : {};
     }, () => {
       this.databaseWritePerformanceOptions = {};
       this.databaseReadPerformanceOptions = {};
       this.databaseTrendHasData = false;
+      this.databaseWriteTrendHasData = false;
+      this.databaseReadTrendHasData = false;
     }, () => this.widgetLoading.databasePerformanceTrend = false);
   }
 
@@ -923,6 +924,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.databaseWritePerformanceOptions = {};
     this.databaseReadPerformanceOptions = {};
     this.databaseTrendHasData = false;
+    this.databaseWriteTrendHasData = false;
+    this.databaseReadTrendHasData = false;
     this.databaseSpaceKpis = [];
     this.databaseSpaceRows = [];
   }
@@ -1013,8 +1016,20 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return this.widgetLoading.databaseOverview || this.hasMetricValues(this.databaseOverviewKpis) || !!this.databaseOverviewRows?.length;
   }
 
+  get hasDatabaseOverviewKpis(): boolean {
+    return this.widgetLoading.databaseOverview || this.hasMetricValues(this.databaseOverviewKpis);
+  }
+
   get hasDatabaseTrendData(): boolean {
     return this.widgetLoading.databasePerformanceTrend || this.databaseTrendHasData;
+  }
+
+  get hasDatabaseWriteTrend(): boolean {
+    return this.widgetLoading.databasePerformanceTrend || this.databaseWriteTrendHasData;
+  }
+
+  get hasDatabaseReadTrend(): boolean {
+    return this.widgetLoading.databasePerformanceTrend || this.databaseReadTrendHasData;
   }
 
   get hasDatabaseSpaceData(): boolean {
@@ -1023,6 +1038,10 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   get hasDatabaseCapacityData(): boolean {
     return this.widgetLoading.databaseCapacityResources || !!this.databaseSpaceRows?.length;
+  }
+
+  get hasDatabaseSpaceSection(): boolean {
+    return this.hasDatabaseSpaceData || this.hasDatabaseCapacityData;
   }
 
   get hasCloudDatabasePerformanceSection(): boolean {
