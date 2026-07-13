@@ -615,8 +615,9 @@
 .discovery-coverage-scroll {
   flex: 1 1 auto;
   min-height: 0;
-  // Show ~7 category rows (36px each) up front; the rest scroll within the panel.
-  max-height: 264px;
+  // Fill the card height (420px card - 40px header) with category rows (~10 at 36px each)
+  // so they occupy the panel; any beyond that scroll.
+  max-height: 380px;
   overflow-y: auto;
   padding: 6px 16px 10px;
 }
@@ -777,14 +778,14 @@
 }
 
 .monitoring-table-card {
-  height: 386px;
-  min-height: 386px;
+  height: 268px;
+  min-height: 268px;
 }
 
 .application-overview-card,
 .services-overview-card {
-  height: 412px;
-  min-height: 412px;
+  height: 268px;
+  min-height: 268px;
 }
 
 .monitoring-table-scroll {
@@ -795,20 +796,27 @@
 .application-overview-card,
 .services-overview-card {
   .monitoring-table-scroll {
-    height: 336px;
+    // 2-line header (~44px) + 5 rows (34px each) = ~214px so all 5 rows show fully; more scroll.
+    height: 216px;
   }
+}
+
+// Center the "no services" empty state within the short scroll area instead of top-aligning it.
+.services-overview-card .monitoring-table-scroll > .dashboard-empty-state {
+  min-height: 100%;
 }
 
 .monitoring-table-card {
   .monitoring-table-scroll {
-    height: 336px;
+    // Legend (50px) + this scroll fills the 268px card; header + 5 rows (34px each) show fully.
+    height: 216px;
   }
 
   .compact-table {
 
     th,
     td {
-      height: 42px;
+      height: 34px;
       padding: 6px 10px;
       font-size: 12px;
       line-height: 16px;
@@ -822,14 +830,16 @@
 
 .os-monitoring-card {
   .monitoring-table-scroll {
-    height: 386px;
+    // OS card has no legend, so its scroll fills the whole 268px card - keeping its height in sync
+    // with the Database card (legend 50 + 216 scroll).
+    height: 266px;
   }
 
   .compact-table {
 
     th,
     td {
-      height: 42px;
+      height: 34px;
     }
   }
 }
@@ -883,7 +893,7 @@
 }
 
 .app-service-status-legend {
-  min-height: 50px;
+  min-height: 40px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -1680,15 +1690,15 @@
 .analytics-health-layout {
   display: grid;
   grid-template-columns: 376px minmax(0, 1fr);
-  gap: 20px;
+  gap: 10px;
   align-items: start;
 }
 
 .analytics-health-layout .analytics-left-stack {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  height: 520px;
+  gap: 10px;
+  height: 510px;
 }
 
 .analytics-health-layout .analytics-side-card {
@@ -1710,7 +1720,7 @@
 }
 
 .analytics-health-layout .analytics-category-card {
-  height: 520px;
+  height: 510px;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -2101,17 +2111,24 @@
   overflow-x: hidden;
 }
 
+// Cap the idle table at ~6 records (header + 6 rows ~40px); extra rows scroll here. The legend
+// (above) and the pagination + footer note (below, outside .idle-table-wrap) stay fixed/visible.
+.idle-table-scroll {
+  max-height: 265px;
+  overflow-y: auto;
+}
+
 .idle-devices-table {
   table-layout: fixed;
   min-width: 0;
   width: 100%;
 
   .idle-device-name-col {
-    width: 17%;
+    width: 28%;
   }
 
   .idle-resource-col {
-    width: 11%;
+    width: 10%;
   }
 
   .idle-metric-col {
@@ -2119,7 +2136,7 @@
   }
 
   .idle-network-col {
-    width: 10%;
+    width: 8%;
   }
 
   .idle-duration-col {
@@ -2134,6 +2151,16 @@
   td {
     padding: 6px 6px;
     font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // The truncateText directive sizes the name cell's inner div from a container width that this table's
+  // extra .idle-table-wrap / .idle-table-scroll nesting mis-measures, leaving a wide empty gap. Force the
+  // name div to fill its (colgroup-sized) column so it truncates at the real column width.
+  td:first-child > div {
+    width: 100% !important;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -2296,7 +2323,9 @@
 
 .idle-duration-body {
   position: relative;
-  min-height: 440px;
+  // Floor kept below the (reduced) device card height so the device drives the shared grid-row
+  // height and this widget stretches up to match it; also holds the section open while loading.
+  min-height: 300px;
   padding: 16px 24px 18px;
 }
 
@@ -2304,7 +2333,6 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  min-height: 406px;
 }
 
 .idle-duration-bars {

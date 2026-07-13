@@ -1639,7 +1639,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   get hasServiceRows(): boolean {
-    return this.widgetLoading.serviceApplications || this.widgetLoading.services || !!this.serviceRows?.length;
+    return this.widgetLoading.serviceApplications || this.widgetLoading.services
+      || !!this.serviceApplicationOptions?.length || !!this.serviceRows?.length;
   }
 
   get hasDatabaseRows(): boolean {

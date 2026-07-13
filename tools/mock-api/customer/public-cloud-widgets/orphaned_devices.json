@@ -1,67 +1,37 @@
 {
-    "count": 120,
+    "count": 3,
     "next": null,
     "previous": null,
     "results": [
         {
-            "name": "vm-prod-0041",
-            "status": "healthy",
-            "last_seen": "22 May 2025 09:12",
-            "datacenter": "AWS"
-        },
-        {
-            "name": "gpu-node-007",
             "status": "warning",
-            "last_seen": "05 May 2025 14:55",
-            "datacenter": "Microsoft Azure"
+            "datacenter": "Microsoft Azure",
+            "days_offline": null,
+            "name": "unitycol01",
+            "category": "Virtual Machines",
+            "reason": "inactive_status: VM stopped",
+            "resource_status": "VM stopped",
+            "last_seen": "Unknown"
         },
         {
-            "name": "stor-vol-0192",
             "status": "critical",
-            "last_seen": "12 May 2025 22:34",
-            "datacenter": "Google Cloud"
+            "datacenter": "Microsoft Azure",
+            "days_offline": null,
+            "name": "vm-monitor-demo",
+            "category": "Virtual Machines",
+            "reason": "inactive_status: VM deallocated",
+            "resource_status": "VM deallocated",
+            "last_seen": "Unknown"
         },
         {
-            "name": "bm-server-021",
-            "status": "healthy",
-            "last_seen": "18 May 2025 08:00",
-            "datacenter": "Google Cloud"
-        },
-        {
-            "name": "net-sw-core-04",
-            "status": "healthy",
-            "last_seen": "15 May 2025 16:45",
-            "datacenter": "Microsoft Azure"
-        },
-        {
-            "name": "vm-dev-0093",
-            "status": "warning",
-            "last_seen": "21 May 2025 11:22",
-            "datacenter": "AWS"
-        },
-        {
-            "name": "gpu-cluster-02",
             "status": "critical",
-            "last_seen": "19 May 2025 19:01",
-            "datacenter": "Meta"
-        },
-        {
-            "name": "stor-nfs-011",
-            "status": "healthy",
-            "last_seen": "10 May 2025 07:45",
-            "datacenter": "Microsoft Azure"
-        },
-        {
-            "name": "stor-nfs-015",
-            "status": "critical",
-            "last_seen": "07 May 2025 08:00",
-            "datacenter": "Google Cloud"
-        },
-        {
-            "name": "stor-nfs-017",
-            "status": "healthy",
-            "last_seen": "14 May 2025 11:22",
-            "datacenter": "AWS"
+            "datacenter": "Microsoft Azure",
+            "days_offline": null,
+            "name": "w-test-vm01",
+            "category": "Virtual Machines",
+            "reason": "inactive_status: VM deallocated",
+            "resource_status": "VM deallocated",
+            "last_seen": "Unknown"
         }
     ]
 }

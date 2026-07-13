@@ -1,138 +1,127 @@
 {
   "summary": {
-    "total": 2131,
-    "critical": 900,
-    "warning": 718,
-    "info": 513
+    "total": 9263,
+    "critical": 793,
+    "warning": 187,
+    "info": 8283
   },
   "items": [
     {
-      "name": "Unknown",
-      "device_type": "Unknown",
-      "critical": 595,
-      "warning": 398,
-      "info": 21,
-      "count": 1014
+      "name": "Network",
+      "category": "network",
+      "device_type": "network",
+      "critical": 6,
+      "warning": 22,
+      "info": 6,
+      "count": 34
     },
     {
-      "name": "hypervisor",
-      "device_type": "hypervisor",
-      "critical": 37,
-      "warning": 39,
-      "info": 259,
-      "count": 335
-    },
-    {
-      "name": "vmware",
-      "device_type": "vmware",
-      "critical": 3,
-      "warning": 0,
-      "info": 198,
-      "count": 201
-    },
-    {
-      "name": "switch",
-      "device_type": "switch",
-      "critical": 66,
-      "warning": 104,
-      "info": 20,
-      "count": 190
-    },
-    {
-      "name": "firewall",
-      "device_type": "firewall",
-      "critical": 91,
-      "warning": 31,
-      "info": 5,
-      "count": 127
-    },
-    {
-      "name": "vm",
-      "device_type": "vm",
-      "critical": 35,
-      "warning": 54,
-      "info": 0,
-      "count": 89
-    },
-    {
-      "name": "load_balancer",
-      "device_type": "load_balancer",
-      "critical": 29,
-      "warning": 25,
-      "info": 1,
-      "count": 55
-    },
-    {
-      "name": "azure_resource",
-      "device_type": "azure_resource",
-      "critical": 2,
-      "warning": 29,
-      "info": 0,
-      "count": 31
-    },
-    {
-      "name": "baremetal",
-      "device_type": "baremetal",
-      "critical": 8,
-      "warning": 15,
-      "info": 7,
-      "count": 30
-    },
-    {
-      "name": "storage_device",
-      "device_type": "storage_device",
-      "critical": 22,
-      "warning": 2,
-      "info": 0,
-      "count": 24
-    },
-    {
-      "name": "pdu",
-      "device_type": "pdu",
-      "critical": 7,
-      "warning": 11,
-      "info": 0,
-      "count": 18
-    },
-    {
-      "name": "aws_resource",
-      "device_type": "aws_resource",
+      "name": "Application",
+      "category": "application",
+      "device_type": "application",
       "critical": 0,
-      "warning": 7,
+      "warning": 0,
       "info": 0,
-      "count": 7
+      "count": 0
     },
     {
-      "name": "storage",
-      "device_type": "storage",
-      "critical": 1,
-      "warning": 3,
+      "name": "Baremetal",
+      "category": "baremetal",
+      "device_type": "baremetal",
+      "critical": 0,
+      "warning": 4,
       "info": 0,
       "count": 4
     },
     {
-      "name": "custom",
-      "device_type": "custom",
-      "critical": 3,
-      "warning": 0,
-      "info": 0,
-      "count": 3
-    },
-    {
-      "name": "database",
-      "device_type": "database",
-      "critical": 1,
-      "warning": 0,
-      "info": 1,
-      "count": 2
-    },
-    {
-      "name": "Switch",
-      "device_type": "Switch",
+      "name": "Containers",
+      "category": "containers",
+      "device_type": "containers",
       "critical": 0,
       "warning": 0,
+      "info": 0,
+      "count": 0
+    },
+    {
+      "name": "GPU",
+      "category": "gpu",
+      "device_type": "gpu",
+      "critical": 0,
+      "warning": 0,
+      "info": 0,
+      "count": 0
+    },
+    {
+      "name": "Database",
+      "category": "database",
+      "device_type": "database",
+      "critical": 5,
+      "warning": 3,
       "info": 1,
+      "count": 9
+    },
+    {
+      "name": "Public Cloud Compute",
+      "category": "public_cloud_compute",
+      "device_type": "public_cloud_compute",
+      "critical": 1,
+      "warning": 0,
+      "info": 0,
       "count": 1
+    },
+    {
+      "name": "Private Cloud Compute",
+      "category": "private_cloud_compute",
+      "device_type": "private_cloud_compute",
+      "critical": 736,
+      "warning": 85,
+      "info": 8276,
+      "count": 9097
+    },
+    {
+      "name": "Platform Services",
+      "category": "platform_services",
+      "device_type": "platform_services",
+      "critical": 3,
+      "warning": 54,
+      "info": 0,
+      "count": 57
+    },
+    {
+      "name": "Sensors",
+      "category": "sensors",
+      "device_type": "sensors",
+      "critical": 0,
+      "warning": 0,
+      "info": 0,
+      "count": 0
+    },
+    {
+      "name": "Storages",
+      "category": "storages",
+      "device_type": "storages",
+      "critical": 0,
+      "warning": 0,
+      "info": 0,
+      "count": 0
+    },
+    {
+      "name": "SD-WAN",
+      "category": "sd_wan",
+      "device_type": "sd_wan",
+      "critical": 0,
+      "warning": 0,
+      "info": 0,
+      "count": 0
+    },
+    {
+      "name": "Others",
+      "category": "others",
+      "device_type": "others",
+      "critical": 42,
+      "warning": 19,
+      "info": 0,
+      "count": 61
     }
   ]
 }

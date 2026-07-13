@@ -1,20 +1,67 @@
 [
-    {
-        "status": "unknown",
-        "avg_response_time_ms": null,
-        "name": "astronomy-shop",
-        "avg_throughput_rps": null,
-        "service_count": 15,
-        "avg_availability_pct": null,
-        "id": 23
-    },
-    {
-        "status": "unknown",
-        "avg_response_time_ms": null,
-        "name": "bank-of-anthos",
-        "avg_throughput_rps": null,
-        "service_count": 4,
-        "avg_availability_pct": null,
-        "id": 24
-    }
+  {
+    "status": "unknown",
+    "avg_response_time_ms": 603.145,
+    "avg_throughput_rps": 120,
+    "service_count": 1,
+    "avg_availability_pct": null,
+    "id": 6,
+    "response_time": "603.145 ms",
+    "latency": "603.145 ms",
+    "name": "Flask-App",
+    "availability": null,
+    "throughput": "120.0 req/min"
+  },
+  {
+    "status": "up",
+    "avg_response_time_ms": 36.227,
+    "avg_throughput_rps": 1440,
+    "service_count": 16,
+    "avg_availability_pct": 100,
+    "id": 7,
+    "response_time": "36.227 ms",
+    "latency": "36.227 ms",
+    "name": "astronomy-shop",
+    "availability": 100,
+    "throughput": "1440.0 req/min"
+  },
+  {
+    "status": "up",
+    "avg_response_time_ms": 38.13,
+    "avg_throughput_rps": 720,
+    "service_count": 13,
+    "avg_availability_pct": 100,
+    "id": 27,
+    "response_time": "38.13 ms",
+    "latency": "38.13 ms",
+    "name": "astronomy-shop-all",
+    "availability": 100,
+    "throughput": "720.0 req/min"
+  },
+  {
+    "status": "unknown",
+    "avg_response_time_ms": 0.958,
+    "avg_throughput_rps": 60,
+    "service_count": 7,
+    "avg_availability_pct": 100,
+    "id": 12,
+    "response_time": "0.958 ms",
+    "latency": "0.958 ms",
+    "name": "bank-of-anthos",
+    "availability": 100,
+    "throughput": "60.0 req/min"
+  },
+  {
+    "status": "unknown",
+    "avg_response_time_ms": 2.376,
+    "avg_throughput_rps": 300,
+    "service_count": 16,
+    "avg_availability_pct": 100,
+    "id": 8,
+    "response_time": "2.376 ms",
+    "latency": "2.376 ms",
+    "name": "easytrade",
+    "availability": 100,
+    "throughput": "300.0 req/min"
+  }
 ]

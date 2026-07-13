@@ -9,7 +9,7 @@
 
 # Command Execution Rules
 - NEVER use Bash, PowerShell, or any shell tool to run npm, ng, node, or any terminal commands.
-- The user runs ALL commands themselves. Only tell the user what command to run — do not execute it.
+- The user runs ALL commands themselves ( except for updating mocks with .har files). Only tell the user what command to run — do not execute it.
 - Never run builds. The user will run the build and report back if something goes wrong.
 
 # Project Scope

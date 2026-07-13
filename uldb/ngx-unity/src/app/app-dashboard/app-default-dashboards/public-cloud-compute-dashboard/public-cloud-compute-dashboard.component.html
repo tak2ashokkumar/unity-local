@@ -632,15 +632,9 @@
                     </table>
                 </div>
                 <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
-                    <div class="orphaned-page-size">
-                        <span>Show</span>
-                        <select class="form-control form-control-sm" [value]="orphanedDevicesPageSize"
-                            (change)="orphanedDevicesPageSizeChange($event)">
-                            <option [value]="10">10</option>
-                            <option [value]="25">25</option>
-                            <option [value]="50">50</option>
-                        </select>
-                    </div>
+                    <div class="orphaned-footer-note">Devices With
+                        Lifecycle Stages Classified As Retired, Disposed, Or Donated Are Considered
+                        Orphaned Devices.</div>
                     <table-pager *ngIf="orphanedDevices.length" [compact]="true" [pageNo]="orphanedDevicesPageNo"
                         [pageSize]="orphanedDevicesPageSize" [totalCount]="orphanedDevicesTotal"
                         (pageChange)="orphanedDevicesPageChange($event)"></table-pager>
@@ -695,6 +689,7 @@
                             Offline / Critical / Unreachable
                         </span>
                     </div>
+                    <div class="idle-table-scroll">
                     <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
                         <colgroup>
                             <col class="idle-device-name-col">
@@ -748,17 +743,11 @@
                             </tr>
                         </tbody>
                     </table>
+                    </div>
                 </div>
                 <div class="idle-pagination-row" *ngIf="idleDevices.length">
-                    <div class="idle-page-size">
-                        <span>Show</span>
-                        <select class="form-control form-control-sm" [value]="idleDevicesPageSize"
-                            (change)="idleDevicesPageSizeChange($event)">
-                            <option [value]="10">10</option>
-                            <option [value]="25">25</option>
-                            <option [value]="50">50</option>
-                        </select>
-                    </div>
+                    <div class="orphaned-footer-note">*Device With <20% Memory And <5% CPU Utilization,
+                        Indicating Low Activity.</div>
                     <table-pager *ngIf="idleDevices.length" [compact]="true" [pageNo]="idleDevicesPageNo"
                         [pageSize]="idleDevicesPageSize" [totalCount]="idleDevicesTotal"
                         (pageChange)="idleDevicesPageChange($event)"></table-pager>

@@ -1,161 +1,150 @@
 {
-    "availability_monitor": "Datacenter",
-    "availability_monitor_key": "datacenter",
-    "duration": "Last 24 Hours",
-    "duration_key": "last_24_hours",
-    "from_date": "2026-07-07T18:21:23.930491+00:00",
-    "summary": {
-        "total": 58,
-        "up": 6,
-        "down": 0,
-        "unknown": 52,
-        "avg_up": 10.34,
-        "avg_down": 0.0,
-        "avg_unknown": 89.66
+  "availability_monitor": "Datacenter",
+  "availability_monitor_key": "datacenter",
+  "duration": "Last 24 Hours",
+  "duration_key": "last_24_hours",
+  "from_date": "2026-07-08T16:04:30.259269+00:00",
+  "summary": {
+    "total": 73,
+    "up": 16,
+    "down": 3,
+    "unknown": 54,
+    "avg_up": 21.92,
+    "avg_down": 4.11,
+    "avg_unknown": 73.97
+  },
+  "items": [
+    {
+      "resource": "Switch",
+      "name": "Switch",
+      "total": 17,
+      "up": 3,
+      "down": 0,
+      "unknown": 14,
+      "avg_up": 17.65,
+      "avg_down": 0,
+      "avg_unknown": 82.35
     },
-    "items": [
-        {
-            "resource": "Switch",
-            "name": "Switch",
-            "total": 7,
-            "up": 0,
-            "down": 0,
-            "unknown": 7,
-            "avg_up": 0.0,
-            "avg_down": 0.0,
-            "avg_unknown": 100.0
-        },
-        {
-            "resource": "Firewall",
-            "name": "Firewall",
-            "total": 7,
-            "up": 1,
-            "down": 0,
-            "unknown": 6,
-            "avg_up": 14.29,
-            "avg_down": 0.0,
-            "avg_unknown": 85.71
-        },
-        {
-            "resource": "Load Balancer",
-            "name": "Load Balancer",
-            "total": 5,
-            "up": 1,
-            "down": 0,
-            "unknown": 4,
-            "avg_up": 20.0,
-            "avg_down": 0.0,
-            "avg_unknown": 80.0
-        },
-        {
-            "resource": "Custom Device",
-            "name": "Custom Device",
-            "total": 2,
-            "up": 0,
-            "down": 0,
-            "unknown": 2,
-            "avg_up": 0.0,
-            "avg_down": 0.0,
-            "avg_unknown": 100.0
-        },
-        {
-            "resource": "Mac Device",
-            "name": "Mac Device",
-            "total": 1,
-            "up": 0,
-            "down": 0,
-            "unknown": 1,
-            "avg_up": 0.0,
-            "avg_down": 0.0,
-            "avg_unknown": 100.0
-        },
-        {
-            "resource": "Storage",
-            "name": "Storage",
-            "total": 3,
-            "up": 0,
-            "down": 0,
-            "unknown": 3,
-            "avg_up": 0.0,
-            "avg_down": 0.0,
-            "avg_unknown": 100.0
-        },
-        {
-            "resource": "Smart PDU",
-            "name": "Smart PDU",
-            "total": 1,
-            "up": 1,
-            "down": 0,
-            "unknown": 0,
-            "avg_up": 100.0,
-            "avg_down": 0.0,
-            "avg_unknown": 0.0
-        },
-        {
-            "resource": "Sensor",
-            "name": "Sensor",
-            "total": 1,
-            "up": 1,
-            "down": 0,
-            "unknown": 0,
-            "avg_up": 100.0,
-            "avg_down": 0.0,
-            "avg_unknown": 0.0
-        },
-        {
-            "resource": "PDU",
-            "name": "PDU",
-            "total": 2,
-            "up": 0,
-            "down": 0,
-            "unknown": 2,
-            "avg_up": 0.0,
-            "avg_down": 0.0,
-            "avg_unknown": 100.0
-        },
-        {
-            "resource": "Hypervisor",
-            "name": "Hypervisor",
-            "total": 8,
-            "up": 2,
-            "down": 0,
-            "unknown": 6,
-            "avg_up": 25.0,
-            "avg_down": 0.0,
-            "avg_unknown": 75.0
-        },
-        {
-            "resource": "Baremetal",
-            "name": "Baremetal",
-            "total": 3,
-            "up": 0,
-            "down": 0,
-            "unknown": 3,
-            "avg_up": 0.0,
-            "avg_down": 0.0,
-            "avg_unknown": 100.0
-        },
-        {
-            "resource": "Database",
-            "name": "Database",
-            "total": 6,
-            "up": 0,
-            "down": 0,
-            "unknown": 6,
-            "avg_up": 0.0,
-            "avg_down": 0.0,
-            "avg_unknown": 100.0
-        },
-        {
-            "resource": "Custom VM",
-            "name": "Custom VM",
-            "total": 12,
-            "up": 0,
-            "down": 0,
-            "unknown": 12,
-            "avg_up": 0.0,
-            "avg_down": 0.0,
-            "avg_unknown": 100.0
-        }
-    ]
+    {
+      "resource": "Firewall",
+      "name": "Firewall",
+      "total": 10,
+      "up": 2,
+      "down": 1,
+      "unknown": 7,
+      "avg_up": 20,
+      "avg_down": 10,
+      "avg_unknown": 70
+    },
+    {
+      "resource": "Load Balancer",
+      "name": "Load Balancer",
+      "total": 4,
+      "up": 1,
+      "down": 0,
+      "unknown": 3,
+      "avg_up": 25,
+      "avg_down": 0,
+      "avg_unknown": 75
+    },
+    {
+      "resource": "Mac Device",
+      "name": "Mac Device",
+      "total": 2,
+      "up": 0,
+      "down": 0,
+      "unknown": 2,
+      "avg_up": 0,
+      "avg_down": 0,
+      "avg_unknown": 100
+    },
+    {
+      "resource": "Storage",
+      "name": "Storage",
+      "total": 3,
+      "up": 0,
+      "down": 0,
+      "unknown": 3,
+      "avg_up": 0,
+      "avg_down": 0,
+      "avg_unknown": 100
+    },
+    {
+      "resource": "Smart PDU",
+      "name": "Smart PDU",
+      "total": 1,
+      "up": 1,
+      "down": 0,
+      "unknown": 0,
+      "avg_up": 100,
+      "avg_down": 0,
+      "avg_unknown": 0
+    },
+    {
+      "resource": "Sensor",
+      "name": "Sensor",
+      "total": 1,
+      "up": 1,
+      "down": 0,
+      "unknown": 0,
+      "avg_up": 100,
+      "avg_down": 0,
+      "avg_unknown": 0
+    },
+    {
+      "resource": "PDU",
+      "name": "PDU",
+      "total": 2,
+      "up": 0,
+      "down": 0,
+      "unknown": 2,
+      "avg_up": 0,
+      "avg_down": 0,
+      "avg_unknown": 100
+    },
+    {
+      "resource": "Hypervisor",
+      "name": "Hypervisor",
+      "total": 9,
+      "up": 2,
+      "down": 0,
+      "unknown": 7,
+      "avg_up": 22.22,
+      "avg_down": 0,
+      "avg_unknown": 77.78
+    },
+    {
+      "resource": "Baremetal",
+      "name": "Baremetal",
+      "total": 4,
+      "up": 0,
+      "down": 1,
+      "unknown": 3,
+      "avg_up": 0,
+      "avg_down": 25,
+      "avg_unknown": 75
+    },
+    {
+      "resource": "Database",
+      "name": "Database",
+      "total": 6,
+      "up": 6,
+      "down": 0,
+      "unknown": 0,
+      "avg_up": 100,
+      "avg_down": 0,
+      "avg_unknown": 0
+    },
+    {
+      "resource": "Custom VM",
+      "name": "Custom VM",
+      "total": 14,
+      "up": 0,
+      "down": 1,
+      "unknown": 13,
+      "avg_up": 0,
+      "avg_down": 7.14,
+      "avg_unknown": 92.86
+    }
+  ]
 }

@@ -320,7 +320,7 @@ export class UnifiedAiopsCommandCentreService {
         }
       },
       legend: { bottom: 0, left: 'center', itemWidth: 14, itemHeight: 7, textStyle: { fontSize: 11, color: '#20272e' }, data: ['Monitored', 'Not Monitored'] },
-      grid: { left: 38, right: 12, top: 18, bottom: 64, containLabel: true },
+      grid: { left: 8, right: 12, top: 18, bottom: 52, containLabel: true },
       xAxis: {
         type: 'category',
         data: categories,
@@ -1854,10 +1854,9 @@ export class UnifiedAiopsCommandCentreService {
       return {};
     }
     const categoryLabels = viewRows.map(row => row.label);
-    // Shrink the axis labels as the category count grows so they never overlap.
+    // Shrink the axis label font as the category count grows and rotate the labels so they never overlap.
     const labelCount = categoryLabels.length;
     const axisFontSize = labelCount > 12 ? 9 : (labelCount > 8 ? 10 : 11);
-    const axisLabelWidth = labelCount > 12 ? 44 : (labelCount > 8 ? 56 : 80);
 
     return {
       color: ['#13bd77', UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical, '#5f6d7b'],
@@ -1879,7 +1878,7 @@ export class UnifiedAiopsCommandCentreService {
       },
       legend: { bottom: 0, left: 'center', itemWidth: 14, itemHeight: 7, textStyle: { fontSize: 11, color: '#20272e' } },
       grid: { left: 4, right: 8, top: 12, bottom: 34, containLabel: true },
-      xAxis: { type: 'category', data: categoryLabels, axisLabel: { fontSize: axisFontSize, color: '#5b6570', interval: 0, width: axisLabelWidth, overflow: 'break', lineHeight: axisFontSize + 2 } },
+      xAxis: { type: 'category', data: categoryLabels, axisLabel: { fontSize: axisFontSize, color: '#5b6570', interval: 0, rotate: 40 } },
       yAxis: { type: 'value', max: 100, axisLabel: { fontSize: 11, color: '#5b6570' }, splitLine: { lineStyle: { color: '#d6dce2', type: 'dashed' } } },
       series: [
         { name: 'UP', type: 'bar', stack: 'availability', barMaxWidth: 20, data: viewRows.map(row => ({ value: row.up, count: row.upCount, coverageLabel: row.upLabel })) },

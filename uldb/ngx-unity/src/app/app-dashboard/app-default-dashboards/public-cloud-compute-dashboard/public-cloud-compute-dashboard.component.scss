@@ -875,6 +875,13 @@ button.legend-link {
   overflow: hidden;
 }
 
+// Let the duration card's body grow and center its content so its height stays in sync with the
+// (taller) device card and the chart is not left with empty space on one side.
+.idle-duration-card {
+  display: flex;
+  flex-direction: column;
+}
+
 .orphaned-widget-header {
   display: flex;
   align-items: center;
@@ -911,9 +918,10 @@ button.legend-link {
 .device-status-legend {
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 16px 24px;
-  padding: 10px 8px 18px;
+  gap: 10px 14px;
+  padding: 0px 5px 9px;
   color: #26313b;
   font-size: 13px;
   line-height: 18px;
@@ -975,6 +983,13 @@ button.legend-link {
   min-height: 300px;
 }
 
+// Cap the idle table at ~6 records; extra rows scroll here. The legend (above) and the pagination
+// (below, outside .idle-table-wrap) stay fixed and always visible.
+.idle-table-scroll {
+  max-height: 265px;
+  overflow-y: auto;
+}
+
 .idle-list-empty-state {
   display: flex;
   align-items: center;
@@ -990,11 +1005,11 @@ button.legend-link {
   width: 100%;
 
   .idle-device-name-col {
-    width: 17%;
+    width: 28%;
   }
 
   .idle-resource-col {
-    width: 11%;
+    width: 10%;
   }
 
   .idle-metric-col {
@@ -1002,7 +1017,7 @@ button.legend-link {
   }
 
   .idle-network-col {
-    width: 10%;
+    width: 8%;
   }
 
   .idle-duration-col {
@@ -1017,6 +1032,16 @@ button.legend-link {
   td {
     font-size: 12px;
     padding: 6px 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Truncate the device name (a link button) on one line instead of wrapping; it fills its column.
+  td:first-child > button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -1049,17 +1074,12 @@ button.legend-link {
   padding: 8px 14px 10px;
 }
 
-.orphaned-page-size,
-.idle-page-size {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #637282;
-  font-size: 12px;
-
-  .form-control {
-    width: 60px;
-  }
+.orphaned-footer-note {
+  padding: 6px 0 2px;
+  color: #7b8794;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 15px;
 }
 
 .orphaned-pagination-row table-pager,
@@ -1130,6 +1150,10 @@ button.legend-link {
 
 .idle-duration-body {
   position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-height: 300px;
   padding: 10px 16px 12px;
 }
@@ -1147,7 +1171,6 @@ button.legend-link {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  min-height: 278px;
 }
 
 .idle-duration-bars {

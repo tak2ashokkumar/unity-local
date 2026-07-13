@@ -1,51 +1,13 @@
 {
-  "cloud": "azure",
-  "hours": 24,
   "metric": "storage_success_server_latency_trend",
-  "title": "Success Server Latency(P95)Trend",
-  "value": 5.7,
+  "hours": 24,
+  "trend_direction": null,
+  "display_value": null,
   "unit": "ms",
-  "display_value": "5.7 ms",
-  "change_percent": 7.3,
-  "trend_direction": "up",
-  "count": 10,
-  "points": [
-    { "clock": 1719900000, "time": "00:00", "value": 5.2 },
-    { "clock": 1719903600, "time": "01:00", "value": 5.5 },
-    { "clock": 1719907200, "time": "02:00", "value": 5.9 },
-    { "clock": 1719910800, "time": "03:00", "value": 5.4 },
-    { "clock": 1719914400, "time": "04:00", "value": 5.7 },
-    { "clock": 1719918000, "time": "05:00", "value": 6.0 },
-    { "clock": 1719921600, "time": "06:00", "value": 5.3 },
-    { "clock": 1719925200, "time": "07:00", "value": 6.1 },
-    { "clock": 1719928800, "time": "08:00", "value": 5.6 },
-    { "clock": 1719932400, "time": "09:00", "value": 5.9 },
-    { "clock": 1719936000, "time": "10:00", "value": 5.5 },
-    { "clock": 1719939600, "time": "11:00", "value": 5.8 },
-    { "clock": 1719943200, "time": "12:00", "value": 5.7 }
-  ],
-  "resources": [
-    {
-      "uuid": "c50862c1-cae4-44ca-9550-c62013359db2",
-      "device_name": "db-volume-01",
-      "name": "db-volume-01",
-      "cloud": "Microsoft Azure",
-      "cloud_key": "azure",
-      "region": "eastus",
-      "cloud_region": "Azure/eastus",
-      "resource_group": "prod-rg",
-      "resource_status": "Succeeded",
-      "value": 5.7,
-      "unit": "ms",
-      "graph_id": "154217",
-      "graph_name": "Latency metrics",
-      "item_id": "256395",
-      "item_name": "Azure: Storage account: Success Server Latency",
-      "item_key": "azure.storage.success_server_latency",
-      "points": [
-        { "clock": 1719900000, "value": 5.2 },
-        { "clock": 1719903600, "value": 5.5 }
-      ]
-    }
-  ]
+  "count": 0,
+  "value": null,
+  "change_percent": null,
+  "points": [],
+  "cloud": "azure",
+  "resources": []
 }

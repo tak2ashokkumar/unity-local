@@ -1,109 +1,122 @@
 {
-    "severity_summary": {
-        "critical": 325082,
-        "warning": 325082,
-        "info": 325082
+  "summary": {
+    "total_alerts": 330804,
+    "critical_alerts": 94056,
+    "warning_alerts": 225510,
+    "info_alerts": 11238
+  },
+  "alert_summary": {
+    "total_alerts": 330804,
+    "critical_alerts": 94056,
+    "warning_alerts": 225510,
+    "info_alerts": 11238
+  },
+  "severity_summary": {
+    "total": 330804,
+    "critical": 94056,
+    "warning": 225510,
+    "info": 11238
+  },
+  "alerts": [
+    {
+      "id": 1497890,
+      "uuid": "a4348b58-6f94-4d21-bcd8-3fdc71249777",
+      "name": "ztc-test-server",
+      "severity": "Warning",
+      "description": "Azure: There are errors in requests to API",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "3m"
     },
-    "alerts": [
-        {
-            "id": 1184405,
-            "uuid": "ef9ae699-0991-485f-bb06-03eef9ec964e",
-            "name": "MySQL-ODBC",
-            "severity": "Information",
-            "description": "MySQL: Service has been restarted (uptime < 10m)",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "16m"
-        },
-        {
-            "id": 1184403,
-            "uuid": "cc32587b-ca71-4e53-b211-96b21d9680b3",
-            "name": "01.unity-lab-lnx-vm1",
-            "severity": "Warning",
-            "description": "Linux: System time is out of sync (diff with Zabbix server > 60s)",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "16m"
-        },
-        {
-            "id": 1184402,
-            "uuid": "2f006d54-91e7-4da5-b19f-a09d31cfbf88",
-            "name": "01.unity-lab-lnx-vm1",
-            "severity": "Warning",
-            "description": "Linux: 01.unity-lab-lnx-vm1-UnityOne Demo has been restarted (uptime < 10m)",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "17m"
-        },
-        {
-            "id": 1184404,
-            "uuid": "b376d81c-25ff-4348-92aa-1da22eb547d9",
-            "name": "MySQL-ODBC",
-            "severity": "Critical",
-            "description": "MySQL: Service is down",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "17m"
-        },
-        {
-            "id": 1184396,
-            "uuid": "7b96a205-0f05-412b-b610-fd1bde076f5c",
-            "name": "MySQL-ODBC",
-            "severity": "Information",
-            "description": "MySQL: Failed to fetch info data (or no data for 30m)",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "46m"
-        },
-        {
-            "id": 1184390,
-            "uuid": "1a59a750-c42b-4136-a004-e92d6e84f6f6",
-            "name": "01.unity-lab-lnx-vm1",
-            "severity": "Warning",
-            "description": "Linux:  agent is not available (for 3m)",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "1h 11m"
-        },
-        {
-            "id": 1184349,
-            "uuid": "8052b99e-bb0d-48dd-af94-fe5287f72b21",
-            "name": "UL-SV1-P26-2-R08-UNITY-LAB-ACC-SW-01.unitylab.local",
-            "severity": "Warning",
-            "description": "I/O: Memory utilization > 70%",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "4h 15m"
-        },
-        {
-            "id": 1184346,
-            "uuid": "63c6e2eb-53de-4c45-8b73-72f776b34b84",
-            "name": "UL-SV1-UNITY-LAB-F5-LB-01.sv1.unitedlayer.com",
-            "severity": "Warning",
-            "description": "F5 BIG-IP: Less than 7 days left until the certificate expires (/Common/HA-Wildcard-SHA256.crt)",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "4h 15m"
-        },
-        {
-            "id": 1184341,
-            "uuid": "57613bec-7c92-46a2-92b5-54a93b9b9fd3",
-            "name": "fw-12",
-            "severity": "Critical",
-            "description": "Firewall Investage",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "4h 15m"
-        },
-        {
-            "id": 1184344,
-            "uuid": "70300bcd-e05c-4b66-abb6-81e8d29b12cd",
-            "name": "UL-SV1-UNITY-LAB-F5-LB-01.sv1.unitedlayer.com",
-            "severity": "Warning",
-            "description": "F5 BIG-IP: Less than 7 days left until the certificate expires (/Common/HA-SHA256-Cert.crt)",
-            "source": "Unity",
-            "acknowledged": false,
-            "duration": "4h 15m"
-        }
-    ]
+    {
+      "id": 1497891,
+      "uuid": "8ccce9cd-b02a-4740-91c0-2bb60d264d86",
+      "name": "ztc-test-server",
+      "severity": "Warning",
+      "description": "Azure: Virtual machine is in unknown state",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "3m"
+    },
+    {
+      "id": 1233831,
+      "uuid": "9fe8caa0-8982-467b-851c-e2144c36cde8",
+      "name": "",
+      "severity": "Critical",
+      "description": "Alarm \"OCI DEMO DB Alert\" is in a \"FIRING\" state; because 1 metric meets the trigger rule: \"VolumeReadThroughput[1m]{resourceId = \"ocid1.instance.oc1.us-sanjose-1.anzwuljrbasfxvycv5dut5peowthjmirlj6edwwiejf3h5zwan3pcwuvtvia\"}.mean() > 33768\", with a trigger delay of 1 minute",
+      "source": "Oci",
+      "acknowledged": false,
+      "duration": "5m"
+    },
+    {
+      "id": 1497887,
+      "uuid": "e4948184-bae2-4978-b90c-8da2dac40e13",
+      "name": "unitycol01",
+      "severity": "Critical",
+      "description": "Azure: Virtual machine is unavailable",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "10m"
+    },
+    {
+      "id": 1497884,
+      "uuid": "955b90ff-1ff5-4c0a-bfca-6a20a8ffbd4b",
+      "name": "unitycol01",
+      "severity": "Warning",
+      "description": "Azure: There are errors in requests to API",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "11m"
+    },
+    {
+      "id": 1497885,
+      "uuid": "df2e521c-f571-43e8-aa2e-afb5cf49be69",
+      "name": "unitycol01",
+      "severity": "Warning",
+      "description": "Azure: Virtual machine is in unknown state",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "11m"
+    },
+    {
+      "id": 1497881,
+      "uuid": "2f6dbeaf-af8f-4c4b-9f3e-303c0d8e0ffb",
+      "name": "test_vmdemo20",
+      "severity": "Warning",
+      "description": "Azure: There are errors in requests to API",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "12m"
+    },
+    {
+      "id": 1497880,
+      "uuid": "baa71da3-8d95-42d0-9b78-8af6040bde0c",
+      "name": "TestVM",
+      "severity": "Warning",
+      "description": "Azure: Virtual machine is in unknown state",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "19m"
+    },
+    {
+      "id": 1497876,
+      "uuid": "7602f9ef-9df0-453e-a9ce-347f12a0c021",
+      "name": "test_vmdemo3",
+      "severity": "Warning",
+      "description": "Azure: Virtual machine is in unknown state",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "22m"
+    },
+    {
+      "id": 1497869,
+      "uuid": "b68a47d8-d873-4e5a-becf-55bb69c804ab",
+      "name": "TestVM",
+      "severity": "Warning",
+      "description": "Azure: There are errors in requests to API",
+      "source": "Unity",
+      "acknowledged": false,
+      "duration": "38m"
+    }
+  ]
 }

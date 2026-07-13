@@ -1,29 +1,31 @@
 {
-    "vmware": {
-        "hypervisor": 29,
-        "baremetal": 2,
-        "database": 4,
-        "vm": 858,
-        "clusters": 16,
-        "datastores": 167,
-        "distributed_switches": 4,
-        "port_groups": 45,
-        "total_resources": 1125
-    },
-    "nutanix": {
-        "total_resources": 0
-    },
-    "hyperv": {
-        "total_resources": 0
-    },
-    "proxmox": {
-        "total_resources": 0
-    },
-    "openstack": {
-        "total_resources": 0
-    },
-    "vcloud": {
-        "total_resources": 0
-    },
-    "total_resources": 1125
+  "vmware": {
+    "switch": 1,
+    "hypervisor": 5,
+    "database": 6,
+    "vm": 147,
+    "clusters": 6,
+    "datastores": 13,
+    "distributed_switches": 4,
+    "port_groups": 20,
+    "total_resources": 202
+  },
+  "nutanix": {
+    "total_resources": 0
+  },
+  "hyperv": {
+    "vm": 116,
+    "total_resources": 116
+  },
+  "proxmox": {
+    "total_resources": 0
+  },
+  "openstack": {
+    "total_resources": 0
+  },
+  "vcloud": {
+    "vm": 8,
+    "total_resources": 8
+  },
+  "total_resources": 326
 }

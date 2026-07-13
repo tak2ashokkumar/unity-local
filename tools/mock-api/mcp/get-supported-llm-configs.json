@@ -2,85 +2,124 @@
   "supported_llms": [
     {
       "active_for_applications": [],
+      "cost_multiplier": null,
       "description": "OpenAI's reliable model",
       "provider": "openai",
       "is_user_owned": true,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
-      "id": 4,
+      "id": 12,
       "model_name": "gpt-4o"
     },
     {
-      "active_for_applications": [],
+      "active_for_applications": [
+        "apm"
+      ],
+      "cost_multiplier": "1.60x",
       "description": "OpenAI's advanced model",
       "provider": "openai",
-      "is_user_owned": false,
+      "is_user_owned": true,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
-      "id": null,
+      "id": 14,
       "model_name": "gpt-4.1"
     },
     {
-      "active_for_applications": [],
-      "description": "OpenAI's best model",
-      "provider": "openai",
-      "is_user_owned": false,
-      "endpoint_url": "",
-      "compatible_applications": {
-        "assistant": "Assistant",
-        "network_agent": "Network Agent",
-        "workflow_agent": "Workflow Agent"
-      },
-      "id": null,
-      "model_name": "gpt-5.1"
-    },
-    {
       "active_for_applications": [
+        "workflow_agent",
+        "compute_agent",
         "network_agent",
         "assistant"
       ],
+      "cost_multiplier": "1.08x",
+      "description": "OpenAI's best model",
+      "provider": "openai",
+      "is_user_owned": true,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "compute_agent": "Compute Agent",
+        "assistant": "Assistant",
+        "apm": "APM",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": 10,
+      "model_name": "gpt-5.1"
+    },
+    {
+      "active_for_applications": [],
+      "cost_multiplier": "1.29x",
       "description": "OpenAI's recent model",
       "provider": "openai",
       "is_user_owned": true,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
-      "id": 2,
+      "id": 3,
       "model_name": "gpt-5.2"
     },
     {
       "active_for_applications": [],
-      "description": "Claude's recent model",
+      "cost_multiplier": "1.00x",
+      "description": "Claude's best model",
       "provider": "anthropic",
-      "is_user_owned": false,
+      "is_user_owned": true,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
-      "id": null,
+      "id": 13,
+      "model_name": "claude-haiku-4-5"
+    },
+    {
+      "active_for_applications": [],
+      "cost_multiplier": "5.15x",
+      "description": "Claude's recent model",
+      "provider": "anthropic",
+      "is_user_owned": true,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "compute_agent": "Compute Agent",
+        "assistant": "Assistant",
+        "apm": "APM",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": 11,
       "model_name": "claude-opus-4-6"
     },
     {
       "active_for_applications": [],
+      "cost_multiplier": "3.12x",
       "description": "Claude's reliable model",
       "provider": "anthropic",
       "is_user_owned": false,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
@@ -89,12 +128,15 @@
     },
     {
       "active_for_applications": [],
+      "cost_multiplier": null,
       "description": "Google's recent model",
       "provider": "google",
       "is_user_owned": false,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
@@ -103,12 +145,15 @@
     },
     {
       "active_for_applications": [],
+      "cost_multiplier": null,
       "description": "Google's reliable model",
       "provider": "google",
       "is_user_owned": false,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
@@ -117,12 +162,15 @@
     },
     {
       "active_for_applications": [],
+      "cost_multiplier": null,
       "description": "groq's llama model",
       "provider": "groq",
       "is_user_owned": false,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
@@ -131,17 +179,71 @@
     },
     {
       "active_for_applications": [],
-      "description": "groq's gpt open source model",
+      "cost_multiplier": null,
+      "description": "groq's gpt open source oss-120b model",
       "provider": "groq",
       "is_user_owned": false,
       "endpoint_url": "",
       "compatible_applications": {
+        "compute_agent": "Compute Agent",
         "assistant": "Assistant",
+        "apm": "APM",
         "network_agent": "Network Agent",
         "workflow_agent": "Workflow Agent"
       },
       "id": null,
       "model_name": "openai/gpt-oss-120b"
+    },
+    {
+      "active_for_applications": [],
+      "cost_multiplier": null,
+      "description": "groq's gpt open source oss-20b model",
+      "provider": "groq",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "compute_agent": "Compute Agent",
+        "assistant": "Assistant",
+        "apm": "APM",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "openai/gpt-oss-20b"
+    },
+    {
+      "active_for_applications": [],
+      "cost_multiplier": null,
+      "description": "groq's llama open source 70b model",
+      "provider": "groq",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "compute_agent": "Compute Agent",
+        "assistant": "Assistant",
+        "apm": "APM",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "llama-3.3-70b-versatile"
+    },
+    {
+      "active_for_applications": [],
+      "cost_multiplier": null,
+      "description": "groq's open source whisper turbo model",
+      "provider": "groq",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "compute_agent": "Compute Agent",
+        "assistant": "Assistant",
+        "apm": "APM",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "whisper-large-v3-turbo"
     }
   ]
 }

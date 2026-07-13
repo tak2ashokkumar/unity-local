@@ -674,7 +674,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
         return metric.kind === 'highLatency'
           ? this.svc.convertToStorageHighLatencyCard(res, metric.color)
           : this.svc.convertToStorageTrendCard(res, metric.color);
-      }).filter(card => !!card.title);
+      }).filter(card => card.hasData);
     }, () => {
       this.storagePerformanceCards = [];
     }, () => this.widgetLoading.storagePerformance = false);
@@ -807,12 +807,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.getOrphanedDevices(this.appliedFilterCriteria);
   }
 
-  orphanedDevicesPageSizeChange(event: Event) {
-    this.orphanedDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
-    this.orphanedDevicesPageNo = 1;
-    this.getOrphanedDevices(this.appliedFilterCriteria);
-  }
-
   getIdleDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.idleDevices = [];
     this.idleDevicesTotal = 0;
@@ -847,12 +841,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     this.idleDevicesPageNo = pageNo;
-    this.getIdleDevices(this.appliedFilterCriteria);
-  }
-
-  idleDevicesPageSizeChange(event: Event) {
-    this.idleDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
-    this.idleDevicesPageNo = 1;
     this.getIdleDevices(this.appliedFilterCriteria);
   }
 

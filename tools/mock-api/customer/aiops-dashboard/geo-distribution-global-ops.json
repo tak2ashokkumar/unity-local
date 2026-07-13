@@ -1,112 +1,722 @@
 {
-    "us-east-2": {
-        "total_resources": 935,
-        "total_alerts": 128,
-        "critical_alerts": 18,
-        "warning_alerts": 67,
-        "information_alerts": 43,
-        "compute_count": 652,
-        "platform_services": 183,
-        "other_services": 100
-    },
-    "us-east-1": {
-        "total_resources": 687,
-        "total_alerts": 96,
-        "critical_alerts": 14,
-        "warning_alerts": 50,
-        "information_alerts": 32,
-        "compute_count": 478,
-        "platform_services": 137,
-        "other_services": 72
-    },
-    "us-west-1": {
-        "total_resources": 572,
-        "total_alerts": 84,
-        "critical_alerts": 11,
-        "warning_alerts": 44,
-        "information_alerts": 29,
-        "compute_count": 398,
-        "platform_services": 118,
-        "other_services": 56
-    },
-    "us-west-2": {
-        "total_resources": 439,
-        "total_alerts": 63,
-        "critical_alerts": 8,
-        "warning_alerts": 33,
-        "information_alerts": 22,
-        "compute_count": 305,
-        "platform_services": 88,
-        "other_services": 46
-    },
-    "ap-southeast-1": {
-        "total_resources": 287,
-        "total_alerts": 41,
-        "critical_alerts": 6,
-        "warning_alerts": 21,
-        "information_alerts": 14,
-        "compute_count": 199,
-        "platform_services": 58,
-        "other_services": 30
-    },
-    "eu-west-1": {
-        "total_resources": 265,
-        "total_alerts": 38,
-        "critical_alerts": 5,
-        "warning_alerts": 20,
-        "information_alerts": 13,
-        "compute_count": 184,
-        "platform_services": 53,
-        "other_services": 28
-    },
-    "ap-south-1": {
-        "total_resources": 198,
-        "total_alerts": 28,
-        "critical_alerts": 4,
-        "warning_alerts": 15,
-        "information_alerts": 9,
-        "compute_count": 138,
-        "platform_services": 40,
-        "other_services": 20
-    },
-    "ca-central-1": {
-        "total_resources": 156,
-        "total_alerts": 22,
-        "critical_alerts": 3,
-        "warning_alerts": 12,
-        "information_alerts": 7,
-        "compute_count": 108,
-        "platform_services": 31,
-        "other_services": 17
-    },
-    "sa-east-1": {
-        "total_resources": 134,
-        "total_alerts": 19,
-        "critical_alerts": 2,
-        "warning_alerts": 10,
-        "information_alerts": 7,
-        "compute_count": 93,
-        "platform_services": 27,
-        "other_services": 14
-    },
-    "me-south-1": {
-        "total_resources": 114,
-        "total_alerts": 16,
-        "critical_alerts": 2,
-        "warning_alerts": 9,
-        "information_alerts": 5,
-        "compute_count": 79,
-        "platform_services": 23,
-        "other_services": 12
-    },
-    "af-south-1": {
-        "total_resources": 98,
-        "total_alerts": 14,
-        "critical_alerts": 2,
-        "warning_alerts": 7,
-        "information_alerts": 5,
-        "compute_count": 68,
-        "platform_services": 20,
-        "other_services": 10
-    }
+  "US": {
+    "total_resources": 4,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 0,
+    "other_services": 4
+  },
+  "Unknown": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 0,
+    "other_services": 1
+  },
+  "africa-south1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-east1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-east2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-northeast1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-northeast2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-northeast3": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-south1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-south2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-southeast1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-southeast2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "asia-southeast3": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "australia-southeast1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "canadacentral": {
+    "total_resources": 23,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 2,
+    "platform_services": 12,
+    "other_services": 9
+  },
+  "canadaeast": {
+    "total_resources": 3,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 3,
+    "other_services": 0
+  },
+  "centralindia": {
+    "total_resources": 31,
+    "total_alerts": 2,
+    "critical_alerts": 0,
+    "warning_alerts": 2,
+    "information_alerts": 0,
+    "compute_count": 4,
+    "platform_services": 26,
+    "other_services": 1
+  },
+  "centralus": {
+    "total_resources": 49,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 1,
+    "platform_services": 37,
+    "other_services": 11
+  },
+  "eastasia": {
+    "total_resources": 12,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 11,
+    "other_services": 1
+  },
+  "eastus": {
+    "total_resources": 107,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 6,
+    "platform_services": 85,
+    "other_services": 16
+  },
+  "eastus2": {
+    "total_resources": 72,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 29,
+    "other_services": 43
+  },
+  "europe-central2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-north1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-north2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-southwest1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west10": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west12": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west3": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west4": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west6": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west8": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "europe-west9": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "global": {
+    "total_resources": 552,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 335,
+    "other_services": 217
+  },
+  "japaneast": {
+    "total_resources": 17,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 17,
+    "other_services": 0
+  },
+  "japanwest": {
+    "total_resources": 6,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 6,
+    "other_services": 0
+  },
+  "me-central1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "me-central2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "me-west1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "northamerica-northeast1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "northamerica-northeast2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "northamerica-south1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "northcentralus": {
+    "total_resources": 5,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 5,
+    "other_services": 0
+  },
+  "northeurope": {
+    "total_resources": 5,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 5,
+    "other_services": 0
+  },
+  "southamerica-east1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "southamerica-west1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "southcentralus": {
+    "total_resources": 7,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 5,
+    "other_services": 2
+  },
+  "southeastasia": {
+    "total_resources": 15,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 12,
+    "other_services": 3
+  },
+  "southindia": {
+    "total_resources": 12,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 6,
+    "other_services": 6
+  },
+  "us": {
+    "total_resources": 9,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 0,
+    "other_services": 9
+  },
+  "us-central1": {
+    "total_resources": 42,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 31,
+    "other_services": 11
+  },
+  "us-central1-a": {
+    "total_resources": 2004,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 32,
+    "platform_services": 41,
+    "other_services": 1931
+  },
+  "us-central1-b": {
+    "total_resources": 6,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 6,
+    "platform_services": 0,
+    "other_services": 0
+  },
+  "us-central1-f": {
+    "total_resources": 9,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 6,
+    "platform_services": 3,
+    "other_services": 0
+  },
+  "us-east1": {
+    "total_resources": 9,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 6,
+    "other_services": 3
+  },
+  "us-east1-b": {
+    "total_resources": 1585,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 2,
+    "platform_services": 17,
+    "other_services": 1566
+  },
+  "us-east4": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "us-east5": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "us-east7": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "us-sanjose-1": {
+    "total_resources": 4,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 1,
+    "platform_services": 1,
+    "other_services": 2
+  },
+  "us-south1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "us-west-2": {
+    "total_resources": 446,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 8,
+    "platform_services": 299,
+    "other_services": 139
+  },
+  "us-west1": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "us-west2": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "us-west3": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "us-west4": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "us-west8": {
+    "total_resources": 1,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 1,
+    "other_services": 0
+  },
+  "westcentralus": {
+    "total_resources": 2,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 0,
+    "other_services": 2
+  },
+  "westeurope": {
+    "total_resources": 3,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 0,
+    "platform_services": 3,
+    "other_services": 0
+  },
+  "westus": {
+    "total_resources": 58,
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "warning_alerts": 0,
+    "information_alerts": 0,
+    "compute_count": 10,
+    "platform_services": 46,
+    "other_services": 2
+  },
+  "westus2": {
+    "total_resources": 53,
+    "total_alerts": 4,
+    "critical_alerts": 2,
+    "warning_alerts": 2,
+    "information_alerts": 0,
+    "compute_count": 3,
+    "platform_services": 44,
+    "other_services": 6
+  }
 }

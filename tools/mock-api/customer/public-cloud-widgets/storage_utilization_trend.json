@@ -1,51 +1,13 @@
 {
-  "cloud": "azure",
-  "hours": 24,
   "metric": "storage_utilization_trend",
-  "title": "Utilization",
-  "value": 38,
+  "hours": 24,
+  "trend_direction": null,
+  "display_value": null,
   "unit": "%",
-  "display_value": "38%",
-  "change_percent": 4.8,
-  "trend_direction": "up",
-  "count": 10,
-  "points": [
-    { "clock": 1719900000, "time": "00:00", "value": 35 },
-    { "clock": 1719903600, "time": "01:00", "value": 36 },
-    { "clock": 1719907200, "time": "02:00", "value": 38 },
-    { "clock": 1719910800, "time": "03:00", "value": 37 },
-    { "clock": 1719914400, "time": "04:00", "value": 38 },
-    { "clock": 1719918000, "time": "05:00", "value": 39 },
-    { "clock": 1719921600, "time": "06:00", "value": 36 },
-    { "clock": 1719925200, "time": "07:00", "value": 40 },
-    { "clock": 1719928800, "time": "08:00", "value": 38 },
-    { "clock": 1719932400, "time": "09:00", "value": 41 },
-    { "clock": 1719936000, "time": "10:00", "value": 37 },
-    { "clock": 1719939600, "time": "11:00", "value": 39 },
-    { "clock": 1719943200, "time": "12:00", "value": 38 }
-  ],
-  "resources": [
-    {
-      "uuid": "c50862c1-cae4-44ca-9550-c62013359db2",
-      "device_name": "db-volume-01",
-      "name": "db-volume-01",
-      "cloud": "Microsoft Azure",
-      "cloud_key": "azure",
-      "region": "eastus",
-      "cloud_region": "Azure/eastus",
-      "resource_group": "prod-rg",
-      "resource_status": "Succeeded",
-      "value": 38,
-      "unit": "%",
-      "graph_id": "154215",
-      "graph_name": "Storage",
-      "item_id": "256500",
-      "item_name": "Azure: Storage account: Used capacity percentage",
-      "item_key": "azure.storage.used_percent",
-      "points": [
-        { "clock": 1719900000, "value": 35 },
-        { "clock": 1719903600, "value": 36 }
-      ]
-    }
-  ]
+  "count": 0,
+  "value": null,
+  "change_percent": null,
+  "points": [],
+  "cloud": "azure",
+  "resources": []
 }

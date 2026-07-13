@@ -964,6 +964,7 @@ export interface PublicCloudStoragePerformanceCard {
   deltaTone: PublicCloudStatusTone;
   subtitle: string;
   chartType: 'area' | 'bar';
+  hasData: boolean;
   options: EChartsOption;
 }
 

@@ -1,11 +1,11 @@
 {
   "summary": {
-    "total_runs": 93,
-    "success_percent": 95.7,
-    "failed_percent": 4.3,
-    "running_percent": 0.0,
-    "avg_duration": "1.34 mins",
-    "auto_remediations": 4
+    "total_runs": 97,
+    "success_percent": 95.88,
+    "failed_percent": 4.12,
+    "running_percent": 0,
+    "avg_duration": "1.32 mins",
+    "auto_remediations": 9
   },
   "top_auto_remediations": [
     {
@@ -23,6 +23,10 @@
     {
       "name": "service down",
       "count": 5
+    },
+    {
+      "name": "Auto remediation script for Restart multiple Docker Container Services",
+      "count": 4
     }
   ]
 }
