@@ -2253,14 +2253,12 @@ export class PublicCloudComputeDashboardService {
       deltaTone: this.getStorageTrendDeltaTone(direction),
       subtitle: '',
       chartType: 'area',
-      hasData: !!points.length,
       options: this.getStorageCardAreaOptions(values, labels, color, unit)
     };
   }
 
   convertToStorageHighLatencyCard(data: PublicCloudStorageHighLatencyResponse, color: string): PublicCloudStoragePerformanceCard {
-    const devices = data?.data || [];
-    const values = devices.map(device => this.getNumericValue(device?.p95_latency));
+    const values = (data?.data || []).map(device => this.getNumericValue(device?.p95_latency));
     return {
       key: 'high_latency_devices',
       title: 'High Latency Devices',
@@ -2271,9 +2269,6 @@ export class PublicCloudComputeDashboardService {
       deltaTone: 'muted',
       subtitle: this.getFirstValue(data?.threshold_display),
       chartType: 'bar',
-      // The title is hardcoded, so data presence comes from the monitored devices: a 0/0 response
-      // (no devices at all) leaves the card with nothing to show.
-      hasData: !!devices.length || this.getNumericValue(data?.total_devices) > 0,
       options: this.getStorageCardBarOptions(values, color)
     };
   }

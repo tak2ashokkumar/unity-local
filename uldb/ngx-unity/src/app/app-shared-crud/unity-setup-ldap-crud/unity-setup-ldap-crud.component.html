@@ -99,10 +99,10 @@
                                     {{credentialFormErrors.dc}}</div>
                             </div>
                             <div class="col-6 form-group">
-                                <label for="collectorid" class="font-col-form-label">Collector<em>*</em></label>
+                                <label for="collectorid" class="font-col-form-label">Collector</label>
                                 <select id="collectoruuid" class="form-control" formControlName="collector"
                                     type="number" [class.is-invalid]="credentialFormErrors.collector">
-                                    <option value="" disabled>Select Collector</option>
+                                    <option value="">None</option>
                                     <option *ngFor="let collector of collectors" [value]="collector.id">
                                         {{collector.name}}
                                     </option>

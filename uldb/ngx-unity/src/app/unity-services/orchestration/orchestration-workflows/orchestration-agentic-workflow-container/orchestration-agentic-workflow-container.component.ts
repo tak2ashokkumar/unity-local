@@ -457,10 +457,30 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
 
   addNode(node: NodeDataModel, positionX: number, positionY: number): void {
     console.log(node)
+    // if (node.type === nodeTypes.Loop && this.connectionList[this.connectionList.length - 1].output_class === 'output_2') {
+    //   // const loopNodeExist = this.nodeDetailsArr.find(n => n.node_type === nodeTypes.Loop);
+    //   // if (loopNodeExist) {
+    //   //   this.notification.error(new Notification('Multiple Loop Nodes not allowed at the moment.'));
+    //   //   return;
+    //   // }
+    //   console.log('connection in loop>>', this.connectionList);
+    // }
     if (node.type === nodeTypes.Loop) {
-      const loopNodeExist = this.nodeDetailsArr.find(n => n.node_type === nodeTypes.Loop);
-      if (loopNodeExist) {
-        this.notification.error(new Notification('Multiple Loop Nodes not allowed at the moment.'));
+      const hasLoopWithOutput2 = this.connectionList.some(conn => {
+        const sourceNode = this.nodeDetailsArr.find(
+          n => Number(n.node_id) === Number(conn.source)
+        );
+
+        return (
+          sourceNode?.node_type === nodeTypes.Loop &&
+          conn.output_class === 'output_2'
+        );
+      });
+
+      if (hasLoopWithOutput2) {
+        this.notification.error(
+          new Notification('Nested loops are not allowed at the moment.')
+        );
         return;
       }
     }
@@ -562,11 +582,11 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
                   this.getConnectedNodeDetails(Number(id));
                   this.openNodeModal(Number(id));
                 } else if (this.latestDroppedNode.type === nodeTypes.Loop) {
-                  const loopNodeExist = this.nodeDetailsArr.find(n => n.node_type === nodeTypes.Loop);
-                  if (loopNodeExist) {
-                    this.notification.error(new Notification('Multiple Loop Nodes not allowed at the moment.'));
-                    return;
-                  }
+                  // const loopNodeExist = this.nodeDetailsArr.find(n => n.node_type === nodeTypes.Loop);
+                  // if (loopNodeExist) {
+                  //   this.notification.error(new Notification('Multiple Loop Nodes not allowed at the moment.'));
+                  //   return;
+                  // }
                   this.adjustNodeInputs(id);
                   this.adjustNodeOutputs(id);
                   this.setNodeDetails(this.latestDroppedNode, id);
@@ -683,11 +703,29 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
               }
               this.handleNodeRemove(id);
             });
-
             this.editor.on('connectionCreated', (connection) => {
               this.connectionList.push(connection);
+
+              const isNestedLoopConnection = this.isNestedLoopConnection(connection);
+
+              if (isNestedLoopConnection) {
+                this.notification.error(
+                  new Notification('Nested Loop nodes are not applicable at the moment. Please remove the connection.')
+                );
+
+                setTimeout(() => {
+                  this.editor.removeConnectionNodeId(
+                    Number(connection.output_id),
+                    Number(connection.input_id),
+                    connection.output_class,
+                    connection.input_class
+                  );
+                }, 0);
+
+                return;
+              }
+
               console.log('created>>>>>', this.connectionList);
-              // this.addMiddleArrows();
             });
 
             // Remove when a connection is deleted in the canvas
@@ -710,6 +748,62 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
         this.workflowMetadata = null;
       }
     );
+  }
+
+  private isNestedLoopConnection(connection: any): boolean {
+    const inputNode = this.nodeDetailsArr.find(
+      n => Number(n.node_id) === Number(connection.input_id)
+    );
+    if (
+      inputNode?.node_type !== nodeTypes.Loop ||
+      connection.input_class !== 'input_1'
+    ) {
+      return false;
+    }
+    return this.hasUpstreamLoopOutput2(
+      Number(connection.output_id),
+      new Set<number>(),
+      Number(connection.output_id) // exclude this node's own loop body from upstream walk
+    );
+  }
+
+  private hasUpstreamLoopOutput2(
+    nodeId: number,
+    visited = new Set<number>(),
+    selfLoopNodeId: number
+  ): boolean {
+    if (visited.has(nodeId)) {
+      return false;
+    }
+    visited.add(nodeId);
+
+    const incomingConnections = this.connectionList.filter(
+      conn => Number(conn.input_id) === Number(nodeId)
+    );
+
+    for (const conn of incomingConnections) {
+      const outputNode = this.nodeDetailsArr.find(
+        n => Number(n.node_id) === Number(conn.output_id)
+      );
+
+      // Don't treat the starting Loop node's own output_2 (its own loop body
+      // feedback) as "upstream" — that's just the loop closing on itself.
+      if (Number(conn.output_id) === selfLoopNodeId && conn.output_class === 'output_2') {
+        continue;
+      }
+
+      if (
+        outputNode?.node_type === nodeTypes.Loop &&
+        conn.output_class === 'output_2'
+      ) {
+        return true;
+      }
+
+      if (this.hasUpstreamLoopOutput2(Number(conn.output_id), visited, selfLoopNodeId)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   //  addMiddleArrows(): void {
@@ -2010,10 +2104,19 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
     const hasNodeErrors = this.nodeDetailsArr?.some(node => this.hasAnyErrors(node.formErrors)) ?? false;
     const hasToolErrors = this.toolsArr?.some(group => group?.data?.some(tool => tool?.hasErrors)) ?? false;
     console.log(this.toolsArr, "Tools Arr")
+
+    if (this.hasNestedLoopConnectionOnSave()) {
+      this.notification.error(
+        new Notification('Nested Loop nodes are not applicable at the moment. Please remove the connection.')
+      );
+      return;
+    }
+
     if (hasNodeErrors || hasToolErrors) {
       this.notification.error(new Notification('Workflow cannot be saved due to configuration errors in one or more nodes.'));
       return
     }
+
     if (!this.validateAgentTimeouts()) return;
     console.log('Drawflow data', this.editor.export());
     const workflowPayload = this.buildWorkflowPayload(
@@ -2117,6 +2220,12 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
         target_input: conn.target_input
       }))
     };
+  }
+
+  private hasNestedLoopConnectionOnSave(): boolean {
+    return this.connectionList.some(connection =>
+      this.isNestedLoopConnection(connection)
+    );
   }
 
   // formatChildren(loopNode) {

@@ -96,10 +96,11 @@ import { ConditionInvestigationNewTerminalComponent } from './condition-investig
 import { ConditionInvestigationTerminalNewTabComponent } from './condition-investigation/condition-investigation-terminal-new-tab/condition-investigation-terminal-new-tab.component';
 import { ConditionInvestigationFloatingTerminalComponent } from './condition-investigation/condition-investigation-floating-terminal/condition-investigation-floating-terminal.component';
 import { ConditionInvestigationFloatingTerminalItemComponent } from './condition-investigation/condition-investigation-floating-terminal/condition-investigation-floating-terminal-item/condition-investigation-floating-terminal-item.component';
+import { EchartsxModule } from 'echarts-for-angular';
 
 @NgModule({
   imports: [AppCoreModule, ChartsModule, ResizableModule, PerfectScrollbarModule,
-    TypeaheadModule.forRoot(), AppDirectivesModule, AppFiltersModule, AppSharedCrudModule, MarkdownModule],
+    TypeaheadModule.forRoot(), AppDirectivesModule, AppFiltersModule, AppSharedCrudModule, MarkdownModule, EchartsxModule],
   exports: [
     AppMainTabComponent,
     ComingSoonComponent,

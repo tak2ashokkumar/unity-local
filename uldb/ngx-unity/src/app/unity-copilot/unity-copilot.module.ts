@@ -20,6 +20,7 @@ import { AiAgentAlertsComponent } from './ai-agent-events-alerts-conditions-dash
 import { AiAgentEventsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events/ai-agent-events.component';
 import { ComputeAiAgentComponent } from './compute-ai-agent/compute-ai-agent.component';
 import { AiAgentConditionsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-conditions/ai-agent-conditions.component';
+import { StorageAiAgentComponent } from './storage-ai-agent/storage-ai-agent.component';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { AiAgentConditionsComponent } from './ai-agent-events-alerts-conditions-
     AiAgentEventsAlertsConditionsDashboardComponent,
     AiAgentEventsComponent,
     AiAgentAlertsComponent,
-    AiAgentConditionsComponent
+    AiAgentConditionsComponent,
+    StorageAiAgentComponent
   ],
   imports: [
     // CommonModule,

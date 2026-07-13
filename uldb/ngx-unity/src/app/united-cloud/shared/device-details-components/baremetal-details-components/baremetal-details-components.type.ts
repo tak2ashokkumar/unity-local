@@ -4,13 +4,12 @@ export interface BaremetalDeviceDetailsIpAddressType {
     Category: string;
     Type: string;
     Item: string;
+    DNSHostName: string;
     TokenId: string;
-    LastScanDate: string;
     Description: string;
     NameFormat: string;
     Address: string;
     AddressType: string;
-    DNSHostName: string;
     ProtocolType: string;
     SubnetMask: string;
     ManagementAddress: string;
@@ -84,7 +83,7 @@ export interface BaremetalDeviceDetailsInterfaceType {
     SystemName: string;
 }
 
-export interface BaremetalDeviceDetailsOperationSystemType {
+export interface BaremetalDeviceDetailsOSType {
     Name: string;
     ShortDescription: string;
     Category: string;
@@ -97,11 +96,9 @@ export interface BaremetalDeviceDetailsOperationSystemType {
     Model: string;
     VersionNumber: string;
     BuildNumber: string;
-    ServicePack: string;
     NameFormat: string;
     MarketVersion: string;
     LicenseType: string;
-    Company: string;
     EndOfLife: string;
     EndOfSupport: string;
     EndOfSecuritySupport: string;

@@ -1,0 +1,217 @@
+@import "variables";
+
+.table td, .table th {
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
+.token-billing-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.token-billing-summary-card {
+  min-height: 342px;
+}
+
+.token-billing-chart-card {
+  min-height: 306px;
+}
+
+.tb-top-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 0.8rem;
+  margin-top: -66px;
+  padding-top: 10px;
+  pointer-events: none;
+  position: relative;
+  z-index: 100;
+}
+
+.tb-dashboard-toolbar {
+  margin-top: 0.75rem;
+}
+
+.tb-filter-row {
+  align-items: flex-end;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tb-filter-dates {
+  align-items: flex-end;
+  display: flex;
+  flex: 1 1 auto;
+  gap: 1rem;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.tb-filter-date-range {
+  flex: 0 0 200px;
+  max-width: 200px;
+  min-width: 180px;
+}
+
+.tb-filter-date-input {
+  flex: 0 0 200px;
+}
+
+.tb-range-select {
+  ::ng-deep .ng-select-container {
+    height: 31px;
+    min-height: 31px;
+  }
+
+  ::ng-deep .ng-value-container {
+    padding-top: 0;
+  }
+}
+
+.tb-top-action-btn {
+  align-items: center;
+  background-color: $warning-500;
+  border: 0;
+  border-radius: 50%;
+  color: $white;
+  display: inline-flex;
+  height: 25px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  pointer-events: auto;
+  width: 25px;
+
+  i {
+    font-size: 12px;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: $warning-600;
+    color: $white;
+    outline: none;
+    text-decoration: none;
+  }
+}
+
+.chart-panel-body {
+  min-height: 304px;
+}
+
+.chart-slot {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.chart-slot-top {
+  height: 220px;
+}
+
+.chart-slot-main {
+  height: 230px;
+}
+
+.tb-graph-filter-dropdown {
+  position: relative;
+}
+
+.tb-graph-filter-menu {
+  max-height: 220px;
+  max-width: min(260px, calc(100vw - 24px));
+  min-width: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  .form-check {
+    align-items: flex-start;
+    display: flex;
+    gap: 6px;
+    min-width: 0;
+    padding-left: 0;
+  }
+
+  .form-check-input {
+    flex: 0 0 auto;
+    margin-left: 0;
+    margin-top: 2px;
+    position: static;
+  }
+
+  .form-check-label {
+    flex: 1 1 auto;
+    line-height: 1.25;
+    max-width: 210px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}
+
+@media (min-width: 992px) {
+  :host-context(body.unity-chatbot-open:not(.unity-chatbot-expanded)) .tb-graph-filter-menu {
+    max-width: min(260px, calc(100vw - var(--unity-chatbot-panel-width, 420px) - 24px));
+  }
+}
+
+.model-cost-table-wrapper {
+  height: 246px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.model-cost-table {
+  table-layout: fixed;
+  thead th {
+    background-color: $gray-100;
+    border-top: none;
+    border-bottom: 1px solid $gray-200;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  th, td {
+    padding: 0.6rem 0.75rem;
+  }
+
+  th:first-child,
+  td:first-child {
+    width: 50%;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 25%;
+  }
+  th:last-child,
+  td:last-child {
+    width: 25%;
+  }
+  tbody td {
+    border-top: 1px solid $gray-100;
+  }
+  tbody tr:last-child td {
+    border-bottom: 1px solid $gray-100;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .tb-filter-row,
+  .tb-filter-dates {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tb-filter-date-range,
+  .tb-filter-date-input {
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+}

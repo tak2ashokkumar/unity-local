@@ -91,18 +91,6 @@ export class UchChatService {
     });
   }
 
-  changeActiveModel(selectedApplication: string, model: SupportedLLMConfigData) {
-    let app: string;
-    switch (selectedApplication) {
-      case 'Assistant': app = 'assistant'; break;
-      case 'Network Agent': app = 'network_agent'; break;
-      case 'Workflow Agent': app = 'workflow_agent'; break;
-      default: app = 'assistant';
-    }
-    let data = { 'active_model': model.id, 'application': app };
-    return this.http.post(`mcp/user-session-config/`, data);
-  }
-
   getDocuments(conversationId: string): Observable<ChatDocuments> {
     const data = { conversation_id: conversationId };
     return this.http.post<ChatDocuments>('mcp/get_conversation_document_ids/', data)
@@ -119,10 +107,10 @@ export class UchChatService {
     conversationId && formData.append('conversation_id', conversationId);
     formData.append('org_id', String(orgId));
     formData.append('user_id', String(userId));
-    return this.http.post(`${environment.ChatbotDocumentUploadUrl}mcp/documents/upload/`, formData);
+    return this.http.post(`mcp/documents/upload/`, formData);
   }
   deleteDocument(docId: string, conversationId: string) {
     const postData = { conversation_id: conversationId, document_id: docId }
-    return this.http.post(`${environment.ChatbotDocumentUploadUrl}mcp/documents/delete/`, postData);
+    return this.http.post(`mcp/documents/delete/`, postData);
   }
 }

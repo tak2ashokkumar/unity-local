@@ -530,6 +530,10 @@ const UNITY_AI_AGENTS_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
             name: 'Compute AI Agent',
             url: '/unity-copilot/compute-ai-agent',
         },
+        // {
+        //     name: 'Storage AI Agent',
+        //     url: '/unity-copilot/storage-ai-agent',
+        // },
         {
             name: `${finopsMenuName}`,
             url: '/unity-copilot/finops-ai-agent',
@@ -642,6 +646,12 @@ const UNITY_SERVICES_NAV_ITEMS = (svc: PermissionService, orgName: string, isTen
             url: '/services/log-management',
             icon: 'fas fa-clipboard-list',
         },
+        {
+            name: 'Token Billing',
+            url: '/services/token-billing/dashboard',
+            icon: 'fas fa-coins',
+            routeAccess: UNITY_ROUTE_ACCESS.SERVICES_TOKEN_BILLING,
+        },
     ]
     if (isTenantOrg) {
         navItems = [
@@ -714,16 +724,6 @@ const UNITED_CLOUD_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
                 access: 'View'
             }
         },
-        // {
-        //     name: 'Infrastructure',
-        //     url: '/unitycloud/infrastructure',
-        //     icon: 'fas fa-boxes',
-        //     attributes: {
-        //         module: [UnityModules.DATACENTER, UnityModules.PRIVATE_CLOUD, UnityModules.PUBLIC_CLOUD],
-        //         access: 'View',
-        //         isBeta: true
-        //     },
-        // },
         {
             name: 'Mesh Services',
             url: '/unitycloud/services',

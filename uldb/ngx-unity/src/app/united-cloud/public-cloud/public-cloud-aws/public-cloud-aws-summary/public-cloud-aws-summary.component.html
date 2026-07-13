@@ -64,19 +64,13 @@
             <div class="col">
                 <div class="card mb-2" *ngFor="let view of CustomerListViewData?.accountDetails">
                     <div class="card-body py-2">
-                        <div class="row">
-                            <div class="col-6 d-flex flex-column">
-                                <div class="text-primary mb-2 text-value pointer-link" (click)="edit(view)"
-                                    accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
-                                    elementType="div">
-                                    {{view?.accountName}}</div>
-                                <div class="text-primary text-value pointer-link" (click)="goToCostAnalysis(view)"
-                                    accessControl moduleName="Cost Analysis" accessType="View Cost Analysis"
-                                    elementType="div">
-                                    ${{view?.currentMonthCost.amount}}</div>
-                            </div>
-                            <div class="col-6 d-flex flex-column text-right">
-                                <div class="mb-2">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="text-primary text-value pointer-link" (click)="edit(view)" accessControl
+                                    moduleName="Public Cloud" accessType="Manage Public Cloud" elementType="div">
+                                    {{view?.accountName}}
+                                </div>
+                                <div>
                                     <span class="text-primary mr-2 text-value pointer-link"
                                         (click)="showServices(view)">{{view?.totalServicesCount}}</span>
                                     <span class="text-muted text-sm mr-2">Services</span>
@@ -88,31 +82,35 @@
                                     <span class="text-primary ml-2 text-value">{{view?.totalAlertEventCount}}</span>
                                     <span class="text-muted text-sm ml-2">Alerts</span>
                                 </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="text-primary text-value pointer-link" (click)="goToCostAnalysis(view)"
+                                    accessControl moduleName="Cost Analysis" accessType="View Cost Analysis"
+                                    elementType="div">
+                                    ${{view?.currentMonthCost.amount}}
+                                </div>
                                 <div>
                                     <button class="action-icons mb-0 fas fa-sync font-sm ml-1" (click)="syncNow(view)"
                                         [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
                                         [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress}" accessControl
                                         moduleName="Public Cloud" accessType="Manage Public Cloud"
-                                        elementType="actionbtn">
-                                    </button>
+                                        elementType="actionbtn"></button>
                                     <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body"
                                         tooltip="Schedule History" (click)="getScheduleHistory(view)"></button>
                                     <button class="action-icons mb-0 fa fa-key font-sm ml-1" tooltip="Change API Keys"
                                         (click)="changeAPIKeys(view)" accessControl moduleName="Public Cloud"
-                                        accessType="Manage Public Cloud" elementType="actionbtn">
-                                    </button>
+                                        accessType="Manage Public Cloud" elementType="actionbtn"></button>
                                     <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1"
                                         (click)="goToStats(view)" [tooltip]="view.statsTooltipMessage" accessControl
                                         moduleName="Monitoring" accessType="View Monitoring" elementType="actionbtn">
                                     </button>
                                     <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
-                                        tooltip="Manage by creating support ticket" (click)="createTicket(view)">
-                                    </button>
+                                        tooltip="Manage by creating support ticket"
+                                        (click)="createTicket(view)"></button>
                                     <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1"
                                         tooltip="Delete Account" (click)="deleteAwsAccount(view)" accessControl
                                         moduleName="Public Cloud" accessType="Manage Public Cloud"
-                                        elementType="actionbtn">
-                                    </button>
+                                        elementType="actionbtn"></button>
                                 </div>
                             </div>
                         </div>
@@ -248,7 +246,8 @@
                 </div>
                 <div class="col-9">
                     <div class="row justify-content-end mr-1">
-                        <table-page-size [currentPageSize]="scheduleHistoryCurrentCriteria.pageSize" [totalCount]="scheduleHistoryCount"
+                        <table-page-size [currentPageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                            [totalCount]="scheduleHistoryCount"
                             (pageSizeChange)="pageSizeChange($event)"></table-page-size>
                     </div>
                 </div>
@@ -276,10 +275,12 @@
                     </tr>
                 </tbody>
             </table>
-            <table-entries [pageNo]="scheduleHistoryCurrentCriteria.pageNo" [pageSize]="scheduleHistoryCurrentCriteria.pageSize"
+            <table-entries [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+                [pageSize]="scheduleHistoryCurrentCriteria.pageSize"
                 [totalCount]="scheduleHistoryCount"></table-entries>
-            <table-pager *ngIf="scheduleHistory.length" [pageNo]="scheduleHistoryCurrentCriteria.pageNo" [pageSize]="scheduleHistoryCurrentCriteria.pageSize"
-                [totalCount]="scheduleHistoryCount" (pageChange)="pageChange($event)"></table-pager>
+            <table-pager *ngIf="scheduleHistory.length" [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+                [pageSize]="scheduleHistoryCurrentCriteria.pageSize" [totalCount]="scheduleHistoryCount"
+                (pageChange)="pageChange($event)"></table-pager>
             <p *ngIf="scheduleHistory.length==0" class="text-center py-3">No history to display</p>
         </div>
         <div class="card-footer">

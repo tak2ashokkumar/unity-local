@@ -57,28 +57,30 @@ export interface StorageDeviceDetailsInterfaceType {
     SystemName: string;
 }
 
-export interface StorageDeviceDetailsOperationSystemType {
-   Name: string;
-    ShortDescription: string;
+export interface StorageDeviceDetailsOSType {
     Category: string;
-    Type: string;
-    Item: string;
-    NameFormat: string;
-    ManufacturerName: string;
-    VersionNumber: string;
-    Model: string;
-    TokenId: string;
-    Description: string;
-    Company: string;
-    BuildNumber: string;
-    ServicePack: string;
-    MarketVersion: string;
-    LicenseType: string;
-    EndOfLife: string;
-    EndOfSupport: string;
-    EndOfSecuritySupport: string;
-    EndOfExtendedSupport: string;
-    SystemClassId: string;
     MarkAsDeleted: string;
     SystemName: string;
+    OSType: string;
+    Type: string;
+    EndOfExtendedSupport: string;
+    ServicePack: string;
+    LicenseType: string;
+    Description: string;
+    Company: string;
+    EndOfLife: string;
+    NameFormat: string;
+    SystemClassId: string;
+    LastScanDate: string;
+    ShortDescription: string;
+    Name: string;
+    TokenId: string;
+    Item: string;
+    Model: string;
+    MarketVersion: string;
+    EndOfSecuritySupport: string;
+    BuildNumber: string;
+    VersionNumber: string;
+    ManufacturerName: string;
+    EndOfSupport: string;
 }

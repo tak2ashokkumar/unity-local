@@ -15,7 +15,7 @@ export class ApplicationDiscoveryAiHealthAnalysisService {
       session_id: this.generateSessionId(),
       message: "give me a health report of all services of astronomy shop, include failure data as well to give a proper overall report"
     };
-    return this.http.post<any>('/aiapm/health', payload);
+    return this.http.post<any>('http://10.192.11.64:9957/health', payload);
   }
 
 

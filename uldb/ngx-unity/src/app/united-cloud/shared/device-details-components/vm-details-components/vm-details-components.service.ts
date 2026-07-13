@@ -17,14 +17,14 @@ export class VmDetailsComponentsService {
     private utilSvc: AppUtilityService,
     private tableService: TableApiServiceService,) { }
 
-  getIpAddresses(deviceId: string): Observable<IpAddressData> {
+  getIpAddresses(deviceId: string): Observable<IpAddressData[]> {
     // let params = new HttpParams().set('device_id', deviceId).set('uuid', deviceId);
-    return this.http.get<IpAddressData>(`/customer/vmware_vms/${deviceId}/vmware/ip-address/`);
+    return this.http.get<IpAddressData[]>(`/customer/vmware_vms/${deviceId}/vmware/ip-address/`);
   }
 
-  getOsDetails(deviceId: string): Observable<OSData> {
+  getOsDetails(deviceId: string): Observable<OSData[]> {
     // let params = new HttpParams().set('device_id', deviceId).set('uuid', deviceId);
-    return this.http.get<OSData>(`/customer/vmware_vms/${deviceId}/vmware/os-data/`);
+    return this.http.get<OSData[]>(`/customer/vmware_vms/${deviceId}/vmware/os-data/`);
   }
 
   getInterfaceDetails(deviceId: string, criteria: SearchCriteria): Observable<PaginatedResult<InterfaceData>> {
@@ -51,58 +51,51 @@ export class VmDetailsComponentsService {
     return this.tableService.getData<PaginatedResult<ServerData>>(`/customer/vmware_vms/${deviceId}/vmware/server-data/`, criteria);
   }
 
-  buildIPAddressForm(data?: IpAddressData): FormGroup {
-    return this.builder.group({
-      name: [{ value: data?.Name ?? '', disabled: true }],
-      shortDescription: [{ value: data?.ShortDescription ?? '', disabled: true }],
-      category: [{ value: data?.Category ?? '', disabled: true }],
-      type: [{ value: data?.Type ?? '', disabled: true }],
-      item: [{ value: data?.Item ?? '', disabled: true }],
-
-      dnsHostName: [{ value: data?.DNSHostName ?? '', disabled: true }],
-      tokenId: [{ value: data?.TokenId ?? '', disabled: true }],
-      nameFormat: [{ value: data?.NameFormat ?? '', disabled: true }],
-
-      address: [{ value: data?.Address ?? '', disabled: true }],
-      addressType: [{ value: data?.AddressType ?? '', disabled: true }],
-      protocolType: [{ value: data?.ProtocolType ?? '', disabled: true }],
-      subnetMask: [{ value: data?.SubnetMask ?? '', disabled: true }],
-      managementAddress: [{ value: data?.ManagementAddress ?? '', disabled: true }],
-
-      company: [{ value: data?.Company ?? '', disabled: true }],
-      description: [{ value: data?.Description ?? '', disabled: true }]
-    });
+  convertToIPAddressViewData(data: IpAddressData[]): IpAddressViewData[] {
+    if (!data || !data.length) return [];
+    let viewData: IpAddressViewData[] = [];
+    data.forEach(d => {
+      let view = new IpAddressViewData();
+      view.name = d.Name;
+      view.category = d.Category;
+      view.managementAddress = d.ManagementAddress;
+      view.addressType = d.AddressType;
+      view.tokenId = d.TokenId;
+      view.protocolType = d.ProtocolType;
+      view.type = d.Type;
+      view.markAsDeleted = d.MarkAsDeleted;
+      view.dnsHostName = d.DNSHostName;
+      view.item = d.Item;
+      view.address = d.Address;
+      view.shortDescription = d.ShortDescription;
+      view.description = d.Description;
+      viewData.push(view);
+    })
+    return viewData;
   }
 
-  buildOSForm(data?: OSData): FormGroup {
-    return this.builder.group({
-      name: [{ value: data?.Name ?? '', disabled: true }],
-      shortDescription: [{ value: data?.ShortDescription ?? '', disabled: true }],
-      category: [{ value: data?.Category ?? '', disabled: true }],
-      type: [{ value: data?.Type ?? '', disabled: true }],
-      item: [{ value: data?.Item ?? '', disabled: true }],
-
-      tokenId: [{ value: data?.TokenId ?? '', disabled: true }],
-      nameFormat: [{ value: data?.NameFormat ?? '', disabled: true }],
-
-      osType: [{ value: data?.OSType ?? '', disabled: true }],
-      manufacturerName: [{ value: data?.ManufacturerName ?? '', disabled: true }],
-      model: [{ value: data?.Model ?? '', disabled: true }],
-      versionNumber: [{ value: data?.VersionNumber ?? '', disabled: true }],
-      buildNumber: [{ value: data?.BuildNumber ?? '', disabled: true }],
-      servicePack: [{ value: data?.ServicePack ?? '', disabled: true }],
-      marketVersion: [{ value: data?.MarketVersion ?? '', disabled: true }],
-
-      licenseType: [{ value: data?.LicenseType ?? '', disabled: true }],
-      company: [{ value: data?.Company ?? '', disabled: true }],
-
-      endOfLife: [{ value: data?.EndOfLife ?? '', disabled: true }],
-      endOfSupport: [{ value: data?.EndOfSupport ?? '', disabled: true }],
-      endOfSecuritySupport: [{ value: data?.EndOfSecuritySupport ?? '', disabled: true }],
-      endOfExtendedSupport: [{ value: data?.EndOfExtendedSupport ?? '', disabled: true }],
-
-      description: [{ value: data?.Description ?? '', disabled: true }]
-    });
+  convertToOSViewData(data: OSData[]): OSViewData[] {
+    if (!data || !data.length) return [];
+    let viewData: OSViewData[] = [];
+    data.forEach(d => {
+      let view = new OSViewData();
+      view.name = d.Name;
+      view.systemName = d.SystemName;
+      view.category = d.Category;
+      view.osType = d.OSType;
+      view.type = d.Type;
+      view.item = d.Item;
+      view.tokenId = d.TokenId;
+      view.markAsDeleted = d.MarkAsDeleted;
+      view.manufacturerName = d.ManufacturerName;
+      view.model = d.Model;
+      view.marketVersion = d.MarketVersion;
+      view.licenseType = d.LicenseType;
+      view.description = d.Description;
+      view.shortDescription = d.ShortDescription;
+      viewData.push(view);
+    })
+    return viewData;
   }
 
   convertToInterfaceViewData(data: InterfaceData[]): InterfaceViewData[] {
@@ -279,19 +272,19 @@ export class VmDetailsComponentsService {
 export class IpAddressViewData {
   constructor() { }
   name: string;
-  shortDescription: string;
   category: string;
-  type: string;
-  item: string;
-  dnsHostName: string;
-  tokenId: string;
-  description: string;
-  nameFormat: string;
-  address: string;
-  addressType: string;
-  protocolType: string;
-  subnetMask: string;
   managementAddress: string;
+  addressType: string;
+  tokenId: string;
+  protocolType: string;
+  type: string;
+  markAsDeleted: string;
+  dnsHostName: string;
+  item: string;
+  address: string;
+  shortDescription: string;
+  description: string;
+  subnetMask: string;
   company: string;
 }
 
@@ -361,25 +354,18 @@ export class OSViewData {
   constructor() { };
   name: string;
   shortDescription: string;
+  systemName: string;
   category: string;
+  osType: string
   type: string;
   item: string;
   tokenId: string;
+  markAsDeleted: string;
   description: string;
-  osType: string;
   manufacturerName: string;
   model: string;
-  versionNumber: string;
-  buildNumber: string;
-  servicePack: string;
-  nameFormat: string;
   marketVersion: string;
   licenseType: string;
-  company: string;
-  endOfLife: string;
-  endOfSupport: string;
-  endOfSecuritySupport: string;
-  endOfExtendedSupport: string;
 }
 
 

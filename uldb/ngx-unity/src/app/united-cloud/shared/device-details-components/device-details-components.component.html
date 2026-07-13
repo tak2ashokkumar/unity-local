@@ -109,7 +109,7 @@
                             <tab id="interface" heading="Interfaces" [active]="view === 'interface'" class="p-0"
                                 (selectTab)="switchView($event)">
                             </tab>
-                            <tab id="os" heading="Operation System" [active]="view === 'os'" class="p-0"
+                            <tab id="os" heading="Operating System" [active]="view === 'os'" class="p-0"
                                 (selectTab)="switchView($event)">
                             </tab>
                             <tab id="hardwareComponents" heading="Hardware Components"
@@ -136,7 +136,7 @@
                             <tab id="fileSystem" heading="File System" [active]="view === 'fileSystem'" class="p-0"
                                 (selectTab)="switchView($event)">
                             </tab>
-                            <tab id="operationSystem" heading="Operation System" [active]="view === 'operationSystem'"
+                            <tab id="os" heading="Operating System" [active]="view === 'os'"
                                 class="p-0" (selectTab)="switchView($event)">
                             </tab>
                             <tab id="softwareServer" heading="Software Server" [active]="view === 'softwareServer'"
@@ -154,8 +154,8 @@
                             <tab id="interface" heading="Interface" class="p-0" [active]="view === 'interface'"
                                 (selectTab)="switchView($event)">
                             </tab>
-                            <tab id="operationSystem" heading="Operation System" class="p-0"
-                                [active]="view === 'operationSystem'" (selectTab)="switchView($event)">
+                            <tab id="os" heading="Operating System" class="p-0"
+                                [active]="view === 'os'" (selectTab)="switchView($event)">
                             </tab>
                         </ng-container>
 
@@ -399,8 +399,8 @@
                 <baremetal-details-components [activeTabId]="'fileSystem'" [deviceType]="deviceType"
                     [deviceId]="deviceId"></baremetal-details-components>
             </ng-container>
-            <ng-container *ngSwitchCase="'operationSystem'">
-                <baremetal-details-components [activeTabId]="'operationSystem'" [deviceType]="deviceType"
+            <ng-container *ngSwitchCase="'os'">
+                <baremetal-details-components [activeTabId]="'os'" [deviceType]="deviceType"
                     [deviceId]="deviceId"></baremetal-details-components>
             </ng-container>
             <ng-container *ngSwitchCase="'softwareServer'">
@@ -426,8 +426,8 @@
                 <storage-details-components [activeTabId]="'interface'" [deviceType]="deviceType"
                     [deviceId]="deviceId"></storage-details-components>
             </ng-container>
-            <ng-container *ngSwitchCase="'operationSystem'">
-                <storage-details-components [activeTabId]="'operationSystem'" [deviceType]="deviceType"
+            <ng-container *ngSwitchCase="'os'">
+                <storage-details-components [activeTabId]="'os'" [deviceType]="deviceType"
                     [deviceId]="deviceId"></storage-details-components>
             </ng-container>
         </ng-container>

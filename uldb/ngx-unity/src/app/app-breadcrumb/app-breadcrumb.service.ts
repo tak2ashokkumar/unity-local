@@ -32,6 +32,13 @@ export class AppBreadcrumbService {
             });
             let routeData = route.snapshot.data;
             if (routeData.hasOwnProperty('breadcrumb') && routeData['breadcrumb'] && routeData.breadcrumb.title) {
+              if (routeData.breadcrumb.parentTitle && breadcrumbs.length) {
+                breadcrumbs[0] = {
+                  ...breadcrumbs[0],
+                  label: routeData.breadcrumb.parentTitle,
+                  url: routeData.breadcrumb.parentUrl || breadcrumbs[0]['url']
+                };
+              }
               const stepbackCount = routeData.breadcrumb.stepbackCount;
               breadcrumbs.push({
                 label: routeData.breadcrumb.title,

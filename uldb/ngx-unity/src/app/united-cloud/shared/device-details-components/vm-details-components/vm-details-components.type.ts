@@ -14,6 +14,9 @@ export interface IpAddressData {
   SubnetMask: string;
   ManagementAddress: string;
   Company: string;
+  SystemClassId: string;
+  MarkAsDeleted: string;
+  SystemName: string;
 }
 
 export interface InterfaceData {
@@ -77,15 +80,17 @@ export interface OSData {
   Model: string;
   VersionNumber: string;
   BuildNumber: string;
-  ServicePack: string;
   NameFormat: string;
   MarketVersion: string;
   LicenseType: string;
-  Company: string;
   EndOfLife: string;
   EndOfSupport: string;
   EndOfSecuritySupport: string;
   EndOfExtendedSupport: string;
+  LastScanDate: string;
+  SystemClassId: string;
+  MarkAsDeleted: string;
+  SystemName: string;
 }
 
 export interface ProcessorData {

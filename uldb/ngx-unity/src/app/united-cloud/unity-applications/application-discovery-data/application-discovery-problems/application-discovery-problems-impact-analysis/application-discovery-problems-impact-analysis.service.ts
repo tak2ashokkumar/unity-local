@@ -15,7 +15,7 @@ export class ApplicationDiscoveryProblemsImpactAnalysisService {
       condition_uuid: conditionId,
       message: "give me a impact report of all services of astronomy shop, try to create a blast radius to show how the topological neighbours are affected"
     };
-    return this.http.post<any>('/aiapm/impact', payload);
+    return this.http.post<any>('http://10.192.11.64:9957/impact', payload);
   }
 
   convertToAiImpactAnalysisViewData(data: ImpactAnalysisModel): ImpactAnalysisViewData {

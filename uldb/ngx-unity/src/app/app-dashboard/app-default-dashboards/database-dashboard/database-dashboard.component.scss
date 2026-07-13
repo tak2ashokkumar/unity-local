@@ -294,7 +294,8 @@
   text-decoration: none;
 }
 
-.utilization-table th.col-sorted {
+.utilization-table th.col-sorted,
+.efficiency-table th.col-sorted {
   background: #cfe4fb;
   color: #0b66c3;
 }
@@ -345,6 +346,10 @@
   color: #28323b;
 }
 
+.tone-unknown {
+  color: #6c7580;
+}
+
 .status-badge.tone-success,
 .progress-fill.tone-success {
   background: #13bd77;
@@ -358,6 +363,11 @@
 .status-badge.tone-danger,
 .progress-fill.tone-danger {
   background: #d90000;
+}
+
+.status-badge.tone-unknown,
+.progress-fill.tone-unknown {
+  background: #6c7580;
 }
 
 .progress-track {
@@ -456,11 +466,6 @@
   margin-top: 8px;
 }
 
-.compact-bar-chart {
-  height: 122px;
-  margin-top: 18px;
-}
-
 .line-chart {
   height: 160px;
   width: 100%;
@@ -519,6 +524,30 @@
   margin-top: 8px;
 }
 
+.efficiency-gauge-chart,
+.temporary-table-performance-chart {
+  width: 100%;
+  height: 190px;
+}
+
+.efficiency-table-scroll {
+  max-height: 318px;
+  overflow-y: auto;
+}
+
+.efficiency-table {
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  th,
+  td {
+    vertical-align: middle;
+  }
+}
+
 .health-card {
   display: grid;
   grid-template-columns: repeat(2, minmax(320px, 1fr));
@@ -563,6 +592,10 @@
   strong.tone-danger {
     background: #fde8ea;
   }
+
+  strong.tone-unknown {
+    background: #eceff2;
+  }
 }
 
 .health-dot {
@@ -581,6 +614,10 @@
 
   &.tone-danger {
     background: #e84a4a;
+  }
+
+  &.tone-unknown {
+    background: #6c7580;
   }
 }
 

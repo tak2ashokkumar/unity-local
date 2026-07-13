@@ -22,8 +22,18 @@ import {
   DatabaseDashboardVersionItem,
   DbDashboardReplicationSyncSummaryData,
   DBDashboardTopServersViewData,
-  DatabaseDashboardTop10UtilizationViewData
+  DatabaseDashboardTop10UtilizationViewData,
+  DBDashboardEfficiencyGaugeViewData,
+  DBDashboardTemporaryTablePerformanceViewData,
+  DBDashboardEfficiencyServerViewData,
+  DatabaseDashboardMetricInfo,
+  DatabaseDashboardMetricInfoStatus,
+  DatabaseDashboardStatusInfo
 } from './database-dashboard.type';
+import {
+  DATABASE_DASHBOARD_EFFICIENCY_STATUS_INFO,
+  DATABASE_DASHBOARD_METRIC_INFO_CONFIG
+} from './database-dashboard.const';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -45,6 +55,8 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   refreshedText: string = '';
   filterForm: FormGroup;
   databaseOptions: DatabaseDashboardFilterOption[] = [];
+  metricInfoMap = DATABASE_DASHBOARD_METRIC_INFO_CONFIG;
+  databaseEfficiencyStatusInfo: DatabaseDashboardStatusInfo[] = DATABASE_DASHBOARD_EFFICIENCY_STATUS_INFO;
 
   summaryMetrics: DatabaseDashboardMetric[] = [];
   // cloudTypeDistribution: DatabaseDashboardDonutItem[] = [];
@@ -71,6 +83,10 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   dbSizeByServerOptions: EChartsOption;
   logSizeByServerOptions: EChartsOption;
   diskUtilizationOptions: EChartsOption;
+  bufferCacheEfficiency: DBDashboardEfficiencyGaugeViewData;
+  databaseObjectUtilization: DBDashboardEfficiencyGaugeViewData;
+  temporaryTablePerformance: DBDashboardTemporaryTablePerformanceViewData;
+  databaseEfficiencyRows: DBDashboardEfficiencyServerViewData[] = [];
 
   healthGroups: DbDashboardHealthGroup[] = [];
   databaseAvailabilityStatus: DbDashboardSummary;
@@ -110,6 +126,8 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     dbSizeByServer: 'databaseDashboardDbSizeByServerLoader',
     logSizeByServer: 'databaseDashboardLogSizeByServerLoader',
     diskUtilization: 'databaseDashboardDiskUtilizationLoader',
+    databaseEfficiency: 'databaseDashboardDatabaseEfficiencyLoader',
+    databaseEfficiencyTop10Overview: 'databaseDashboardDatabaseEfficiencyTop10TableLoader',
     healthGroups: 'databaseDashboardHealthGroupsLoader',
     alertSummary: 'databaseDashboardAlertSummaryLoader',
     criticalAlerts: 'databaseDashboardCriticalAlertsLoader'
@@ -142,10 +160,12 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   sortColumn: string = 'cpu_usage_system_percent';
   sortDirection: string = 'asc';
+  databaseEfficiencySortColumn: string = 'buffer_pool_efficiency';
+  databaseEfficiencySortDirection: string = 'desc';
   utilizationSortOptions = [
     { label: 'CPU', value: 'cpu_usage_system_percent' },
     { label: 'Memory', value: 'memory_used_percent' },
-    { label: 'Disk', value: 'disk_usage_percent' },
+    { label: 'Disk', value: 'disk_utilization_percent' },
     { label: 'Disk IOPS', value: 'disk_iops' },
     { label: 'Up Time', value: 'system_uptime_seconds' }
   ];
@@ -286,6 +306,20 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     return !!this.getSortDirection(columnName);
   }
 
+  onDatabaseEfficiencySorted($event: SearchCriteria) {
+    this.databaseEfficiencySortColumn = $event.sortColumn;
+    this.databaseEfficiencySortDirection = $event.sortDirection;
+    this.getCapacityGrowthInsightsDBEfficiencyTableData(this.getFilterFormOutput());
+  }
+
+  getDatabaseEfficiencySortDirection(columnName: string): string {
+    return this.databaseEfficiencySortColumn === columnName ? this.databaseEfficiencySortDirection : '';
+  }
+
+  isDatabaseEfficiencySortedColumn(columnName: string): boolean {
+    return !!this.getDatabaseEfficiencySortDirection(columnName);
+  }
+
   onUtilizationSortChange(sortColumn: string): void {
     if (!sortColumn || sortColumn === this.sortColumn) {
       return;
@@ -325,7 +359,9 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       this.getInventoryOverviewWidgetData(filterFormOutput);
       this.getWorkloadInsightsTop10UtilData(filterFormOutput);
       this.getWorkloadInsightsTop10QueryWidgetData(filterFormOutput);
-      this.getCapacityGrowthInsightsWidgetData(filterFormOutput);
+      // this.getCapacityGrowthInsightsWidgetData(filterFormOutput);
+      this.getCapacityGrowthInsightsDBEfficiencyWidgetData(filterFormOutput);
+      this.getCapacityGrowthInsightsDBEfficiencyTableData(filterFormOutput);
       this.getHealthOverviewWidgetData(filterFormOutput);
       this.getAlertsOverviewWidgetData(filterFormOutput);
     }, 0);
@@ -396,7 +432,6 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   getWorkloadInsightsTop10QueryWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
     // this.spinnerService.start(this.loaderNames.performanceQueryResponse);
-
     this.spinnerService.start(this.loaderNames.queryResponse);
     this.spinnerService.start(this.loaderNames.queryLatency);
     this.spinnerService.start(this.loaderNames.activeSessions);
@@ -497,6 +532,42 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
+  getCapacityGrowthInsightsDBEfficiencyWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
+    this.spinnerService.start(this.loaderNames.databaseEfficiency);
+    this.bufferCacheEfficiency = null;
+    this.databaseObjectUtilization = null;
+    this.temporaryTablePerformance = null;
+    this.svc.getDatabaseEfficiencyWidgetData(filterFormOutput)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        if (res) {
+          this.bufferCacheEfficiency = this.svc.convertToBufferCacheEfficiencyViewData(res.buffer_cache_efficiency);
+          this.databaseObjectUtilization = this.svc.convertToDatabaseObjectUtilizationViewData(res.database_object_utilization);
+          this.temporaryTablePerformance = this.svc.convertToTemporaryTablePerformanceViewData(res.temporary_table_performance);
+        }
+        this.spinnerService.stop(this.loaderNames.databaseEfficiency);
+      }, (_err: HttpErrorResponse) => {
+        this.spinnerService.stop(this.loaderNames.databaseEfficiency);
+        this.notification.error(new Notification('Failed to get database efficiency data. Try again later'));
+      });
+  }
+
+  getCapacityGrowthInsightsDBEfficiencyTableData(filterFormOutput: DatabaseDashboardFilterCriteria) {
+    this.spinnerService.start(this.loaderNames.databaseEfficiencyTop10Overview);
+    this.databaseEfficiencyRows = [];
+    this.svc.getDatabaseEfficiencyTableData(filterFormOutput, this.databaseEfficiencySortColumn, this.databaseEfficiencySortDirection)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        if (res) {
+          this.databaseEfficiencyRows = this.svc.convertToDatabaseEfficiencyRowsViewData(res.servers);
+        }
+        this.spinnerService.stop(this.loaderNames.databaseEfficiencyTop10Overview);
+      }, (_err: HttpErrorResponse) => {
+        this.spinnerService.stop(this.loaderNames.databaseEfficiencyTop10Overview);
+        this.notification.error(new Notification('Failed to get database efficiency overview data. Try again later'));
+      });
+  }
+
   getHealthOverviewWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
     this.spinnerService.start(this.loaderNames.healthOverview);
     this.databaseAvailabilityStatus = null;
@@ -543,6 +614,14 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   getStatusClass(tone: DatabaseDashboardTone): string {
     return tone ? `tone-${tone}` : '';
+  }
+
+  getMetricInfo(headerName: string): DatabaseDashboardMetricInfo {
+    return this.metricInfoMap[headerName];
+  }
+
+  trackByMetricInfoStatus(_: number, status: DatabaseDashboardMetricInfoStatus): string {
+    return `${status.name}-${status.range}`;
   }
 
   trackByIndex(index: number): number {

@@ -65,16 +65,13 @@
             <div class="col">
                 <div class="card" *ngFor="let view of CustomerListViewData?.accountDetails">
                     <div class="card-body py-2">
-                        <div class="row">
-                            <div class="col-6 d-flex flex-column">
-                                <div class="text-primary mb-2 text-value pointer-link" (click)="edit(view)"
-                                    accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
-                                    elementType="actionbtn">
-                                    {{view?.accountName}}</div>
-                                <div class="text-primary text-value">${{view?.currentMonthCost.amount}}</div>
-                            </div>
-                            <div class="col-6 d-flex flex-column text-right">
-                                <div class="mb-2">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="text-primary text-value pointer-link" (click)="edit(view)" accessControl
+                                    moduleName="Public Cloud" accessType="Manage Public Cloud" elementType="actionbtn">
+                                    {{view?.accountName}}
+                                </div>
+                                <div>
                                     <span class="text-primary mr-2 text-value pointer-link"
                                         (click)="showServices(view)">{{view?.totalServicesCount}}</span>
                                     <span class="text-muted text-sm mr-2">Services</span>
@@ -86,6 +83,9 @@
                                     <span class="text-primary ml-2 text-value">{{view?.totalAlertEventCount}}</span>
                                     <span class="text-muted text-sm ml-2">Alerts</span>
                                 </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="text-primary text-value">${{view?.currentMonthCost.amount}}</div>
                                 <div>
                                     <!-- <button class="action-icons mb-0 fa fa-key font-sm ml-1" tooltip="Change API Keys"
                                         (click)="changeAPIKeys(view)">

@@ -10,7 +10,7 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { PRIVATE_CLOUD_ALERT_TREND_STACK_GROUPS, PRIVATE_CLOUD_TICKETS_TOTAL, VmDensityPerHostChartColors } from './private-cloud-compute-dashboard.const';
-import { AlertsSeverityItem, CapacityAndGrowthDataType, CapacityTrendAndForecastItem, CloudTypeDistributionItem, ClusterCapacityUtilTrendData, EnvironmentCriticalityItem, ExecutiveSummaryItem, ExecutiveSummaryWidgetType, FiltersCriteriaType, IdleDevices, IdleDurationDistributionItem, InfrahealthstatusDataType, OrphanedCategory, OrphanedResourcesResponse, PerformanceHotspots, PerformanceWorkloadDataType, PowerActivityStateItem, PrivateCloudAlertSideCard, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudStatusTone, PrivateCloudTicketDonutItem, PrivateCloudUtilization, PrivateCloudUtilizationRow, PrivateCloudUtilizationViewRow, ProvisioningStatus, RecentAlerts, RecentAlertsItem, Top10ClustersByVMsData, TopHeaderDataType, TopHostUtilizationItem, VmCountByOSTypeItem, } from './private-cloud-compute-dashboard.type';
+import { AlertsSeverityItem, CapacityAndGrowthDataType, CapacityTrendAndForecastItem, CloudTypeDistributionItem, ClusterCapacityUtilTrendData, EnvironmentCriticalityItem, ExecutiveSummaryItem, ExecutiveSummaryWidgetType, FiltersCriteriaType, IdleDevices, IdleDurationDistributionItem, InfrahealthstatusDataType, OrphanedCategory, OrphanedDevice, OrphanedResourcesResponse, PerformanceHotspots, PerformanceWorkloadDataType, PowerActivityStateItem, PrivateCloudAlertSideCard, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudStatusTone, PrivateCloudTicketDonutItem, PrivateCloudUtilization, PrivateCloudUtilizationRow, PrivateCloudUtilizationViewRow, ProvisioningStatus, RecentAlerts, RecentAlertsItem, Top10ClustersByVMsData, TopHeaderDataType, TopHostUtilizationItem, VmCountByOSTypeItem, } from './private-cloud-compute-dashboard.type';
 
 
 @Injectable()
@@ -83,7 +83,8 @@ export class PrivateCloudComputeDashboardService {
   }
 
   convertToCloudTypeChartData(data: CloudTypeDistributionItem[]) {
-    if (!data || !data.length) {
+    const filteredData = (data || []).filter(item => this.isPositiveChartValue(item?.count));
+    if (!filteredData.length) {
       return;
     }
     const view: UnityChartDetails = new UnityChartDetails();
@@ -119,6 +120,7 @@ export class PrivateCloudComputeDashboardService {
     ];
     view.options = {
       ...view.options,
+      animation: false,
       tooltip: {
         trigger: 'item',
         formatter: (params: any) => {
@@ -132,8 +134,8 @@ export class PrivateCloudComputeDashboardService {
         {
           name: 'Cloud Type',
           type: 'pie',
-          radius: ['45%', '78%'],
-          center: ['50%', '42%'],
+          radius: ['43%', '72%'],
+          center: ['50%', '45%'],
           label: {
             show: true,
             position: 'outside',
@@ -150,7 +152,7 @@ export class PrivateCloudComputeDashboardService {
               width: 1
             }
           },
-          data: data.map((item, index) => ({
+          data: filteredData.map((item, index) => ({
             value: item.percentage,
             name: item.type,
             count: item.count,
@@ -189,11 +191,12 @@ export class PrivateCloudComputeDashboardService {
     });
     view.options = {
       ...view.options,
+      animation: false,
       grid: {
         left: 45,
-        right: 15,
-        top: 20,
-        bottom: 40
+        right: 10,
+        top: 12,
+        bottom: 28
       },
       tooltip: {
         trigger: 'item',
@@ -245,7 +248,7 @@ export class PrivateCloudComputeDashboardService {
       series: [
         {
           type: 'bar',
-          barWidth: 52,
+          barWidth: 58,
           data: formattedData.map(item => ({
             value: item.count,
             color: item.color,
@@ -261,7 +264,8 @@ export class PrivateCloudComputeDashboardService {
   }
 
   convertToVmCountByOSTypeChartData(data: VmCountByOSTypeItem[]) {
-    if (!data || !data.length) { return; }
+    const filteredData = (data || []).filter(item => this.isPositiveChartValue(item?.count));
+    if (!filteredData.length) { return; }
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getDefaultPieChartOptions();
@@ -269,6 +273,7 @@ export class PrivateCloudComputeDashboardService {
 
     view.options = {
       ...view.options,
+      animation: false,
 
       tooltip: {
         trigger: 'item',
@@ -289,7 +294,7 @@ export class PrivateCloudComputeDashboardService {
           fontSize: 13
         },
         formatter: (name: string) => {
-          const item = data.find(d => d.os === name);
+          const item = filteredData.find(d => d.os === name);
           return item ? `${name} ${item.percentage}%` : name;
         }
       },
@@ -298,9 +303,9 @@ export class PrivateCloudComputeDashboardService {
         {
           name: 'OS Type',
           type: 'pie',
-          radius: ['45%', '72%'],
-          center: ['50%', '48%'],
-          bottom: 30,
+          radius: ['42%', '70%'],
+          center: ['50%', '43%'],
+          bottom: 26,
           label: {
             show: true,
             position: 'outside',
@@ -318,7 +323,7 @@ export class PrivateCloudComputeDashboardService {
             }
           },
 
-          data: data.map((item, index) => ({
+          data: filteredData.map((item, index) => ({
             value: item.percentage,
             name: item.os,
             count: item.count,
@@ -350,11 +355,12 @@ export class PrivateCloudComputeDashboardService {
 
     view.options = {
       ...view.options,
+      animation: false,
 
       grid: {
-        left: 100,
-        right: 40,
-        top: 6,
+        left: 96,
+        right: 38,
+        top: 2,
         bottom: 2,
         containLabel: false
       },
@@ -462,8 +468,6 @@ export class PrivateCloudComputeDashboardService {
   getCapacityGrowthWidgetData(filters: FiltersCriteriaType): Observable<CapacityAndGrowthDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<CapacityAndGrowthDataType>('/customer/widgets/capacity_growth_insights/', { params });
-
-
   }
 
   convertToVmDensityHostViewData(data: TopHostUtilizationItem[]): VmDensityHost {
@@ -502,6 +506,13 @@ export class PrivateCloudComputeDashboardService {
 
     view.options = {
       ...view.options,
+      animation: false,
+      grid: {
+        left: 44,
+        right: 16,
+        top: 14,
+        bottom: 28
+      },
       // title: {
       //   text: 'VM Capacity Trend & Growth Forecast',
       //   left: 'center',
@@ -603,9 +614,22 @@ export class PrivateCloudComputeDashboardService {
 
 
   getTop10ClustersByVMsWidgetData(filters: FiltersCriteriaType): Observable<Top10ClustersByVMsData> {
+    // return of({
+    //   topClustersByVMCount: [
+    //     { clusterName: 'PROD-VCENTER-CLUSTER-01', vmCount: 386, hostCount: 24, datastoreCount: 18 },
+    //     { clusterName: 'PROD-VCENTER-CLUSTER-02', vmCount: 342, hostCount: 22, datastoreCount: 16 },
+    //     { clusterName: 'NUTANIX-PROD-CLUSTER-A', vmCount: 296, hostCount: 18, datastoreCount: 14 },
+    //     { clusterName: 'DEV-PRIVATE-CLOUD-01', vmCount: 248, hostCount: 14, datastoreCount: 10 },
+    //     { clusterName: 'QA-VMWARE-CLUSTER-02', vmCount: 213, hostCount: 12, datastoreCount: 8 },
+    //     { clusterName: 'STAGE-HYPERV-CLUSTER', vmCount: 186, hostCount: 10, datastoreCount: 7 },
+    //     { clusterName: 'EDGE-COMPUTE-CLUSTER', vmCount: 164, hostCount: 8, datastoreCount: 6 },
+    //     { clusterName: 'BACKUP-RECOVERY-CLUSTER', vmCount: 139, hostCount: 7, datastoreCount: 5 },
+    //     { clusterName: 'LAB-VALIDATION-CLUSTER', vmCount: 112, hostCount: 6, datastoreCount: 4 },
+    //     { clusterName: 'SANDBOX-CLUSTER-01', vmCount: 84, hostCount: 5, datastoreCount: 3 }
+    //   ]
+    // });
     let params = this.convertFiltersToParams(filters)
-    return this.http.get<any>('/customer/widgets/top_clusters_by_vm_count/', { params });
-
+    return this.http.get<Top10ClustersByVMsData>('/customer/widgets/top_clusters_by_vm_count/', { params });
   }
 
 
@@ -716,6 +740,11 @@ export class PrivateCloudComputeDashboardService {
 
   // Cluster capacity
   getClusterCapacityUtilTrendWidgetData(filters: FiltersCriteriaType): Observable<ClusterCapacityUtilTrendData> {
+    // return of({
+    //   months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    //   cpuUtilizationTrend: [41, 46, 48, 45, 47, 52, 57, 60, 63, 66, 70, 73],
+    //   memoryUtilizationTrend: [44, 49, 51, 53, 55, 58, 61, 64, 66, 68, 72, 75]
+    // });
     let params = this.convertFiltersToParams(filters)
     return this.http.get<ClusterCapacityUtilTrendData>('/customer/widgets/cluster_capacity_utilization_trend/', { params });
   }
@@ -831,6 +860,8 @@ export class PrivateCloudComputeDashboardService {
 
   //Performance Hotspot widget
   /*
+
+  
   * -----Start----- Performance Hotspots Widget Related -------------------
   */
   getUtilizationRows(filters?: any, ordering?: string): Observable<PerformanceHotspots> {
@@ -840,7 +871,6 @@ export class PrivateCloudComputeDashboardService {
       params = params.set('limit', 10);
     }
     return this.http.get<PerformanceHotspots>('/customer/widgets/performance_hotspots/', { params });
-
   }
 
   convertToUtilizationViewData(data: PerformanceHotspots): PrivateCloudUtilization {
@@ -860,11 +890,11 @@ export class PrivateCloudComputeDashboardService {
     return (input?.topUtilization || []).map(item => ({
       name: item.name,
 
-      cpuSeries: item.cpuUtilization?.sparkline || [],
+      cpuSeries: this.normalizeSparkline(item.cpuUtilization?.sparkline),
       cpuStatus: item.cpuUtilization?.current ?? 0,
       cpuTone: this.getProgressClass(item.cpuUtilization?.current ?? 0),
 
-      memorySeries: item.memoryUtilization?.sparkline || [],
+      memorySeries: this.normalizeSparkline(item.memoryUtilization?.sparkline),
       memoryStatus: item.memoryUtilization?.current ?? 0,
       memoryTone: this.getProgressClass(item.memoryUtilization?.current ?? 0),
 
@@ -876,11 +906,11 @@ export class PrivateCloudComputeDashboardService {
         tone: this.getProgressClass(item.storageUtilization?.percentage ?? 0)
       },
 
-      diskIops: {
-        value: item.diskIops?.value ?? 0,
-        label: `${item.diskIops?.value ?? 0}k`,
-        percent: item.diskIops?.percentage ?? 0,
-        tone: this.getProgressClass(item.diskIops?.percentage ?? 0)
+      networkSpeed: {
+        value: item.networkSpeed?.displayValue ?? item.diskIops?.displayValue ?? '0',
+        label: this.formatNetworkSpeedLabel(item.networkSpeed?.displayValue ?? item.diskIops?.displayValue ?? '0'),
+        percent: item.networkSpeed?.percentage ?? item.diskIops?.percentage ?? 0,
+        tone: this.getProgressClass(item.networkSpeed?.percentage ?? item.diskIops?.percentage ?? 0)
       },
 
       upTime: item.uptime || 'N/A',
@@ -888,6 +918,14 @@ export class PrivateCloudComputeDashboardService {
       deviceType: item.deviceType,
       vmSubType: item.deviceType === 'Virtual Machine' ? item.vmSubType : undefined
     }));
+  }
+
+  private normalizeSparkline(values?: Array<number | null | undefined>): number[] {
+    return (values || []).map(value => typeof value === 'number' && !Number.isNaN(value) ? value : 0);
+  }
+
+  private formatNetworkSpeedLabel(value: string): string {
+    return String(value || '0').trim().replace(/\s+/g, '\u00A0');
   }
 
   getProgressClass(value: number): PrivateCloudStatusTone {
@@ -982,14 +1020,14 @@ export class PrivateCloudComputeDashboardService {
       status: item.status,
 
       avgCpu: {
-        used: `${item.avgCpu?.used ?? 0}GB`,
+        used: `${item.avgCpu?.used ?? 0}%`,
         free: `${item.avgCpu?.free ?? 0}%`,
         percent: +(100 - (item.avgCpu?.free ?? 0)).toFixed(2),
         tone: this.getProgressClass(100 - (item.avgCpu?.free ?? 0))
       },
 
       avgMem: {
-        used: `${item.avgMem?.used ?? 0}GB`,
+        used: `${item.avgMem?.used ?? 0}%`,
         free: `${item.avgMem?.free ?? 0}%`,
         percent: +(100 - (item.avgMem?.free ?? 0)).toFixed(2),
         tone: this.getProgressClass(100 - (item.avgMem?.free ?? 0))
@@ -1013,8 +1051,8 @@ export class PrivateCloudComputeDashboardService {
   convertToIdleDurationDistributionChartData(
     data: DistributionRowData[]
   ) {
-
-    if (!data || !data.length) {
+    const filteredData = (data || []).filter(item => this.isPositiveChartValue(item?.percent));
+    if (!filteredData.length) {
       return;
     }
     const view: UnityChartDetails = new UnityChartDetails();
@@ -1066,7 +1104,7 @@ export class PrivateCloudComputeDashboardService {
             }
           },
 
-          data: data.map((item, index) => ({
+          data: filteredData.map((item, index) => ({
             value: item.percent,
             name: item.duration,
             itemStyle: {
@@ -1279,10 +1317,6 @@ export class PrivateCloudComputeDashboardService {
     return view;
   }
 
-
-
-
-
   /*
    * ******End ****** Alert & Events View Widget Related ********************
    */
@@ -1301,14 +1335,17 @@ export class PrivateCloudComputeDashboardService {
   convertToOrphanedDeviceListView(data: OrphanedResourcesResponse): OrphanedDeviceView {
     const viewData = new OrphanedDeviceView();
 
-    viewData.orphanList = (data?.results || []).map((item: any) => {
+    viewData.orphanList = (data?.results || []).map((item: OrphanedDevice) => {
       return {
         name: item.name,
         status: item.status,
         lastSeen: item.lastSeen,
         uuid: item.uuid,
-        deviceType: item.deviceType,
-        datacenter: item.datacenter
+        device: item.device,
+        datacenter: item.datacenter,
+        monitoring: item.monitoring,
+        os: item.os,
+        vmSubType: item.vmSubType,
       } as OrphanedDeviceList;
     });
 
@@ -1317,7 +1354,8 @@ export class PrivateCloudComputeDashboardService {
 
 
   convertToOrphanedByCategoryChartData(data: OrphanedCategory[]) {
-    if (!data || !data.length) { return; }
+    const filteredData = (data || []).filter(item => this.isPositiveChartValue(item?.count));
+    if (!filteredData.length) { return; }
     const view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getDefaultPieChartOptions();
@@ -1352,7 +1390,7 @@ export class PrivateCloudComputeDashboardService {
           fontSize: 14
         },
         formatter: (name: string) => {
-          const item = data.find(d => d.category === name);
+          const item = filteredData.find(d => d.category === name);
           if (!item) {
             return name;
           }
@@ -1388,7 +1426,7 @@ export class PrivateCloudComputeDashboardService {
               width: 1
             }
           },
-          data: data.map((item, index) => ({
+          data: filteredData.map((item, index) => ({
             value: item.count,
             name: item.category,
 
@@ -1417,6 +1455,11 @@ export class PrivateCloudComputeDashboardService {
     };
 
     return view;
+  }
+
+  private isPositiveChartValue(value: unknown): boolean {
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) && numericValue > 0;
   }
 }
 
@@ -1599,10 +1642,12 @@ export class OrphanedDeviceList {
   name: string;
   status: string;
   uuid: string;
-  deviceType: string
+  device: string
   vmSubType?: string;
   lastSeen: string;
   datacenter: string;
+  monitoring: OrphanedDevice['monitoring'];
+  os: OrphanedDevice['os'];
 }
 
 export class OrphanedDeviceWidgetView {

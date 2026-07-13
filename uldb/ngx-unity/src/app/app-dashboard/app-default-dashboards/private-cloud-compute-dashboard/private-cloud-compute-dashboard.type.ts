@@ -221,7 +221,8 @@ export interface TopUtilizationItem {
   cpuUtilization: CpuUtilization;
   memoryUtilization: MemoryUtilization;
   storageUtilization: StorageUtilization;
-  diskIops: DiskIOPS;
+  networkSpeed?: NetworkSpeed;
+  diskIops?: NetworkSpeed;
   uptime: string;
   uuid: string;
   deviceType: string;
@@ -241,9 +242,11 @@ export interface StorageUtilization {
   free: number;
   percentage: number;
 }
-export interface DiskIOPS {
-  value: number;
+export interface NetworkSpeed {
+  displayValue: string;
   percentage: number;
+  value: number;
+
 }
 
 
@@ -267,7 +270,7 @@ export interface PrivateCloudUtilizationRow {
   memoryStatus: number;
   memoryTone: PrivateCloudStatusTone;
   storage: PrivateCloudStorageUtilization;
-  diskIops: PrivateCloudDiskIops;
+  networkSpeed: PrivateCloudNetworkSpeed;
   upTime: string;
   uuid: string;
   deviceType: string;
@@ -289,12 +292,12 @@ export interface PrivateCloudStorageUtilization {
   percent: number;
   tone: PrivateCloudStatusTone;
 }
-
-export interface PrivateCloudDiskIops {
-  value: number;
+export interface PrivateCloudNetworkSpeed {
+  value: string;
   label: string;
   percent: number;
   tone: PrivateCloudStatusTone;
+
 }
 
 export interface PrivateCloudFilterOption {
@@ -366,12 +369,31 @@ export interface PrivateCloudTicketRow {
 
 
 export interface OrphanedDevice {
-  name: string;
   status: string;
-  uuid: string;
-  deviceType: string;
-  lastSeen: string;
   datacenter: string;
+  name: string;
+  tag: string;
+  monitoring: Monitoring;
+  os: string | Os;
+  device: string;
+  vmSubType: string;
+  lastSeen: string;
+  uuid: string;
+}
+
+interface Monitoring {
+  configured: boolean;
+  observium: boolean;
+  enabled: boolean;
+  zabbix: boolean;
+}
+interface Os {
+  url: string;
+  id: number;
+  name: string;
+  version: string;
+  full_name: string;
+  platform_type: string;
 }
 
 

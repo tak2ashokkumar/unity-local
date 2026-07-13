@@ -1,0 +1,642 @@
+<div class="discovery-dashboard">
+    <div class="discovery-header">
+        <div class="discovery-heading">
+            <div class="discovery-title">Discovery Dashboard</div>
+            <div class="discovery-subtitle">Infrastructure discovery &amp; CMDB synchronization - UnityOne AI</div>
+        </div>
+
+        <div class="discovery-filter-loading" *ngIf="!filterForm && !filterLoadFailed">
+            <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
+        </div>
+
+        <form class="discovery-filters" *ngIf="filterForm" [formGroup]="filterForm">
+            <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
+            <div class="discovery-filter-control">
+                <label>Regions</label>
+                <multiselect-dropdown [options]="regionOptions" [settings]="regionMultiselectSettings"
+                    [texts]="regionMultiselectTexts" class="form-control p-0 dashboard-multiselect" formControlName="region">
+                </multiselect-dropdown>
+            </div>
+
+            <div class="discovery-filter-control">
+                <label>Discovery Type</label>
+                <multiselect-dropdown [options]="discoveryTypeDropdownOptions"
+                    [settings]="discoveryTypeMultiselectSettings" [texts]="discoveryTypeMultiselectTexts"
+                    class="form-control p-0 dashboard-multiselect" formControlName="discoveryType">
+                </multiselect-dropdown>
+            </div>
+
+            <div class="discovery-filter-control discovery-filter-control--small">
+                <label>Time Range</label>
+                <select class="form-control form-control-sm" formControlName="timeRange" (change)="applyFilters()">
+                    <option *ngFor="let option of timeRangeOptions" [value]="option.value">
+                        {{option.label}}
+                    </option>
+                </select>
+            </div>
+
+            <button class="discovery-action-button" type="button" (click)="applyFilters(); loadData()"
+                [tooltip]="'Apply Filters'" container="body">
+                <i class="fas fa-filter"></i>
+            </button>
+            <span class="discovery-action-separator"></span>
+            <button class="discovery-action-button" type="button" (click)="refreshFilters()" [tooltip]="'Refresh'"
+                container="body">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            <button class="discovery-action-button" type="button" (click)="goBack()" [tooltip]="'Go Back'"
+                container="body">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="container-fluid px-3 py-3" *ngIf="filterForm && !filterLoadFailed">
+        <div class="d-flex flex-wrap align-items-start justify-content-between mb-2">
+            <div class="discovery-section-title font-600">Executive KPIs</div>
+            <div class="discovery-section-note">
+                *The displayed values represent only devices discovered and currently onboarded for monitoring within
+                the selected time range
+            </div>
+        </div>
+
+        <div class="card discovery-kpi-card">
+            <app-spinner [name]="loaderNames.executiveKpis" [width]="0"></app-spinner>
+            <div class="card-body p-0">
+                <div class="row no-gutters text-center">
+                    <div class="col discovery-kpi-item px-3 py-2">
+                        <div class="discovery-kpi-content">
+                            <div class="discovery-kpi-label">Discovered Devices (Total)</div>
+                            <div class="discovery-kpi-value text-primary text-left">
+                                {{ executiveKpiViewData.discoveredDevicesTotal | number:'1.0-0' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col discovery-kpi-item px-3 py-2">
+                        <div class="discovery-kpi-content">
+                            <div class="discovery-kpi-label">Newly Discovered Resources</div>
+                            <div class="discovery-kpi-value text-success text-left">
+                                {{ executiveKpiViewData.newlyDiscoveredResources | number:'1.0-0' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col discovery-kpi-item px-3 py-2">
+                        <div class="discovery-kpi-content">
+                            <div class="discovery-kpi-label">Discovery Success Rate</div>
+                            <div class="discovery-kpi-value text-success text-left">
+                                {{ executiveKpiViewData.discoverySuccessRate | number:'1.0-1' }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col discovery-kpi-item px-3 py-2">
+                        <div class="discovery-kpi-content">
+                            <div class="discovery-kpi-label">Discovery Failures</div>
+                            <div class="discovery-kpi-value text-left">
+                                {{ executiveKpiViewData.discoveryFailures | number:'1.0-0' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col discovery-kpi-item px-3 py-2">
+                        <div class="discovery-kpi-content">
+                            <div class="discovery-kpi-label">Devices Pending Monitoring</div>
+                            <div class="discovery-kpi-value text-primary text-left">
+                                {{ executiveKpiViewData.devicesPendingMonitoring | number:'1.0-0' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12 col-xl-6">
+                <div class="discovery-chart-section-title mb-2">Discovery Trend Analytics</div>
+                <div class="card discovery-chart-card">
+                    <app-spinner [name]="loaderNames.trendAnalytics" [width]="0"></app-spinner>
+                    <div class="card-body px-3 py-3">
+                        <div echarts *ngIf="trendAnalyticsChartOptions; else trendAnalyticsNoData"
+                            [options]="trendAnalyticsChartOptions" class="discovery-trend-chart"></div>
+                        <ng-template #trendAnalyticsNoData>
+                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                No data available
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-xl-6">
+                <div class="discovery-chart-section-title mb-2">Discovery Success vs Failure</div>
+                <div class="card discovery-chart-card">
+                    <app-spinner [name]="loaderNames.successAndFailure" [width]="0"></app-spinner>
+                    <div class="card-body px-3 py-3">
+                        <div echarts *ngIf="sucessAndFailureChartOptions; else successFailureNoData"
+                            [options]="sucessAndFailureChartOptions" class="discovery-trend-chart"></div>
+                        <ng-template #successFailureNoData>
+                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                No data available
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="discovery-chart-section-title mb-2">CMDB Synchronization Insights</div>
+                <div class="discovery-insights-grid">
+                    <app-spinner [name]="loaderNames.cmdbSyncInsights" [width]="0"></app-spinner>
+                    <div class="row mx-n2 mb-0">
+                        <div class="col mb-0 px-2">
+                            <div class="card discovery-insight-card">
+                                <div class="card-body d-flex flex-column justify-content-center px-3 py-3">
+                                    <div class="discovery-insight-label">CMDB Sync Rate</div>
+                                    <div class="discovery-insight-value discovery-insight-value--primary">
+                                        {{ cmdbSyncInsights.cmdbSyncRate | number:'1.0-1' }}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col mb-0 px-2">
+                            <div class="card discovery-insight-card">
+                                <div class="card-body d-flex flex-column justify-content-center px-3 py-3">
+                                    <div class="discovery-insight-label">CMDB Platforms</div>
+                                    <div class="discovery-insight-value discovery-insight-value--primary">
+                                        {{ cmdbSyncInsights.cmdbPlatform }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col mb-0 px-2">
+                            <div class="card discovery-insight-card">
+                                <div class="card-body d-flex flex-column justify-content-center px-3 py-3">
+                                    <div class="discovery-insight-label">New CIs Added</div>
+                                    <div class="discovery-insight-value discovery-insight-value--primary">
+                                        {{ cmdbSyncInsights.newCisAdded | number:'1.0-0' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col mb-0 px-2">
+                            <div class="card discovery-insight-card">
+                                <div class="card-body d-flex flex-column justify-content-center px-3 py-3">
+                                    <div class="discovery-insight-label">CI Update Failures</div>
+                                    <div class="discovery-insight-value discovery-insight-value--danger">
+                                        {{ cmdbSyncInsights.ciUpdateFailures | number:'1.0-0' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col mb-0 px-2">
+                            <div class="card discovery-insight-card">
+                                <div class="card-body d-flex flex-column justify-content-center px-3 py-3">
+                                    <div class="discovery-insight-label">Duplicate CIs</div>
+                                    <div class="discovery-insight-value discovery-insight-value--primary">
+                                        {{ cmdbSyncInsights.duplicateCis | number:'1.0-0' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12 col-xl-6 mb-3">
+                <div class="discovery-chart-section-title mb-2">CI Distribution By Device</div>
+                <div class="card discovery-chart-card discovery-chart-card--device">
+                    <app-spinner [name]="loaderNames.ciDistributionByDevice" [width]="0"></app-spinner>
+                    <div class="card-body px-3 py-3">
+                        <div echarts *ngIf="ciDistributionByDeviceChartData; else ciDistributionByDeviceNoData"
+                            [options]="ciDistributionByDeviceChartData" class="discovery-device-chart"></div>
+                        <ng-template #ciDistributionByDeviceNoData>
+                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                No data available
+                            </div>
+                        </ng-template>
+
+                        <div class="d-flex flex-wrap justify-content-center align-items-center px-2 discovery-device-legend"
+                            *ngIf="ciDistributionByDeviceLegendItems.length">
+                            <div class="d-inline-flex align-items-center mx-2 mb-2 discovery-html-legend-item"
+                                *ngFor="let item of ciDistributionByDeviceLegendItems">
+                                <span class="discovery-html-legend-dot mr-2"
+                                    [style.background-color]="item.color"></span>
+                                <span>{{ item.label }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-xl-6">
+                <div class="discovery-chart-section-title mb-2">CI Distribution By Discovery</div>
+                <div class="card discovery-chart-card discovery-chart-card--discovery">
+                    <app-spinner [name]="loaderNames.ciDistributionByDiscovery" [width]="0"></app-spinner>
+                    <div class="card-body px-3 py-3">
+                        <div echarts *ngIf="ciDistributionByDiscoveryChartData; else ciDistributionByDiscoveryNoData"
+                            [options]="ciDistributionByDiscoveryChartData" class="discovery-discovery-chart"></div>
+                        <ng-template #ciDistributionByDiscoveryNoData>
+                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                No data available
+                            </div>
+                        </ng-template>
+
+                        <div class="d-flex flex-wrap justify-content-center align-items-center px-2 discovery-discovery-legend"
+                            *ngIf="ciDistributionByDiscoveryLegendItems.length">
+                            <div class="d-inline-flex align-items-center mx-2 mb-2 discovery-html-legend-item"
+                                *ngFor="let item of ciDistributionByDiscoveryLegendItems">
+                                <span class="discovery-html-legend-dot mr-2"
+                                    [style.background-color]="item.color"></span>
+                                <span>{{ item.label }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="d-flex align-items-center mb-2">
+            <span class="discovery-table-count text-center">{{ newlyDiscoveredDevicesCount }}</span>
+            <div class="discovery-section-title mb-0 ml-2">Newly Discovered Devices</div>
+        </div>
+
+        <div class="card discovery-table-card">
+            <app-spinner [name]="loaderNames.newlyDiscoveredDevices" [width]="0"></app-spinner>
+            <div class="card-body p-0">
+                <div
+                    class="d-flex flex-wrap justify-content-between align-items-center px-3 py-2 border-bottom discovery-recent-sync-toolbar">
+                    <div class="input-group discovery-table-search">
+                        <div class="w-100">
+                            <search-box [searchValue]="newlyDiscoveredDevicesSearch" [customClass]="'form-control-sm'"
+                                (searched)="onNewlyDiscoveredDevicesSearched($event)"></search-box>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-end align-items-center mt-2 mt-md-0">
+                        <div class="d-inline-flex align-items-center mr-3 discovery-status-legend-item">
+                            <i class="fas fa-check-circle text-success mr-1"></i>
+                            <span>Healthy / Up</span>
+                        </div>
+                        <div class="d-inline-flex align-items-center mr-3 discovery-status-legend-item">
+                            <i class="fas fa-exclamation-circle text-warning mr-1"></i>
+                            <span>Warning / Degraded</span>
+                        </div>
+                        <div class="d-inline-flex align-items-center mr-3 discovery-status-legend-item">
+                            <i class="fas fa-exclamation-triangle text-danger mr-1"></i>
+                            <span>Critical / Down</span>
+                        </div>
+                        <div class="d-inline-flex align-items-center discovery-status-legend-item">
+                            <i class="fas fa-question-circle text-muted mr-1"></i>
+                            <span>No Data / Unknown</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table mb-0 discovery-device-table"
+                        *ngIf="newlyDiscoveredDevices.length; else newlyDiscoveredDevicesNoData">
+                        <thead>
+                            <tr>
+                                <th scope="col">Device name</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Datacenter</th>
+                                <th scope="col">Manufacturer</th>
+                                <th scope="col">Model</th>
+                                <th scope="col">OS Type</th>
+                                <th scope="col">OS Version</th>
+                                <th scope="col" class="text-center">Status</th>
+                                <th scope="col">Last Sync</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let device of newlyDiscoveredDevices">
+                                <td>
+                                    <a href="javascript:void(0)" class="discovery-device-link">{{device.deviceName}}</a>
+                                </td>
+                                <td>{{ device.type }}</td>
+                                <td>{{ device.datacenter }}</td>
+                                <td>{{ device.manufacturer }}</td>
+                                <td>{{ device.model }}</td>
+                                <td>{{ device.osType }}</td>
+                                <td>{{ device.osVersion }}</td>
+                                <td class="text-center">
+                                    <i [class]="device.statusClass"></i>
+                                </td>
+                                <td>{{ device.lastSync }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <ng-template #newlyDiscoveredDevicesNoData>
+                        <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            No data available
+                        </div>
+                    </ng-template>
+                </div>
+                <div class="discovery-table-footer" *ngIf="newlyDiscoveredDevices.length">
+                    <div class="discovery-page-size-control">
+                        <span>Show</span>
+                        <select class="form-control form-control-sm discovery-table-page-size"
+                            [value]="newlyDiscoveredDevicesPageSize"
+                            (change)="newlyDiscoveredDevicesPageSizeChange($event)">
+                            <option [value]="10">10</option>
+                            <option [value]="25">25</option>
+                            <option [value]="50">50</option>
+                        </select>
+                    </div>
+
+                    <table-pager [compact]="true" [pageNo]="newlyDiscoveredDevicesPageNo"
+                        [pageSize]="newlyDiscoveredDevicesPageSize" [totalCount]="newlyDiscoveredDevicesCount"
+                        (pageChange)="newlyDiscoveredDevicesPageChange($event)"></table-pager>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-xl-6 mb-3">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="discovery-table-count text-center">{{ topDiscoveryFailuresCount }}</span>
+                    <div class="discovery-section-title mb-0 ml-2">Top Discovery Failures</div>
+                </div>
+
+                <div class="card discovery-table-card">
+                    <app-spinner [name]="loaderNames.topDiscoveryFailures" [width]="0"></app-spinner>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0 discovery-device-table"
+                                *ngIf="topDiscoveryFailures.length; else topDiscoveryFailuresNoData">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Policy Name </th>
+                                        <th scope="col" class="text-center">Failures </th>
+                                        <th scope="col">Last Failure </th>
+                                        <th scope="col">Alert ID</th>
+                                        <th scope="col">ITSM Incident</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let failure of topDiscoveryFailures">
+                                        <td>
+                                            <a href="javascript:void(0)" class="discovery-device-link">{{
+                                                failure.deviceName }}</a>
+                                        </td>
+                                        <td class="text-center">{{ failure.failures }}</td>
+                                        <td>{{ failure.lastFailure }}</td>
+                                        <td>{{ failure.alertId }}</td>
+                                        <td>{{ failure.itsmIncident }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <ng-template #topDiscoveryFailuresNoData>
+                                <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                    No data available
+                                </div>
+                            </ng-template>
+                        </div>
+                        <div class="discovery-table-footer" *ngIf="topDiscoveryFailures.length">
+                            <div class="discovery-page-size-control">
+                                <span>Show</span>
+                                <select class="form-control form-control-sm discovery-table-page-size"
+                                    [value]="topDiscoveryFailuresPageSize"
+                                    (change)="topDiscoveryFailuresPageSizeChange($event)">
+                                    <option [value]="10">10</option>
+                                    <option [value]="25">25</option>
+                                    <option [value]="50">50</option>
+                                </select>
+                            </div>
+
+                            <table-pager [compact]="true" [pageNo]="topDiscoveryFailuresPageNo"
+                                [pageSize]="topDiscoveryFailuresPageSize" [totalCount]="topDiscoveryFailuresCount"
+                                (pageChange)="topDiscoveryFailuresPageChange($event)"></table-pager>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-6 mb-3">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="discovery-table-count text-center">{{ operatingSystemsCount }}</span>
+                    <div class="discovery-section-title mb-0 ml-2">Operating System</div>
+                </div>
+
+                <div class="card discovery-table-card">
+                    <app-spinner [name]="loaderNames.operatingSystems" [width]="0"></app-spinner>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0 discovery-device-table"
+                                *ngIf="operatingSystems.length; else operatingSystemsNoData">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">OS Type</th>
+                                        <th scope="col">OS Version</th>
+                                        <th scope="col" class="text-center">Count</th>
+                                        <th scope="col">EOL Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let operatingSystem of operatingSystems">
+                                        <td>{{ operatingSystem.osType }}</td>
+                                        <td>{{ operatingSystem.osVersion }}</td>
+                                        <td class="text-center">{{ operatingSystem.count }}</td>
+                                        <td>{{ operatingSystem.eolDate }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <ng-template #operatingSystemsNoData>
+                                <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                    No data available
+                                </div>
+                            </ng-template>
+                        </div>
+                        <div class="discovery-table-footer" *ngIf="operatingSystems.length">
+                            <div class="discovery-page-size-control">
+                                <span>Show</span>
+                                <select class="form-control form-control-sm discovery-table-page-size"
+                                    [value]="operatingSystemsPageSize"
+                                    (change)="operatingSystemsPageSizeChange($event)">
+                                    <option [value]="10">10</option>
+                                    <option [value]="25">25</option>
+                                    <option [value]="50">50</option>
+                                </select>
+                            </div>
+
+                            <table-pager [compact]="true" [pageNo]="operatingSystemsPageNo"
+                                [pageSize]="operatingSystemsPageSize" [totalCount]="operatingSystemsCount"
+                                (pageChange)="operatingSystemsPageChange($event)"></table-pager>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="discovery-section-title mb-2">Recently Synchronized Configuration Items</div>
+
+        <div class="card discovery-table-card mb-3">
+            <app-spinner [name]="loaderNames.recentSyncConfig" [width]="0"></app-spinner>
+            <div class="card-body p-0">
+                <div
+                    class="d-flex flex-wrap justify-content-between align-items-center px-3 py-2 border-bottom discovery-recent-sync-toolbar">
+                    <div class="input-group discovery-table-search">
+                        <div class="w-100">
+                            <search-box [searchValue]="recentSyncConfigSearch" [customClass]="'form-control-sm'"
+                                (searched)="onRecentSyncConfigSearched($event)"></search-box>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-end align-items-center mt-2 mt-md-0">
+                        <div class="d-inline-flex align-items-center mr-3 discovery-status-legend-item">
+                            <i class="fas fa-check-circle text-success mr-1"></i>
+                            <span>Synced</span>
+                        </div>
+                        <div class="d-inline-flex align-items-center mr-3 discovery-status-legend-item">
+                            <i class="fas fa-exclamation-circle text-warning mr-1"></i>
+                            <span>Pending</span>
+                        </div>
+                        <div class="d-inline-flex align-items-center discovery-status-legend-item">
+                            <i class="fas fa-exclamation-triangle text-danger mr-1"></i>
+                            <span>Failed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table mb-0 discovery-device-table"
+                        *ngIf="recentSyncConfig.length; else recentSyncConfigNoData">
+                        <thead>
+                            <tr>
+                                <th scope="col">CI Name</th>
+                                <th scope="col">CI Type</th>
+                                <th scope="col">Platform</th>
+                                <th scope="col">Source</th>
+                                <th scope="col" class="text-center">CMDB Status</th>
+                                <th scope="col" class="text-center">Sync Status</th>
+                                <th scope="col">Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of recentSyncConfig">
+                                <td>
+                                    <a href="javascript:void(0)" class="discovery-device-link">{{ item.ciName }}</a>
+                                </td>
+                                <td>{{ item.ciType }}</td>
+                                <td>{{ item.platform }}</td>
+                                <td>{{ item.source }}</td>
+                                <td class="text-center">
+                                    <span [class]="item.cmdbStatusClass">{{ item.cmdbStatus }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <i [class]="item.syncStatus"></i>
+                                </td>
+                                <td>{{ item.lastUpdated }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <ng-template #recentSyncConfigNoData>
+                        <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            No data available
+                        </div>
+                    </ng-template>
+                </div>
+                <div class="discovery-table-footer" *ngIf="recentSyncConfig.length">
+                    <div class="discovery-page-size-control">
+                        <span>Show</span>
+                        <select class="form-control form-control-sm discovery-table-page-size"
+                            [value]="recentSyncConfigPageSize" (change)="recentSyncConfigPageSizeChange($event)">
+                            <option [value]="10">10</option>
+                            <option [value]="25">25</option>
+                            <option [value]="50">50</option>
+                        </select>
+                    </div>
+
+                    <table-pager [compact]="true" [pageNo]="recentSyncConfigPageNo"
+                        [pageSize]="recentSyncConfigPageSize" [totalCount]="recentSyncConfigCount"
+                        (pageChange)="recentSyncConfigPageChange($event)"></table-pager>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 mb-3">
+                <div class="discovery-chart-section-title mb-2">Discovery Vs CMDB Sync Trend</div>
+                <div class="card discovery-chart-card equalize-card">
+                    <app-spinner [name]="loaderNames.cmdbSyncTrend" [width]="0"></app-spinner>
+                    <div class="card-body px-3 py-3">
+                        <div echarts *ngIf="cmdbSyncTrend; else cmdbSyncTrendNoData" [options]="cmdbSyncTrend"
+                            class="discovery-trend-chart"></div>
+                        <ng-template #cmdbSyncTrendNoData>
+                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                No data available
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 mb-3">
+                <div class="discovery-chart-section-title mb-2">CI Distribution</div>
+                <div class="card discovery-chart-card discovery-chart-card--ci-distribution equalize-card">
+                    <app-spinner [name]="loaderNames.ciDistribution" [width]="0"></app-spinner>
+                    <div class="card-body px-3 py-3">
+                        <div echarts *ngIf="ciDistributionChartData; else ciDistributionNoData"
+                            [options]="ciDistributionChartData" class="discovery-ci-distribution-chart"></div>
+                        <ng-template #ciDistributionNoData>
+                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                No data available
+                            </div>
+                        </ng-template>
+
+                        <div class="discovery-ci-distribution-legend" *ngIf="ciDistributionLegendItems.length">
+                            <div class="d-inline-flex align-items-center discovery-html-legend-item"
+                                *ngFor="let item of ciDistributionLegendItems">
+                                <span class="discovery-html-legend-dot mr-2"
+                                    [style.background-color]="item.color"></span>
+                                <span>{{ item.label }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 mb-3">
+                <div class="discovery-chart-section-title mb-2">Resource Discovery Distribution &amp; CMDB Sync Status
+                </div>
+                <div class="card discovery-table-card discovery-resource-discovery-card equalize-card">
+                    <app-spinner [name]="loaderNames.resourceDiscovery" [width]="0"></app-spinner>
+                    <div class="card-body p-0">
+                        <div class="table-responsive"
+                            *ngIf="resourceDiscoveryData.length; else resourceDiscoveryNoData">
+                            <table class="table mb-0 discovery-device-table discovery-resource-discovery-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Display Name</th>
+                                        <th scope="col" class="text-center">CI Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of resourceDiscoveryData">
+                                        <td>
+                                            <span class="discovery-device-link">{{ item.name }}</span>
+                                        </td>
+                                        <td class="text-center">{{ item.value | number:'1.0-0' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #resourceDiscoveryNoData>
+                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                No data available
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="discovery-empty-state" *ngIf="filterLoadFailed">No data available</div>
+</div>

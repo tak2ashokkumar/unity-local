@@ -93,3 +93,27 @@ export interface ChatDocument {
     file_name: string;
     conversation_id: string;
 }
+
+// export interface TokenUsage {
+//   input_tokens: number;
+//   output_tokens: number;
+//   total_tokens: number;
+//   tokens_used: number;
+//   token_limit: number;
+//   usage_percent: number;
+//   total_cost_usd: number;
+//   from_timestamp: string;
+//   to_timestamp: string;
+//   period: string;
+// }
+
+export interface TokenUsage {
+  used_tokens: number;
+  input_tokens: number;
+  output_tokens: number;
+  limit: number;
+  remaining_tokens: number;
+  total_cost_usd: number;
+  window_start: string;
+  window_end: string;
+}

@@ -674,7 +674,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
         return metric.kind === 'highLatency'
           ? this.svc.convertToStorageHighLatencyCard(res, metric.color)
           : this.svc.convertToStorageTrendCard(res, metric.color);
-      }).filter(card => card.hasData);
+      }).filter(card => !!card.title);
     }, () => {
       this.storagePerformanceCards = [];
     }, () => this.widgetLoading.storagePerformance = false);

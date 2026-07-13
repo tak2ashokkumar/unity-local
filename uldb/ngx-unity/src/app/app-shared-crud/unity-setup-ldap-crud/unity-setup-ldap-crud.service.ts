@@ -32,7 +32,7 @@ export class UnitySetupLdapCrudService {
         'password': ['', [Validators.required, NoWhitespaceValidator]],
         'dc': [ldapConfigData.dc, [Validators.required, NoWhitespaceValidator]],
         'ldap_port': [ldapConfigData.ldap_port, [Validators.required, NoWhitespaceValidator]],
-        'collector': [ldapConfigData.collector, [Validators.required, NoWhitespaceValidator]]
+        'collector': [ldapConfigData.collector || '', []]
 
       });
     } else {
@@ -42,7 +42,7 @@ export class UnitySetupLdapCrudService {
         'password': ['', [Validators.required, NoWhitespaceValidator]],
         'dc': ['', [Validators.required, NoWhitespaceValidator]],
         'ldap_port': ['', [Validators.required, NoWhitespaceValidator]],
-        'collector': ['', [Validators.required, NoWhitespaceValidator]]
+        'collector': ['', []]
 
       });
     }
@@ -75,9 +75,6 @@ export class UnitySetupLdapCrudService {
     },
     'ldap_port': {
       'required': 'LDAP Port is required'
-    },
-    'collector': {
-      'required': 'Collector is required'
     }
   }
 

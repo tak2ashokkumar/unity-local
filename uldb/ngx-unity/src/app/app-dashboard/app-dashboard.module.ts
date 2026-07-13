@@ -29,6 +29,8 @@ import { ExecutiveAiBusinessSummaryComponent } from './app-default-dashboards/ap
 import { CloudCostOverviewDashboardComponent } from './app-default-dashboards/cloud-cost-overview-dashboard/cloud-cost-overview-dashboard.component';
 import { ResourceLevelDashboardComponent } from './app-default-dashboards/cloud-cost-overview-dashboard/resource-level-dashboard/resource-level-dashboard.component';
 import { DatabaseDashboardComponent } from './app-default-dashboards/database-dashboard/database-dashboard.component';
+import { EventAnalyticsDashboardComponent } from './app-default-dashboards/event-analytics-dashboard/event-analytics-dashboard.component';
+import { EventAnalyticsTicketRouteContextComponent } from './app-default-dashboards/event-analytics-dashboard/event-analytics-ticket-route-context.component';
 import { InfrastructureOverviewDashboardComponent } from './app-default-dashboards/infrastructure-overview-dashboard/infrastructure-overview-dashboard.component';
 import { InterfaceDetailsDashboardComponent } from './app-default-dashboards/interface-details-dashboard/interface-details-dashboard.component';
 import { IotDevicesSummaryDashboardComponent } from './app-default-dashboards/iot-devices-summary-dashboard/iot-devices-summary-dashboard.component';
@@ -41,6 +43,8 @@ import { AppPersonaDashboardCrudComponent } from './app-persona-dashboards/app-p
 import { AppPersonaDashboardViewComponent } from './app-persona-dashboards/app-persona-dashboard-view/app-persona-dashboard-view.component';
 import { AppPersonaDashboardsComponent } from './app-persona-dashboards/app-persona-dashboards.component';
 import { BankOfAnthosApplicationDashboardComponent } from './app-default-dashboards/application-overview-dashboard/bank-of-anthos-application-dashboard/bank-of-anthos-application-dashboard.component';
+import { DiscoveryDashboardComponent } from './app-default-dashboards/discovery-dashboard/discovery-dashboard.component';
+import { NetworkDashboardComponent } from './app-default-dashboards/network-dashboard/network-dashboard.component';
 // import { DashboardMapWidgetComponent } from '../app-home/dashboard-map-widget/dashboard-map-widget.component';
 
 export const MY_NATIVE_FORMATS = {
@@ -72,6 +76,8 @@ export const MY_NATIVE_FORMATS = {
     PrivateCloudComputeDashboardComponent,
     PublicCloudComputeDashboardComponent,
     DatabaseDashboardComponent,
+    EventAnalyticsDashboardComponent,
+    EventAnalyticsTicketRouteContextComponent,
     UnifiedAiopsCommandCentreComponent,
     AppDashboardCollectionsComponent,
     AppDashboardCollectionsCrudComponent,
@@ -79,7 +85,9 @@ export const MY_NATIVE_FORMATS = {
     AppCollectionDashboardViewComponent,
     AppPersonaDashboardsComponent,
     AppPersonaDashboardCrudComponent,
-    AppPersonaDashboardViewComponent
+    AppPersonaDashboardViewComponent,
+    DiscoveryDashboardComponent,
+    NetworkDashboardComponent
   ],
   imports: [
     AppCoreModule,

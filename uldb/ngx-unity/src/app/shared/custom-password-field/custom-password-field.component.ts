@@ -20,7 +20,7 @@ export class CustomPasswordFieldComponent implements OnInit, ControlValueAccesso
 
   value!: string;
   @Input() isDisabled: boolean = false;
-  @Input() options?: { id?: string; placeholder?: string; errors?: any, class?: string };
+  @Input() options?: { id?: string; placeholder?: string; errors?: any, class?: string; autocomplete?: string };
 
   onChange!: (value: string) => void;
   onTouched!: () => void;

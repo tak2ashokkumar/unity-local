@@ -180,14 +180,14 @@ export class AiAgentEventsService {
 }
 
 export const AIOPS_DEVICE_TYPES: DeviceType[] = [
-  { type: 'Switch', mapping: DeviceMapping.SWITCHES, key: 'switch', aiAgentType: 'network' },
-  { type: 'Firewall', mapping: DeviceMapping.FIREWALL, key: 'firewall', aiAgentType: 'network' },
-  { type: 'Load Balancer', mapping: DeviceMapping.LOAD_BALANCER, key: 'load_balancer', aiAgentType: 'network' },
-  { type: 'Bare Metal Server', mapping: DeviceMapping.BARE_METAL_SERVER, key: 'baremetal', aiAgentType: 'compute' },
-  { type: 'Hypervisor', mapping: DeviceMapping.HYPERVISOR, key: 'hypervisor', aiAgentType: 'compute' },
-  { type: 'MAC Device', mapping: DeviceMapping.MAC_MINI, key: 'mac_device', aiAgentType: 'compute' },
-  { type: 'Virtual Machine', mapping: DeviceMapping.VIRTUAL_MACHINE, key: 'vm', aiAgentType: 'compute' },
-  // { type: 'Storage Device', mapping: DeviceMapping.STORAGE_DEVICES, key: 'storage' },
+  { type: 'Switch', mapping: DeviceMapping.SWITCHES, key: 'switch', aiAgentType: 'networkAgent' },
+  { type: 'Firewall', mapping: DeviceMapping.FIREWALL, key: 'firewall', aiAgentType: 'networkAgent' },
+  { type: 'Load Balancer', mapping: DeviceMapping.LOAD_BALANCER, key: 'load_balancer', aiAgentType: 'networkAgent' },
+  { type: 'Bare Metal Server', mapping: DeviceMapping.BARE_METAL_SERVER, key: 'baremetal', aiAgentType: 'computeAgent' },
+  { type: 'Hypervisor', mapping: DeviceMapping.HYPERVISOR, key: 'hypervisor', aiAgentType: 'computeAgent' },
+  { type: 'MAC Device', mapping: DeviceMapping.MAC_MINI, key: 'mac_device', aiAgentType: 'computeAgent' },
+  { type: 'Virtual Machine', mapping: DeviceMapping.VIRTUAL_MACHINE, key: 'vm', aiAgentType: 'computeAgent' },
+  { type: 'Storage Device', mapping: DeviceMapping.STORAGE_DEVICES, key: 'storage', aiAgentType: 'storageAgent' },
   // { type: 'Database Server', mapping: DeviceMapping.DB_SERVER, key: 'database' },
   // { type: 'PDU', mapping: DeviceMapping.PDU, key: 'pdu' },
 ];

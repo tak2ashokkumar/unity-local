@@ -165,16 +165,8 @@ export const privateCloudTabItems = [
 
 export const DEVICE_TYPE_MAP: Record<string, string> = {
   'Baremetal Servers': 'bmservers',
-  'Switches': 'switches',
-  'Load Balancer': 'loadbalancers',
-  'Network Controllers': 'network-controllers',
   'Hypervisors': 'hypervisors',
-  'Mac Device': 'macdevices',
   'Virtual Machine': 'vms',
-  'Containers': 'kubernetes',
-  'Storage': 'storagedevices',
-  'Cloud Controllers': 'cloudcontrollers',
-  'Database': 'databases'
 };
 
 // export const Private_CLOUD_UTILIZATION_ROWS: PerformanceHotspots = {

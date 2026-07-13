@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { StorageDeviceDetailsInterfaceType, StorageDeviceDetailsIpAddressType, StorageDeviceDetailsMacAddressType, StorageDeviceDetailsOperationSystemType } from './storage-details-components.type';
+import { StorageDeviceDetailsInterfaceType, StorageDeviceDetailsIpAddressType, StorageDeviceDetailsMacAddressType, StorageDeviceDetailsOSType } from './storage-details-components.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
@@ -14,8 +14,8 @@ export class StorageDetailsComponentsService {
     private tableSvc: TableApiServiceService,
     private builder: FormBuilder) { }
 
-  getIpAddressData(deviceId: string): Observable<StorageDeviceDetailsIpAddressType> {
-    return this.http.get<StorageDeviceDetailsIpAddressType>(`/customer/storagedevices/${deviceId}/storage/ip-address/`);
+  getIpAddressData(deviceId: string): Observable<StorageDeviceDetailsIpAddressType[]> {
+    return this.http.get<StorageDeviceDetailsIpAddressType[]>(`/customer/storagedevices/${deviceId}/storage/ip-address/`);
   }
 
   getMacAddressData(criteria: SearchCriteria, deviceId: string): Observable<PaginatedResult<StorageDeviceDetailsMacAddressType>> {
@@ -28,27 +28,31 @@ export class StorageDetailsComponentsService {
     return this.http.get<PaginatedResult<StorageDeviceDetailsInterfaceType>>(`/customer/storagedevices/${deviceId}/storage/interface-data/`, { params: params });
   }
 
-  getOperationSystemData(deviceId: string): Observable<StorageDeviceDetailsOperationSystemType> {
-    return this.http.get<StorageDeviceDetailsOperationSystemType>(`/customer/storagedevices/${deviceId}/storage/os-data/`);
+  getOSData(deviceId: string): Observable<StorageDeviceDetailsOSType[]> {
+    return this.http.get<StorageDeviceDetailsOSType[]>(`/customer/storagedevices/${deviceId}/storage/os-data/`);
   }
 
-  buildIpAddressForm(data: StorageDeviceDetailsIpAddressType): FormGroup {
-    return this.builder.group({
-      'Name': [{ value: data?.Name ?? '', disabled: true }],
-      'NameFormat': [{ value: data?.NameFormat ?? '', disabled: true }],
-      'Address': [{ value: data?.Address ?? '', disabled: true }],
-      'AddressType': [{ value: data?.AddressType ?? '', disabled: true }],
-      'ProtocolType': [{ value: data?.ProtocolType ?? '', disabled: true }],
-      'SubnetMask': [{ value: data?.SubnetMask ?? '', disabled: true }],
-      'Category': [{ value: data?.Category ?? '', disabled: true }],
-      'Type': [{ value: data?.Type ?? '', disabled: true }],
-      'Item': [{ value: data?.Item ?? '', disabled: true }],
-      'DNSHostName': [{ value: data?.DNSHostName ?? '', disabled: true }],
-      'ManagementAddress': [{ value: data?.ManagementAddress ?? '', disabled: true }],
-      'Company': [{ value: data?.Company ?? '', disabled: true }],
-      'ShortDescription': [{ value: data?.ShortDescription ?? '', disabled: true }],
-      'Description': [{ value: data?.Description ?? '', disabled: true }],
+  convertToIPAddressViewData(data: StorageDeviceDetailsIpAddressType[]): IPAddressViewData[] {
+    if (!data || !data.length) return [];
+    let viewData: IPAddressViewData[] = [];
+    data.forEach(d => {
+      let view = new IPAddressViewData();
+      view.name = d.Name;
+      view.category = d.Category;
+      view.managementAddress = d.ManagementAddress;
+      view.addressType = d.AddressType;
+      view.tokenId = d.TokenId;
+      view.protocolType = d.ProtocolType;
+      view.type = d.Type;
+      view.markAsDeleted = d.MarkAsDeleted;
+      view.dnsHostName = d.DNSHostName;
+      view.item = d.Item;
+      view.address = d.Address;
+      view.shortDescription = d.ShortDescription;
+      view.description = d.Description;
+      viewData.push(view);
     })
+    return viewData;
   }
 
   convertToMacAddressViewData(data: StorageDeviceDetailsMacAddressType[]): MacAddressViewData[] {
@@ -95,28 +99,47 @@ export class StorageDetailsComponentsService {
     return viewData;
   }
 
-  buildOperationSystemForm(data: StorageDeviceDetailsOperationSystemType): FormGroup {
-    return this.builder.group({
-      'Name': [{ value: data?.Name ?? '', disabled: true }],
-      'NameFormat': [{ value: data?.NameFormat ?? '', disabled: true }],
-      'VersionNumber': [{ value: data?.VersionNumber ?? '', disabled: true }],
-      'BuildNumber': [{ value: data?.BuildNumber ?? '', disabled: true }],
-      'Category': [{ value: data?.Category ?? '', disabled: true }],
-      'Type': [{ value: data?.Type ?? '', disabled: true }],
-      'Item': [{ value: data?.Item ?? '', disabled: true }],
-      'ManufacturerName': [{ value: data?.ManufacturerName ?? '', disabled: true }],
-      'Model': [{ value: data?.Model ?? '', disabled: true }],
-      'MarketVersion': [{ value: data?.MarketVersion ?? '', disabled: true }],
-      'ServicePack': [{ value: data?.ServicePack ?? '', disabled: true }],
-      'LicenseType': [{ value: data?.LicenseType ?? '', disabled: true }],
-      'EndOfLife': [{ value: data?.EndOfLife ?? '', disabled: true }],
-      'EndOfSupport': [{ value: data?.EndOfSupport ?? '', disabled: true }],
-      'EndOfSecuritySupport': [{ value: data?.EndOfSecuritySupport ?? '', disabled: true }],
-      'EndOfExtendedSupport': [{ value: data?.EndOfExtendedSupport ?? '', disabled: true }],
-      'ShortDescription': [{ value: data?.ShortDescription ?? '', disabled: true }],
-      'Description': [{ value: data?.Description ?? '', disabled: true }],
+  convertToOSViewData(data: StorageDeviceDetailsOSType[]): OSViewData[] {
+    if (!data || !data.length) return [];
+    let viewData: OSViewData[] = [];
+    data.forEach(d => {
+      let a = new OSViewData();
+      a.name = d.Name;
+      a.systemName = d.SystemName;
+      a.category = d.Category;
+      a.osType = d.OSType;
+      a.type = d.Type;
+      a.item = d.Item;
+      a.tokenId = d.TokenId;
+      a.markAsDeleted = d.MarkAsDeleted;
+      a.manufacturerName = d.ManufacturerName;
+      a.model = d.Model;
+      a.marketVersion = d.MarketVersion;
+      a.licenseType = d.LicenseType;
+      a.description = d.Description;
+      a.shortDescription = d.ShortDescription;
+      viewData.push(a);
     })
+    return viewData;
   }
+
+}
+
+export class IPAddressViewData {
+  constructor() { }
+  name: string;
+  category: string;
+  managementAddress: string;
+  addressType: string;
+  tokenId: string;
+  protocolType: string;
+  type: string;
+  markAsDeleted: string;
+  dnsHostName: string;
+  item: string;
+  address: string;
+  shortDescription: string;
+  description: string;
 }
 
 export class MacAddressViewData {
@@ -151,4 +174,22 @@ export class InterfaceViewData {
   company: string;
   shortDescription: string;
   description: string;
+}
+
+export class OSViewData {
+  constructor() { }
+  name: string;
+  systemName: string;
+  category: string;
+  osType: string;
+  type: string;
+  item: string;
+  tokenId: string;
+  markAsDeleted: string;
+  manufacturerName: string;
+  model: string;
+  marketVersion: string;
+  licenseType: string;
+  description: string;
+  shortDescription: string;
 }

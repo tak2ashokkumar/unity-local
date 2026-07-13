@@ -37,7 +37,8 @@
                                             accessControl moduleName="Dashboard" accessType="View Dashboard"
                                             elementType="div"
                                             [modulePermissions]="view.applicableModulePermissions">{{view.name}}</a>
-                                        <span *ngIf="!view.defaultDashboardUrl" [tooltip]="view.name">{{view.name}}</span>
+                                        <span *ngIf="!view.defaultDashboardUrl"
+                                            [tooltip]="view.name">{{view.name}}</span>
                                     </td>
                                     <td class="tdw-15">
                                         <div [tooltip]="view.type">{{view.type}}</div>

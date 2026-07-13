@@ -1,11 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { SupportedLLMConfig, SupportedLLMConfigData } from '../shared/SharedEntityTypes/ai-chatbot/llm-model.type';
-import { AssistedInsights, ChatDocuments, UntiyChatBotExploreMenu, UrlData } from './unity-chatbot.type';
+import { AssistedInsights, ChatDocuments, TokenUsage, UntiyChatBotExploreMenu, UrlData } from './unity-chatbot.type';
+import { UnityChartDetails } from '../shared/unity-chart-config.service';
+import { EChartsOption } from 'echarts';
 
 @Injectable({
   providedIn: 'root'
@@ -42,20 +44,6 @@ export class UnityChatbotService {
         return res && res.supported_llms ? res.supported_llms : [];
       })
     )
-  }
-
-  changeActiveModel(selectedApplication: string, model: SupportedLLMConfigData) {
-    let app: string;
-    switch (selectedApplication) {
-      case 'Assistant': app = 'assistant'; break;
-      case 'Network Agent': app = 'network_agent'; break;
-      case 'Workflow Agent': app = 'workflow_agent'; break;
-      default: app = 'assistant';
-    }
-    let data = { 'active_model': model.id, 'application': app };
-    return this.http.post(`mcp/user-session-config/`, data);
-
-    // return of(null);
   }
 
   getResponse(data: any) {
@@ -139,22 +127,130 @@ export class UnityChatbotService {
     return this.http.post<ChatDocuments>('mcp/get_conversation_document_ids/', data)
   }
 
-uploadDocument(files: File[], conversationId: string, orgId: any, userId: any): Observable<any> {
-  const formData = new FormData();
+  uploadDocument(files: File[], conversationId: string, orgId: any, userId: any): Observable<any> {
+    const formData = new FormData();
 
-  if (files.length === 1) {
-    formData.append('file', files[0], files[0].name);
-  } else {
-    files.forEach(file => formData.append('files', file, file.name));
+    if (files.length === 1) {
+      formData.append('file', files[0], files[0].name);
+    } else {
+      files.forEach(file => formData.append('files', file, file.name));
+    }
+    conversationId && formData.append('conversation_id', conversationId);
+    formData.append('org_id', String(orgId));
+    formData.append('user_id', String(userId));
+    return this.http.post(`mcp/documents/upload/`, formData);
   }
-  conversationId && formData.append('conversation_id', conversationId);
-  formData.append('org_id', String(orgId));
-  formData.append('user_id', String(userId));
-  return this.http.post(`${environment.ChatbotDocumentUploadUrl}mcp/documents/upload/`, formData);
-}
+
   deleteDocument(docId: string, conversationId: string) {
     const postData = { conversation_id: conversationId, document_id: docId }
-    return this.http.post(`${environment.ChatbotDocumentUploadUrl}mcp/documents/delete/`, postData);
+    return this.http.post(`mcp/documents/delete/`, postData);
+  }
+
+  getTokenUsage(orgId: any, userId: any): Observable<TokenUsage> {
+    let params = new HttpParams()
+      .set('org_id', orgId)
+    //   .set('user_id', userId);
+    return this.http.get<TokenUsage>(`mcp/token-usage/org/`, { params });
+  }
+
+  // convertToTokenUsageChartData(data: TokenUsage, showCenterText: boolean = false): UnityChartDetails {
+  //   let view: UnityChartDetails = new UnityChartDetails();
+  //   const used = data.tokens_used;
+  //   const remaining = Math.max(data.token_limit - data.tokens_used, 0);
+  //   const percent = Math.min(Math.round(data.usage_percent), 100);
+
+  //   const options: EChartsOption = {
+  //     series: [{
+  //       type: 'pie',
+  //       radius: ['55%', '80%'],
+  //       avoidLabelOverlap: false,
+  //       label: { show: false },
+  //       labelLine: { show: false },
+  //       data: [
+  //         { value: used, name: 'Used', itemStyle: { color: '#0cbb70' } },
+  //         { value: remaining, name: 'Remaining', itemStyle: { color: '#e8e8e8' } }
+  //       ]
+  //     }]
+  //   };
+
+  //   if (showCenterText) {
+  //     options.graphic = [{
+  //       type: 'text',
+  //       left: 'center',
+  //       top: 'center',
+  //       style: {
+  //         text: `${percent}%`,
+  //         fontSize: 12,
+  //         fontWeight: 'bold',
+  //         fill: '#333'
+  //       }
+  //     }];
+  //   }
+  //   view.options = options;
+  //   return view;
+  // }
+  convertToTokenUsageViewData(data: any): TokenUsageViewData {
+    let view: TokenUsageViewData = new TokenUsageViewData();
+    if (!data) return view;
+
+    view.usedTokens = data.used_tokens ?? 0;
+    view.inputTokens = data.input_tokens ?? 0;
+    view.outputTokens = data.output_tokens ?? 0;
+    view.limit = data.limit ?? 0;
+    view.remainingTokens = data.remaining_tokens ?? 0;
+    view.totalCostUsd = data.total_cost_usd ?? 0;
+    view.usagePercent = data.limit ? Math.round((data.used_tokens / data.limit) * 100) : 0;
+    view.windowStart = data.window_start ?? '';
+    view.windowEnd = data.window_end ?? '';
+    if (!data.used_tokens && !data.remaining_tokens) {
+      const emptyChart: EChartsOption = {
+        series: [{
+          type: 'pie',
+          radius: ['55%', '80%'],
+          avoidLabelOverlap: false,
+          label: { show: false },
+          labelLine: { show: false },
+          data: [
+            { value: 1, name: 'No Data', itemStyle: { color: '#e8e8e8' } }
+          ]
+        }]
+      };
+      view.iconChartOptions = { ...emptyChart };
+      view.popupChartOptions = { ...emptyChart };
+      return view;
+    }
+
+    const chartBase: EChartsOption = {
+      series: [{
+        type: 'pie',
+        radius: ['55%', '80%'],
+        avoidLabelOverlap: false,
+        label: { show: false },
+        labelLine: { show: false },
+        data: [
+          { value: view.usedTokens, name: 'Used', itemStyle: { color: '#0cbb70' } },
+          { value: view.remainingTokens > 0 ? view.remainingTokens : 0, name: 'Remaining', itemStyle: { color: '#e8e8e8' } }
+        ]
+      }]
+    };
+
+    view.iconChartOptions = { ...chartBase };
+    view.popupChartOptions = {
+      ...chartBase,
+      graphic: [{
+        type: 'text',
+        left: 'center',
+        top: 'center',
+        style: {
+          text: `${view.usagePercent}%`,
+          fontSize: 12,
+          fontWeight: 'bold',
+          fill: '#333'
+        }
+      }]
+    };
+
+    return view;
   }
 }
 
@@ -229,3 +325,17 @@ export const TabNames = [
   { name: 'Agentic Workflows', isSelected: false },
   // { name: 'AI Agents', isSelected: false },
 ]
+
+export class TokenUsageViewData {
+  usedTokens: number = 0;
+  inputTokens: number = 0;
+  outputTokens: number = 0;
+  limit: number = 0;
+  remainingTokens: number = 0;
+  totalCostUsd: number = 0;
+  usagePercent: number = 0;
+  windowStart: string = '';
+  windowEnd: string = '';
+  iconChartOptions: EChartsOption = {};
+  popupChartOptions: EChartsOption = {};
+}

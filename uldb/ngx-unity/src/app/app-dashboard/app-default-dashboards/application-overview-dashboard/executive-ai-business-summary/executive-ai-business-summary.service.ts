@@ -15,7 +15,7 @@ export class ExecutiveAiBusinessSummaryService {
       message: 'Get me a Exective Summary of the app',
       session_id: this.generateSessionId(),
     }
-    return this.http.post<ExtendtedAIBusinessSummaryType>(`/aiapm/executive`, payload);
+    return this.http.post<ExtendtedAIBusinessSummaryType>('http://10.192.11.64:9957/executive',payload);
   }
 
   generateSessionId(): string {

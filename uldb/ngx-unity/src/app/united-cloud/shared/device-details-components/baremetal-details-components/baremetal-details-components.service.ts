@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
-import { BaremetalDeviceDetailsCpuProcessorsType, BaremetalDeviceDetailsFileSystemType, BaremetalDeviceDetailsInterfaceType, BaremetalDeviceDetailsIpAddressType, BaremetalDeviceDetailsMacAddressType, BaremetalDeviceDetailsOperationSystemType, BaremetalDeviceDetailsProductType, BaremetalDeviceDetailsSoftwareServerType } from './baremetal-details-components.type';
+import { BaremetalDeviceDetailsCpuProcessorsType, BaremetalDeviceDetailsFileSystemType, BaremetalDeviceDetailsInterfaceType, BaremetalDeviceDetailsIpAddressType, BaremetalDeviceDetailsMacAddressType, BaremetalDeviceDetailsOSType, BaremetalDeviceDetailsProductType, BaremetalDeviceDetailsSoftwareServerType } from './baremetal-details-components.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -16,8 +16,8 @@ export class BaremetalDetailsComponentsService {
     private tableSvc: TableApiServiceService,
     private utilSvc: AppUtilityService) { }
 
-  getIpAddressData(deviceId: string): Observable<BaremetalDeviceDetailsIpAddressType> {
-    return this.http.get<BaremetalDeviceDetailsIpAddressType>(`/customer/bm_servers/${deviceId}/baremetal/ip-address/`);
+  getIpAddressData(deviceId: string): Observable<BaremetalDeviceDetailsIpAddressType[]> {
+    return this.http.get<BaremetalDeviceDetailsIpAddressType[]>(`/customer/bm_servers/${deviceId}/baremetal/ip-address/`);
   }
 
   getMacAddressData(criteria: SearchCriteria, deviceId: string): Observable<PaginatedResult<BaremetalDeviceDetailsMacAddressType>> {
@@ -50,30 +50,33 @@ export class BaremetalDetailsComponentsService {
     return this.http.get<PaginatedResult<BaremetalDeviceDetailsSoftwareServerType>>(`/customer/bm_servers/${deviceId}/baremetal/servers/`, { params: params });
   }
 
-  getOperationSystemData(deviceId: string): Observable<BaremetalDeviceDetailsOperationSystemType> {
-    return this.http.get<BaremetalDeviceDetailsOperationSystemType>(`/customer/bm_servers/${deviceId}/baremetal/os-data/`);
+  getOSData(deviceId: string): Observable<BaremetalDeviceDetailsOSType[]> {
+    return this.http.get<BaremetalDeviceDetailsOSType[]>(`/customer/bm_servers/${deviceId}/baremetal/os-data/`);
   }
 
-  buildIpAddressForm(data: BaremetalDeviceDetailsIpAddressType): FormGroup {
-    return this.builder.group({
-      'Name': [{ value: data?.Name ?? '', disabled: true }],
-      'NameFormat': [{ value: data?.NameFormat ?? '', disabled: true }],
-      'Address': [{ value: data?.Address ?? '', disabled: true }],
-      'AddressType': [{ value: data?.AddressType ?? '', disabled: true }],
-      'ProtocolType': [{ value: data?.ProtocolType ?? '', disabled: true }],
-      'SubnetMask': [{ value: data?.SubnetMask ?? '', disabled: true }],
-      'Category': [{ value: data?.Category ?? '', disabled: true }],
-      'Type': [{ value: data?.Type ?? '', disabled: true }],
-      'Item': [{ value: data?.Item ?? '', disabled: true }],
-      'DNSHostName': [{ value: data?.DNSHostName ?? '', disabled: true }],
-      'TokenId': [{ value: data?.TokenId ?? '', disabled: true }],
-      'LastScanDate': [{ value: data?.LastScanDate ?? '', disabled: true }],
-      'ManagementAddress': [{ value: data?.ManagementAddress ?? '', disabled: true }],
-      'Company': [{ value: data?.Company ?? '', disabled: true }],
-      'ShortDescription': [{ value: data?.ShortDescription ?? '', disabled: true }],
-      'Description': [{ value: data?.Description ?? '', disabled: true }],
+  convertToIPAddressViewData(data: BaremetalDeviceDetailsIpAddressType[]): IpAddressViewData[] {
+    if (!data || !data.length) return [];
+    let viewData: IpAddressViewData[] = [];
+    data.forEach(d => {
+      let a = new IpAddressViewData();
+      a.name = d.Name;
+      a.category = d.Category;
+      a.managementAddress = d.ManagementAddress;
+      a.addressType = d.AddressType;
+      a.tokenId = d.TokenId;
+      a.protocolType = d.ProtocolType;
+      a.type = d.Type;
+      a.markAsDeleted = d.MarkAsDeleted;
+      a.dnsHostName = d.DNSHostName;
+      a.item = d.Item;
+      a.address = d.Address;
+      a.shortDescription = d.ShortDescription;
+      a.description = d.Description;
+      viewData.push(a);
     })
+    return viewData;
   }
+
 
   convertToMacAddressViewData(data: BaremetalDeviceDetailsMacAddressType[]): MacAddressViewData[] {
     let viewData: MacAddressViewData[] = [];
@@ -216,32 +219,62 @@ export class BaremetalDetailsComponentsService {
     return viewData;
   }
 
-  buildOperationSystemForm(data: BaremetalDeviceDetailsOperationSystemType): FormGroup {
-    return this.builder.group({
-      'Name': [{ value: data?.Name ?? '', disabled: true }],
-      'NameFormat': [{ value: data?.NameFormat ?? '', disabled: true }],
-      'VersionNumber': [{ value: data?.VersionNumber ?? '', disabled: true }],
-      'BuildNumber': [{ value: data?.BuildNumber ?? '', disabled: true }],
-      'Category': [{ value: data?.Category ?? '', disabled: true }],
-      'Type': [{ value: data?.Type ?? '', disabled: true }],
-      'Item': [{ value: data?.Item ?? '', disabled: true }],
-      'ManufacturerName': [{ value: data?.ManufacturerName ?? '', disabled: true }],
-      'Model': [{ value: data?.Model ?? '', disabled: true }],
-      'MarketVersion': [{ value: data?.MarketVersion ?? '', disabled: true }],
-      'TokenId': [{ value: data?.TokenId ?? '', disabled: true }],
-      'OSType': [{ value: data?.OSType ?? '', disabled: true }],
-      'ServicePack': [{ value: data?.ServicePack ?? '', disabled: true }],
-      'LicenseType': [{ value: data?.LicenseType ?? '', disabled: true }],
-      'Company': [{ value: data?.Company ?? '', disabled: true }],
-      'LastScanDate': [{ value: data?.LastScanDate ?? '', disabled: true }],
-      'EndOfLife': [{ value: data?.EndOfLife ?? '', disabled: true }],
-      'EndOfSupport': [{ value: data?.EndOfSupport ?? '', disabled: true }],
-      'EndOfSecuritySupport': [{ value: data?.EndOfSecuritySupport ?? '', disabled: true }],
-      'EndOfExtendedSupport': [{ value: data?.EndOfExtendedSupport ?? '', disabled: true }],
-      'ShortDescription': [{ value: data?.ShortDescription ?? '', disabled: true }],
-      'Description': [{ value: data?.Description ?? '', disabled: true }],
+  convertToOSViewData(data: BaremetalDeviceDetailsOSType[]): OSViewData[] {
+    if (!data || !data.length) return [];
+    let viewData: OSViewData[] = [];
+    data.forEach(d => {
+      let a = new OSViewData();
+      a.name = d.Name;
+      a.systemName = d.SystemName;
+      a.category = d.Category;
+      a.osType = d.OSType;
+      a.type = d.Type;
+      a.item = d.Item;
+      a.tokenId = d.TokenId;
+      a.markAsDeleted = d.MarkAsDeleted;
+      a.manufacturerName = d.ManufacturerName;
+      a.model = d.Model;
+      a.marketVersion = d.MarketVersion;
+      a.licenseType = d.LicenseType;
+      a.description = d.Description;
+      a.shortDescription = d.ShortDescription;
+      viewData.push(a);
     })
+    return viewData;
   }
+}
+
+export class IpAddressViewData {
+  name: string;
+  category: string;
+  managementAddress: string;
+  addressType: string;
+  tokenId: string;
+  protocolType: string;
+  type: string;
+  markAsDeleted: string;
+  dnsHostName: string;
+  item: string;
+  address: string;
+  shortDescription: string;
+  description: string;
+}
+
+export class OSViewData {
+  name: string;
+  shortDescription: string;
+  systemName: string;
+  category: string;
+  osType: string;
+  type: string;
+  item: string;
+  tokenId: string;
+  markAsDeleted: string;
+  description: string;
+  manufacturerName: string;
+  model: string;
+  marketVersion: string;
+  licenseType: string;
 }
 
 export class MacAddressViewData {

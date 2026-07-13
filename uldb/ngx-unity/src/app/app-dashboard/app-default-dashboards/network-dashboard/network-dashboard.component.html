@@ -1,0 +1,111 @@
+<div class="card border-0 mb-0 network-dashboard-shell">
+    <div class="card-header network-dashboard-header bg-white">
+        <div class="network-dashboard-header-info">
+            <div class="network-dashboard-title">Networks</div>
+            <div class="network-dashboard-meta text-muted">
+                <span class="network-dashboard-meta-item network-dashboard-meta-item--divider">Refreshed: Today 10:00
+                    IST</span>
+                <span class="network-dashboard-meta-item">Scope: All providers · All regions · All accounts</span>
+            </div>
+        </div>
+
+        <form class="network-dashboard-filter-form" *ngIf="filterForm" [formGroup]="filterForm">
+            <div class="form-group mb-0 network-dashboard-filter-group">
+                <label class="m-0 p-0">Datacenter</label>
+                <multiselect-dropdown [options]="datacenterOptions" [settings]="datacenterMultiselectSettings"
+                    [texts]="datacenterMultiselectTexts" class="form-control p-0 network-dashboard-multiselect"
+                    formControlName="datacenters">
+                </multiselect-dropdown>
+            </div>
+
+            <div class="form-group mb-0 network-dashboard-filter-group network-dashboard-filter-group--small">
+                <label class="m-0 p-0">Time Range</label>
+                <select class="form-control form-control-sm" formControlName="timeRange" (change)="applyFilters()">
+                    <option *ngFor="let option of timeRangeOptions" [value]="option">
+                        {{ getTimeRangeLabel(option) }}
+                    </option>
+                </select>
+            </div>
+
+            <button class="network-dashboard-action-btn" type="button" (click)="applyFilters(); loadData()"
+                [tooltip]="'Apply Filters'" container="body">
+                <i class="fas fa-filter"></i>
+            </button>
+            <span class="network-dashboard-action-separator"></span>
+            <button class="network-dashboard-action-btn" type="button" (click)="refreshFilters()" [tooltip]="'Refresh'"
+                container="body">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            <button class="network-dashboard-action-btn" type="button" (click)="goBack()" [tooltip]="'Go Back'"
+                container="body">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="container-fluid px-3 pt-3 pb-2" *ngIf="networkOverviewViewData">
+        <div class="d-flex flex-wrap align-items-start justify-content-between mb-2">
+            <div class="network-dashboard-section-title">Network Overview</div>
+            <div class="network-dashboard-section-note">
+                *The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring Within
+                The Selected Time Range
+            </div>
+        </div>
+
+        <div class="card network-dashboard-overview-card">
+            <div class="card-body p-0">
+                <div class="d-flex flex-nowrap text-center network-dashboard-overview-list">
+                    <div class="network-dashboard-overview-item network-dashboard-overview-item--summary">
+                        <div class="network-dashboard-overview-label">Device Availability</div>
+                        <div
+                            class="network-dashboard-overview-value network-dashboard-overview-value--success text-left ml-3">
+                            {{ networkOverviewViewData.deviceAvailability?.percentage | number:'1.0-1' }}%
+                        </div>
+                        <div class="network-dashboard-overview-subtext">
+                            {{ networkOverviewViewData.deviceAvailability?.online | number:'1.0-0' }}/{{
+                            networkOverviewViewData.deviceAvailability?.total | number:'1.0-0' }}
+                            Online
+                        </div>
+                    </div>
+
+                    <div class="network-dashboard-overview-item network-dashboard-overview-item--summary">
+                        <div class="network-dashboard-overview-label">Discovered Devices</div>
+                        <div class="network-dashboard-overview-value network-dashboard-overview-value--primary">
+                            {{ networkOverviewViewData.discoveredDevices | number:'1.0-0' }}
+                        </div>
+                    </div>
+
+                    <div class="network-dashboard-overview-item network-dashboard-overview-item--summary">
+                        <div class="network-dashboard-overview-label">Monitored Devices</div>
+                        <div class="network-dashboard-overview-value network-dashboard-overview-value--primary">
+                            {{ networkOverviewViewData.monitoredDevices | number:'1.0-0' }}
+                        </div>
+                    </div>
+
+                    <div class="network-dashboard-overview-item"
+                        *ngFor="let item of networkOverviewViewData.deviceTypes">
+                        <div class="network-dashboard-overview-label">{{ item.type }}</div>
+                        <div class="network-dashboard-overview-value">
+                            {{ item.count | number:'1.0-0' }}
+                        </div>
+                        <div
+                            class="d-flex align-items-center justify-content-center flex-nowrap network-dashboard-overview-status-row">
+                            <span class="mx-1 network-dashboard-overview-status-item">
+                                <i [class]="item.normalIconClass"></i>
+                                <span class="ml-1">{{ item.normal | number:'1.0-0' }}</span>
+                            </span>
+                            <span class="mx-1 network-dashboard-overview-status-item">
+                                <i [class]="item.criticalIconClass"></i>
+                                <span class="ml-1">{{ item.critical | number:'1.0-0' }}</span>
+                            </span>
+                            <span class="mx-1 text-muted network-dashboard-overview-status-item">
+                                <i [class]="item.unknownIconClass"></i>
+                                <span class="ml-1">{{ item.unknown | number:'1.0-0' }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -34,7 +34,7 @@
                         </div>
                         <div class="w-20 mx-3">
                             <custom-password-field formControlName="enable_or_encrypted_password"
-                                [options]="{ placeholder:'', class: 'form-control-sm'}"></custom-password-field>
+                                [options]="{ id: 'ncm-bulk-enable-or-encrypted-password', placeholder:'Enter Password', class: 'form-control-sm', autocomplete: ''}"></custom-password-field>
                         </div>
                         <div class="w-20 mr-3">
                             <select class="form-control form-control-sm" formControlName="config_device_type"
@@ -103,7 +103,7 @@
                             <div>
                                 <input [id]="i + '-enable_or_encrypted_password'" type="password" class="form-control"
                                     formControlName="enable_or_encrypted_password"
-                                    [disabled]="view.form.get('enable_or_encrypted_password').disabled">
+                                    [disabled]="view.form.get('enable_or_encrypted_password').disabled" autocomplete="">
                             </div>
                         </td>
                         <td class="tdw-17">

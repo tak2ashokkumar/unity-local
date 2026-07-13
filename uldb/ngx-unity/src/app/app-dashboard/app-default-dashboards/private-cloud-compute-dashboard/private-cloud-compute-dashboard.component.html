@@ -1,139 +1,139 @@
 <div class="card border-0 mb-0">
-    <div class="card-header d-flex justify-content-between align-items-center bg-white border-bottm-0 px-2 py-2">
-        <div class="px-5">
-            <a class="nav-link tabs-level1-link border-0 text-success p-0">Private Cloud Compute Dashboard</a>
-            <div *ngIf="headerData" class="d-flex align-items-center justify-content-start text-muted">
-                <span class="pr-2 border-right">Refreshed: {{headerData?.lastRefreshed}}</span>
-                <span class="pl-2">Scope: </span>
-                <span class="pl-2">{{topScope?.providers}}</span>
-                <span class="pl-2">{{topScope?.regions}}</span>
-                <span class="pl-2">{{topScope?.accounts}}</span>
+    <div class="card-header private-cloud-header bg-white border-bottm-0">
+        <div class="private-cloud-header-info">
+            <a class="nav-link tabs-level1-link border-0 text-success p-0 private-cloud-header-title">Private Cloud
+                Compute Dashboard</a>
+            <div *ngIf="headerData" class="private-cloud-header-meta text-muted">
+                <span class="private-cloud-header-meta-item private-cloud-header-meta-item--divider">Refreshed:
+                    {{headerData?.lastRefreshed}}</span>
+                <span class="private-cloud-header-meta-item">Scope: {{topScope?.providers}} · {{topScope?.regions}} ·
+                    {{topScope?.accounts}}</span>
             </div>
         </div>
-        <div class="col-6 m-0 p-0 d-flex px-1 align-items-center justify-content-end ">
-            <form class="col-10 m-0 p-0 d-flex px-3 align-items-center justify-content-center border-right"
-                *ngIf="filterForm" [formGroup]="filterForm">
-                <div class="form-group mb-0 col-3 pr-1">
+        <div class="private-cloud-header-filters">
+            <form class="private-cloud-filter-form border-right" *ngIf="filterForm" [formGroup]="filterForm">
+                <div class="form-group mb-0 private-cloud-filter-group">
                     <label class="m-0 p-0">Platform</label>
                     <multiselect-dropdown [options]="platformOptions" [settings]="multiselectSettings"
-                        [texts]="multiselectTexts" class="form-control p-0" formControlName="platforms">
+                        [texts]="multiselectTexts" class="form-control p-0 private-cloud-multiselect"
+                        formControlName="platforms">
                     </multiselect-dropdown>
                 </div>
-                <div class="form-group mb-0 col-3 pr-1">
+                <div class="form-group mb-0 private-cloud-filter-group">
                     <label class="m-0 p-0">Datacenter</label>
                     <multiselect-dropdown [options]="datacenterOptions" [settings]="multiselectSettings"
-                        [texts]="multiselectTexts" class="form-control p-0" formControlName="datacenters">
+                        [texts]="multiselectTexts" class="form-control p-0 private-cloud-multiselect"
+                        formControlName="datacenters">
                     </multiselect-dropdown>
                 </div>
-                <div class="form-group mb-0 col-3 pr-1">
+                <div class="form-group mb-0 private-cloud-filter-group">
                     <label class="m-0 p-0">Environment</label>
                     <multiselect-dropdown [options]="environmentOptions" [settings]="multiselectSettings"
-                        [texts]="multiselectTexts" class="form-control p-0" formControlName="environments">
+                        [texts]="multiselectTexts" class="form-control p-0 private-cloud-multiselect"
+                        formControlName="environments">
                     </multiselect-dropdown>
                 </div>
-                <div class="form-group mb-0 col-3 pr-1">
+                <div class="form-group mb-0 private-cloud-filter-group">
                     <label class="m-0 p-0">Account</label>
                     <multiselect-dropdown [options]="accountOptions" [settings]="multiselectSettings"
-                        [texts]="multiselectTexts" class="form-control p-0" formControlName="accounts">
+                        [texts]="multiselectTexts" class="form-control p-0 private-cloud-multiselect"
+                        formControlName="accounts">
                     </multiselect-dropdown>
                 </div>
-                <button class="round-action-btn px-2 mx-2 mt-1" type="button" (click)="applyFilters()"
+                <button class="round-action-btn private-cloud-filter-btn" type="button" (click)="applyFilters()"
                     [tooltip]="'Apply Filters'" container="body">
                     <i class="fas fa-filter"></i>
                 </button>
             </form>
-            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
-            <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
-                [tooltip]="'Go Back'" container="body">
-                <i class="fa fa-arrow-left"></i>
-            </button>
+            <div class="private-cloud-header-actions">
+                <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2 private-cloud-back-btn" type="button"
+                    (click)="goBack()" [tooltip]="'Go Back'" container="body">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 
 <div class="row mx-1 my-2">
-    <div class="col-12">
+    <div class="col-12" *ngIf="showExecutiveSummaryWidget">
         <div class="bg-transparent font-500 font-lg p-2 executive-summary-header">
-            <span>Executive Summary / Cloud Inventory</span>
+            <span class="executive-summary-title">Executive Summary / Cloud Inventory</span>
             <span class="executive-summary-note">
-                *Metrics And Insights Shown Are Applicable Only To Devices Currently Enabled For Monitoring
+                *The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring Within
+                The Selected Time Range
             </span>
         </div>
-        <div class="card round-edge equalize-card executive-summary-card mb-3 p-4">
-            <div class="row justify-content-around">
-                <div class="col-6 d-flex justify-content-around">
-                    <app-spinner [name]="executiveSummaryWidgetData.executiveSummaryLoader"></app-spinner>
-
-                    <div class="text-center p-1">
-                        <div class="text-muted">Total VMs</div>
-                        <div class="font-lg-xl font-500 text-primary text-left" role="link" tabindex="0"
-                            style="cursor: pointer;" (click)="openAllVmsInNewTab()"
+        <div class="card round-edge equalize-card executive-summary-card mb-3">
+            <div class="executive-summary-metrics-wrapper position-relative">
+                <app-spinner [name]="executiveSummaryWidgetData.executiveSummaryLoader"></app-spinner>
+                <div class="executive-summary-metrics">
+                    <div class="executive-summary-metric">
+                        <div class="executive-summary-metric-label">Total VMs</div>
+                        <div class="executive-summary-metric-value executive-summary-metric-value--primary" role="link"
+                            tabindex="0" style="cursor: pointer;" (click)="openAllVmsInNewTab()"
                             (keydown.enter)="openAllVmsInNewTab()" (keydown.space)="openAllVmsInNewTab()">
-                            {{executiveSummaryViewData?.totalVMs || 0}}
-                        </div>
-                    </div>
-                    <div class="my-2 border border-secondary"></div>
-
-                    <div class="text-center p-1">
-                        <div class="text-muted">Physical Hosts</div>
-                        <div class="font-lg font-500 text-left">
-                            {{executiveSummaryViewData?.physicalHosts || 0}}
+                            {{(executiveSummaryViewData?.totalVMs || 0) | number}}
                         </div>
                     </div>
 
-                    <div class="my-2 border border-secondary"></div>
-                    <div class="text-center p-1">
-                        <div class="text-muted">Clusters</div>
-                        <div class="font-lg font-500 text-left">{{executiveSummaryViewData?.clusters
-                            || 0}}
+                    <div class="executive-summary-metric">
+                        <div class="executive-summary-metric-label">Physical Hosts</div>
+                        <div class="executive-summary-metric-value">
+                            {{(executiveSummaryViewData?.physicalHosts || 0) | number}}
                         </div>
                     </div>
 
-                    <div class="my-2 border border-secondary"></div>
-                    <div class="text-center p-1">
-                        <div class="text-muted">Powered On</div>
-                        <div class="font-lg-xl font-500 text-success text-left">
-                            {{executiveSummaryViewData?.poweredOn || 0}}
+                    <div class="executive-summary-metric">
+                        <div class="executive-summary-metric-label">Clusters</div>
+                        <div class="executive-summary-metric-value">{{(executiveSummaryViewData?.clusters || 0) |
+                            number}}
                         </div>
                     </div>
 
-                    <div class="my-2 border border-secondary"></div>
-                    <div class="text-center p-1">
-                        <div class="text-muted">Powered Off</div>
-                        <div class="font-lg-xl font-500 text-danger text-left">
-                            {{executiveSummaryViewData?.poweredOff || 0}}
+                    <div class="executive-summary-metric">
+                        <div class="executive-summary-metric-label">Powered on</div>
+                        <div class="executive-summary-metric-value executive-summary-metric-value--success">
+                            {{(executiveSummaryViewData?.poweredOn || 0) | number}}
                         </div>
                     </div>
-                    <div class="my-2 border border-secondary"></div>
-                    <div class="text-center p-1">
-                        <div class="text-muted">Idle VMs</div>
-                        <div class="font-lg-xl font-500 text-danger text-left">
-                            {{executiveSummaryViewData?.idleVMs || 0}}
+
+                    <div class="executive-summary-metric">
+                        <div class="executive-summary-metric-label">Powered off</div>
+                        <div class="executive-summary-metric-value executive-summary-metric-value--danger">
+                            {{(executiveSummaryViewData?.poweredOff || 0) | number}}
                         </div>
                     </div>
-                    <div class="my-2 border border-secondary"></div>
-                    <div class="text-center p-1">
-                        <div class="text-muted">Orphaned VMs</div>
-                        <div class="font-lg-xl font-500 text-left">
-                            {{executiveSummaryViewData?.orphanedVMs || 0}}
+
+                    <div class="executive-summary-metric">
+                        <div class="executive-summary-metric-label">Idle VMs</div>
+                        <div class="executive-summary-metric-value">
+                            {{(executiveSummaryViewData?.idleVMs || 0) | number}}
+                        </div>
+                    </div>
+
+                    <div class="executive-summary-metric">
+                        <div class="executive-summary-metric-label">Orphaned VMs</div>
+                        <div class="executive-summary-metric-value">
+                            {{(executiveSummaryViewData?.orphanedVMs || 0) | number}}
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row justify-content-around mt-3">
-                <div class="col-3 px-1 mt-3 executive-summary-chart-col executive-summary-chart-col--lowered">
-
-                    <div class="text-center p-2 font-500">
+            <div class="executive-summary-charts">
+                <div class="executive-summary-chart-panel">
+                    <div class="executive-summary-chart-title">
                         Cloud Type Distribution
                     </div>
 
-                    <div class="card-body position-relative mt-2">
+                    <div class="card-body position-relative executive-summary-chart-body">
                         <app-spinner [name]="'CloudTypeLoader'"></app-spinner>
                         <ng-container *ngIf="executiveSummaryWidgetData?.cloudTypeChartData">
                             <div echarts [options]="executiveSummaryWidgetData?.cloudTypeChartData?.options"
-                                (chartInit)="onCloudTypeChartInit($event)" [defaultHeight]="200"
-                                style="width: 100%; height:250px;">
+                                (chartInit)="onCloudTypeChartInit($event)" [defaultHeight]="172"
+                                style="width: 100%; height:172px;">
                             </div>
                             <div class="cloud-legend-wrapper">
                                 <button type="button" class="cloud-legend-item border-0 bg-transparent p-0 text-left"
@@ -151,22 +151,23 @@
                             </div>
                         </ng-container>
                         <div *ngIf="!executiveSummaryWidgetData.cloudTypeChartData"
-                            class="d-flex justify-content-center align-items-center" style="width: 100%; height:250px;">
+                            class="d-flex justify-content-center align-items-center executive-summary-chart-empty"
+                            style="width: 100%; height:172px;">
                             No data available.
                         </div>
                     </div>
                 </div>
-                <div class="col-3 px-1 mt-3 executive-summary-chart-col executive-summary-chart-col--lowered">
-                    <div class="text-center p-2 font-500">
+                <div class="executive-summary-chart-panel">
+                    <div class="executive-summary-chart-title">
                         Power & Activity State
                     </div>
-                    <div class="card-body position-relative mt-2">
+                    <div class="card-body position-relative executive-summary-chart-body">
                         <app-spinner [name]="executiveSummaryWidgetData.powerActivityLoader">
                         </app-spinner>
                         <ng-container *ngIf="executiveSummaryWidgetData?.powerActivityChartData">
                             <div echarts [options]="executiveSummaryWidgetData?.powerActivityChartData?.options"
-                                (chartInit)="onPowerActivityChartInit($event)" [defaultHeight]="200"
-                                style="width: 100%; height:250px;">
+                                (chartInit)="onPowerActivityChartInit($event)" [defaultHeight]="172"
+                                style="width: 100%; height:172px;">
                             </div>
                             <div class="power-legend-wrapper">
                                 <div class="power-legend-item">
@@ -186,79 +187,88 @@
                             </div>
                         </ng-container>
                         <div *ngIf="!executiveSummaryWidgetData.powerActivityChartData"
-                            class="d-flex justify-content-center align-items-center" style="width: 100%; height:250px;">
+                            class="d-flex justify-content-center align-items-center executive-summary-chart-empty"
+                            style="width: 100%; height:172px;">
                             No data available.
                         </div>
                     </div>
                 </div>
-                <div class="col-3 px-1 mt-3 executive-summary-chart-col executive-summary-chart-col--lowered">
-                    <div class="text-center p-2 font-500">
+                <div class="executive-summary-chart-panel">
+                    <div class="executive-summary-chart-title">
                         VM Count By OS Type
                     </div>
-                    <div class="card-body position-relative mt-2">
+                    <div class="card-body position-relative executive-summary-chart-body">
                         <app-spinner [name]="executiveSummaryWidgetData.vmCountByOSTypeLoader"></app-spinner>
                         <ng-container *ngIf="executiveSummaryWidgetData?.vmCountByOSTypeChartData">
                             <div echarts [options]="executiveSummaryWidgetData?.vmCountByOSTypeChartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height:250px;">
+                                [defaultHeight]="210" style="width: 100%; height:210px;">
                             </div>
                         </ng-container>
                         <div *ngIf="!executiveSummaryWidgetData.vmCountByOSTypeChartData"
-                            class="d-flex justify-content-center align-items-center" style="width: 100%; height:250px;">
+                            class="d-flex justify-content-center align-items-center executive-summary-chart-empty"
+                            style="width: 100%; height:210px;">
                             No data
                             available.
                         </div>
                     </div>
                 </div>
-                <div class="col-3 px-1 mt-3">
-                    <div class="">
-                        <div class="text-center p-2 font-500">
-                            Environment & Criticality
-                        </div>
-                        <div class="card-body position-relative pb-0">
-                            <app-spinner
-                                [name]="executiveSummaryWidgetData.environmentAndCriticalityLoader"></app-spinner>
-                            <ng-container *ngIf="executiveSummaryWidgetData?.environmentAndCriticalityChartData">
-                                <div echarts
-                                    [options]="executiveSummaryWidgetData?.environmentAndCriticalityChartData?.options"
-                                    [defaultHeight]="155" style="width: 100%; height: 155px;">
+                <div class="executive-summary-chart-panel">
+                    <div class="executive-summary-right-stack">
+                        <div>
+                            <div class="executive-summary-chart-title">
+                                Environment & Criticality
+                            </div>
+                            <div class="card-body position-relative executive-summary-environment-body">
+                                <app-spinner
+                                    [name]="executiveSummaryWidgetData.environmentAndCriticalityLoader"></app-spinner>
+                                <ng-container *ngIf="executiveSummaryWidgetData?.environmentAndCriticalityChartData">
+                                    <div echarts
+                                        [options]="executiveSummaryWidgetData?.environmentAndCriticalityChartData?.options"
+                                        [defaultHeight]="102" style="width: 100%; height: 102px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!executiveSummaryWidgetData.environmentAndCriticalityChartData"
+                                    class="d-flex justify-content-center align-items-center executive-summary-chart-empty"
+                                    style="width: 100%; height: 102px;">No data
+                                    available.
                                 </div>
-                            </ng-container>
-                            <div *ngIf="!executiveSummaryWidgetData.environmentAndCriticalityChartData"
-                                class="d-flex justify-content-center align-items-center"
-                                style="width: 100%; height: 155px;">No data
-                                available.
                             </div>
                         </div>
-                    </div>
-                    <div class="mt-2" *ngIf="executiveSummaryWidgetData?.alertSeverityViewData">
-                        <div class="text-center mb-3 font-500" role="link" tabindex="0" style="cursor: pointer;"
-                            (click)="openAlertsInNewTab()" (keydown.enter)="openAlertsInNewTab()"
-                            (keydown.space)="openAlertsInNewTab()" [tooltip]="'Open linked page'" container="body">
-                            Alerts Severity
-                        </div>
 
-                        <div class="d-flex justify-content-center align-items-center flex-wrap " style="gap: 15px;">
-
-                            <span class="severity-pill severity-critical" role="link" tabindex="0"
-                                style="cursor: pointer;" (click)="openAlertsInNewTab()"
+                        <div *ngIf="executiveSummaryWidgetData?.alertSeverityViewData">
+                            <div class="executive-summary-chart-title executive-summary-alert-title" role="link"
+                                tabindex="0" style="cursor: pointer;" (click)="openAlertsInNewTab()"
                                 (keydown.enter)="openAlertsInNewTab()" (keydown.space)="openAlertsInNewTab()"
                                 [tooltip]="'Open linked page'" container="body">
-                                Critical {{executiveSummaryWidgetData?.alertSeverityViewData?.critical || '0' }}
-                            </span>
+                                Alerts Severity
+                            </div>
 
-                            <span class="severity-pill severity-warning" role="link" tabindex="0"
-                                style="cursor: pointer;" (click)="openAlertsInNewTab()"
-                                (keydown.enter)="openAlertsInNewTab()" (keydown.space)="openAlertsInNewTab()"
-                                [tooltip]="'Open linked page'" container="body">
-                                Warning {{executiveSummaryWidgetData?.alertSeverityViewData?.warning|| '0' }}
-                            </span>
+                            <div class="executive-summary-alert-pills">
 
-                            <span class="severity-pill severity-info" role="link" tabindex="0" style="cursor: pointer;"
-                                (click)="openAlertsInNewTab()" (keydown.enter)="openAlertsInNewTab()"
-                                (keydown.space)="openAlertsInNewTab()" [tooltip]="'Open linked page'" container="body">
-                                Info {{executiveSummaryWidgetData?.alertSeverityViewData?.info ||'0' }}
-                            </span>
+                                <span class="severity-pill severity-critical" role="link" tabindex="0"
+                                    style="cursor: pointer;" (click)="openAlertsInNewTab()"
+                                    (keydown.enter)="openAlertsInNewTab()" (keydown.space)="openAlertsInNewTab()"
+                                    [tooltip]="'Open linked page'" container="body">
+                                    Critical {{(executiveSummaryWidgetData?.alertSeverityViewData?.critical || 0) |
+                                    number}}
+                                </span>
 
+                                <span class="severity-pill severity-warning" role="link" tabindex="0"
+                                    style="cursor: pointer;" (click)="openAlertsInNewTab()"
+                                    (keydown.enter)="openAlertsInNewTab()" (keydown.space)="openAlertsInNewTab()"
+                                    [tooltip]="'Open linked page'" container="body">
+                                    Warning {{(executiveSummaryWidgetData?.alertSeverityViewData?.warning || 0) |
+                                    number}}
+                                </span>
+
+                                <span class="severity-pill severity-info" role="link" tabindex="0"
+                                    style="cursor: pointer;" (click)="openAlertsInNewTab()"
+                                    (keydown.enter)="openAlertsInNewTab()" (keydown.space)="openAlertsInNewTab()"
+                                    [tooltip]="'Open linked page'" container="body">
+                                    Info {{(executiveSummaryWidgetData?.alertSeverityViewData?.info || 0) | number}}
+                                </span>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -267,19 +277,19 @@
     </div>
 </div>
 
-<div class="row mx-1 my-4 py-4">
+<div class="row mx-1 my-2 " *ngIf="showCapacityGrowthWidget">
     <div class="col-12">
-        <div class="bg-transparent font-500 font-lg p-2">
+        <div class="bg-transparent font-500 font-lg p-2 capacity-growth-title">
             Capacity and Growth Insights
         </div>
-        <div class="card round-edge equalize-card p-4">
-            <div class="row">
-                <div class="col-4 px-1">
-                    <div class=" p-2 font-500">
-                        Host Utilization
+        <div class="card round-edge m-0 capacity-growth-card">
+            <div class="capacity-growth-grid">
+                <div class="capacity-growth-host-panel">
+                    <div class="capacity-growth-panel-title">
+                        Top 5 VM Count Per Host
                     </div>
-                    <div class="card-body">
-                        <app-spinner [name]="densityHostVm.loader"></app-spinner>
+                    <div class="card-body capacity-growth-host-body">
+                        <app-spinner [name]="densityHostVm.loader" [width]="0"></app-spinner>
                         <div *ngIf="densityHostVm?.desnityHostRows?.length">
                             <div class="distribution-header d-flex  font-weight-600 mb-2 border-bottom">
                                 <div class="distribution-label text-dark font-weight-bold " style="max-width: 180px;">
@@ -369,61 +379,59 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-4 px-1">
-                    <div class=" p-2 font-500">
+                <div class="capacity-growth-trend-panel">
+                    <div class="capacity-growth-panel-title capacity-growth-panel-title--center">
                         VM Capacity Trend & Growth Forecast
                     </div>
-                    <div class="card-body">
-                        <app-spinner [name]="capacityAndGrowthInsightsWidgetData.vmCapacityLoader"></app-spinner>
+                    <div class="card-body capacity-growth-chart-body">
+                        <app-spinner [name]="capacityAndGrowthInsightsWidgetData.vmCapacityLoader" [width]="0">
+                        </app-spinner>
                         <ng-container *ngIf="capacityAndGrowthInsightsWidgetData?.vmCapacityChartData">
                             <div echarts [options]="capacityAndGrowthInsightsWidgetData?.vmCapacityChartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height: 200px;">
+                                [defaultHeight]="178" style="width: 100%; height: 178px;">
                             </div>
                         </ng-container>
                         <div *ngIf="!capacityAndGrowthInsightsWidgetData.vmCapacityChartData"
                             class="d-flex justify-content-center align-items-center"
-                            style="width: 100%; height: 200px;">No
+                            style="width: 100%; height: 178px;">No
                             data
                             available.
                         </div>
                     </div>
                 </div>
-                <div class="col-4 px-1 align-content-around ">
-                    <div class="p-2 text-center font-500">
+                <div class="capacity-growth-provision-panel">
+                    <div class="capacity-growth-panel-title capacity-growth-panel-title--center">
                         VM Provisioning Status (30 days)
                     </div>
-                    <div class="card-body d-flex justify-content-center">
-                        <div class="pr-2">
-                            <div class="text-muted">Provisioned VMs</div>
-                            <div class="d-flex align-items-baseline">
-                                <span
-                                    class="font-500 text-success">{{capacityAndGrowthInsightsWidgetData?.vmProvisioningViewData?.provisionedCount
-                                    || 0}}</span>
+                    <div class="card-body capacity-growth-provision-body">
+                        <div class="capacity-growth-provision-metric">
+                            <div class="capacity-growth-provision-label">Provisioned</div>
+                            <div class="capacity-growth-provision-value text-success">
+                                {{(capacityAndGrowthInsightsWidgetData?.vmProvisioningViewData?.provisionedCount || 0)
+                                | number}}
                             </div>
                         </div>
-                        <div class="mx-2 border border-secondary"></div>
-                        <div class="pl-2">
-                            <div class="text-muted">Decommissioned VMs</div>
-                            <div class="d-flex align-items-baseline">
-                                <span
-                                    class="font-500 text-danger">{{capacityAndGrowthInsightsWidgetData?.vmProvisioningViewData?.decommissionedCount
-                                    || 0}}</span>
+                        <div class="capacity-growth-provision-divider"></div>
+                        <div class="capacity-growth-provision-metric">
+                            <div class="capacity-growth-provision-label">Decommissioned</div>
+                            <div class="capacity-growth-provision-value text-danger">
+                                {{(capacityAndGrowthInsightsWidgetData?.vmProvisioningViewData?.decommissionedCount ||
+                                0) | number}}
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mx-1 my-4">
-    <div class="col-6">
+<div class="row mx-1 my-2">
+    <div class="col-6" *ngIf="showTop10ClustersWidget">
         <div class="bg-transparent font-500 font-lg py-2">
             Top 10 Clusters by VM Count
         </div>
-        <div class="card round-edge equalize-card d-flex flex-column  position-relative p-2">
+        <div class="card round-edge d-flex flex-column m-0 position-relative p-2 private-cloud-chart-card">
             <app-spinner [name]="top10ClustersByVMsWidgetData.loader"></app-spinner>
             <ng-container *ngIf="top10ClustersByVMsWidgetData?.chartData">
                 <div echarts [options]="top10ClustersByVMsWidgetData?.chartData?.options" [defaultHeight]="200"
@@ -436,11 +444,11 @@
             </div>
         </div>
     </div>
-    <div class="col-6">
+    <div class="col-6" *ngIf="showClusterCapacityTrendWidget">
         <div class="bg-transparent font-500 font-lg py-2">
             Cluster Capacity Utilization Trend (CPU & Memory %)
         </div>
-        <div class="card round-edge equalize-card d-flex flex-column p-2 position-relative">
+        <div class="card round-edge d-flex flex-column m-0 p-2 position-relative private-cloud-chart-card">
             <app-spinner [name]="clusterCapacityUtilTrendWidgetData.loader"></app-spinner>
             <ng-container *ngIf="clusterCapacityUtilTrendWidgetData?.chartData">
                 <div echarts [options]="clusterCapacityUtilTrendWidgetData?.chartData?.options" [defaultHeight]="200"
@@ -455,12 +463,12 @@
     </div>
 </div>
 
-<div class="row mx-1 py-4">
+<div class="row mx-1 " *ngIf="showSensorStatisticsWidget">
     <div class="col-12">
         <div class=" bg-transparent font-500 font-lg py-2">
             Sensor Statistics
         </div>
-        <div class="card round-edge equalize-card sensor-stats-card mb-3 p-4">
+        <div class="card round-edge sensor-stats-card m-0 mb-3 p-4">
             <app-spinner [name]="infrastructureHealthWidgetData.loader"></app-spinner>
             <div class="row">
                 <div class="col-4 px-5">
@@ -580,7 +588,7 @@
     </div>
 </div>
 
-<div class="row mx-1 py-4">
+<div class="row mx-1 " *ngIf="showPerformanceHotspotsWidget">
     <div class="col-12">
         <div class="bg-transparent font-500 font-lg py-2 utilization-section-header">
             <span>Performance Hotspots-Top 10 Private Cloud VM's</span>
@@ -595,7 +603,7 @@
                 </select>
             </div> -->
         </div>
-        <div class="card round-edge equalize-card workload-widget-card mb-3 p-4 position-relative">
+        <div class="card round-edge equalize-card workload-widget-card mb-2 p-4 position-relative private-cloud-hotspots-card">
             <app-spinner [name]="utilizationRows.loader" [width]="0"></app-spinner>
             <div class="row">
                 <div class="col-12 px-1">
@@ -603,15 +611,15 @@
                         <div class="utilization-legend-wrapper hotspots-legend-wrapper">
                             <div class="utilization-legend-item">
                                 <span class="utilization-legend-dot bg-success"></span>
-                                <span class="utilization-legend-text">Healthy / Low Utilization (0–50%)</span>
+                                <span class="utilization-legend-text">Healthy / Low Utilization (0-50%)</span>
                             </div>
                             <div class="utilization-legend-item">
                                 <span class="utilization-legend-dot bg-warning"></span>
-                                <span class="utilization-legend-text">Warning / Moderate Utilization (51–80%)</span>
+                                <span class="utilization-legend-text">Warning / Moderate Utilization (51-80%)</span>
                             </div>
                             <div class="utilization-legend-item">
                                 <span class="utilization-legend-dot bg-danger"></span>
-                                <span class="utilization-legend-text">Critical / High Utilization (81–100%)</span>
+                                <span class="utilization-legend-text">Critical / High Utilization (81-100%)</span>
                             </div>
                         </div>
                     </div>
@@ -642,11 +650,11 @@
                                                 class="fa ml-1" [ngClass]="iconClass"></i>
                                         </span>
                                     </th>
-                                    <th class="iops-column" [ngClass]="getUtilizationHeaderClass('diskOps')"
-                                        (click)="onUtilizationHeaderSort('diskOps')">
-                                        <span class="utilization-sort-heading">Disk IOPS
-                                            <i *ngIf="getUtilizationSortIcon('diskOps') as iconClass" class="fa ml-1"
-                                                [ngClass]="iconClass"></i>
+                                    <th class="iops-column" [ngClass]="getUtilizationHeaderClass('networkSpeed')"
+                                        (click)="onUtilizationHeaderSort('networkSpeed')">
+                                        <span class="utilization-sort-heading">Network Speed
+                                            <i *ngIf="getUtilizationSortIcon('networkSpeed') as iconClass"
+                                                class="fa ml-1" [ngClass]="iconClass"></i>
                                         </span>
                                     </th>
                                     <th [ngClass]="getUtilizationHeaderClass('uptime')"
@@ -662,8 +670,7 @@
                                 <tr *ngFor="let row of utilizationRows?.utilRow; trackBy: trackByIndex">
                                     <td>
                                         <button type="button" class="btn btn-link p-0 table-link text-left"
-                                            (click)="openUtilizationDeviceDetails(row)" [tooltip]="'Open linked page'"
-                                            container="body">
+                                            (click)="openUtilizationDeviceDetails(row)">
                                             {{row.name}}
                                         </button>
                                     </td>
@@ -696,12 +703,12 @@
                                     </td>
                                     <td class="iops-column">
                                         <div class="iops-cell">
-                                            <div class="progress-track">
-                                                <div class="progress-fill" [ngClass]="getStatusClass(row.diskIops.tone)"
-                                                    [style.width.%]="row.diskIops.percent">
+                                            <!-- <div class="progress-track">
+                                                <div class="progress-fill" [ngClass]="getStatusClass(row.networkSpeed.tone)"
+                                                    [style.width.%]="row.networkSpeed.percent">
                                                 </div>
-                                            </div>
-                                            <span>{{row.diskIops.label}}</span>
+                                            </div> -->
+                                            <span class="network-speed-value">{{row.networkSpeed.label}}</span>
                                         </div>
                                     </td>
                                     <td class="uptime-cell">{{row.upTime}}</td>
@@ -718,7 +725,7 @@
     </div>
 </div>
 
-<div class="row mx-1 py-4 mt-4">
+<div class="row mx-1" *ngIf="showPerformanceWorkloadInsightsWidget">
     <div class="col-12">
         <div class=" bg-transparent font-500 font-lg py-2">
             Performance / Workload insights
@@ -842,8 +849,8 @@
     </div>
 </div>
 
-<div class="row mx-1 py-4">
-    <div class="col-8">
+<div class="row mx-1">
+    <div class="col-8" *ngIf="showIdleDevicesAnalysisWidget">
         <div class="card round-edge  mb-0 equalize-card">
             <div class="card-header bg-transparent font-500 font-lg p-2">
                 <span
@@ -885,8 +892,7 @@
                             <tr *ngFor="let device of idleDevicesRow?.devicesRow; trackBy: trackByIndex">
                                 <td>
                                     <button type="button" class="btn btn-link p-0 table-link text-left"
-                                        (click)="openIdleDeviceDetails(device)" [tooltip]="'Open linked page'"
-                                        container="body">
+                                        (click)="openIdleDeviceDetails(device)">
                                         {{device.deviceName}}
                                     </button>
                                 </td>
@@ -941,12 +947,12 @@
             </div>
         </div>
     </div>
-    <div class="col-4 ">
+    <div class="col-4 " *ngIf="showIdleDurationDistributionWidget">
         <div class="card round-edge mb-0 equalize-card">
             <div class="card-header bg-transparent font-500 font-lg p-2">
                 Idle Duration Distribution
             </div>
-            <div class="card-body position-relative">
+            <div class="card-body position-relative idle-distribution-body">
                 <app-spinner [name]="idleDistributionRows.loader" [width]="0">
                 </app-spinner>
                 <div class="distribution-row" *ngFor="let row of idleDistributionRows?.distributionRow; let i = index">
@@ -985,8 +991,8 @@
 </div>
 
 
-<div class="row mx-1 py-4">
-    <div class="col-8">
+<div class="row mx-1 pt-2">
+    <div class="col-8" *ngIf="showOrphanedDeviceListWidget">
         <div class="card round-edge mb-0 equalize-card">
             <div class="card-header bg-transparent font-500 font-lg p-2">
                 <span class="badge badge-secondary font-lg font-500 mr-2">{{orphanedDevicesTotal||0}}</span>Orphaned
@@ -1024,8 +1030,7 @@
                             <tr *ngFor="let device of orphanedDeviceListViewData.orphanList; trackBy: trackByIndex">
                                 <td>
                                     <button type="button" class="btn btn-link p-0 table-link text-left"
-                                        (click)="openOrphanedDeviceDetails(device)" [tooltip]="'Open linked page'"
-                                        container="body">
+                                        (click)="openOrphanedDeviceDetails(device)">
                                         {{device.name}}
                                     </button>
                                 </td>
@@ -1061,7 +1066,7 @@
             </div>
         </div>
     </div>
-    <div class="col-4">
+    <div class="col-4" *ngIf="showOrphanedByCategoryWidget">
         <div class="card round-edge mb-0 equalize-card">
             <div class="card-header bg-transparent font-500 font-lg p-2">
                 Orphaned By Category
@@ -1101,13 +1106,13 @@
     </div>
 </div>
 
-<div class="row mx-1 pt-2 pb-4">
+<div class="row mx-1  pb-4" *ngIf="showRecentAlertsWidget">
     <div class="col-12">
         <div class=" bg-transparent font-500 font-lg py-2">
             Recent Alerts
         </div>
-        <div class="card round-edge equalize-card mb-3 p-4 position-relative">
-            <div class="alert-summary">
+        <div class="card round-edge equalize-card mb-3 p-4 position-relative alert-card">
+            <div class="alert-summary alert-summary-panel">
                 <app-spinner [name]="alertSummaryMetrics?.loader" [width]="0"></app-spinner>
                 <div class="alert-summary-metric" role="link" tabindex="0" style="cursor: pointer;"
                     (click)="openAlertsInNewTab()" (keydown.enter)="openAlertsInNewTab()"
@@ -1128,7 +1133,7 @@
                     <strong class="tone-primary">{{alertSummaryMetrics?.information}}</strong>
                 </div>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive alert-table-panel">
                 <app-spinner [name]="criticalAlerts.loader" [width]="0"></app-spinner>
                 <table class="table table-sm alert-table">
                     <thead>

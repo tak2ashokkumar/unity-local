@@ -74,7 +74,11 @@ export class WSSHClient {
 
     getEndpoint(): string {
         const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-        return `${protocol}${environment.cliNetworkAgentUrl}/${this.wsOptions.uuid}`;
+        const endpoint = environment.production
+            ? `${window.location.host}/unity_cli/ws/terminal`
+            : environment.cliNetworkAgentUrl;
+
+        return `${protocol}${endpoint}/${this.wsOptions.uuid}`;
     }
 
     connect() {

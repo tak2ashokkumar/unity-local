@@ -81,31 +81,7 @@ export class HypervisorsService {
       }
 
       if (this.user.isManagementEnabled) {
-        if (a.hasOS && a.platformType.match('Windows')) {
-          a.isSameTabEnabled = false;
-          a.sameTabTootipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
-
-          a.isNewTabEnabled = ((a.managementIP.match('N/A') ? false : true) || (d.proxy.proxy_fqdn ? true : false));
-          a.newTabWebAccessUrl = a.managementIP.match('N/A') ? null : this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIP) : WINDOWS_CONSOLE_CLIENT(a.managementIP);
-          a.newTabConsoleAccessUrl = a.managementIP.match('N/A') ? null : VM_CONSOLE_CLIENT();
-          a.newTabTootipMessage = a.isNewTabEnabled ? 'Manage In New Tab' : 'Device Not Configured';
-          if (a.isNewTabEnabled && !a.isSameTabEnabled && !d.proxy.same_tab) {
-            a.sameTabTootipMessage = 'Non Managable In Same Tab';
-          }
-        } else {
-          a.isSameTabEnabled = ((d.proxy.same_tab && d.proxy.proxy_fqdn ? true : false) || (a.managementIP.match('N/A') ? false : true));
-          a.sameTabWebAccessUrl = this.user.rdpUrls.length ? this.user.rdpUrls.getLast() : d.proxy.proxy_fqdn;
-          a.sameTabConsoleAccessUrl = a.managementIP.match('N/A') ? null : a.managementIP;
-          a.sameTabTootipMessage = a.isSameTabEnabled ? 'Manage In Same Tab' : 'Device Not Configured';
-
-          a.isNewTabEnabled = ((a.managementIP.match('N/A') ? false : true) || (d.proxy.proxy_fqdn ? true : false));
-          a.newTabWebAccessUrl = a.sameTabWebAccessUrl;
-          a.newTabConsoleAccessUrl = a.managementIP.match('N/A') ? null : VM_CONSOLE_CLIENT();
-          a.newTabTootipMessage = a.isNewTabEnabled ? 'Manage In New Tab' : 'Device Not Configured';
-          if (a.isNewTabEnabled && !a.isSameTabEnabled && !d.proxy.same_tab) {
-            a.sameTabTootipMessage = 'Non Managable In Same Tab';
-          }
-        }
+        this.setXtermAttributes(a);
       } else {
         a.sameTabTootipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
         a.newTabTootipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
@@ -186,12 +162,16 @@ export class HypervisorsService {
   }
 
   private setXtermAttributes(viewData: HypervisorViewData) {
-    viewData.isSameTabEnabled = (!viewData.managementIP.match('N/A') && viewData.hasOS && viewData.platformType.match('Linux')) ? true : false;
+    viewData.isSameTabEnabled = (!viewData.managementIP.match('N/A') && viewData.hasOS && (viewData.platformType.match('Linux') || viewData.platformType.match('ESXI'))) ? true : false;
     if (viewData.hasOS) {
       switch (viewData.platformType) {
         case 'Windows': viewData.sameTabTootipMessage = 'Open in same tab option is not available for windows machines';
           break;
+        case 'Hyper-V': viewData.sameTabTootipMessage = 'Open in same tab option is not available for hyper-v machines';
+          break;
         case 'Linux': viewData.sameTabTootipMessage = 'Open in same tab';
+          break;
+        case 'ESXI': viewData.sameTabTootipMessage = 'Open in same tab';
           break;
         default: viewData.sameTabTootipMessage = 'Open in same tab option is not available';
           break;
@@ -206,7 +186,13 @@ export class HypervisorsService {
         case 'Windows': viewData.newTabTootipMessage = 'Open In New Tab';
           viewData.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), viewData.managementIP) : WINDOWS_CONSOLE_CLIENT(viewData.managementIP);
           break;
+        case 'Hyper-V': viewData.newTabTootipMessage = 'Open In New Tab';
+          viewData.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), viewData.managementIP) : WINDOWS_CONSOLE_CLIENT(viewData.managementIP);
+          break;
         case 'Linux': viewData.newTabTootipMessage = 'Open In New Tab';
+          viewData.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
+          break;
+        case 'ESXI': viewData.newTabTootipMessage = 'Open In New Tab';
           viewData.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
           break;
         default: viewData.newTabTootipMessage = 'Open in new tab option is not available';

@@ -30,6 +30,9 @@ import { PrivateCloudComputeDashboardComponent } from "./private-cloud-compute-d
 import { PublicCloudComputeDashboardComponent } from "./public-cloud-compute-dashboard/public-cloud-compute-dashboard.component";
 import { DatabaseDashboardComponent } from "./database-dashboard/database-dashboard.component";
 import { UnifiedAiopsCommandCentreComponent } from "./unified-aiops-command-centre/unified-aiops-command-centre.component";
+import { EventAnalyticsDashboardComponent } from "./event-analytics-dashboard/event-analytics-dashboard.component";
+import { DiscoveryDashboardComponent } from "./discovery-dashboard/discovery-dashboard.component";
+import { NetworkDashboardComponent } from "./network-dashboard/network-dashboard.component";
 
 export const DEFAULT_DASHBOARD_ROUTES: Routes = [
     {
@@ -360,6 +363,25 @@ export const DEFAULT_DASHBOARD_ROUTES: Routes = [
                 stepbackCount: 1
             }
         },
+    }, {
+        path: 'default/discovery',
+        component: DiscoveryDashboardComponent,
+        data: {
+            breadcrumb: {
+                title: 'Discovery Dashboard',
+                stepbackCount: 1
+            }
+        },
+    },
+    {
+        path: 'default/network',
+        component: NetworkDashboardComponent,
+        data: {
+            breadcrumb: {
+                title: 'Network Dashboard',
+                stepbackCount: 1
+            }
+        },
     },
     {
         path: 'default/database',
@@ -367,6 +389,16 @@ export const DEFAULT_DASHBOARD_ROUTES: Routes = [
         data: {
             breadcrumb: {
                 title: 'Database Dashboard',
+                stepbackCount: 1
+            }
+        },
+    },
+    {
+        path: 'default/event-analytics',
+        component: EventAnalyticsDashboardComponent,
+        data: {
+            breadcrumb: {
+                title: 'Event Analytics',
                 stepbackCount: 1
             }
         },

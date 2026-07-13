@@ -173,28 +173,22 @@
                         <div class="mr-3 border rounded p-4 position-relative">
                             <div class="pb-2 mb-3 bg-white position-absolute section-name">Actions
                             </div>
-                            <div class="row form-group">
-                                <div class="col-2 pl-0 text-right">Onboard Device To Platform : </div>
-                                <div class="col-1 ml-2">
+                            <div class="actions-layout">
+                                <div class="action-row">
+                                    <span class="action-checkbox-label">Onboard Device To Platform :</span>
                                     <input class="form-check-input form-check-xl" type="checkbox"
                                         formControlName="onboard_device">
                                 </div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-2 text-right">Update If Any Changes : </div>
-                                <div class="col-1 ml-2">
+                                <div class="action-row">
+                                    <span class="action-checkbox-label">Update If Any Changes :</span>
                                     <input class="form-check-input form-check-xl" type="checkbox"
                                         formControlName="update_changes">
                                 </div>
-                            </div>
-                            <div class="row form-group" style="height:60px">
-                                <div class="col-2 text-right mt-3">Update Location : </div>
-                                <div class="col d-flex align-item-center">
-                                    <div class="ml-2 mt-3 pr-0">
-                                        <input class="form-check-input form-check-xl" type="checkbox"
-                                            formControlName="update_location">
-                                    </div>
-                                    <div class="col-2 pl-0 ml-3" *ngIf="form.get('default_datacenter')">
+                                <div class="action-row action-location-row">
+                                    <span class="action-checkbox-label">Update Location :</span>
+                                    <input class="form-check-input form-check-xl" type="checkbox"
+                                        formControlName="update_location">
+                                    <div class="action-field" *ngIf="form.get('default_datacenter')">
                                         <label class="form-col-form-label">Datacenter<em>*</em></label>
                                         <!-- <multiselect-dropdown [options]="datacenters" [settings]="dcSettings"
                                             class="form-control p-0" (dropdownClosed)="dcChange()"
@@ -209,7 +203,7 @@
                                         <div class="invalid-feedback d-block" *ngIf="formErrors.default_datacenter">
                                             {{formErrors.default_datacenter}}</div>
                                     </div>
-                                    <div class="col-2" *ngIf="form.get('default_cabinet')">
+                                    <div class="action-field" *ngIf="form.get('default_cabinet')">
                                         <label class="form-col-form-label">Cabinets<em>*</em></label>
                                         <!-- <multiselect-dropdown [options]="datacenterCabinets"
                                             [settings]="cabinetSettings" class="form-control p-0"
@@ -226,10 +220,8 @@
                                             {{formErrors.default_cabinet}}</div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-2 text-right">Activate Monitoring : </div>
-                                <div class="col-1 ml-2">
+                                <div class="action-row">
+                                    <span class="action-checkbox-label">Activate Monitoring :</span>
                                     <input class="form-check-input form-check-xl" type="checkbox"
                                         formControlName="activate_monitoring">
                                 </div>
@@ -242,9 +234,9 @@
                                         *ngFor="let mt of form.controls.monitoring_templates.controls; let i = index; let last = last;">
                                         <div [formGroupName]="i">
                                             <div class="row">
-                                                <div class="col-2 form-group">
+                                                <div class="col-3 form-group">
                                                     <label for="type" class="form-col-form-label">Type <em>*</em></label>
-                                                    <select name="type" id="type" class="form-control form-control-sm"
+                                                    <select name="type" id="type" class="form-control form-control-sm template-type-select"
                                                         formControlName="type"
                                                         [class.is-invalid]="formErrors.monitoring_templates[i]?.type">
                                                         <option value="manufacturers">Manufacturer</option>
@@ -254,7 +246,7 @@
                                                         *ngIf="formErrors.monitoring_templates[i]?.type">
                                                         {{formErrors.monitoring_templates[i]?.type}}</div>
                                                 </div>
-                                                <div class="col-2 form-group"
+                                                <div class="col-3 form-group"
                                                     *ngIf="form.get('monitoring_templates').controls[i].get('type')?.value=='manufacturers'">
                                                     <label class="form-col-form-label">Device Type
                                                         <em>*</em></label>
@@ -280,7 +272,7 @@
                                                         *ngIf="formErrors.monitoring_templates[i]?.device_type">
                                                         {{formErrors.monitoring_templates[i]?.device_type}}</div>
                                                 </div>
-                                                <div class="col-2 form-group"
+                                                <div class="col-3 form-group"
                                                     *ngIf="form.get('monitoring_templates').controls[i].get('type')?.value=='manufacturers'">
                                                     <label for="manufacturer" class="form-col-form-label">Manufacturer
                                                         <em>*</em></label>
@@ -297,7 +289,7 @@
                                                         *ngIf="formErrors.monitoring_templates[i]?.manufacturers">
                                                         {{formErrors.monitoring_templates[i]?.manufacturers}}</div>
                                                 </div>
-                                                <div class="col-2 form-group"
+                                                <div class="col-3 form-group"
                                                     *ngIf="form.get('monitoring_templates').controls[i].get('type')?.value=='operatingsystems'">
                                                     <label for="operatingsystems" class="form-col-form-label">Operating System
                                                         <em>*</em></label>
@@ -315,7 +307,7 @@
                                                         *ngIf="formErrors.monitoring_templates[i]?.operatingsystems">
                                                         {{formErrors.monitoring_templates[i]?.operatingsystems}}</div>
                                                 </div>
-                                                <div class="col-2 form-group">
+                                                <div class="col-3 form-group">
                                                     <label for="connection_type" class="form-col-form-label">Monitoring Type
                                                         <em>*</em></label>
                                                     <select name="connection_type" id="connection_type"
@@ -330,7 +322,7 @@
                                                         *ngIf="formErrors.monitoring_templates[i]?.connection_type">
                                                         {{formErrors.monitoring_templates[i]?.connection_type}}</div>
                                                 </div>
-                                                <div class="col-2 form-group" *ngIf="templates && templates.length > 0">
+                                                <div class="col-3 form-group" *ngIf="templates && templates.length > 0">
                                                     <label class="form-col-form-label">Template
                                                         <em>*</em></label>
                                                     <!-- <select name="template" id="template"
@@ -341,25 +333,25 @@
                                                             *ngFor="let template of templates">
                                                             {{template.template_name}}</option>
                                                     </select> -->
-                                                    <multiselect-dropdown [options]="templates"
-                                                        [settings]="templateSettings"
-                                                        class="form-control form-control-sm p-0" style="height:auto;"
-                                                        formControlName="template"
-                                                        [class.is-invalid]="formErrors.monitoring_templates[i]?.template"></multiselect-dropdown>
+                                                    <div class="template-control-row">
+                                                        <multiselect-dropdown [options]="templates"
+                                                            [settings]="templateSettings"
+                                                            class="form-control form-control-sm p-0" style="height:auto;"
+                                                            formControlName="template"
+                                                            [class.is-invalid]="formErrors.monitoring_templates[i]?.template"></multiselect-dropdown>
+                                                        <span class="form-control border-0 p-0 template-action-icons">
+                                                            <button tooltip="Remove Filter"
+                                                                *ngIf="form.controls.monitoring_templates.controls.length > 1"
+                                                                class="action-icons mb-0 fas fa-minus font-sm ml-1"
+                                                                (click)="removeFilter(i)"></button>
+                                                            <button tooltip="Add Filter" *ngIf="last"
+                                                                class="action-icons mb-0 fas fa-plus font-sm ml-1"
+                                                                (click)="addFilter(i)"></button>
+                                                        </span>
+                                                    </div>
                                                     <div class="invalid-feedback"
                                                         *ngIf="formErrors.monitoring_templates[i]?.template">
                                                         {{formErrors.monitoring_templates[i]?.template}}</div>
-                                                </div>
-                                                <div class="col-2 form-group mt-4">
-                                                    <span class="form-control border-0 p-0">
-                                                        <button tooltip="Remove Filter"
-                                                            *ngIf="form.controls.monitoring_templates.controls.length > 1"
-                                                            class="action-icons mb-0 fas fa-minus font-sm ml-1"
-                                                            (click)="removeFilter(i)"></button>
-                                                        <button tooltip="Add Filter" *ngIf="last"
-                                                            class="action-icons mb-0 fas fa-plus font-sm ml-1"
-                                                            (click)="addFilter(i)"></button>
-                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

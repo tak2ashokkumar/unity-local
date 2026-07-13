@@ -29,7 +29,7 @@ import { EchartsxModule } from 'echarts-for-angular';
     PerfectScrollbarModule,
     ChartsModule,
     UnitedCloudSharedModule,
-    EchartsxModule
+    EchartsxModule,
   ]
 })
 export class InfrastructureModule { }

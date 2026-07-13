@@ -929,6 +929,18 @@ td a.table-column-btn {
   }
 }
 
+.active-ai-modal-multiplier-tooltip {
+  z-index: 10050;
+
+  .tooltip-inner {
+    max-width: 260px;
+    overflow-wrap: anywhere;
+    text-align: left;
+    white-space: normal;
+    word-break: normal;
+  }
+}
+
 .pull-right {
   float: right;
 }

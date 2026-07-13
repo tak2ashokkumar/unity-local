@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TabData } from 'src/app/shared/tabdata';
@@ -8,10 +8,10 @@ import { TabData } from 'src/app/shared/tabdata';
   templateUrl: './compute-ai-agent.component.html',
   styleUrls: ['./compute-ai-agent.component.scss']
 })
-export class ComputeAiAgentComponent implements OnInit {
+export class ComputeAiAgentComponent implements OnInit, OnDestroy {
   subscr: Subscription;
   tabItems: TabData[] = tabData;
-  
+
   constructor(private router: Router) {
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {

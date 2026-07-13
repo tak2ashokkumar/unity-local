@@ -1,4 +1,4 @@
-<div class="custom-gradient-bg d-flex flex-column overflow-hidden pb-0 pt-1 px-1 border-top"
+<div class="custom-gradient-bg unity-assistant-chat-shell d-flex flex-column overflow-hidden pb-0 pt-1 px-1 border-top"
     style="height: calc(100%);">
     <div class="row mx-0">
         <div [ngClass]="isExpanded ? 'col-8 offset-2 p-0' : 'col-12 p-0'">
@@ -115,35 +115,64 @@
                             (change)="onFilesSelected($event)" multiple>
                         <i class="fas fa-paperclip font-md text-muted" style="cursor: pointer;"
                             (click)="fileInput.click()"></i>
+                        <span *ngIf="fileUploadLoader" class="fas fa-spinner fa-spin font-sm text-muted ml-2"></span>
                     </div>
-                    <div *ngIf="fileUploadLoader" class="d-flex align-items-center justify-content-center">
-                        <span class="mr-1 text-muted font-sm">Upoading</span>
-                        <span class="fas fa-spinner fa-spin"></span>
+                    <div class="chat-mode-toggle d-flex align-items-center" role="group"
+                        aria-label="Chat input mode">
+                        <button type="button" class="chat-mode-toggle-option"
+                            [ngClass]="{'selected': chatInputModePayload.chat_mode === 'auto'}"
+                            (click)="setChatInputMode('auto')">
+                            AUTO
+                        </button>
+                        <button type="button" class="chat-mode-toggle-option"
+                            [ngClass]="{'selected': chatInputModePayload.chat_mode === 'pro'}"
+                            (click)="setChatInputMode('pro')">
+                            PRO
+                        </button>
                     </div>
                     <div class="d-flex align-items-center ml-auto flex-shrink-0">
-                        <div class="active-ai-modal-model-selector">
+                        <div class="active-ai-modal-model-selector"
+                            [ngClass]="{'disabled': chatInputModePayload.chat_mode === 'auto'}"
+                            tooltip="Switch to Pro mode to select a model."
+                            containerClass="active-ai-modal-multiplier-tooltip" container="body" placement="top"
+                            [adaptivePosition]="false" [isDisabled]="chatInputModePayload.chat_mode !== 'auto'">
                             <button type="button"
                                 class="btn btn-pill active-ai-modal-model-btn d-flex align-items-center"
+                                [disabled]="chatInputModePayload.chat_mode === 'auto'"
                                 (click)="toggleDropdown()">
-                                <img *ngIf="activeModel?.image" [src]="activeModel?.image"
+                                <img *ngIf="selectedChatInputModel?.image" [src]="selectedChatInputModel?.image"
                                     class="active-ai-modal-model-icon mr-1">
-                                {{activeModel?.text || 'Select Model'}}
+                                {{chatInputModePayload.chat_mode === 'auto' ? 'Unity AI' :
+                                (selectedChatInputModel?.text || 'Select Model')}}
                                 <i class="fas fa-chevron-down ml-1"></i>
                             </button>
                             <div *ngIf="showModelDropdown" class="active-ai-modal-model-dropdown">
                                 <div *ngFor="let model of llmModels" class="active-ai-modal-model-option"
                                     (click)="changeActiveModel(model)" [ngClass]="getModelItemClass(model)">
-                                    <img [src]="model?.image" class="active-ai-modal-model-icon mr-2">
-                                    <div style="min-width: 0; flex: 1;">
-                                        <div class="d-flex align-items-center justify-content-between font-sm">
-                                            <div class="font-500 text-truncate" style="min-width: 0; flex: 1;">
+                                    <img [src]="model?.image" class="active-ai-modal-model-icon">
+                                    <div class="active-ai-modal-model-option-content">
+                                        <div class="active-ai-modal-model-row font-sm">
+                                            <div class="active-ai-modal-model-label-group">
+                                                <div #modelNameEl
+                                                    class="active-ai-modal-model-name font-500 text-truncate"
+                                                    (mouseenter)="modelNameEl.title = modelNameEl.scrollWidth > modelNameEl.clientWidth ? model?.text : ''">
                                                 {{model?.text}}
+                                                </div>
+                                                <div *ngIf="hasModelTokenMultiplier(model)"
+                                                    class="active-ai-modal-multiplier-chip font-sm-xs"
+                                                    [tooltip]="getModelTokenMultiplierTooltip(model)"
+                                                    containerClass="active-ai-modal-multiplier-tooltip"
+                                                    container="body" placement="left" [adaptivePosition]="false"
+                                                    tabindex="0">
+                                                    {{getModelTokenMultiplier(model)}}
+                                                </div>
                                             </div>
-                                            <div *ngIf="!model.is_user_owned"
-                                                class="ml-1 flex-shrink-0 text-primary font-sm-xs"
-                                                style="cursor: pointer; text-decoration: underline;"
-                                                (click)="goToConfig(model); $event.stopPropagation()">
-                                                Configure
+                                            <div class="active-ai-modal-configure-slot font-sm-xs">
+                                                <span *ngIf="!model.is_user_owned"
+                                                    class="active-ai-modal-configure-link text-primary"
+                                                    (click)="goToConfig(model); $event.stopPropagation()">
+                                                    Configure
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="text-muted font-sm-xs">
@@ -159,6 +188,70 @@
                                 <i class="fas fa-comment-medical font-md text-muted"></i>
                             </button>
                         </ng-container>
+                        <div *ngIf="tokenUsageData" class="token-usage-selector ml-1">
+                            <!-- icon -->
+                            <div style="width: 2rem; height: 2rem; cursor: pointer;"
+                                (click)="toggleTokenUsageDropdown()">
+                                <div echarts [options]="tokenUsageData.iconChartOptions"
+                                    style="width: 100%; height: 100%;"></div>
+                            </div>
+
+                            <!-- popup -->
+                            <div *ngIf="showTokenUsage" class="token-usage-dropdown">
+                                <div
+                                    class="d-flex align-items-center justify-content-between px-3 pt-2 pb-1 border-bottom">
+                                    <span class="font-500 font-sm">Token Usage</span>
+                                    <i class="fas fa-times text-muted" style="cursor: pointer;"
+                                        (click)="showTokenUsage = false"></i>
+                                </div>
+                                <ng-container *ngIf="tokenUsageLoader">
+                                    <div class="d-flex align-items-center justify-content-center p-3">
+                                        <span class="fas fa-spinner fa-spin fa-lg"></span>
+                                        <span class="ml-2 text-muted font-sm">Loading</span>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!tokenUsageData">
+                                    <div class="d-flex align-items-center justify-content-center p-3">
+                                        <span class="text-muted font-sm">No data
+                                            available.</span>
+                                    </div>
+                                </ng-container>
+                                <div class="d-flex align-items-center p-3 flex-column">
+                                    <div class="d-flex align-items-center">
+                                        <div style="width: 80px; height: 80px; flex-shrink: 0;">
+                                            <div echarts [options]="tokenUsageData.popupChartOptions"
+                                                style="width: 100%; height: 100%;"></div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <div class="font-sm-xs">
+                                                <span class="text-muted">Tokens Used</span>
+                                                <div class="font-500">{{tokenUsageData?.usedTokens |
+                                                    number}}</div>
+                                            </div>
+                                            <div class="font-sm-xs mt-1">
+                                                <span class="text-muted">Limit</span>
+                                                <div class="font-500">{{tokenUsageData?.limit |
+                                                    number}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center justify-content-between mt-2 flex-column w-100">
+                                        <div class="font-sm-xs d-flex justify-content-between align-items-center w-100">
+                                            <div class="text-muted">Input Tokens</div>
+                                            <div class="font-500">{{tokenUsageData?.inputTokens |
+                                                number}}</div>
+                                        </div>
+                                        <div
+                                            class="font-sm-xs d-flex justify-content-between align-items-center w-100 mt-1">
+                                            <div class="text-muted">Output Tokens</div>
+                                            <div class="font-500">{{tokenUsageData?.outputTokens |
+                                                number}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <button *ngIf="!showStopButton" type="button" class="btn btn-sm mx-2 query-button"
                             [ngClass]="!typingQueue.length ? 'btn-success query-button-success' : 'btn-secondary'"
                             (click)="onSubmit()">
@@ -173,5 +266,28 @@
                 </div>
             </div>
         </form>
+    </div>
+    <div *ngIf="enableProModeModalVisible" class="enable-pro-mode-overlay">
+        <div class="enable-pro-mode-content">
+            <button type="button" class="enable-pro-mode-close" aria-label="Close"
+                (click)="closeEnableProModeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="enable-pro-mode-icon">
+                <i class="fas fa-cube"></i>
+            </div>
+            <h5 class="enable-pro-mode-title">Enable Pro Mode</h5>
+            <div class="enable-pro-mode-copy">No AI model has been configured yet.</div>
+            <div class="enable-pro-mode-copy mb-4">Configure a model to start using Pro Mode.</div>
+            <div class="enable-pro-mode-actions">
+                <button type="button" class="btn enable-pro-mode-primary" (click)="configureModelFromProModal()">
+                    <i class="fas fa-cog mr-2"></i>
+                    Configure Model
+                </button>
+                <button type="button" class="btn enable-pro-mode-secondary" (click)="closeEnableProModeModal()">
+                    Stay in Auto Mode
+                </button>
+            </div>
+        </div>
     </div>
 </div>

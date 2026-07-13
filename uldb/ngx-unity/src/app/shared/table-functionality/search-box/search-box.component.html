@@ -5,5 +5,6 @@
         </span>
     </div>
     <input placeholder="Search" class="form-control" [ngClass]="customClass" id="prependedInput" size="16" type="text"
-        [ngModel]="searchValue" (keydown.enter)="$event.preventDefault()" (ngModelChange)="onSearched($event)">
+        autocomplete="off" [ngModelOptions]="{standalone: true}" [ngModel]="searchValue"
+        (keydown.enter)="$event.preventDefault()" (ngModelChange)="onSearched($event)">
 </div>

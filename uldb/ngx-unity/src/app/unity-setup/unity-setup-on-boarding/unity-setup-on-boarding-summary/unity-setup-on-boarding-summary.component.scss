@@ -2,6 +2,12 @@
 
 .summary-card {
     height: 85px;
+
+    .summary-card-body {
+        gap: 1rem;
+        min-width: 0;
+        padding: 0 1.25rem !important;
+    }
     &.enabled {
         &.hypervisor {
             border-color: $hypervisor;
@@ -42,7 +48,36 @@
         }
     }
 }
+
+.summary-icon-wrap {
+    flex: 0 0 auto;
+}
+
+.summary-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.summary-title {
+    display: -webkit-box;
+    margin-bottom: .35rem;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.15;
+}
+
+.summary-count {
+    line-height: 1;
+
+    h6 {
+        margin-bottom: 0;
+    }
+}
+
 .summary-icons {
+    flex: 0 0 auto;
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 50%;
@@ -94,6 +129,7 @@
 }
 
 .donut {
+    flex: 0 0 60px;
     margin-left: auto;
     /* (A1) CIRCLE */
     width: 60px;

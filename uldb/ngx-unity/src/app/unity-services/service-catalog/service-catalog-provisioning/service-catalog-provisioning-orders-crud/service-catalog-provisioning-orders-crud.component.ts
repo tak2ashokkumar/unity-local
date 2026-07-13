@@ -326,20 +326,31 @@ export class ServiceCatalogProvisioningOrdersCrudComponent implements OnInit, On
           // this.editTemplateDropdown();
 
           if (this.viewData.isPrivateCloud) {
+            console.log(this.viewData, "view data")
             this.svc.getImages(this.newOrders?.account_id, this.viewData.cloudType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
               this.image = data;
               this.filteredImage = data;
 
               if (this.newOrders?.vm_image) {
                 const vmImage = this.image.find(img => img.uuid === this.newOrders.vm_image);
-                this.ordersForm.addControl('image', new FormControl(vmImage.uuid, Validators.required));
+                if (this.viewData?.cloudType === 'Nutanix') {
+                  this.ordersForm.removeControl('image');
+                  this.ordersForm.updateValueAndValidity();
+                } else {
+                  this.ordersForm.addControl('image', new FormControl(vmImage.uuid, Validators.required));
+                }
                 this.toggleSelection('image', vmImage)
 
                 this.svc.getResourceModel(this.newOrders?.cloud_type, vmImage.min_vcpu, vmImage.min_memory).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
                   this.model = data;
                   this.filteredModel = data;
                   const resourcePlan = this.model.find(resource => resource.uuid === this.newOrders.resource_plan);
-                  this.ordersForm.addControl('resource_model', new FormControl(this.newOrders?.resource_plan, Validators.required));
+                  if (this.viewData?.cloudType === 'Nutanix') {
+                    this.ordersForm.removeControl('resource_model');
+                    this.ordersForm.updateValueAndValidity();
+                  } else {
+                    this.ordersForm.addControl('resource_model', new FormControl(this.newOrders?.resource_plan, Validators.required));
+                  }
                   this.toggleSelection('model', resourcePlan);
 
                   // if (this.newOrders?.vm_image === this.image.uuid) {
@@ -461,25 +472,31 @@ export class ServiceCatalogProvisioningOrdersCrudComponent implements OnInit, On
           // this.getTemplateDropdownOptions();
 
           if (this.viewData.isPrivateCloud) {
-            this.ordersForm.addControl('image', new FormControl('', Validators.required));
-            this.ordersForm.addControl('resource_model', new FormControl('', Validators.required));
-            this.ordersForm.get('account.options').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(selectedAccount => {
-              this.svc.getImages(selectedAccount, this.viewData.cloudType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-                this.image = data;
-                this.filteredImage = data;
+            if (this.viewData?.cloudType === 'Nutanix') {
+              this.ordersForm.removeControl('image');
+              this.ordersForm.removeControl('resource_model');
+              this.ordersForm.updateValueAndValidity();
+            } else {
+              this.ordersForm.addControl('image', new FormControl('', Validators.required));
+              this.ordersForm.addControl('resource_model', new FormControl('', Validators.required));
+              this.ordersForm.get('account.options').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(selectedAccount => {
+                this.svc.getImages(selectedAccount, this.viewData.cloudType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+                  this.image = data;
+                  this.filteredImage = data;
+                });
               });
-            });
-            this.ordersForm.get('image').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(image => {
-              if (image) {
-                const matchingImage = this.image.find(img => img.uuid === image);
-                if (matchingImage) {
-                  this.svc.getResourceModel(this.viewData.cloudType, matchingImage.min_vcpu, matchingImage.min_memory).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-                    this.model = data;
-                    this.filteredModel = data;
-                  });
+              this.ordersForm.get('image').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(image => {
+                if (image) {
+                  const matchingImage = this.image.find(img => img.uuid === image);
+                  if (matchingImage) {
+                    this.svc.getResourceModel(this.viewData.cloudType, matchingImage.min_vcpu, matchingImage.min_memory).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+                      this.model = data;
+                      this.filteredModel = data;
+                    });
+                  }
                 }
-              }
-            });
+              });
+            }
             // })
           } else {
             this.getCredentials();

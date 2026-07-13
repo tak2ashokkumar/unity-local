@@ -45,11 +45,41 @@ import { UnityNtaServicesComponent } from './unity-nta-services/unity-nta-servic
 import { VmBackupComponent } from './vm-backup/vm-backup.component';
 import { VmMigrationComponent } from './vm-migration/vm-migration.component';
 import { NaciTerminalNewTabComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-terminal-new-tab/naci-terminal-new-tab.component';
+import { LeftPanelRouteAccessGuard } from '../shared/app-guards/left-panel-route-access.guard';
+import { TokenBillingComponent } from './token-billing/token-billing.component';
+import { TokenBillingDashboardComponent } from './token-billing/token-billing-dashboard/token-billing-dashboard.component';
+import { TokenBillingTracingComponent } from './token-billing/token-billing-tracing/token-billing-tracing.component';
 
 const routes: Routes = [
   {
     path: 'terminal-new-tab',
     component: NaciTerminalNewTabComponent
+  },
+  {
+    path: 'token-billing',
+    component: TokenBillingComponent,
+    canActivate: [LeftPanelRouteAccessGuard],
+    canActivateChild: [LeftPanelRouteAccessGuard],
+    data: {
+      breadcrumb: {
+        title: 'Token Billing',
+        stepbackCount: 0,
+      },
+      title: 'Token Billing',
+    },
+    children: [
+      {
+        path: 'dashboard',
+        component: TokenBillingDashboardComponent,
+        data: { title: 'Token Billing' },
+      },
+      {
+        path: 'tracing',
+        component: TokenBillingTracingComponent,
+        data: { title: 'Token Billing' },
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
   },
   {
     path: 'devopscontroller',

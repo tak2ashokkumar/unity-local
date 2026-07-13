@@ -17,5 +17,8 @@ export const UNITY_ROUTE_ACCESS = {
     },
     SERVICES_SUSTAINABILITY: {
         aliases: ['/services/greeenIT']
+    },
+    SERVICES_TOKEN_BILLING: {
+        aliases: ['/services/token-billing']
     }
 };

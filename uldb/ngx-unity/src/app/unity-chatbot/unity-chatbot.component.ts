@@ -12,8 +12,17 @@ import { SupportedLLMConfigData } from '../shared/SharedEntityTypes/ai-chatbot/l
 import { UserInfoService } from '../shared/user-info.service';
 import { UcChartsService } from './uc-charts/uc-charts.service';
 import { UcTableService } from './uc-table/uc-table.service';
-import { DashboardApiMapping, InsightsMapping, ModuleIcons, moduleMapping, TabNames, UnityChatbotService } from './unity-chatbot.service';
-import { ChatHistoryData, ChatDocument, Insight, UnityChatBot, UntiyChatBotExploreMenu } from './unity-chatbot.type';
+import { DashboardApiMapping, InsightsMapping, ModuleIcons, moduleMapping, TabNames, TokenUsageViewData, UnityChatbotService } from './unity-chatbot.service';
+import { ChatHistoryData, ChatDocument, Insight, UnityChatBot, UntiyChatBotExploreMenu, TokenUsage } from './unity-chatbot.type';
+import { UnityChartDetails } from '../shared/unity-chart-config.service';
+import { getTokenMultiplier, getTokenMultiplierTooltip, hasTokenMultiplier } from '../shared/SharedEntityTypes/ai-chatbot/llm-model.util';
+
+type ChatInputMode = 'auto' | 'pro';
+
+interface ChatInputModePayload {
+  chat_mode: ChatInputMode;
+  session_model_uuid: string;
+}
 
 @Component({
   selector: 'unity-chatbot',
@@ -57,7 +66,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   devopsTo: string;
 
   tabs = TabNames;
-  selectedTab: string = this.tabs.getFirst().name;
+  selectedTab: string = this.tabs[0].name;
   @Input() moduleLevelData;
 
   private timerSub: Subscription;
@@ -68,6 +77,13 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   showModelDropdown = false;
   llmModels: SupportedLLMConfigData[] = [];
   activeModel: SupportedLLMConfigData;
+  selectedChatInputModel: SupportedLLMConfigData;
+  readonly chatInputModeStorageKey = 'unity_assistant_chat_input_mode_payload';
+  chatInputModePayload: ChatInputModePayload = {
+    chat_mode: 'auto',
+    session_model_uuid: ''
+  };
+  enableProModeModalVisible: boolean = false;
 
   chatId: string;
 
@@ -91,6 +107,9 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     const target = event.target as HTMLElement;
     if (!target.closest('.active-ai-modal-model-selector')) {
       this.showModelDropdown = false;
+    }
+    if (!target.closest('.token-usage-selector')) {
+      this.showTokenUsage = false;
     }
   }
 
@@ -143,6 +162,8 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   ngOnInit(): void {
+    this.resetChatInputModePayload();
+    this.getTokenUsage();
     this.isInsightsOpen = false;
     if (this.userInfoService.isInsightsEnabled) {
       this.showInsightsButton = this.hasInsights();
@@ -165,6 +186,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   ngOnDestroy(): void {
+    this.resetChatInputModePayload();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     this.annoucedNgUnsubscribe.next();
@@ -213,13 +235,19 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.isStreaming = true;
     this.showStopButton = true;
     this.doneData = null;
-    let postData = { conversation_id: this.conversationId, query: chat, org_id: this.userInfoService.userOrgId };
+    let postData = {
+      conversation_id: this.conversationId,
+      query: chat,
+      org_id: this.userInfoService.userOrgId,
+      chat_mode: this.chatInputModePayload.chat_mode,
+      session_model_uuid: this.chatInputModePayload.chat_mode === 'auto' ? '' : this.chatInputModePayload.session_model_uuid
+    };
     this.startWaitMessages();
 
     this.chatHistoryData.push({ user: 'bot', message: '', type: 'text' });
     const lastIndex = this.chatHistoryData.length - 1;
 
-    this.service.getStreamingResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+    this.service.getStreamingResponse(postData).subscribe({
       next: ({ event, data }) => {
         if (event === 'start') {
           this.conversationId = data.conversation_id;
@@ -233,6 +261,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
 
         } else if (event === 'done') {
           this.doneData = data;
+          this.tokenUsageData = this.service.convertToTokenUsageViewData(this.doneData.token_usage.org);
           this.chatId = data.chat_message_id ?? '';
           this.conversationId = data.conversation_id;
           // this.chatHistoryData[lastIndex]['suggestedPrompt'] = data.suggested_questions?.length ? data.suggested_questions[0] : '';
@@ -770,6 +799,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.ngUnsubscribe.complete();
     this.conversationId = null;
     this.chatHistoryData = [];
+    this.resetChatInputModePayload();
     this.expandDefaultQueries();
   }
 
@@ -784,16 +814,28 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     }, err => {
       this.llmModels = [];
       this.activeModel = null;
+      this.selectedChatInputModel = null;
     })
   }
 
   toggleDropdown() {
+    if (this.chatInputModePayload.chat_mode === 'auto') {
+      this.showModelDropdown = false;
+      return;
+    }
     this.showModelDropdown = !this.showModelDropdown;
   }
 
   changeActiveModel(model: SupportedLLMConfigData) {
+    if (this.chatInputModePayload.chat_mode === 'auto') {
+      this.showModelDropdown = false;
+      this.persistChatInputModePayload('auto', '');
+      return;
+    }
     if (this.activeModel?.id === model.id) {
       this.showModelDropdown = false;
+      this.selectedChatInputModel = model;
+      this.persistChatInputModePayload('pro', this.getModelUuid(model));
       return;
     }
 
@@ -811,14 +853,12 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
 
   changeActiveModelToSelected(model: SupportedLLMConfigData) {
     this.showModelDropdown = false;
-    this.service.changeActiveModel(this.selectedTab, model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.activeModel = model;
-    }, err => {
-
-    })
+    this.selectedChatInputModel = model;
+    this.persistChatInputModePayload('pro', this.getModelUuid(model));
+    this.activeModel = model;
   }
 
-  goToConfig(model: SupportedLLMConfigData) {
+  goToConfig(model?: SupportedLLMConfigData) {
     this.togglePopUp();
     this.router.navigate(['/settings/profile/add-model']);
   }
@@ -828,6 +868,106 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
       'active-model-item': model.active_for_applications?.includes('assistant'),
       'bg-light text-muted': !model.is_user_owned
     }
+  }
+
+  hasModelTokenMultiplier(model: SupportedLLMConfigData): boolean {
+    return hasTokenMultiplier(model);
+  }
+
+  getModelTokenMultiplier(model: SupportedLLMConfigData): string | null {
+    return getTokenMultiplier(model);
+  }
+
+  getModelTokenMultiplierTooltip(model: SupportedLLMConfigData): string {
+    return getTokenMultiplierTooltip(model);
+  }
+
+  setChatInputMode(mode: ChatInputMode) {
+    if (mode === 'auto') {
+      this.showModelDropdown = false;
+      this.selectedChatInputModel = null;
+      this.persistChatInputModePayload('auto', '');
+      return;
+    }
+    this.showModelDropdown = false;
+    if (this.shouldShowEnableProModeModal()) {
+      this.selectedChatInputModel = null;
+      this.persistChatInputModePayload('auto', '');
+      this.showEnableProModeModal();
+      return;
+    }
+    this.selectMostCostEffectiveConfiguredModel();
+  }
+
+  showEnableProModeModal() {
+    this.enableProModeModalVisible = true;
+  }
+
+  closeEnableProModeModal() {
+    this.enableProModeModalVisible = false;
+    this.showModelDropdown = false;
+    this.selectedChatInputModel = null;
+    this.persistChatInputModePayload('auto', '');
+  }
+
+  configureModelFromProModal() {
+    this.enableProModeModalVisible = false;
+    this.goToConfig();
+  }
+
+  private resetChatInputModePayload() {
+    this.showModelDropdown = false;
+    this.selectedChatInputModel = null;
+    this.persistChatInputModePayload('auto', '');
+  }
+
+  private persistChatInputModePayload(chatMode: ChatInputMode, sessionModelUuid: string) {
+    this.chatInputModePayload = {
+      chat_mode: chatMode,
+      session_model_uuid: chatMode === 'auto' ? '' : sessionModelUuid
+    };
+    localStorage.setItem(this.chatInputModeStorageKey, JSON.stringify(this.chatInputModePayload));
+  }
+
+  private getModelUuid(model: SupportedLLMConfigData): string {
+    return `${model?.uuid || model?.id || ''}`;
+  }
+
+  private selectMostCostEffectiveConfiguredModel() {
+    const selectedModel = this.getMostCostEffectiveConfiguredModel();
+    this.selectedChatInputModel = selectedModel;
+    this.activeModel = selectedModel || this.activeModel;
+    this.persistChatInputModePayload('pro', this.getModelUuid(selectedModel));
+  }
+
+  private getConfiguredModels(): SupportedLLMConfigData[] {
+    return this.llmModels.filter(model => model?.is_user_owned);
+  }
+
+  private shouldShowEnableProModeModal(): boolean {
+    return this.getConfiguredModels().length === 0;
+  }
+
+  private getMostCostEffectiveConfiguredModel(): SupportedLLMConfigData {
+    const configuredModels = this.getConfiguredModels();
+    if (!configuredModels.length) {
+      return null;
+    }
+    if (configuredModels.length === 1) {
+      return configuredModels[0];
+    }
+    return configuredModels.reduce((bestModel, currentModel) => {
+      return this.getMultiplierValue(currentModel) < this.getMultiplierValue(bestModel) ? currentModel : bestModel;
+    });
+  }
+
+  private getMultiplierValue(model: SupportedLLMConfigData): number {
+    const multiplier = getTokenMultiplier(model);
+    if (!multiplier) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const value = Number.parseFloat(`${multiplier}`.replace(/x$/i, ''));
+    return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
   }
 
   stopResponse() {
@@ -889,5 +1029,30 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.service.deleteDocument(file.document_id, this.conversationId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.getDocuments();
     })
+  }
+
+  showTokenUsage: boolean = false;
+  tokenUsageData: TokenUsageViewData;
+  tokenIconChart: UnityChartDetails;
+  tokenPopupChart: UnityChartDetails;
+  tokenUsageLoader: boolean = false;
+
+  getTokenUsage() {
+    this.tokenUsageLoader = true;
+    this.service.getTokenUsage(this.userInfoService.userOrgId, this.userInfoService.userDetails.id).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: TokenUsage) => {
+      // this.tokenUsageData = res;
+      this.tokenUsageData = this.service.convertToTokenUsageViewData(res);
+      this.tokenUsageLoader = false;
+    }, (err: HttpErrorResponse) => {
+      this.tokenUsageData = null;
+      this.tokenIconChart = null;
+      this.tokenPopupChart = null;
+      this.tokenUsageLoader = false;
+    });
+  }
+
+  toggleTokenUsageDropdown() {
+    this.showTokenUsage = !this.showTokenUsage
+    this.getTokenUsage();
   }
 }

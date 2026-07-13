@@ -15,7 +15,6 @@ export interface NetworkDevicesDetailsIPAddress {
     Item: string;
     DNSHostName: string;
     TokenId: string;
-    LastScanDate: string;
     Description: string;
     NameFormat: string;
     Address: string;
@@ -28,6 +27,7 @@ export interface NetworkDevicesDetailsIPAddress {
     MarkAsDeleted: string;
     SystemName: string;
 }
+
 export interface NetworkDevicesDetailsOSData {
     Name: string;
     ShortDescription: string;

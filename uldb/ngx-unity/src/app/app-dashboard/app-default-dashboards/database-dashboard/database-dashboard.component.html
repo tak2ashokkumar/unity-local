@@ -30,6 +30,60 @@
         </form>
     </div>
 
+    <ng-template #metricInfoPopoverTmpl let-info="info">
+        <div class="p-1" style="min-width: 160px;" *ngIf="info">
+            <div class="font-500 mb-2">{{info.title}}</div>
+            <ng-container
+                *ngFor="let section of (info.sections?.length ? info.sections : [info]); trackBy: trackByIndex">
+                <div class="font-500 mb-1" *ngIf="info.sections?.length">{{section.title}}</div>
+                <div class="d-flex align-items-center justify-content-between mb-1"
+                    *ngFor="let status of section.status || []; trackBy: trackByMetricInfoStatus">
+                    <span class="d-inline-flex align-items-center mr-3">
+                        <span class="d-inline-block rounded-circle mr-2" [style.background]="status.color"
+                            style="width: 10px; height: 10px;"></span>
+                        <span>{{status.name}}</span>
+                    </span>
+                    <span class="text-muted text-right">{{status.range}}</span>
+                </div>
+            </ng-container>
+        </div>
+    </ng-template>
+
+    <ng-template #metricInfoIconTmpl let-headerName="headerName">
+        <button *ngIf="getMetricInfo(headerName)" class="btn btn-link p-0 mb-0 ml-1 text-muted" type="button"
+            [popover]="metricInfoPopoverTmpl" [popoverContext]="{ info: getMetricInfo(headerName) }"
+            triggers="mouseenter:mouseleave" placement="bottom" container="body"
+            (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+            (keydown.space)="$event.stopPropagation()">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+        </button>
+    </ng-template>
+
+    <ng-template #databaseEfficiencyStatusPopoverTmpl>
+        <div class="p-1" style="min-width: 230px;">
+            <div class="font-500 mb-2">Status</div>
+            <div class="d-flex align-items-start mb-2"
+                *ngFor="let status of databaseEfficiencyStatusInfo; trackBy: trackByIndex">
+                <i class="fa mt-1 mr-2" [ngClass]="[status.icon, status.colorClass]" aria-hidden="true"></i>
+                <div>
+                    <div class="font-500">{{status.name}}</div>
+                    <div class="text-muted" *ngFor="let description of status.descriptions; trackBy: trackByIndex">
+                        {{description}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #databaseEfficiencyStatusInfoIconTmpl>
+        <button class="btn btn-link p-0 mb-0 ml-1 text-muted" type="button" [popover]="databaseEfficiencyStatusPopoverTmpl"
+            triggers="mouseenter:mouseleave" placement="left" container="body"
+            (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+            (keydown.space)="$event.stopPropagation()">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+        </button>
+    </ng-template>
+
     <!-- <div class="dashboard-content" *ngIf="filterForm"> -->
     <div class="dashboard-content">
         <div class="section-title">Database Estate / Inventory Overview</div>
@@ -43,7 +97,10 @@
                             <div class="summary-metric"
                                 *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex">
                                 <div class="metric-label">{{metric.label}}</div>
-                                <div class="metric-value" [ngClass]="{'metric-primary': first, 'pointer-link': metric.link}" [tooltip]="metric.link ? 'Open linked page' : null" (click)="metric.link && openSummaryMetric(metric)">{{metric.value}}</div>
+                                <div class="metric-value"
+                                    [ngClass]="{'metric-primary': first, 'pointer-link': metric.link}"
+                                    [tooltip]="metric.link ? 'Open linked page' : null"
+                                    (click)="metric.link && openSummaryMetric(metric)">{{metric.value}}</div>
                             </div>
                         </div>
                     </div>
@@ -55,7 +112,8 @@
                         <app-spinner [name]="loaderNames.cloudTypeDistribution" [width]="0"></app-spinner>
                         <div class="widget-title">Cloud Type Distribution</div>
                         <ng-container *ngIf="cloudTypeDistributionOptions">
-                            <div echarts [options]="cloudTypeDistributionOptions" (chartInit)="onInventoryChartInit($event)" class="cloud-type-chart"></div>
+                            <div echarts [options]="cloudTypeDistributionOptions"
+                                (chartInit)="onInventoryChartInit($event)" class="cloud-type-chart"></div>
                         </ng-container>
                         <div *ngIf="!cloudTypeDistributionOptions"
                             class="d-flex justify-content-center align-items-center"
@@ -66,7 +124,8 @@
                         <app-spinner [name]="loaderNames.platformCounts" [width]="0"></app-spinner>
                         <div class="widget-title">DB Count by Platform / Technology</div>
                         <ng-container *ngIf="dbCountByPlatformOptions">
-                            <div echarts [options]="dbCountByPlatformOptions" (chartInit)="onInventoryChartInit($event)" class="platform-chart"></div>
+                            <div echarts [options]="dbCountByPlatformOptions" (chartInit)="onInventoryChartInit($event)"
+                                class="platform-chart"></div>
                         </ng-container>
                         <div *ngIf="!dbCountByPlatformOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -93,8 +152,7 @@
                                     {{tag.name}} {{tag.count}}
                                 </span>
                             </div>
-                            <div *ngIf="!tags?.length"
-                                class="d-flex justify-content-center align-items-center p-2"
+                            <div *ngIf="!tags?.length" class="d-flex justify-content-center align-items-center p-2"
                                 style="width: 100%;">No data
                             </div>
                         </div>
@@ -120,48 +178,60 @@
                 <span class="font-500 font-md py-2">Performance Hotspots - Top 10 Utilization</span>
                 <div class="filter-control">
                     <label for="utilization-sort-select" class="m-0">Sort By</label>
-                    <select #utilizationSortSelect id="utilization-sort-select"
-                        class="form-control form-control-sm" [value]="sortColumn"
-                        (change)="onUtilizationSortChange(utilizationSortSelect.value)">
+                    <select #utilizationSortSelect id="utilization-sort-select" class="form-control form-control-sm"
+                        [value]="sortColumn" (change)="onUtilizationSortChange(utilizationSortSelect.value)">
                         <option *ngFor="let sortOption of utilizationSortOptions" [value]="sortOption.value">
                             {{sortOption.label}}
                         </option>
                     </select>
                 </div>
             </div>
+            <div class="d-flex align-items-center justify-content-center px-2 pb-2">
+                <div class="d-flex align-items-center p-2">
+                    <span class="legend-dot bg-success mr-1"></span>
+                    <span class="font-md">Healthy / Low Utilization (0-50%)</span>
+                </div>
+                <div class="d-flex align-items-center p-2">
+                    <span class="legend-dot bg-warning mr-1"></span>
+                    <span class="font-md">Warning / Moderate Utilization (51-80%)</span>
+                </div>
+                <div class="d-flex align-items-center p-2">
+                    <span class="legend-dot bg-danger mr-1"></span>
+                    <span class="font-md">Critical / High Utilization (81-100%)</span>
+                </div>
+            </div>
             <div class="col-12 p-0">
                 <app-spinner [name]="loaderNames.performancWorkloadUtilization" [width]="0"></app-spinner>
-                <div class="d-flex align-items-center justify-content-center px-2 pb-2">
-                    <div class="d-flex align-items-center p-2">
-                        <span class="legend-dot bg-success mr-1"></span>
-                        <span class="font-md">Healthy / Low Utilization (0-50%)</span>
-                    </div>
-                    <div class="d-flex align-items-center p-2">
-                        <span class="legend-dot bg-warning mr-1"></span>
-                        <span class="font-md">Warning / Moderate Utilization (51-80%)</span>
-                    </div>
-                    <div class="d-flex align-items-center p-2">
-                        <span class="legend-dot bg-danger mr-1"></span>
-                        <span class="font-md">Critical / High Utilization (81-100%)</span>
-                    </div>
-                </div>
                 <div class="table-responsive">
-                    <table class="table table-sm utilization-table text-center" sortableTable (sorted)="onSorted($event)">
+                    <table class="table table-sm utilization-table text-center" sortableTable
+                        (sorted)="onSorted($event)">
                         <thead class="bg-gray-200">
                             <tr>
-                                <th class="text-left">Name</th>
-                                <th sortable-column="cpu_usage_system_percent" [sort-direction]="getSortDirection('cpu_usage_system_percent')" [class.col-sorted]="isSortedColumn('cpu_usage_system_percent')">CPU Utilization</th>
-                                <th sortable-column="memory_used_percent" [sort-direction]="getSortDirection('memory_used_percent')" [class.col-sorted]="isSortedColumn('memory_used_percent')">Memory Utilization</th>
-                                <th sortable-column="disk_usage_percent" [sort-direction]="getSortDirection('disk_usage_percent')" [class.col-sorted]="isSortedColumn('disk_usage_percent')">Disk Utilization</th>
-                                <th sortable-column="disk_iops" [sort-direction]="getSortDirection('disk_iops')" [class.col-sorted]="isSortedColumn('disk_iops')">Disk IOPS</th>
-                                <th sortable-column="system_uptime_seconds" [sort-direction]="getSortDirection('system_uptime_seconds')" [class.col-sorted]="isSortedColumn('system_uptime_seconds')">Up Time</th>
+                                <th class="text-left w-15">Name</th>
+                                <th class="w-20" sortable-column="cpu_usage_system_percent"
+                                    [sort-direction]="getSortDirection('cpu_usage_system_percent')"
+                                    [class.col-sorted]="isSortedColumn('cpu_usage_system_percent')">CPU Utilization</th>
+                                <th class="w-20" sortable-column="memory_used_percent"
+                                    [sort-direction]="getSortDirection('memory_used_percent')"
+                                    [class.col-sorted]="isSortedColumn('memory_used_percent')">Memory Utilization</th>
+                                <th class="w-20" sortable-column="disk_utilization_percent"
+                                    [sort-direction]="getSortDirection('disk_utilization_percent')"
+                                    [class.col-sorted]="isSortedColumn('disk_utilization_percent')">Disk Utilization
+                                </th>
+                                <th class="" sortable-column="disk_iops"
+                                    [sort-direction]="getSortDirection('disk_iops')"
+                                    [class.col-sorted]="isSortedColumn('disk_iops')">Disk IOPS</th>
+                                <th class="" sortable-column="system_uptime_seconds"
+                                    [sort-direction]="getSortDirection('system_uptime_seconds')"
+                                    [class.col-sorted]="isSortedColumn('system_uptime_seconds')">Up Time</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let row of utilizationRows; trackBy: trackByIndex">
                                 <td class="text-left">
-                                    <button class="btn btn-link text-decoration-none p-0 table-column-btn text-primary" type="button"
-                                        [tooltip]="'Open linked page'" (click)="openDatabaseServerDetails(row.dbUUID)">{{row.name}}</button>
+                                    <button class="btn btn-link text-decoration-none p-0 table-column-btn text-primary"
+                                        type="button" [tooltip]="'Open linked page'"
+                                        (click)="openDatabaseServerDetails(row.dbUUID)">{{row.name}}</button>
                                 </td>
                                 <td>
                                     <div class="sparkline-cell">
@@ -180,7 +250,7 @@
                                 <td>
                                     <div class="capacity-line">Capacity: {{row.diskCapacityGB}}</div>
                                     <div class="progress-track">
-                                        <div class="progress-fill" [ngClass]="getStatusClass(row.storageTone)"
+                                        <div class="progress-fill" [ngClass]="getStatusClass(row.diskTone)"
                                             [style.width.%]="row.diskUsedPercent"></div>
                                     </div>
                                     <div class="storage-meta">
@@ -189,7 +259,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="iops-cell">
+                                    <div class="iops-cell pl-3">
                                         <div class="progress-track">
                                             <div class="progress-fill" [ngClass]="getStatusClass(row.diskIopsTone)"
                                                 [style.width.%]="row.diskIopsPercent"></div>
@@ -220,9 +290,14 @@
                 <div class="workload-grid">
                     <div class="chart-widget">
                         <app-spinner [name]="loaderNames.queryResponse" [width]="0"></app-spinner>
-                        <div class="widget-title">Top 10 - Query Response Time (Ms)</div>
+                        <div class="widget-title">
+                            <span>Top 10 - Query Response Time (Ms)</span>
+                            <ng-container
+                                *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Top 10 - Query Response Time (Ms)' }"></ng-container>
+                        </div>
                         <ng-container *ngIf="queryResponseOptions">
-                            <div echarts [options]="queryResponseOptions" (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart"></div>
+                            <div echarts [options]="queryResponseOptions"
+                                (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!queryResponseOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -230,9 +305,14 @@
                     </div>
                     <div class="chart-widget">
                         <app-spinner [name]="loaderNames.queryLatency" [width]="0"></app-spinner>
-                        <div class="widget-title">Top 10 Query Latency (Avg / P95)</div>
+                        <div class="widget-title">
+                            <span>Top 10 Query Latency (Avg / P95)</span>
+                            <ng-container
+                                *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Top 10 Query Latency (Avg / P95)' }"></ng-container>
+                        </div>
                         <ng-container *ngIf="queryLatencyOptions">
-                            <div echarts [options]="queryLatencyOptions" (chartInit)="onTop10QueryRespChartInit($event)"  class="bar-chart"></div>
+                            <div echarts [options]="queryLatencyOptions" (chartInit)="onTop10QueryRespChartInit($event)"
+                                class="bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!queryLatencyOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -240,9 +320,14 @@
                     </div>
                     <div class="chart-widget">
                         <app-spinner [name]="loaderNames.activeSessions" [width]="0"></app-spinner>
-                        <div class="widget-title">Top 10 DBs - Active Sessions / Connections</div>
+                        <div class="widget-title">
+                            <span>Top 10 DBs - Active Sessions / Connections</span>
+                            <ng-container
+                                *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Top 10 DBs - Active Sessions / Connections' }"></ng-container>
+                        </div>
                         <ng-container *ngIf="activeSessionsOptions">
-                            <div echarts [options]="activeSessionsOptions" (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart"></div>
+                            <div echarts [options]="activeSessionsOptions"
+                                (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!activeSessionsOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -250,9 +335,14 @@
                     </div>
                     <div class="chart-widget">
                         <app-spinner [name]="loaderNames.errorRate" [width]="0"></app-spinner>
-                        <div class="widget-title">Top 10 Error Rate / Deadlocks</div>
+                        <div class="widget-title">
+                            <span>Aborted Connections per Second</span>
+                            <ng-container
+                                *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Aborted Connections per Second' }"></ng-container>
+                        </div>
                         <ng-container *ngIf="errorRateOptions">
-                            <div echarts [options]="errorRateOptions" (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart"></div>
+                            <div echarts [options]="errorRateOptions" (chartInit)="onTop10QueryRespChartInit($event)"
+                                class="bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!errorRateOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -260,7 +350,11 @@
                     </div>
                     <div class="chart-widget">
                         <app-spinner [name]="loaderNames.transactionThroughput" [width]="0"></app-spinner>
-                        <div class="widget-title">Transaction Throughput &amp; Cache Hit Ratio</div>
+                        <div class="widget-title">
+                            <span>Transactions Processed Per Second</span>
+                            <ng-container
+                                *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Transactions Processed Per Second' }"></ng-container>
+                        </div>
                         <ng-container *ngIf="transactionThroughputOptions">
                             <div echarts [options]="transactionThroughputOptions" class="line-chart"></div>
                         </ng-container>
@@ -271,9 +365,15 @@
                     </div>
                     <div class="chart-widget">
                         <app-spinner [name]="loaderNames.cacheHitRatio" [width]="0"></app-spinner>
-                        <div class="widget-title">Buffer / Cache Hit Ratio</div>
+                        <div class="widget-title">
+                            <span>Buffer / Cache Hit Ratio</span>
+                            <ng-container
+                                *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Buffer / Cache Hit Ratio' }"></ng-container>
+                        </div>
                         <ng-container *ngIf="cacheHitRatioOptions">
-                            <div echarts [options]="cacheHitRatioOptions" (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart compact-bar-chart"></div>
+                            <div echarts [options]="cacheHitRatioOptions"
+                                (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart">
+                            </div>
                         </ng-container>
                         <div *ngIf="!cacheHitRatioOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -284,8 +384,8 @@
         </div>
 
         <div class="section-title mt-3">Capacity / growth Insights</div>
-        <div class="card bg-white px-2">
-            <!-- <app-spinner [name]="loaderNames.capacityGrowth" [width]="0"></app-spinner> -->
+        <!-- <div class="card bg-white px-2">
+            <app-spinner [name]="loaderNames.capacityGrowth" [width]="0"></app-spinner>
             <div class="row justify-content-start align-items-center">
                 <div class="col-6">
                     <div class="col p-0 m-0">
@@ -410,6 +510,177 @@
                     </div>
                 </div>
             </div>
+        </div> -->
+        <div class="card bg-white px-2">
+            <div class="col-12 p-0 mt-2">
+                <app-spinner [name]="loaderNames.databaseEfficiency" [width]="0"></app-spinner>
+                <div class="d-flex">
+                    <div class="col-4 p-2">
+                        <div class="border rounded h-100 p-2">
+                            <div class="font-lg font-500 mb-2">
+                                <span>{{bufferCacheEfficiency?.title || 'Buffer Cache Efficiency'}}</span>
+                                <ng-container
+                                    *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Buffer Cache Efficiency' }"></ng-container>
+                            </div>
+                            <div class="row no-gutters text-center py-2">
+                                <div class="col"
+                                    *ngFor="let metric of bufferCacheEfficiency?.stats || []; let last = last; trackBy: trackByIndex"
+                                    [class.border-right]="!last">
+                                    <div class="text-muted">{{metric.label}}</div>
+                                    <div class="font-lg-xl font-500" [ngClass]="getStatusClass(metric.tone)">
+                                        {{metric.value}}</div>
+                                </div>
+                            </div>
+                            <!-- <div class="text-center text-muted font-sm px-3">
+                                {{bufferCacheEfficiency?.subtitle || 'Buffer Pool Efficiency (%)'}}
+                            </div>  -->
+                            <ng-container *ngIf="bufferCacheEfficiency?.chartOptions">
+                                <div echarts [options]="bufferCacheEfficiency.chartOptions"
+                                    class="efficiency-gauge-chart"></div>
+                                <div class="text-center text-muted font-sm px-3">
+                                    <span>InnoDB Buffer Pool Read Requests + </span>
+                                    <span>Buffer Pool Reads</span>
+                                </div>
+                            </ng-container>
+                            <div *ngIf="!bufferCacheEfficiency?.chartOptions"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 190px;">No data
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 p-2">
+                        <div class="border rounded h-100 p-2">
+                            <div class="font-lg font-500 mb-2">
+                                <span>{{databaseObjectUtilization?.title || 'Database Object Utilization'}}</span>
+                                <ng-container
+                                    *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Database Object Utilization' }"></ng-container>
+                            </div>
+                            <div class="row no-gutters text-center py-2">
+                                <div class="col"
+                                    *ngFor="let metric of databaseObjectUtilization?.stats || []; let last = last; trackBy: trackByIndex"
+                                    [class.border-right]="!last">
+                                    <div class="text-muted">{{metric.label}}</div>
+                                    <div class="font-lg-xl font-500" [ngClass]="getStatusClass(metric.tone)">
+                                        {{metric.value}}</div>
+                                </div>
+                            </div>
+                            <!-- <div class="text-center text-muted font-sm px-3">
+                                {{databaseObjectUtilization?.subtitle || 'Open Tables'}}
+                            </div> -->
+                            <ng-container *ngIf="databaseObjectUtilization?.chartOptions">
+                                <div echarts [options]="databaseObjectUtilization.chartOptions"
+                                    class="efficiency-gauge-chart"></div>
+                                <div class="text-center text-muted font-sm px-3">
+                                    Number of currently open tables
+                                </div>
+                            </ng-container>
+                            <div *ngIf="!databaseObjectUtilization?.chartOptions"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 190px;">No data
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 p-2">
+                        <div class="border rounded h-100 p-2">
+                            <div class="font-lg font-500 mb-2">
+                                <span>{{temporaryTablePerformance?.title || 'Temporary Table Performance'}}</span>
+                                <ng-container
+                                    *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Temporary Table Performance' }"></ng-container>
+                            </div>
+                            <div class="row no-gutters text-center py-2">
+                                <div class="col"
+                                    *ngFor="let metric of temporaryTablePerformance?.stats || []; let last = last; trackBy: trackByIndex"
+                                    [class.border-right]="!last">
+                                    <div class="text-muted">{{metric.label}}</div>
+                                    <div class="font-lg-xl font-500">
+                                        <span [ngClass]="metric.memoryClass">{{metric.memory}}</span>/<span
+                                            [ngClass]="metric.diskClass">{{metric.disk}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <ng-container *ngIf="temporaryTablePerformance?.chartOptions">
+                                <div echarts [options]="temporaryTablePerformance.chartOptions"
+                                    class="temporary-table-performance-chart"></div>
+                            </ng-container>
+                            <div *ngIf="!temporaryTablePerformance?.chartOptions"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 190px;">No data
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="font-lg font-500 px-2 py-2">Database Efficiency Overview - Top 10</div>
+            <div class="col-12 p-0 mb-2">
+                <app-spinner [name]="loaderNames.databaseEfficiencyTop10Overview" [width]="0"></app-spinner>
+                <div class="table-responsive efficiency-table-scroll mb-3">
+                    <table class="table table-sm text-center efficiency-table mb-0" sortableTable
+                        (sorted)="onDatabaseEfficiencySorted($event)">
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th class="text-left" sortable-column="name"
+                                    [sort-direction]="getDatabaseEfficiencySortDirection('name')"
+                                    [class.col-sorted]="isDatabaseEfficiencySortedColumn('name')">
+                                    <span>Device Name</span>                                    
+                                </th>
+                                <th sortable-column="buffer_pool_efficiency"
+                                    [sort-direction]="getDatabaseEfficiencySortDirection('buffer_pool_efficiency')"
+                                    [class.col-sorted]="isDatabaseEfficiencySortedColumn('buffer_pool_efficiency')">
+                                    <span>Buffer Pool Efficiency</span>
+                                    <ng-container
+                                        *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Buffer Pool Efficiency' }"></ng-container>
+                                </th>
+                                <th sortable-column="open_tables"
+                                    [sort-direction]="getDatabaseEfficiencySortDirection('open_tables')"
+                                    [class.col-sorted]="isDatabaseEfficiencySortedColumn('open_tables')">
+                                    <span>Open Tables</span>
+                                    <ng-container
+                                        *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Open Tables' }"></ng-container>
+                                </th>
+                                <th sortable-column="temp_tables_in_memory_per_sec"
+                                    [sort-direction]="getDatabaseEfficiencySortDirection('temp_tables_in_memory_per_sec')"
+                                    [class.col-sorted]="isDatabaseEfficiencySortedColumn('temp_tables_in_memory_per_sec')">
+                                    <span>Temporary Table Created<br>In Memory/sec</span>
+                                    <ng-container
+                                        *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Temporary Table Created In Memory/sec' }"></ng-container>
+                                </th>
+                                <th sortable-column="temp_tables_on_disk_per_sec"
+                                    [sort-direction]="getDatabaseEfficiencySortDirection('temp_tables_on_disk_per_sec')"
+                                    [class.col-sorted]="isDatabaseEfficiencySortedColumn('temp_tables_on_disk_per_sec')">
+                                    <span>Temporary Table Created<br>In Disk/sec</span>
+                                    <ng-container
+                                        *ngTemplateOutlet="metricInfoIconTmpl; context: { headerName: 'Temporary Table Created In Disk/sec' }"></ng-container>
+                                </th>
+                                <th sortable-column="status"
+                                    [sort-direction]="getDatabaseEfficiencySortDirection('status')"
+                                    [class.col-sorted]="isDatabaseEfficiencySortedColumn('status')">
+                                    <span>Status</span>
+                                    <ng-container *ngTemplateOutlet="databaseEfficiencyStatusInfoIconTmpl"></ng-container>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of databaseEfficiencyRows; trackBy: trackByIndex">
+                                <td class="text-left">
+                                    <button class="btn btn-link text-decoration-none p-0 table-column-btn text-primary"
+                                        type="button" [tooltip]="'Open linked page'"
+                                        (click)="openDatabaseServerDetails(row.hostUUID)">{{row.name}}</button>
+                                </td>
+                                <td [ngClass]="row.bufferPoolEfficiencyClass">{{row.bufferPoolEfficiency}}</td>
+                                <td [ngClass]="row.openTablesClass">{{row.openTables}}</td>
+                                <td [ngClass]="row.tempTablesInMemoryPerSecClass">{{row.tempTablesInMemoryPerSec}}</td>
+                                <td [ngClass]="row.tempTablesOnDiskPerSecClass">{{row.tempTablesOnDiskPerSec}}</td>
+                                <td><i class="fa font-lg" [ngClass]="[row.statusIcon, row.statusClass]"
+                                        [tooltip]="row.status"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="!databaseEfficiencyRows?.length" style="height: 100px;"
+                        class="d-flex justify-content-center align-items-center">
+                        No records available.
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="section-title mt-3">Availability / Health Overview</div>
@@ -508,7 +779,9 @@
                         <div class="alert-summary-metric"
                             *ngFor="let metric of alertSummaryMetrics; trackBy: trackByIndex">
                             <div>{{metric.label}}</div>
-                            <strong [ngClass]="getStatusClass(metric.tone)" [class.pointer-link]="metric.link" [tooltip]="metric.link ? 'Open linked page' : null" (click)="metric.link && openAlertsPage(metric)">{{metric.value}}</strong>
+                            <strong [ngClass]="getStatusClass(metric.tone)" [class.pointer-link]="metric.link"
+                                [tooltip]="metric.link ? 'Open linked page' : null"
+                                (click)="metric.link && openAlertsPage(metric)">{{metric.value}}</strong>
                         </div>
                     </div>
                 </div>
@@ -533,10 +806,12 @@
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let alert of criticalAlerts; trackBy: trackByIndex">
-                                        <td>                                                
-                                            <button class="btn btn-link text-decoration-none p-0 table-column-btn font-xs-sm font-500" type="button"
-                                            [tooltip]="'Open linked page'" (click)="viewAlertDetails(alert.uuid)">{{alert.id}}</button>
-                                        </td>                                            
+                                        <td>
+                                            <button
+                                                class="btn btn-link text-decoration-none p-0 table-column-btn font-xs-sm font-500"
+                                                type="button" [tooltip]="'Open linked page'"
+                                                (click)="viewAlertDetails(alert.uuid)">{{alert.id}}</button>
+                                        </td>
                                         <td>{{alert.deviceName}}</td>
                                         <!-- <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td> -->
                                         <td class="text-center">

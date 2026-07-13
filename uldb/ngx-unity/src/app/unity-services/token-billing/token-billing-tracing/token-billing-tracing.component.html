@@ -1,0 +1,208 @@
+<div class="tb-top-actions">
+    <button type="button" class="tb-top-action-btn" tooltip="Back" container="body" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+    <button type="button" class="tb-top-action-btn" tooltip="Refresh" container="body" (click)="refreshData()">
+        <i class="fas fa-sync-alt"></i>
+    </button>
+</div>
+
+<div class="row my-4">
+    <div class="col-12">
+        <div class="card round-edge">
+            <app-spinner [name]="loader"></app-spinner>
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{filteredRows.length}}</span>
+                    <span class="ml-2 font-lg">Tracing</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div *ngIf="errorMessage" class="alert alert-danger py-2" role="alert">
+                    {{errorMessage}}
+                </div>
+
+                <div class="tb-filter-row mb-3">
+                    <div class="tb-filter-search">
+                        <div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            </div>
+                                <input type="text" class="form-control" placeholder="Search" [(ngModel)]="searchValue" (ngModelChange)="onSearchChange()"/>
+                        </div>
+                    </div>
+                    <div class="tb-filter-dates">
+                        <div class="tb-filter-date-input" *ngIf="selectedRange === 'custom'">
+                            <label class="text-muted mb-1">From</label>
+                            <input type="date" class="form-control form-control-sm" [(ngModel)]="customFromDate"
+                                (change)="onCustomDateChange()">
+                        </div>
+                        <div class="tb-filter-date-input" *ngIf="selectedRange === 'custom'">
+                            <label class="text-muted mb-1">To</label>
+                            <input type="date" class="form-control form-control-sm" [(ngModel)]="customToDate"
+                                (change)="onCustomDateChange()">
+                        </div>
+                        <div class="tb-filter-date-range">
+                            <label class="text-muted mb-1">Date Range</label>
+                            <ng-select [items]="timeRangeOptions" bindLabel="label" bindValue="value" [clearable]="false"
+                                [(ngModel)]="selectedRange" (change)="onTimeRangeChange()" class="tb-range-select">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0 tb-tracing-table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>
+                                    <button type="button" class="btn btn-link tb-sort-btn" (click)="sortBy('query_name')">
+                                        Query Name
+                                        <i class="fas ml-1" [ngClass]="{
+                                            'fa-sort': sortColumn !== 'query_name',
+                                            'fa-sort-up': sortColumn === 'query_name' && sortDirection === 'asc',
+                                            'fa-sort-down': sortColumn === 'query_name' && sortDirection === 'desc'
+                                        }"></i>
+                                    </button>
+                                </th>
+                                <th class="text-left">
+                                    <button type="button" class="btn btn-link tb-sort-btn" (click)="sortBy('input_tokens')">
+                                        Sum Input Token
+                                        <i class="fas ml-1" [ngClass]="{
+                                            'fa-sort': sortColumn !== 'input_tokens',
+                                            'fa-sort-up': sortColumn === 'input_tokens' && sortDirection === 'asc',
+                                            'fa-sort-down': sortColumn === 'input_tokens' && sortDirection === 'desc'
+                                        }"></i>
+                                    </button>
+                                </th>
+                                <th class="text-left">
+                                    <button type="button" class="btn btn-link tb-sort-btn" (click)="sortBy('output_tokens')">
+                                        Sum Output Token
+                                        <i class="fas ml-1" [ngClass]="{
+                                            'fa-sort': sortColumn !== 'output_tokens',
+                                            'fa-sort-up': sortColumn === 'output_tokens' && sortDirection === 'asc',
+                                            'fa-sort-down': sortColumn === 'output_tokens' && sortDirection === 'desc'
+                                        }"></i>
+                                    </button>
+                                </th>
+                                <th class="text-left">
+                                    <button type="button" class="btn btn-link tb-sort-btn" (click)="sortBy('total_tokens')">
+                                        Sum Total Token
+                                        <i class="fas ml-1" [ngClass]="{
+                                            'fa-sort': sortColumn !== 'total_tokens',
+                                            'fa-sort-up': sortColumn === 'total_tokens' && sortDirection === 'asc',
+                                            'fa-sort-down': sortColumn === 'total_tokens' && sortDirection === 'desc'
+                                        }"></i>
+                                    </button>
+                                </th>
+                                <th class="text-left">
+                                    <button type="button" class="btn btn-link tb-sort-btn" (click)="sortBy('total_cost_usd')">
+                                        Sum Total Cost (USD)
+                                        <i class="fas ml-1" [ngClass]="{
+                                            'fa-sort': sortColumn !== 'total_cost_usd',
+                                            'fa-sort-up': sortColumn === 'total_cost_usd' && sortDirection === 'asc',
+                                            'fa-sort-down': sortColumn === 'total_cost_usd' && sortDirection === 'desc'
+                                        }"></i>
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of pagedRows" [ngClass]="{'tb-max-cost-row': isMaxCostRow(row)}">
+                                <td class="tb-query-name-cell">
+                                    <button type="button" class="btn btn-link p-0 text-left tb-query-name-link"
+                                        [tooltip]="row.query_name || 'Unnamed Query'" container="body" (click)="showDetails(row)">
+                                        {{row.query_name || 'Unnamed Query'}}
+                                    </button>
+                                </td>
+                                <td class="text-left">{{row.input_tokens | number}}</td>
+                                <td class="text-left">{{row.output_tokens | number}}</td>
+                                <td class="text-left">{{row.total_tokens | number}}</td>
+                                <td class="text-left">
+                                    <span>{{formatCost(row.total_cost_usd)}}</span>
+                                    <span *ngIf="isMaxCostRow(row)" class="badge tb-highest-cost-badge">
+                                        Highest Cost
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!pagedRows.length">
+                                <td colspan="5" class="text-center text-muted py-4">No tracing data available.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tb-pagination-footer" *ngIf="filteredRows.length">
+                    <div class="tb-pagination-summary">
+                        <div class="tb-page-size">
+                            <label for="tb-tracing-page-size" class="mr-2 my-1">Show</label>
+                            <select id="tb-tracing-page-size" name="tb-tracing-page-size"
+                                class="d-inline-block form-control form-control-sm" [(ngModel)]="pageSize"
+                                (ngModelChange)="pageSizeChange($event)">
+                                <option *ngFor="let size of pageSizeOptions" [ngValue]="size">{{size}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="tb-pagination-actions">
+                        <table-pager [pageNo]="currentPage" [pageSize]="pageSize" [totalCount]="filteredRows.length"
+                            [compact]="true" (pageChange)="pageChange($event)">
+                        </table-pager>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #traceDetails>
+    <div class="card mb-0">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Query Details</span>
+            <button type="button" class="close" aria-label="Close" (click)="modalRef.hide()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm mb-0">
+                <tbody>
+                    <tr>
+                        <th>Query Name</th>
+                        <td>{{selectedRow?.query_name || 'Unnamed Query'}}</td>
+                    </tr>
+                    <tr *ngIf="selectedRow?.query">
+                        <th>Query</th>
+                        <td class="text-break">{{selectedRow?.query}}</td>
+                    </tr>
+                    <tr *ngIf="selectedRow?.request_id">
+                        <th>Request ID</th>
+                        <td>{{selectedRow?.request_id}}</td>
+                    </tr>
+                    <tr *ngIf="selectedRow?.conversation_id">
+                        <th>Conversation ID</th>
+                        <td>{{selectedRow?.conversation_id}}</td>
+                    </tr>
+                    <tr>
+                        <th>Sum Input Token</th>
+                        <td>{{selectedRow?.input_tokens | number}}</td>
+                    </tr>
+                    <tr>
+                        <th>Sum Output Token</th>
+                        <td>{{selectedRow?.output_tokens | number}}</td>
+                    </tr>
+                    <tr>
+                        <th>Sum Total Token</th>
+                        <td>{{selectedRow?.total_tokens | number}}</td>
+                    </tr>
+                    <tr>
+                        <th>Sum Total Cost (USD)</th>
+                        <td>{{formatCost(selectedRow?.total_cost_usd)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-sm btn-secondary pull-right" (click)="modalRef.hide()">Close</button>
+        </div>
+    </div>
+</ng-template>

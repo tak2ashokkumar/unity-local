@@ -4,16 +4,13 @@ import { UnityCopilotComponent } from './unity-copilot.component';
 import { ItsmAiAgentComponent } from './itsm-ai-agent/itsm-ai-agent.component';
 import { FinopsAiAgentComponent } from './finops-ai-agent/finops-ai-agent.component';
 import { ConditionInvestigationComponent } from '../shared/condition-investigation/condition-investigation.component';
-import { NetworkAiAgentDashboardConditionsComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-conditions/network-ai-agent-dashboard-conditions.component';
-import { NetworkAiAgentDashboardAlertsComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-alerts/network-ai-agent-dashboard-alerts.component';
-import { NetworkAiAgentDashboardEventsComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard-events/network-ai-agent-dashboard-events.component';
-import { NetworkAiAgentDashboardComponent } from './network-ai-agent/network-ai-agent-dashboard/network-ai-agent-dashboard.component';
 import { NetworkAiAgentComponent } from './network-ai-agent/network-ai-agent.component';
 import { ComputeAiAgentComponent } from './compute-ai-agent/compute-ai-agent.component';
 import { AiAgentEventsAlertsConditionsDashboardComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events-alerts-conditions-dashboard.component';
 import { AiAgentAlertsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-alerts/ai-agent-alerts.component';
 import { AiAgentEventsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events/ai-agent-events.component';
 import { AiAgentConditionsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-conditions/ai-agent-conditions.component';
+import { StorageAiAgentComponent } from './storage-ai-agent/storage-ai-agent.component';
 
 const routes: Routes = [
   {
@@ -53,7 +50,7 @@ const routes: Routes = [
                     title: 'Events',
                     stepbackCount: 0
                   },
-                  aiAgentType: 'network'
+                  aiAgentType: 'networkAgent'
                 }
               },
               {
@@ -64,7 +61,7 @@ const routes: Routes = [
                     title: 'Alerts',
                     stepbackCount: 0
                   },
-                  aiAgentType: 'network'
+                  aiAgentType: 'networkAgent'
                 }
               },
               {
@@ -75,7 +72,7 @@ const routes: Routes = [
                     title: 'Conditions',
                     stepbackCount: 0
                   },
-                  aiAgentType: 'network'
+                  aiAgentType: 'networkAgent'
                 }
               },
             ]
@@ -90,7 +87,7 @@ const routes: Routes = [
             title: 'Investigate',
             stepbackCount: 0
           },
-          aiAgentType: 'network'
+          aiAgentType: 'networkAgent'
         },
       },
       {
@@ -121,7 +118,7 @@ const routes: Routes = [
                     title: 'Events',
                     stepbackCount: 0
                   },
-                  aiAgentType: 'compute'
+                  aiAgentType: 'computeAgent'
                 }
               },
               {
@@ -132,7 +129,7 @@ const routes: Routes = [
                     title: 'Alerts',
                     stepbackCount: 0
                   },
-                  aiAgentType: 'compute'
+                  aiAgentType: 'computeAgent'
                 }
               },
               {
@@ -143,7 +140,7 @@ const routes: Routes = [
                     title: 'Conditions',
                     stepbackCount: 0
                   },
-                  aiAgentType: 'compute'
+                  aiAgentType: 'computeAgent'
                 }
               },
             ]
@@ -158,9 +155,77 @@ const routes: Routes = [
             title: 'Investigate',
             stepbackCount: 0
           },
-          aiAgentType: 'compute'
+          aiAgentType: 'computeAgent'
         },
       },
+      // {
+      //   path: 'storage-ai-agent',
+      //   component: StorageAiAgentComponent,
+      //   data: {
+      //     breadcrumb: {
+      //       title: 'Storage AI Agent',
+      //       stepbackCount: 0
+      //     }
+      //   },
+      //   children: [
+      //     {
+      //       path: 'dashboard',
+      //       component: AiAgentEventsAlertsConditionsDashboardComponent,
+      //       data: {
+      //         breadcrumb: {
+      //           title: 'Dashboard',
+      //           stepbackCount: 0
+      //         }
+      //       },
+      //       children: [
+      //         {
+      //           path: 'events',
+      //           component: AiAgentEventsComponent,
+      //           data: {
+      //             breadcrumb: {
+      //               title: 'Events',
+      //               stepbackCount: 0
+      //             },
+      //             aiAgentType: 'storageAgent'
+      //           }
+      //         },
+      //         {
+      //           path: 'alerts',
+      //           component: AiAgentAlertsComponent,
+      //           data: {
+      //             breadcrumb: {
+      //               title: 'Alerts',
+      //               stepbackCount: 0
+      //             },
+      //             aiAgentType: 'storageAgent'
+      //           }
+      //         },
+      //         {
+      //           path: 'conditions',
+      //           component: AiAgentConditionsComponent,
+      //           data: {
+      //             breadcrumb: {
+      //               title: 'Conditions',
+      //               stepbackCount: 0
+      //             },
+      //             aiAgentType: 'storageAgent'
+      //           }
+      //         },
+      //       ]
+      //     },
+      //   ]
+      // },
+      // {
+      //   path: 'storage-ai-agent/conditions/:conditionId/:conditionUuid/investigate',
+      //   component: ConditionInvestigationComponent,
+      //   data: {
+      //     breadcrumb: {
+      //       title: 'Investigate',
+      //       stepbackCount: 0
+      //     },
+      //     aiAgentType: 'storageAgent'
+      //   },
+      // },
       {
         path: 'finops-ai-agent',
         component: FinopsAiAgentComponent,

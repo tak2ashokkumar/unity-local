@@ -8,6 +8,8 @@ export interface AiAgentConditionsSummaryType {
   mac_device?: number;
   vm?:number;
 
+  storage?:number;
+
   total: AiAgentCondtionSummaryTotalType;
 }
 

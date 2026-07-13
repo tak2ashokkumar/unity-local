@@ -6,7 +6,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntil } from 'rxjs/operators';
 import { FormGroup } from '@angular/forms';
-import { InterfaceViewData, MacAddressViewData, StorageDetailsComponentsService } from './storage-details-components.service';
+import { InterfaceViewData, IPAddressViewData, MacAddressViewData, OSViewData, StorageDetailsComponentsService } from './storage-details-components.service';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
 
 @Component({
@@ -21,14 +21,14 @@ export class StorageDetailsComponentsComponent implements OnInit, OnDestroy {
   @Input() deviceId: string;
   private ngUnsubscribe = new Subject();
 
-  ipAddressForm: FormGroup;
-  operationSystemForm: FormGroup;
 
   currentCriteria: SearchCriteria;
-  interfacesCount: number = 0;
+  ipAddressViewData: IPAddressViewData[] = [];
   interfaceViewData: InterfaceViewData[] = [];
-  macAddressCount: number = 0;
+  interfacesCount: number = 0;
   macAddressViewData: MacAddressViewData[] = [];
+  macAddressCount: number = 0;
+  osViewData: OSViewData[] = [];
 
   constructor(private svc: StorageDetailsComponentsService,
     private spinner: AppSpinnerService,
@@ -64,8 +64,8 @@ export class StorageDetailsComponentsComponent implements OnInit, OnDestroy {
       case 'interface':
         this.getInterfaceData();
         break;
-      case 'operationSystem':
-        this.getOperationSystemData();
+      case 'os':
+        this.getOSData();
         break;
       default:
         break;
@@ -94,7 +94,7 @@ export class StorageDetailsComponentsComponent implements OnInit, OnDestroy {
   getIpAddressData() {
     this.spinner.start('ipaddressSpinner');
     this.svc.getIpAddressData(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.ipAddressForm = this.svc.buildIpAddressForm(res);
+      this.ipAddressViewData = this.svc.convertToIPAddressViewData(res);
       this.spinner.stop('ipaddressSpinner');
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('ipaddressSpinner');
@@ -127,13 +127,13 @@ export class StorageDetailsComponentsComponent implements OnInit, OnDestroy {
     })
   }
 
-  getOperationSystemData() {
-    this.spinner.start('operationSystemSpinner');
-    this.svc.getOperationSystemData(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.operationSystemForm = this.svc.buildOperationSystemForm(res);
-      this.spinner.stop('operationSystemSpinner');
+  getOSData() {
+    this.spinner.start('osSpinner');
+    this.svc.getOSData(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.osViewData = this.svc.convertToOSViewData(res);
+      this.spinner.stop('osSpinner');
     }, (err: HttpErrorResponse) => {
-      this.spinner.stop('operationSystemSpinner');
+      this.spinner.stop('osSpinner');
     })
   }
 }

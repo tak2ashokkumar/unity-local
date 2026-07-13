@@ -402,9 +402,9 @@ export class BmServersComponent implements OnInit {
   }
 
   resetPassword(view: BMServerViewData) {
-    if (!view.isBmStatsButtonEnabled) {
-      return;
-    }
+    // if (!view.isBmStatsButtonEnabled) {
+    //   return;
+    // }
     this.resetPasswordForm = this.bmService.buildResetPasswordForm(view);
     this.resetPasswordFormErrors = this.bmService.resetPasswordFormErrors();
     this.resetPasswordFormValidationMessages = this.bmService.resetPasswordFormValidationMessages;

@@ -55,6 +55,8 @@ export class AiAgentConditionsService {
     summaryByDeviceType.macDevice = data.mac_device;
     summaryByDeviceType.vm = data.vm;
 
+    summaryByDeviceType.storage = data.storage;
+
     viewData.summaryByDeviceType = summaryByDeviceType;
 
     return viewData;
@@ -490,6 +492,7 @@ export class AiAgentConditionSummaryByDeviceTypeViewData {
   hypervisor: number;
   macDevice: number;
   vm: number;
+  storage:number;
 }
 
 export class AiAgentConditionsViewData {

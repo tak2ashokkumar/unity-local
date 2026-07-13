@@ -35,8 +35,7 @@ export class AppDefaultDashboardsService {
   }
 
   getDefaultDashboardRouteSegment(name: string) {
-    let dbname = (name || '').trim().toLowerCase();
-    switch (dbname) {
+    switch ((name || '').trim().toLowerCase()) {
       case 'infrastructure overview':
         return 'infrastructure';
       case 'network overview':
@@ -51,16 +50,22 @@ export class AppDefaultDashboardsService {
         return 'application';
       case 'private cloud compute dashboard':
         return 'private-cloud-compute';
+      case 'discovery and cmdb':
+        return 'discovery';
       case 'public cloud compute dashboard':
         return 'public-cloud-compute';
       case 'database dashboard':
         return 'database';
+      case 'event analytics':
+      case 'event analytics dashboard':
+        return 'event-analytics';
       case 'navigator central':
+        return 'navigator-central';
       case 'unified aiops command center':
       case 'unified aiops command center dashboard':
       case 'unified aiops command centre':
       case 'unified aiops command centre dashboard':
-        return 'navigator-central';
+        return 'unified-aiops-command-centre';
     }
   }
 }

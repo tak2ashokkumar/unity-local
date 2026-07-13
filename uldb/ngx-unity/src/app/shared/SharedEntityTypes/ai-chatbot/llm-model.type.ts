@@ -29,11 +29,13 @@ export interface SupportedLLMConfigData {
     endpoint_url: string;
     compatible_applications: LLMCompatibleModules;
     id: number;
+    uuid?: string;
     model_name: string;
+    cost_multiplier?: string | number | null;
 
     // for ui use
     text?: string;
-    type?: string;
+    type?: string;x
     image?: string;
 }
 export interface LLMCompatibleModules {

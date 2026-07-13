@@ -7,11 +7,21 @@ import { UserInfoService } from 'src/app/shared/user-info.service';
 import { takeUntil } from 'rxjs/operators';
 import { IPageInfo, VirtualScrollerComponent } from 'ngx-virtual-scroller';
 import { FormGroup } from '@angular/forms';
-import { ChatDocument, ChatHistoryData, UnityChatBot } from '../../unity-chatbot.type';
+import { ChatDocument, ChatHistoryData, TokenUsage, UnityChatBot } from '../../unity-chatbot.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { SupportedLLMConfigData } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-model.type';
 import { Router } from '@angular/router';
+import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
+import { TokenUsageViewData, UnityChatbotService } from '../../unity-chatbot.service';
+import { getTokenMultiplier, getTokenMultiplierTooltip, hasTokenMultiplier } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-model.util';
 // import { EventEmitter } from 'stream';
+
+type ChatInputMode = 'auto' | 'pro';
+
+interface ChatInputModePayload {
+  chat_mode: ChatInputMode;
+  session_model_uuid: string;
+}
 
 @Component({
   selector: 'uch-chat',
@@ -54,7 +64,14 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   showModelDropdown = false;
   activeModel: SupportedLLMConfigData;
+  selectedChatInputModel: SupportedLLMConfigData;
   llmModels: SupportedLLMConfigData[] = [];
+  readonly chatInputModeStorageKey = 'unity_assistant_chat_input_mode_payload';
+  chatInputModePayload: ChatInputModePayload = {
+    chat_mode: 'auto',
+    session_model_uuid: ''
+  };
+  enableProModeModalVisible: boolean = false;
   typingQueue: string[] = [];
   showStopButton: boolean = false;
   isStreaming: boolean = false;
@@ -67,10 +84,11 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   attachedFiles: ChatDocument[] = [];
   fileUploadErrorMessage: string = '';
 
-  @Input() isExpanded : boolean;
+  @Input() isExpanded: boolean;
   constructor(private service: UchChatService,
     private userService: UserInfoService,
-    private router: Router) {
+    private router: Router,
+    private ucService: UnityChatbotService) {
     this.chatCurrentCriteria = {
       searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.TEN,
       params: [{
@@ -83,6 +101,7 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnInit(): void {
+    this.resetChatInputModePayload();
     this.getDocuments();
     this.getAIModels();
     this.buildForm();
@@ -91,6 +110,7 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnDestroy(): void {
+    this.resetChatInputModePayload();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
@@ -232,6 +252,7 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }, err => {
       this.llmModels = [];
       this.activeModel = null;
+      this.selectedChatInputModel = null;
     })
   }
 
@@ -242,7 +263,13 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.isStreaming = true;
     this.showStopButton = true;
     this.doneData = null;
-    let postData = { conversation_id: this.selectedHistory.conversation_id, query: chat, org_id: this.userService.userOrgId };
+    let postData = {
+      conversation_id: this.selectedHistory.conversation_id,
+      query: chat,
+      org_id: this.userService.userOrgId,
+      chat_mode: this.chatInputModePayload.chat_mode,
+      session_model_uuid: this.chatInputModePayload.chat_mode === 'auto' ? '' : this.chatInputModePayload.session_model_uuid
+    };
     this.startWaitMessages();
 
     this.chatHistoryData.push({ user: 'bot', message: '', type: 'text' });
@@ -262,6 +289,7 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         } else if (event === 'done') {
           this.doneData = data;
+          this.tokenUsageData = this.ucService.convertToTokenUsageViewData(this.doneData.token_usage.org);
           // this.chatId = data.chat_message_id ?? '';
           // this.conversationId = data.conversation_id;
           // this.chatHistoryData[lastIndex]['suggestedPrompt'] = data.suggested_questions?.length ? data.suggested_questions[0] : '';
@@ -326,17 +354,30 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   toggleDropdown() {
+    if (this.chatInputModePayload.chat_mode === 'auto') {
+      this.showModelDropdown = false;
+      return;
+    }
     this.showModelDropdown = !this.showModelDropdown;
   }
 
   changeActiveModel(model: SupportedLLMConfigData) {
+    if (this.chatInputModePayload.chat_mode === 'auto') {
+      this.showModelDropdown = false;
+      this.persistChatInputModePayload('auto', '');
+      return;
+    }
     if (this.activeModel?.id === model.id) {
       this.showModelDropdown = false;
+      this.selectedChatInputModel = model;
+      this.persistChatInputModePayload('pro', this.getModelUuid(model));
       return;
     }
 
     if (model.is_user_owned) {
-      this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
+      if (this.activeModel) {
+        this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
+      }
       model.active_for_applications.push('assistant');
       this.changeActiveModelToSelected(model);
     } else {
@@ -347,14 +388,12 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   changeActiveModelToSelected(model: SupportedLLMConfigData) {
     this.showModelDropdown = false;
-    this.service.changeActiveModel('Assistant', model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.activeModel = model;
-    }, err => {
-
-    })
+    this.selectedChatInputModel = model;
+    this.persistChatInputModePayload('pro', this.getModelUuid(model));
+    this.activeModel = model;
   }
 
-  goToConfig(model: SupportedLLMConfigData) {
+  goToConfig(model?: SupportedLLMConfigData) {
     // this.togglePopUp();
     this.router.navigate(['/settings/profile/add-model']);
   }
@@ -364,6 +403,106 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       'active-model-item': model.active_for_applications?.includes('assistant'),
       'bg-light text-muted': !model.is_user_owned
     }
+  }
+
+  hasModelTokenMultiplier(model: SupportedLLMConfigData): boolean {
+    return hasTokenMultiplier(model);
+  }
+
+  getModelTokenMultiplier(model: SupportedLLMConfigData): string | null {
+    return getTokenMultiplier(model);
+  }
+
+  getModelTokenMultiplierTooltip(model: SupportedLLMConfigData): string {
+    return getTokenMultiplierTooltip(model);
+  }
+
+  setChatInputMode(mode: ChatInputMode) {
+    if (mode === 'auto') {
+      this.showModelDropdown = false;
+      this.selectedChatInputModel = null;
+      this.persistChatInputModePayload('auto', '');
+      return;
+    }
+    this.showModelDropdown = false;
+    if (this.shouldShowEnableProModeModal()) {
+      this.selectedChatInputModel = null;
+      this.persistChatInputModePayload('auto', '');
+      this.showEnableProModeModal();
+      return;
+    }
+    this.selectMostCostEffectiveConfiguredModel();
+  }
+
+  showEnableProModeModal() {
+    this.enableProModeModalVisible = true;
+  }
+
+  closeEnableProModeModal() {
+    this.enableProModeModalVisible = false;
+    this.showModelDropdown = false;
+    this.selectedChatInputModel = null;
+    this.persistChatInputModePayload('auto', '');
+  }
+
+  configureModelFromProModal() {
+    this.enableProModeModalVisible = false;
+    this.goToConfig();
+  }
+
+  private resetChatInputModePayload() {
+    this.showModelDropdown = false;
+    this.selectedChatInputModel = null;
+    this.persistChatInputModePayload('auto', '');
+  }
+
+  private persistChatInputModePayload(chatMode: ChatInputMode, sessionModelUuid: string) {
+    this.chatInputModePayload = {
+      chat_mode: chatMode,
+      session_model_uuid: chatMode === 'auto' ? '' : sessionModelUuid
+    };
+    localStorage.setItem(this.chatInputModeStorageKey, JSON.stringify(this.chatInputModePayload));
+  }
+
+  private getModelUuid(model: SupportedLLMConfigData): string {
+    return `${model?.uuid || model?.id || ''}`;
+  }
+
+  private selectMostCostEffectiveConfiguredModel() {
+    const selectedModel = this.getMostCostEffectiveConfiguredModel();
+    this.selectedChatInputModel = selectedModel;
+    this.activeModel = selectedModel || this.activeModel;
+    this.persistChatInputModePayload('pro', this.getModelUuid(selectedModel));
+  }
+
+  private getConfiguredModels(): SupportedLLMConfigData[] {
+    return this.llmModels.filter(model => model?.is_user_owned);
+  }
+
+  private shouldShowEnableProModeModal(): boolean {
+    return this.getConfiguredModels().length === 0;
+  }
+
+  private getMostCostEffectiveConfiguredModel(): SupportedLLMConfigData {
+    const configuredModels = this.getConfiguredModels();
+    if (!configuredModels.length) {
+      return null;
+    }
+    if (configuredModels.length === 1) {
+      return configuredModels[0];
+    }
+    return configuredModels.reduce((bestModel, currentModel) => {
+      return this.getMultiplierValue(currentModel) < this.getMultiplierValue(bestModel) ? currentModel : bestModel;
+    });
+  }
+
+  private getMultiplierValue(model: SupportedLLMConfigData): number {
+    const multiplier = getTokenMultiplier(model);
+    if (!multiplier) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const value = Number.parseFloat(`${multiplier}`.replace(/x$/i, ''));
+    return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
   }
 
   submitQuery(query: string) {
@@ -450,5 +589,33 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.service.deleteDocument(file.document_id, this.selectedHistory.conversation_id).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.getDocuments();
     })
+  }
+
+  showTokenUsage: boolean = false;
+  tokenUsageData: TokenUsageViewData;
+  tokenIconChart: UnityChartDetails;
+  tokenPopupChart: UnityChartDetails;
+  tokenUsageLoader: boolean = false;
+
+
+  getTokenUsage() {
+    this.tokenUsageLoader = true;
+    this.ucService.getTokenUsage(this.userService.userOrgId, this.userService.userDetails.id).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: TokenUsage) => {
+      // this.tokenUsageData = res;
+      // this.tokenIconChart = this.ucService.convertToTokenUsageChartData(res, false);
+      // this.tokenPopupChart = this.ucService.convertToTokenUsageChartData(res, true);
+      this.tokenUsageData = this.ucService.convertToTokenUsageViewData(res);
+      this.tokenUsageLoader = false;
+    }, (err: HttpErrorResponse) => {
+      this.tokenUsageData = null;
+      this.tokenIconChart = null;
+      this.tokenPopupChart = null;
+      this.tokenUsageLoader = false;
+    });
+  }
+
+  toggleTokenUsageDropdown() {
+    this.showTokenUsage = !this.showTokenUsage
+    this.getTokenUsage();
   }
 }

@@ -146,7 +146,7 @@ export class ApplicationDiscoveryProblemsService {
     //   response: staticdataairemediation,
     // }
 
-    return this.http.post<AIRemediationType>('/aiapm/remediation', payload);
+    return this.http.post<AIRemediationType>('http://10.192.11.64:9957/remediation', payload);
     // return of(obj).pipe(delay(100))
   }
 

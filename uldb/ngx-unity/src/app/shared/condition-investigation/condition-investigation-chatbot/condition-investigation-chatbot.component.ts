@@ -2,18 +2,29 @@ import { AfterViewChecked, Component, ElementRef, EventEmitter, HostListener, In
 import { Subject, Subscription, timer } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { NetworkAgentsChatResponseType } from './condition-investigation-chatbot.type';
-import { ChatHistoryData } from 'src/app/unity-chatbot/unity-chatbot.type';
+import { ChatHistoryData, TokenUsage } from 'src/app/unity-chatbot/unity-chatbot.type';
 import { FormGroup } from '@angular/forms';
 import { ConditionInvestigationChatbotService } from './condition-investigation-chatbot.service';
 import { UserInfoService } from '../../user-info.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupportedLLMConfigData } from '../../SharedEntityTypes/ai-chatbot/llm-model.type';
+import { getTokenMultiplier, getTokenMultiplierTooltip, hasTokenMultiplier } from '../../SharedEntityTypes/ai-chatbot/llm-model.util';
 import { takeUntil } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ConditionInvestigationNewTerminalService } from '../condition-investigation-new-terminal/condition-investigation-new-terminal.service';
 import { UnityAssistantChatHistory } from 'src/app/unity-chatbot/uc-history/uc-history.type';
 import { PAGE_SIZES, SearchCriteria } from '../../table-functionality/search-criteria';
 import { PaginatedResult } from '../../SharedEntityTypes/paginated.type';
+import { TokenUsageViewData, UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
+import { UnityChartDetails } from '../../unity-chart-config.service';
+import { HttpErrorResponse } from '@angular/common/http';
+
+type ChatInputMode = 'auto' | 'pro';
+
+interface ChatInputModePayload {
+  chat_mode: ChatInputMode;
+  session_model_uuid: string;
+}
 
 @Component({
   selector: 'condition-investigation-chatbot',
@@ -47,6 +58,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
 
   @ViewChild('executeCommand') executeCommand: ElementRef;
   confirmExecutionModalRef: BsModalRef;
+  enableProModeModalVisible: boolean = false;
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
@@ -62,7 +74,8 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     private router: Router,
     private route: ActivatedRoute,
     private modalService: BsModalService,
-    private newTerminalService: ConditionInvestigationNewTerminalService) {
+    private newTerminalService: ConditionInvestigationNewTerminalService,
+    private ucService: UnityChatbotService) {
     this.route.queryParams.subscribe(params => {
       this.loadHistory = params['load_history'] || 'false';
       this.conversationId = this.loadHistory == 'true' ? params['conversation_id'] : null;
@@ -82,6 +95,8 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   }
 
   ngOnInit(): void {
+    this.getTokenUsage();
+    this.resetChatInputModePayload();
     this.getAIModels();
     const firstQuery = `Create an investigation plan to resolve the condition ${this.conditionId}`;
     if (this.loadHistory == 'true') {
@@ -94,6 +109,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   }
 
   ngOnDestroy(): void {
+    this.resetChatInputModePayload();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
@@ -227,7 +243,13 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   hasReachedTop: boolean = false;
   showModelDropdown = false;
   activeModel: SupportedLLMConfigData;
+  selectedChatInputModel: SupportedLLMConfigData;
   llmModels: SupportedLLMConfigData[] = [];
+  readonly chatInputModeStorageKey = 'chat_input_mode_payload';
+  chatInputModePayload: ChatInputModePayload = {
+    chat_mode: 'auto',
+    session_model_uuid: ''
+  };
   typingQueue: string[] = [];
   showStopButton: boolean = false;
   typingInterval: any = null;
@@ -255,7 +277,9 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       conversation_id: this.conversationId,
       role: 'User',
       streaming: false,
-      title: this.title
+      title: this.title,
+      chat_mode: this.chatInputModePayload.chat_mode,
+      session_model_uuid: this.chatInputModePayload.chat_mode === 'auto' ? '' : this.chatInputModePayload.session_model_uuid
     }
     this.chatHistoryData.push({ user: 'bot', message: '', type: 'text' });
     this.chatHistoryData.getLast()['showAction'] = false;
@@ -278,6 +302,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
           } else {
             this.doneData = data;
           }
+          this.tokenUsageData = this.ucService.convertToTokenUsageViewData(this.doneData.meta.token_usage.org);
           this.chatResponse.emit(this.doneData);
           if (this.sectionBreakReached) {
             if (this.doneData?.meta?.recommended_actions?.length) {
@@ -394,6 +419,9 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       this.shouldScroll = false;
       return;
     }
+    if (!this.canSubmitQuery()) {
+      return;
+    }
     if (this.form.get('chat').value.trim()) {
       this.shouldScroll = true;
       this.chatHistoryData.push({ user: 'user', message: this.form.get('chat').value, type: 'text' });
@@ -405,6 +433,9 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   submitQuery(query: string) {
     if (this.isTyping) {
       this.shouldScroll = false;
+      return;
+    }
+    if (!this.canSubmitQuery()) {
       return;
     }
     if (query.trim()) {
@@ -449,20 +480,35 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
         if (m.active_for_applications?.includes(this.service.serverSideApplicationMapping(this.application))) {
           this.activeModel = m;
         }
-      })
+      });
+      if (this.chatInputModePayload.chat_mode === 'pro' && !this.selectedChatInputModel) {
+        this.selectMostCostEffectiveConfiguredModel();
+      }
     }, err => {
       this.llmModels = [];
       this.activeModel = null;
+      this.selectedChatInputModel = null;
     })
   }
 
   toggleDropdown() {
+    if (this.chatInputModePayload.chat_mode === 'auto') {
+      this.showModelDropdown = false;
+      return;
+    }
     this.showModelDropdown = !this.showModelDropdown;
   }
 
   changeActiveModel(model: SupportedLLMConfigData) {
+    if (this.chatInputModePayload.chat_mode === 'auto') {
+      this.showModelDropdown = false;
+      this.persistChatInputModePayload('auto', '');
+      return;
+    }
     if (this.activeModel?.id === model.id) {
       this.showModelDropdown = false;
+      this.selectedChatInputModel = model;
+      this.persistChatInputModePayload('pro', this.getModelUuid(model));
       return;
     }
 
@@ -479,16 +525,24 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
 
   }
 
+  // changeActiveModelToSelected(model: SupportedLLMConfigData) {
+  //   this.showModelDropdown = false;
+  //   this.service.changeActiveModel(this.application, model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+  //     this.activeModel = model;
+  //   }, err => { })
+  //   this.selectedChatInputModel = model;
+  //   this.persistChatInputModePayload('pro', this.getModelUuid(model));
+  //   this.activeModel = model;
+  // }
+
   changeActiveModelToSelected(model: SupportedLLMConfigData) {
     this.showModelDropdown = false;
-    this.service.changeActiveModel(this.application, model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.activeModel = model;
-    }, err => {
-
-    })
+    this.selectedChatInputModel = model;
+    this.persistChatInputModePayload('pro', this.getModelUuid(model));
+    this.activeModel = model;
   }
 
-  goToConfig(model: SupportedLLMConfigData) {
+  goToConfig(model?: SupportedLLMConfigData) {
     // this.togglePopUp();
     this.router.navigate(['/settings/profile/add-model']);
   }
@@ -498,6 +552,110 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       'active-model-item': model.active_for_applications?.includes('assistant'),
       'bg-light text-muted': !model.is_user_owned
     }
+  }
+
+  hasModelTokenMultiplier(model: SupportedLLMConfigData): boolean {
+    return hasTokenMultiplier(model);
+  }
+
+  getModelTokenMultiplier(model: SupportedLLMConfigData): string | null {
+    return getTokenMultiplier(model);
+  }
+
+  getModelTokenMultiplierTooltip(model: SupportedLLMConfigData): string {
+    return getTokenMultiplierTooltip(model);
+  }
+
+  setChatInputMode(mode: ChatInputMode) {
+    if (mode === 'auto') {
+      this.showModelDropdown = false;
+      this.selectedChatInputModel = null;
+      this.persistChatInputModePayload('auto', '');
+      return;
+    }
+    this.showModelDropdown = false;
+    if (this.shouldShowEnableProModeModal()) {
+      this.selectedChatInputModel = null;
+      this.persistChatInputModePayload('auto', '');
+      this.showEnableProModeModal();
+      return;
+    }
+    this.selectMostCostEffectiveConfiguredModel();
+  }
+
+  showEnableProModeModal() {
+    this.enableProModeModalVisible = true;
+  }
+
+  closeEnableProModeModal() {
+    this.enableProModeModalVisible = false;
+    this.showModelDropdown = false;
+    this.selectedChatInputModel = null;
+    this.persistChatInputModePayload('auto', '');
+  }
+
+  configureModelFromProModal() {
+    this.enableProModeModalVisible = false;
+    this.goToConfig();
+  }
+
+  private resetChatInputModePayload() {
+    this.showModelDropdown = false;
+    this.selectedChatInputModel = null;
+    this.persistChatInputModePayload('auto', '');
+  }
+
+  private persistChatInputModePayload(chatMode: ChatInputMode, sessionModelUuid: string) {
+    this.chatInputModePayload = {
+      chat_mode: chatMode,
+      session_model_uuid: chatMode === 'auto' ? '' : sessionModelUuid
+    };
+    localStorage.setItem(this.chatInputModeStorageKey, JSON.stringify(this.chatInputModePayload));
+  }
+
+  private getModelUuid(model: SupportedLLMConfigData): string {
+    return `${model?.uuid || model?.id || ''}`;
+  }
+
+  private selectMostCostEffectiveConfiguredModel() {
+    const selectedModel = this.getMostCostEffectiveConfiguredModel();
+    this.selectedChatInputModel = selectedModel;
+    this.activeModel = selectedModel || this.activeModel;
+    this.persistChatInputModePayload('pro', this.getModelUuid(selectedModel));
+  }
+
+  private canSubmitQuery(): boolean {
+    return this.chatInputModePayload.chat_mode !== 'pro' || !!this.selectedChatInputModel;
+  }
+
+  private getConfiguredModels(): SupportedLLMConfigData[] {
+    return this.llmModels.filter(model => model?.is_user_owned);
+  }
+
+  private shouldShowEnableProModeModal(): boolean {
+    return this.getConfiguredModels().length === 0;
+  }
+
+  private getMostCostEffectiveConfiguredModel(): SupportedLLMConfigData {
+    const configuredModels = this.getConfiguredModels();
+    if (!configuredModels.length) {
+      return null;
+    }
+    if (configuredModels.length === 1) {
+      return configuredModels[0];
+    }
+    return configuredModels.reduce((bestModel, currentModel) => {
+      return this.getMultiplierValue(currentModel) < this.getMultiplierValue(bestModel) ? currentModel : bestModel;
+    });
+  }
+
+  private getMultiplierValue(model: SupportedLLMConfigData): number {
+    const multiplier = getTokenMultiplier(model);
+    if (!multiplier) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const value = Number.parseFloat(`${multiplier}`.replace(/x$/i, ''));
+    return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
   }
 
   stopResponse() {
@@ -535,5 +693,30 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     this.newTerminalService.setConversationId(this.conversationId);
     this.newTerminalService.setBackendTabId(null);
     this.newTerminalService.openTerminal();
+  }
+
+  showTokenUsage: boolean = false;
+  tokenUsageData: TokenUsageViewData;
+  tokenIconChart: UnityChartDetails;
+  tokenPopupChart: UnityChartDetails;
+  tokenUsageLoader: boolean = false;
+
+  getTokenUsage() {
+    this.tokenUsageLoader = true;
+    this.ucService.getTokenUsage(this.userInfoService.userOrgId, this.userInfoService.userDetails.id).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: TokenUsage) => {
+      // this.tokenUsageData = res;
+      this.tokenUsageData = this.ucService.convertToTokenUsageViewData(res);
+      this.tokenUsageLoader = false;
+    }, (err: HttpErrorResponse) => {
+      this.tokenUsageData = null;
+      this.tokenIconChart = null;
+      this.tokenPopupChart = null;
+      this.tokenUsageLoader = false;
+    });
+  }
+
+  toggleTokenUsageDropdown() {
+    this.showTokenUsage = !this.showTokenUsage
+    this.getTokenUsage();
   }
 }

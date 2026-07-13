@@ -190,19 +190,84 @@
 @media(min-width: 992px) {
   .sidebar-lg-show.sidebar-minimized.unity-chatbot-open {
     .notification-content {
-      width: calc(100% - 470px) !important;  // Minimized Sidebar(50px) + Unity Chatbot(420px) = 470px
+      width: calc(100% - calc(50px + var(--unity-chatbot-panel-width))) !important; // Minimized Sidebar(50px) + Unity Chatbot(420px) = 470px
     }
   }
 
   .sidebar-lg-show.sidebar-minimized.unity-chatbot-open.modal-open {
     .notification-content {
-      width: calc(100% - 50px) !important;  // Minimized Sidebar(50px) 
+      width: calc(100% - 50px) !important; // Minimized Sidebar(50px) 
     }
   }
 }
 
 .tooltip.static {
   z-index: 1040 !important;
+}
+
+.token-billing-echarts-tooltip {
+  max-width: min(260px, calc(100vw - 24px));
+  pointer-events: auto;
+  white-space: normal;
+}
+
+.tb-echarts-tooltip-content {
+  max-width: 250px;
+}
+
+.tb-echarts-tooltip-title {
+  color: $gray-600;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  max-width: 230px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tb-echarts-tooltip-row {
+  align-items: center;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.tb-echarts-tooltip-row + .tb-echarts-tooltip-row {
+  margin-top: 3px;
+}
+
+.tb-echarts-tooltip-dot {
+  border-radius: 50%;
+  display: inline-block;
+  height: 7px;
+  width: 7px;
+}
+
+.tb-echarts-tooltip-name {
+  color: $gray-700;
+  font-size: 11px;
+  max-width: 145px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tb-echarts-tooltip-value {
+  color: $gray-800;
+  font-size: 11px;
+  font-weight: 600;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+@media (min-width: 992px) {
+  body.unity-chatbot-open:not(.unity-chatbot-expanded) .token-billing-echarts-tooltip {
+    max-width: min(260px, calc(100vw - var(--unity-chatbot-panel-width, 420px) - 24px));
+  }
 }
 
 .info-multi-line .tooltip-inner {
@@ -249,15 +314,15 @@
 
 .vis-item {
   border-radius: 50% !important;
-  background-color: #008cba;
-  color: #fff;
+  background-color: $cyan;
+  color: $white;
 }
 
 .workflow-poc-body {
   min-height: 85vh;
 
   a {
-    color: #2c18df;
+    color: $indigo;
     text-decoration: none;
   }
 

@@ -1,11 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { BaremetalDetailsComponentsService, CpuProcessorsViewData, FileSystemViewData, InterfaceViewData, MacAddressViewData, ProductViewData, SoftwareServerViewData } from './baremetal-details-components.service';
+import { BaremetalDetailsComponentsService, CpuProcessorsViewData, FileSystemViewData, InterfaceViewData, IpAddressViewData, MacAddressViewData, OSViewData, ProductViewData, SoftwareServerViewData } from './baremetal-details-components.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { Subject } from 'rxjs';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { takeUntil } from 'rxjs/operators';
-import { FormGroup } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
 
@@ -21,10 +20,9 @@ export class BaremetalDetailsComponentsComponent implements OnInit, OnDestroy {
   @Input() deviceId: string;
   private ngUnsubscribe = new Subject();
 
-  ipAddressForm: FormGroup;
-  operationSystemForm: FormGroup;
 
   currentCriteria: SearchCriteria;
+  ipAddressViewData: IpAddressViewData[] = [];
   macAddressCount: number = 0;
   macAddressViewData: MacAddressViewData[] = [];
   cpuProcessorsCount: number = 0;
@@ -35,6 +33,7 @@ export class BaremetalDetailsComponentsComponent implements OnInit, OnDestroy {
   productViewData: ProductViewData[] = [];
   fileSystemCount: number = 0;
   fileSystemViewData: FileSystemViewData[] = [];
+  operationSystemViewData: OSViewData[] = [];
   softwareServerCount: number = 0;
   softwareServerViewData: SoftwareServerViewData[] = [];
 
@@ -81,8 +80,8 @@ export class BaremetalDetailsComponentsComponent implements OnInit, OnDestroy {
       case 'fileSystem':
         this.getFileSystemData();
         break;
-      case 'operationSystem':
-        this.getOperationSystemData();
+      case 'os':
+        this.getOSData();
         break;
       case 'softwareServer':
         this.getSoftwareServerData();
@@ -114,7 +113,7 @@ export class BaremetalDetailsComponentsComponent implements OnInit, OnDestroy {
   getIpAddressData() {
     this.spinner.start('ipaddressSpinner');
     this.svc.getIpAddressData(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.ipAddressForm = this.svc.buildIpAddressForm(res);
+      this.ipAddressViewData = this.svc.convertToIPAddressViewData(res);
       this.spinner.stop('ipaddressSpinner');
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('ipaddressSpinner');
@@ -199,10 +198,10 @@ export class BaremetalDetailsComponentsComponent implements OnInit, OnDestroy {
     })
   }
 
-  getOperationSystemData() {
+  getOSData() {
     this.spinner.start('operationSystemSpinner');
-    this.svc.getOperationSystemData(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.operationSystemForm = this.svc.buildOperationSystemForm(res);
+    this.svc.getOSData(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.operationSystemViewData = this.svc.convertToOSViewData(res);
       this.spinner.stop('operationSystemSpinner');
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('operationSystemSpinner');

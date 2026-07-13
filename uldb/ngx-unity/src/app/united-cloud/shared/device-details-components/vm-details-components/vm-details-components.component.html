@@ -19,7 +19,7 @@
             <ng-container *ngTemplateOutlet="fileDetailsRef"></ng-container>
         </ng-container>
         <ng-container *ngSwitchCase="'os'">
-            <ng-container *ngTemplateOutlet="osFormRef"></ng-container>
+            <ng-container *ngTemplateOutlet="osRef"></ng-container>
         </ng-container>
         <ng-container *ngSwitchCase="'software_server'">
             <ng-container *ngTemplateOutlet="serverDetailsRef"></ng-container>
@@ -88,125 +88,80 @@
 </div> -->
 
 <ng-template #ipAddressFormRef>
-    <div class="row">
-        <div class="col-12">
-            <form *ngIf="ipAddressForm" [formGroup]="ipAddressForm">
-                <div class="card mb-0 border-0 rounded-0">
-                    <app-spinner [name]="'ipaddressSpinner'"></app-spinner>
-                    <div class="card-body">
-                        <div class="row text-right">
-                            <div class="col-6">
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Name</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="name">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Address</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="address">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Protocol Type</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="protocolType">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Category</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="category">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Item</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="item">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row mb-1">
-                                    <label class="col-3 col-form-label">Management Address</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="managementAddress">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Short Description</label>
-                                    <div class="col-9">
-                                        <textarea class="form-control static" rows="4"
-                                            formControlName="shortDescription"></textarea>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <!-- RIGHT COLUMN -->
-                            <div class="col-6">
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">DNS Host Name</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="dnsHostName">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Address Type</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="addressType">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Subnet Mask</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="subnetMask">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Type</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="type">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Name Format</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="nameFormat">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Company</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="company">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row pt-2">
-                                    <label class="col-3 col-form-label">Description</label>
-                                    <div class="col-9">
-                                        <textarea class="form-control static" rows="4"
-                                            formControlName="description"></textarea>
-                                    </div>
-                                </div>
-
-                            </div>
-
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'ipaddressSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left mb-0" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Management Address</th>
+                                    <th>Address Type</th>
+                                    <th>Token ID</th>
+                                    <th>Protocol Type</th>
+                                    <th>Type</th>
+                                    <th>Mark As Deleted</th>
+                                    <th>DNS Host Name</th>
+                                    <th>Item</th>
+                                    <th>Address</th>
+                                    <th>Short Description</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of ipAddressViewData; let i = index">
+                                    <td>
+                                        <div>{{view.name}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.category}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.managementAddress}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.addressType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.tokenId}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.protocolType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.type}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.markAsDeleted}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.dnsHostName}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.item}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.address}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.shortDescription}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.description}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-4" *ngIf="!ipAddressViewData?.length">
+                            No associated IP Address data found.
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </ng-template>
@@ -350,184 +305,6 @@
                 </div>
 
             </div>
-        </div>
-    </div>
-</ng-template>
-
-<ng-template #osFormRef>
-    <div class="row">
-        <div class="col-12">
-            <form *ngIf="operatingSystemForm" [formGroup]="operatingSystemForm">
-                <div class="card">
-                    <app-spinner [name]="'OsSpinner'"></app-spinner>
-                    <div class="card-body">
-                        <div class="row text-right">
-                            <div class="col-6">
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Name</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="name">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">OS Type</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="osType">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Manufacturer</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="manufacturerName">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Model</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="model">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Version</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="versionNumber">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Build Number</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="buildNumber">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Service Pack</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="servicePack">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">End Of Life</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="endOfLife" readonly
-                                            formControlNameDateFormatter>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">End Of Support</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="endOfSupport" readonly
-                                            formControlNameDateFormatter>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Short Description</label>
-                                    <div class="col-9">
-                                        <textarea class="form-control static" rows="3"
-                                            formControlName="shortDescription"></textarea>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Description</label>
-                                    <div class="col-9">
-                                        <textarea class="form-control static" rows="3"
-                                            formControlName="description"></textarea>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <!-- RIGHT COLUMN -->
-                            <div class="col-6">
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Category</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="category">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Type</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="type">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Item</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="item">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Token ID</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="tokenId">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Name Format</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="nameFormat">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Market Version</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="marketVersion">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">License Type</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="licenseType">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">Company</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="company">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">End Of Security Support</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="endOfSecuritySupport"
-                                            readonly formControlNameDateFormatter>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-3 col-form-label">End Of Extended Support</label>
-                                    <div class="col-9">
-                                        <input class="form-control" type="text" formControlName="endOfExtendedSupport"
-                                            readonly formControlNameDateFormatter>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
 </ng-template>
@@ -714,6 +491,90 @@
     </div>
 </ng-template>
 
+<ng-template #osRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'osSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>System Name</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>OS Type</th>
+                                    <th>Item</th>
+                                    <th>Token ID</th>
+                                    <th>Mark As Deleted</th>
+                                    <th>Manufacturer Name</th>
+                                    <th>Model</th>
+                                    <th>Market Version</th>
+                                    <th>License Type</th>
+                                    <th>Short Description</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of osViewData; let i = index">
+                                    <td>
+                                        <div>{{view.name}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.systemName}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.category}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.type}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.osType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.item}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.tokenId}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.markAsDeleted}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.manufacturerName}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.model}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.marketVersion}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.licenseType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.shortDescription}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.description}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" *ngIf="!osViewData?.length">
+                            No associated
+                            Operating System data
+                            found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
 
 <ng-template #serverDetailsRef>
     <div class="card mb-0 border-0 rounded-0">

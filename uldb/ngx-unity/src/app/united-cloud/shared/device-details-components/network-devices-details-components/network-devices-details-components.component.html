@@ -19,13 +19,78 @@
 </ng-container>
 
 <ng-template #ipAddressRef>
-    <div class="row">
-        <div class="col-12">
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-body p-0">
             <div class="card mb-0 border-0 rounded-0">
                 <app-spinner [name]="'ipAddressSpinner'"></app-spinner>
-                <div class="card-body">
-                    <ng-container *ngTemplateOutlet="formRef"></ng-container>
-                    <div class="py-5 text-center" *ngIf="!form"> No Data Available</div>
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Management Address</th>
+                                    <th>Address Type</th>
+                                    <th>Token ID</th>
+                                    <th>Protocol Type</th>
+                                    <th>Type</th>
+                                    <th>Mark As Deleted</th>
+                                    <th>DNS Host Name</th>
+                                    <th>Item</th>
+                                    <th>Address</th>
+                                    <th>Short Description</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of ipAddressViewData; let i = index">
+                                    <td>
+                                        <div>{{view.name}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.category}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.managementAddress}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.addressType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.tokenId}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.protocolType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.type}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.markAsDeleted}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.dnsHostName}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.item}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.address}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.shortDescription}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.description}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" *ngIf="!ipAddressViewData?.length">
+                            No data available.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,13 +98,82 @@
 </ng-template>
 
 <ng-template #osRef>
-    <div class="row">
-        <div class="col-12">
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-body p-0">
             <div class="card mb-0 border-0 rounded-0">
                 <app-spinner [name]="'osSpinner'"></app-spinner>
-                <div class="card-body">
-                    <ng-container *ngTemplateOutlet="formRef"></ng-container>
-                    <div class="py-5 text-center" *ngIf="!form"> No Data Available</div>
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>System Name</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>OS Type</th>
+                                    <th>Item</th>
+                                    <th>Token ID</th>
+                                    <th>Mark As Deleted</th>
+                                    <th>Manufacturer Name</th>
+                                    <th>Model</th>
+                                    <th>Market Version</th>
+                                    <th>License Type</th>
+                                    <th>Short Description</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of osViewData; let i = index">
+                                    <td>
+                                        <div>{{view.name}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.systemName}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.category}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.type}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.osType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.item}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.tokenId}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.markAsDeleted}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.manufacturerName}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.model}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.marketVersion}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.licenseType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.shortDescription}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.description}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" *ngIf="!osViewData?.length">
+                            No data available.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

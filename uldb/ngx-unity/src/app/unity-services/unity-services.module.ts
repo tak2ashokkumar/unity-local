@@ -88,6 +88,7 @@ import { AiObservabilityLlmComponent } from './ai-observability/ai-observability
 import { AiObservabilityGpuComponent } from './ai-observability/ai-observability-gpu/ai-observability-gpu.component';
 import { AiObservabilityVectorDbComponent } from './ai-observability/ai-observability-vector-db/ai-observability-vector-db.component';
 import { OrchestrationWorkflowPocComponent } from './orchestration/orchestration-workflows/orchestration-workflow-poc/orchestration-workflow-poc.component';
+import { TokenBillingModule } from './token-billing/token-billing.module';
 import { OrchestrationExecutionLogsNewWorkflowWidgetComponent } from './orchestration/orchestration-executions/orchestration-execution-logs-new-workflow-widget/orchestration-execution-logs-new-workflow-widget.component';
 import { AiObservabilityLlmServicesComponent } from './ai-observability/ai-observability-llm/ai-observability-llm-services/ai-observability-llm-services.component';
 import { AiObservabilityGpuServicesComponent } from './ai-observability/ai-observability-gpu/ai-observability-gpu-services/ai-observability-gpu-services.component';
@@ -373,6 +374,7 @@ export const MY_NATIVE_FORMATS = {
     SequentialWorkflowDesignerModule,
     UnitedCloudSharedModule,
     EchartsxModule,
+    TokenBillingModule,
     MarkdownModule,
     CollapseModule,
 

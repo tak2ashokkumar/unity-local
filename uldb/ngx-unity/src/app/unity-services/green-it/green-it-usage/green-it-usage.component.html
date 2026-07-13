@@ -7,8 +7,8 @@
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group row px-2">
-                                    <label for="datacenters" class="col-3 col-form-label col-form-label-sm px-0">Datacenters<em>*</em>:&nbsp;</label>
-                                    <div class="col-9">
+                                    <label for="datacenters" class="flex-shrink-0 col-form-label col-form-label-sm px-0">Datacenters<em>*</em>:&nbsp;</label>
+                                    <div class="col">
                                         <multiselect-dropdown [options]="datacenters" [settings]="dcSettings" class="form-control p-0"
                                             (dropdownClosed)="dcChange()" style="height:auto;" formControlName="data_center"></multiselect-dropdown>
                                     </div>
@@ -16,8 +16,8 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group row mb-0 px-2">
-                                    <label for="cabinets" class="col-3 col-form-label col-form-label-sm px-0">Cabinets:&nbsp;</label>
-                                    <div class="col-9">
+                                    <label for="cabinets" class="flex-shrink-0 col-form-label col-form-label-sm px-0">Cabinets:&nbsp;</label>
+                                    <div class="col">
                                         <multiselect-dropdown [options]="cabinets" [settings]="cabinetSettings" class="form-control p-0"
                                             style="height:auto;" formControlName="cabinets" [isDisabled]="!selectedFileterData.data_center.length"></multiselect-dropdown>
                                     </div>
@@ -25,9 +25,9 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group row mb-0 px-2">
-                                    <label for="cabinets" class="col-3 col-form-label col-form-label-sm px-0">Device
+                                    <label for="cabinets" class="flex-shrink-0 col-form-label col-form-label-sm px-0">Device
                                         Types:&nbsp;</label>
-                                    <div class="col-9">
+                                    <div class="col">
                                         <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings"
                                             class="form-control p-0" style="height:auto;" formControlName="device_types"></multiselect-dropdown>
                                     </div>

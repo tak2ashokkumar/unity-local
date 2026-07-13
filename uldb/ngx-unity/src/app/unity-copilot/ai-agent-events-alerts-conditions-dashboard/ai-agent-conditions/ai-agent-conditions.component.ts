@@ -20,7 +20,7 @@ import { AiAgentConfigType, AiAgentType } from '../ai-agent-events-alerts-condit
 import { aiAgentConfigMap } from '../ai-agent-events-alerts-conditions-dashboard.component';
 import { AiAgentConditionDetails } from './ai-agent-conditions.type';
 
-/** This component is used for Network and Compute AI agents. */
+/** This component is used for Network, Compute, and Storage AI agents. */
 @Component({
   selector: 'ai-agent-conditions',
   templateUrl: './ai-agent-conditions.component.html',

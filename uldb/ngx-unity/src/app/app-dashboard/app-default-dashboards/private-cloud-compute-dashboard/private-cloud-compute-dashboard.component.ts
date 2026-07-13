@@ -11,15 +11,18 @@ import { AimlEventDetailsService } from 'src/app/shared/aiml-event-details/aiml-
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
+import { StorageType } from 'src/app/shared/app-storage/storage-type';
+import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
+import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { DEVICE_OPTIONS, DEVICE_TYPE_MAP, PLATFORM_OPTIONS, privateCloudTabItems } from './private-cloud-compute-dashboard.const';
 import { CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DevicesRowViewData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceList, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, SwapBalloonMemoryWidgetData, Top10ClustersByVMsWidgetData, TopCriticalAlertsViewData, VmDensityHost } from './private-cloud-compute-dashboard.service';
 import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
 
-type UtilizationSortKey = 'cpuUtilization' | 'memoryUtilization' | 'storageUtilization' | 'diskOps' | 'uptime';
+type UtilizationSortKey = 'cpuUtilization' | 'memoryUtilization' | 'storageUtilization' | 'networkSpeed' | 'uptime';
 type SortDirection = 'asc' | 'desc';
 
 @Component({
@@ -95,20 +98,26 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   executiveSummaryViewData: ExecutiveSummaryViewData = new ExecutiveSummaryViewData();
   executiveSummaryWidgetData: ExecutiveSummaryWidgetData = new ExecutiveSummaryWidgetData();
+  showExecutiveSummaryWidget = true;
   capacityAndGrowthInsightsWidgetData: CapacityAndGrowthInsightsWidgetData = new CapacityAndGrowthInsightsWidgetData();
+  showCapacityGrowthWidget = true;
 
   top10ClustersByVMsWidgetData: Top10ClustersByVMsWidgetData = new Top10ClustersByVMsWidgetData();
+  showTop10ClustersWidget = true;
   clusterCapacityUtilTrendWidgetData: ClusterCapacityUtilTrendWidgetData = new ClusterCapacityUtilTrendWidgetData();
+  showClusterCapacityTrendWidget = true;
 
   infrastructureHealthWidgetData: InfrastructureHealthWidgetData = new InfrastructureHealthWidgetData();
+  showSensorStatisticsWidget = true;
 
   performanceHotspotWidgetData: PerformanceHotspotWidgetData = new PerformanceHotspotWidgetData();
+  showPerformanceHotspotsWidget = true;
   utilizationRows: PrivateCloudUtilization = new PrivateCloudUtilization()
   utilizationSortOptions: { value: UtilizationSortKey; label: string }[] = [
     { value: 'cpuUtilization', label: 'CPU Utilization' },
     { value: 'memoryUtilization', label: 'Memory Utilization' },
     { value: 'storageUtilization', label: 'Storage Utilization' },
-    { value: 'diskOps', label: 'Disk IOPS' },
+    { value: 'networkSpeed', label: 'Network Speed' },
     { value: 'uptime', label: 'Up Time' }
   ];
   selectedUtilizationSort: UtilizationSortKey = 'cpuUtilization';
@@ -116,15 +125,19 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   idleDevicesRow: IdleDevicesViewData = new IdleDevicesViewData()
   idleDistributionRows: IdleDevicesDistribution = new IdleDevicesDistribution()
+  showIdleDevicesAnalysisWidget = true;
+  showIdleDurationDistributionWidget = true;
 
   diskLatencyWidgetData: DiskLatencyWidgetData = new DiskLatencyWidgetData();
   cpuReadyWidgetData: CpuReadyWidgetData = new CpuReadyWidgetData();
   swapBalloonMemoryWidgetData: SwapBalloonMemoryWidgetData = new SwapBalloonMemoryWidgetData();
+  showPerformanceWorkloadInsightsWidget = true;
 
 
 
   alertSummaryMetrics: RecentAlertSummaryViewData = new RecentAlertSummaryViewData();
   criticalAlerts: TopCriticalAlertsViewData = new TopCriticalAlertsViewData()
+  showRecentAlertsWidget = true;
   alertTrendLegend: any;
   alertTrendPolarOptions: EChartsOption = {};
   alertTrendStackOptions: EChartsOption = {};
@@ -137,6 +150,8 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   orphanedDeviceListViewData: OrphanedDeviceView = new OrphanedDeviceView()
   orphanedDeviceWidgetViewData: OrphanedDeviceWidgetView = new OrphanedDeviceWidgetView()
+  showOrphanedDeviceListWidget = true;
+  showOrphanedByCategoryWidget = true;
 
   orphanedByCategoryColors = chartColors;
   orphanedByCategory: any[] = []
@@ -175,6 +190,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     private route: ActivatedRoute,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
+    private storageService: StorageService,
     private overlay: Overlay,
     private location: Location) {
     this.ticketDatePickerScrollStrategy = this.overlay.scrollStrategies.reposition();
@@ -281,7 +297,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   //---------Executive Summary / Cloud Inventory------
 
   getExecutiveSummaryWidgetData() {
-
+    this.showExecutiveSummaryWidget = true;
 
     this.executiveSummaryWidgetData.cloudTypeChartData = null;
     this.executiveSummaryWidgetData.powerActivityChartData = null;
@@ -295,6 +311,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopExecutiveSummaryWidgetLoaders()))
       .subscribe(res => {
         if (res) {
+          this.showExecutiveSummaryWidget = this.hasExecutiveSummaryWidgetData(res);
           this.executiveSummaryViewData = this.svc.convertExecutiveSummaryViewData(res.executiveSummary);
           this.executiveSummaryWidgetData.cloudTypeChartData = this.svc.convertToCloudTypeChartData(res.cloudTypeDistribution);
           this.executiveSummaryWidgetData.powerActivityChartData = this.svc.convertToPowerActivityChartData(res.powerActivityState);
@@ -308,6 +325,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
         this.executiveSummaryWidgetData.vmCountByOSTypeChartData = null;
         this.executiveSummaryWidgetData.environmentAndCriticalityChartData = null;
         this.executiveSummaryWidgetData.alertSeverityViewData = null;
+        this.showExecutiveSummaryWidget = false;
         this.notification.error(
           new Notification('Failed to get Executive Summary Data data. Try again later')
         );
@@ -332,11 +350,37 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     ].forEach(loaderName => this.spinner.stop(loaderName));
   }
 
+  private hasExecutiveSummaryWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
+  }
+
+  private hasMeaningfulExecutiveSummaryValue(value: unknown): boolean {
+    if (value === null || value === undefined) {
+      return false;
+    }
+
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
+
+    if (Array.isArray(value)) {
+      return value.some(item => this.hasMeaningfulExecutiveSummaryValue(item));
+    }
+
+    if (typeof value === 'object') {
+      return Object.values(value as Record<string, unknown>)
+        .some(item => this.hasMeaningfulExecutiveSummaryValue(item));
+    }
+
+    return false;
+  }
+
   //------------Capacity and Growth Insight ----------------------
 
   densityHostVm: VmDensityHost = new VmDensityHost();
 
   getCapacityGrowthWidgetData() {
+    this.showCapacityGrowthWidget = true;
     this.densityHostVm.desnityHostRows = []
     this.spinner.start(this.densityHostVm.loader);
     this.spinner.start(this.capacityAndGrowthInsightsWidgetData.vmCapacityLoader);
@@ -347,6 +391,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
+          this.showCapacityGrowthWidget = this.hasCapacityGrowthWidgetData(res);
           this.densityHostVm = this.svc.convertToVmDensityHostViewData(res.topHostUtilization);
           this.capacityAndGrowthInsightsWidgetData.vmCapacityChartData = this.svc.convertToVmCapacityChartData(res.capacityTrendAndForecast);
           this.capacityAndGrowthInsightsWidgetData.vmProvisioningViewData = this.svc.convertToVmProvisioningViewData(res.provisioningStatus);
@@ -359,8 +404,14 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
         this.spinner.stop(this.capacityAndGrowthInsightsWidgetData.vmCapacityLoader);
         this.capacityAndGrowthInsightsWidgetData.vmDensityChartData = null;
         this.capacityAndGrowthInsightsWidgetData.vmCapacityChartData = null;
-        this.capacityAndGrowthInsightsWidgetData.vmProvisioningViewData = null; this.notification.error(new Notification('Failed to get Capacity and Growth data. Try again later'));
+        this.capacityAndGrowthInsightsWidgetData.vmProvisioningViewData = null;
+        this.showCapacityGrowthWidget = false;
+        this.notification.error(new Notification('Failed to get Capacity and Growth data. Try again later'));
       });
+  }
+
+  private hasCapacityGrowthWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
   }
 
   getUtilizationClass(utilizationPct: number): string {
@@ -387,28 +438,36 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   //-----Top 10 Clusters By VM Count-----------
 
   getTop10ClustersByVMsWidgetData() {
+    this.showTop10ClustersWidget = true;
     this.spinner.start(this.top10ClustersByVMsWidgetData.loader);
     this.top10ClustersByVMsWidgetData.chartData = null;
     this.svc.getTop10ClustersByVMsWidgetData(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       if (res) {
+        this.showTop10ClustersWidget = this.hasTop10ClustersWidgetData(res);
         this.spinner.stop(this.top10ClustersByVMsWidgetData.loader);
         let chartdata = this.svc.convertToTop10ClustersByVMCountViewData(res)
         this.top10ClustersByVMsWidgetData.chartData = this.svc.convertToTop10ClustersByVMsChartData(chartdata.clusterList);
       }
     }, (_err: HttpErrorResponse) => {
       this.spinner.stop(this.top10ClustersByVMsWidgetData.loader);
-
+      this.showTop10ClustersWidget = false;
       this.notification.error(new Notification('Failed to get top10 Clusters By VMs data. Try again later'));
     });
+  }
+
+  private hasTop10ClustersWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
   }
 
   //-----Cluster Capacity Utilization Trend-----------
 
   getClusterCapacityUtilTrendWidgetData() {
+    this.showClusterCapacityTrendWidget = true;
     this.spinner.start(this.clusterCapacityUtilTrendWidgetData.loader);
     this.clusterCapacityUtilTrendWidgetData.chartData = null;
     this.svc.getClusterCapacityUtilTrendWidgetData(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       if (res) {
+        this.showClusterCapacityTrendWidget = this.hasClusterCapacityTrendWidgetData(res);
         this.spinner.stop(this.clusterCapacityUtilTrendWidgetData.loader);
         let data = this.svc.convertToClusterCapacityUtilTrendViewData(res);
         this.clusterCapacityUtilTrendWidgetData.chartData = this.svc.convertToClusterCapacityUtilTrendChartData(data);
@@ -416,48 +475,68 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     }, (_err: HttpErrorResponse) => {
       this.spinner.stop(this.clusterCapacityUtilTrendWidgetData.loader);
       this.clusterCapacityUtilTrendWidgetData.chartData = null;
+      this.showClusterCapacityTrendWidget = false;
       this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
     });
+  }
+
+  private hasClusterCapacityTrendWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
   }
 
   //-----Infrastructure Health / Hardware Status------
 
   getInfrastructureHealthWidgetData() {
+    this.showSensorStatisticsWidget = true;
     this.spinner.start(this.infrastructureHealthWidgetData.loader);
     // this.infrastructureHealthWidgetData = null;
     this.svc.getInfrastructureHealthWidgetData(this.filterForm.getRawValue())
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
+          this.showSensorStatisticsWidget = this.hasSensorStatisticsWidgetData(res);
           this.infrastructureHealthWidgetData = this.svc.convertInfrastructureHealthViewData(res);
         }
         this.spinner.stop(this.infrastructureHealthWidgetData.loader);
 
       }, (_err: HttpErrorResponse) => {
         this.spinner.stop(this.infrastructureHealthWidgetData.loader);
-
+        this.showSensorStatisticsWidget = false;
         this.notification.error(new Notification('Failed to get Infrastructure and Hardware Health Widget data. Try again later'));
       });
+  }
+
+  private hasSensorStatisticsWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
   }
 
 
 
   getPerformanceHotspotWidgetData() {
+    this.showPerformanceHotspotsWidget = true;
     this.utilizationRows.utilRow = [];
     this.spinner.start(this.loaderNames.performanceHotspot);
     this.svc.getUtilizationRows(this.filterForm.getRawValue(), this.getUtilizationOrdering())
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         this.spinner.stop(this.loaderNames.performanceHotspot);
+        this.showPerformanceHotspotsWidget = this.hasPerformanceHotspotsWidgetData(res);
         this.utilizationRows = this.svc.convertToUtilizationViewData(res);
       }, () => {
         this.utilizationRows.utilRow = [];
+        this.showPerformanceHotspotsWidget = false;
         this.spinner.stop(this.loaderNames.performanceHotspot);
         this.notification.error(new Notification('Failed to get Performance Hotspot data. Try again later'));
       });
   }
 
+  private hasPerformanceHotspotsWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
+  }
+
   getIdleDevicesData() {
+    this.showIdleDevicesAnalysisWidget = true;
+    this.showIdleDurationDistributionWidget = true;
     this.idleDevicesRow.devicesRow = []
     this.idleDistributionRows.distributionRow = []
     this.idleDistributionRows.chartData = null;
@@ -467,6 +546,8 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     this.svc.getIdleDevicesData(this.filterForm.getRawValue(), this.idleDevicesPageNo, this.idleDevicesPageSize).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.spinner.stop(this.idleDevicesRow.loader);
       this.spinner.stop(this.idleDistributionRows.loader);
+      this.showIdleDevicesAnalysisWidget = this.hasIdleDevicesAnalysisWidgetData(res);
+      this.showIdleDurationDistributionWidget = this.hasIdleDurationDistributionWidgetData(res?.idleDurationDistribution);
 
       this.idleDevicesRow = this.svc.convertToDeviceIdleViewData(res)
       this.idleDevicesTotal = res.count
@@ -477,10 +558,20 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
       this.idleDistributionRows.chartData = null;
       this.idleDevicesRow.devicesRow = []
       this.idleDistributionRows.distributionRow = []
+      this.showIdleDevicesAnalysisWidget = false;
+      this.showIdleDurationDistributionWidget = false;
       this.spinner.stop(this.idleDistributionRows.loader);
       this.spinner.stop(this.idleDevicesRow.loader);
       this.notification.error(new Notification('Failed to get Idle Devices data. Try again later'));
     });
+  }
+
+  private hasIdleDevicesAnalysisWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
+  }
+
+  private hasIdleDurationDistributionWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
   }
 
   getDistributionClass(index: number): string {
@@ -499,6 +590,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   }
 
   getPerformanceWorkloadWidgetData() {
+    this.showPerformanceWorkloadInsightsWidget = true;
     this.spinner.start(this.diskLatencyWidgetData.loader);
     this.spinner.start(this.cpuReadyWidgetData.loader);
     this.spinner.start(this.swapBalloonMemoryWidgetData.loader);
@@ -509,6 +601,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
+          this.showPerformanceWorkloadInsightsWidget = this.hasPerformanceWorkloadInsightsWidgetData(res);
           this.diskLatencyWidgetData.chartData = this.svc.convertTodiskLatencyChartData(res.diskLatencyTop10);
           this.cpuReadyWidgetData.chartData = this.svc.convertToCpuReadyChartData(res.cpuReadyWaitTop10);
           this.swapBalloonMemoryWidgetData.chartData = this.svc.convertToSwapBalloonMemoryChartData(res.swapBalloonMemoryTop10);
@@ -523,8 +616,13 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
         this.diskLatencyWidgetData.chartData = null;
         this.cpuReadyWidgetData.chartData = null;
         this.swapBalloonMemoryWidgetData.chartData = null;
+        this.showPerformanceWorkloadInsightsWidget = false;
         this.notification.error(new Notification('Failed to get Disk Latency data. Try again later'));
       });
+  }
+
+  private hasPerformanceWorkloadInsightsWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
   }
 
   //Alert and Events
@@ -535,19 +633,26 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   }
 
   getRecentAlerts(filterFormOutput: any) {
+    this.showRecentAlertsWidget = true;
     this.criticalAlerts.alertList = null;
     this.spinner.start(this.alertSummaryMetrics.loader)
     this.spinner.start(this.criticalAlerts.loader)
     this.svc.getRecentAlerts(filterFormOutput).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.showRecentAlertsWidget = this.hasRecentAlertsWidgetData(res);
       this.alertSummaryMetrics = this.svc.convertToAlertSummaryView(res);
       this.criticalAlerts = this.svc.convertToTopCriticalAlertsViewData(res.recentAlerts);
       this.spinner.stop(this.alertSummaryMetrics.loader)
       this.spinner.stop(this.criticalAlerts.loader)
     }, () => {
       this.criticalAlerts.alertList = null;
+      this.showRecentAlertsWidget = false;
       this.spinner.stop(this.alertSummaryMetrics.loader)
       this.spinner.stop(this.criticalAlerts.loader)
     });
+  }
+
+  private hasRecentAlertsWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
   }
 
   viewAlertDetails(index: number) {
@@ -556,17 +661,23 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
 
   getOrphanedDeviceData() {
+    this.showOrphanedDeviceListWidget = true;
+    this.showOrphanedByCategoryWidget = true;
     this.spinner.start(this.orphanedDeviceListViewData.loader);
     this.spinner.start(this.orphanedDeviceWidgetViewData.loader);
     this.orphanedDeviceListViewData.orphanList = null;
+    this.orphanedDeviceWidgetViewData.chartData = null;
+    this.orphanedByCategory = [];
     this.svc.getOrphanedDeviceData(this.filterForm.getRawValue(), this.orphanedDevicesPageNo, this.orphanedDevicesPageSize)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
+          this.showOrphanedDeviceListWidget = this.hasOrphanedDeviceListWidgetData(res);
+          this.showOrphanedByCategoryWidget = this.hasOrphanedByCategoryWidgetData(res?.orphanedByCategory);
           this.orphanedDeviceListViewData = this.svc.convertToOrphanedDeviceListView(res);
-          this.orphanedByCategory = res.orphanedByCategory
+          this.orphanedByCategory = (res.orphanedByCategory || []).filter(item => Number(item?.count) > 0);
           this.orphanedDevicesTotal = res.count
-          this.orphanedDeviceWidgetViewData.chartData = this.svc.convertToOrphanedByCategoryChartData(res.orphanedByCategory)
+          this.orphanedDeviceWidgetViewData.chartData = this.svc.convertToOrphanedByCategoryChartData(this.orphanedByCategory)
         }
         this.spinner.stop(this.orphanedDeviceListViewData.loader);
         this.spinner.stop(this.orphanedDeviceWidgetViewData.loader);
@@ -576,8 +687,20 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
         this.spinner.stop(this.orphanedDeviceWidgetViewData.loader);
 
         this.orphanedDeviceListViewData.orphanList = null;
+        this.orphanedDeviceWidgetViewData.chartData = null;
+        this.orphanedByCategory = [];
+        this.showOrphanedDeviceListWidget = false;
+        this.showOrphanedByCategoryWidget = false;
         this.notification.error(new Notification('Failed to get Orphaned Device data. Try again later'));
       });
+  }
+
+  private hasOrphanedDeviceListWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
+  }
+
+  private hasOrphanedByCategoryWidgetData(data: unknown): boolean {
+    return this.hasMeaningfulExecutiveSummaryValue(data);
   }
 
 
@@ -597,62 +720,143 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   }
 
   openOrphanedDeviceDetails(device: OrphanedDeviceList) {
-    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid, device?.vmSubType);
+    this.openDeviceDetailsInNewTab({
+      deviceType: device?.device,
+      uuid: device?.uuid,
+      vmSubType: device?.vmSubType,
+      name: device?.name,
+      monitoring: device?.monitoring,
+      os: device?.os
+    });
   }
 
   openIdleDeviceDetails(device: DevicesRowViewData) {
-    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid, device?.vmSubType);
+    this.openDeviceDetailsInNewTab({
+      deviceType: device?.deviceType,
+      uuid: device?.uuid,
+      vmSubType: device?.vmSubType,
+      name: device?.deviceName
+    });
   }
 
-  openUtilizationDeviceDetails(device: { deviceType: string; uuid: string; vmSubType?: string }) {
-    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid, device?.vmSubType);
+  openUtilizationDeviceDetails(device: { deviceType: string; uuid: string; vmSubType?: string; name?: string }) {
+    this.openDeviceDetailsInNewTab({
+      deviceType: device?.deviceType,
+      uuid: device?.uuid,
+      vmSubType: device?.vmSubType,
+      name: device?.name
+    });
   }
 
   private getMappedOrphanedDeviceType(deviceType: string): string | undefined {
-    const trimmedDeviceType = (deviceType || '').trim();
+    const trimmedDeviceType = this.normalizeDeviceType(deviceType);
     return Object.entries(this.deviceTypeMap).find(([key]) => key.trim() === trimmedDeviceType)?.[1];
   }
 
   private getVmSubTypeRoute(vmSubType?: string): string | undefined {
-    const trimmedVmSubType = (vmSubType || '').trim();
-    const directMatch = this.privateCloudVmRouteOptions.find(option => option.name.trim() === trimmedVmSubType)?.url;
+    const trimmedVmSubType = (vmSubType || '').trim().toLowerCase();
+    const directMatch = this.privateCloudVmRouteOptions.find(option => option.name.trim().toLowerCase() === trimmedVmSubType)?.url;
 
     if (directMatch) {
       return directMatch;
     }
 
     switch (trimmedVmSubType) {
-      case 'vCloud Director':
+      case 'vcloud director':
         return 'vcloud';
-      case 'Hyperv':
+      case 'hyperv':
         return 'hyperv';
-      case 'G3KVM':
+      case 'g3kvm':
         return 'g3kvm';
       default:
         return undefined;
     }
   }
 
-  private openDeviceDetailsInNewTab(deviceType: string, uuid: string, vmSubType?: string) {
-    const devicePath = this.getMappedOrphanedDeviceType(deviceType);
+  private normalizeDeviceType(deviceType?: string): string {
+    const trimmedDeviceType = (deviceType || '').trim();
 
-    if (!devicePath || !uuid) {
+    if (trimmedDeviceType === 'Virtual Machines') {
+      return 'Virtual Machine';
+    }
+
+    return trimmedDeviceType;
+  }
+
+  private isVmwareVirtualMachine(deviceType?: string, vmSubType?: string): boolean {
+    return this.normalizeDeviceType(deviceType) === 'Virtual Machine' && (vmSubType || '').trim().toLowerCase() === 'vmware';
+  }
+
+  private isCustomVirtualMachine(deviceType?: string, vmSubType?: string): boolean {
+    return this.normalizeDeviceType(deviceType) === 'Virtual Machine' && (vmSubType || '').trim().toLowerCase() === 'custom';
+  }
+
+  private getVmPlatformType(device: {
+    vmSubType?: string;
+    os?: string | { platform_type?: string };
+  }): string | undefined {
+    return device?.vmSubType || (typeof device?.os === 'string' ? undefined : device?.os?.platform_type);
+  }
+
+  private setVmwareDeviceContext(device: {
+    name?: string;
+    monitoring?: { configured?: boolean };
+    os?: string | { platform_type?: string };
+    vmSubType?: string;
+  }) {
+    this.storageService.put('device', {
+      name: device?.name,
+      deviceType: DeviceMapping.VMWARE_VIRTUAL_MACHINE,
+      configured: device?.monitoring?.configured,
+      ssr_os: this.getVmPlatformType(device)
+    }, StorageType.SESSIONSTORAGE);
+  }
+
+  private setCustomVmDeviceContext(device: {
+    name?: string;
+    monitoring?: { configured?: boolean };
+    os?: string | { platform_type?: string };
+    vmSubType?: string;
+  }) {
+    this.storageService.put('device', {
+      name: device?.name,
+      deviceType: DeviceMapping.CUSTOM_VIRTUAL_MACHINE,
+      configured: device?.monitoring?.configured,
+      os: device?.os,
+      ssr_os: this.getVmPlatformType(device)
+    }, StorageType.SESSIONSTORAGE);
+  }
+
+  private openDeviceDetailsInNewTab(device: {
+    deviceType?: string;
+    uuid?: string;
+    vmSubType?: string;
+    name?: string;
+    monitoring?: { configured?: boolean };
+    os?: string | { platform_type?: string };
+  }) {
+    const normalizedDeviceType = this.normalizeDeviceType(device?.deviceType);
+    const devicePath = this.getMappedOrphanedDeviceType(normalizedDeviceType);
+
+    if (!devicePath || !device?.uuid) {
       return;
     }
 
-    const vmSubTypeRoute = deviceType === 'Virtual Machine'
-      ? this.getVmSubTypeRoute(vmSubType)
+    const vmSubTypeRoute = normalizedDeviceType === 'Virtual Machine'
+      ? this.getVmSubTypeRoute(device?.vmSubType)
       : undefined;
 
-    const detailsPath = vmSubTypeRoute
-      ? `/unitycloud/devices/${devicePath}/${vmSubTypeRoute}/${uuid}/zbx/details`
-      : `/unitycloud/devices/${devicePath}/${uuid}/zbx/details`;
+    if (this.isVmwareVirtualMachine(normalizedDeviceType, device?.vmSubType)) {
+      this.setVmwareDeviceContext(device);
+    } else if (this.isCustomVirtualMachine(normalizedDeviceType, device?.vmSubType)) {
+      this.setCustomVmDeviceContext(device);
+    }
 
-    const routeUrl = this.router.serializeUrl(
-      this.router.parseUrl(detailsPath)
-    );
-    const externalUrl = this.location.prepareExternalUrl(routeUrl);
-    window.open(externalUrl, '_blank', 'noopener');
+    const detailsPath = vmSubTypeRoute
+      ? `/unitycloud/devices/${devicePath}/${vmSubTypeRoute}/${device.uuid}/zbx/details`
+      : `/unitycloud/devices/${devicePath}/${device.uuid}/zbx/details`;
+
+    this.router.navigateByUrl(detailsPath);
   }
   idleDevicesPageChange(pageNo: number) {
     if (this.idleDevicesPageNo === pageNo) {

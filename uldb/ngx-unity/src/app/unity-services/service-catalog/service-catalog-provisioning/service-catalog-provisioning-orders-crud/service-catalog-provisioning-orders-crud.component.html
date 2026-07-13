@@ -239,7 +239,7 @@
             </div>
 
             <!-- Image Dropdown -->
-            <div class="form-group row" *ngIf="viewData.isPrivateCloud">
+            <div class="form-group row" *ngIf="viewData.isPrivateCloud && (viewData.cloudType !== 'Nutanix')">
               <label for="host" class="col-2 ml-5 col-form-label text-right">Image<em>*</em> :</label>
               <div class="col-4 p-0">
                 <div class="dropdown">
@@ -277,7 +277,7 @@
             </div>
 
             <!-- Resource Model Dropdown -->
-            <div class="form-group row" *ngIf="viewData.isPrivateCloud">
+            <div class="form-group row" *ngIf="viewData.isPrivateCloud && (viewData.cloudType !== 'Nutanix')">
               <label for="host" class="col-2 ml-5 col-form-label text-right">Resource Model<em>*</em> :</label>
               <div class="col-4 p-0">
                 <div class="dropdown">

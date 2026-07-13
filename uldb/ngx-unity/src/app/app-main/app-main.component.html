@@ -89,7 +89,7 @@
 </app-header>
 <div class="app-body">
     <app-sidebar [fixed]="true" [display]="'lg'" [navItems]="navItems" [disabled]="sidebarMinimized"
-        *ngIf="navItems.length" [style.z-index]="3002">
+        *ngIf="navItems.length" [style.z-index]="isChatbotExpanded() ? 3002 : null">
         <li sidebar-extra-nav class="nav-item">
             <a class="nav-link" href="javascript:void(0);" (click)="reportAnIssue()">
                 <i class="nav-icon fa fa-envelope"></i>

@@ -164,6 +164,9 @@ export class UnitySetupLdapCrudComponent implements OnInit, OnDestroy {
   onSubmit(runNowFlag: boolean) {
     this.spinner.start('main');
     let obj = Object.assign({}, this.credentialForm.getRawValue(), this.scheduleSvc.getFormValue(runNowFlag));
+    if (obj.collector === '') {
+      obj.collector = null;
+    }
     if (this.ldapConfigId) {
       this.crudSvc.editLDAPConfig(this.ldapConfigId, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
         this.goBack();

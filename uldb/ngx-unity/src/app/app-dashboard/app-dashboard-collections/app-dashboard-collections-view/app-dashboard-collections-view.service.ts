@@ -167,10 +167,15 @@ export class AppDashboardCollectionsViewService {
         return 'application';
       case 'private cloud compute dashboard':
         return 'private-cloud-compute';
+      case 'discovery and cmdb':
+        return 'discovery';
       case 'public cloud compute dashboard':
         return 'public-cloud-compute';
       case 'database dashboard':
         return 'database';
+      case 'event analytics':
+      case 'event analytics dashboard':
+        return 'event-analytics';
       case 'navigator central':
       case 'unified aiops command center':
       case 'unified aiops command center dashboard':
@@ -205,6 +210,7 @@ export class AppDashboardCollectionsViewService {
         return 'private-cloud-compute-main-section-fullpage.png';
       case 'public-cloud-compute':
         return 'public-cloud-compute-main-section-fullpage.png';
+      case 'navigator-central':
       case 'unified-aiops-command-centre':
         return 'unified-aiops-command-centre-main-section-fullpage.png';
     }

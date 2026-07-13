@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
-import { DynamicFormField } from '../device-details-components.service';
-import { NetworkDevicesDetailsHardwareData, NetworkDevicesDetailsInterfaceData, NetworkDevicesDetailsIPAddress, NetworkDevicesDetailsMacData } from './network-devices-details-components.type';
+import { NetworkDevicesDetailsHardwareData, NetworkDevicesDetailsInterfaceData, NetworkDevicesDetailsIPAddress, NetworkDevicesDetailsMacData, NetworkDevicesDetailsOSData } from './network-devices-details-components.type';
 
 @Injectable()
 export class NetworkDevicesDetailsComponentsService {
@@ -16,9 +15,32 @@ export class NetworkDevicesDetailsComponentsService {
     private tableSvc: TableApiServiceService,
     private utilSvc: AppUtilityService) { }
 
-  getIpAddressData(deviceType: DeviceMapping, deviceId: string): Observable<NetworkDevicesDetailsIPAddress> {
+  getIpAddressData(deviceType: DeviceMapping, deviceId: string): Observable<NetworkDevicesDetailsIPAddress[]> {
     const deviceApiType = this.utilSvc.getDeviceAPIPluralMappingByDeviceMapping(deviceType);
-    return this.http.get<NetworkDevicesDetailsIPAddress>(`/customer/${deviceApiType}/${deviceId}/network/ip-address/`);
+    return this.http.get<NetworkDevicesDetailsIPAddress[]>(`/customer/${deviceApiType}/${deviceId}/network/ip-address/`);
+  }
+
+  convertToIPAddressViewData(data: NetworkDevicesDetailsIPAddress[]): NetworkDeviceIPAddressViewData[] {
+    if (!data || !data.length) return [];
+    let viewData: NetworkDeviceIPAddressViewData[] = [];
+    data.forEach(d => {
+      let a = new NetworkDeviceIPAddressViewData();
+      a.name = d.Name;
+      a.category = d.Category;
+      a.managementAddress = d.ManagementAddress;
+      a.addressType = d.AddressType;
+      a.tokenId = d.TokenId;
+      a.protocolType = d.ProtocolType;
+      a.type = d.Type;
+      a.markAsDeleted = d.MarkAsDeleted;
+      a.dnsHostName = d.DNSHostName;
+      a.item = d.Item;
+      a.address = d.Address;
+      a.shortDescription = d.ShortDescription;
+      a.description = d.Description;
+      viewData.push(a);
+    })
+    return viewData;
   }
 
   getMacAddressData(deviceType: DeviceMapping, deviceId: string, criteria: SearchCriteria): Observable<PaginatedResult<NetworkDevicesDetailsMacData>> {
@@ -82,6 +104,30 @@ export class NetworkDevicesDetailsComponentsService {
     return this.http.get<any>(`/customer/${deviceApiType}/${deviceId}/network/os-data/`);
   }
 
+  convertToOSViewData(data: NetworkDevicesDetailsOSData[]): NetworkDeviceOSViewData[] {
+    if (!data || !data.length) return [];
+    let viewData: NetworkDeviceOSViewData[] = [];
+    data.forEach(d => {
+      let a = new NetworkDeviceOSViewData();
+      a.name = d.Name;
+      a.systemName = d.SystemName;
+      a.category = d.Category;
+      a.osType = d.OSType;
+      a.type = d.Type;
+      a.item = d.Item;
+      a.tokenId = d.TokenId;
+      a.markAsDeleted = d.MarkAsDeleted;
+      a.manufacturerName = d.ManufacturerName;
+      a.model = d.Model;
+      a.marketVersion = d.MarketVersion;
+      a.licenseType = d.LicenseType;
+      a.description = d.Description;
+      a.shortDescription = d.ShortDescription;
+      viewData.push(a);
+    })
+    return viewData;
+  }
+
   getHardwareComponentsData(deviceType: DeviceMapping, deviceId: string, criteria: SearchCriteria): Observable<PaginatedResult<NetworkDevicesDetailsHardwareData>> {
     const deviceApiType = this.utilSvc.getDeviceAPIPluralMappingByDeviceMapping(deviceType);
     let params = this.tableSvc.getWithParam(criteria);
@@ -114,43 +160,23 @@ export class NetworkDevicesDetailsComponentsService {
     return viewData;
   }
 
-  buildForm(fields: DynamicFormField[], data: any): FormGroup {
-    if (!fields || !fields.length) {
-      return null;
-    }
-    const group: any = {};
-    fields.forEach(field => {
-      group[field.key] = [
-        data[field.key] ?? '',
-        field.required ? Validators.required : []
-      ];
-    });
-    return this.builder.group(group);
-  }
+}
 
-  generateSchemaFromJson(data: any): DynamicFormField[] {
-    if (!data) {
-      return [];
-    }
-    return Object.keys(data).map(key => {
-      const value = data[key];
-      let type: DynamicFormField['type'] = 'text';
-      if (typeof value === 'number') type = 'number';
-      if (typeof value === 'boolean') type = 'checkbox';
-      if (key.toLowerCase().includes('date')) type = 'date';
-      if (key.toLowerCase().includes('description')) type = 'textarea';
-      return {
-        key,
-        label: this.toLabel(key),
-        type,
-        readonly: true
-      };
-    });
-  }
-
-  toLabel(key: string): string {
-    return key.replace(/([A-Z])/g, ' $1').trim();
-  }
+export class NetworkDeviceIPAddressViewData {
+  constructor() { }
+  name: string;
+  category: string;
+  managementAddress: string;
+  addressType: string;
+  tokenId: string;
+  protocolType: string;
+  type: string;
+  markAsDeleted: string;
+  dnsHostName: string;
+  item: string;
+  address: string;
+  shortDescription: string;
+  description: string;
 }
 
 export class NetworkDeviceMacAddressViewData {
@@ -185,6 +211,24 @@ export class NetworkDeviceInterfacesViewData {
   permanentAddress: string;
   portType: string;
   company: string;
+}
+
+export class NetworkDeviceOSViewData {
+  constructor() { }
+  name: string;
+  systemName: string;
+  category: string;
+  osType: string;
+  type: string;
+  item: string;
+  tokenId: string;
+  markAsDeleted: string;
+  manufacturerName: string;
+  model: string;
+  marketVersion: string;
+  licenseType: string;
+  description: string;
+  shortDescription: string;
 }
 
 export class NetworkDeviceHWComponentsViewData {

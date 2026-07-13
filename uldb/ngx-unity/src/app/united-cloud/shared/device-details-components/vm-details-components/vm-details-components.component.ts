@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FileViewData, InterfaceViewData, MacViewData, ProcessorViewData, ProductViewData, ServerViewData, VmDetailsComponentsService } from './vm-details-components.service';
+import { FileViewData, InterfaceViewData, IpAddressViewData, MacViewData, OSViewData, ProcessorViewData, ProductViewData, ServerViewData, VmDetailsComponentsService } from './vm-details-components.service';
 import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { Subject } from 'rxjs';
 import { FormGroup } from '@angular/forms';
@@ -24,8 +24,8 @@ export class VmDetailsComponentsComponent implements OnInit, OnDestroy {
   @Input() deviceId: string;
   private ngUnsubscribe = new Subject();
 
-  ipAddressForm: FormGroup;
-  operatingSystemForm: FormGroup;
+  ipAddressViewData: IpAddressViewData[] = [];
+  osViewData: OSViewData[] = [];
   interfaceViewData: InterfaceViewData[] = [];
   macViewData: MacViewData[] = [];
   processorViewData: ProcessorViewData[] = [];
@@ -161,7 +161,7 @@ export class VmDetailsComponentsComponent implements OnInit, OnDestroy {
   getIpAddresses() {
     this.spinner.start('ipaddressSpinner');
     this.svc.getIpAddresses(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.ipAddressForm = this.svc.buildIPAddressForm(res);
+      this.ipAddressViewData = this.svc.convertToIPAddressViewData(res);
       this.spinner.stop('ipaddressSpinner');
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('ipaddressSpinner');
@@ -171,7 +171,7 @@ export class VmDetailsComponentsComponent implements OnInit, OnDestroy {
   getOsDetails() {
     this.spinner.start('OsSpinner');
     this.svc.getOsDetails(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.operatingSystemForm = this.svc.buildOSForm(res);
+      this.osViewData = this.svc.convertToOSViewData(res);
       this.spinner.stop('OsSpinner');
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('OsSpinner');

@@ -6,6 +6,8 @@ import {
   DatabaseDashboardCriticalAlertViewData,
   DatabaseDashboardDonutItem,
   DatabaseDashboardFilterOption,
+  DatabaseDashboardMetricInfoMap,
+  DatabaseDashboardStatusInfo,
   DbDashboardHealthGroup,
   DatabaseDashboardMetric,
   DatabaseDashboardStorageRow,
@@ -18,6 +20,153 @@ export const PROGRESSBARCOLORS = ['#e54b4b', '#f5a623', '#2f80d1', '#5c8f1f'];
 export const DBDASHBOARDCOLORS = ['#f5a623','#2F8BD7','#5B9E29','#D03533','#26A69A','#9B59B6','#B7D99A','#FFD099','#9BC9F0','#F5A3A3']
 
 export const DATABASE_DASHBOARD_ALL_SELECTED_VALUE = 'all';
+
+export const DATABASE_DASHBOARD_EFFICIENCY_STATUS_INFO: DatabaseDashboardStatusInfo[] = [
+  {
+    name: 'Healthy',
+    icon: 'fa-check-circle',
+    colorClass: 'text-success',
+    descriptions: ['All metrics healthy']
+  },
+  {
+    name: 'Warning',
+    icon: 'fa-exclamation-circle',
+    colorClass: 'text-warning',
+    descriptions: ['At least one metric in warning state', 'No critical metrics']
+  },
+  {
+    name: 'Critical',
+    icon: 'fa-exclamation-triangle',
+    colorClass: 'text-danger',
+    descriptions: ['Any critical metric exists']
+  },
+  {
+    name: 'Unknown',
+    icon: 'fa-question-circle',
+    colorClass: 'text-muted',
+    descriptions: ['Missing data']
+  }
+];
+
+export const DATABASE_DASHBOARD_METRIC_INFO_CONFIG: DatabaseDashboardMetricInfoMap = {
+  'Buffer Cache Efficiency': {
+    title: 'Buffer Cache Efficiency',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '> 95%' },
+      { name: 'Warning', color: '#F39C12', range: '90% - 95%' },
+      { name: 'Critical', color: '#DC3545', range: '< 90%' }
+    ]
+  },
+  'Database Object Utilization': {
+    title: 'Database Object Utilization',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '< 70%' },
+      { name: 'Warning', color: '#F39C12', range: '70% - 85%' },
+      { name: 'Critical', color: '#DC3545', range: '> 85%' }
+    ]
+  },
+  'Open Tables': {
+    title: 'Open Tables',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '< 70%' },
+      { name: 'Warning', color: '#F39C12', range: '70% - 85%' },
+      { name: 'Critical', color: '#DC3545', range: '> 85%' }
+    ]
+  },
+  'Temporary Table Performance': {
+    title: 'Temporary Table Performance',
+    sections: [
+      {
+        title: 'In-Memory / sec',
+        status: [
+          { name: 'Healthy', color: '#28A745', range: '> 0.80 sec' },
+          { name: 'Warning', color: '#F39C12', range: '0.60 - 0.80 sec' },
+          { name: 'Critical', color: '#DC3545', range: '< 0.60 sec' }
+        ]
+      },
+      {
+        title: 'On Disk / sec',
+        status: [
+          { name: 'Healthy', color: '#28A745', range: '< 0.10 sec' },
+          { name: 'Warning', color: '#F39C12', range: '0.10 - 0.15 sec' },
+          { name: 'Critical', color: '#DC3545', range: '> 0.15 sec' }
+        ]
+      }
+    ]
+  },
+  'Top 10 - Query Response Time (Ms)': {
+    title: 'Top 10 Query Response Time',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '< 500 ms' },
+      { name: 'Warning', color: '#F39C12', range: '500 ms - 2000 ms' },
+      { name: 'Critical', color: '#DC3545', range: '> 2000 ms' }
+    ]
+  },
+  'Top 10 Query Latency (Avg / P95)': {
+    title: 'Top 10 Query Latency',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '< 500 ms' },
+      { name: 'Warning', color: '#F39C12', range: '500 ms - 1500 ms' },
+      { name: 'Critical', color: '#DC3545', range: '> 1500 ms' }
+    ]
+  },
+  'Top 10 DBs - Active Sessions / Connections': {
+    title: 'Top 10 DBs - Active Sessions / Connections',
+    status: [
+      { name: 'Normal', color: '#28A745', range: '< 100 sessions' },
+      { name: 'Warning', color: '#F39C12', range: '100 - 200 sessions' },
+      { name: 'Critical', color: '#DC3545', range: '> 200 sessions' }
+    ]
+  },
+  'Aborted Connections per Second': {
+    title: 'Aborted Connections per Second',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '< 0.1/sec' },
+      { name: 'Warning', color: '#F39C12', range: '0.1 - 0.5/sec' },
+      { name: 'Critical', color: '#DC3545', range: '> 0.5/sec' }
+    ]
+  },
+  'Transactions Processed Per Second': {
+    title: 'Transactions Processed Per Second',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: 'TPS < 1' },
+      { name: 'Warning', color: '#F39C12', range: 'TPS 1 - 10' },
+      { name: 'Critical', color: '#DC3545', range: 'TPS > 10' }
+    ]
+  },
+  'Buffer / Cache Hit Ratio': {
+    title: 'Buffer Cache Hit Ratio',
+    status: [
+      { name: 'Healthy Cache', color: '#28A745', range: '> 95%' },
+      { name: 'Moderate Cache', color: '#F39C12', range: '90% - 95%' },
+      { name: 'Low Cache', color: '#DC3545', range: '< 90%' }
+    ]
+  },
+  'Buffer Pool Efficiency': {
+    title: 'Buffer Pool Efficiency',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '> 95%' },
+      { name: 'Warning', color: '#F39C12', range: '90% - 95%' },
+      { name: 'Critical', color: '#DC3545', range: '< 90%' }
+    ]
+  },
+  'Temporary Table Created In Memory/sec': {
+    title: 'In-Memory Temp Tables',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '> 0.80' },
+      { name: 'Warning', color: '#F39C12', range: '0.60 - 0.80' },
+      { name: 'Critical', color: '#DC3545', range: '< 0.60' }
+    ]
+  },
+  'Temporary Table Created In Disk/sec': {
+    title: 'Disk Temp Tables',
+    status: [
+      { name: 'Healthy', color: '#28A745', range: '< 0.10' },
+      { name: 'Warning', color: '#F39C12', range: '0.10 - 0.15' },
+      { name: 'Critical', color: '#DC3545', range: '> 0.15' }
+    ]
+  }
+};
 
 // export const DATABASE_DASHBOARD_DATABASE_OPTIONS: DatabaseDashboardFilterOption[] = [
 //   { value: DATABASE_DASHBOARD_ALL_SELECTED_VALUE, label: 'All Selected' },
@@ -377,21 +526,51 @@ export const DATABASE_DASHBOARD_CRITICAL_ALERTS: DatabaseDashboardCriticalAlertV
 
 // Single api const for testing
 export const INVENTORY_RESP = {
-  "total_databases": 42,
+  "total_databases": 4,
   "status": {
-    "active": 38,
-    "inactive": 4
+    "active": 4,
+    "inactive": 0
   },
   "by_cloud_type": [
-    { "cloud_type": "RDBMS", "count": 20, "percentage": 64.26 },
-    { "cloud_type": "NoSql", "count": 8, "percentage": 25.26 },
-    { "cloud_type": "Cloud DB", "count": 8, "percentage": 25.40 },
+    {
+      "count": 4,
+      "percentage": 100,
+      "cloud_type": "RDBMS"
+    }
   ],
   "by_type": [
-    { "db_type": "MySQL", "active": 20, "inactive": 10, "percentage": 42.86 },
-    { "db_type": "PostgreSQL", "active": 0, "inactive": 19, "percentage": 28.57 },
-    { "db_type": "MSSQL", "active": 11, "inactive": 5, "percentage": 19.05 },
-    { "db_type": "Oracle", "active": 4, "inactive": 4, "percentage": 10.52 }
+    {
+      "count": 1,
+      "db_type": "MSSQL Server",
+      "inactive": 0,
+      "active": 1,
+      "percentage": 25,
+      "server_types": []
+    },
+    {
+      "count": 1,
+      "db_type": "MySQL",
+      "inactive": 0,
+      "active": 1,
+      "percentage": 25,
+      "server_types": []
+    },
+    {
+      "count": 1,
+      "db_type": "Oracle",
+      "inactive": 0,
+      "active": 1,
+      "percentage": 25,
+      "server_types": []
+    },
+    {
+      "count": 1,
+      "db_type": "PostgreSQL",
+      "inactive": 0,
+      "active": 1,
+      "percentage": 25,
+      "server_types": []
+    }
   ],
   "by_environment": [
     { "environment": "Production", "count": 20, "percentage": 47.62 },
@@ -399,202 +578,391 @@ export const INVENTORY_RESP = {
     { "environment": "Test", "count": 8, "percentage": 19.05 }
   ],
   "by_version": [
-    { "version": "8.0.32", "count": 10, "percentage": 23.81 },
-    { "version": "14.5", "count": 8, "percentage": 19.05 },
-    { "version": "Unknown", "count": 4, "percentage": 9.52 }
+    {
+      "count": 1,
+      "percentage": 25,
+      "version": "MSSQL Server 16.0.1000.6"
+    },
+    {
+      "count": 1,
+      "percentage": 25,
+      "version": "MySQL 8.0.23"
+    },
+    {
+      "count": 1,
+      "percentage": 25,
+      "version": "Oracle 19.0"
+    },
+    {
+      "count": 1,
+      "percentage": 25,
+      "version": "PostgreSQL 13.22"
+    }
   ],
   "by_tags": [
-    { "tag": "critical", "count": 15, "percentage": 35.71 },
-    { "tag": "Untagged", "count": 10, "percentage": 23.81 }
-  ]
+    {
+      "count": 4,
+      "percentage": 100,
+      "tag": "Untagged"
+    }
+  ],
 }
 
 export const TOPUTIL_RESP = [
-  // {
-  //   "host_id": 10084,
-  //   "name": "prod-mysql-01",
-  //   "CPU Usage (System %)": 34.5,
-  //   "Memory Used (%)": 71.2,
-  //   "Disk Usage (%)": 58.4,
-  //   "Disk Read Ops": 120.3,
-  //   "Disk Write Ops": 85.1,
-  //   "System Uptime (seconds)": 1209600
-  // },
-  // {
-  //   "host_id": 10085,
-  //   "name": "prod-postgres-01",
-  //   "CPU Usage (System %)": 61.8,
-  //   "Memory Used (%)": 83.4,
-  //   "Disk Usage (%)": 74.1,
-  //   "Disk Read Ops": 240.7,
-  //   "Disk Write Ops": 198.3,
-  //   "System Uptime (seconds)": 864000
-  // },
-
-  // {
-  //   name: 'Cisco 1',
-  //   db_uuid: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
-  //   host_id: 1,
-  //   disk_read_ops: 120,
-  //   disk_write_ops: 10012,
-  //   cpu_usage_system_percent: 24,
-  //   cpu_usage_user_percent: 45,
-  //   memory_used_percent: 24,
-  //   stroage_capacity: '256GB',
-  //   stroage_used: 128,
-  //   stroage_free_percent: 50,
-  //   disk_usage_percent: 68,
-  //   system_uptime_seconds: 2645854
-  // },
-  // {
-  //   name: 'Cisco 2',
-  //   db_uuid: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
-  //   host_id: 2,
-  //   cpu_usage_system_percent: 80,
-  //   cpu_usage_user_percent: 34,
-  //   memory_used_percent: 50,
-  //   stroage_capacity: '1024GB',
-  //   stroage_used: 400,
-  //   stroage_free_percent: 40,
-  //   disk_usage_percent: 48,
-  //   disk_read_ops: 12000,
-  //   disk_write_ops: 5012,
-  //   system_uptime_seconds: 2645854
-  // },
-
   {
-    "host_id": 10084,
-    "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "db_uuid": "f0e1d2c3-b4a5-6789-0abc-def123456789",
-
-    "name": "prod-postgres-01",
-    "cpu_usage_system_percent": 14.73,
-    "memory_used_percent": 67.40,
-
-    "disk_capacity": '1024GB',
-    "disk_used": 400,    
-    "disk_usage_percent": 82.15,
-
-    "disk_read_ops": 120.500,
-    "disk_write_ops": 95.200,
-    "disk_iops": 120.500,
-
-    "system_uptime_seconds": 2592000,
+    "disk_used_gb": 44.54,
+    "cpu_usage_system_percent": 4.31,
+    "name": "Db_instance_psql",
+    "disk_capacity_gb": 95.9,
+    "disk_iops_max": 4.56,
+    "disk_write_ops_per_sec": 2.5571,
+    "disk_read_latency_ms": 0.0,
+    "host_uuid": "d6945ffb-523a-4465-8ba5-a2feb7460c05",
+    "disk_read_ops_per_sec": 0.0,
     "cpu_trend": [
-      { "ts": 1748822400, "value": 12.45 },
-      { "ts": 1748826000, "value": 13.10 },
-      { "ts": 1748829600, "value": 15.02 }
+      { "ts": 1782273600, "value": 2.75 },
+      { "ts": 1782277200, "value": 2.31 },
+      { "ts": 1782280800, "value": 2.26 },
+      { "ts": 1782284400, "value": 2.31 },
+      { "ts": 1782288000, "value": 2.28 },
+      { "ts": 1782291600, "value": 2.3 },
+      { "ts": 1782295200, "value": 2.32 },
+      { "ts": 1782298800, "value": 2.35 },
+      { "ts": 1782302400, "value": 2.26 },
+      { "ts": 1782306000, "value": 2.28 },
+      { "ts": 1782309600, "value": 2.28 },
+      { "ts": 1782313200, "value": 2.29 },
+      { "ts": 1782316800, "value": 2.39 }
     ],
+    "disk_utilization_percent": 21.005,
+    "system_uptime_seconds": 7203334.0,
+    "disk_iops": 2.5571,
+    "host_id": 10901,
+    "memory_used_percent": 68.14,
+    "db_uuid": "3516d387-024f-439f-8ed6-305df19ddcbf",
     "memory_trend": [
-      { "ts": 1748822400, "value": 65.30 },
-      { "ts": 1748826000, "value": 66.80 },
-      { "ts": 1748829600, "value": 67.40 }
+      { "ts": 1782273600, "value": 68.55 },
+      { "ts": 1782277200, "value": 68.4 },
+      { "ts": 1782280800, "value": 66.37 },
+      { "ts": 1782284400, "value": 67.52 },
+      { "ts": 1782288000, "value": 68.23 },
+      { "ts": 1782291600, "value": 66.7 },
+      { "ts": 1782295200, "value": 68.02 },
+      { "ts": 1782298800, "value": 68.88 },
+      { "ts": 1782302400, "value": 67.33 },
+      { "ts": 1782306000, "value": 67.96 },
+      { "ts": 1782309600, "value": 68.15 },
+      { "ts": 1782313200, "value": 67.16 },
+      { "ts": 1782316800, "value": 67.54 }
     ]
   },
   {
-    "host_id": 10084,
-    "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "db_uuid": "f0e1d2c3-b4a5-6789-0abc-def123456789",
-    
-    "name": "prod-postgres-01",
-    "cpu_usage_system_percent": 14.73,
-    "memory_used_percent": 67.40,
-
-    "disk_capacity": '1024GB',
-    "disk_used": 400,    
-    "disk_usage_percent": 82.15,
-
-    "disk_read_ops": 120.500,
-    "disk_write_ops": 95.200,
-    "disk_iops": 2000.500,
-
-    "system_uptime_seconds": 2592000,
-    
-    "cpu_trend": [
-      { "ts": 1748822400, "value": 12.45 },
-      { "ts": 1748826000, "value": 80.10 },
-      { "ts": 1748829600, "value": 50.02 }
-    ],
-    "memory_trend": [
-      { "ts": 1748822400, "value": 65.30 },
-      { "ts": 1748826000, "value": 30.80 },
-      { "ts": 1748829600, "value": 70.40 }
-    ]
+    "host_id": 10902,
+    "db_uuid": "79b3351a-03c4-475f-8617-98dab7c02e8c",
+    "host_uuid": "2297b248-095c-47ce-8a1e-e466772b95e2",
+    "system_uptime_seconds": 0.0,
+    "name": "mssql_mon"
   }
 ]
 
 export const TOPQUERY_RESP = {
-  "top_response_time": [
-    {
-      "host_id": 1234,
-      "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "name": "db-server-01",
-      "db_type": "MySQL",
-      "response_time_ms": 142.350
-    }
-  ],
- 
-  "top_latency": [
-    {
-      "host_id": 1235,
-      "host_uuid": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-      "db_uuid": "d4e5f6a7-b8c9-0123-defa-234567890123",
-      "name": "db-server-02",
-      "db_type": "PostgreSQL",
-      "response_time_ms": 98.120
-    }
-  ],
- 
-  "top_connections": [
-    {
-      "host_id": 1234,
-      "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "name": "db-server-01",
-      "db_type": "MySQL",
-      "active_connections": 312.0
-    }
-  ],
- 
-  "top_errors_deadlocks": [
-    {
-      "host_id": 1236,
-      "host_uuid": "e5f6a7b8-c9d0-1234-efab-345678901234",
-      "db_uuid": "f6a7b8c9-d0e1-2345-fabc-456789012345",
-      "name": "db-server-03",
-      "db_type": "Oracle",
-      "deadlock_count": 5.0
-    }
-  ],
- 
-  "top_throughput": [
-    {
-      "host_id": 1234,
-      "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "name": "db-server-01",
-      "db_type": "MySQL",
-      "trend": [
-        {"date": "2026-05-18", "transactions_per_sec": 1240.500},
-        {"date": "2026-05-19", "transactions_per_sec": 1380.200},
-        {"date": "2026-05-20", "transactions_per_sec": 0.0},
-        {"date": "2026-05-21", "transactions_per_sec": 1190.750},
-        {"date": "2026-05-22", "transactions_per_sec": 1450.300},
-        {"date": "2026-05-23", "transactions_per_sec": 1320.100},
-        {"date": "2026-05-24", "transactions_per_sec": 980.600}
-      ]
-    }
-  ],
- 
   "top_cache_hit_ratio": [
     {
-      "host_id": 1235,
-      "host_uuid": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-      "db_uuid": "d4e5f6a7-b8c9-0123-defa-234567890123",
-      "name": "db-server-02",
+      "status": "critical",
+      "hit_ratio_pct": 0.595,
+      "name": "sdxdclmysqlappd01_MYSQLSERVER",
+      "db_type": "MySQL",
+      "host_id": 14673,
+      "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
+      "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
+    },
+    {
+      "status": "healthy",
+      "hit_ratio_pct": 99.882,
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "db_type": "Oracle",
+      "host_id": 14674,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
+    },
+    {
+      "status": "healthy",
+      "hit_ratio_pct": 100,
+      "name": "sdxdcwmssql_2022_MSSQLSERVER",
+      "db_type": "MSSQL Server",
+      "host_id": 14583,
+      "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+      "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
+    }
+  ],
+  "top_latency": [
+    {
+      "status": "critical",
+      "name": "sdxdclmysqlappd01_MYSQLSERVER",
+      "db_type": "MySQL",
+      "host_id": 14673,
+      "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
+      "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf",
+      "response_time_ms": 4620.839
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "db_type": "Oracle",
+      "host_id": 14674,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340",
+      "response_time_ms": 0
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdcwmssql_2022_MSSQLSERVER",
+      "db_type": "MSSQL Server",
+      "host_id": 14583,
+      "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+      "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c",
+      "response_time_ms": 0
+    }
+  ],
+  "top_errors_deadlocks": [
+    {
+      "status": "healthy",
+      "name": "sdxdclmysqlappd01_MYSQLSERVER",
+      "db_type": "MySQL",
+      "deadlock_count": 0,
+      "host_id": 14673,
+      "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
+      "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "db_type": "Oracle",
+      "deadlock_count": 0,
+      "host_id": 14674,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclpostgressrc_POSTGRES_SERVER",
       "db_type": "PostgreSQL",
-      "hit_ratio_pct": 72.450
+      "deadlock_count": 0,
+      "host_id": 14871,
+      "db_uuid": "2e91b612-220a-4861-b1df-56879b0a2695",
+      "host_uuid": "45fc9a5e-2f3b-46fa-9ac5-54a6a699d625"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdcwmssql_2022_MSSQLSERVER",
+      "db_type": "MSSQL Server",
+      "deadlock_count": 0,
+      "host_id": 14583,
+      "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+      "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
+    }
+  ],
+  "top_throughput": [
+    {
+      "status": "healthy",
+      "name": "sdxdcwmssql_2022_MSSQLSERVER",
+      "trend": [
+        {
+          "date": "2026-06-19",
+          "transactions_per_sec": 0.62
+        },
+        {
+          "date": "2026-06-20",
+          "transactions_per_sec": 0.619
+        },
+        {
+          "date": "2026-06-21",
+          "transactions_per_sec": 0.62
+        },
+        {
+          "date": "2026-06-22",
+          "transactions_per_sec": 0.62
+        },
+        {
+          "date": "2026-06-23",
+          "transactions_per_sec": 0.62
+        },
+        {
+          "date": "2026-06-24",
+          "transactions_per_sec": 0.619
+        },
+        {
+          "date": "2026-06-25",
+          "transactions_per_sec": 0.618
+        }
+      ],
+      "db_type": "MSSQL Server",
+      "host_id": 14583,
+      "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+      "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "trend": [
+        {
+          "date": "2026-06-19",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-20",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-21",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-22",
+          "transactions_per_sec": 0.188
+        },
+        {
+          "date": "2026-06-23",
+          "transactions_per_sec": 0.19
+        },
+        {
+          "date": "2026-06-24",
+          "transactions_per_sec": 0.193
+        },
+        {
+          "date": "2026-06-25",
+          "transactions_per_sec": 0.198
+        }
+      ],
+      "db_type": "Oracle",
+      "host_id": 14674,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclmysqlappd01_MYSQLSERVER",
+      "trend": [
+        {
+          "date": "2026-06-19",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-20",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-21",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-22",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-23",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-24",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-25",
+          "transactions_per_sec": 0
+        }
+      ],
+      "db_type": "MySQL",
+      "host_id": 14673,
+      "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
+      "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclpostgressrc_POSTGRES_SERVER",
+      "trend": [
+        {
+          "date": "2026-06-19",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-20",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-21",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-22",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-23",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-24",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-25",
+          "transactions_per_sec": 0
+        }
+      ],
+      "db_type": "PostgreSQL",
+      "host_id": 14871,
+      "db_uuid": "2e91b612-220a-4861-b1df-56879b0a2695",
+      "host_uuid": "45fc9a5e-2f3b-46fa-9ac5-54a6a699d625"
+    }
+  ],
+  "top_response_time": [
+    {
+      "status": "healthy",
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "db_type": "Oracle",
+      "host_id": 14674,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340",
+      "response_time_ms": 1.21
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdcwmssql_2022_MSSQLSERVER",
+      "db_type": "MSSQL Server",
+      "host_id": 14583,
+      "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+      "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c",
+      "response_time_ms": 0
+    }
+  ],
+  "top_connections": [
+    {
+      "status": "healthy",
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "db_type": "Oracle",
+      "active_connections": 58,
+      "host_id": 14674,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdcwmssql_2022_MSSQLSERVER",
+      "db_type": "MSSQL Server",
+      "active_connections": 15,
+      "host_id": 14583,
+      "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+      "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclmysqlappd01_MYSQLSERVER",
+      "db_type": "MySQL",
+      "active_connections": 5,
+      "host_id": 14673,
+      "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
+      "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
     }
   ]
 }
@@ -693,78 +1061,300 @@ export const CAPACITY_RESP = {
   ]
 }
 
-export const HEALTHGROWTH_RESP = {
-  "summary": {
-    "online": 28,
-    "degraded": 4,
-    "unreachable": 2,
-    "maintenance": 3,
-    "inactive": 5,
-    "total": 42
+export const CAPACITY_GROWTH_INSIGHT_SUMMARY_RESP = {
+  "status": "critical",
+  "buffer_cache_efficiency": {
+    "status": "critical",
+    "subtitle": "Buffer Pool Efficiency (%)",
+    "title": "Buffer Cache Efficiency",
+    "value": 66.82,
+    "gauge": {
+      "max": 100,
+      "min": 0
+    },
+    "stats": {
+      "max": 100,
+      "avg": 66.82,
+      "min": 0.59
+    },
+    "unit": "%"
   },
+  "temporary_table_performance": {
+    "stats": {
+      "max": {
+        "disk": 2.39,
+        "memory": 0.76
+      },
+      "avg": {
+        "disk": 0.62,
+        "memory": 0.43
+      },
+      "min": {
+        "disk": 0,
+        "memory": 0
+      }
+    },
+    "subtitle": "Temporary Tables Created (per sec)",
+    "title": "Temporary Table Performance",
+    "chart": {
+      "labels": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "datasets": [
+        {
+          "data": [0.5445, 0.7589, null, 0],
+          "label": "In Memory / sec"
+        },
+        {
+          "data": [2.3942, 0.0675, 0, 0],
+          "label": "On Disk / sec"
+        }
+      ]
+    },
+    "status_disk": "critical",
+    "status_memory": "critical"
+  },
+  "database_object_utilization": {
+    "status": "healthy",
+    "stats": {
+      "display_max": "2.27 K",
+      "min": 1064,
+      "max": 2272,
+      "display_avg": "1.67 K",
+      "avg": 1668,
+      "display_min": "1.06 K"
+    },
+    "subtitle": "Open Tables",
+    "unit": "tables",
+    "title": "Database Object Utilization",
+    "gauge": {
+      "max": 3000,
+      "min": 0
+    },
+    "display_value": "1.67 K",
+    "value": 1668
+  }
+}
+
+export const CAPACITY_GROWTH_INSIGHT_TABLE_RESP = {
+  "count": 4,
+  "limit": 4,
+  "total_pages": 1,
+  "page": 1,
   "servers": [
-    { "name": "dev-mysql-02", "status": "inactive", "cpu_pct": 40.40 },
-    { "name": "prod-mssql-01", "status": "maintenance", "cpu_pct": 58.40 },
-    { "name": "prod-mysql-01", "status": "online", "cpu_pct": 60.40 },
-    { "name": "prod-oracle-01", "status": "degraded", "cpu_pct": 88.40 },
-    { "name": "prod-postgres-01", "status": "unreachable", "cpu_pct": 91.40 }
+    {
+      "status": "critical",
+      "rank": 1,
+      "open_tables_status": "healthy",
+      "host_id": 14583,
+      "host_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+      "temp_tables_in_memory_per_sec": 0.5445,
+      "temp_tables_on_disk_per_sec": 2.3942,
+      "name": "sdxdcwmssql_2022_MSSQLSERVER",
+      "open_tables": 1064,
+      "db_type": "MSSQL Server",
+      "temp_tables_in_memory_status": "critical",
+      "buffer_pool_efficiency": 100,
+      "temp_tables_on_disk_status": "critical",
+      "buffer_pool_efficiency_status": "healthy"
+    },
+    {
+      "status": "healthy",
+      "rank": 2,
+      "open_tables_status": "unknown",
+      "host_id": 14674,
+      "host_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "temp_tables_in_memory_per_sec": null,
+      "temp_tables_on_disk_per_sec": 0,
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "open_tables": null,
+      "db_type": "Oracle",
+      "temp_tables_in_memory_status": "unknown",
+      "buffer_pool_efficiency": 99.88,
+      "temp_tables_on_disk_status": "unknown",
+      "buffer_pool_efficiency_status": "healthy"
+    },
+    {
+      "status": "critical",
+      "rank": 3,
+      "open_tables_status": "warning",
+      "host_id": 14673,
+      "host_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
+      "temp_tables_in_memory_per_sec": 0.7589,
+      "temp_tables_on_disk_per_sec": 0.0675,
+      "name": "sdxdclmysqlappd01_MYSQLSERVER",
+      "open_tables": 2272,
+      "db_type": "MySQL",
+      "temp_tables_in_memory_status": "warning",
+      "buffer_pool_efficiency": 0.59,
+      "temp_tables_on_disk_status": "healthy",
+      "buffer_pool_efficiency_status": "critical"
+    },
+    {
+      "status": "unknown",
+      "rank": 4,
+      "open_tables_status": "unknown",
+      "host_id": 14871,
+      "host_uuid": "2e91b612-220a-4861-b1df-56879b0a2695",
+      "temp_tables_in_memory_per_sec": 0,
+      "temp_tables_on_disk_per_sec": 0,
+      "name": "sdxdclpostgressrc_POSTGRES_SERVER",
+      "open_tables": null,
+      "db_type": "PostgreSQL",
+      "temp_tables_in_memory_status": "unknown",
+      "buffer_pool_efficiency": null,
+      "temp_tables_on_disk_status": "unknown",
+      "buffer_pool_efficiency_status": "unknown"
+    }
+  ]
+}
+
+export const HEALTHGROWTH_RESP = {
+  "servers": [
+    {
+      "status": "online",
+      "name": "sdxdclOracleFPPServer_oracledb"
+    },
+    {
+      "status": "online",
+      "name": "sdxdclmysqlappd01_MYSQLSERVER"
+    },
+    {
+      "status": "unreachable",
+      "name": "sdxdclpostgressrc_POSTGRES_SERVER"
+    },
+    {
+      "status": "online",
+      "name": "sdxdcwmssql_2022_MSSQLSERVER"
+    }
   ],
   "replication_sync": {
-    "summary": {
-      "sync_healthy": 18,
-      "lag_over_30s": 3,
-      "deadlocks": 2,
-      "errors_per_second": 1,
-      "connection_errors": 2,
-      "no_replication": 16
-    },
     "servers": [
-      { "name": "prod-mysql-01", "replication_status": "sync_healthy", "lag_sec": 1.4 },
-      { "name": "prod-mysql-02", "replication_status": "lag_over_30s", "lag_sec": 84.2 },
-      { "name": "prod-mssql-01", "replication_status": "deadlocks", "deadlock_count": 14 },
-      { "name": "prod-oracle-01", "replication_status": "errors_per_second", "errors_per_sec": 3.20 },
-      { "name": "prod-postgres-01", "replication_status": "connection_errors", "connection_errors": 5 },
-      { "name": "dev-mysql-02", "replication_status": "no_replication" }
-    ]
+      {
+        "lag_sec": 0,
+        "name": "sdxdclOracleFPPServer_oracledb",
+        "replication_status": "sync_healthy"
+      },
+      {
+        "name": "sdxdclmysqlappd01_MYSQLSERVER",
+        "replication_status": "sync_healthy"
+      },
+      {
+        "name": "sdxdclpostgressrc_POSTGRES_SERVER",
+        "replication_status": "sync_healthy"
+      },
+      {
+        "name": "sdxdcwmssql_2022_MSSQLSERVER",
+        "replication_status": "sync_healthy"
+      }
+    ],
+    "summary": {
+      "deadlocks": 0,
+      "no_replication": 0,
+      "errors_per_second": 0,
+      "sync_healthy": 4,
+      "connection_errors": 0,
+      "lag_over_30s": 0
+    }
+  },
+  "summary": {
+    "inactive": 0,
+    "maintenance": 0,
+    "online": 3,
+    "unreachable": 1,
+    "degraded": 0,
+    "total": 4
   }
 }
 
 export const ALERTS_RESP = {
-  "summary": {
-    "critical_alerts": 7,
-    "high_alerts": 12,
-    "open_itsm_tickets": 5,
-    "automation_success_pct": 83.33,
-    "automation_total_runs": 18
-  },
   "critical_alerts": [
     {
-      "uuid": "1dd9a17f-5ac8-4634-8860-3dba06aa85d4",
-      "id": 481928,
-      "device_name": "prod-oracle-01",
-      "description": "ORA-00600: internal error code, argume...",
-      "event_count": 34,
+      "source": "Unity",
+      "uuid": "344f3580-de37-472e-bee1-719058a4a926",
+      "event_count": 3,
+      "severity": "Critical",
+      "description": "PostgreSQL: Service is down",
+      "age": "1d 2h",
       "acknowledged": false,
-      "age": "2d 4h"
+      "id": "1408866",
+      "device_name": "sdxdclpostgressrc_POSTGRES_SERVER"
     },
     {
-      "uuid": "4819",
-      "id": 4819,
-      "device_name": "prod-mssql-01",
-      "description": "SQL Server service stopped unexpectedl...",
-      "event_count": 12,
-      "acknowledged": true,
-      "age": "5h 20m"
+      "source": "Unity",
+      "uuid": "06f268ab-5632-43d9-870e-de618277028b",
+      "event_count": 2,
+      "severity": "Critical",
+      "description": "PostgreSQL: Service is down",
+      "age": "7d 1h",
+      "acknowledged": false,
+      "id": "1345651",
+      "device_name": "sdxdclpostgressrc_POSTGRES_SERVER"
+    },
+    {
+      "source": "Unity",
+      "uuid": "773ce847-880d-4aae-92aa-c19a4a79a085",
+      "event_count": 1,
+      "severity": "Critical",
+      "description": "Oracle 'DB' TBS 'SYSTEM': Tablespace usage is too high (over 95% for 5m).",
+      "age": "2d 18h",
+      "acknowledged": false,
+      "id": "1396779",
+      "device_name": "sdxdclOracleFPPServer_oracledb"
+    },
+    {
+      "source": "Unity",
+      "uuid": "719ee4b7-39d6-40d0-bd94-fa22fdd64ff4",
+      "event_count": 1,
+      "severity": "Critical",
+      "description": "MSSQL: Failed to fetch info data (or no data for 30m)",
+      "age": "5d 8h",
+      "acknowledged": false,
+      "id": "1367484",
+      "device_name": "sdxdcwmssql_2022_MSSQLSERVER"
+    },
+    {
+      "source": "Unity",
+      "uuid": "a27d78d6-ac04-4c5d-b1dd-79d5438aafee",
+      "event_count": 1,
+      "severity": "Critical",
+      "description": "MSSQL: Failed to fetch info data (or no data for 30m)",
+      "age": "64d 20h",
+      "acknowledged": false,
+      "id": "1017477",
+      "device_name": "sdxdcwmssql_2022_MSSQLSERVER"
+    },
+    {
+      "source": "Unity",
+      "uuid": "9a649486-55c5-4829-beac-d81d8fb06386",
+      "event_count": 1,
+      "severity": "Critical",
+      "description": "PostgreSQL: DB is down",
+      "age": "64d 21h",
+      "acknowledged": false,
+      "id": "1017279",
+      "device_name": "sdxdclpostgressrc_POSTGRES_SERVER"
+    },
+    {
+      "source": "Unity",
+      "uuid": "3880f120-c960-4b0b-8015-1b6fd93d2968",
+      "event_count": 1,
+      "severity": "Critical",
+      "description": "MSSQL: Service is unavailable",
+      "age": "72d 1h",
+      "acknowledged": false,
+      "id": "979334",
+      "device_name": "sdxdclmysqlappd01_MYSQLSERVER"
     }
   ],
-  "high_alerts": [
-    {
-      "id": "4830",
-      "device_name": "prod-mysql-01",
-      "description": "High memory usage detected on database...",
-      "event_count": 8,
-      "acknowledged": false,
-      "age": "47m"
-    }
-  ]
+  "summary": {
+    "open_itsm_tickets": 21,
+    "critical_alerts": 7,
+    "high_alerts": 10,
+    "automation_total_runs": 0,
+    "automation_success_pct": 0
+  }
 }

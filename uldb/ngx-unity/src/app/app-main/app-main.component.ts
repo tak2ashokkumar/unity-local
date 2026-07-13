@@ -185,4 +185,8 @@ export class AppMainComponent implements OnInit, OnDestroy {
     this.brandWasMinimizedBeforeChat = false;
     this.chatbotChangedSidebar = false;
   }
+
+  isChatbotExpanded(): boolean {
+    return document.body.classList.contains('unity-chatbot-expanded');
+  }
 }

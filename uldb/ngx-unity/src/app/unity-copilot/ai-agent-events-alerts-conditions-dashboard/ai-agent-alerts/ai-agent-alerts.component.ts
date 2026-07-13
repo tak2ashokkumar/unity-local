@@ -16,7 +16,7 @@ import { cloneDeep as _clone } from 'lodash-es';
 import { AiAgentConfigType, AiAgentType } from '../ai-agent-events-alerts-conditions-dashboard.type';
 import { aiAgentConfigMap } from '../ai-agent-events-alerts-conditions-dashboard.component';
 
-/** This component is used for Network and Compute AI agents. */
+/** This component is used for Network, Compute, and Storage AI agents. */
 @Component({
   selector: 'ai-agent-alerts',
   templateUrl: './ai-agent-alerts.component.html',

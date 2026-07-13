@@ -110,9 +110,6 @@
                     <a class="dropdown-item text-primary" *ngIf="view.newTabWebAccessUrl"
                       (click)="webAccessNewTab(view)">Web
                       Access</a>
-                    <a class="dropdown-item text-primary" *ngIf="!view.newTabWebAccessUrl"
-                      (click)="requestWebAccess(view)">Request
-                      Web Access </a>
                     <a class="dropdown-item"
                       [ngClass]="view.newTabConsoleAccessUrl?'text-primary':'text-secondary disabled'"
                       (click)="consoleNewTab(view)"> Console Access </a>

@@ -1,6 +1,6 @@
 import { EChartsOption } from 'echarts';
 
-export type DatabaseDashboardTone = 'primary' | 'success' | 'warning' | 'danger' | 'muted';
+export type DatabaseDashboardTone = 'primary' | 'success' | 'warning' | 'danger' | 'muted' | 'unknown';
 
 export interface DatabaseDashboardHeaderInfoResponse {
   refresh_time: string;
@@ -24,6 +24,29 @@ export interface DatabaseDashboardMetric {
   tone?: DatabaseDashboardTone;
   key: string;
   link?: boolean;
+}
+
+export interface DatabaseDashboardMetricInfoStatus {
+  name: string;
+  color: string;
+  range: string;
+}
+
+export interface DatabaseDashboardMetricInfo {
+  title: string;
+  status?: DatabaseDashboardMetricInfoStatus[];
+  sections?: DatabaseDashboardMetricInfo[];
+}
+
+export interface DatabaseDashboardMetricInfoMap {
+  [headerName: string]: DatabaseDashboardMetricInfo;
+}
+
+export interface DatabaseDashboardStatusInfo {
+  name: string;
+  icon: string;
+  colorClass: string;
+  descriptions: string[];
 }
 
 export interface DatabaseDashboardDonutItem {
@@ -101,6 +124,52 @@ export interface DatabaseDashboardCapacityMetric {
   helper: string;
 }
 
+export interface DBDashboardEfficiencyStatViewData {
+  label: string;
+  value?: string;
+  memory?: string;
+  disk?: string;
+  memoryClass?: string;
+  diskClass?: string;
+  tone?: DatabaseDashboardTone;
+}
+
+export class DBDashboardEfficiencyGaugeViewData {
+  constructor() { }
+  title: string;
+  subtitle: string;
+  stats: DBDashboardEfficiencyStatViewData[];
+  chartOptions: EChartsOption;
+}
+
+export class DBDashboardTemporaryTablePerformanceViewData {
+  constructor() { }
+  title: string;
+  subtitle: string;
+  stats: DBDashboardEfficiencyStatViewData[];
+  chartOptions: EChartsOption;
+}
+
+export class DBDashboardEfficiencyServerViewData {
+  constructor() { }
+  rank: number;
+  hostId?: number;
+  hostUUID?: string;
+  name: string;
+  dbType: string;
+  bufferPoolEfficiency: string;
+  bufferPoolEfficiencyClass: string;
+  openTables: string;
+  openTablesClass: string;
+  tempTablesInMemoryPerSec: string;
+  tempTablesInMemoryPerSecClass: string;
+  tempTablesOnDiskPerSec: string;
+  tempTablesOnDiskPerSecClass: string;
+  status: string;
+  statusIcon: string;
+  statusClass: string;
+}
+
 export interface DatabaseDashboardStorageRow {
   server: string;
   used: string;
@@ -170,18 +239,19 @@ export interface DatabaseDashboardTop10Utilization {
   host_uuid: string;
   db_uuid: string;
   name: string;
-  cpu_usage_system_percent: number;
-  memory_used_percent: number;
-  disk_capacity: number;
-  disk_used: number;
-  disk_usage_percent: number;
-  disk_read_ops: number;
-  disk_write_ops: number;
-  disk_iops: number;
-  disk_iops_percent: number;
-  system_uptime_seconds: number;
-  cpu_trend: top10UtilizationTrendItem[];
-  memory_trend: top10UtilizationTrendItem[];
+  cpu_usage_system_percent?: number;
+  memory_used_percent?: number;
+  disk_capacity_gb?: number;
+  disk_used_gb?: number;  
+  disk_utilization_percent?: number;
+  // disk_read_ops_per_sec?: number;
+  // disk_write_ops_per_sec?: number;
+  disk_iops?: number;
+  disk_iops_max?: number;
+  // disk_read_latency_ms?: number;
+  system_uptime_seconds?: number;
+  cpu_trend?: top10UtilizationTrendItem[];
+  memory_trend?: top10UtilizationTrendItem[];
 }
 
 export interface top10UtilizationTrendItem {
@@ -197,20 +267,20 @@ export class DatabaseDashboardTop10UtilizationViewData {
   name: string;
   cpuChartOptions?: EChartsOption;
   cpuUtilizationPercent: number;
-  cpuTone: string;
+  cpuTone: DatabaseDashboardTone;
   memoryChartOptions?: EChartsOption;
   memoryUtilizationPercent: number;
-  memoryTone: string;
+  memoryTone: DatabaseDashboardTone;
   diskCapacityGB: number;
   diskUsedGB: number;
   diskUsedPercent: number;
   diskFreePercent: number;
-  diskTone: string;
+  diskTone: DatabaseDashboardTone;
   diskRops: number;
   diskWops: number;
   diskIops: number;
   diskIopsPercent: number;
-  diskIopsTone: string;
+  diskIopsTone: DatabaseDashboardTone;
   uptime: string;
 }
 
@@ -231,15 +301,19 @@ export interface DBDashboardTopQueryType {
 }
 export interface DBDashboardTopResponseTimeType extends DBDashboardTopQueryType {
   response_time_ms: number;
+  status?: string;
 }
 export interface DBDashboardTopLatencyType extends DBDashboardTopQueryType {
   response_time_ms: number;
+  status?: string;
 }
 export interface DBDashboardTopConnectionsType extends DBDashboardTopQueryType {
   active_connections: number;
+  status?: string;
 }
 export interface DBDashboardTopErrorsDeadlocksType extends DBDashboardTopQueryType {
   deadlock_count: number;
+  status?: string;
 }
 // export interface DBDashboardTopThroughputType extends DBDashboardTopQueryType {
 //   transactions_per_sec: number;
@@ -250,7 +324,8 @@ export interface DBDashboardTopThroughputType {
   db_type: string;
   trend: DBDashboardTopThroughputTrendType[];
   host_uuid: string,
-  db_uuid: string
+  db_uuid: string;
+  status?: string;
 }
 export interface DBDashboardTopThroughputTrendType {
   date: string;
@@ -259,19 +334,29 @@ export interface DBDashboardTopThroughputTrendType {
 }
 export interface DBDashboardTopCacheHitRatioType extends DBDashboardTopQueryType {
   hit_ratio_pct: number;
+  status?: string;
 }
 
 //Capacity Insights
 export interface DBDashboardCapacityGrowthType {
-  summary_stats: DBDashboardSummaryStats;
-  top_servers: DBDashboardTopServersType[];
-  top_tablespace_filesystem_usage: DBDashboardTopTableSpaceUsageType[];
-  storage_growth_trend: DBDashboardStroageGrowthTrendType[];
-  log_growth_rate: DBDashboardLogGrowthRateType[];
-  disk_utilization: DBDashboardDiskUtilizationType[];
-  log_size_by_server: DBDashboardLogSizeByServerType[];
-  db_size_by_server: DBDashboardDbSizeByServerType[];
-  archive_log_growth_trend: DBDashboardArchiveLogGrowthTrendType[];
+  summary_stats?: DBDashboardSummaryStats;
+  top_servers?: DBDashboardTopServersType[];
+  top_tablespace_filesystem_usage?: DBDashboardTopTableSpaceUsageType[];
+  storage_growth_trend?: DBDashboardStroageGrowthTrendType[];
+  log_growth_rate?: DBDashboardLogGrowthRateType[];
+  disk_utilization?: DBDashboardDiskUtilizationType[];
+  log_size_by_server?: DBDashboardLogSizeByServerType[];
+  db_size_by_server?: DBDashboardDbSizeByServerType[];
+  archive_log_growth_trend?: DBDashboardArchiveLogGrowthTrendType[];
+  status?: string;
+  count?: number;
+  total_pages?: number;
+  page?: number;
+  limit?: number;
+  buffer_cache_efficiency?: DBDashboardEfficiencyGaugeType;
+  database_object_utilization?: DBDashboardEfficiencyGaugeType;
+  temporary_table_performance?: DBDashboardTemporaryTablePerformanceType;
+  servers?: DBDashboardEfficiencyServerType[];
 }
 export interface DBDashboardSummaryStats {
   total_db_size_gb: number;
@@ -358,6 +443,76 @@ export interface DBDashboardTrendType {
   log_growth_gb: number;
 }
 
+export interface DBDashboardGaugeRangeType {
+  min: number;
+  max: number;
+}
+
+export interface DBDashboardGaugeStatsType {
+  min: number;
+  avg: number;
+  max: number;
+  display_min?: string;
+  display_avg?: string;
+  display_max?: string;
+}
+
+export interface DBDashboardEfficiencyGaugeType {
+  title: string;
+  subtitle?: string;
+  value: number;
+  status?: string;
+  display_value?: string;
+  unit?: string;
+  gauge: DBDashboardGaugeRangeType;
+  stats: DBDashboardGaugeStatsType;
+}
+
+export interface DBDashboardTemporaryTableStatsType {
+  memory: number;
+  disk: number;
+}
+
+export interface DBDashboardTemporaryTableDatasetType {
+  label: string;
+  data: number[];
+}
+
+export interface DBDashboardTemporaryTableChartType {
+  labels: string[];
+  datasets: DBDashboardTemporaryTableDatasetType[];
+}
+
+export interface DBDashboardTemporaryTablePerformanceType {
+  title: string;
+  subtitle?: string;
+  status_memory?: string;
+  status_disk?: string;
+  chart: DBDashboardTemporaryTableChartType;
+  stats: {
+    min: DBDashboardTemporaryTableStatsType;
+    avg: DBDashboardTemporaryTableStatsType;
+    max: DBDashboardTemporaryTableStatsType;
+  };
+}
+
+export interface DBDashboardEfficiencyServerType {
+  rank: number;
+  host_id?: number;
+  host_uuid?: string;
+  name: string;
+  db_type: string;
+  buffer_pool_efficiency: number;
+  buffer_pool_efficiency_status?: string;
+  open_tables: number;
+  open_tables_status?: string;
+  temp_tables_in_memory_per_sec: number;
+  temp_tables_in_memory_status?: string;
+  temp_tables_on_disk_per_sec: number;
+  temp_tables_on_disk_status?: string;
+  status?: string;
+}
+
 export interface DBDashboardStorageGrowthTrendType {
   name: string;
   trend: DBDashboardStorageTrendType[];
@@ -433,7 +588,7 @@ export type DatabaseDashboardAlertSummaryKey = 'critical_alerts' | 'high_alerts'
 export interface DatabaseDashboardTopCriticalAlertsResponse {
   summary: DatabaseDashboardTopCriticalAlertsSummary;
   critical_alerts: DatabaseDashboardCriticalAlert[];
-  high_alerts: DatabaseDashboardHighAlerts[];
+  high_alerts?: DatabaseDashboardHighAlerts[];
 }
 
 export interface DatabaseDashboardTopCriticalAlertsSummary {
@@ -447,7 +602,7 @@ export interface DatabaseDashboardTopCriticalAlertsSummary {
 
 export interface DatabaseDashboardCriticalAlert {
   uuid: string;
-  id: number;
+  id: number | string;
   device_name: string;
   severity?: string;
   description: string;
@@ -478,7 +633,7 @@ export interface DatabaseDashboardAlertSummaryMetric {
 export class DatabaseDashboardCriticalAlertViewData {
   constructor() { }
   uuid: string;
-  id: number;
+  id: number | string;
   deviceName: string;
   severity: string;
   description: string;

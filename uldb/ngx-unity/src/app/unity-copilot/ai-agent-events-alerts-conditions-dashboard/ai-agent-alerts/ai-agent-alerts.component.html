@@ -23,7 +23,7 @@
     <div class="row">
 
         <!-- Total Alerts -->
-        <div class="col pl-1">
+        <div class="pl-1" [ngClass]="aiAgentType=='storageAgent' ? 'col-2' :'col'">
             <div class="card p-1 border rounded mb-2">
                 <div class="font-lg font-500 py-1 pl-1">Total Alerts</div>
                 <div class="d-flex align-items-center pl-1">
@@ -33,7 +33,7 @@
         </div>
 
         <!-- Dedupe Events -->
-        <div class="col">
+        <div [ngClass]="aiAgentType=='storageAgent' ? 'col-2' :'col'">
             <div class="card p-1 border rounded mb-2">
                 <div class="font-lg font-500 py-1 pl-1">Suppressed Events</div>
                 <div class="d-flex align-items-center pl-1">
@@ -43,7 +43,7 @@
         </div>
 
         <!-- Noise Reduction -->
-        <div class="col">
+        <div [ngClass]="aiAgentType=='storageAgent' ? 'col-2' :'col'">
             <div class="card p-1 border rounded mb-2">
                 <div class="font-lg font-500 py-1 pl-1">Noise Reduction</div>
                 <div class="font-lg font-500 text-primary pl-1">{{summaryViewData?.total?.noise_reduction}}%</div>
@@ -51,19 +51,21 @@
         </div>
 
         <ng-container [ngSwitch]="aiAgentType">
-            <ng-container *ngSwitchCase="'network'">
-                <ng-container *ngTemplateOutlet="networkSummaryWidget"></ng-container>
+            <ng-container *ngSwitchCase="'networkAgent'">
+                <ng-container *ngTemplateOutlet="networkAgentSummaryWidget"></ng-container>
             </ng-container>
-            <ng-container *ngSwitchCase="'compute'">
-                <ng-container *ngTemplateOutlet="computeSummaryWidget"></ng-container>
+            <ng-container *ngSwitchCase="'computeAgent'">
+                <ng-container *ngTemplateOutlet="computeAgentSummaryWidget"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'storageAgent'">
+                <ng-container *ngTemplateOutlet="storageAgentSummaryWidget"></ng-container>
             </ng-container>
         </ng-container>
 
     </div>
 </div>
 
-<ng-template #networkSummaryWidget>
-    <!-- Critical -->
+<ng-template #networkAgentSummaryWidget>
     <div class="col">
         <div class="card p-1 border rounded mb-2">
             <div class="font-lg font-500 py-1 pl-1">Switches</div>
@@ -73,7 +75,6 @@
         </div>
     </div>
 
-    <!-- Warning -->
     <div class="col">
         <div class="card p-1 border rounded mb-2">
             <div class="font-lg font-500 py-1 pl-1">Firewalls</div>
@@ -83,7 +84,6 @@
         </div>
     </div>
 
-    <!-- Information -->
     <div class="col">
         <div class="card p-1 border rounded mb-2">
             <div class="font-lg font-500 py-1 pl-1">Load Balancers</div>
@@ -94,7 +94,7 @@
     </div>
 </ng-template>
 
-<ng-template #computeSummaryWidget>
+<ng-template #computeAgentSummaryWidget>
     <div class="col">
         <div class="card p-1 border rounded mb-2">
             <div class="font-lg font-500 py-1 pl-1">Baremental</div>
@@ -127,6 +127,17 @@
             <div class="font-lg font-500 py-1 pl-1">VM</div>
             <div class="d-flex align-items-center pl-1">
                 <div class="font-lg text-primary">{{summaryViewData?.vm}}</div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #storageAgentSummaryWidget>
+    <div class="col-2">
+        <div class="card p-1 border rounded mb-2">
+            <div class="font-lg font-500 py-1 pl-1">Storage</div>
+            <div class="d-flex align-items-center pl-1">
+                <div class="font-lg font-500 text-primary">{{summaryViewData?.storage}}</div>
             </div>
         </div>
     </div>

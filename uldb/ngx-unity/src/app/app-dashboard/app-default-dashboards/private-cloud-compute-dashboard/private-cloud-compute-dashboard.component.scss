@@ -1,39 +1,310 @@
+.private-cloud-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 10px 22px 8px;
+  border-bottom: 1px solid #d7dfe6;
+}
+
+.private-cloud-header-info {
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.private-cloud-header-title {
+  color: #00b16a;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.private-cloud-header-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-top: 2px;
+  color: #748191;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.private-cloud-header-meta-item {
+  white-space: nowrap;
+}
+
+.private-cloud-header-meta-item--divider {
+  margin-right: 8px;
+  padding-right: 8px;
+  border-right: 1px solid #ccd4dc;
+}
+
+.private-cloud-header-filters {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.private-cloud-filter-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin: 0;
+  padding: 0 12px 0 0;
+  flex: 0 0 auto;
+}
+
+.private-cloud-filter-group {
+  width: 116px;
+}
+
+.private-cloud-filter-group label {
+  display: block;
+  margin-bottom: 2px !important;
+  color: #303841;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 400;
+}
+
+.private-cloud-filter-group .form-control {
+  min-height: 24px;
+  border-color: #c6d1db;
+  border-radius: 2px;
+  background: #ffffff;
+}
+
+.private-cloud-filter-group .private-cloud-multiselect {
+  height: 24px;
+  padding: 0;
+  background: #ffffff;
+}
+
+:host ::ng-deep .private-cloud-multiselect .dropdown {
+  width: 100%;
+}
+
+:host ::ng-deep .private-cloud-multiselect .btn {
+  height: 22px;
+  min-height: 22px;
+  padding: 2px 8px;
+  border: 0;
+  box-shadow: none;
+  color: #5b6672;
+  background: #ffffff;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+:host ::ng-deep .private-cloud-multiselect .dropdown-menu {
+  min-width: 180px;
+  font-size: 12px;
+  z-index: 2050;
+}
+
+.private-cloud-filter-btn {
+  margin: 0 0 0 4px;
+}
+
+.private-cloud-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 1px;
+  flex: 0 0 auto;
+}
+
+.private-cloud-back-btn {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .cloud-legend-wrapper {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
-  margin-top: -10px;
+  gap: 10px 12px;
+  margin-top: -4px;
+  min-height: 46px;
 }
 
 .executive-summary-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
+  padding: 0 8px 10px 2px !important;
+}
+
+.executive-summary-title {
+  color: #1f2933;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.25;
 }
 
 .executive-summary-note {
   color: #7a8594;
-  font-size: 12px;
+  font-size: 11px;
   font-style: italic;
   font-weight: 400;
   line-height: 1.3;
   text-align: right;
   white-space: nowrap;
+  padding-top: 1px;
 }
 
 .executive-summary-card {
   height: auto;
-  padding-bottom: 1rem !important;
+  min-height: 324px;
+  padding: 18px 28px 14px !important;
+  border: 1px solid #cbd3da;
+  border-radius: 6px;
+  box-shadow: 0 1px 1px rgba(15, 23, 42, 0.04);
 }
 
 .executive-summary-card .card-body {
-  padding-bottom: 0.5rem;
+  padding: 0;
 }
 
-.executive-summary-card .row:last-child {
-  margin-bottom: 0;
+.executive-summary-metrics-wrapper {
+  margin-bottom: 24px;
+}
+
+.executive-summary-metrics {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.executive-summary-metric {
+  min-width: 0;
+  padding: 0 15px;
+  border-right: 1px solid #d8dde5;
+}
+
+.executive-summary-metric:first-child {
+  min-width: 96px;
+  padding-left: 0;
+}
+
+.executive-summary-metric:nth-child(2) {
+  min-width: 124px;
+}
+
+.executive-summary-metric:nth-child(3) {
+  min-width: 84px;
+}
+
+.executive-summary-metric:nth-child(4),
+.executive-summary-metric:nth-child(5) {
+  min-width: 108px;
+}
+
+.executive-summary-metric:nth-child(6),
+.executive-summary-metric:nth-child(7) {
+  min-width: 86px;
+}
+
+.executive-summary-metric:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.executive-summary-metric-label {
+  color: #687a91;
+  font-size: 14px;
+  line-height: 18px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+
+.executive-summary-metric-value {
+  color: #1f2933;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  text-align: left;
+}
+
+.executive-summary-metric-value--primary,
+.executive-summary-metric-value--success,
+.executive-summary-metric-value--danger {
+  font-size: 22px;
+  line-height: 26px;
+}
+
+.executive-summary-metric-value--primary {
+  color: #2f80d1;
+}
+
+.executive-summary-metric-value--success {
+  color: #00a65a;
+}
+
+.executive-summary-metric-value--danger {
+  color: #e60000;
+}
+
+.executive-summary-charts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 34px;
+  align-items: start;
+}
+
+.executive-summary-chart-panel {
+  min-width: 0;
+}
+
+.executive-summary-chart-title {
+  color: #202932;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.executive-summary-chart-body {
+  min-height: 220px;
+}
+
+.executive-summary-environment-body {
+  min-height: 102px;
+}
+
+.executive-summary-right-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.executive-summary-alert-title {
+  margin-bottom: 10px;
+}
+
+.executive-summary-alert-pills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.executive-summary-chart-empty {
+  color: #7a8594;
+  font-size: 12px;
 }
 
 .executive-summary-chart-col--lowered {
@@ -41,6 +312,8 @@
 }
 
 .sensor-stats-card {
+  position: relative;
+  overflow: hidden;
   height: auto;
   padding-bottom: 1rem !important;
 }
@@ -53,16 +326,24 @@
   margin-bottom: 0.75rem !important;
 }
 
+:host ::ng-deep .sensor-stats-card app-spinner .spinner-wrapper {
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100%;
+}
+
 .cloud-legend-item {
   display: flex;
   align-items: center;
   font-size: 12px;
   color: #7d7d7d;
+  line-height: 16px;
 }
 
 .cloud-legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   margin-right: 6px;
   display: inline-block;
@@ -77,7 +358,7 @@
   justify-content: center;
   align-items: center;
   gap: 18px;
-  margin-top: -8px;
+  margin-top: -4px;
 }
 
 .power-legend-item {
@@ -88,8 +369,8 @@
 }
 
 .power-legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   margin-right: 6px;
   display: inline-block;
@@ -103,7 +384,9 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px !important;
 }
 
 .utilization-legend-item {
@@ -112,16 +395,134 @@
 }
 
 .utilization-legend-dot {
-  width: 24px;
-  height: 14px;
-  border-radius: 4px;
-  margin-right: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 4px;
   display: inline-block;
 }
 
 .utilization-legend-text {
-  font-size: 12px;
-  color: #6b7280;
+  font-size: 11px;
+  color: #2d3742;
+  white-space: nowrap;
+}
+
+.capacity-growth-title {
+  color: #1f2933;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  padding: 0 0 10px !important;
+}
+
+.capacity-growth-card {
+  min-height: 282px;
+  padding: 16px 16px 14px !important;
+  border: 1px solid #cbd3da;
+  border-radius: 6px;
+  box-shadow: 0 1px 1px rgba(15, 23, 42, 0.04);
+}
+
+.capacity-growth-grid {
+  display: grid;
+  grid-template-columns: 1.24fr 1.28fr 0.74fr;
+  column-gap: 34px;
+  align-items: center;
+}
+
+.capacity-growth-host-panel,
+.capacity-growth-trend-panel,
+.capacity-growth-provision-panel {
+  min-width: 0;
+}
+
+.capacity-growth-panel-title {
+  color: #202932;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  margin-bottom: 10px;
+}
+
+.capacity-growth-panel-title--center {
+  text-align: center;
+}
+
+.capacity-growth-host-body,
+.capacity-growth-chart-body,
+.capacity-growth-provision-body {
+  position: relative;
+  padding: 0;
+}
+
+.capacity-growth-host-body,
+.capacity-growth-chart-body {
+  overflow: hidden;
+}
+
+.private-cloud-chart-card {
+  overflow: hidden;
+}
+
+:host ::ng-deep .private-cloud-chart-card app-spinner .spinner-wrapper {
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100%;
+}
+
+:host ::ng-deep .capacity-growth-card app-spinner .spinner-wrapper {
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100%;
+}
+
+.capacity-growth-host-body {
+  min-height: 220px;
+}
+
+.capacity-growth-chart-body {
+  min-height: 178px;
+}
+
+.capacity-growth-provision-panel {
+  align-self: center;
+  transform: translateY(10px);
+}
+
+.capacity-growth-provision-body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.capacity-growth-provision-metric {
+  min-width: 86px;
+}
+
+.capacity-growth-provision-label {
+  color: #75869c;
+  font-size: 14px;
+  line-height: 18px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+
+.capacity-growth-provision-value {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.capacity-growth-provision-divider {
+  align-self: stretch;
+  width: 1px;
+  min-height: 50px;
+  background: #d8dde5;
 }
 
 .hotspots-legend-row {
@@ -134,6 +535,17 @@
   justify-content: center;
   gap: 18px;
   padding: 0 6px;
+}
+
+.private-cloud-hotspots-card {
+  overflow: hidden;
+}
+
+:host ::ng-deep .private-cloud-hotspots-card app-spinner .spinner-wrapper {
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100%;
 }
 
 .utilization-section-header {
@@ -459,6 +871,23 @@
   padding: 1.25rem;
 }
 
+.idle-distribution-body {
+  overflow: hidden;
+}
+
+:host ::ng-deep .idle-distribution-body app-spinner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:host ::ng-deep .idle-distribution-body app-spinner .spinner-wrapper {
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100%;
+}
+
 :host ::ng-deep private-cloud-compute-dashboard .orphaned-category-body app-spinner .spinner-wrapper {
   background: rgba(255, 255, 255, 0.72);
   opacity: 1;
@@ -568,7 +997,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: auto; // ✅ pushes it to the right
+  margin-left: auto; //  pushes it to the right
   font-size: 11px;
 
   label {
@@ -758,7 +1187,7 @@
 
   th.iops-column,
   td.iops-column {
-    width: 165px;
+    width: 190px;
   }
 
   th.iops-column .utilization-sort-heading {
@@ -870,13 +1299,19 @@
 }
 
 .iops-cell {
-  display: grid;
-  grid-template-columns: 88px 34px;
+  display: flex;
   align-items: center;
-  gap: 8px;
   justify-content: center;
-  width: fit-content;
+  width: 100%;
   margin: 0 auto;
+}
+
+.network-speed-value {
+  color: #1f2937;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .uptime-cell {
@@ -913,6 +1348,7 @@
 }
 
 .workload-chart-body {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -920,6 +1356,20 @@
   gap: 12px;
   min-height: auto;
   padding: 0.75rem 0.5rem 0.35rem;
+  overflow: hidden;
+}
+
+:host ::ng-deep .workload-chart-body app-spinner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:host ::ng-deep .workload-chart-body app-spinner .spinner-wrapper {
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100%;
 }
 
 .workload-chart {
@@ -988,6 +1438,7 @@
 }
 
 .alert-card {
+  overflow: hidden;
   padding: 18px 18px 20px;
 }
 
@@ -997,6 +1448,26 @@
   justify-content: center;
   min-height: 60px;
   margin-bottom: 18px;
+}
+
+.alert-summary-panel,
+.alert-table-panel {
+  overflow: hidden;
+}
+
+:host ::ng-deep .alert-summary-panel app-spinner,
+:host ::ng-deep .alert-table-panel app-spinner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:host ::ng-deep .alert-summary-panel app-spinner .spinner-wrapper,
+:host ::ng-deep .alert-table-panel app-spinner .spinner-wrapper {
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100%;
 }
 
 .table-responsive {

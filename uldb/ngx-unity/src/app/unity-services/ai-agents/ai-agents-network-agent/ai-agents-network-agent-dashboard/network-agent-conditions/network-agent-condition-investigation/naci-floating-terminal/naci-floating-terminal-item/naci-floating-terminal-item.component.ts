@@ -29,6 +29,8 @@ export class NaciFloatingTerminalItemComponent implements OnInit {
   term: Terminal;
   wsClient: WSSHClient;
   fitAddon = new FitAddon();
+  private currentCommand = '';
+  private exitCommandSent = false;
   constructor(private termService: NaciFloatingTerminalService) {
     this.termService.resizeAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       setTimeout(() => {
@@ -59,6 +61,8 @@ export class NaciFloatingTerminalItemComponent implements OnInit {
   }
 
   initTerminal() {
+    this.currentCommand = '';
+    this.exitCommandSent = false;
     document.getElementById('term-' + this.index).setAttribute('style', 'height:' + Math.round(window.innerHeight - document.getElementsByClassName('terminal-container')[0].getBoundingClientRect().top) + 'px;');
     this.term = new Terminal({ cursorBlink: true });
     this.term.loadAddon(this.fitAddon);
@@ -112,7 +116,9 @@ export class NaciFloatingTerminalItemComponent implements OnInit {
 
     this.wsClient.onClose.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.term.write(`\rconnection closed\r\n`);
-      this.term.write("Enter Y to reconnect...\r\n");
+      if (!this.exitCommandSent) {
+        this.term.write("Enter Y to reconnect...\r\n");
+      }
     });
 
     this.wsClient.onError.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
@@ -122,10 +128,27 @@ export class NaciFloatingTerminalItemComponent implements OnInit {
 
   sendDataToClient(data: any) {
     if (!this.wsClient.isConnectionClosed() && !this.wsClient.isConnecting()) {
+      this.trackExitCommand(data);
       this.wsClient.sendClientData(data);
     } else if (data == 'y' || data == 'Y') {
       this.term.dispose();
       this.initTerminal();
+    }
+  }
+
+  trackExitCommand(data: any) {
+    const input = String(data);
+    for (const char of input) {
+      if (char === '\r' || char === '\n') {
+        if (this.currentCommand.trim().toLowerCase() === 'exit') {
+          this.exitCommandSent = true;
+        }
+        this.currentCommand = '';
+      } else if (char === '\u007f' || char === '\b') {
+        this.currentCommand = this.currentCommand.slice(0, -1);
+      } else if (char >= ' ') {
+        this.currentCommand += char;
+      }
     }
   }
 

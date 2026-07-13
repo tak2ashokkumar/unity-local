@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { AiAgentConfigMapType, AiAgentConfigType } from './ai-agent-events-alerts-conditions-dashboard.type';
+import { AiAgentConfigMapType } from './ai-agent-events-alerts-conditions-dashboard.type';
 
-/** This component is used for Network and Compute AI agents. */
+//** This component is used for Network, Compute, and Storage AI agents. */
 @Component({
   selector: 'ai-agent-events-alerts-conditions-dashboard',
   templateUrl: './ai-agent-events-alerts-conditions-dashboard.component.html',
@@ -21,7 +21,8 @@ export class AiAgentEventsAlertsConditionsDashboardComponent implements OnInit, 
     private spinner: AppSpinnerService) {
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        if (event.url == '/unity-copilot/network-ai-agent/dashboard' || event.url == '/unity-copilot/compute-ai-agent/dashboard') {
+        const isAllowedToNavigateToCondtions = event.url == '/unity-copilot/network-ai-agent/dashboard' || event.url == '/unity-copilot/compute-ai-agent/dashboard' || event.url == '/unity-copilot/storage-ai-agent/dashboard';
+        if (isAllowedToNavigateToCondtions) {
           this.router.navigate(['conditions'], { relativeTo: this.route });
         }
         this.currentPath = event.url.split('/').pop();
@@ -50,16 +51,22 @@ export class AiAgentEventsAlertsConditionsDashboardComponent implements OnInit, 
 
 
 export const aiAgentConfigMap: AiAgentConfigMapType = {
-  network: {
+  networkAgent: {
     title: 'Network AI Agent',
-    aiAgentType: 'network',
+    aiAgentType: 'networkAgent',
     routeBase: '/unity-copilot/network-ai-agent',
     deviceTypesForApi: ['switch', 'firewall', 'load_balancer'],
   },
-  compute: {
+  computeAgent: {
     title: 'Compute AI Agent',
-    aiAgentType: 'compute',
+    aiAgentType: 'computeAgent',
     routeBase: '/unity-copilot/compute-ai-agent',
     deviceTypesForApi: ['baremetal', 'hypervisor', 'mac_device', 'vm'],
+  },
+  storageAgent: {
+    title: 'Storage AI Agent',
+    aiAgentType: 'storageAgent',
+    routeBase: '/unity-copilot/storage-ai-agent',
+    deviceTypesForApi: ['storage'],
   },
 };

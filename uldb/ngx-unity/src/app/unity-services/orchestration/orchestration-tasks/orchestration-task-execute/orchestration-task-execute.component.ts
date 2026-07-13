@@ -690,10 +690,19 @@ export class OrchestrationTaskExecuteComponent implements OnInit, OnDestroy {
       const rawValues = this.cloudForm.getRawValue();
       const inputsArray = (Array.isArray(rawValues.inputs) ? rawValues.inputs : Object.values(rawValues.inputs))
         .map((input: any) => {
+          let defaultValue = input.default_value;
+
+          if ((input.param_type === 'List' || input.param_type === 'Dictionary') && typeof defaultValue === 'string') {
+            try {
+              defaultValue = JSON.parse(defaultValue);
+            } catch (e) {
+              console.error('Invalid JSON:', defaultValue);
+            }
+          }
           return {
             param_name: input.param_name || '',
             param_type: input.param_type || '',
-            default_value: input.default_value || '',
+            default_value: defaultValue,
             attribute: input.attribute || '',
             template: input.template || '',
             template_name: input.template_name || ''
@@ -736,10 +745,19 @@ export class OrchestrationTaskExecuteComponent implements OnInit, OnDestroy {
       // const inputsArray = Object.keys(rawValues.inputs).map(key => {
       const inputsArray = (Array.isArray(rawValues.inputs) ? rawValues.inputs : Object.values(rawValues.inputs))
         .map((input: any) => {
+          let defaultValue = input.default_value;
+
+          if ((input.param_type === 'List' || input.param_type === 'Dictionary') && typeof defaultValue === 'string') {
+            try {
+              defaultValue = JSON.parse(defaultValue);
+            } catch (e) {
+              console.error('Invalid JSON:', defaultValue);
+            }
+          }
           return {
             param_name: input.param_name ? input.param_name : '',
             param_type: input.param_type ? input.param_type : '',
-            default_value: input.default_value ? input.default_value : '',
+            default_value: defaultValue,
             attribute: input.attribute ? input.attribute : '',
             template: input.template ? input.template : '',
             template_name: input.template_name ? input.template_name : ''
@@ -868,10 +886,19 @@ export class OrchestrationTaskExecuteComponent implements OnInit, OnDestroy {
       const rawValues = this.LocalForm.getRawValue();
       const inputsArray = (Array.isArray(rawValues.inputs) ? rawValues.inputs : Object.values(rawValues.inputs))
         .map((input: any) => {
+          let defaultValue = input.default_value;
+
+          if ((input.param_type === 'List' || input.param_type === 'Dictionary') && typeof defaultValue === 'string') {
+            try {
+              defaultValue = JSON.parse(defaultValue);
+            } catch (e) {
+              console.error('Invalid JSON:', defaultValue);
+            }
+          }
           return {
             param_name: input.param_name || '',
             param_type: input.param_type || '',
-            default_value: input.default_value || '',
+            default_value: defaultValue,
             attribute: input.attribute || '',
             template: input.template || '',
             template_name: input.template_name || ''

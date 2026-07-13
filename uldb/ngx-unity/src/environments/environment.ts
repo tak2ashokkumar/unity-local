@@ -19,9 +19,9 @@ export const environment = {
     defaultTheme: 'light',
     availableThemes: ['light', 'dark'] as string[],
   },
-  networkAgentHostUrl: 'http://10.192.11.64:8003/',
+  networkAgentHostUrl: 'http://10.192.11.57:8003/',
   ChatbotDocumentUploadUrl: 'http://10.192.11.64:8000/',
-  cliNetworkAgentUrl: '10.192.11.64:8006/ws/terminal'
+  cliNetworkAgentUrl: '10.192.11.86:8006/ws/terminal'
 };
 
 /*

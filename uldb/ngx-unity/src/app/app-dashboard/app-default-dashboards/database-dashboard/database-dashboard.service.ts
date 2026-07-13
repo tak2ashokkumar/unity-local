@@ -4,8 +4,15 @@ import { EChartsOption } from 'echarts';
 import { Observable, of } from 'rxjs';
 import { DatabaseServersService } from 'src/app/united-cloud/shared/database-servers/database-servers.service';
 import {
+  ALERTS_RESP,
+  CAPACITY_GROWTH_INSIGHT_SUMMARY_RESP,
+  CAPACITY_GROWTH_INSIGHT_TABLE_RESP,
+  CAPACITY_RESP,
   DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG,
   DBDASHBOARDCOLORS,
+  HEALTHGROWTH_RESP,
+  INVENTORY_RESP,
+  TOPQUERY_RESP,
   TOPUTIL_RESP
 } from './database-dashboard.const';
 import {
@@ -43,6 +50,7 @@ import {
   DBDashboardTopErrorsDeadlocksType,
   DBDashboardTopCacheHitRatioType,
   DBDashboardTopThroughputType,
+  DBDashboardTopThroughputTrendType,
   DBDashboardCapacityGrowthType,
   DBDashboardSummaryStats,
   DBDashboardTopServersViewData,
@@ -55,7 +63,15 @@ import {
   DBDashboardArchiveLogGrowthTrendType,
   DBDashboardStroageGrowthTrendType,
   DatabaseDashboardHeaderInfoResponse,
-  top10UtilizationTrendItem
+  top10UtilizationTrendItem,
+  DBDashboardEfficiencyGaugeType,
+  DBDashboardEfficiencyGaugeViewData,
+  DBDashboardTemporaryTablePerformanceType,
+  DBDashboardTemporaryTablePerformanceViewData,
+  DBDashboardEfficiencyStatViewData,
+  DBDashboardEfficiencyServerType,
+  DBDashboardEfficiencyServerViewData,
+  DatabaseDashboardTone
 } from './database-dashboard.type';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
@@ -125,7 +141,7 @@ export class DatabaseDashboardService {
   //     // : DATABASE_DASHBOARD_DATABASE_OPTIONS.filter(option => option.value !== DATABASE_DASHBOARD_ALL_SELECTED_VALUE);
   // }
 
-  private convertFiltersToApiParams(criteria?: DatabaseDashboardFilterCriteria, sortColumn?: string, sortDirection?: string): HttpParams {
+  private convertFiltersToApiParams(criteria?: DatabaseDashboardFilterCriteria, sortColumn?: string, sortDirection?: string, pageNo?: number , pageSize?: number): HttpParams {
     // console.log("criteria", JSON.parse(JSON.stringify(criteria)), sortColumn, sortDirection);
     let params: HttpParams = new HttpParams();
     params = this.appendMultiValueParam(params, 'database', criteria?.databases);
@@ -134,6 +150,12 @@ export class DatabaseDashboardService {
     }
     if (sortDirection) {
       params = params.append('sort_order', sortDirection);
+    }
+    if (pageNo) {
+      params = params.append('page', pageNo);
+    }
+    if (pageSize) {
+      params = params.append('page_size', pageSize);
     }
     // console.log("params", JSON.parse(JSON.stringify(params)));
     return params;
@@ -195,7 +217,7 @@ export class DatabaseDashboardService {
     let graphData = data.map(d => ({
       name: d.cloud_type,
       value: d.count,
-      percentage: d.percentage.toFixed(0)
+      percentage: this.roundDecimalValueAsString(d.percentage)
     }));
     return this.getCloudTypeDistributionOptions(graphData || []);
   }
@@ -253,7 +275,7 @@ export class DatabaseDashboardService {
       name: d.db_type,
       active: d.active,
       inactive: d.inactive,
-      percentage: d.percentage.toFixed(0)
+      percentage: this.roundDecimalValueAsString(d.percentage)
     }));
     return this.getPlatformCountOptions(graphData || []);
   }
@@ -353,14 +375,21 @@ export class DatabaseDashboardService {
     let graphData = data.map(d => ({
       name: d.environment,
       value: d.count,
-      label: d.percentage.toFixed(0),
-      color: this.getProgressBarColor(Number(d.percentage.toFixed(0)))
+      label: this.roundDecimalValueAsString(d.percentage),
+      color: this.getProgressBarColor(this.roundDecimalValue(d.percentage))
     }));
     return this.getEnvironmentOptions(graphData || []);
   }
 
   private getEnvironmentOptions(items: DatabaseDashboardBarItem[]): EChartsOption {
     const maxValue = 100;
+    const barData = items.map(item => ({
+      value: item.label,
+      itemStyle: {
+        color: item.color,
+        borderRadius: 4
+      }
+    }));
     return {
       animation: false,
       grid: { top: 8, right: 35, bottom: 12, left: 85 },
@@ -401,10 +430,9 @@ export class DatabaseDashboardService {
             fontSize: 10
           },
           itemStyle: {
-            borderRadius: 4,
-            color: (params: any) => items[params.dataIndex].color
+            borderRadius: 4
           },
-          data: items.map(item => item.label)
+          data: barData
         }
       ]
     };
@@ -456,8 +484,6 @@ export class DatabaseDashboardService {
   convertToUtilizationRowsViewData(data: DatabaseDashboardTop10Utilization[]): DatabaseDashboardTop10UtilizationViewData[] {
     if (!data || data?.length == 0) { return; }
     let viewData: DatabaseDashboardTop10UtilizationViewData[] = [];
-    const diskIopsValues = data.map(row => Number(row.disk_read_ops || 0) + Number(row.disk_write_ops || 0));
-    const diskIopsTotal = Math.max(...diskIopsValues);
 
     data.forEach(row => {
       let view = new DatabaseDashboardTop10UtilizationViewData();
@@ -466,35 +492,37 @@ export class DatabaseDashboardService {
       view.name = row.name ? row.name : "N/A";
 
       view.cpuChartOptions = this.getSparklineOptions(row.cpu_trend ? row.cpu_trend : [], '#5d8df5', 'rgba(93, 141, 245, 0.28)');
-      view.cpuUtilizationPercent = Number(row.cpu_usage_system_percent ? row.cpu_usage_system_percent.toFixed(0) : 0);
+      view.cpuUtilizationPercent = this.roundDecimalValue(row.cpu_usage_system_percent);
       view.cpuTone = this.getToneType(view.cpuUtilizationPercent);
 
       view.memoryChartOptions = this.getSparklineOptions(row.memory_trend ? row.memory_trend : [], '#6aa544', 'rgba(106, 165, 68, 0.28)');
-      view.memoryUtilizationPercent = Number(row.memory_used_percent ? row.memory_used_percent.toFixed(0) : 0);
+      view.memoryUtilizationPercent = this.roundDecimalValue(row.memory_used_percent);
       view.memoryTone = this.getToneType(view.memoryUtilizationPercent);
 
-      view.diskCapacityGB = Number(row.disk_capacity ? row.disk_capacity : 0);
-      view.diskUsedGB = Number(row.disk_used ? row.disk_used : 0);
-      view.diskUsedPercent = Number(row.disk_usage_percent ? row.disk_usage_percent.toFixed(0) : 0);
-      view.diskFreePercent = Math.ceil(100 - view.diskUsedPercent);
+      view.diskCapacityGB = this.roundDecimalValue(row.disk_capacity_gb);
+      view.diskUsedGB = this.roundDecimalValue(row.disk_used_gb);
+      view.diskUsedPercent = this.roundDecimalValue(row.disk_utilization_percent);
+      view.diskFreePercent = this.roundDecimalValue(100 - view.diskUsedPercent);
       view.diskTone = this.getToneType(view.diskUsedPercent);
 
-      view.diskRops = Number(row.disk_read_ops ? row.disk_read_ops : 0);
-      view.diskWops = Number(row.disk_write_ops ? row.disk_write_ops : 0);
-      const diskIops = view.diskRops + view.diskWops;
-      view.diskIops = Number(diskIops.toFixed(0));
-      view.diskIopsPercent = diskIopsTotal ? Math.round((diskIops / diskIopsTotal) * 100) : 0;
+      // view.diskRops = Number(row.disk_read_ops_per_sec ? row.disk_read_ops_per_sec : 0);
+      // view.diskWops = Number(row.disk_write_ops_per_sec ? row.disk_write_ops_per_sec : 0);
+      // const diskIops = view.diskRops + view.diskWops;
+      const diskIops = Number(row.disk_iops ?? 0);
+      view.diskIops = this.roundDecimalValue(diskIops);
+      const diskIopsMax = this.roundDecimalValue(row.disk_iops_max ?? 0);
+      view.diskIopsPercent = (diskIops > 0 && diskIopsMax > 0) ? this.roundDecimalValue((diskIops / diskIopsMax) * 100, 2) : 0;
       view.diskIopsTone = this.getToneType(view.diskIopsPercent);
-
       view.uptime = this.formatSeconds(row.system_uptime_seconds);
 
-      viewData.push(view)
+      viewData.push(view);
     });
     return (viewData);
   }
 
   private getSparklineOptions(data: top10UtilizationTrendItem[], lineColor: string, areaColor: string): EChartsOption {
     // const xAxisData = data?.map((item: top10UtilizationTrendItem) => item.ts) || [];
+    const yAxisBounds = this.getSparklineAxisBounds(data);
     return {
       animation: false,
       grid: { top: 2, right: 1, bottom: 2, left: 1 },
@@ -507,13 +535,13 @@ export class DatabaseDashboardService {
       yAxis: {
         type: 'value',
         show: false,
-        min: 0,
-        max: 100
+        min: yAxisBounds.min,
+        max: yAxisBounds.max
       },
       series: [
         {
           type: 'line',
-          data: data.map(item => item.value),
+          data: data.map(item => this.roundDecimalValue(item.value)),
           symbol: 'none',
           smooth: false,
           lineStyle: { width: 1.5, color: lineColor },
@@ -521,6 +549,55 @@ export class DatabaseDashboardService {
         }
       ]
     };
+  }
+
+  private getSparklineAxisBounds(data: top10UtilizationTrendItem[]): { min: number; max: number } {
+    const values = (data || [])
+      .map(item => Number(item.value || 0))
+      .filter(value => Number.isFinite(value));
+
+    if (!values.length) {
+      return { min: 0, max: 100 };
+    }
+
+    return this.getDecimalAxisBounds(values, { min: 0, max: 100 });
+  }
+
+  private getDecimalAxisBounds(values: number[], limits?: { min?: number; max?: number }): { min: number; max: number } {
+    const numericValues = (values || [])
+      .map(value => Number(value || 0))
+      .filter(value => Number.isFinite(value));
+
+    if (!numericValues.length) {
+      return {
+        min: limits?.min != null ? limits.min : 0,
+        max: limits?.max != null ? limits.max : 100
+      };
+    }
+
+    const minValue = Math.min(...numericValues);
+    const maxValue = Math.max(...numericValues);
+    const range = maxValue - minValue;
+    const padding = range > 0 ? Math.max(range * 0.1, 0.01) : Math.max(Math.abs(maxValue) * 0.01, 0.01);
+    let min = this.roundDecimalValue(minValue - padding);
+    let max = this.roundDecimalValue(maxValue + padding);
+
+    if (limits?.min != null) {
+      min = Math.max(limits.min, min);
+    }
+    if (limits?.max != null) {
+      max = Math.min(limits.max, max);
+    }
+    if (min >= max) {
+      const offset = Math.max(padding, 0.01);
+      if (limits?.max != null && max >= limits.max) {
+        min = this.roundDecimalValue(max - offset);
+      } else {
+        max = this.roundDecimalValue(min + offset);
+      }
+    }
+
+    return { min, max };
   }
 
   getWorkloadInsightsTop10QueryWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardTopQueryType> {
@@ -534,9 +611,9 @@ export class DatabaseDashboardService {
     if (!data || data?.length == 0) { return; }
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.response_time_ms.toFixed(0)),
-      label: `${d.response_time_ms}k`,
-      // color: this.getProgressBarColor(d.response_time_ms)
+      value: this.roundDecimalValue(d.response_time_ms),
+      label: `${this.roundDecimalValueAsString(d.response_time_ms)}ms`,
+      color: this.getQueryResponseStatusColor(d.status, d.response_time_ms),
       db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
@@ -544,11 +621,12 @@ export class DatabaseDashboardService {
 
   convertToQueryLatencyOptions(data: DBDashboardTopLatencyType[]): EChartsOption {
     if (!data || data?.length == 0) { return; }
+    const getLatencyValue = (item: DBDashboardTopLatencyType) => item.response_time_ms;
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.response_time_ms.toFixed(0)),
-      label: `${d.response_time_ms}ms`,
-      // color: this.getProgressBarColor(d.response_time_ms)
+      value: this.roundDecimalValue(getLatencyValue(d)),
+      label: `${this.roundDecimalValueAsString(getLatencyValue(d))}ms`,
+      color: this.getQueryLatencyStatusColor(d.status, getLatencyValue(d)),
       db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
@@ -558,9 +636,9 @@ export class DatabaseDashboardService {
     if (!data || data?.length == 0) { return; }
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.active_connections.toFixed(0)),
-      label: `${d.active_connections}min`,
-      // color: this.getProgressBarColor(d.active_connections)
+      value: this.roundDecimalValue(d.active_connections),
+      label: this.roundDecimalValueAsString(d.active_connections),
+      color: this.getActiveSessionsStatusColor( d.status, d.active_connections),
       db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
@@ -570,9 +648,9 @@ export class DatabaseDashboardService {
     if (!data || data?.length == 0) { return; }
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.deadlock_count.toFixed(0)),
-      label: `${d.deadlock_count}`,
-      // color: this.getProgressBarColor(d.deadlock_count)
+      value: this.roundDecimalValue(d.deadlock_count),
+      label: this.roundDecimalValueAsString(d.deadlock_count),
+      color: this.getErrorRateStatusColor( d.status, d.deadlock_count),
       db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
@@ -587,9 +665,9 @@ export class DatabaseDashboardService {
     if (!data || data?.length == 0) { return; }
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.hit_ratio_pct.toFixed(0)),
-      label: `${d.hit_ratio_pct}%`,
-      // color: this.getCacheHitProgressBarColor(d.hit_ratio_pct)
+      value: this.roundDecimalValue(d.hit_ratio_pct),
+      label: `${this.roundDecimalValueAsString(d.hit_ratio_pct)}%`,
+      color: this.getCacheHitRatioStatusColor(d.status, d.hit_ratio_pct),
       db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || [], true);
@@ -612,9 +690,9 @@ export class DatabaseDashboardService {
 
   convertToCapacityMetricsViewData(data: DBDashboardSummaryStats): DatabaseDashboardCapacityMetric[] {
     return [
-      { label: 'Total DB Size', value: `${data?.total_db_size_gb ? data.total_db_size_gb : 0} GB`, helper: 'Database Storage' },
-      { label: 'Total Free Space', value: `${data?.total_free_space_gb ? data.total_free_space_gb : 0} GB`, helper: 'Combined Free Capacity' },
-      { label: 'Avg Storage Used', value: `${data?.avg_used_percentage ? data.avg_used_percentage : 0}%`, helper: 'Across 10 Servers' }
+      { label: 'Total DB Size', value: `${this.roundDecimalValueAsString(data?.total_db_size_gb)} GB`, helper: 'Database Storage' },
+      { label: 'Total Free Space', value: `${this.roundDecimalValueAsString(data?.total_free_space_gb)} GB`, helper: 'Combined Free Capacity' },
+      { label: 'Avg Storage Used', value: `${this.roundDecimalValueAsString(data?.avg_used_percentage)}%`, helper: 'Across 10 Servers' }
     ];
   }
 
@@ -625,11 +703,11 @@ export class DatabaseDashboardService {
       const view = new DBDashboardTopServersViewData();
       view.server = d.name;
       view.dbUUID = d.db_uuid;
-      view.used = Number(d.used_percentage.toFixed(0));
-      view.free = Number(d.free_gb.toFixed(0));
-      view.dbSize = Number(d.db_size_gb.toFixed(0));
-      view.logSize = Number(d.log_size_gb.toFixed(0));
-      view.logGrowth = Number(d.log_growth_gb_per_day.toFixed(0))
+      view.used = this.roundDecimalValue(d.used_percentage);
+      view.free = this.roundDecimalValue(d.free_gb);
+      view.dbSize = this.roundDecimalValue(d.db_size_gb);
+      view.logSize = this.roundDecimalValue(d.log_size_gb);
+      view.logGrowth = this.roundDecimalValue(d.log_growth_gb_per_day);
       viewData.push(view);
     });
     return viewData || [];
@@ -639,8 +717,8 @@ export class DatabaseDashboardService {
     if (!data || data?.length == 0) { return; }
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.disk_used_pct.toFixed(0)),
-      percentage: d.disk_used_pct.toFixed(0),
+      value: this.roundDecimalValue(d.disk_used_pct),
+      percentage: this.roundDecimalValueAsString(d.disk_used_pct),
       db_uuid: d.db_uuid ? d.db_uuid : null
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
@@ -661,7 +739,7 @@ export class DatabaseDashboardService {
     const max = this.getMaxValueForAxis(data, 'log_growth_gb_per_day')
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.log_growth_gb_per_day.toFixed(2)),
+      value: this.roundDecimalValue(d.log_growth_gb_per_day),
       // color: '#7b3ff2'
       db_uuid: d.db_uuid
     }));
@@ -673,7 +751,7 @@ export class DatabaseDashboardService {
     const max = this.getMaxValueForAxis(data, 'db_size_gb')
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.db_size_gb.toFixed(2)),
+      value: this.roundDecimalValue(d.db_size_gb),
       // color: '#3d8df3'
       db_uuid: d.db_uuid
     }));
@@ -685,7 +763,7 @@ export class DatabaseDashboardService {
     const max = this.getMaxValueForAxis(data, 'log_size_gb')
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.log_size_gb.toFixed(2)),
+      value: this.roundDecimalValue(d.log_size_gb),
       // color: '#e84a4a'
       db_uuid: d.db_uuid
     }));
@@ -696,12 +774,301 @@ export class DatabaseDashboardService {
     if (!data || data?.length == 0) { return; }
     let graphData = data.map(d => ({
       name: d.name,
-      value: Number(d.disk_used_pct.toFixed(0)),
-      percentage: d.disk_used_pct.toFixed(0),
+      value: this.roundDecimalValue(d.disk_used_pct),
+      percentage: this.roundDecimalValueAsString(d.disk_used_pct),
       db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
   }
+
+  getDatabaseEfficiencyWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<DBDashboardCapacityGrowthType> {
+    // return of(CAPACITY_GROWTH_INSIGHT_SUMMARY_RESP);
+    return this.http.get<DBDashboardCapacityGrowthType>('/customer/persona/database-dashboard/capacity-growth-insight-summary/', {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToBufferCacheEfficiencyViewData(data: DBDashboardEfficiencyGaugeType): DBDashboardEfficiencyGaugeViewData {
+    return this.convertToEfficiencyGaugeViewData(data, true, 'buffer-cache');
+  }
+
+  convertToDatabaseObjectUtilizationViewData(data: DBDashboardEfficiencyGaugeType): DBDashboardEfficiencyGaugeViewData {
+    return this.convertToEfficiencyGaugeViewData(data, false, 'database-object');
+  }
+
+  convertToTemporaryTablePerformanceViewData(data: DBDashboardTemporaryTablePerformanceType): DBDashboardTemporaryTablePerformanceViewData {
+    if (!data || !data.chart) { return; }
+    const view = new DBDashboardTemporaryTablePerformanceViewData();
+    view.title = data.title || 'Temporary Table Performance';
+    view.subtitle = data.subtitle || 'Temporary Tables Created (per sec)';
+    view.stats = this.convertToTemporaryTableStatsViewData(data);
+    view.chartOptions = this.convertToTemporaryTablePerformanceOptions(data);
+    return view;
+  }
+
+  getDatabaseEfficiencyTableData(criteria?: DatabaseDashboardFilterCriteria, sortColumn?: string, sortDirection?: string): Observable<DBDashboardCapacityGrowthType> {
+    // return of(CAPACITY_GROWTH_INSIGHT_TABLE_RESP);
+    return this.http.get<DBDashboardCapacityGrowthType>('/customer/persona/database-dashboard/capacity-growth-insight-table/', {
+      params: this.convertFiltersToApiParams(criteria, sortColumn, sortDirection, 1, 10)
+    });
+  }
+
+  convertToDatabaseEfficiencyRowsViewData(data: DBDashboardEfficiencyServerType[]): DBDashboardEfficiencyServerViewData[] {
+    if (!data || data?.length == 0) { return []; }
+    return data.map(row => {
+      const view = new DBDashboardEfficiencyServerViewData();
+      view.rank = row.rank;
+      view.hostId = row.host_id;
+      view.hostUUID = row.host_uuid;
+      view.name = row.name || 'N/A';
+      view.dbType = row.db_type || 'N/A';
+      view.bufferPoolEfficiency = this.formatNumberValueWithMetrics(row.buffer_pool_efficiency, '%');
+      view.bufferPoolEfficiencyClass = this.getTextStatusClass(row.buffer_pool_efficiency_status || 'unknown');
+      view.openTables = this.formatThousandsToKvalue(row.open_tables);
+      view.openTablesClass = this.getTextStatusClass(row.open_tables_status || 'unknown');
+      view.tempTablesInMemoryPerSec = this.formatNumberValueWithMetrics(row.temp_tables_in_memory_per_sec, '');
+      view.tempTablesInMemoryPerSecClass = this.getTextStatusClass(row.temp_tables_in_memory_status || 'unknown');
+      view.tempTablesOnDiskPerSec = this.formatNumberValueWithMetrics(row.temp_tables_on_disk_per_sec, '');
+      view.tempTablesOnDiskPerSecClass = this.getTextStatusClass(row.temp_tables_on_disk_status || 'unknown');
+      view.status = row.status || 'Unknown';
+      view.statusIcon = this.getDatabaseEfficiencyStatusIcon(view.status);
+      view.statusClass = this.getTextStatusClass(view.status);
+      return view;
+    });
+  }
+
+  private convertToEfficiencyGaugeViewData(data: DBDashboardEfficiencyGaugeType, invertRange: boolean, metricType?: string): DBDashboardEfficiencyGaugeViewData {
+    if (!data || !data.gauge) { return; }
+    const view = new DBDashboardEfficiencyGaugeViewData();
+    view.title = data.title || '';
+    view.subtitle = data.subtitle || '';
+    view.stats = this.convertToEfficiencyGaugeStatsViewData(data, invertRange, metricType);
+    view.chartOptions = this.convertToEfficiencyGaugeOptions(data, invertRange, metricType);
+    return view;
+  }
+
+  private convertToEfficiencyGaugeStatsViewData(data: DBDashboardEfficiencyGaugeType, invertRange: boolean, metricType?: string): DBDashboardEfficiencyStatViewData[] {
+    const min = data.stats?.min || 0;
+    const avg = data.stats?.avg || 0;
+    const max = data.stats?.max || 0;
+    return [
+      {
+        label: 'Minimum',
+        value: this.formatNumberValueWithMetrics(min, data.unit, data.stats?.display_min),
+        tone: this.getEfficiencyMetricTone(min, data.gauge?.min, data.gauge?.max, invertRange, metricType)
+      },
+      {
+        label: 'Average',
+        value: this.formatNumberValueWithMetrics(avg, data.unit, data.stats?.display_avg),
+        tone: this.getEfficiencyMetricTone(avg, data.gauge?.min, data.gauge?.max, invertRange, metricType)
+      },
+      {
+        label: 'Maximum',
+        value: this.formatNumberValueWithMetrics(max, data.unit, data.stats?.display_max),
+        tone: this.getEfficiencyMetricTone(max, data.gauge?.min, data.gauge?.max, invertRange, metricType)
+      }
+    ];
+  }
+
+  private convertToTemporaryTableStatsViewData(data: DBDashboardTemporaryTablePerformanceType): DBDashboardEfficiencyStatViewData[] {
+    const memoryClass = this.getTextStatusClass(data.status_memory || this.getInMemoryTempTablesStatus(data.stats?.avg?.memory));
+    const diskClass = this.getTextStatusClass(data.status_disk || this.getDiskTempTablesStatus(data.stats?.avg?.disk));
+    return [
+      {
+        label: 'Minimum',
+        memory: this.formatNumberValueWithMetrics(data.stats?.min?.memory, ''),
+        disk: this.formatNumberValueWithMetrics(data.stats?.min?.disk, ''),
+        memoryClass: memoryClass,
+        diskClass: diskClass
+      },
+      {
+        label: 'Average',
+        memory: this.formatNumberValueWithMetrics(data.stats?.avg?.memory, ''),
+        disk: this.formatNumberValueWithMetrics(data.stats?.avg?.disk, ''),
+        memoryClass: memoryClass,
+        diskClass: diskClass
+      },
+      {
+        label: 'Maximum',
+        memory: this.formatNumberValueWithMetrics(data.stats?.max?.memory, ''),
+        disk: this.formatNumberValueWithMetrics(data.stats?.max?.disk, ''),
+        memoryClass: memoryClass,
+        diskClass: diskClass
+      }
+    ];
+  }
+
+  private convertToEfficiencyGaugeOptions(data: DBDashboardEfficiencyGaugeType, invertRange: boolean, metricType?: string): EChartsOption {
+    const min = Number(data.gauge?.min || 0);
+    const max = Number(data.gauge?.max || 100);
+    const value = Number(data.value || 0);
+    const valueText = this.formatNumberValueWithMetrics(value, data.unit, data.display_value);
+    const tone = data.status?.trim() ? this.getToneFromStatus(data.status) : this.getEfficiencyMetricTone(value, min, max, invertRange, metricType);
+    const color = this.getEfficiencyToneColor(tone);
+
+    return {
+      animation: false,
+      series: [
+        {
+          type: 'gauge',
+          min: min,
+          max: max,
+          startAngle: 180,
+          endAngle: 0,
+          center: ['50%', '78%'],
+          radius: '110%',
+          // splitNumber: 4,
+          axisLine: {
+            // roundCap: true,
+            lineStyle: {
+              width: 11,
+              color: this.getEfficiencyGaugeAxisColors(metricType, invertRange)
+            }
+          },
+          pointer: {
+            show: true,
+            length: '15%',
+            width: 2,
+            offsetCenter: [0, '-85%'],
+            itemStyle: {
+              color: '#1f2937'
+            }
+          },
+          axisTick: {
+            show: false
+          },
+          splitLine: {
+            show: false
+          },
+          axisLabel: {
+            distance: -50,
+            color: '#1f2937',
+            fontSize: 11,
+            fontWeight: 500,
+            formatter: (axisValue: number) => {
+              if (axisValue === min) {
+                return this.formatGaugeAxisValue(min);
+              }
+              if (axisValue === max) {
+                return this.formatGaugeAxisValue(max);
+              }
+              return '';
+            }
+          },
+          detail: {
+            // formatter: `{value}%`,
+            color: color,
+            fontSize: 42,
+            fontWeight: 500,
+            valueAnimation: true,
+            offsetCenter: [0, '-10%'],
+            formatter: () => valueText,
+          },
+          title: {
+            offsetCenter: [0, '20%'],
+            color: '#6b7280',
+            fontSize: 14,
+            fontWeight: 500
+          },
+          data: [
+            {
+              value: value,
+              name: 'Average'
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  convertToTemporaryTablePerformanceOptions(data: DBDashboardTemporaryTablePerformanceType): EChartsOption {
+    if (!data?.chart?.labels?.length || !data.chart.datasets?.length) { return; }
+    const colors = data.chart.datasets.map((dataset, index) => {
+      const datasetName = (dataset.label || '').toLowerCase();
+      if (datasetName.includes('disk')) {
+        return this.getStatusColor(data.status_disk || this.getDiskTempTablesStatus(data.stats?.avg?.disk));
+      }
+      if (datasetName.includes('memory')) {
+        return this.getStatusColor(data.status_memory || this.getInMemoryTempTablesStatus(data.stats?.avg?.memory));
+      }
+      return [this.getStatusColor('healthy'), this.getStatusColor('critical')][index % 2];
+    });
+    return {
+      animation: false,
+      color: colors,
+      legend: {
+        top: 0,
+        left: 'center',
+        itemWidth: 10,
+        itemHeight: 10,
+        textStyle: {
+          color: '#26313b',
+          fontSize: 11,
+          fontWeight: 600
+        }
+      },
+      grid: {
+        top: 36,
+        right: 12,
+        bottom: 24,
+        left: 34,
+        containLabel: true
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      xAxis: {
+        type: 'category',
+        data: data.chart.labels,
+        axisTick: {
+          show: false
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#d5dbe1'
+          }
+        },
+        axisLabel: {
+          color: '#566270',
+          fontSize: 11,
+          fontWeight: 600
+        }
+      },
+      yAxis: {
+        type: 'value',
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#566270',
+          fontSize: 11,
+          formatter: (value: number) => this.roundDecimalValueAsString(value)
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e4e9ee'
+          }
+        }
+      },
+      series: data.chart.datasets.map((dataset, index) => ({
+        name: dataset.label,
+        type: 'bar',
+        barWidth: 10,
+        itemStyle: {
+          color: colors[index % colors.length],
+          borderRadius: [2, 2, 0, 0]
+        },
+        data: (dataset.data || []).map(value => this.roundDecimalValue(value))
+      }))
+    };
+  }
+
   /*
    * ******End ****** Capacity / Growth Insights Widget Related ********************
    */
@@ -789,13 +1156,14 @@ export class DatabaseDashboardService {
 
   private formatAlertSummaryValue(value: number | string, suffix?: string): string {
     if (value == null) { return 'N/A' }
-    const formattedValue = typeof value === 'number' ? this.formatNumber(value) : String(value || '0');
+    const numericValue = Number(value);
+    const formattedValue = Number.isFinite(numericValue) ? this.formatNumber(numericValue) : String(value || '0');
     return suffix && !formattedValue.endsWith(suffix) ? `${formattedValue}${suffix}` : formattedValue;
   }
 
   private formatNumber(value: number | string): string {
     const numericValue = Number(value || 0);
-    return isNaN(numericValue) ? '0' : numericValue.toLocaleString('en-US');
+    return Number.isFinite(numericValue) ? this.roundDecimalValue(numericValue).toLocaleString('en-US') : '0';
   }
 
   /*
@@ -804,14 +1172,90 @@ export class DatabaseDashboardService {
 
   private getMaxValueForAxis(data: any[], key: string) {
     if (!data || data?.length === 0 || !key) { return; }
-    const maxVal = Math.max(...data.map((item: any) => item[key] ? item[key] : 100));
-    const max = maxVal + ((maxVal * 10) / 100);
-    return max;
+    const values = data
+      .map((item: any) => Number(item?.[key] || 0))
+      .filter(value => Number.isFinite(value));
+    const maxVal = values.length ? Math.max(...values) : 0;
+    return this.roundDecimalValue(maxVal + ((maxVal * 10) / 100));
   }
 
   private getColorByMaxValue(value: number, max: number, inverse?: boolean) {
     const percent = ((value / max) * 100);
     return inverse ? this.getProgressBarInverseColor(percent) : this.getProgressBarColor(percent);
+  }
+
+  private getStatusColor(status?: string): string {
+    const normalizedStatus = (status || '').trim().toLowerCase();
+    if (!normalizedStatus) {
+      return '#6c7580';
+    }
+    if (normalizedStatus.includes('critical') || normalizedStatus.includes('down')) {
+      return '#DC3545';
+    }
+    if (normalizedStatus.includes('warning') || normalizedStatus.includes('degraded')) {
+      return '#F39C12';
+    }
+    if (normalizedStatus.includes('healthy') || normalizedStatus.includes('success')) {
+      return '#28A745';
+    }
+    return '#6c7580';
+  }
+
+  private getToneFromStatus(status?: string): DatabaseDashboardTone {
+    const normalizedStatus = (status || '').trim().toLowerCase();
+    if (!normalizedStatus) {
+      return 'unknown';
+    }
+    if (normalizedStatus.includes('critical') || normalizedStatus.includes('down')) {
+      return 'danger';
+    }
+    if (normalizedStatus.includes('warning') || normalizedStatus.includes('degraded')) {
+      return 'warning';
+    }
+    if (normalizedStatus.includes('healthy') ||normalizedStatus.includes('normal')) {
+      return 'success';
+    }
+    return 'unknown';
+  }
+
+  private getQueryResponseStatusColor(status: string | undefined, _value: number = 0): string {
+    return this.getStatusColor(status);
+  }
+
+  private getQueryLatencyStatusColor(status: string | undefined, _value: number = 0): string {
+    return this.getStatusColor(status);
+  }
+
+  private getActiveSessionsStatusColor(status: string | undefined, _value: number = 0): string {
+    return this.getStatusColor(status);
+  }
+
+  private getErrorRateStatusColor(status: string | undefined, _value: number = 0): string {
+    return this.getStatusColor(status);
+  }
+
+  private getTransactionThroughputStatusColor(status: string | undefined, _value: number = 0): string {
+    return this.getStatusColor(status);
+  }
+
+  private getCacheHitRatioStatusColor(status: string | undefined, _value: number = 0): string {
+    return this.getStatusColor(status);
+  }
+
+  private getInMemoryTempTablesStatus(value?: number | null): string {
+    if (!value) {
+      return 'unknown';
+    }
+    const numericValue = Number(value);
+    return numericValue > 0.8 ? 'healthy' : numericValue >= 0.6 ? 'warning' : 'critical';
+  }
+
+  private getDiskTempTablesStatus(value?: number | null): string {
+    if (!value) {
+      return 'unknown';
+    }
+    const numericValue = Number(value);
+    return numericValue < 0.1 ? 'healthy' : numericValue <= 0.15 ? 'warning' : 'critical';
   }
 
   private getProgressBarColor(value: number): string {
@@ -822,14 +1266,151 @@ export class DatabaseDashboardService {
     return value < 20 ? '#E24B4A' : value > 20 && value < 50 ? '#EF9F27' : value > 50 && value < 80 ? '#378ADD' : '#639922';
   }
 
-  private getToneType(value: number): string {
+  private getToneType(value: number): DatabaseDashboardTone {
     return value < 50 ? 'success' : value > 50 && value < 80 ? 'warning' : 'danger';
+  }
+
+  private getEfficiencyTone(value: number = 0, min: number = 0, max: number = 100, invertRange: boolean = false): DatabaseDashboardTone {
+    const safeMin = Number(min || 0);
+    const safeMax = Number(max || 100);
+    const percent = safeMax === safeMin ? 0 : ((Number(value || 0) - safeMin) / (safeMax - safeMin)) * 100;
+    if (invertRange) {
+      return percent >= 80 ? 'success' : percent >= 50 ? 'warning' : 'danger';
+    }
+    return percent >= 75 ? 'danger' : percent >= 50 ? 'warning' : 'success';
+  }
+
+  private getEfficiencyMetricTone(value: number = 0, min: number = 0, max: number = 100, invertRange: boolean = false, metricType?: string): DatabaseDashboardTone {
+    if (metricType === 'buffer-cache') {
+      return value >= 95 ? 'success' : value >= 90 ? 'warning' : 'danger';
+    }
+    if (metricType === 'database-object') {
+      const safeMin = Number(min || 0);
+      const safeMax = Number(max || 100);
+      const percent = safeMax === safeMin ? 0 : ((Number(value || 0) - safeMin) / (safeMax - safeMin)) * 100;
+      return percent < 70 ? 'success' : percent <= 85 ? 'warning' : 'danger';
+    }
+    return this.getEfficiencyTone(value, min, max, invertRange);
+  }
+
+  private getEfficiencyGaugeAxisColors(metricType: string | undefined, invertRange: boolean): [number, string][] {
+    if (metricType === 'buffer-cache') {
+      return [[0.9, '#DC3545'], [0.95, '#F39C12'], [1, '#28A745']];
+    }
+    if (metricType === 'database-object') {
+      return [[0.7, '#28A745'], [0.85, '#F39C12'], [1, '#DC3545']];
+    }
+    return invertRange
+      ? [[0.5, '#DC3545'], [0.8, '#F39C12'], [1, '#28A745']]
+      : [[0.5, '#28A745'], [0.8, '#F39C12'], [1, '#DC3545']];
+  }
+
+  private getEfficiencyToneColor(tone: DatabaseDashboardTone): string {
+    const colors: Record<DatabaseDashboardTone, string> = {
+      primary: '#2588df',
+      success: '#28A745',
+      warning: '#F39C12',
+      danger: '#DC3545',
+      muted: '#6c7580',
+      unknown: '#6c7580'
+    };
+    return colors[tone] || colors.muted;
+  }
+
+  private formatGaugeAxisValue(value: number): string {
+    return value >= 1000 ? `${this.roundDecimalValueAsString(value / 1000, 1)} K` : this.roundDecimalValueAsString(value);
+  }
+
+  private roundDecimalValue(value?: number | null, decimals: number = 2): number {
+    const numericValue = Number(value || 0);
+    if (!Number.isFinite(numericValue)) {
+      return 0;
+    }
+    const factor = Math.pow(10, decimals);
+    return Math.round((numericValue + Number.EPSILON) * factor) / factor;
+  }
+
+  private roundDecimalValueAsString(value?: number | null, decimals: number = 2): string {
+    return this.roundDecimalValue(value, decimals).toString();
+  }
+
+  private formatNumberValueWithMetrics(value?: number | null, unit?: string, displayValue?: string, decimals: number = 2,): string {
+    const numericValue = Number(value);
+    if (displayValue) {
+      return displayValue;
+    }
+    let formattedValue = this.roundDecimalValueAsString(value, decimals)
+    const formattedUnit = (unit || '').trim();
+    if(unit == 'tables'){
+      if (numericValue > 1000) {
+        formattedValue = this.roundDecimalValueAsString(value / 1000, decimals);
+        return `${formattedValue}K`;
+      }
+      return `${formattedValue}`;
+    }
+    return `${formattedValue}${formattedUnit}`;
+  }
+
+  private formatThousandsToKvalue(value?: number | null): string {
+    const numericValue = Number(value);
+    if (value == null || !Number.isFinite(numericValue)) {
+      return 'N/A';
+    }
+    if (numericValue > 1000) {
+      return this.formatNumberValueWithMetrics(numericValue / 1000, 'K');
+    }
+    return this.formatNumberValueWithMetrics(numericValue);
+  }
+
+  private getDatabaseEfficiencyStatusIcon(status?: string): string {
+    const normalizedStatus = (status || '').trim().toLowerCase();
+    if (!normalizedStatus) {
+      return 'fa-question-circle';
+    }
+    if (normalizedStatus.includes('critical') || normalizedStatus.includes('down')) {
+      return 'fa-exclamation-triangle';
+    }
+    if (normalizedStatus.includes('warning') || normalizedStatus.includes('degraded')) {
+      return 'fa-exclamation-circle';
+    }
+    if (normalizedStatus.includes('healthy') || normalizedStatus.includes('normal')) {
+      return 'fa-check-circle';
+    }
+    return 'fa-question-circle';
+  }
+
+  private getTextStatusClass(status?: string): string {
+    const normalizedStatus = (status || '').trim().toLowerCase();
+    if (!normalizedStatus) {
+      return 'text-muted';
+    }
+    if (normalizedStatus.includes('critical') || normalizedStatus.includes('down')) {
+      return 'text-danger';
+    }
+    if (normalizedStatus.includes('warning') || normalizedStatus.includes('degraded')) {
+      return 'text-warning';
+    }
+    if (normalizedStatus.includes('healthy') || normalizedStatus.includes('normal')) {
+      return 'text-success';
+    }
+    return 'text-muted';
   }
 
   private getHorizontalProgressBarOptions(items: DatabaseDashboardBarItem[], reverseColors: boolean = false): EChartsOption {
     const sortedData: any = [...items].sort((a: any, b: any) => b.value - a.value);
     const maxVal = Math.max(...items.map((item: any) => item.value));
-    const max = maxVal + ((maxVal * 10) / 100);
+    const max = maxVal ? maxVal + ((maxVal * 10) / 100) : 100;
+    const getItemColor = (index: number) => sortedData[index]?.color || this.getColorByMaxValue(sortedData[index].value, max, reverseColors);
+    const barData = sortedData.map((item: any, index: number) => ({
+      ...item,
+      itemStyle: {
+        color: getItemColor(index),
+        borderRadius: 4
+      },
+      label: {
+        color: getItemColor(index)
+      }
+    }));
     // const labelWidth = Math.max(...items.map((item: any) => item.name.length));
     // console.log("maxVal-", maxVal, " max calc-", max);
     return {
@@ -884,18 +1465,16 @@ export class DatabaseDashboardService {
             position: 'right',
             distance: 5,
             formatter: (params: any) => String(sortedData[params.dataIndex].label || sortedData[params.dataIndex].value),
-            color: '#2e3338',
             fontSize: 9
           },
           itemStyle: {
-            borderRadius: 4,
-            color: (params: any) => this.getColorByMaxValue(sortedData[params.dataIndex].value, max, reverseColors)
+            borderRadius: 4
           },
           emphasis: {
             disabled: true
           },
           // data: sortedData.map(item => item.value)
-          data: sortedData
+          data: barData
         }
       ]
     };
@@ -950,7 +1529,6 @@ export class DatabaseDashboardService {
 
   private getTransactionThroughputOptions(items: DBDashboardTopThroughputType[]): EChartsOption {
     const xAxisData = items?.[0]?.trend?.map((item: any) => this.formatDateLabel(item.date)) || [];
-    const colors = ['#2F8BD7', '#f5a623', '#5B9E29', '#D03533', '#26A69A', '#9B59B6', '#B7D99A', '#FFD099', '#9BC9F0', '#F5A3A3']
     return {
       animation: false,
       legend: {
@@ -982,12 +1560,6 @@ export class DatabaseDashboardService {
       },
       yAxis: {
         type: 'value',
-        // min: (value: any) => {
-        //   return Math.floor(value.min * 10) / 10;
-        // },
-        // max: (value: any) => {
-        //   return Math.ceil(value.max * 10) / 10;
-        // },
         splitNumber: 4,
         axisLine: {
           show: false
@@ -999,7 +1571,7 @@ export class DatabaseDashboardService {
           color: '#7a8794',
           fontSize: 10,
           // formatter: (value: number) => `${value / 1000}k`
-          formatter: (value: number) => `${value}k`
+          formatter: (value: number) => `${this.roundDecimalValueAsString(value)}k`
         },
         splitLine: { lineStyle: { color: '#edf0f2' } }
       },
@@ -1011,27 +1583,29 @@ export class DatabaseDashboardService {
       //     data: [12900, 12400, 13750, 11300, 12750, 12100, 13250],
       //   }
       // ],
-      series: items.map((host: any, index: number) => {
+      series: items.map((host: DBDashboardTopThroughputType) => {
+        const maxTps = Math.max(...(host.trend || []).map((item: DBDashboardTopThroughputTrendType) => Number(item.transactions_per_sec || 0)));
+        const lineColor = this.getTransactionThroughputStatusColor(host.status , maxTps);
         return {
           name: host.name,
           type: 'line',
           smooth: true,
           symbol: 'circle',
           symbolSize: 6,
-          showSymbol: false,
+          // showSymbol: false,
           lineStyle: {
             width: 3,
-            color: colors[index % colors.length]
+            color: lineColor
           },
           itemStyle: {
-            color: colors[index % colors.length]
+            color: lineColor
           },
           areaStyle: {
-            color: this.getLineAreaGradient(colors[index % colors.length])
+            color: this.getLineAreaGradient(lineColor)
           },
           // data: host.trend.map((item: any) => item)          
           data: host.trend.map(item => ({
-            value: item.transactions_per_sec,
+            value: this.roundDecimalValue(item.transactions_per_sec),
             ...item,
             db_uuid: host.db_uuid,
             db_name: host.name
@@ -1042,7 +1616,8 @@ export class DatabaseDashboardService {
   }
 
   private getStorageGrowthOptions(items: DBDashboardStroageGrowthTrendType[]): EChartsOption {
-    const allValues = items.flatMap(db => db.trend.map(t => t.db_size_gb));
+    const allValues = items.flatMap(db => db.trend.map(t => Number(t.db_size_gb || 0)));
+    const yAxisBounds = this.getDecimalAxisBounds(allValues);
     const colors = ['#2F8BD7', '#f5a623', '#5B9E29', '#D03533', '#26A69A', '#9B59B6', '#B7D99A', '#FFD099', '#9BC9F0', '#F5A3A3']
     return {
 
@@ -1069,7 +1644,7 @@ export class DatabaseDashboardService {
         formatter: (params: any) => {
           return params.map((p: any) => {
             const d = p.data;
-            return ` ${p.marker} ${p.seriesName}: ${d.db_size_gb.toFixed(2)} GB `;
+            return ` ${p.marker} ${p.seriesName}: ${this.roundDecimalValueAsString(d.db_size_gb)} GB `;
           }).join('<br/>');
         }
       },
@@ -1087,10 +1662,10 @@ export class DatabaseDashboardService {
       yAxis: {
         type: 'value',
         axisLabel: {
-          formatter: '{value} GB'
+          formatter: (value: number) => `${this.roundDecimalValueAsString(value)} GB`
         },
-        min: Math.floor(Math.min(...allValues)),
-        max: Math.ceil(Math.max(...allValues))
+        min: yAxisBounds.min,
+        max: yAxisBounds.max
       },
 
       series: items.map((db, index) => ({
@@ -1111,7 +1686,7 @@ export class DatabaseDashboardService {
           color: this.getLineAreaGradient(colors[index % colors.length])
         },
         data: db.trend.map(item => ({
-          value: item.db_size_gb,
+          value: this.roundDecimalValue(item.db_size_gb),
           ...item,
           db_uuid: db.db_uuid,
           db_name: db.name
@@ -1165,7 +1740,7 @@ export class DatabaseDashboardService {
         // splitNumber: 4,
         axisLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { color: '#7a8794', fontSize: 10, formatter: '{value}GB' },
+        axisLabel: { color: '#7a8794', fontSize: 10, formatter: (value: number) => `${this.roundDecimalValueAsString(value)}GB` },
         splitLine: { lineStyle: { color: '#edf0f2' } }
       },
       // series: [
@@ -1196,7 +1771,7 @@ export class DatabaseDashboardService {
           areaStyle: {
             color: this.getLineAreaGradient(colors[index % colors.length])
           },
-          data: host.trend.map((item: any) => item.log_growth_gb)
+          data: host.trend.map((item: any) => this.roundDecimalValue(item.log_growth_gb))
         };
       })
     };
@@ -1237,10 +1812,11 @@ export class DatabaseDashboardService {
   }
 
   private formatSeconds(seconds: number): string {
-    const days = Math.floor(seconds / (60 * 60 * 24));
-    const hours = Math.floor((seconds % (60 * 60 * 24)) / (60 * 60));
-    const minutes = Math.floor((seconds % (60 * 60)) / 60);
-    const secs = seconds % 60;
+    const totalSeconds = Math.floor(Number(seconds || 0));
+    const days = Math.floor(totalSeconds / (60 * 60 * 24));
+    const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+    const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+    const secs = totalSeconds % 60;
 
     const parts: string[] = [];
     if (days > 0) {
@@ -1255,8 +1831,7 @@ export class DatabaseDashboardService {
     if (secs > 0) {
       parts.push(`${secs}s`);
     }
-    // If all are zero, return "0s" as a fallback
-    return parts.length > 0 ? parts.join(" ") : "0s";
+    return parts.length > 0 ? parts.slice(0, 2).join(" ") : "0s";
   }
 
 }
