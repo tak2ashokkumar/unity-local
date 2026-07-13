@@ -1,0 +1,173 @@
+{
+  "url": "https://unity.unitedlayer.com/customer/private_cloud_integrated/4455bf34-7e33-49a2-9da0-e35208096013/",
+  "id": 979,
+  "proxy": {
+    "proxy_fqdn": "https://075ec3b6-9cd1-4f65-86cf-7a99f73b6388.unity-uproxy.unitedlayer.com",
+    "backend_url": "https://10.128.7.21",
+    "same_tab": true
+  },
+  "name": "1.DemoVcenter - GlobalVCS-Lab",
+  "uuid": "4455bf34-7e33-49a2-9da0-e35208096013",
+  "platform_type": "VMware",
+  "customer": {
+    "url": "https://unity.unitedlayer.com/rest/fast/org/417/",
+    "id": 417,
+    "name": "UnityOne Demo",
+    "storage": null,
+    "uuid": "49e91ec8-a5fd-4571-89ea-9a8e46a9a316"
+  },
+  "colocation_cloud": {
+    "id": 457,
+    "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2",
+    "name": "DC1"
+  },
+  "servers": [
+    {
+      "id": 3556,
+      "url": "https://unity.unitedlayer.com/rest/server/3556/",
+      "name": "ul-sf10-502-lab-esx11.unitedlayer.com",
+      "uuid": "b77f5881-73d3-4867-aec9-841c1752336c",
+      "esxi": null
+    }
+  ],
+  "vms": [],
+  "vms_count": 73,
+  "device_count": 2,
+  "switch": [
+    {
+      "url": "https://unity.unitedlayer.com/rest/switch/6983/",
+      "id": 6983,
+      "uuid": "72ba1e47-fced-4418-8148-4fd2ddfc0bb3",
+      "name": "UL-SV1-P26-2-R08-UNITY-LAB-ACC-SW-01.unitylab.local",
+      "object_class": "Switch",
+      "is_shared": false,
+      "display_name": "UL-SV1-P26-2-R08-UNITY-LAB-ACC-SW-01.unitylab.local - UnityOne Demo"
+    }
+  ],
+  "load_balancer": [],
+  "customdevice": [],
+  "firewall": [],
+  "storage_device": [],
+  "mac_device": [],
+  "upstream_providers": [],
+  "hypervisors": [
+    {
+      "name": "ul-sf10-502-lab-esx11.unitedlayer.com"
+    }
+  ],
+  "bm_server": [],
+  "display_platform": "VMware vCenter",
+  "server_list": [
+    3556
+  ],
+  "collector": null,
+  "nutanix": null,
+  "nutanix_details": null,
+  "monitoring": null,
+  "resources_list": [
+    {
+      "id": 55,
+      "uuid": "3164eb75-5ccc-4eab-9aff-816d06f7ee5b",
+      "resource_name": "cost test",
+      "cloud_type": "VMware",
+      "cost_type": "All At One Price"
+    }
+  ],
+  "discover_resources": true,
+  "discover_dependency": true,
+  "through_collector": true,
+  "is_managed": true,
+  "ingest_event": false,
+  "total_resources": 92,
+  "clusters": [
+    {
+      "id": 1,
+      "name": "Linux Cluster",
+      "uuid": "204f7c6e-5ca4-4cc5-b682-1dce5184568a"
+    },
+    {
+      "id": 5,
+      "name": "DEFR-MGMT",
+      "uuid": "d586745d-6e10-409f-87e6-5f3b35ac8fa6"
+    },
+    {
+      "id": 4,
+      "name": "DEFR-DMZ01",
+      "uuid": "c6389062-2fdd-4254-a242-44614d5c3860"
+    },
+    {
+      "id": 3,
+      "name": "DEFR-PROD01",
+      "uuid": "f8fcd059-3869-45c0-8d72-52db8483b945"
+    },
+    {
+      "id": 2,
+      "name": "DEFR-PROD02",
+      "uuid": "ef863302-6eb5-42c2-ad9e-7c6550c493cd"
+    }
+  ],
+  "datastores": [
+    {
+      "id": 7,
+      "name": "datastore1 (4)",
+      "uuid": "56ca41c5-837d-42fc-87ee-93e055d6bb0c"
+    },
+    {
+      "id": 6,
+      "name": "esx11-ds2",
+      "uuid": "1fd74a78-da33-4306-867c-31b48552e095"
+    },
+    {
+      "id": 1,
+      "name": "lab-esx1",
+      "uuid": "eba5f66b-6a4a-459e-aff7-2928e1774abf"
+    },
+    {
+      "id": 8,
+      "name": "esx13-DS1",
+      "uuid": "8854c806-648b-4236-b941-57277bdd7c9a"
+    },
+    {
+      "id": 2,
+      "name": "lab-esx3",
+      "uuid": "d23211fe-1c29-48c9-b763-de88d8826911"
+    },
+    {
+      "id": 79,
+      "name": "lab-ds4",
+      "uuid": "8f2eec73-757d-4dfb-979a-875755d8d066"
+    },
+    {
+      "id": 9,
+      "name": "esx11-DS3",
+      "uuid": "bcc5d861-ab03-47a1-b9a4-17610401a466"
+    },
+    {
+      "id": 5,
+      "name": "lab-esx2",
+      "uuid": "16a9bfc4-95cd-48a7-9fac-6b4d6e427108"
+    },
+    {
+      "id": 3,
+      "name": "lab-esx5",
+      "uuid": "760246e8-dde6-4c22-9ba6-e092b28c2f72"
+    }
+  ],
+  "networks": [
+    {
+      "id": 3,
+      "name": "UL-VLAN-2021",
+      "uuid": "9ab521de-816f-49c8-ac12-c6e5392603e2"
+    },
+    {
+      "id": 2,
+      "name": "U-D-T",
+      "uuid": "7cc0b4cc-db74-4193-bacf-5a8bed04f55d"
+    },
+    {
+      "id": 1,
+      "name": "VM Network",
+      "uuid": "cc5113b2-bad3-4055-b350-d9b91eb9a1fa"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "url": "https://unity.unitedlayer.com/customer/private_cloud_integrated/f83bed82-17e7-4b4f-99ba-acfdf02cd4fc/",
+  "id": 1050,
+  "proxy": {},
+  "name": "Nutanix",
+  "uuid": "f83bed82-17e7-4b4f-99ba-acfdf02cd4fc",
+  "platform_type": "Nutanix",
+  "customer": {
+    "url": "https://unity.unitedlayer.com/rest/fast/org/417/",
+    "id": 417,
+    "name": "UnityOne Demo",
+    "storage": null,
+    "uuid": "49e91ec8-a5fd-4571-89ea-9a8e46a9a316"
+  },
+  "colocation_cloud": {
+    "id": 457,
+    "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2",
+    "name": "DC1"
+  },
+  "servers": [],
+  "vms": [],
+  "vms_count": 3,
+  "device_count": 0,
+  "switch": [],
+  "load_balancer": [],
+  "customdevice": [],
+  "firewall": [],
+  "storage_device": [],
+  "mac_device": [],
+  "upstream_providers": [],
+  "hypervisors": [],
+  "bm_server": [],
+  "display_platform": "Nutanix",
+  "server_list": [],
+  "collector": null,
+  "nutanix": {
+    "virtual_machine": {
+      "total": 3,
+      "good": 3,
+      "warning": 0,
+      "error": 0
+    },
+    "storage_container": {
+      "total": 3,
+      "good": 3,
+      "warning": 0,
+      "error": 0
+    },
+    "cluster": {
+      "total": 1,
+      "good": 0,
+      "warning": 0,
+      "error": 1
+    },
+    "host": {
+      "total": 1,
+      "good": 0,
+      "warning": 0,
+      "error": 1
+    },
+    "storage_pool": {
+      "total": 1,
+      "good": 1,
+      "warning": 0,
+      "error": 0
+    },
+    "disk": {
+      "total": 7,
+      "good": 7,
+      "warning": 0,
+      "error": 0
+    },
+    "virtual_disks": {
+      "total": 0
+    }
+  },
+  "nutanix_details": {
+    "components_to_discover": [
+      "vm",
+      "cluster",
+      "host",
+      "sc",
+      "disk",
+      "sp",
+      "vdisk"
+    ],
+    "credentials": {
+      "id": 68,
+      "uuid": "fdbbadb3-526f-4415-b0a5-053fa2d562d5",
+      "name": "MyNutanixCloud",
+      "connection_type": "Default",
+      "database_type": null
+    },
+    "schedule": {
+      "schedule_type": "none"
+    },
+    "protection_domain": "",
+    "onboard": true,
+    "hostname": "https://10.192.5.211:9440"
+  },
+  "monitoring": {
+    "configured": false,
+    "observium": false,
+    "enabled": false,
+    "zabbix": true
+  },
+  "resources_list": [
+    {
+      "id": 52,
+      "uuid": "ec4377ce-884e-41be-9e04-ab71be9b479c",
+      "resource_name": "pc-tiny",
+      "cloud_type": "Nutanix",
+      "cost_type": "All At One Price"
+    }
+  ],
+  "discover_resources": false,
+  "discover_dependency": false,
+  "through_collector": true,
+  "is_managed": false,
+  "ingest_event": false,
+  "total_resources": 3,
+  "clusters": [],
+  "datastores": [],
+  "networks": []
+}

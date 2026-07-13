@@ -11,7 +11,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
 import { DevicePopoverData } from '../../devices-popover/device-popover-data';
 import { PowerToggleInput } from '../../server-power-toggle/server-power-toggle.service';
-import { VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE } from 'src/app/app-constants';
+import { VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
@@ -58,8 +58,11 @@ export class VmsListOpenstackService {
 
     if (this.user.isManagementEnabled) {
       a.isPowerButtonEnabled = true;
-      a.isSameTabEnabled = ((vm.management_ip ? true : false) && a.powerStatusOn);
-      if (!vm.management_ip) {
+      const isWindows: boolean = vm.operating_system ? (vm.operating_system.lastIndexOf('Microsoft', 0) == 0) : false;
+      a.isSameTabEnabled = ((vm.management_ip ? true : false) && a.powerStatusOn && !isWindows);
+      if (isWindows) {
+        a.sameTabTootipMessage = 'Open in Same tab option is not available for windows based machines';
+      } else if (!vm.management_ip) {
         a.sameTabTootipMessage = 'Management IP not Configured';
       } else if (!a.powerStatusOn) {
         a.sameTabTootipMessage = 'VM is Down';
@@ -72,6 +75,9 @@ export class VmsListOpenstackService {
         a.newTabToolipMessage = 'Management IP not Configured';
       } else if (!a.powerStatusOn) {
         a.newTabToolipMessage = 'VM is Down';
+      } else if (isWindows) {
+        a.newTabToolipMessage = 'Open In New Tab';
+        a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
       } else {
         a.newTabToolipMessage = 'Open In New Tab';
         a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();

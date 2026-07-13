@@ -1,0 +1,95 @@
+{
+  "id": 498,
+  "uuid": "3c874681-c479-497d-9689-9c1c29a85efc",
+  "name": "vCenter Demo 1",
+  "private_cloud": 1304,
+  "colocation_cloud": {
+    "name": "DC1",
+    "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2"
+  },
+  "hostname": "10.192.17.23",
+  "username": "ulecloudadmin@vsphere.local",
+  "port": 443,
+  "collector": {
+    "name": "Demo-Coll",
+    "uuid": "bae82259-7216-4539-91c3-ee703e614aef"
+  },
+  "resource_pool_name": "",
+  "discover_resources": true,
+  "discover_dependency": false,
+  "is_managed": true,
+  "ingest_event": false,
+  "proxy": {
+    "proxy_fqdn": "https://81a001f7-d306-474b-9f72-6a083790bde3.unity-uproxy.unitedlayer.com",
+    "backend_url": "https://10.192.17.23",
+    "same_tab": true
+  },
+  "servers": [
+    {
+      "id": 4401,
+      "url": "https://unity.unitedlayer.com/rest/server/4401/",
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+      "uuid": "54b0927b-a6d4-4496-a4bc-b6e6e11d9cfb",
+      "esxi": null
+    },
+    {
+      "id": 4402,
+      "url": "https://unity.unitedlayer.com/rest/server/4402/",
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+      "uuid": "1644da7b-6745-483c-904e-b81debaffa48",
+      "esxi": null
+    }
+  ],
+  "vms": [],
+  "vms_count": 0,
+  "device_count": 2,
+  "switch": [],
+  "load_balancer": [],
+  "customdevice": [],
+  "firewall": [],
+  "storage_device": [],
+  "mac_device": [],
+  "upstream_providers": [],
+  "hypervisors": [
+    {
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com"
+    },
+    {
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com"
+    }
+  ],
+  "bm_server": [],
+  "display_platform": "VMware vCenter",
+  "server_list": [
+    4401,
+    4402
+  ],
+  "platform_type": "VMware",
+  "resources_list": [],
+  "customer": {
+    "id": 417,
+    "name": "UnityOne Demo",
+    "uuid": "49e91ec8-a5fd-4571-89ea-9a8e46a9a316"
+  },
+  "total_resources": 2,
+  "clusters": [],
+  "datastores": [],
+  "networks": [],
+  "distributed_switches": [],
+  "port_groups": [],
+  "status": -1,
+  "domain": null,
+  "monitoring": {
+    "configured": true,
+    "observium": false,
+    "enabled": true,
+    "zabbix": true
+  },
+  "schedule_meta": {
+    "run_now": true,
+    "schedule_type": "none"
+  },
+  "event_inbound_webhook": null,
+  "event_inbound_api": null,
+  "ticket_subject_format": null
+}

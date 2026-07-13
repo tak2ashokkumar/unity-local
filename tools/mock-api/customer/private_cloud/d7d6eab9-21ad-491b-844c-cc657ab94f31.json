@@ -1,4 +1,135 @@
 {
-  "id": null,
-  "uuid": "d7d6eab9-21ad-491b-844c-cc657ab94f31"
+  "url": "https://unity.unitedlayer.com/customer/private_cloud_integrated/d7d6eab9-21ad-491b-844c-cc657ab94f31/",
+  "id": 1237,
+  "proxy": {
+    "proxy_fqdn": "https://622d2b69-91c0-4bc1-b667-83ea5719cf91.unity-uproxy.unitedlayer.com",
+    "backend_url": "https://10.192.17.23",
+    "same_tab": true
+  },
+  "name": "01.Global_VCenter_Lab",
+  "uuid": "d7d6eab9-21ad-491b-844c-cc657ab94f31",
+  "platform_type": "VMware",
+  "customer": {
+    "url": "https://unity.unitedlayer.com/rest/fast/org/417/",
+    "id": 417,
+    "name": "UnityOne Demo",
+    "storage": null,
+    "uuid": "49e91ec8-a5fd-4571-89ea-9a8e46a9a316"
+  },
+  "colocation_cloud": {
+    "id": 457,
+    "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2",
+    "name": "DC1"
+  },
+  "servers": [
+    {
+      "id": 3945,
+      "url": "https://unity.unitedlayer.com/rest/server/3945/",
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+      "uuid": "61b93090-1ee7-4258-9e09-3be62f748211",
+      "esxi": null
+    },
+    {
+      "id": 3944,
+      "url": "https://unity.unitedlayer.com/rest/server/3944/",
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+      "uuid": "f6c8c659-d821-4e58-ad13-f20e78f41310",
+      "esxi": null
+    }
+  ],
+  "vms": [],
+  "vms_count": 74,
+  "device_count": 2,
+  "switch": [],
+  "load_balancer": [],
+  "customdevice": [],
+  "firewall": [],
+  "storage_device": [],
+  "mac_device": [],
+  "upstream_providers": [],
+  "hypervisors": [
+    {
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com"
+    },
+    {
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com"
+    }
+  ],
+  "bm_server": [],
+  "display_platform": "VMware vCenter",
+  "server_list": [
+    3945,
+    3944
+  ],
+  "collector": {
+    "uuid": "bae82259-7216-4539-91c3-ee703e614aef",
+    "name": "Demo-Coll",
+    "id": 264
+  },
+  "nutanix": null,
+  "nutanix_details": null,
+  "monitoring": null,
+  "resources_list": [],
+  "discover_resources": true,
+  "discover_dependency": false,
+  "through_collector": true,
+  "is_managed": true,
+  "ingest_event": false,
+  "total_resources": 86,
+  "clusters": [
+    {
+      "id": 159,
+      "name": "UNITY-LAB-CL",
+      "uuid": "d8d1af4d-9836-4c23-85d9-ae324200b32b"
+    }
+  ],
+  "datastores": [
+    {
+      "id": 692,
+      "name": "LocalDS_ESXI01",
+      "uuid": "001ef330-f666-438c-a70e-a966b52a1a37"
+    },
+    {
+      "id": 694,
+      "name": "LocalDS_ESXI02",
+      "uuid": "f32b96c3-277d-4ccb-ba88-0f6ebce061a6"
+    },
+    {
+      "id": 695,
+      "name": "LAB-ESX01-DS",
+      "uuid": "caf33b22-dc39-450e-b12d-995f929a97c2"
+    },
+    {
+      "id": 693,
+      "name": "LAB-ESX02-DS",
+      "uuid": "98ca091c-305f-43f0-a0c9-511daf15eb73"
+    }
+  ],
+  "networks": [
+    {
+      "id": 573,
+      "name": "VLAN-217",
+      "uuid": "a9acb095-0c4a-45cf-9643-2f6b16ff050b"
+    },
+    {
+      "id": 572,
+      "name": "VM Network",
+      "uuid": "604ab4e1-251f-49e3-8592-a055925d2f67"
+    },
+    {
+      "id": 607,
+      "name": "VLAN 156",
+      "uuid": "04bc6679-c58d-463e-bb2f-f899851ac871"
+    },
+    {
+      "id": 590,
+      "name": "VM-NW-333",
+      "uuid": "c14983ea-086d-4f8d-9d1b-d35fce97a5fa"
+    },
+    {
+      "id": 606,
+      "name": "VLAN 157",
+      "uuid": "d6462d09-d678-4c91-bac9-b3058abc425f"
+    }
+  ]
 }

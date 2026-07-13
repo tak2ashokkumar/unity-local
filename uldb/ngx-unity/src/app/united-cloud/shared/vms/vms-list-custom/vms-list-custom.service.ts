@@ -42,7 +42,7 @@ export class VmsListCustomService {
       a.tags = vm.tags.filter(tg => tg);
       a.monitoring = vm.monitoring;
       if (this.user.isManagementEnabled) {
-        const isWindows: boolean = vm.os ? (vm.os.platform_type == 'Windows' ? true : false) : false;
+        const isWindows: boolean = (vm.os && vm.os.full_name) ? (vm.os.full_name.lastIndexOf('Microsoft', 0) == 0) : false;
         a.isSameTabEnabled = ((vm.management_ip ? true : false) && !isWindows);
         if (!vm.management_ip) {
           a.sameTabTootipMessage = 'Management IP not Configured';

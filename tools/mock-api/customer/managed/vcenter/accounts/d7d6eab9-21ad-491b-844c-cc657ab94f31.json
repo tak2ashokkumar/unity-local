@@ -1,4 +1,615 @@
 {
-  "id": null,
-  "uuid": "d7d6eab9-21ad-491b-844c-cc657ab94f31"
+  "id": 467,
+  "uuid": "d7d6eab9-21ad-491b-844c-cc657ab94f31",
+  "name": "01.Global_VCenter_Lab",
+  "private_cloud": 1237,
+  "colocation_cloud": {
+    "name": "DC1",
+    "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2"
+  },
+  "hostname": "10.192.17.23",
+  "username": "ulecloudadmin@vsphere.local",
+  "port": 443,
+  "collector": {
+    "name": "Demo-Coll",
+    "uuid": "bae82259-7216-4539-91c3-ee703e614aef"
+  },
+  "resource_pool_name": "",
+  "discover_resources": true,
+  "discover_dependency": false,
+  "is_managed": true,
+  "ingest_event": false,
+  "proxy": {
+    "proxy_fqdn": "https://622d2b69-91c0-4bc1-b667-83ea5719cf91.unity-uproxy.unitedlayer.com",
+    "backend_url": "https://10.192.17.23",
+    "same_tab": true
+  },
+  "servers": [
+    {
+      "id": 3945,
+      "url": "https://unity.unitedlayer.com/rest/server/3945/",
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+      "uuid": "61b93090-1ee7-4258-9e09-3be62f748211",
+      "esxi": null
+    },
+    {
+      "id": 3944,
+      "url": "https://unity.unitedlayer.com/rest/server/3944/",
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+      "uuid": "f6c8c659-d821-4e58-ad13-f20e78f41310",
+      "esxi": null
+    }
+  ],
+  "vms": [
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40285/",
+      "id": 40285,
+      "name": "unity-lab-lnx-vm9",
+      "uuid": "23807365-b737-467b-9325-02fcf99394cb"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40283/",
+      "id": 40283,
+      "name": "unity-lab-lnx-vm10",
+      "uuid": "67528954-eaba-4c4e-b17f-a45f5f1177b3"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41318/",
+      "id": 41318,
+      "name": "03.unity-lab-lnx-ubuntu-vm3",
+      "uuid": "fb246113-fc57-4090-ade6-cd4dcb4bca01"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/42209/",
+      "id": 42209,
+      "name": "VM Vcenter",
+      "uuid": "1a531df2-5b5d-4dd2-b2e1-522c2bc3e144"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/42358/",
+      "id": 42358,
+      "name": "ZeroTouchVM",
+      "uuid": "1889b04a-91bd-4e40-9f0e-3b6551212689"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40278/",
+      "id": 40278,
+      "name": "unity-lab-k8-SNode1",
+      "uuid": "bd93d40b-a056-4808-a2bf-af2bcb247120"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40292/",
+      "id": 40292,
+      "name": "unity-lab-lnx-ubuntu-vm1",
+      "uuid": "116c99f6-a3e4-4f60-ba14-cd845648d336"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40252/",
+      "id": 40252,
+      "name": "unity-lab-lnx-centos-vm3",
+      "uuid": "a2527a9e-a245-41e2-9d92-45ac6896d3e1"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40229/",
+      "id": 40229,
+      "name": "unity-lab-lnx-suse-vm1",
+      "uuid": "61657101-2158-46c0-affe-b41d7fd488ed"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40263/",
+      "id": 40263,
+      "name": "unity-lab-lnx-debian-vm1",
+      "uuid": "3e8cc91a-a1de-434b-b50d-ccadfb007a1f"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40246/",
+      "id": 40246,
+      "name": "unity-lab-lnx-vm12",
+      "uuid": "308fe327-1b5d-482b-bb08-d2440b47e776"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40242/",
+      "id": 40242,
+      "name": "unity-lab-lnx-vm13",
+      "uuid": "42d4a6c3-cfff-4865-be2c-07f59a33ae16"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40256/",
+      "id": 40256,
+      "name": "unity-lab-lnx-vm14",
+      "uuid": "cfee324f-eae0-43e2-8dc4-1f786df705d3"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40231/",
+      "id": 40231,
+      "name": "unity-lab-lnx-vm15",
+      "uuid": "6895fd37-0678-4ea2-8bbd-85f3b3750fad"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40247/",
+      "id": 40247,
+      "name": "unity-lab-Win-vm12",
+      "uuid": "acacb8e5-3aa0-439d-941f-66e06fdf62b5"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40266/",
+      "id": 40266,
+      "name": "unity-lab-Win-vm5",
+      "uuid": "053a5d92-e3e1-4bed-8c59-e00b7dda3497"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40275/",
+      "id": 40275,
+      "name": "UL-UNITY-LAB-VC",
+      "uuid": "3a023e60-0117-4cc5-a496-85f9f6f766ed"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/43128/",
+      "id": 43128,
+      "name": "test-vm3",
+      "uuid": "c8a0b642-5ce4-4a96-8ceb-c5ecb736b956"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41315/",
+      "id": 41315,
+      "name": "10.UL-WIN2019-VM01",
+      "uuid": "bf07039b-108a-4e0a-976f-0339a5e81d86"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40260/",
+      "id": 40260,
+      "name": "unity-lab-Win-vm2",
+      "uuid": "f20e5de0-9a37-4600-ac13-b90d6df15bc4"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40240/",
+      "id": 40240,
+      "name": "unity-lab-lnx-ubuntu-vm6",
+      "uuid": "351cd24e-3355-4708-9fca-6d864c28e5b0"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41316/",
+      "id": 41316,
+      "name": "08.unity-lab-lnx-rocky-vm1",
+      "uuid": "03f81768-449e-4b7a-90cb-41dea94175d5"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41319/",
+      "id": 41319,
+      "name": "02.unity-lab-lnx-vm11",
+      "uuid": "f8463968-120a-49f8-a23c-0a6de747c57a"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41320/",
+      "id": 41320,
+      "name": "11.UL-WIN2019-VM02",
+      "uuid": "9c41c4a1-ecd2-4678-940e-2a4b8495dd51"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41321/",
+      "id": 41321,
+      "name": "ul-easy-trade-app01",
+      "uuid": "29efd749-b065-471f-8dde-f4b7810ff47f"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41317/",
+      "id": 41317,
+      "name": "12.UL-WIN2019-VM03",
+      "uuid": "c9e80f8f-34cc-46e4-8955-5784afc8e0af"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40294/",
+      "id": 40294,
+      "name": "unity-lab-lnx-vm8",
+      "uuid": "1f894408-38d3-44c1-a8cf-2ef828cc5330"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41322/",
+      "id": 41322,
+      "name": "05.unity-lab-Win-vm3",
+      "uuid": "e30c68a6-c1fb-4b18-adbf-510fb97d9704"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40284/",
+      "id": 40284,
+      "name": "UL-Template-Ubuntu22LTS_100GB",
+      "uuid": "2a1a1445-562f-4497-b5d7-584edffe8c34"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40290/",
+      "id": 40290,
+      "name": "unity-lab-lnx-vm5",
+      "uuid": "1b63a71c-77c7-416f-8f49-84fdc9303f83"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40282/",
+      "id": 40282,
+      "name": "unity-lab-Win-vm - Template",
+      "uuid": "da0d080c-988b-4493-9132-950ced84d4d9"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40239/",
+      "id": 40239,
+      "name": "unity-lab-Win-vm13",
+      "uuid": "ad6ff217-ee58-4d9c-a0e6-ff91712c7cc2"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40280/",
+      "id": 40280,
+      "name": "UL-Template-Centos9-40GB",
+      "uuid": "3498e937-0a0f-4fb6-b609-b1d5886eccc9"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/43129/",
+      "id": 43129,
+      "name": "test-vm",
+      "uuid": "0448c559-b7de-423b-a33a-8a341b1d602e"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40291/",
+      "id": 40291,
+      "name": "UL-Template-RockyLinux9.5-40GB",
+      "uuid": "491cec6d-a8d3-44f0-ad3e-40516d2d34c2"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40232/",
+      "id": 40232,
+      "name": "UL-TMP-WIN-11",
+      "uuid": "aa287798-f037-461b-b7bf-402b3e860faf"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40293/",
+      "id": 40293,
+      "name": "UL-Template-Debian10-40GB",
+      "uuid": "27ace59f-7f92-4e5c-b30d-8610fb05a092"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40251/",
+      "id": 40251,
+      "name": "UL-TMP-WIN-2019",
+      "uuid": "8ab60acc-00fe-404a-8448-70fecab440d9"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40281/",
+      "id": 40281,
+      "name": "UL-Template-Suse15.6-40GB",
+      "uuid": "f9254f9e-d15a-4f61-a5af-19d6996406ec"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40782/",
+      "id": 40782,
+      "name": "devopsubt24-template",
+      "uuid": "02b1685e-f35a-4304-b291-f8b35f9690d1"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40777/",
+      "id": 40777,
+      "name": "devopscentos9-template",
+      "uuid": "72bbc76c-28fb-464d-8037-c9583aea46fb"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41323/",
+      "id": 41323,
+      "name": "01.unity-lab-lnx-vm1",
+      "uuid": "bdf31421-360f-411d-b4f4-38517c493ded"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41314/",
+      "id": 41314,
+      "name": "07.Unity-VM-Veeam01",
+      "uuid": "a032acbf-fdfe-4542-b04f-866099798c07"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41730/",
+      "id": 41730,
+      "name": "ul-demolab-f5-test-01",
+      "uuid": "bd740467-3872-4d3c-a7cd-78437e840470"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40287/",
+      "id": 40287,
+      "name": "unity-lab-lnx-vm3",
+      "uuid": "6489cebe-f529-44b9-b2b7-c7a8cd81012c"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41066/",
+      "id": 41066,
+      "name": "ul-test-log-metrics01_Clone_replica",
+      "uuid": "533fdf10-57a2-4683-8361-62d71c53721d"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40244/",
+      "id": 40244,
+      "name": "UL-TMP-WIN-2022",
+      "uuid": "04bf626e-71ec-4ef1-8234-43687cfc3ab3"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40259/",
+      "id": 40259,
+      "name": "UL-WIN11-VM02",
+      "uuid": "e4cde6a7-ca28-4ea6-897a-374dd575fff1"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40228/",
+      "id": 40228,
+      "name": "UL-WIN2022-VM02",
+      "uuid": "8bd1af4d-dce5-45f8-8236-8106f6686997"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40245/",
+      "id": 40245,
+      "name": "unity-lab-lnx-centos-vm2",
+      "uuid": "37a47f47-ec68-45aa-b27a-832bc4642d14"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40274/",
+      "id": 40274,
+      "name": "unity-lab-lnx-debian-vm2",
+      "uuid": "e09bcc45-fe78-4be2-bff9-a51da755fe6f"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40264/",
+      "id": 40264,
+      "name": "unity-lab-lnx-debian-vm3",
+      "uuid": "22de2255-39f1-4aa0-afeb-a6b36e00a26b"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40277/",
+      "id": 40277,
+      "name": "unity-lab-lnx-template22_40GB",
+      "uuid": "75173eff-763b-4a09-b713-e5f2fc03f170"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40233/",
+      "id": 40233,
+      "name": "unity-lab-lnx-rocky-vm2",
+      "uuid": "44021b6b-5cff-4a22-b3d7-d42953813aa6"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40271/",
+      "id": 40271,
+      "name": "unity-lab-lnx-vm6",
+      "uuid": "a06859eb-ff8e-4e95-8a2b-2f71250b5832"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40267/",
+      "id": 40267,
+      "name": "unity-lab-lnx-vm7",
+      "uuid": "49197e0e-4030-40bc-ac83-63817cf4e12e"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41729/",
+      "id": 41729,
+      "name": "ul-demolab-f5-test-02",
+      "uuid": "0f615dd1-75c1-4760-9435-aee4de6c7dc5"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40253/",
+      "id": 40253,
+      "name": "unity-lab-lnx-ubuntu-vm5",
+      "uuid": "a22df4f2-2e16-4929-b047-34b99a98b8b5"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40261/",
+      "id": 40261,
+      "name": "UL-WIN2022-VM01",
+      "uuid": "af8bc552-63ba-44ff-a623-e405d755366e"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41325/",
+      "id": 41325,
+      "name": "06.unity-lab-Win-vm4",
+      "uuid": "f212a05e-9c51-4672-bbf2-03ed93c37958"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41731/",
+      "id": 41731,
+      "name": "ul-BankOfAnthos-app01",
+      "uuid": "f10f2f4f-b086-4c93-9313-b5a919c1a065"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40248/",
+      "id": 40248,
+      "name": "unity-lab-lnx-ubuntu-vm4",
+      "uuid": "defde640-c8d2-4808-bffb-a877ec2ec3b2"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40295/",
+      "id": 40295,
+      "name": "unity-lab-lnx-vm4",
+      "uuid": "0a01fbe0-250d-4c05-81dc-c64601a1b358"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40273/",
+      "id": 40273,
+      "name": "unity-lab-k8-Master",
+      "uuid": "4a27d16c-839d-47dc-9a20-c98ffb8a9714"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40783/",
+      "id": 40783,
+      "name": "devopsubt22-template",
+      "uuid": "eedefe96-56b9-44aa-a03a-aa1717c99986"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40250/",
+      "id": 40250,
+      "name": "unity-lab-lnx-centos-vm1",
+      "uuid": "aab3bace-260c-40df-8caa-ac2e24d0b0a0"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/41324/",
+      "id": 41324,
+      "name": "04.unity-lab-Win-vm1",
+      "uuid": "24226f5e-8f79-45d7-bc71-5360011a6add"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40241/",
+      "id": 40241,
+      "name": "unity-lab-Win-vm11",
+      "uuid": "f0c122d0-d53a-4eef-ba57-a04e70cc9a6b"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40243/",
+      "id": 40243,
+      "name": "unity-lab-lnx-ubuntu-vm7",
+      "uuid": "b296fb7d-1ab8-464f-b152-5c7477934bcb"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40249/",
+      "id": 40249,
+      "name": "UL-WIN11-VM01",
+      "uuid": "72244bc7-038e-45bc-bea5-6a5bdc865e48"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40269/",
+      "id": 40269,
+      "name": "unity-lab-lnx-vm2",
+      "uuid": "d52ddfbf-6a76-4336-be82-aeca9c8f4613"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40265/",
+      "id": 40265,
+      "name": "unity-lab-k8-SNode2",
+      "uuid": "d39b3be1-dbe0-4e66-869f-ee12298a9de5"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40778/",
+      "id": 40778,
+      "name": "devopswin22-template",
+      "uuid": "954952f7-1ba3-4ab5-8721-606f9abfc33c"
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/vm/40238/",
+      "id": 40238,
+      "name": "unity-lab-lnx-suse-vm2",
+      "uuid": "0d374fdc-1ede-4017-b113-b207cc000499"
+    }
+  ],
+  "vms_count": 74,
+  "device_count": 2,
+  "switch": [],
+  "load_balancer": [],
+  "customdevice": [],
+  "firewall": [],
+  "storage_device": [],
+  "mac_device": [],
+  "upstream_providers": [],
+  "hypervisors": [
+    {
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com"
+    },
+    {
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com"
+    }
+  ],
+  "bm_server": [],
+  "display_platform": "VMware vCenter",
+  "server_list": [
+    3945,
+    3944
+  ],
+  "platform_type": "VMware",
+  "resources_list": [],
+  "customer": {
+    "id": 417,
+    "name": "UnityOne Demo",
+    "uuid": "49e91ec8-a5fd-4571-89ea-9a8e46a9a316"
+  },
+  "total_resources": 90,
+  "clusters": [
+    {
+      "id": 159,
+      "name": "UNITY-LAB-CL",
+      "uuid": "d8d1af4d-9836-4c23-85d9-ae324200b32b"
+    }
+  ],
+  "datastores": [
+    {
+      "id": 692,
+      "name": "LocalDS_ESXI01",
+      "uuid": "001ef330-f666-438c-a70e-a966b52a1a37"
+    },
+    {
+      "id": 694,
+      "name": "LocalDS_ESXI02",
+      "uuid": "f32b96c3-277d-4ccb-ba88-0f6ebce061a6"
+    },
+    {
+      "id": 695,
+      "name": "LAB-ESX01-DS",
+      "uuid": "caf33b22-dc39-450e-b12d-995f929a97c2"
+    },
+    {
+      "id": 693,
+      "name": "LAB-ESX02-DS",
+      "uuid": "98ca091c-305f-43f0-a0c9-511daf15eb73"
+    }
+  ],
+  "networks": [
+    {
+      "id": 573,
+      "name": "VLAN-217",
+      "uuid": "a9acb095-0c4a-45cf-9643-2f6b16ff050b"
+    },
+    {
+      "id": 572,
+      "name": "VM Network",
+      "uuid": "604ab4e1-251f-49e3-8592-a055925d2f67"
+    },
+    {
+      "id": 607,
+      "name": "VLAN 156",
+      "uuid": "04bc6679-c58d-463e-bb2f-f899851ac871"
+    },
+    {
+      "id": 590,
+      "name": "VM-NW-333",
+      "uuid": "c14983ea-086d-4f8d-9d1b-d35fce97a5fa"
+    },
+    {
+      "id": 606,
+      "name": "VLAN 157",
+      "uuid": "d6462d09-d678-4c91-bac9-b3058abc425f"
+    }
+  ],
+  "distributed_switches": [
+    {
+      "id": 94,
+      "name": "DSwitch-01",
+      "uuid": "08825f49-a5e5-4ecc-b51f-ef07814ff62d"
+    }
+  ],
+  "port_groups": [
+    {
+      "id": 827,
+      "name": "DSwitch-01-DVUplinks-24",
+      "uuid": "1d57d87a-ad78-43c8-83be-155a7034afa7"
+    },
+    {
+      "id": 619,
+      "name": "VM-Net-VLAN218",
+      "uuid": "c43b98d3-f501-4587-afbf-92e266a491fc"
+    },
+    {
+      "id": 620,
+      "name": "DPortGroup",
+      "uuid": "63bccc57-e03b-4e53-8e60-495e62a7f605"
+    }
+  ],
+  "status": 1,
+  "domain": "01.Global_VCenter_Lab",
+  "monitoring": {
+    "configured": true,
+    "observium": false,
+    "enabled": false,
+    "zabbix": true
+  },
+  "schedule_meta": {
+    "run_now": false,
+    "schedule_type": "none"
+  },
+  "event_inbound_webhook": null,
+  "event_inbound_api": null,
+  "ticket_subject_format": null
 }

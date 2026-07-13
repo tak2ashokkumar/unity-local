@@ -46,7 +46,8 @@ export class VmsListHypervService {
     a.monitoring = vm.monitoring;
 
     if (this.user.isManagementEnabled) {
-      const isWindows: boolean = vm.os ? (vm.os.lastIndexOf('Microsoft', 0) == 0) : false;
+      const isWindows: boolean = vm.os ? (vm.os.includes('Microsoft') || vm.os.includes('Windows', 0) || vm.ssr_os == 'Windows') : false;
+      // const isWindows: boolean = vm.os ? (vm.os.lastIndexOf('Microsoft', 0) == 0) : false;
       const powerOn: boolean = vm.status == 'Running';
       a.isSameTabEnabled = ((vm.management_ip ? true : false) && powerOn && !isWindows);
       if (!vm.management_ip) {

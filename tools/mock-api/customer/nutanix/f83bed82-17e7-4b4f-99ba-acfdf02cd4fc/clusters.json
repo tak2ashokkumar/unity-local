@@ -1,0 +1,60 @@
+[
+  {
+    "name": "UL-Nutanix-Test",
+    "uuid": "00060fb7-099d-052c-4c21-588a5ae9acb7",
+    "aos_version": "6.5.2",
+    "host_count": 1,
+    "vm_count": 3,
+    "ip_address": null,
+    "cpu_usage": "10.88 %",
+    "memory_usage": "25.25 %",
+    "total_storage": "4.0 TB",
+    "used_storage": "69.2 GB",
+    "free_storage_pct": "98.30 %",
+    "hypervisors": "AHV",
+    "upgrade_status": null,
+    "cluster_runway": null,
+    "inefficient_vms": null,
+    "health_summary": {
+      "virtual_machine": {
+        "total": 3,
+        "good": 3,
+        "warning": 0,
+        "error": 0
+      },
+      "storage_container": {
+        "total": 3,
+        "good": 3,
+        "warning": 0,
+        "error": 0
+      },
+      "cluster": {
+        "total": 1,
+        "good": 0,
+        "warning": 0,
+        "error": 1
+      },
+      "host": {
+        "total": 1,
+        "good": 0,
+        "warning": 0,
+        "error": 1
+      },
+      "storage_pool": {
+        "total": 1,
+        "good": 1,
+        "warning": 0,
+        "error": 0
+      },
+      "disk": {
+        "total": 7,
+        "good": 7,
+        "warning": 0,
+        "error": 0
+      },
+      "virtual_disks": {
+        "total": 0
+      }
+    }
+  }
+]

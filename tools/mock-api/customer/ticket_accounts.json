@@ -1,14 +1,19 @@
 [
-    {
-        "default": false,
-        "type": "DynamicsCrm",
-        "uuid": "7077bcd2-0c79-414f-89b9-57d5effbc599",
-        "name": "CRM-Prod"
-    },
-    {
-        "default": false,
-        "type": "DynamicsCrm",
-        "uuid": "c36ba309-863b-4998-bd25-e20f826c872f",
-        "name": "CRM-UnitedLayer New"
-    }
+  {
+    "default": true,
+    "type": "ServiceNow",
+    "uuid": "4d2f439a-9e62-4a46-aa53-9867e386beec",
+    "name": "ServiceNowDev"
+  },
+  {
+    "default": false,
+    "type": "DynamicsCrm",
+    "uuid": "71f70d14-eadf-42fc-9031-d77d378c445d",
+    "name": "Unity CRM Integration"
+  },
+  {
+    "default": true,
+    "type": "UnityOne ITSM",
+    "name": "UnityOne ITSM"
+  }
 ]

@@ -1,0 +1,145 @@
+{
+  "id": 499,
+  "uuid": "6165c13d-93bb-439a-a0b8-9d08c5e9ab7e",
+  "name": "Vcenter ZTC",
+  "private_cloud": 1306,
+  "colocation_cloud": {
+    "name": "DC1",
+    "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2"
+  },
+  "hostname": "10.192.17.23",
+  "username": "ulecloudadmin@vsphere.local",
+  "port": 443,
+  "collector": {
+    "name": "unity-lab-lnx-vm11",
+    "uuid": "9b5146a7-0ba5-466d-9349-171bad0e1866"
+  },
+  "resource_pool_name": "",
+  "discover_resources": true,
+  "discover_dependency": false,
+  "is_managed": true,
+  "ingest_event": false,
+  "proxy": {
+    "proxy_fqdn": "https://ee8f4b41-0025-468e-a3ea-f97ded35ff89.unity-uproxy.unitedlayer.com",
+    "backend_url": "https://10.192.17.23",
+    "same_tab": true
+  },
+  "servers": [],
+  "vms": [],
+  "vms_count": 0,
+  "device_count": 0,
+  "switch": [],
+  "load_balancer": [],
+  "customdevice": [],
+  "firewall": [],
+  "storage_device": [],
+  "mac_device": [],
+  "upstream_providers": [],
+  "hypervisors": [],
+  "bm_server": [],
+  "display_platform": "VMware vCenter",
+  "server_list": [],
+  "platform_type": "VMware",
+  "resources_list": [],
+  "customer": {
+    "id": 417,
+    "name": "UnityOne Demo",
+    "uuid": "49e91ec8-a5fd-4571-89ea-9a8e46a9a316"
+  },
+  "total_resources": 14,
+  "clusters": [
+    {
+      "id": 198,
+      "name": "UNITY-LAB-CL",
+      "uuid": "39fa9f95-13a7-4833-902c-1f9b8add4472"
+    }
+  ],
+  "datastores": [
+    {
+      "id": 960,
+      "name": "LocalDS_ESXI01",
+      "uuid": "285d5163-670c-46e8-9ced-0ce1a3443482"
+    },
+    {
+      "id": 962,
+      "name": "LAB-ESX01-DS",
+      "uuid": "0c70ffb4-f249-4f4d-992d-027cad22aaf0"
+    },
+    {
+      "id": 959,
+      "name": "LocalDS_ESXI02",
+      "uuid": "ef43dff7-a3a3-4a93-94cf-1c05b39ff8de"
+    },
+    {
+      "id": 961,
+      "name": "LAB-ESX02-DS",
+      "uuid": "709e3baf-6dd8-4f1d-a212-5cfcde193540"
+    }
+  ],
+  "networks": [
+    {
+      "id": 827,
+      "name": "VLAN 156",
+      "uuid": "e5ebfcf7-3f09-4211-9fde-d26305df480e"
+    },
+    {
+      "id": 826,
+      "name": "VLAN 157",
+      "uuid": "91b57c13-ef0a-42e9-94c3-5ee9e18d3071"
+    },
+    {
+      "id": 829,
+      "name": "VLAN-217",
+      "uuid": "52fe73d1-a3bb-4f6c-bc1e-4a7503932f8c"
+    },
+    {
+      "id": 828,
+      "name": "VM Network",
+      "uuid": "33ab6756-b696-4af1-826a-46d0930a9559"
+    },
+    {
+      "id": 825,
+      "name": "VM-NW-333",
+      "uuid": "ed6d97ea-9ece-45ae-950d-2cdcdaa77835"
+    }
+  ],
+  "distributed_switches": [
+    {
+      "id": 122,
+      "name": "DSwitch-01",
+      "uuid": "eb3dc859-fa38-430c-96ef-499c1fcda14b"
+    }
+  ],
+  "port_groups": [
+    {
+      "id": 828,
+      "name": "VM-Net-VLAN218",
+      "uuid": "7030d42a-180c-4732-b49a-4eaf2d3e671c"
+    },
+    {
+      "id": 830,
+      "name": "DPortGroup",
+      "uuid": "0eb86d7f-d96b-47cb-a65c-8d394fd085f6"
+    },
+    {
+      "id": 829,
+      "name": "DSwitch-01-DVUplinks-24",
+      "uuid": "86abd196-af32-4394-8ae7-a9124dc7d6c7"
+    }
+  ],
+  "status": -1,
+  "domain": null,
+  "monitoring": {
+    "configured": true,
+    "observium": false,
+    "enabled": true,
+    "zabbix": true
+  },
+  "schedule_meta": {
+    "run_now": false,
+    "schedule_type": "none"
+  },
+  "event_inbound_webhook": null,
+  "event_inbound_api": null,
+  "ticket_subject_format": null
+}

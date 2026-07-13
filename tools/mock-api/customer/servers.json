@@ -1,6 +1,481 @@
 {
-  "count": 0,
+  "count": 2,
   "next": null,
   "previous": null,
-  "results": []
+  "results": [
+    {
+      "url": "https://unity.unitedlayer.com/customer/servers/23028a0e-6529-4648-8883-bfea8cd9a6a1/",
+      "id": 4403,
+      "proxy": {},
+      "ip_address": "10.192.17.21",
+      "snmp_community": null,
+      "snmp_version": "v2c",
+      "snmp_authlevel": null,
+      "snmp_authname": null,
+      "snmp_authpass": null,
+      "snmp_authalgo": null,
+      "snmp_cryptopass": null,
+      "snmp_cryptoalgo": null,
+      "uuid": "23028a0e-6529-4648-8883-bfea8cd9a6a1",
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+      "asset_tag": null,
+      "manufacturer": {
+        "url": "https://unity.unitedlayer.com/rest/server_manufacturer/1/",
+        "id": 1,
+        "name": "Supermicro"
+      },
+      "os": {
+        "url": "https://unity.unitedlayer.com/rest/os/80/",
+        "id": 80,
+        "name": "ESXi",
+        "version": "6.7.0",
+        "full_name": "ESXi 6.7.0",
+        "platform_type": "ESXi"
+      },
+      "instance": {
+        "url": "https://unity.unitedlayer.com/rest/instance/2851/",
+        "id": 2851,
+        "uuid": "44b1f464-3258-48b3-8cad-210d9422305e",
+        "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+        "os": {
+          "url": "https://unity.unitedlayer.com/rest/os/80/",
+          "id": 80,
+          "name": "ESXi",
+          "version": "6.7.0",
+          "full_name": "ESXi 6.7.0",
+          "platform_type": "ESXi"
+        },
+        "instance_type": "Hypervisor",
+        "virtualization_type": "ESXi",
+        "object_class": "Instance",
+        "functional_hostname": null,
+        "modified_user": "",
+        "ordered_date": "2026-07-13T08:02:16.417586-07:00"
+      },
+      "bm_server": null,
+      "last_known_state": null,
+      "last_checked": null,
+      "cabinet": null,
+      "model": {
+        "url": "https://unity.unitedlayer.com/rest/server_model/381/",
+        "id": 381,
+        "name": "VMware Virtual Platform"
+      },
+      "description": null,
+      "status": "1",
+      "salesforce_id": null,
+      "private_cloud": {
+        "id": 1306,
+        "name": "Vcenter ZTC",
+        "uuid": "6165c13d-93bb-439a-a0b8-9d08c5e9ab7e",
+        "platform_type": "VMware",
+        "collector": {
+          "name": "unity-lab-lnx-vm11",
+          "uuid": "9b5146a7-0ba5-466d-9349-171bad0e1866"
+        }
+      },
+      "esxi": [],
+      "esxi_hostname": null,
+      "esxi_username": null,
+      "num_cores": 12,
+      "num_cpus": 24,
+      "memory_mb": 262030,
+      "capacity_gb": 255,
+      "observium_status": null,
+      "position": 0,
+      "failed_alerts_count": null,
+      "management_ip": "10.192.17.21",
+      "size": 1,
+      "username": null,
+      "bm_enabled": false,
+      "tags": [],
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "datacenter": {
+        "url": "https://unity.unitedlayer.com/rest/colo_cloud/457/",
+        "id": 457,
+        "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2",
+        "name": "DC1"
+      },
+      "end_of_life": null,
+      "end_of_service": null,
+      "collector": {
+        "uuid": "9b5146a7-0ba5-466d-9349-171bad0e1866",
+        "name": "unity-lab-lnx-vm11",
+        "id": 323
+      },
+      "credentials": null,
+      "credentials_type": null,
+      "credentials_m2m": [],
+      "cpu_usage": {
+        "available": {
+          "unit": "GHz",
+          "value": 0
+        },
+        "available_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "consumed_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "total": {
+          "unit": "GHz",
+          "value": 0
+        },
+        "used": {
+          "unit": "GHz",
+          "value": 0
+        }
+      },
+      "memory_usage": {
+        "available": {
+          "unit": "GB",
+          "value": 0
+        },
+        "available_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "consumed_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "total": {
+          "unit": "GB",
+          "value": 0
+        },
+        "used": {
+          "unit": "GB",
+          "value": 0
+        }
+      },
+      "storage_usage": {
+        "available": {
+          "unit": "GB",
+          "value": 0
+        },
+        "available_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "consumed_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "total": {
+          "unit": "GB",
+          "value": 0
+        },
+        "used": {
+          "unit": "GB",
+          "value": 0
+        }
+      },
+      "vmware_cluster": null,
+      "custom_attribute_data": null,
+      "os_build_version": null,
+      "dns_name": null,
+      "domain": "unitedlayer.com",
+      "discovery_method": "API",
+      "first_discovered": "2026-07-13T04:08:02.686163-07:00",
+      "system_object_oid": null,
+      "environment": null,
+      "last_discovered": "2026-07-13T08:02:15.039569-07:00",
+      "out_of_band_management_ip": null,
+      "last_rebooted": null,
+      "hypervisor": true,
+      "serial_number": null,
+      "logical_cpu": null,
+      "fan": null,
+      "pdu1": null,
+      "pdu2": null,
+      "firmware_version": null,
+      "last_updated": null,
+      "address": "10.192.17.21",
+      "power_socket1": null,
+      "power_socket2": null,
+      "out_of_band_management_type": null,
+      "note": null,
+      "interfaces": null,
+      "uptime": null,
+      "cpu_type": "Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz",
+      "cpu_speed": "2.4GHz",
+      "redfish": false,
+      "service_pack": null,
+      "snapshot_available": false,
+      "cpu_model": null,
+      "fqdn": null,
+      "mac_address": null,
+      "server_type": "Virtual",
+      "os_type": null,
+      "short_description": null,
+      "primary_capability": null,
+      "capability_list": null,
+      "flash_memory": null,
+      "frequency": null,
+      "input_current": null,
+      "input_voltage": null,
+      "reset_limit": null,
+      "ports_per_slot": null,
+      "supported": true,
+      "boot_rom_supported": true,
+      "dhcp_use": true,
+      "system_type": null,
+      "max_consumption": null,
+      "other_capability_description": null,
+      "media_supported": null,
+      "admin_password_status": null,
+      "reset_count": null,
+      "data_rate": null,
+      "number_of_slots": null,
+      "configuration_options": null,
+      "reset_capability": null,
+      "end_of_security_support": null,
+      "end_of_extended_support": null,
+      "disk_space": null
+    },
+    {
+      "url": "https://unity.unitedlayer.com/customer/servers/3a3ff8dc-ec73-423d-8d7a-3fa0a58366d0/",
+      "id": 4404,
+      "proxy": {},
+      "ip_address": "10.192.17.22",
+      "snmp_community": null,
+      "snmp_version": "v2c",
+      "snmp_authlevel": null,
+      "snmp_authname": null,
+      "snmp_authpass": null,
+      "snmp_authalgo": null,
+      "snmp_cryptopass": null,
+      "snmp_cryptoalgo": null,
+      "uuid": "3a3ff8dc-ec73-423d-8d7a-3fa0a58366d0",
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+      "asset_tag": null,
+      "manufacturer": {
+        "url": "https://unity.unitedlayer.com/rest/server_manufacturer/1/",
+        "id": 1,
+        "name": "Supermicro"
+      },
+      "os": {
+        "url": "https://unity.unitedlayer.com/rest/os/80/",
+        "id": 80,
+        "name": "ESXi",
+        "version": "6.7.0",
+        "full_name": "ESXi 6.7.0",
+        "platform_type": "ESXi"
+      },
+      "instance": {
+        "url": "https://unity.unitedlayer.com/rest/instance/2852/",
+        "id": 2852,
+        "uuid": "8bb07dd4-f452-43dc-8a8c-851997c45330",
+        "name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+        "os": {
+          "url": "https://unity.unitedlayer.com/rest/os/80/",
+          "id": 80,
+          "name": "ESXi",
+          "version": "6.7.0",
+          "full_name": "ESXi 6.7.0",
+          "platform_type": "ESXi"
+        },
+        "instance_type": "Hypervisor",
+        "virtualization_type": "ESXi",
+        "object_class": "Instance",
+        "functional_hostname": null,
+        "modified_user": "",
+        "ordered_date": "2026-07-13T08:02:17.465439-07:00"
+      },
+      "bm_server": null,
+      "last_known_state": null,
+      "last_checked": null,
+      "cabinet": null,
+      "model": {
+        "url": "https://unity.unitedlayer.com/rest/server_model/381/",
+        "id": 381,
+        "name": "VMware Virtual Platform"
+      },
+      "description": null,
+      "status": "1",
+      "salesforce_id": null,
+      "private_cloud": {
+        "id": 1306,
+        "name": "Vcenter ZTC",
+        "uuid": "6165c13d-93bb-439a-a0b8-9d08c5e9ab7e",
+        "platform_type": "VMware",
+        "collector": {
+          "name": "unity-lab-lnx-vm11",
+          "uuid": "9b5146a7-0ba5-466d-9349-171bad0e1866"
+        }
+      },
+      "esxi": [],
+      "esxi_hostname": null,
+      "esxi_username": null,
+      "num_cores": 8,
+      "num_cpus": 16,
+      "memory_mb": 130965,
+      "capacity_gb": 127,
+      "observium_status": null,
+      "position": 0,
+      "failed_alerts_count": null,
+      "management_ip": "10.192.17.22",
+      "size": 1,
+      "username": null,
+      "bm_enabled": false,
+      "tags": [],
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "datacenter": {
+        "url": "https://unity.unitedlayer.com/rest/colo_cloud/457/",
+        "id": 457,
+        "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2",
+        "name": "DC1"
+      },
+      "end_of_life": null,
+      "end_of_service": null,
+      "collector": {
+        "uuid": "9b5146a7-0ba5-466d-9349-171bad0e1866",
+        "name": "unity-lab-lnx-vm11",
+        "id": 323
+      },
+      "credentials": null,
+      "credentials_type": null,
+      "credentials_m2m": [],
+      "cpu_usage": {
+        "available": {
+          "unit": "GHz",
+          "value": 0
+        },
+        "available_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "consumed_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "total": {
+          "unit": "GHz",
+          "value": 0
+        },
+        "used": {
+          "unit": "GHz",
+          "value": 0
+        }
+      },
+      "memory_usage": {
+        "available": {
+          "unit": "GB",
+          "value": 0
+        },
+        "available_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "consumed_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "total": {
+          "unit": "GB",
+          "value": 0
+        },
+        "used": {
+          "unit": "GB",
+          "value": 0
+        }
+      },
+      "storage_usage": {
+        "available": {
+          "unit": "GB",
+          "value": 0
+        },
+        "available_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "consumed_percentage": {
+          "unit": "%",
+          "value": 0
+        },
+        "total": {
+          "unit": "GB",
+          "value": 0
+        },
+        "used": {
+          "unit": "GB",
+          "value": 0
+        }
+      },
+      "vmware_cluster": null,
+      "custom_attribute_data": null,
+      "os_build_version": null,
+      "dns_name": null,
+      "domain": "unitedlayer.com",
+      "discovery_method": "API",
+      "first_discovered": "2026-07-13T04:08:02.686163-07:00",
+      "system_object_oid": null,
+      "environment": null,
+      "last_discovered": "2026-07-13T08:02:17.255009-07:00",
+      "out_of_band_management_ip": null,
+      "last_rebooted": null,
+      "hypervisor": true,
+      "serial_number": null,
+      "logical_cpu": null,
+      "fan": null,
+      "pdu1": null,
+      "pdu2": null,
+      "firmware_version": null,
+      "last_updated": null,
+      "address": "10.192.17.22",
+      "power_socket1": null,
+      "power_socket2": null,
+      "out_of_band_management_type": null,
+      "note": null,
+      "interfaces": null,
+      "uptime": null,
+      "cpu_type": "Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz",
+      "cpu_speed": "2.6GHz",
+      "redfish": false,
+      "service_pack": null,
+      "snapshot_available": false,
+      "cpu_model": null,
+      "fqdn": null,
+      "mac_address": null,
+      "server_type": "Virtual",
+      "os_type": null,
+      "short_description": null,
+      "primary_capability": null,
+      "capability_list": null,
+      "flash_memory": null,
+      "frequency": null,
+      "input_current": null,
+      "input_voltage": null,
+      "reset_limit": null,
+      "ports_per_slot": null,
+      "supported": true,
+      "boot_rom_supported": true,
+      "dhcp_use": true,
+      "system_type": null,
+      "max_consumption": null,
+      "other_capability_description": null,
+      "media_supported": null,
+      "admin_password_status": null,
+      "reset_count": null,
+      "data_rate": null,
+      "number_of_slots": null,
+      "configuration_options": null,
+      "reset_capability": null,
+      "end_of_security_support": null,
+      "end_of_extended_support": null,
+      "disk_space": null
+    }
+  ]
 }

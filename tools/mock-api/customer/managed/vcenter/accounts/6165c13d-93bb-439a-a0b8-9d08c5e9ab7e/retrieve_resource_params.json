@@ -1,0 +1,163 @@
+[
+  {
+    "datacenter": "UNITYLAB-DC",
+    "host": "10.192.17.23",
+    "network": [
+      "VM-Net-VLAN218",
+      "DSwitch-01-DVUplinks-24",
+      "DPortGroup",
+      "VM-NW-333",
+      "VLAN 157",
+      "VLAN 156",
+      "VM Network",
+      "VLAN-217"
+    ],
+    "datastore": [
+      {
+        "status": "connected",
+        "host_count": 1,
+        "cluster_ids": [
+          "domain-c7"
+        ],
+        "name": "LocalDS_ESXI02",
+        "ds_obj": "'vim.Datastore:datastore-16'",
+        "summary": {
+          "provisioned": {
+            "unit": "GB",
+            "value": 28.2
+          },
+          "capacity": {
+            "unit": "GB",
+            "value": 103.8
+          },
+          "freespace": {
+            "unit": "GB",
+            "value": 75.5
+          },
+          "provisioned_percentage": {
+            "unit": "%",
+            "value": 0
+          },
+          "access": "Single host",
+          "unity": false,
+          "type": "VMFS"
+        },
+        "host_name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+        "os": "VMware ESXi 6.7.0 build-15160138",
+        "vm_count": 3
+      },
+      {
+        "status": "connected",
+        "host_count": 1,
+        "cluster_ids": [
+          "domain-c7"
+        ],
+        "name": "LocalDS_ESXI01",
+        "ds_obj": "'vim.Datastore:datastore-19'",
+        "summary": {
+          "provisioned": {
+            "unit": "GB",
+            "value": 4.9
+          },
+          "capacity": {
+            "unit": "GB",
+            "value": 103.8
+          },
+          "freespace": {
+            "unit": "GB",
+            "value": 98.9
+          },
+          "provisioned_percentage": {
+            "unit": "%",
+            "value": 0
+          },
+          "access": "Single host",
+          "unity": false,
+          "type": "VMFS"
+        },
+        "host_name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+        "os": "VMware ESXi 6.7.0 build-15160138",
+        "vm_count": 0
+      },
+      {
+        "status": "connected",
+        "host_count": 1,
+        "cluster_ids": [
+          "domain-c7"
+        ],
+        "name": "LAB-ESX02-DS",
+        "ds_obj": "'vim.Datastore:datastore-17'",
+        "summary": {
+          "provisioned": {
+            "unit": "TB",
+            "value": 1.7
+          },
+          "capacity": {
+            "unit": "TB",
+            "value": 1.8
+          },
+          "freespace": {
+            "unit": "GB",
+            "value": 88.8
+          },
+          "provisioned_percentage": {
+            "unit": "%",
+            "value": 0
+          },
+          "access": "Single host",
+          "unity": false,
+          "type": "VMFS"
+        },
+        "host_name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+        "os": "VMware ESXi 6.7.0 build-15160138",
+        "vm_count": 39
+      },
+      {
+        "status": "connected",
+        "host_count": 1,
+        "cluster_ids": [
+          "domain-c7"
+        ],
+        "name": "LAB-ESX01-DS",
+        "ds_obj": "'vim.Datastore:datastore-20'",
+        "summary": {
+          "provisioned": {
+            "unit": "TB",
+            "value": 1.3
+          },
+          "capacity": {
+            "unit": "TB",
+            "value": 1.8
+          },
+          "freespace": {
+            "unit": "GB",
+            "value": 519.1
+          },
+          "provisioned_percentage": {
+            "unit": "%",
+            "value": 0
+          },
+          "access": "Single host",
+          "unity": false,
+          "type": "VMFS"
+        },
+        "host_name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+        "os": "VMware ESXi 6.7.0 build-15160138",
+        "vm_count": 31
+      }
+    ],
+    "cluster": [
+      {
+        "pool_data": [
+          "ResourcePool2",
+          "ResourcePool1"
+        ],
+        "hosts": [
+          "ul-sv1-unity-lab-esx01.unitedlayer.com",
+          "ul-sv1-unity-lab-esx02.unitedlayer.com"
+        ],
+        "name": "UNITY-LAB-CL"
+      }
+    ]
+  }
+]

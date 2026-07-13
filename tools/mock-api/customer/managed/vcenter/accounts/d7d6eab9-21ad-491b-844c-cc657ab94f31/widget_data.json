@@ -1,6 +1,142 @@
 {
-  "count": 0,
-  "next": null,
-  "previous": null,
-  "results": []
+  "allocated_ram": {
+    "value": 383.8,
+    "unit": "GB"
+  },
+  "alert_count": 2,
+  "disk_utilization": {
+    "value": 80,
+    "unit": "%"
+  },
+  "top_cpu_usage": [
+    {
+      "usage": {
+        "total": {
+          "value": 49.6,
+          "unit": "GHz"
+        },
+        "available": {
+          "value": 20.8,
+          "unit": "GHz"
+        },
+        "consumed_percentage": {
+          "value": 58.1,
+          "unit": "%"
+        },
+        "used": {
+          "value": 28.8,
+          "unit": "GHz"
+        },
+        "available_percentage": {
+          "value": 41.9,
+          "unit": "%"
+        }
+      },
+      "status": "Up",
+      "name": "UNITY-LAB-CL",
+      "uuid": "d8d1af4d-9836-4c23-85d9-ae324200b32b"
+    }
+  ],
+  "vcpu_runtime_usage": 64,
+  "alerts": {
+    "information": 2,
+    "total": 345,
+    "warning": 56,
+    "critical": 287
+  },
+  "ram_runtime_usage": 39.9,
+  "available_ram": {
+    "value": 229.8,
+    "unit": "GB"
+  },
+  "highest_host": [
+    "UNITY-LAB-CL"
+  ],
+  "configured_vcpu": 94,
+  "configured_storage_disk": {
+    "value": 3.1,
+    "unit": "TB"
+  },
+  "available_vcpu": 6,
+  "total_resources": 96,
+  "ram_utilization": {
+    "value": 40.1,
+    "unit": "%"
+  },
+  "allocated_vcpu": 100,
+  "top_memory_usage": [
+    {
+      "usage": {
+        "total": {
+          "value": 383.8,
+          "unit": "GB"
+        },
+        "available": {
+          "value": 228.8,
+          "unit": "GB"
+        },
+        "consumed_percentage": {
+          "value": 40.4,
+          "unit": "%"
+        },
+        "used": {
+          "value": 155,
+          "unit": "GB"
+        },
+        "available_percentage": {
+          "value": 59.6,
+          "unit": "%"
+        }
+      },
+      "status": "Up",
+      "name": "UNITY-LAB-CL",
+      "uuid": "d8d1af4d-9836-4c23-85d9-ae324200b32b"
+    }
+  ],
+  "available_storage_disk": {
+    "value": 783,
+    "unit": "GB"
+  },
+  "vcpu_utilization": {
+    "value": 94,
+    "unit": "%"
+  },
+  "top_storage_usage": [
+    {
+      "usage": {
+        "total": {
+          "value": 3.8,
+          "unit": "TB"
+        },
+        "available": {
+          "value": 752.5,
+          "unit": "GB"
+        },
+        "consumed_percentage": {
+          "value": 80.9,
+          "unit": "%"
+        },
+        "used": {
+          "value": 3.1,
+          "unit": "TB"
+        },
+        "available_percentage": {
+          "value": 19.099999999999994,
+          "unit": "%"
+        }
+      },
+      "status": "Up",
+      "name": "UNITY-LAB-CL",
+      "uuid": "d8d1af4d-9836-4c23-85d9-ae324200b32b"
+    }
+  ],
+  "configured_ram": {
+    "value": 154,
+    "unit": "GB"
+  },
+  "allocated_storage_disk": {
+    "value": 3.8,
+    "unit": "TB"
+  },
+  "total_clusters": 1
 }

@@ -1,0 +1,82 @@
+{
+  "url": "https://unity.unitedlayer.com/customer/private_cloud_integrated/3c874681-c479-497d-9689-9c1c29a85efc/",
+  "id": 1304,
+  "proxy": {
+    "proxy_fqdn": "https://81a001f7-d306-474b-9f72-6a083790bde3.unity-uproxy.unitedlayer.com",
+    "backend_url": "https://10.192.17.23",
+    "same_tab": true
+  },
+  "name": "vCenter Demo 1",
+  "uuid": "3c874681-c479-497d-9689-9c1c29a85efc",
+  "platform_type": "VMware",
+  "customer": {
+    "url": "https://unity.unitedlayer.com/rest/fast/org/417/",
+    "id": 417,
+    "name": "UnityOne Demo",
+    "storage": null,
+    "uuid": "49e91ec8-a5fd-4571-89ea-9a8e46a9a316"
+  },
+  "colocation_cloud": {
+    "id": 457,
+    "uuid": "d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2",
+    "name": "DC1"
+  },
+  "servers": [
+    {
+      "id": 4401,
+      "url": "https://unity.unitedlayer.com/rest/server/4401/",
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+      "uuid": "54b0927b-a6d4-4496-a4bc-b6e6e11d9cfb",
+      "esxi": null
+    },
+    {
+      "id": 4402,
+      "url": "https://unity.unitedlayer.com/rest/server/4402/",
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+      "uuid": "1644da7b-6745-483c-904e-b81debaffa48",
+      "esxi": null
+    }
+  ],
+  "vms": [],
+  "vms_count": 0,
+  "device_count": 2,
+  "switch": [],
+  "load_balancer": [],
+  "customdevice": [],
+  "firewall": [],
+  "storage_device": [],
+  "mac_device": [],
+  "upstream_providers": [],
+  "hypervisors": [
+    {
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com"
+    },
+    {
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com"
+    }
+  ],
+  "bm_server": [],
+  "display_platform": "VMware vCenter",
+  "server_list": [
+    4401,
+    4402
+  ],
+  "collector": {
+    "uuid": "bae82259-7216-4539-91c3-ee703e614aef",
+    "name": "Demo-Coll",
+    "id": 264
+  },
+  "nutanix": null,
+  "nutanix_details": null,
+  "monitoring": null,
+  "resources_list": [],
+  "discover_resources": true,
+  "discover_dependency": false,
+  "through_collector": true,
+  "is_managed": true,
+  "ingest_event": false,
+  "total_resources": 2,
+  "clusters": [],
+  "datastores": [],
+  "networks": []
+}

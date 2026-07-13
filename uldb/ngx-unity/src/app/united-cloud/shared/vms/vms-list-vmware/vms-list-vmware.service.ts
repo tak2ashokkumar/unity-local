@@ -151,13 +151,13 @@ export class VmsListVmwareService {
 
     if (this.user.isManagementEnabled && !vm.is_template) {
       const isWindows: boolean = (vm.os_name.lastIndexOf('Microsoft', 0) == 0);
-      a.isSameTabEnabled = ((vm.mgmt_ip_address ? true : false) && a.powerStatusOn && !isWindows);
-      if (!vm.mgmt_ip_address) {
+      a.isSameTabEnabled = (!isWindows && a.powerStatusOn && (vm.mgmt_ip_address ? true : false));
+      if (isWindows) {
+        a.sameTabTootipMessage = 'Open in Same tab option is not available for windows based machines';
+      } else if (!vm.mgmt_ip_address) {
         a.sameTabTootipMessage = 'Management IP not Configured';
       } else if (!a.powerStatusOn) {
         a.sameTabTootipMessage = 'VM is Down';
-      } else if (isWindows) {
-        a.sameTabTootipMessage = 'Open in Same tab option is not available for windows based machines';
       } else {
         a.sameTabTootipMessage = 'Open in same tab';
       }
