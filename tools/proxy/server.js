@@ -22,9 +22,19 @@ const unityProxy = createProxyMiddleware({
   changeOrigin: true
 });
 
-/* ADMIN PORTAL PROXY (Angular 1.x) */
+/* ADMIN PORTAL PROXY
+ * ADMIN_UI selects which admin panel serves /admin:
+ *   legacy (default) -> AngularJS admin-server on :8095 (unchanged behavior)
+ *   react            -> new React ngx-admin static server on :8096
+ * Both serve the shared /static tree, so only the active one needs to be running.
+ */
+const ADMIN_UI = (process.env.ADMIN_UI || "legacy").toLowerCase();
+const ADMIN_TARGET = ADMIN_UI === "react"
+  ? "http://localhost:8096"
+  : "http://localhost:8095";
+
 const adminProxy = createProxyMiddleware({
-  target: "http://localhost:8095",
+  target: ADMIN_TARGET,
   changeOrigin: true
 });
 
@@ -64,6 +74,7 @@ app.use((req, res, next) => {
 
 app.listen(8091, () => {
   console.log("Proxy running at http://localhost:8091");
+  console.log(`Admin UI mode: ${ADMIN_UI.toUpperCase()} -> ${ADMIN_TARGET} (set ADMIN_UI=react to use ngx-admin)`);
 });
 
 /* MTP DEDICATED PROXY — :8061 */

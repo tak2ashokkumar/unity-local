@@ -74,6 +74,36 @@ serveadmin() {
     node server.js
 }
 
+# --- ADMIN PORTAL (React - ngx-admin) ---
+
+adminreact() {
+    cd "$UNITY_HOME/uldb/ngx-admin" || return
+}
+
+# One-time / on-change production build of the React admin (outputs dist/).
+buildadmin() {
+    adminreact || return
+    npm run build
+}
+
+# Watch-rebuild the React admin during development.
+buildadminwatch() {
+    adminreact || return
+    npm run build -- --watch
+}
+
+# Serve the built React admin on :8096 (mirrors serveunity's static-server).
+serveadminreact() {
+    adminreact || return
+    npm run static-server
+}
+
+# Run the proxy with the React admin active at http://localhost:8091/admin.
+startproxyreact() {
+    proxy || return
+    ADMIN_UI=react node server.js
+}
+
 # --- Python (3.13.12) ---
 pythonlocal(){
     "$UNITY_HOME/tools/python/python.exe" "$@"
