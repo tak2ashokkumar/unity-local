@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
 import { DeviceDiscoveryScanOp } from '../device-discovery-scan-op.type';
 import { DEVICE_DISCOVERY_SCAN_OP, PDU_MODELS, CABINETS_BY_DATACENTER_ID, PDU_POWER_CIRCUITS, FIREWALL_CABINETS, CREATE_DEVICE_DISCOVERY_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
-import { DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { DeviceMapping, HPDU_SOCKETS_PER_UNIT, NoWhitespaceValidator, PDU_MAX_SOCKETS, PDUTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PDUCRUDModel, PDUCRUDCabinet, PDUCRUDPowerCircuit } from 'src/app/united-cloud/datacenter/entities/pdus-crud.type';
 import { RxwebValidators, IpVersion } from '@rxweb/reactive-form-validators';
@@ -74,7 +74,7 @@ export class DeviceDiscoveryPdusService {
         'id': ['', [Validators.required, NoWhitespaceValidator]],
       }),
       'position': [{ value: '', disabled: true }, [Validators.min(0), NoWhitespaceValidator]],
-      'size': ['', [Validators.required, Validators.min(1), NoWhitespaceValidator]],
+      'size': [{ value: '', disabled: true }, [Validators.required, Validators.min(1), NoWhitespaceValidator]],
       'sockets': ['', [Validators.required, Validators.min(1), NoWhitespaceValidator]],
       'management_ip': [{ value: pdu.ip_address ? pdu.ip_address : '', disabled: pdu.ip_address ? true : false }, [NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
       'observium_id': [{ value: pdu.observium_id, disabled: true }]
@@ -142,10 +142,28 @@ export class DeviceDiscoveryPdusService {
     },
     'sockets': {
       'required': 'Number of Sockets are required',
-      'min': 'Minimum value should be greater than or equal to 1'
+      'min': 'Minimum value should be greater than or equal to 1',
+      'max': 'Number of sockets exceeds the maximum allowed for the selected PDU type'
     },
     'management_ip': {
       'ip': 'Invalid IP'
+    }
+  }
+
+  applySocketMax(form: FormGroup, pduType: string) {
+    const max = (pduType == PDUTypes.HORIZONTAL) ? PDU_MAX_SOCKETS.HORIZONTAL : PDU_MAX_SOCKETS.VERTICAL;
+    const socketsCtrl = form.get('sockets');
+    socketsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(max), NoWhitespaceValidator]);
+    socketsCtrl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  setDerivedSize(form: FormGroup, pduType: string) {
+    const sizeCtrl = form.get('size');
+    if (pduType == PDUTypes.HORIZONTAL) {
+      const sockets = Number(form.get('sockets').value);
+      sizeCtrl.setValue(sockets > 0 ? Math.ceil(sockets / HPDU_SOCKETS_PER_UNIT) : '', { emitEvent: false });
+    } else if (pduType == PDUTypes.VERTICAL) {
+      sizeCtrl.setValue(1, { emitEvent: false });
     }
   }
 

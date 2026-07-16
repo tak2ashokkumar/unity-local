@@ -9,7 +9,7 @@ import { AppLevelService } from 'src/app/app-level.service';
 import { AppNotificationService } from '../../shared/app-notification/app-notification.service';
 import { Notification } from '../../shared/app-notification/notification.type';
 import { AppSpinnerService } from '../../shared/app-spinner/app-spinner.service';
-import { AppUtilityService, CRUDActionTypes, PDUTypes } from '../../shared/app-utility/app-utility.service';
+import { AppUtilityService, CRUDActionTypes } from '../../shared/app-utility/app-utility.service';
 import { PDUCrudFormData, PduCrudService } from './pdu-crud.service';
 import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from './pdu-crud.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
@@ -154,13 +154,12 @@ export class PduCrudComponent implements OnInit, OnDestroy {
         this.getModels(val, true);
       });
       this.pduForm.get('pdu_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
-        if (val == PDUTypes.HORIZONTAL) {
-          this.pduForm.get('size').enable();
-        }
-        else {
-          this.pduForm.get('size').disable();
-          this.pduForm.get('size').setValue(1);
-        }
+        this.crudService.applySocketMax(this.pduForm, val);
+        this.pduForm.get('size').disable();
+        this.crudService.setDerivedSize(this.pduForm, val);
+      });
+      this.pduForm.get('sockets').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.crudService.setDerivedSize(this.pduForm, this.pduForm.get('pdu_type').value);
       });
       this.pduForm.get('cabinet.id').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
         this.pduForm.get('position').setValue('');

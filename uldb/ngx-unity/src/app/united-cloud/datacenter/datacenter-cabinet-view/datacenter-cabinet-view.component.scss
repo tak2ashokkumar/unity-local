@@ -70,17 +70,27 @@ $cabinet_unit-border-color: #181a1f;
   }
 
   .vpdu {
+    // Fixed-height socket strip: the slot is always the same height; the sockets
+    // flex to fill it, so N sockets (few or many) always occupy the same slot.
+    display: flex;
+    flex-direction: column;
+    height: 32rem; // tune so the strip sits inside the 36.4rem slot
+
     img {
       width: 100% !important;
-      position: relative;
       z-index: 200;
       margin-left: 0.2px;
-      height: 1.25rem;
     }
 
     img.pdu_start {
+      flex: 0 0 auto;
       height: 1.5rem;
       vertical-align: text-top;
+    }
+
+    img.single_socket {
+      flex: 1 1 0;
+      min-height: 0; // allow sockets to shrink so many of them still fit the fixed slot
     }
 
     img.highlight_socket.single_socket {
@@ -89,7 +99,7 @@ $cabinet_unit-border-color: #181a1f;
     }
 
     img.pdu_end {
-      top: -5.1rem;
+      flex: 0 0 auto;
       height: 2.5rem;
     }
   }
@@ -226,8 +236,18 @@ $cabinet_unit-border-color: #181a1f;
         margin-left: -5px;
         width: calc(100% - 7px);
 
+        // Each cabinet unit holds one row of up to 8 sockets; rows stack top to bottom.
+        .hpdu_row {
+          display: block;
+          height: 13px;
+          white-space: nowrap;
+          font-size: 0; // collapse inter-image whitespace so a full row of 8 fits exactly
+        }
         img.hpdu_start {
           width: 5%;
+        }
+        img.hpdu_single_socket {
+          width: 10%;
         }
         img.hpdu_end {
           width: 15%;

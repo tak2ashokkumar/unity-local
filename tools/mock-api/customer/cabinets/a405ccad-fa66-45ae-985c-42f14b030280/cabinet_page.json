@@ -1,0 +1,130 @@
+{
+  "storage_devices": [],
+  "load_balancers": [],
+  "capacity": 42,
+  "uuid": "a405ccad-fa66-45ae-985c-42f14b030280",
+  "mac_devices": [],
+  "custom_devices": [],
+  "pdus": [],
+  "firewalls": [],
+  "servers": [],
+  "switches": [
+    {
+      "status": "0",
+      "is_shared": false,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "Cisco Nexus- NCM Demo",
+      "uuid": "f4083209-0193-4de4-b2bb-0543cfc7f5d3",
+      "management_ip": "10.128.7.4",
+      "position": 39,
+      "model": "NEXUS 93108TC-EX",
+      "manufacturer": "CISCO",
+      "id": 6363,
+      "size": 5
+    },
+    {
+      "status": "1",
+      "is_shared": false,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "Cisco FTD- NCM De",
+      "uuid": "f52a4d9f-1c97-4bb6-bfbf-1fe2b3a88937",
+      "management_ip": "10.128.7.7",
+      "position": 42,
+      "model": "NEXUS 93108TC-EX",
+      "manufacturer": "CISCO",
+      "id": 6364,
+      "size": 2
+    },
+    {
+      "status": "0",
+      "is_shared": false,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "Cisco IOS - NCM Demo",
+      "uuid": "5991bfe3-9bc8-4b08-b321-3c9964f7df91",
+      "management_ip": "10.128.7.105",
+      "position": 37,
+      "model": "CATALYST 2960S-48LPS-L",
+      "manufacturer": "CISCO",
+      "id": 6365,
+      "size": 1
+    }
+  ],
+  "panel_devices": [
+    {
+      "name": "cable Organizer2",
+      "uuid": "3d707e69-e20b-4976-b9bf-88112baa1dfe",
+      "panel_type": 2,
+      "position": 24,
+      "id": 585,
+      "size": 1
+    },
+    {
+      "name": "blank pannel2",
+      "uuid": "fa2bed8a-0372-4fbd-83ab-2630f1f12e01",
+      "panel_type": 1,
+      "position": 30,
+      "id": 587,
+      "size": 1
+    },
+    {
+      "name": "cable Organizer1",
+      "uuid": "ea3b330a-c8c3-4704-9d50-eebb785d75db",
+      "panel_type": 2,
+      "position": 17,
+      "id": 583,
+      "size": 1
+    },
+    {
+      "name": "blank pannel3",
+      "uuid": "1fe86c78-a8b0-486d-a616-ebf04c119a99",
+      "panel_type": 1,
+      "position": 27,
+      "id": 588,
+      "size": 1
+    },
+    {
+      "name": "Patch Pannel 1",
+      "uuid": "5838fe87-80b2-4521-9d6f-3de7a1326e51",
+      "panel_type": 3,
+      "position": 42,
+      "id": 584,
+      "size": 1
+    },
+    {
+      "name": "cable Organizer3",
+      "uuid": "a1a50305-a0e1-46bf-a692-6b2b58f4e49f",
+      "panel_type": 2,
+      "position": 40,
+      "id": 586,
+      "size": 1
+    },
+    {
+      "name": "blank pannel1",
+      "uuid": "6ca486ff-5ae9-4787-b01a-3f11e9375fe4",
+      "panel_type": 1,
+      "position": 35,
+      "id": 582,
+      "size": 2
+    }
+  ],
+  "available_size": 26,
+  "model": "Standard",
+  "type": "COLO DEDICATED",
+  "id": 1517,
+  "name": "CAB2-SF10"
+}

@@ -17,9 +17,9 @@
     ],
     "pdus": [
         {
-            "status": null,
+            "status": "0",
             "pdu_type": "VERTICAL",
-            "name": "testpdu",
+            "name": "UnityDemo-vpdu-32sockets",
             "monitoring": {
                 "configured": false,
                 "observium": false,
@@ -27,9 +27,9 @@
                 "zabbix": true
             },
             "uuid": "b58f5748-35ea-4673-a92f-f8cdb972c12a",
-            "sockets": 2,
+            "sockets": 32,
             "management_ip": null,
-            "position": "0",
+            "position": "C",
             "model": "AP7800",
             "manufacturer": "APC",
             "id": 5138,
@@ -38,7 +38,7 @@
         {
             "status": "0",
             "pdu_type": "VERTICAL",
-            "name": "UnityDemo-pdub-1c02b3.sf9",
+            "name": "UnityDemo-vpdu-24sockets",
             "monitoring": {
                 "configured": false,
                 "observium": false,
@@ -46,7 +46,7 @@
                 "zabbix": true
             },
             "uuid": "28319322-da20-4bac-a559-f99c3226f679",
-            "sockets": 21,
+            "sockets": 24,
             "management_ip": "209.237.225.144",
             "position": "B",
             "model": "AP7800",
@@ -57,7 +57,7 @@
         {
             "status": "0",
             "pdu_type": "VERTICAL",
-            "name": "UnityDemo-pdua-110t.sf10.unitedlayer.com",
+            "name": "UnityDemo-vpdu-16sockets",
             "monitoring": {
                 "configured": false,
                 "observium": false,
@@ -65,13 +65,70 @@
                 "zabbix": true
             },
             "uuid": "bf0efa8a-90a6-4ea1-8215-de2a9f53dcda",
-            "sockets": 18,
+            "sockets": 16,
             "management_ip": "209.237.225.33",
             "position": "A",
             "model": "AP7901",
             "manufacturer": "APC",
             "id": 3451,
             "size": 1
+        },
+        {
+            "status": "0",
+            "pdu_type": "HORIZONTAL",
+            "name": "UnityDemo-hpdu-8sockets",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "uuid": "a1111111-1111-4111-8111-000000000008",
+            "sockets": 8,
+            "management_ip": null,
+            "position": "10",
+            "model": "AP7900",
+            "manufacturer": "APC",
+            "id": 6001,
+            "size": 1
+        },
+        {
+            "status": "0",
+            "pdu_type": "HORIZONTAL",
+            "name": "UnityDemo-hpdu-16sockets",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "uuid": "a2222222-2222-4222-8222-000000000016",
+            "sockets": 16,
+            "management_ip": null,
+            "position": "12",
+            "model": "AP7900",
+            "manufacturer": "APC",
+            "id": 6002,
+            "size": 2
+        },
+        {
+            "status": "0",
+            "pdu_type": "HORIZONTAL",
+            "name": "UnityDemo-hpdu-24sockets",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "uuid": "a3333333-3333-4333-8333-000000000024",
+            "sockets": 24,
+            "management_ip": null,
+            "position": "15",
+            "model": "AP7900",
+            "manufacturer": "APC",
+            "id": 6003,
+            "size": 3
         }
     ],
     "firewalls": [],
@@ -226,7 +283,7 @@
         }
     ],
     "panel_devices": [],
-    "available_size": 31,
+    "available_size": 25,
     "model": "Standard",
     "type": "COLO DEDICATED",
     "id": 1273,

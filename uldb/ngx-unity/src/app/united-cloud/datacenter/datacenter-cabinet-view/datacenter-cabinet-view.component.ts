@@ -51,8 +51,6 @@ export class DatacenterCabinetViewComponent implements OnInit, OnDestroy {
   deviceHovered: DatacenterCabinetUnitDevice = new DatacenterCabinetUnitDevice();
   deviceClicked: DatacenterCabinetUnitDevice = new DatacenterCabinetUnitDevice();
 
-  verticalPDUSockets: number[] = [];
-  horizontalPDUSockets: number[] = [];
   @ViewChildren("vLPDURef") vLPDURef: QueryList<TooltipDirective>;
   @ViewChildren("vRPDURef") vRPDURef: QueryList<TooltipDirective>;
   @ViewChildren("hDURef") hDURef: QueryList<TooltipDirective>;
@@ -100,8 +98,6 @@ export class DatacenterCabinetViewComponent implements OnInit, OnDestroy {
       this.datacenterId = params.get('dcId');
       this.cabinetId = params.get('cabinetId');
     })
-    Array(24).fill(0).map((e, i) => this.verticalPDUSockets.push(i));
-    Array(8).fill(0).map((e, i) => this.horizontalPDUSockets.push(i));
     this.termService.isOpenAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => this.termOpened = res);
     this.refreshService.inProgressToggled$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => this.inProgress = res);
   }

@@ -6,7 +6,7 @@ import { Observable, of, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PDU } from 'src/app/united-cloud/datacenter/entities/pdus.type';
 import { CABINET_FAST_BY_DEVICE_ID, DEVICE_LIST_BY_DEVICE_TYPE, DEVICE_MODELS, GET_AGENT_CONFIGURATIONS, PDU_DELETE, PDU_MANUFACTURERS, PDU_POWER_CIRCUITS, PDU_UPDATE } from '../../shared/api-endpoint.const';
-import { DeviceMapping, NoWhitespaceValidator, PDUTypes } from '../../shared/app-utility/app-utility.service';
+import { DeviceMapping, HPDU_SOCKETS_PER_UNIT, NoWhitespaceValidator, PDU_MAX_SOCKETS, PDUTypes } from '../../shared/app-utility/app-utility.service';
 import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from './pdu-crud.type';
 import { UserInfoService } from '../../shared/user-info.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
@@ -92,9 +92,10 @@ export class PduCrudService {
             'annual_escalation': [pd.annual_escalation, [Validators.min(0), Validators.max(100)]],
             'tags': [pd.tags.filter(tg => tg)]
           });
-          if (pd.pdu_type == PDUTypes.VERTICAL) {
-            form.get('size').disable();
-          }
+          // Size is derived from sockets (horizontal) or fixed at 1 (vertical); never user-edited.
+          form.get('size').disable();
+          this.applySocketMax(form, pd.pdu_type);
+          this.setDerivedSize(form, pd.pdu_type);
           // if (pd.snmp_community) {
           //   form.addControl('snmp_community', new FormControl({ value: pd.snmp_community, disabled: isBillingCRUD }, [NoWhitespaceValidator, Validators.required]));
           //   form.addControl('ip_address', new FormControl({ value: pd.ip_address, disabled: isBillingCRUD }, [NoWhitespaceValidator]));
@@ -125,7 +126,7 @@ export class PduCrudService {
           'id': ['', [Validators.required, NoWhitespaceValidator]],
         }),
         'position': [{ value: '', disabled: true }, [Validators.min(0), NoWhitespaceValidator]],
-        'size': ['', [Validators.required, Validators.min(1), NoWhitespaceValidator]],
+        'size': [{ value: '', disabled: true }, [Validators.required, Validators.min(1), NoWhitespaceValidator]],
         'sockets': ['', [Validators.required, Validators.min(1), NoWhitespaceValidator]],
         'management_ip': ['', [NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
         'cost': [null, [Validators.min(0)]],
@@ -140,6 +141,23 @@ export class PduCrudService {
         }
         return form;
       }));;
+    }
+  }
+
+  applySocketMax(form: FormGroup, pduType: string) {
+    const max = (pduType == PDUTypes.HORIZONTAL) ? PDU_MAX_SOCKETS.HORIZONTAL : PDU_MAX_SOCKETS.VERTICAL;
+    const socketsCtrl = form.get('sockets');
+    socketsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(max), NoWhitespaceValidator]);
+    socketsCtrl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  setDerivedSize(form: FormGroup, pduType: string) {
+    const sizeCtrl = form.get('size');
+    if (pduType == PDUTypes.HORIZONTAL) {
+      const sockets = Number(form.get('sockets').value);
+      sizeCtrl.setValue(sockets > 0 ? Math.ceil(sockets / HPDU_SOCKETS_PER_UNIT) : '', { emitEvent: false });
+    } else if (pduType == PDUTypes.VERTICAL) {
+      sizeCtrl.setValue(1, { emitEvent: false });
     }
   }
 
@@ -208,7 +226,8 @@ export class PduCrudService {
     },
     'sockets': {
       'required': 'Number of Sockets are required',
-      'min': 'Minimum value should be greater than or equal to 1'
+      'min': 'Minimum value should be greater than or equal to 1',
+      'max': 'Number of sockets exceeds the maximum allowed for the selected PDU type'
     },
     'management_ip': {
       'ip': 'Invalid IP'

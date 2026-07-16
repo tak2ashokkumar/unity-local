@@ -1166,6 +1166,11 @@ export enum PDUTypes {
   VERTICAL = 'VERTICAL'
 }
 
+// Maximum sockets allowed per PDU type. Horizontal PDUs occupy cabinet slots
+// (HPDU_SOCKETS_PER_UNIT sockets per 1U), vertical PDUs sit outside the cabinet.
+export const PDU_MAX_SOCKETS = { HORIZONTAL: 24, VERTICAL: 32 };
+export const HPDU_SOCKETS_PER_UNIT = 8;
+
 export const deviceEnvironmentOptions: string[] = [
   'Production', 'Dev', 'Test'
 ];

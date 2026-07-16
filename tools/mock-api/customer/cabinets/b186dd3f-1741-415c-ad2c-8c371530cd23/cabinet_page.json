@@ -1,0 +1,321 @@
+{
+  "storage_devices": [
+    {
+      "status": "1",
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "Nimble Storage - SF",
+      "uuid": "21418516-a708-40c6-9d04-7b268815fc13",
+      "management_ip": "192.168.232.17",
+      "position": 7,
+      "model": "AF3000",
+      "manufacturer": "Nimble",
+      "id": 458,
+      "size": 10
+    },
+    {
+      "status": "1",
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "Pure-Storage-SF",
+      "uuid": "568c9e89-6e0c-46ef-a6ab-b1b496147738",
+      "management_ip": "10.192.4.164",
+      "position": 2,
+      "model": "PureStorage Flash Array",
+      "manufacturer": "Pure storage",
+      "id": 460,
+      "size": 2
+    }
+  ],
+  "load_balancers": [
+    {
+      "status": "1",
+      "is_shared": false,
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "name": "UL-SV1-UNITY-LAB-F5-LB-01.sv1.unitedlayer.com",
+      "uuid": "11a24da4-572a-4a6f-824e-7085cdf0e885",
+      "management_ip": "10.192.17.9",
+      "position": 0,
+      "model": "BIG-IP 2000",
+      "manufacturer": "F5 LABS, INC.",
+      "id": 6497,
+      "size": 1
+    }
+  ],
+  "capacity": 42,
+  "uuid": "b186dd3f-1741-415c-ad2c-8c371530cd23",
+  "mac_devices": [],
+  "custom_devices": [],
+  "pdus": [
+    {
+      "status": "1",
+      "pdu_type": "VERTICAL",
+      "name": "UnityDemo-pdua-110t.sf10.unitedlayer.com",
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "uuid": "279ae2af-c589-4ef9-bb6e-c03e7e4b1ed3",
+      "sockets": 32,
+      "management_ip": "10.192.10.251",
+      "position": "A",
+      "model": "AP7901",
+      "manufacturer": "APC",
+      "id": 5388,
+      "size": 1
+    },
+    {
+      "status": "0",
+      "pdu_type": "HORIZONTAL",
+      "name": "UnityDemo-pdub-1c02b3.sf9",
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "uuid": "7cf83f0c-188f-4bc5-8caa-129904058721",
+      "sockets": 24,
+      "management_ip": "10.192.2.19",
+      "position": "23",
+      "model": "AP7800",
+      "manufacturer": "APC",
+      "id": 5389,
+      "size": 3
+    }
+  ],
+  "firewalls": [
+    {
+      "status": "1",
+      "is_shared": false,
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "name": "UL-SV1-P26-2-R08-PA-FWB",
+      "uuid": "de154216-e7d7-4937-a3ab-9c14b3df8883",
+      "management_ip": "10.192.17.14",
+      "position": 0,
+      "model": "PA-500",
+      "manufacturer": "Palo Alto Networks",
+      "id": 6982,
+      "size": 1
+    },
+    {
+      "status": "0",
+      "is_shared": false,
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "name": "fw-12",
+      "uuid": "619f26c4-9a4b-4cd8-a85f-908087085455",
+      "management_ip": "10.10.10.10",
+      "position": 0,
+      "model": "Dummy model",
+      "manufacturer": "Adaptec",
+      "id": 6793,
+      "size": 1
+    },
+    {
+      "status": "0",
+      "is_shared": false,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "UnityDemo-fw1-505.sf10.unitedlayer.com",
+      "uuid": "ebc7b21b-90cc-407c-9f81-466a5ba74a1c",
+      "management_ip": "209.237.233.100",
+      "position": 37,
+      "model": "SRX345",
+      "manufacturer": "Juniper",
+      "id": 5363,
+      "size": 1
+    },
+    {
+      "status": "1",
+      "is_shared": false,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "UnityDemo-fw1-313.sf10.unitedlayer.com",
+      "uuid": "13ecb607-30a9-4f6d-913c-58fa785662cd",
+      "management_ip": "207.7.137.4",
+      "position": 35,
+      "model": "SRX240H",
+      "manufacturer": "Juniper",
+      "id": 5362,
+      "size": 1
+    }
+  ],
+  "servers": [
+    {
+      "status": "1",
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "UL-SV1-UNITY-LAB-ESX02.unitedlayer.com",
+      "uuid": "84ed0352-9fb7-450f-ad4b-96b6e7ec5e97",
+      "management_ip": "10.192.17.22",
+      "bm_server": {
+        "os": {
+          "name": "Vmware ESXi"
+        },
+        "uuid": "9b64a071-75e3-4472-975e-77bada8f8ea7"
+      },
+      "position": 0,
+      "model": "Super Server",
+      "manufacturer": "Supermicro",
+      "id": 3972,
+      "size": 1
+    },
+    {
+      "status": "0",
+      "username": "ADMIN",
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "UnityDemo1-BM-Lab Hypervisor-01",
+      "uuid": "760354e1-4f06-45e4-ad7d-e97c354a64e5",
+      "management_ip": "10.128.7.37",
+      "bm_server": {
+        "os": {
+          "name": "Ubuntu"
+        },
+        "uuid": "b5f5285c-45cc-47dd-9d4c-8a95f01e9464"
+      },
+      "bm_enabled": true,
+      "position": 32,
+      "model": "E5-2620",
+      "manufacturer": "Supermicro",
+      "id": 2912,
+      "size": 2
+    }
+  ],
+  "switches": [
+    {
+      "status": "1",
+      "is_shared": false,
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "name": "UL-SV1-P26-2-R08-UNITY-LAB-ACC-SW-01.unitylab.local",
+      "uuid": "72ba1e47-fced-4418-8148-4fd2ddfc0bb3",
+      "management_ip": "10.192.17.3",
+      "position": 0,
+      "model": "CATALYST 3750-48PS-S",
+      "manufacturer": "CISCO",
+      "id": 6983,
+      "size": 1
+    },
+    {
+      "status": "1",
+      "is_shared": false,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "UL-UDEMO-NEXUS-TESTSW01.unitedlayer.com",
+      "uuid": "163daa14-4a12-43cf-a3d9-b3340d585b68",
+      "management_ip": "10.192.17.13",
+      "position": 27,
+      "model": "NEXUS 3232C",
+      "manufacturer": "cisco",
+      "id": 7256,
+      "size": 1
+    },
+    {
+      "status": null,
+      "is_shared": false,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "name": "test ztx",
+      "uuid": "71d942f9-ed97-42f0-941c-761fbb04b793",
+      "management_ip": "10.200.65.31",
+      "position": 0,
+      "model": "S-7050QX-32S-R",
+      "manufacturer": "Arista",
+      "id": 7527,
+      "size": 2
+    }
+  ],
+  "panel_devices": [
+    {
+      "name": "PatchPanel1",
+      "uuid": "005bba09-4bde-4c03-baef-b30b84f9a70f",
+      "panel_type": 3,
+      "position": 38,
+      "id": 533,
+      "size": 2
+    },
+    {
+      "name": "Admin",
+      "uuid": "70326eca-f16a-4173-9ee9-67342ef7ccf8",
+      "panel_type": 3,
+      "position": 1,
+      "id": 572,
+      "size": 1
+    },
+    {
+      "name": "PatchPanel2",
+      "uuid": "ed032f4b-4c6c-478c-a55e-a3561e388ff3",
+      "panel_type": 3,
+      "position": 19,
+      "id": 534,
+      "size": 1
+    },
+    {
+      "name": "CabOrg1",
+      "uuid": "f62e2142-2648-453d-a337-5abe7438875f",
+      "panel_type": 2,
+      "position": 21,
+      "id": 532,
+      "size": 2
+    }
+  ],
+  "available_size": 19,
+  "model": "Standard",
+  "type": "COLO DEDICATED",
+  "id": 1480,
+  "name": "CAB1-SF10"
+}

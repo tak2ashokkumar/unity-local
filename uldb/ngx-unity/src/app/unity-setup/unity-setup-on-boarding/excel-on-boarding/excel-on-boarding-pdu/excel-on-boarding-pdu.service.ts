@@ -5,7 +5,7 @@ import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { COLLECTOR_LIST_FOR_MANUAL_ONBOARDING, DEVICE_MODELS, FIREWALL_CABINETS, GET_EXCEL_DATA_BY_DEVICE_TYPE, PDU_MANUFACTURERS, PDU_MODELS, PDU_POWER_CIRCUITS, SAVE_EXCEL_DATA_BY_DEVICE_TYPE, SAVE_FILE_DETAILS_TO_TEMP } from 'src/app/shared/api-endpoint.const';
-import { DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { DeviceMapping, HPDU_SOCKETS_PER_UNIT, NoWhitespaceValidator, PDU_MAX_SOCKETS, PDUTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { DeviceDiscoveryAgentConfigurationType } from '../../advanced-discovery-connectivity/agent-config.type';
 
@@ -95,11 +95,14 @@ export class ExcelOnBoardingPduService {
           'id': [{ value: '', disabled: view.onboarded }, [Validators.required, NoWhitespaceValidator]],
         }),
         'position': [{ value: d.position, disabled: view.onboarded }, [Validators.min(0), NoWhitespaceValidator]],
-        'size': [{ value: d.size, disabled: view.onboarded }, [Validators.required, Validators.min(1), NoWhitespaceValidator]],
+        'size': [{ value: d.size, disabled: true }, [Validators.required, Validators.min(1), NoWhitespaceValidator]],
         'sockets': [{ value: d.sockets, disabled: view.onboarded }, [Validators.required, Validators.min(1), NoWhitespaceValidator]],
         'management_ip': [{ value: d.ip_address, disabled: view.onboarded }, [NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
         'snmp_ip': [{ value: d.snmp_ip, disabled: view.onboarded }, [NoWhitespaceValidator]],
       });
+      // Size is derived from sockets (horizontal) or fixed at 1 (vertical); seed cap + size from imported type.
+      this.applySocketMax(view.form, d.pdu_type);
+      this.setDerivedSize(view.form, d.pdu_type);
 
       viewData.push(view);
     });
@@ -148,10 +151,28 @@ export class ExcelOnBoardingPduService {
     },
     'sockets': {
       'required': 'Number of Sockets are required',
-      'min': 'Minimum value should be greater than or equal to 1'
+      'min': 'Minimum value should be greater than or equal to 1',
+      'max': 'Number of sockets exceeds the maximum allowed for the selected PDU type'
     },
     'management_ip': {
       'ip': 'Invalid IP'
+    }
+  }
+
+  applySocketMax(form: FormGroup, pduType: string) {
+    const max = (pduType == PDUTypes.HORIZONTAL) ? PDU_MAX_SOCKETS.HORIZONTAL : PDU_MAX_SOCKETS.VERTICAL;
+    const socketsCtrl = form.get('sockets');
+    socketsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(max), NoWhitespaceValidator]);
+    socketsCtrl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  setDerivedSize(form: FormGroup, pduType: string) {
+    const sizeCtrl = form.get('size');
+    if (pduType == PDUTypes.HORIZONTAL) {
+      const sockets = Number(form.get('sockets').value);
+      sizeCtrl.setValue(sockets > 0 ? Math.ceil(sockets / HPDU_SOCKETS_PER_UNIT) : '', { emitEvent: false });
+    } else if (pduType == PDUTypes.VERTICAL) {
+      sizeCtrl.setValue(1, { emitEvent: false });
     }
   }
 

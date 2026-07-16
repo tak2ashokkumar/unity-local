@@ -177,8 +177,8 @@
                     <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
 
                     <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
-                      [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
-                      *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                      [id]="'pdu-' + pdu.id + i"
+                      *ngFor='let socket of pdu.vPDUSingleSocketArray; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
                       #vLPDURef="bs-tooltip" />
 
                     <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
@@ -224,18 +224,17 @@
                                 [style.opacity]="(device.sensor && device.sensor.sensorState ? '0.8' : '1')"
                                 dndDragImageRef />
 
-                              <span class="hpdu" *ngIf="device.frontView && device.isPDU" dndDragImageRef>
-                                <img class="hpdu_start" [ngClass]="device.unitOccupiedClass"
-                                  [src]="device.hPDUStartImgURL" alt="" />
+                              <span class="hpdu" [ngClass]="device.unitOccupiedClass"
+                                *ngIf="device.frontView && device.isPDU" dndDragImageRef>
+                                <span class="hpdu_row" *ngFor="let row of device.hPDUSocketRows">
+                                  <img class="hpdu_start" [src]="device.hPDUStartImgURL" alt="" />
 
-                                <img class="hpdu_single_socket" [ngClass]="device.unitOccupiedClass"
-                                  *ngFor='let socket of device.hPDUSingleSocketArray; let k = index'
-                                  id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
-                                  [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip"
-                                  [style.width]="socket + '%'" />
+                                  <img class="hpdu_single_socket" *ngFor="let k of row"
+                                    id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
+                                    [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip" />
 
-                                <img class="hpdu_end" [ngClass]="device.unitOccupiedClass" [src]="device.hPDUEndImgURL"
-                                  alt="" />
+                                  <img class="hpdu_end" [src]="device.hPDUEndImgURL" alt="" />
+                                </span>
                               </span>
 
                               <img class="img-fluid right-cell pull-right"
@@ -288,8 +287,8 @@
                     <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
 
                     <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
-                      [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
-                      *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                      [id]="'pdu-' + pdu.id + i"
+                      *ngFor='let socket of pdu.vPDUSingleSocketArray; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
                       #vRPDURef="bs-tooltip" />
 
                     <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
@@ -368,8 +367,8 @@
                     <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
 
                     <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
-                      [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
-                      *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                      [id]="'pdu-' + pdu.id + i"
+                      *ngFor='let socket of pdu.vPDUSingleSocketArray; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
                       #vLPDURef="bs-tooltip" />
 
                     <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
@@ -415,18 +414,17 @@
                                 [style.opacity]="(device.sensor && device.sensor.sensorState ? '0.8' : '1')"
                                 dndDragImageRef />
 
-                              <span class="hpdu" *ngIf="device.rearView && device.isPDU" dndDragImageRef>
-                                <img class="hpdu_start" [ngClass]="device.unitOccupiedClass"
-                                  [src]="device.hPDUStartImgURL" alt="" />
+                              <span class="hpdu" [ngClass]="device.unitOccupiedClass"
+                                *ngIf="device.rearView && device.isPDU" dndDragImageRef>
+                                <span class="hpdu_row" *ngFor="let row of device.hPDUSocketRows">
+                                  <img class="hpdu_start" [src]="device.hPDUStartImgURL" alt="" />
 
-                                <img class="hpdu_single_socket" [ngClass]="device.unitOccupiedClass"
-                                  *ngFor='let socket of device.hPDUSingleSocketArray; let k = index'
-                                  id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
-                                  [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip"
-                                  [style.width]="socket + '%'" />
+                                  <img class="hpdu_single_socket" *ngFor="let k of row"
+                                    id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
+                                    [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip" />
 
-                                <img class="hpdu_end" [ngClass]="device.unitOccupiedClass" [src]="device.hPDUEndImgURL"
-                                  alt="" />
+                                  <img class="hpdu_end" [src]="device.hPDUEndImgURL" alt="" />
+                                </span>
                               </span>
 
                               <img class="img-fluid right-cell pull-right"
@@ -479,8 +477,8 @@
                     <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
 
                     <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
-                      [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
-                      *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                      [id]="'pdu-' + pdu.id + i"
+                      *ngFor='let socket of pdu.vPDUSingleSocketArray; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
                       #vRPDURef="bs-tooltip" />
 
                     <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
@@ -562,8 +560,8 @@
                         <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
 
                         <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
-                          [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
-                          *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                          [id]="'pdu-' + pdu.id + i"
+                          *ngFor='let socket of pdu.vPDUSingleSocketArray; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
                           #vLPDURef="bs-tooltip" />
 
                         <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
@@ -609,18 +607,17 @@
                                     [style.opacity]="(device.sensor && device.sensor.sensorState ? '0.8' : '1')"
                                     dndDragImageRef />
 
-                                  <span class="hpdu" *ngIf="device.frontView && device.isPDU" dndDragImageRef>
-                                    <img class="hpdu_start" [ngClass]="device.unitOccupiedClass"
-                                      [src]="device.hPDUStartImgURL" alt="" />
+                                  <span class="hpdu" [ngClass]="device.unitOccupiedClass"
+                                    *ngIf="device.frontView && device.isPDU" dndDragImageRef>
+                                    <span class="hpdu_row" *ngFor="let row of device.hPDUSocketRows">
+                                      <img class="hpdu_start" [src]="device.hPDUStartImgURL" alt="" />
 
-                                    <img class="hpdu_single_socket" [ngClass]="device.unitOccupiedClass"
-                                      *ngFor='let socket of device.hPDUSingleSocketArray; let k = index'
-                                      id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
-                                      [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip"
-                                      [style.width]="socket + '%'" />
+                                      <img class="hpdu_single_socket" *ngFor="let k of row"
+                                        id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
+                                        [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip" />
 
-                                    <img class="hpdu_end" [ngClass]="device.unitOccupiedClass"
-                                      [src]="device.hPDUEndImgURL" alt="" />
+                                      <img class="hpdu_end" [src]="device.hPDUEndImgURL" alt="" />
+                                    </span>
                                   </span>
 
                                   <img class="img-fluid right-cell pull-right"
@@ -681,18 +678,17 @@
                                     [style.opacity]="(device.sensor && device.sensor.sensorState ? '0.8' : '1')"
                                     dndDragImageRef />
 
-                                  <span class="hpdu" *ngIf="device.rearView && device.isPDU" dndDragImageRef>
-                                    <img class="hpdu_start" [ngClass]="device.unitOccupiedClass"
-                                      [src]="device.hPDUStartImgURL" alt="" />
+                                  <span class="hpdu" [ngClass]="device.unitOccupiedClass"
+                                    *ngIf="device.rearView && device.isPDU" dndDragImageRef>
+                                    <span class="hpdu_row" *ngFor="let row of device.hPDUSocketRows">
+                                      <img class="hpdu_start" [src]="device.hPDUStartImgURL" alt="" />
 
-                                    <img class="hpdu_single_socket" [ngClass]="device.unitOccupiedClass"
-                                      *ngFor='let socket of device.hPDUSingleSocketArray; let k = index'
-                                      id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
-                                      [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip"
-                                      [style.width]="socket + '%'" />
+                                      <img class="hpdu_single_socket" *ngFor="let k of row"
+                                        id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
+                                        [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip" />
 
-                                    <img class="hpdu_end" [ngClass]="device.unitOccupiedClass"
-                                      [src]="device.hPDUEndImgURL" alt="" />
+                                      <img class="hpdu_end" [src]="device.hPDUEndImgURL" alt="" />
+                                    </span>
                                   </span>
 
                                   <img class="img-fluid right-cell pull-right"
@@ -746,8 +742,8 @@
                         <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
 
                         <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
-                          [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
-                          *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                          [id]="'pdu-' + pdu.id + i"
+                          *ngFor='let socket of pdu.vPDUSingleSocketArray; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
                           #vRPDURef="bs-tooltip" />
 
                         <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />

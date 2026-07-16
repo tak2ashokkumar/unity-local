@@ -5,7 +5,7 @@ import { takeUntil, take } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { AppUtilityService, PDUTypes } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { AdvancedDiscoveryPdusService, DevDisPDUViewdata, DeviceDiscoveryPDUFormData } from './advanced-discovery-pdus.service';
 
@@ -110,13 +110,12 @@ export class AdvancedDiscoveryPdusComponent implements OnInit, OnDestroy {
         }
       });
       data.form.get('pdu_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
-        if (val == PDUTypes.HORIZONTAL) {
-          data.form.get('size').enable();
-        }
-        else {
-          data.form.get('size').disable();
-          data.form.get('size').setValue(1);
-        }
+        this.pduSvc.applySocketMax(data.form, val);
+        data.form.get('size').disable();
+        this.pduSvc.setDerivedSize(data.form, val);
+      });
+      data.form.get('sockets').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.pduSvc.setDerivedSize(data.form, data.form.get('pdu_type').value);
       });
     });
   }

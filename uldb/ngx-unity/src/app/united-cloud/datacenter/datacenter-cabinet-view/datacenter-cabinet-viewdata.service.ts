@@ -4,7 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FEATURE_NOT_ENABLED_MESSAGE, MANAGEMENT_NOT_ENABLED_MESSAGE } from 'src/app/app-constants';
 import { DEVICE_POWER_STATUS_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
-import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { DeviceMapping, HPDU_SOCKETS_PER_UNIT, PDUTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { BMServerPowerStatus, DeviceSensorData, DeviceSensorOutputItem, DeviceStatusData } from '../entities/cab-view-other-entities.type';
@@ -274,6 +274,18 @@ export class DatacenterCabinetViewdataService {
     return cabinetStorageDevices;
   }
 
+  private buildHPDUSocketRows(sockets: number): number[][] {
+    const rows: number[][] = [];
+    for (let i = 0; i < sockets; i++) {
+      const row = Math.floor(i / HPDU_SOCKETS_PER_UNIT);
+      if (!rows[row]) {
+        rows[row] = [];
+      }
+      rows[row].push(i); // keep the global 0-based socket index for id/tooltip mapping
+    }
+    return rows;
+  }
+
   addPdus(pdus: CabinetPdus[]): DatacenterCabinetUnitDevice[] {
     let cabinetPDUs: DatacenterCabinetUnitDevice[] = [];
     pdus.map((pdu: CabinetPdus) => {
@@ -288,14 +300,21 @@ export class DatacenterCabinetViewdataService {
       d.manufacturer = pdu.manufacturer;
       d.managementIP = pdu.management_ip;
       d.position = Number.isInteger(Number(pdu.position)) ? Number(pdu.position) : pdu.position;
-      d.size = pdu.size;
       d.sockets = pdu.sockets;
       d.monitoring = pdu.monitoring;
-      Array(pdu.sockets).fill(0).map((e, i) => d.hPDUSingleSocketArray.push(80 / pdu.sockets));
+      if (pdu.pdu_type == PDUTypes.HORIZONTAL) {
+        // Horizontal PDU: 8 sockets per cabinet unit; size is derived, sockets grouped into rows of 8.
+        d.size = Math.ceil(pdu.sockets / HPDU_SOCKETS_PER_UNIT);
+        d.hPDUSocketRows = this.buildHPDUSocketRows(pdu.sockets);
+      } else {
+        // Vertical PDU: keep stored size; sockets fill a fixed-height slot (one entry per socket).
+        d.size = pdu.size;
+        Array(pdu.sockets).fill(0).map((e, i) => d.vPDUSingleSocketArray.push(i));
+      }
 
       d.faIconClass = DatacenterCabinetDeviceIconClass.PDU;
       d.unitOccupied = (pdu.position != '0') ? true : false;
-      d.unitOccupiedClass = `unit_${pdu.size}`;
+      d.unitOccupiedClass = `unit_${d.size}`;
       d.frontView = `${this.assetsUrl.concat(DatacenterCabinetFrontViewImagePaths.PDU)}`;
       d.rearView = `${this.assetsUrl.concat(DatacenterCabinetRearViewImagePaths.PDU)}`;
       d.hPDUStartImgURL = `${this.assetsUrl.concat(DatacenterCabinetViewCommonImages.HPDU_START)}`;

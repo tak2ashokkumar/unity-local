@@ -6,7 +6,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
-import { AppUtilityService, PDUTypes } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { PDUCRUDCabinet, PDUCRUDPowerCircuit, PDUCRUDManufacturer, PDUCRUDModel } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { ExcelOnBoardingNextPrevService } from '../excel-on-boarding-next-prev/excel-on-boarding-next-prev.service';
 import { ExcelOnBoardingPduService, ExcelOnBoardingPDUViewdata } from './excel-on-boarding-pdu.service';
@@ -165,13 +165,12 @@ export class ExcelOnBoardingPduComponent implements OnInit, OnDestroy {
         }
       });
       view.form.get('pdu_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
-        if (val == PDUTypes.HORIZONTAL) {
-          view.form.get('size').enable();
-        }
-        else {
-          view.form.get('size').disable();
-          view.form.get('size').setValue(1);
-        }
+        this.xlSvc.applySocketMax(view.form, val);
+        view.form.get('size').disable();
+        this.xlSvc.setDerivedSize(view.form, val);
+      });
+      view.form.get('sockets').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.xlSvc.setDerivedSize(view.form, view.form.get('pdu_type').value);
       });
     });
   }
