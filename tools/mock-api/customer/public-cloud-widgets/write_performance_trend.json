@@ -1,6 +1,67 @@
 {
   "hours": 24,
-  "count": 0,
-  "data": [],
+  "count": 1,
+  "data": [
+    {
+      "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a01",
+      "database_instance": "rds-dbs-1",
+      "series": {
+        "write_throughput": {
+          "label": "Write Throughput",
+          "unit": "Kbps",
+          "points": [
+            { "clock": 1784073600, "value": 238.4 },
+            { "clock": 1784080800, "value": 245.2 },
+            { "clock": 1784088000, "value": 252.9 },
+            { "clock": 1784095200, "value": 261.5 },
+            { "clock": 1784102400, "value": 274.8 },
+            { "clock": 1784109600, "value": 293.6 },
+            { "clock": 1784116800, "value": 312.5 },
+            { "clock": 1784124000, "value": 298.1 },
+            { "clock": 1784131200, "value": 276.4 },
+            { "clock": 1784138400, "value": 259.3 },
+            { "clock": 1784145600, "value": 247.6 },
+            { "clock": 1784152800, "value": 241.9 }
+          ]
+        },
+        "write_iops": {
+          "label": "Write IOPS",
+          "unit": "RPS",
+          "points": [
+            { "clock": 1784073600, "value": 4.8 },
+            { "clock": 1784080800, "value": 5.1 },
+            { "clock": 1784088000, "value": 5.3 },
+            { "clock": 1784095200, "value": 5.6 },
+            { "clock": 1784102400, "value": 5.9 },
+            { "clock": 1784109600, "value": 6.4 },
+            { "clock": 1784116800, "value": 6.9 },
+            { "clock": 1784124000, "value": 6.5 },
+            { "clock": 1784131200, "value": 6.0 },
+            { "clock": 1784138400, "value": 5.5 },
+            { "clock": 1784145600, "value": 5.2 },
+            { "clock": 1784152800, "value": 4.9 }
+          ]
+        },
+        "write_latency": {
+          "label": "Write Latency",
+          "unit": "ms",
+          "points": [
+            { "clock": 1784073600, "value": 0.58 },
+            { "clock": 1784080800, "value": 0.61 },
+            { "clock": 1784088000, "value": 0.64 },
+            { "clock": 1784095200, "value": 0.68 },
+            { "clock": 1784102400, "value": 0.72 },
+            { "clock": 1784109600, "value": 0.79 },
+            { "clock": 1784116800, "value": 0.86 },
+            { "clock": 1784124000, "value": 0.81 },
+            { "clock": 1784131200, "value": 0.74 },
+            { "clock": 1784138400, "value": 0.69 },
+            { "clock": 1784145600, "value": 0.63 },
+            { "clock": 1784152800, "value": 0.6 }
+          ]
+        }
+      }
+    }
+  ],
   "cloud": "aws"
 }

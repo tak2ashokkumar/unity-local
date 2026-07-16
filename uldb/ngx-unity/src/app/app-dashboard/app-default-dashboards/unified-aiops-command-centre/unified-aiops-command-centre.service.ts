@@ -38,6 +38,8 @@ import {
   UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG,
   UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT,
+  UNIFIED_AIOPS_PRIVATE_RESOURCE_ICONS,
+  UNIFIED_AIOPS_PRIVATE_RESOURCE_ICON_FALLBACK,
   UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT,
   UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_LABELS,
   UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER,
@@ -324,7 +326,7 @@ export class UnifiedAiopsCommandCentreService {
       xAxis: {
         type: 'category',
         data: categories,
-        axisLabel: { fontSize: 11, color: '#5b6570', interval: 0, width: 84, overflow: 'break', lineHeight: 13 }
+        axisLabel: { fontSize: 9, color: '#5b6570', interval: 0, width: 84, overflow: 'break', lineHeight: 11 }
       },
       yAxis: { type: 'value', max: 100, axisLabel: { fontSize: 11, color: '#5b6570', formatter: '{value}' }, splitLine: { lineStyle: { color: '#d6dce2', type: 'dashed' } } },
       series: [
@@ -1217,12 +1219,13 @@ export class UnifiedAiopsCommandCentreService {
     };
   }
 
-  private getCoverageRows(payload: any): Array<{ label: string; value: string }> {
+  private getCoverageRows(payload: any): UnifiedAiopsCoverageRow[] {
     if (Array.isArray(payload)) {
       return payload
         .map(row => ({
           label: this.getReadableCoverageLabel(row?.label || row?.name || row?.type || row?.resource_type),
-          value: this.formatNumber(row?.value ?? row?.count ?? row?.total ?? 0)
+          value: this.formatNumber(row?.value ?? row?.count ?? row?.total ?? 0),
+          ...this.getPrivateResourceIcon(row?.type || row?.resource_type || row?.name || row?.label)
         }))
         .filter(row => this.getNumberValue(row.value) > 0);
     }
@@ -1231,9 +1234,17 @@ export class UnifiedAiopsCommandCentreService {
       .filter(key => !this.isCoverageTotalKey(key) && this.isSimpleMetricValue(payload[key]))
       .map(key => ({
         label: this.getReadableCoverageLabel(key),
-        value: this.formatNumber(payload[key])
+        value: this.formatNumber(payload[key]),
+        ...this.getPrivateResourceIcon(key)
       }))
       .filter(row => this.getNumberValue(row.value) > 0);
+  }
+
+  // Resolves the Font Awesome glyph + color for a private-cloud resource-type slug (the private coverage
+  // API sends no icon), mirroring the private-cloud summary page's Component Summary icons.
+  private getPrivateResourceIcon(slug: any) {
+    return UNIFIED_AIOPS_PRIVATE_RESOURCE_ICONS[this.normalizeKey(String(slug || ''))]
+      || UNIFIED_AIOPS_PRIVATE_RESOURCE_ICON_FALLBACK;
   }
 
   private isCoverageTotalKey(key: string): boolean {

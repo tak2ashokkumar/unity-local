@@ -1,8 +1,10 @@
 import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
+import { FaIconMapping } from 'src/app/shared/app-utility/app-utility.service';
 import {
   UnifiedAiopsDeviceTypeOption,
   UnifiedAiopsExecutiveSectionConfig,
   UnifiedAiopsFilterOption,
+  UnifiedAiopsResourceIcon,
   UnifiedAiopsStatusLegendItem,
   UnifiedAiopsTone,
   UnifiedAiopsViewByOption
@@ -276,4 +278,50 @@ export const UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_LOGOS: { [key: string]: string 
   azure: 'logos/Azure-short.svg',
   gcp: 'logos/GCP.svg',
   oci: 'logos/Oracle.svg'
+};
+
+// Private-cloud resource-type slug (normalized: lowercased, non-alphanumerics stripped) -> Font Awesome
+// glyph + color. Mirrors the private-cloud summary page's Component Summary icons (which use the shared
+// FaIconMapping glyphs) so resource icons stay consistent app-wide. The private-cloud coverage API sends
+// no icon, so icons are resolved client-side from the resource slug. Keys are pre-normalized (no
+// underscores) and include singular + plural because the slug normalizer does not collapse them.
+export const UNIFIED_AIOPS_PRIVATE_RESOURCE_ICONS: { [normalizedSlug: string]: UnifiedAiopsResourceIcon } = {
+  cluster: { iconClass: FaIconMapping.CLUSTER, iconColor: '#22a6eb' },
+  clusters: { iconClass: FaIconMapping.CLUSTER, iconColor: '#22a6eb' },
+  vm: { iconClass: FaIconMapping.VIRTUAL_MACHINE, iconColor: '#22a6eb' },
+  vms: { iconClass: FaIconMapping.VIRTUAL_MACHINE, iconColor: '#22a6eb' },
+  virtualmachine: { iconClass: FaIconMapping.VIRTUAL_MACHINE, iconColor: '#22a6eb' },
+  virtualmachines: { iconClass: FaIconMapping.VIRTUAL_MACHINE, iconColor: '#22a6eb' },
+  hypervisor: { iconClass: FaIconMapping.HYPERVISOR, iconColor: '#f2b53f' },
+  hypervisors: { iconClass: FaIconMapping.HYPERVISOR, iconColor: '#f2b53f' },
+  host: { iconClass: FaIconMapping.HOST, iconColor: '#f2b53f' },
+  hosts: { iconClass: FaIconMapping.HOST, iconColor: '#f2b53f' },
+  baremetal: { iconClass: FaIconMapping.BARE_METAL_SERVER, iconColor: '#ff4545' },
+  baremetalserver: { iconClass: FaIconMapping.BARE_METAL_SERVER, iconColor: '#ff4545' },
+  switch: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+  switches: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+  distributedswitch: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+  distributedswitches: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+  portgroup: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+  portgroups: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+  network: { iconClass: FaIconMapping.NETWORKS, iconColor: '#009688' },
+  networks: { iconClass: FaIconMapping.NETWORKS, iconColor: '#009688' },
+  firewall: { iconClass: FaIconMapping.FIREWALL, iconColor: '#e56717' },
+  firewalls: { iconClass: FaIconMapping.FIREWALL, iconColor: '#e56717' },
+  loadbalancer: { iconClass: FaIconMapping.LOAD_BALANCER, iconColor: '#a66829' },
+  loadbalancers: { iconClass: FaIconMapping.LOAD_BALANCER, iconColor: '#a66829' },
+  storage: { iconClass: FaIconMapping.STORAGE_DEVICE, iconColor: '#3032b4' },
+  storagedevice: { iconClass: FaIconMapping.STORAGE_DEVICE, iconColor: '#3032b4' },
+  database: { iconClass: FaIconMapping.DATABASE, iconColor: '#3032b4' },
+  databases: { iconClass: FaIconMapping.DATABASE, iconColor: '#3032b4' },
+  datastore: { iconClass: FaIconMapping.DATASTORE, iconColor: '#3032b4' },
+  datastores: { iconClass: FaIconMapping.DATASTORE, iconColor: '#3032b4' },
+  mac: { iconClass: FaIconMapping.MAC_MINI, iconColor: '#6c757d' },
+  macmini: { iconClass: FaIconMapping.MAC_MINI, iconColor: '#6c757d' }
+};
+
+// Neutral glyph for resource slugs not in the map above.
+export const UNIFIED_AIOPS_PRIVATE_RESOURCE_ICON_FALLBACK: UnifiedAiopsResourceIcon = {
+  iconClass: FaIconMapping.OTHER_DEVICES,
+  iconColor: '#6c757d'
 };

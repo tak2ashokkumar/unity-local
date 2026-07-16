@@ -1414,6 +1414,34 @@
   }
 }
 
+// Private cloud rows show a Font Awesome resource glyph (colored per resource type via [style.color])
+// before the label - mirroring the private-cloud summary page's Component Summary icons.
+.coverage-resource-icon {
+  width: 16px;
+  flex: 0 0 auto;
+  font-size: 14px;
+  line-height: 1;
+  text-align: center;
+}
+
+.private-grid {
+  .coverage-row-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .coverage-row-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 .datacenter-geography-card {
   min-height: 300px;
   overflow: hidden;

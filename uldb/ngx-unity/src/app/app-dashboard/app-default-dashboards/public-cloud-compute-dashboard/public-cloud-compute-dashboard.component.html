@@ -84,9 +84,10 @@
             <div class="section-title mb-0">Executive Summary / Cloud Inventory</div>
             <div class="inventory-note">*The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring Within The Selected Time Range</div>
         </div>
-        <div class="dashboard-card inventory-card" *ngIf="hasInventoryWidgets">
+        <div class="dashboard-card inventory-card" *ngIf="hasInventoryWidgets"
+            [class.inventory-loading]="widgetLoading.inventorySummary || widgetLoading.geoDistribution">
+            <app-spinner [name]="loaderNames.inventoryCard" [width]="0"></app-spinner>
             <div class="summary-metrics" *ngIf="hasSummaryMetrics">
-                <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
                 <div class="summary-metric" *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex">
                     <button type="button" class="metric-label metric-link" (click)="openSummaryMetric(metric)"
                         [tooltip]="'Open linked page'" container="body">{{metric.label}}</button>
@@ -96,7 +97,6 @@
             <div class="inventory-grid">
                 <div class="provider-panel">
                     <div class="provider-distribution-panel">
-                        <app-spinner [name]="loaderNames.providerDistribution" [width]="0"></app-spinner>
                         <div class="widget-title">Cloud Provider Distribution</div>
                         <ng-container *ngIf="hasProviderDistributionData; else providerNoData">
                             <div echarts [options]="providerDistributionOptions" (chartInit)="onProviderDistributionChartInit($event)"
@@ -116,7 +116,6 @@
                         </ng-template>
                     </div>
                     <div class="tags-panel">
-                        <app-spinner [name]="loaderNames.tags" [width]="0"></app-spinner>
                         <div class="tags-title">Tags</div>
                         <ng-container *ngIf="tags.length; else tagsNoData">
                             <div class="tag-list">
@@ -127,12 +126,11 @@
                             </div>
                         </ng-container>
                         <ng-template #tagsNoData>
-                            <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No Tags data available for Tags</div>
+                            <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No Tags data available</div>
                         </ng-template>
                     </div>
                 </div>
                 <div class="inventory-geo-panel">
-                    <app-spinner [name]="loaderNames.geoDistribution" [width]="0"></app-spinner>
                     <div class="widget-title">Geo Distribution</div>
                     <ng-container *ngIf="hasGeoDistributionData; else geoNoData">
                         <div echarts [options]="geoHeatmapOptions" (chartInit)="onGeoDistributionChartInit($event)"
@@ -300,8 +298,8 @@
             </ng-template>
         </div>
 
+        <div class="section-title" *ngIf="hasCloudDatabasePerformanceSection">Cloud Database Performance</div>
         <div class="dashboard-card cloud-database-card" *ngIf="hasCloudDatabasePerformanceSection">
-            <div class="cloud-database-section-header">Cloud Database Performance</div>
 
             <ng-container *ngIf="hasDatabaseOverviewData">
             <div class="cloud-database-subsection-title">Database Overview</div>
@@ -384,9 +382,10 @@
                 </div>
             </div>
             </ng-container>
+        </div>
 
-            <ng-container *ngIf="hasDatabaseSpaceSection">
-            <div class="cloud-database-subsection-title">Space Consumption</div>
+        <div class="section-title" *ngIf="hasDatabaseSpaceSection">Space Consumption</div>
+        <div class="dashboard-card cloud-database-card database-space-card" *ngIf="hasDatabaseSpaceSection">
             <div class="database-kpi-strip">
                 <app-spinner [name]="loaderNames.databaseSpaceConsumption" [width]="0"></app-spinner>
                 <ng-container *ngIf="hasDatabaseSpaceData; else databaseSpaceKpiNoData">
@@ -439,11 +438,10 @@
                     <div class="widget-no-data" *ngIf="!widgetLoading.databaseCapacityResources">No data available</div>
                 </ng-template>
             </div>
-            </ng-container>
         </div>
 
-        <div class="dashboard-card cloud-storage-card mt-3" *ngIf="hasCloudStorageHealthSection">
-            <div class="cloud-storage-section-header">Cloud Storage Health</div>
+        <div class="section-title" *ngIf="hasCloudStorageHealthSection">Cloud Storage Health</div>
+        <div class="dashboard-card cloud-storage-card" *ngIf="hasCloudStorageHealthSection">
 
             <ng-container *ngIf="hasStoragePerformanceData">
             <div class="cloud-database-subsection-title">Storage Performance</div>
@@ -519,9 +517,11 @@
                 </ng-template>
             </div>
             </ng-container>
+        </div>
 
-            <div class="latency-metric-title" *ngIf="hasLatencyMetricSection">Latency Metric</div>
-            <div class="latency-metric-grid" *ngIf="hasLatencyMetricSection">
+        <div class="section-title" *ngIf="hasLatencyMetricSection">Latency Metric</div>
+        <div class="dashboard-card latency-metric-card" *ngIf="hasLatencyMetricSection">
+            <div class="latency-metric-grid">
                 <div class="latency-metric-widget write-perf-widget">
                     <app-spinner [name]="loaderNames.writePerformanceTrend" [width]="0"></app-spinner>
                     <div class="latency-metric-widget-title">Write Performance Trend</div>
@@ -577,203 +577,214 @@
             </div>
         </div>
 
-        <div class="orphaned-widgets-grid" *ngIf="hasOrphanedDevices || hasOrphanedByCategory"
+        <div class="orphaned-widgets-grid mt-3" *ngIf="hasOrphanedDevices || hasOrphanedByCategory"
             [ngClass]="{'single-widget-grid': !(hasOrphanedDevices && hasOrphanedByCategory)}">
-            <div class="dashboard-card orphaned-device-card" *ngIf="hasOrphanedDevices">
-                <div class="orphaned-widget-header">
-                    <div class="subsection-title mb-0">
-                        <span class="badge badge-secondary orphaned-count-badge">{{orphanedDevicesTotal}}</span>
-                        Orphaned device list
-                        <button type="button" class="header-link-icon" (click)="openOrphanedDevices()"
-                            [tooltip]="'Open linked page'" container="body">
-                            <i class="fas fa-link"></i>
-                        </button>
-                    </div>
+            <div class="orphaned-widget-col" *ngIf="hasOrphanedDevices">
+                <div class="subsection-title orphaned-widget-title">
+                    <span class="badge badge-secondary orphaned-count-badge">{{orphanedDevicesTotal}}</span>
+                    Orphaned Device List
                 </div>
-                <div class="orphaned-table-wrap">
-                    <app-spinner [name]="loaderNames.orphanedDevices" [width]="0"></app-spinner>
-                    <div class="device-status-legend" *ngIf="orphanedDevices.length">
-                        <span class="device-status-legend-item">
-                            <i class="fas fa-check-circle text-success font-xs-sm"></i>
-                            Active / Reachable
-                        </span>
-                        <span class="device-status-legend-item">
-                            <i class="fas fa-exclamation-circle text-warning font-xs-sm"></i>
-                            Partially Reachable / Warning State
-                        </span>
-                        <span class="device-status-legend-item">
-                            <i class="fas fa-exclamation-triangle text-danger font-xs-sm"></i>
-                            Offline / Critical / Unreachable
-                        </span>
+                <div class="dashboard-card orphaned-device-card">
+                    <div class="orphaned-table-wrap">
+                        <app-spinner [name]="loaderNames.orphanedDevices" [width]="0"></app-spinner>
+                        <div class="device-status-legend" *ngIf="orphanedDevices.length">
+                            <span class="device-status-legend-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                Active / Reachable
+                            </span>
+                            <span class="device-status-legend-item">
+                                <i class="fas fa-exclamation-circle text-warning"></i>
+                                Partially Reachable / Warning State
+                            </span>
+                            <span class="device-status-legend-item">
+                                <i class="fas fa-exclamation-triangle text-danger"></i>
+                                Offline / Critical / Unreachable
+                            </span>
+                        </div>
+                        <table class="table table-sm orphaned-table mb-0" *ngIf="orphanedDevices.length">
+                            <colgroup>
+                                <col class="orphaned-name-col">
+                                <col class="orphaned-status-col">
+                                <col class="orphaned-type-col">
+                                <col class="orphaned-last-seen-col">
+                                <col class="orphaned-datacenter-col">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Device Name</th>
+                                    <th>Status</th>
+                                    <th>Type</th>
+                                    <th>Last Seen <i class="fas fa-sort ml-1"></i></th>
+                                    <th>Datacenter</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let device of orphanedDevices; trackBy: trackByIndex" truncateText>
+                                    <td class="tdw-35">
+                                        <div class="text-primary pointer-link" [tooltip]="device.name"
+                                            (click)="openOrphanedDevices()">{{device.name}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <i [ngClass]="getOrphanedStatusIconClass(device.status)"></i>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="device.resourceType">{{device.resourceType}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="device.lastSeen">{{device.lastSeen}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="device.datacenter">{{device.datacenter}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <table class="table table-sm orphaned-table mb-0" *ngIf="orphanedDevices.length">
-                        <colgroup>
-                            <col class="orphaned-name-col">
-                            <col class="orphaned-status-col">
-                            <col class="orphaned-last-seen-col">
-                            <col class="orphaned-datacenter-col">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Status</th>
-                                <th>Last Seen <i class="fas fa-sort ml-1"></i></th>
-                                <th>Datacenter</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let device of orphanedDevices; trackBy: trackByIndex">
-                                <td><span>{{device.name}}</span></td>
-                                <td><i [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
-                                <td>{{device.lastSeen}}</td>
-                                <td>{{device.datacenter}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
-                    <div class="orphaned-footer-note">Devices With
-                        Lifecycle Stages Classified As Retired, Disposed, Or Donated Are Considered
-                        Orphaned Devices.</div>
-                    <table-pager *ngIf="orphanedDevices.length" [compact]="true" [pageNo]="orphanedDevicesPageNo"
-                        [pageSize]="orphanedDevicesPageSize" [totalCount]="orphanedDevicesTotal"
-                        (pageChange)="orphanedDevicesPageChange($event)"></table-pager>
+                    <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
+                        <div class="orphaned-footer-note">Devices With
+                            Lifecycle Stages Classified As Retired, Disposed, Or Donated Are Considered
+                            Orphaned Devices.</div>
+                        <table-pager [compact]="true" [pageNo]="orphanedDevicesPageNo"
+                            [pageSize]="orphanedDevicesPageSize" [totalCount]="orphanedDevicesTotal"
+                            (pageChange)="orphanedDevicesPageChange($event)"></table-pager>
+                    </div>
                 </div>
             </div>
 
-            <div class="dashboard-card orphaned-category-card" *ngIf="hasOrphanedByCategory">
-                <div class="orphaned-widget-header">
-                    <div class="subsection-title mb-0">Orphaned by Category</div>
-                </div>
-                <div class="orphaned-category-body">
-                    <app-spinner [name]="loaderNames.orphanedDevicesByCategory" [width]="0"></app-spinner>
-                    <div echarts [options]="orphanedByCategoryOptions" (chartInit)="onOrphanedCategoryChartInit($event)"
-                        class="orphaned-category-chart chart-click-target"
-                        *ngIf="orphanedByCategoryHasData"></div>
-                    <div class="orphaned-category-legend" *ngIf="orphanedByCategoryHasData">
-                        <button type="button" class="orphaned-category-legend-item legend-link"
-                            *ngFor="let item of orphanedByCategory; trackBy: trackByIndex"
-                            (click)="openOrphanedCategory(item)"
-                            [tooltip]="'Open linked page'" container="body">
-                            <span class="legend-dot" [style.background]="item.color"></span>
-                            <span>{{item.category}}</span>
-                            <strong>{{item.count}} ({{item.percentage}}%)</strong>
-                        </button>
+            <div class="orphaned-widget-col" *ngIf="hasOrphanedByCategory">
+                <div class="subsection-title orphaned-widget-title">Orphaned by Category</div>
+                <div class="dashboard-card orphaned-category-card">
+                    <div class="orphaned-category-body">
+                        <app-spinner [name]="loaderNames.orphanedDevicesByCategory" [width]="0"></app-spinner>
+                        <div echarts [options]="orphanedByCategoryOptions" (chartInit)="onOrphanedCategoryChartInit($event)"
+                            class="orphaned-category-chart chart-click-target"
+                            *ngIf="orphanedByCategoryHasData"></div>
+                        <div class="orphaned-category-legend" *ngIf="orphanedByCategoryHasData">
+                            <button type="button" class="orphaned-category-legend-item legend-link"
+                                *ngFor="let item of orphanedByCategory; trackBy: trackByIndex"
+                                (click)="openOrphanedCategory(item)"
+                                [tooltip]="'Open linked page'" container="body">
+                                <span class="legend-dot" [style.background]="item.color"></span>
+                                <span>{{item.category}}</span>
+                                <strong>{{item.count}} ({{item.percentage}}%)</strong>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="idle-widgets-grid" *ngIf="hasIdleDevices || hasIdleDuration"
+        <div class="idle-widgets-grid mt-3" *ngIf="hasIdleDevices || hasIdleDuration"
             [ngClass]="{'single-widget-grid': !(hasIdleDevices && hasIdleDuration)}">
-            <div class="dashboard-card idle-device-card" *ngIf="hasIdleDevices">
-                <div class="orphaned-widget-header">
-                    <div class="subsection-title mb-0">
-                        <span class="badge badge-secondary orphaned-count-badge">{{idleDevicesTotal}}</span>
-                        Idle device analysis
-                    </div>
+            <div class="orphaned-widget-col" *ngIf="hasIdleDevices">
+                <div class="subsection-title orphaned-widget-title">
+                    <span class="badge badge-secondary orphaned-count-badge">{{idleDevicesTotal}}</span>
+                    Idle Device Analysis
                 </div>
-                <div class="idle-table-wrap">
-                    <app-spinner [name]="loaderNames.idleDevices" [width]="0"></app-spinner>
-                    <div class="device-status-legend" *ngIf="idleDevices.length">
-                        <span class="device-status-legend-item">
-                            <i class="fas fa-check-circle text-success font-xs-sm"></i>
-                            Device Is Active / Reachable
-                        </span>
-                        <span class="device-status-legend-item">
-                            <i class="fas fa-exclamation-circle text-warning font-xs-sm"></i>
-                            Partially Reachable / Warning State
-                        </span>
-                        <span class="device-status-legend-item">
-                            <i class="fas fa-exclamation-triangle text-danger font-xs-sm"></i>
-                            Offline / Critical / Unreachable
-                        </span>
+                <div class="dashboard-card idle-device-card">
+                    <div class="idle-table-wrap">
+                        <app-spinner [name]="loaderNames.idleDevices" [width]="0"></app-spinner>
+                        <div class="device-status-legend" *ngIf="idleDevices.length">
+                            <span class="device-status-legend-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                Active / Reachable
+                            </span>
+                            <span class="device-status-legend-item">
+                                <i class="fas fa-exclamation-circle text-warning"></i>
+                                Partially Reachable / Warning State
+                            </span>
+                            <span class="device-status-legend-item">
+                                <i class="fas fa-exclamation-triangle text-danger"></i>
+                                Offline / Critical / Unreachable
+                            </span>
+                        </div>
+                        <div class="idle-table-scroll">
+                        <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
+                            <colgroup>
+                                <col class="idle-device-name-col">
+                                <col class="idle-resource-col">
+                                <col class="idle-metric-col">
+                                <col class="idle-metric-col">
+                                <col class="idle-network-col">
+                                <col class="idle-duration-col">
+                                <col class="idle-status-col">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Device Name</th>
+                                    <th>Type</th>
+                                    <th>Avg CPU %</th>
+                                    <th>Avg Mem %</th>
+                                    <th>Network I/O</th>
+                                    <th>Idle Duration</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let device of idleDevices; trackBy: trackByIndex">
+                                    <td>
+                                        <div class="text-primary pointer-link" [tooltip]="device.deviceName"
+                                            (click)="openIdleDevice(device)">{{device.deviceName}}</div>
+                                    </td>
+                                    <td>{{device.resourceType}}</td>
+                                    <td>
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(device.avgCpu.tone)"
+                                                [style.width.%]="device.avgCpu.percent"></div>
+                                        </div>
+                                        <div class="storage-meta">
+                                            <span>Used: {{device.avgCpu.used}}</span>
+                                            <span>Free: {{device.avgCpu.free}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(device.avgMem.tone)"
+                                                [style.width.%]="device.avgMem.percent"></div>
+                                        </div>
+                                        <div class="storage-meta">
+                                            <span>Used: {{device.avgMem.used}}</span>
+                                            <span>Free: {{device.avgMem.free}}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{device.networkIO}}</td>
+                                    <td>{{device.idleDuration}}</td>
+                                    <td><i [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
                     </div>
-                    <div class="idle-table-scroll">
-                    <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
-                        <colgroup>
-                            <col class="idle-device-name-col">
-                            <col class="idle-resource-col">
-                            <col class="idle-metric-col">
-                            <col class="idle-metric-col">
-                            <col class="idle-network-col">
-                            <col class="idle-duration-col">
-                            <col class="idle-status-col">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Device Name</th>
-                                <th>Resource Type</th>
-                                <th>Avg CPU %</th>
-                                <th>Avg Mem %</th>
-                                <th>Network I/O</th>
-                                <th>Idle Duration</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let device of idleDevices; trackBy: trackByIndex">
-                                <td><button type="button" class="btn btn-link p-0 table-link"
-                                        (click)="openIdleDevice(device)" [tooltip]="'Open linked page'"
-                                        container="body">{{device.deviceName}}</button></td>
-                                <td>{{device.resourceType}}</td>
-                                <td>
-                                    <div class="progress-track">
-                                        <div class="progress-fill" [ngClass]="getStatusClass(device.avgCpu.tone)"
-                                            [style.width.%]="device.avgCpu.percent"></div>
-                                    </div>
-                                    <div class="storage-meta">
-                                        <span>Used: {{device.avgCpu.used}}</span>
-                                        <span>Free: {{device.avgCpu.free}}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="progress-track">
-                                        <div class="progress-fill" [ngClass]="getStatusClass(device.avgMem.tone)"
-                                            [style.width.%]="device.avgMem.percent"></div>
-                                    </div>
-                                    <div class="storage-meta">
-                                        <span>Used: {{device.avgMem.used}}</span>
-                                        <span>Free: {{device.avgMem.free}}</span>
-                                    </div>
-                                </td>
-                                <td>{{device.networkIO}}</td>
-                                <td>{{device.idleDuration}}</td>
-                                <td><i [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="idle-pagination-row" *ngIf="idleDevices.length">
+                        <div class="orphaned-footer-note">*Device With <20% Memory And <5% CPU Utilization,
+                            Indicating Low Activity.</div>
+                        <table-pager [compact]="true" [pageNo]="idleDevicesPageNo"
+                            [pageSize]="idleDevicesPageSize" [totalCount]="idleDevicesTotal"
+                            (pageChange)="idleDevicesPageChange($event)"></table-pager>
                     </div>
-                </div>
-                <div class="idle-pagination-row" *ngIf="idleDevices.length">
-                    <div class="orphaned-footer-note">*Device With <20% Memory And <5% CPU Utilization,
-                        Indicating Low Activity.</div>
-                    <table-pager *ngIf="idleDevices.length" [compact]="true" [pageNo]="idleDevicesPageNo"
-                        [pageSize]="idleDevicesPageSize" [totalCount]="idleDevicesTotal"
-                        (pageChange)="idleDevicesPageChange($event)"></table-pager>
                 </div>
             </div>
 
-            <div class="dashboard-card idle-duration-card" *ngIf="hasIdleDuration">
-                <div class="orphaned-widget-header">
-                    <div class="subsection-title mb-0">Idle duration distribution</div>
-                </div>
-                <div class="idle-duration-body">
-                    <app-spinner [name]="loaderNames.idleDuration" [width]="0"></app-spinner>
-                    <div class="idle-duration-content" *ngIf="idleDurationHasData">
-                        <div class="idle-duration-bars">
-                            <div class="idle-duration-row" *ngFor="let item of idleDurationRows; trackBy: trackByIndex">
-                                <div class="idle-duration-label">{{item.duration}}</div>
-                                <div class="idle-duration-track">
-                                    <div class="idle-duration-fill" [style.width.%]="item.percent"
-                                        [style.background]="item.color">
-                                        <span>{{item.count}}</span>
+            <div class="orphaned-widget-col" *ngIf="hasIdleDuration">
+                <div class="subsection-title orphaned-widget-title">Idle Duration Distribution</div>
+                <div class="dashboard-card idle-duration-card">
+                    <div class="idle-duration-body">
+                        <app-spinner [name]="loaderNames.idleDuration" [width]="0"></app-spinner>
+                        <div class="idle-duration-content" *ngIf="idleDurationHasData">
+                            <div class="idle-duration-bars">
+                                <div class="idle-duration-row" *ngFor="let item of idleDurationRows; trackBy: trackByIndex">
+                                    <div class="idle-duration-label">{{item.duration}}</div>
+                                    <div class="idle-duration-track">
+                                        <div class="idle-duration-fill" [style.width.%]="item.percent"
+                                            [style.background]="item.color">
+                                            <span>{{item.count}}</span>
+                                        </div>
                                     </div>
+                                    <div class="idle-duration-value">{{item.count}}</div>
                                 </div>
-                                <div class="idle-duration-value">{{item.count}}</div>
                             </div>
+                            <div echarts [options]="idleDurationOptions" class="idle-duration-chart"></div>
                         </div>
-                        <div echarts [options]="idleDurationOptions" class="idle-duration-chart"></div>
                     </div>
                 </div>
             </div>

@@ -155,6 +155,12 @@
   background-color: #ff8900 !important;
 }
 
+// Single card-level loader for the Executive Summary / Cloud Inventory card: opaque so the
+// panel titles do not ghost through while the two inventory requests load.
+:host ::ng-deep .public-cloud-compute-dashboard .inventory-card app-spinner .spinner-wrapper {
+  background: #ffffff;
+}
+
 .round-action-btn {
   width: 26px;
   height: 26px;
@@ -190,7 +196,6 @@
   font-weight: 600;
   color: #1e252c;
   line-height: 18px;
-  margin: 0 0 7px;
 }
 
 .section-title-with-link {
@@ -202,7 +207,8 @@
 .dashboard-card+.section-title,
 .orphaned-widgets-grid+.idle-widgets-grid,
 .idle-widgets-grid+.section-title {
-  margin-top: 12px;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
 }
 
 .dashboard-card {
@@ -231,6 +237,12 @@
 
 .inventory-card {
   padding: 16px 20px 18px;
+}
+
+// While the two inventory requests load, reserve a height close to the loaded card so the
+// single overlay looks like a full widget instead of a thin strip.
+.inventory-card.inventory-loading {
+  min-height: 380px;
 }
 
 .summary-metrics {
@@ -428,6 +440,13 @@ button.legend-link {
   font-size: 12px;
   line-height: 16px;
   text-align: center;
+}
+
+// Inside the left column the empty message must hug its heading, otherwise the heading
+// visually groups with the chart above (heading-to-message must stay below the 18px panel gap).
+.provider-distribution-panel .inventory-widget-empty,
+.tags-panel .inventory-widget-empty {
+  min-height: 0;
 }
 
 .tags-empty-state {
@@ -675,7 +694,6 @@ button.legend-link {
 .performance-hotspots-card {
   position: relative;
   padding: 14px 16px 16px;
-  margin-top: 12px;
 }
 
 // While the widget is loading the table/legend are not yet rendered, so reserve a comfortable
@@ -849,17 +867,14 @@ button.legend-link {
   line-height: 18px;
 }
 
-.orphaned-widgets-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr);
-  gap: 12px;
-  margin-top: 12px;
-}
-
+.orphaned-widgets-grid,
 .idle-widgets-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.85fr) minmax(360px, 1fr);
-  gap: 12px;
+  gap: 10px;
+  // Columns size to their own content: the chart card's height follows its data instead of
+  // stretching both cards to the taller one (which left the list card with empty space).
+  align-items: start;
 }
 
 .orphaned-widgets-grid.single-widget-grid,
@@ -875,19 +890,35 @@ button.legend-link {
   overflow: hidden;
 }
 
-// Let the duration card's body grow and center its content so its height stays in sync with the
-// (taller) device card and the chart is not left with empty space on one side.
-.idle-duration-card {
+.orphaned-widget-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.subsection-title.orphaned-widget-title {
+  margin: 0 0 8px;
+  color: #1f2a34;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+// Each card fills its own column; with the grids aligned to start, every column (and its card)
+// takes only the height its content needs.
+.orphaned-widget-col>.dashboard-card {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
 }
 
-.orphaned-widget-header {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #dce2e6;
-  min-height: 40px;
-  padding: 8px 14px;
+.orphaned-widget-col .orphaned-table-wrap,
+.orphaned-widget-col .idle-table-wrap {
+  flex: 1 1 auto;
+}
+
+.orphaned-widget-col .orphaned-category-body {
+  flex: 1 1 auto;
+  justify-content: center;
 }
 
 .orphaned-count-badge {
@@ -899,11 +930,11 @@ button.legend-link {
 .orphaned-table-wrap,
 .idle-table-wrap {
   position: relative;
-  padding: 10px 14px 0;
+  padding: 8px 12px 0;
 }
 
 .orphaned-table-wrap {
-  min-height: 300px;
+  overflow-x: hidden;
 }
 
 .orphaned-list-empty-state {
@@ -921,8 +952,8 @@ button.legend-link {
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px 14px;
-  padding: 0px 5px 9px;
-  color: #26313b;
+  padding: 5px 5px 9px;
+  color: #20272e;
   font-size: 13px;
   line-height: 18px;
 }
@@ -930,12 +961,18 @@ button.legend-link {
 .device-status-legend-item {
   display: inline-flex;
   align-items: center;
+  gap: 5px;
   white-space: nowrap;
 
   i {
     font-size: 15px;
-    margin-right: 6px;
   }
+}
+
+// Cell text wrappers may not exceed their fixed-layout columns so truncateText can ellipsize.
+.orphaned-table td>div,
+.idle-devices-table td>div {
+  max-width: 100%;
 }
 
 .orphaned-table {
@@ -943,19 +980,23 @@ button.legend-link {
   width: 100%;
 
   .orphaned-name-col {
-    width: 28%;
+    width: 24%;
   }
 
   .orphaned-status-col {
-    width: 15%;
+    width: 10%;
+  }
+
+  .orphaned-type-col {
+    width: 20%;
   }
 
   .orphaned-last-seen-col {
-    width: 25%;
+    width: 22%;
   }
 
   .orphaned-datacenter-col {
-    width: 32%;
+    width: 24%;
   }
 
   th,
@@ -972,15 +1013,10 @@ button.legend-link {
   i {
     font-size: 14px;
   }
-
-  .table-link {
-    font-size: 12px;
-  }
 }
 
 .idle-table-wrap {
   overflow-x: hidden;
-  min-height: 300px;
 }
 
 // Cap the idle table at ~6 records; extra rows scroll here. The legend (above) and the pagination
@@ -1036,11 +1072,9 @@ button.legend-link {
     text-overflow: ellipsis;
   }
 
-  // Truncate the device name (a link button) on one line instead of wrapping; it fills its column.
-  td:first-child > button {
-    display: block;
-    width: 100%;
-    text-align: left;
+  // Force the name div to fill its (colgroup-sized) column so it truncates at the real column width.
+  td:first-child > div {
+    width: 100% !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1055,10 +1089,6 @@ button.legend-link {
     font-size: 14px;
   }
 
-  .table-link {
-    font-size: 12px;
-  }
-
   .storage-meta {
     font-size: 10px;
     gap: 4px;
@@ -1071,7 +1101,7 @@ button.legend-link {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 8px 14px 10px;
+  padding: 6px 12px 8px;
 }
 
 .orphaned-footer-note {
@@ -1139,6 +1169,11 @@ button.legend-link {
   background: #f5f8fb;
 }
 
+// The category legend rows keep their drill-down clicks but render like the reference's static rows.
+.orphaned-category-legend .legend-link:hover {
+  background: transparent;
+}
+
 .metric-link:focus-visible,
 .stat-link:focus-visible,
 .header-link-icon:focus-visible,
@@ -1155,7 +1190,7 @@ button.legend-link {
   flex-direction: column;
   justify-content: center;
   min-height: 300px;
-  padding: 10px 16px 12px;
+  padding: 16px 24px 18px;
 }
 
 .idle-duration-empty-state {
@@ -1175,35 +1210,35 @@ button.legend-link {
 
 .idle-duration-bars {
   display: grid;
-  gap: 5px;
+  gap: 8px;
 }
 
 .idle-duration-row {
   display: grid;
-  grid-template-columns: 90px minmax(150px, 1fr) 34px;
+  grid-template-columns: 84px minmax(150px, 1fr) 34px;
   align-items: center;
   column-gap: 8px;
   color: #2b333c;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .idle-duration-label {
   border-bottom: 1px solid #e1e5e8;
-  line-height: 24px;
+  line-height: 30px;
   white-space: nowrap;
 }
 
 .idle-duration-track {
-  height: 24px;
+  height: 31px;
   overflow: hidden;
   background: #d8d8d8;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .idle-duration-fill {
   min-width: 42px;
   height: 100%;
-  border-radius: 4px;
+  border-radius: 5px;
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -1219,24 +1254,18 @@ button.legend-link {
 
 .idle-duration-chart {
   width: 100%;
-  height: 218px;
-  margin: 10px auto 0;
+  height: 238px;
+  margin: 20px auto 0;
 }
 
 .cloud-database-card {
   overflow: hidden;
-  margin-top: 12px;
 }
 
-.cloud-database-section-header {
-  min-height: 46px;
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-  border-bottom: 1px solid #cbd3da;
-  color: #202a33;
-  font-size: 20px;
-  line-height: 24px;
+// Space Consumption stands as its own widget; give the leading KPI strip a little headroom
+// since the card does not start with a subsection title.
+.database-space-card {
+  padding-top: 8px;
 }
 
 .cloud-database-grid {
@@ -1552,17 +1581,7 @@ button.legend-link {
 
 .cloud-storage-card {
   overflow: hidden;
-}
-
-.cloud-storage-section-header {
-  min-height: 46px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  border-bottom: 1px solid #cbd3da;
-  color: #202a33;
-  font-size: 20px;
-  line-height: 24px;
+  margin-top: 12px;
 }
 
 .cloud-storage-kpi-strip,
@@ -1838,9 +1857,7 @@ button.legend-link {
   }
 }
 
-.alert-table,
-.orphaned-table,
-.idle-devices-table {
+.alert-table {
   th {
     background: #eef1f3;
     border: 0;
@@ -1890,11 +1907,20 @@ button.legend-link {
 }
 
 .progress-fill.tone-warning {
-  background: #ff8a00;
+  background: #ff8800;
 }
 
 .progress-fill.tone-danger {
-  background: #d90000;
+  background: #cc0000;
+}
+
+.progress-fill.tone-primary,
+.progress-fill.tone-muted {
+  background: #2d86dd;
+}
+
+.progress-fill.tone-info {
+  background: #378ad8;
 }
 
 .progress-track {
@@ -1919,6 +1945,8 @@ button.legend-link {
 .storage-meta {
   display: flex;
   justify-content: space-between;
+  margin-top: 4px;
+  white-space: nowrap;
 }
 
 .alert-card {
@@ -2072,11 +2100,17 @@ button.legend-link {
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
 
-  .inventory-grid,
   .orphaned-widgets-grid,
   .idle-widgets-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1200px) {
+
+  .inventory-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2177,12 +2211,6 @@ button.legend-link {
   .database-storage-legend {
     flex-wrap: wrap;
     gap: 10px;
-  }
-
-  .orphaned-pagination-row,
-  .idle-pagination-row {
-    flex-direction: column;
-    align-items: flex-start;
   }
 
 }
@@ -2397,12 +2425,12 @@ button.legend-link {
   }
 }
 
-.latency-metric-title {
-  color: #3a4651;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 20px;
-  padding: 14px 20px 8px;
+// Latency Metric stands as its own widget; the card supplies the top inset the removed
+// in-card title used to provide.
+.latency-metric-card {
+  overflow: hidden;
+  margin-top: 12px;
+  padding-top: 14px;
 }
 
 .latency-metric-grid {

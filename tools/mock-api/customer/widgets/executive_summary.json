@@ -1,0 +1,93 @@
+{
+  "cloudTypeDistribution": [
+    {
+      "count": 220,
+      "percentage": 60.9,
+      "type": "VMware vCenter"
+    },
+    {
+      "count": 0,
+      "percentage": 0,
+      "type": "VMware vCenter"
+    },
+    {
+      "count": 14,
+      "percentage": 3.9,
+      "type": "Custom"
+    },
+    {
+      "count": 116,
+      "percentage": 32.1,
+      "type": "Hyperv"
+    },
+    {
+      "count": 3,
+      "percentage": 0.8,
+      "type": "Nutanix"
+    },
+    {
+      "count": 8,
+      "percentage": 2.2,
+      "type": "VMware vCloud"
+    }
+  ],
+  "executiveSummary": {
+    "totalVMs": 361,
+    "physicalHosts": 13,
+    "idleVMs": 81,
+    "poweredOnVMs": 192,
+    "poweredOffVMs": 155,
+    "clusters": 9,
+    "orphanedVMs": 44
+  },
+  "alertsSeverity": {
+    "info": 39701,
+    "total": 44576,
+    "critical": 4753,
+    "warning": 122
+  },
+  "environmentCriticality": [
+    {
+      "environment": "Production",
+      "count": 3,
+      "percentage": 0.8
+    },
+    {
+      "environment": "Development",
+      "count": 3,
+      "percentage": 0.8
+    },
+    {
+      "environment": "Test",
+      "count": 4,
+      "percentage": 1.1
+    },
+    {
+      "environment": "None",
+      "count": 351,
+      "percentage": 97.2
+    }
+  ],
+  "vmCountByOSType": [
+    {
+      "count": 156,
+      "percentage": 43,
+      "os": "Linux"
+    },
+    {
+      "count": 55,
+      "percentage": 15,
+      "os": "Windows"
+    }
+  ],
+  "powerActivityState": [
+    {
+      "count": 155,
+      "state": "Powered Off"
+    },
+    {
+      "count": 192,
+      "state": "Powered On"
+    }
+  ]
+}

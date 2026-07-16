@@ -184,6 +184,14 @@ export interface UnifiedAiopsCoverageRow {
   label: string;
   value: string;
   iconPath?: string;
+  // Private cloud rows: Font Awesome glyph classes + color (public cloud uses iconPath instead).
+  iconClass?: string;
+  iconColor?: string;
+}
+
+export interface UnifiedAiopsResourceIcon {
+  iconClass: string;
+  iconColor: string;
 }
 
 export interface UnifiedAiopsCoverageGroup {

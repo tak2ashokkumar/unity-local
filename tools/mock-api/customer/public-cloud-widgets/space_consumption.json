@@ -1,16 +1,27 @@
 {
-  "count": 0,
-  "data": [],
+  "count": 10,
+  "data": [
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a04", "database_instance": "rds-dbs-4", "cloud": "AWS", "cloud_key": "aws", "region": "us-west-2", "max_allocated_storage": 200, "max_allocated_storage_unit": "GB", "allocated_storage": 148, "allocated_storage_unit": "GB", "free_storage_space": 52, "free_storage_space_unit": "GB", "utilization_percent": 74.0 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a05", "database_instance": "aurora-prod-01", "cloud": "AWS", "cloud_key": "aws", "region": "us-east-2", "max_allocated_storage": 180, "max_allocated_storage_unit": "GB", "allocated_storage": 132, "allocated_storage_unit": "GB", "free_storage_space": 48, "free_storage_space_unit": "GB", "utilization_percent": 73.33 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a01", "database_instance": "rds-dbs-1", "cloud": "AWS", "cloud_key": "aws", "region": "us-east-1", "max_allocated_storage": 150, "max_allocated_storage_unit": "GB", "allocated_storage": 96, "allocated_storage_unit": "GB", "free_storage_space": 54, "free_storage_space_unit": "GB", "utilization_percent": 64.0 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a06", "database_instance": "aurora-prod-02", "cloud": "AWS", "cloud_key": "aws", "region": "us-east-2", "max_allocated_storage": 150, "max_allocated_storage_unit": "GB", "allocated_storage": 88, "allocated_storage_unit": "GB", "free_storage_space": 62, "free_storage_space_unit": "GB", "utilization_percent": 58.67 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a02", "database_instance": "rds-dbs-2", "cloud": "AWS", "cloud_key": "aws", "region": "us-east-1", "max_allocated_storage": 120, "max_allocated_storage_unit": "GB", "allocated_storage": 83, "allocated_storage_unit": "GB", "free_storage_space": 37, "free_storage_space_unit": "GB", "utilization_percent": 69.17 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a07", "database_instance": "azure-sql-dbs-1", "cloud": "Microsoft Azure", "cloud_key": "azure", "region": "eastus", "max_allocated_storage": 100, "max_allocated_storage_unit": "GB", "allocated_storage": 71, "allocated_storage_unit": "GB", "free_storage_space": 29, "free_storage_space_unit": "GB", "utilization_percent": 71.0 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a03", "database_instance": "rds-dbs-3", "cloud": "AWS", "cloud_key": "aws", "region": "us-west-2", "max_allocated_storage": 100, "max_allocated_storage_unit": "GB", "allocated_storage": 64, "allocated_storage_unit": "GB", "free_storage_space": 36, "free_storage_space_unit": "GB", "utilization_percent": 64.0 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a08", "database_instance": "azure-sql-dbs-2", "cloud": "Microsoft Azure", "cloud_key": "azure", "region": "westus2", "max_allocated_storage": 80, "max_allocated_storage_unit": "GB", "allocated_storage": 52, "allocated_storage_unit": "GB", "free_storage_space": 28, "free_storage_space_unit": "GB", "utilization_percent": 65.0 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a09", "database_instance": "gcp-cloudsql-01", "cloud": "GCP", "cloud_key": "gcp", "region": "us-central1", "max_allocated_storage": 60, "max_allocated_storage_unit": "GB", "allocated_storage": 41, "allocated_storage_unit": "GB", "free_storage_space": 19, "free_storage_space_unit": "GB", "utilization_percent": 68.33 },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a10", "database_instance": "oci-adb-01", "cloud": "OCI", "cloud_key": "oci", "region": "us-sanjose-1", "max_allocated_storage": 60, "max_allocated_storage_unit": "GB", "allocated_storage": 35, "allocated_storage_unit": "GB", "free_storage_space": 25, "free_storage_space_unit": "GB", "utilization_percent": 58.33 }
+  ],
   "cloud": "aws",
   "summary": {
-    "total_free_space": null,
+    "total_free_space": 390,
     "utilization_unit": "%",
-    "average_utilization": null,
-    "total_allocated": null,
-    "storage_unit": null,
-    "database_count": 0,
-    "average_allocated": null,
-    "max_allocated_storage": null,
-    "average_free_space": null
+    "average_utilization": 66.58,
+    "total_allocated": 810,
+    "storage_unit": "GB",
+    "database_count": 10,
+    "average_allocated": 81,
+    "max_allocated_storage": 1200,
+    "average_free_space": 39
   }
 }

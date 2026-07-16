@@ -470,6 +470,9 @@ export interface PublicCloudOrphanedDeviceResponseItem {
   device_name?: string;
   instance_name?: string;
   status?: string;
+  resource_type?: string;
+  resourceType?: string;
+  type?: string;
   lastSeen?: string;
   last_seen?: string;
   datacenter?: string;
@@ -492,6 +495,7 @@ export interface PublicCloudOrphanedDevicesResponse {
 export interface PublicCloudOrphanedDeviceRow {
   name: string;
   status: string;
+  resourceType: string;
   lastSeen: string;
   datacenter: string;
 }
@@ -964,6 +968,7 @@ export interface PublicCloudStoragePerformanceCard {
   deltaTone: PublicCloudStatusTone;
   subtitle: string;
   chartType: 'area' | 'bar';
+  hasData: boolean;
   options: EChartsOption;
 }
 

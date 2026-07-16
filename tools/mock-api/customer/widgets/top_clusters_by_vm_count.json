@@ -1,0 +1,154 @@
+{
+  "topClustersByVMCount": [
+    {
+      "clusterName": "Linux Cluster",
+      "hostCount": 6,
+      "vmCount": 62,
+      "datastoreCount": 9
+    },
+    {
+      "clusterName": "UNITY-LAB-CL",
+      "hostCount": 2,
+      "vmCount": 60,
+      "datastoreCount": 4
+    },
+    {
+      "clusterName": "UNITY-LAB-CL",
+      "hostCount": 2,
+      "vmCount": 59,
+      "datastoreCount": 4
+    },
+    {
+      "clusterName": "DEFR-PROD02",
+      "hostCount": 0,
+      "vmCount": 0,
+      "datastoreCount": 0
+    },
+    {
+      "clusterName": "DEFR-PROD01",
+      "hostCount": 0,
+      "vmCount": 0,
+      "datastoreCount": 0
+    },
+    {
+      "clusterName": "DEFR-DMZ01",
+      "hostCount": 0,
+      "vmCount": 0,
+      "datastoreCount": 0
+    },
+    {
+      "clusterName": "DEFR-MGMT",
+      "hostCount": 0,
+      "vmCount": 0,
+      "datastoreCount": 0
+    },
+    {
+      "clusterName": "UNITY-LAB-CL",
+      "hostCount": 2,
+      "vmCount": 0,
+      "datastoreCount": 4
+    }
+  ],
+  "filters": {
+    "platforms": [
+      {
+        "value": "VMware",
+        "label": "VMware vCenter"
+      },
+      {
+        "value": "vCloud Director",
+        "label": "VMware vCloud"
+      },
+      {
+        "value": "United Private Cloud vCenter",
+        "label": "VMware vCenter"
+      },
+      {
+        "value": "Custom",
+        "label": "Custom"
+      },
+      {
+        "value": "Hyperv",
+        "label": "Hyperv"
+      },
+      {
+        "value": "Nutanix",
+        "label": "Nutanix"
+      }
+    ],
+    "accounts": [
+      {
+        "value": "3c874681-c479-497d-9689-9c1c29a85efc",
+        "label": "vCenter Demo 1"
+      },
+      {
+        "value": "d9d24889-8e6c-4b1b-a297-2c50b345f791",
+        "label": "HARI ZTC"
+      },
+      {
+        "value": "6165c13d-93bb-439a-a0b8-9d08c5e9ab7e",
+        "label": "Vcenter ZTC"
+      },
+      {
+        "value": "d7d6eab9-21ad-491b-844c-cc657ab94f31",
+        "label": "01.Global_VCenter_Lab"
+      },
+      {
+        "value": "bf1e9659-8e80-4770-bfb3-ecc210affbce",
+        "label": "3.VMware vCloud"
+      },
+      {
+        "value": "2fa55012-d137-495f-8462-01d27125ae4a",
+        "label": "United cloud"
+      },
+      {
+        "value": "f399797c-e4e9-4741-b5da-75825700a0a1",
+        "label": "upc"
+      },
+      {
+        "value": "d408e6b1-85cc-4897-81c4-71f57bb8075c",
+        "label": "Custom DC3"
+      },
+      {
+        "value": "4455bf34-7e33-49a2-9da0-e35208096013",
+        "label": "1.DemoVcenter - GlobalVCS-Lab"
+      },
+      {
+        "value": "86992fee-b969-446d-a78d-15cc3aa9fc5e",
+        "label": "hyperV"
+      },
+      {
+        "value": "f83bed82-17e7-4b4f-99ba-acfdf02cd4fc",
+        "label": "Nutanix"
+      }
+    ],
+    "environments": [
+      {
+        "value": "Production",
+        "label": "Production"
+      },
+      {
+        "value": "Development",
+        "label": "Development"
+      },
+      {
+        "value": "Test",
+        "label": "Test"
+      },
+      {
+        "value": "None",
+        "label": "None"
+      }
+    ],
+    "datacenters": [
+      {
+        "value": "DC3",
+        "label": "DC3"
+      },
+      {
+        "value": "DC1",
+        "label": "DC1"
+      }
+    ]
+  }
+}

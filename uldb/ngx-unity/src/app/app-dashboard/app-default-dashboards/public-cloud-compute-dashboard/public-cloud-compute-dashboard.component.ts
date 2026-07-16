@@ -209,10 +209,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   loaderNames = {
     filters: 'publicCloudFiltersLoader',
-    summaryMetrics: 'publicCloudSummaryMetricsLoader',
-    providerDistribution: 'publicCloudProviderDistributionLoader',
-    tags: 'publicCloudTagsLoader',
-    geoDistribution: 'publicCloudGeoDistributionLoader',
+    inventoryCard: 'publicCloudInventoryCardLoader',
     publicCloudCoverage: 'publicCloudInfraCoverageLoader',
     performanceHotspots: 'publicCloudPerformanceHotspotsLoader',
     orphanedDevices: 'publicCloudOrphanedDevicesLoader',
@@ -508,45 +505,19 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
+  // The inventory card shares one loader with getGeoDistribution: the spinner service is
+  // reference-counted, so the single overlay hides only after BOTH requests finish.
   getInventorySummary(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.summaryMetrics = [];
-    this.providerDistribution = [];
-    this.providerDistributionOptions = {};
-    this.tags = [];
+    this.clearInventorySummaryViewData();
     this.widgetLoading.inventorySummary = true;
-    this.startInventorySummaryLoaders();
-    this.svc.getInventorySummary(filterFormOutput).pipe(
-      takeUntil(this.ngUnsubscribe),
-      finalize(() => {
-        this.widgetLoading.inventorySummary = false;
-        this.stopInventorySummaryLoaders();
-      })
-    ).subscribe(res => {
+    this.loadWidget(this.loaderNames.inventoryCard, this.svc.getInventorySummary(filterFormOutput), res => {
       this.summaryMetrics = this.svc.convertToSummaryMetricsViewData(res);
       this.providerDistribution = this.svc.convertToProviderDistributionViewData(res);
       this.providerDistributionOptions = this.svc.convertToProviderDistributionOptions(this.providerDistribution);
       this.tags = this.svc.convertToTagsViewData(res);
     }, () => {
       this.clearInventorySummaryViewData();
-    });
-  }
-
-  private startInventorySummaryLoaders() {
-    [
-      this.loaderNames.summaryMetrics,
-      this.loaderNames.providerDistribution,
-      this.loaderNames.tags
-    ].forEach(loaderName => this.spinnerService.start(loaderName));
-  }
-
-  private stopInventorySummaryLoaders() {
-    setTimeout(() => {
-      [
-        this.loaderNames.summaryMetrics,
-        this.loaderNames.providerDistribution,
-        this.loaderNames.tags
-      ].forEach(loaderName => this.spinnerService.stop(loaderName));
-    }, 0);
+    }, () => this.widgetLoading.inventorySummary = false);
   }
 
   private clearInventorySummaryViewData() {
@@ -559,7 +530,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   getGeoDistribution(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.geoHeatmapOptions = {};
     this.widgetLoading.geoDistribution = true;
-    this.loadWidget(this.loaderNames.geoDistribution, this.svc.getGeoDistribution(filterFormOutput), res => {
+    this.loadWidget(this.loaderNames.inventoryCard, this.svc.getGeoDistribution(filterFormOutput), res => {
       this.geoHeatmapOptions = this.svc.convertToGeoHeatmapOptions(res);
     }, () => {
       this.geoHeatmapOptions = {};
@@ -674,7 +645,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
         return metric.kind === 'highLatency'
           ? this.svc.convertToStorageHighLatencyCard(res, metric.color)
           : this.svc.convertToStorageTrendCard(res, metric.color);
-      }).filter(card => !!card.title);
+      }).filter(card => card.hasData);
     }, () => {
       this.storagePerformanceCards = [];
     }, () => this.widgetLoading.storagePerformance = false);
@@ -1033,7 +1004,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   }
 
   get hasCloudDatabasePerformanceSection(): boolean {
-    return this.hasDatabaseOverviewData || this.hasDatabaseTrendData || this.hasDatabaseSpaceData || this.hasDatabaseCapacityData;
+    return this.hasDatabaseOverviewData || this.hasDatabaseTrendData;
   }
 
   get hasStoragePerformanceData(): boolean {
@@ -1057,7 +1028,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   }
 
   get hasCloudStorageHealthSection(): boolean {
-    return this.hasStoragePerformanceData || this.hasStorageResourcesData || this.hasLatencyMetricSection;
+    return this.hasStoragePerformanceData || this.hasStorageResourcesData;
   }
 
   get hasAnyDashboardWidget(): boolean {
@@ -1068,7 +1039,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.hasPublicCloudCoverage ||
       this.hasPerformanceHotspots ||
       this.hasCloudDatabasePerformanceSection ||
+      this.hasDatabaseSpaceSection ||
       this.hasCloudStorageHealthSection ||
+      this.hasLatencyMetricSection ||
       this.hasOrphanedDevices ||
       this.hasOrphanedByCategory ||
       this.hasIdleDevices ||

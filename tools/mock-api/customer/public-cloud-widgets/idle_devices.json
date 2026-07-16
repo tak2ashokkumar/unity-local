@@ -1,49 +1,17 @@
 {
-    "count": 120,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "device_name": "vm-prod-0041",
-            "resource_type": "VM",
-            "idle_duration": "34 days",
-            "status": "healthy"
-        },
-        {
-            "device_name": "gpu-node-007",
-            "resource_type": "GPU",
-            "idle_duration": "52 days",
-            "status": "warning"
-        },
-        {
-            "device_name": "stor-vol-0192",
-            "resource_type": "Storage",
-            "idle_duration": "78 days",
-            "status": "critical"
-        },
-        {
-            "device_name": "bm-server-021",
-            "resource_type": "VM",
-            "idle_duration": "12 days",
-            "status": "healthy"
-        },
-        {
-            "device_name": "net-sw-core-04",
-            "resource_type": "Storage",
-            "idle_duration": "21 days",
-            "status": "healthy"
-        },
-        {
-            "device_name": "vm-dev-0093",
-            "resource_type": "VM",
-            "idle_duration": "18 days",
-            "status": "warning"
-        },
-        {
-            "device_name": "gpu-cluster-02",
-            "resource_type": "GPU",
-            "idle_duration": "48 days",
-            "status": "critical"
-        }
-    ]
+  "count": 12,
+  "previous": null,
+  "results": [
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc01", "device_name": "idle-vm-batch-01", "resource_type": "VM Instance", "provider": "azure", "cloud_type": "azure", "monitoring_type": "zabbix", "avg_cpu": { "used": "2.1%", "free": "97.9%", "percent": 2.1 }, "avg_mem": { "used": "11.4%", "free": "88.6%", "percent": 11.4 }, "network_io": "14 Kbps", "idle_duration": "21 days", "status": "success" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc02", "device_name": "idle-vm-report-02", "resource_type": "VM Instance", "provider": "azure", "cloud_type": "azure", "monitoring_type": "zabbix", "avg_cpu": { "used": "1.4%", "free": "98.6%", "percent": 1.4 }, "avg_mem": { "used": "8.9%", "free": "91.1%", "percent": 8.9 }, "network_io": "9 Kbps", "idle_duration": "34 days", "status": "warning" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc03", "device_name": "idle-gpu-train-01", "resource_type": "GPU", "provider": "gcp", "cloud_type": "gcp", "monitoring_type": "observium", "avg_cpu": { "used": "3.8%", "free": "96.2%", "percent": 3.8 }, "avg_mem": { "used": "16.2%", "free": "83.8%", "percent": 16.2 }, "network_io": "22 Kbps", "idle_duration": "9 days", "status": "success" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc04", "device_name": "idle-vol-archive-07", "resource_type": "Storage Volume", "provider": "aws", "cloud_type": "aws", "monitoring_type": "observium", "avg_cpu": { "used": "0.6%", "free": "99.4%", "percent": 0.6 }, "avg_mem": { "used": "4.8%", "free": "95.2%", "percent": 4.8 }, "network_io": "3 Kbps", "idle_duration": "42 days", "status": "critical" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc05", "device_name": "idle-vm-stage-04", "resource_type": "VM Instance", "provider": "gcp", "cloud_type": "gcp", "monitoring_type": "zabbix", "avg_cpu": { "used": "4.2%", "free": "95.8%", "percent": 4.2 }, "avg_mem": { "used": "18.7%", "free": "81.3%", "percent": 18.7 }, "network_io": "31 Kbps", "idle_duration": "6 days", "status": "success" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc06", "device_name": "idle-vm-poc-11", "resource_type": "VM Instance", "provider": "azure", "cloud_type": "azure", "monitoring_type": "zabbix", "avg_cpu": { "used": "1.9%", "free": "98.1%", "percent": 1.9 }, "avg_mem": { "used": "12.5%", "free": "87.5%", "percent": 12.5 }, "network_io": "11 Kbps", "idle_duration": "17 days", "status": "warning" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc07", "device_name": "idle-bm-lab-02", "resource_type": "Bare Metal", "provider": "oci", "cloud_type": "oci", "monitoring_type": "observium", "avg_cpu": { "used": "2.8%", "free": "97.2%", "percent": 2.8 }, "avg_mem": { "used": "9.3%", "free": "90.7%", "percent": 9.3 }, "network_io": "7 Kbps", "idle_duration": "28 days", "status": "unknown" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc08", "device_name": "idle-vm-demo-06", "resource_type": "VM Instance", "provider": "aws", "cloud_type": "aws", "monitoring_type": "zabbix", "avg_cpu": { "used": "3.1%", "free": "96.9%", "percent": 3.1 }, "avg_mem": { "used": "14.6%", "free": "85.4%", "percent": 14.6 }, "network_io": "18 Kbps", "idle_duration": "12 days", "status": "success" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc09", "device_name": "idle-vol-backup-03", "resource_type": "Storage Volume", "provider": "azure", "cloud_type": "azure", "monitoring_type": "observium", "avg_cpu": { "used": "0.9%", "free": "99.1%", "percent": 0.9 }, "avg_mem": { "used": "5.2%", "free": "94.8%", "percent": 5.2 }, "network_io": "4 Kbps", "idle_duration": "37 days", "status": "critical" },
+    { "uuid": "9a10b2c3-1111-4d5e-8f01-aa01bb02cc10", "device_name": "idle-vm-sandbox-08", "resource_type": "VM Instance", "provider": "gcp", "cloud_type": "gcp", "monitoring_type": "zabbix", "avg_cpu": { "used": "2.4%", "free": "97.6%", "percent": 2.4 }, "avg_mem": { "used": "10.8%", "free": "89.2%", "percent": 10.8 }, "network_io": "13 Kbps", "idle_duration": "4 days", "status": "success" }
+  ],
+  "next": null
 }

@@ -1,109 +1,109 @@
 {
   "alert_summary": {
-    "warning_alerts": 59,
-    "critical_alerts": 66,
+    "warning_alerts": 79,
+    "critical_alerts": 84,
     "info_alerts": 1
   },
   "alerts": [
     {
       "source": "Unity",
-      "uuid": "99afaf7a-db67-4468-bc7f-9e9b1cd841fd",
-      "duration": "4m 33s",
+      "uuid": "721bceaa-6a65-4f11-bc51-770f2cf00197",
+      "duration": "2h 11m",
       "severity": "critical",
       "description": "Azure: Virtual machine is unavailable",
       "acknowledged": "No",
-      "id": "1498256",
+      "id": "1519445",
       "device_name": "unitycol01"
     },
     {
       "source": "Unity",
-      "uuid": "c7b086bf-998a-4c29-ab92-2b0f92e1c467",
-      "duration": "68d 12h",
-      "severity": "critical",
-      "description": "Azure: Virtual machine is unavailable",
-      "acknowledged": "No",
-      "id": "1061896",
-      "device_name": "unitycol01"
-    },
-    {
-      "source": "Unity",
-      "uuid": "de277d7d-d25e-4a7c-8a2f-808f6c027d05",
-      "duration": "69d 16h",
-      "severity": "critical",
-      "description": "Azure: Virtual machine is unavailable",
-      "acknowledged": "No",
-      "id": "1059675",
-      "device_name": "unitycol01"
-    },
-    {
-      "source": "Unity",
-      "uuid": "46d3ad86-be39-4ec3-83d3-a54c3fd11a4d",
-      "duration": "80d 9h",
-      "severity": "critical",
-      "description": "Azure: Virtual machine is unavailable",
-      "acknowledged": "No",
-      "id": "1015592",
-      "device_name": "unitycol01"
-    },
-    {
-      "source": "Unity",
-      "uuid": "1eb4ada1-5a5e-4c44-b2c6-4dfe8a747110",
-      "duration": "132d 9h",
-      "severity": "critical",
-      "description": "Datastore free space is low (datastore1 (4) free space < 20%)",
-      "acknowledged": "No",
-      "id": "920704",
-      "device_name": "test"
-    },
-    {
-      "source": "Unity",
-      "uuid": "4f3888b6-2660-49a1-881f-d9b9c1656581",
-      "duration": "134d 21h",
-      "severity": "critical",
-      "description": "Datastore free space is low (LAB-ESX02-DS free space < 20%)",
-      "acknowledged": "No",
-      "id": "918357",
-      "device_name": "test"
-    },
-    {
-      "source": "Unity",
-      "uuid": "28c6ad0a-be02-4686-b87d-0ce82a907719",
-      "duration": "134d 21h",
-      "severity": "critical",
-      "description": "Datastore free space is critically low (LAB-ESX01-DS free space < 10%)",
-      "acknowledged": "No",
-      "id": "918356",
-      "device_name": "test"
-    },
-    {
-      "source": "Unity",
-      "uuid": "3eadda3a-db8e-4092-b51c-6c0ccdc8233a",
-      "duration": "154d 20h",
+      "uuid": "1b004fe1-4123-4faf-a0f0-083a32fc4d1c",
+      "duration": "1d 13h",
       "severity": "critical",
       "description": "Azure: There are errors in requests to API",
       "acknowledged": "No",
-      "id": "913730",
-      "device_name": "unitycol01"
+      "id": "1517120",
+      "device_name": "ztc-test-server"
     },
     {
       "source": "Unity",
-      "uuid": "854034c8-7bc9-4f51-b8ed-0959dbced33c",
-      "duration": "154d 23h",
+      "uuid": "5409f2b3-d1c8-4c7f-afae-954f163aee3e",
+      "duration": "5d 14h",
       "severity": "critical",
       "description": "Azure: Virtual machine is in unknown state",
       "acknowledged": "No",
-      "id": "913725",
+      "id": "1498501",
+      "device_name": "ztc-test-server"
+    },
+    {
+      "source": "Unity",
+      "uuid": "7034c8aa-09a4-4cf6-8c54-4c468af1ca66",
+      "duration": "5d 14h",
+      "severity": "critical",
+      "description": "Azure: Virtual machine is in unknown state",
+      "acknowledged": "No",
+      "id": "1498500",
+      "device_name": "TestVM"
+    },
+    {
+      "source": "Unity",
+      "uuid": "f52737f8-0d7a-4caf-8ace-c27977b34abd",
+      "duration": "5d 14h",
+      "severity": "critical",
+      "description": "Azure: Virtual machine is in unknown state",
+      "acknowledged": "No",
+      "id": "1498498",
+      "device_name": "test-123-vm"
+    },
+    {
+      "source": "Unity",
+      "uuid": "9ab28121-4dda-4927-afe1-a6c905fe4fbb",
+      "duration": "5d 14h",
+      "severity": "critical",
+      "description": "Azure: Virtual machine is unavailable",
+      "acknowledged": "No",
+      "id": "1498497",
       "device_name": "unitycol01"
     },
     {
       "source": "Unity",
-      "uuid": "96c06b88-18d6-4fa3-8232-ce3b7220fe31",
-      "duration": "158d 9h",
+      "uuid": "01933b6f-0348-4e8a-9f95-f8e36db5319c",
+      "duration": "5d 14h",
       "severity": "critical",
       "description": "Azure: There are errors in requests to API",
       "acknowledged": "No",
-      "id": "913668",
+      "id": "1498494",
+      "device_name": "ztc-test-server"
+    },
+    {
+      "source": "Unity",
+      "uuid": "f9557c29-ec7a-45c2-ba8b-32adefc641e9",
+      "duration": "5d 14h",
+      "severity": "critical",
+      "description": "Azure: There are errors in requests to API",
+      "acknowledged": "No",
+      "id": "1498492",
       "device_name": "unitycol01"
+    },
+    {
+      "source": "Unity",
+      "uuid": "5cd73e67-cbfa-4a59-aca4-4b88070e21a4",
+      "duration": "5d 14h",
+      "severity": "critical",
+      "description": "Azure: There are errors in requests to API",
+      "acknowledged": "No",
+      "id": "1498491",
+      "device_name": "TestVM"
+    },
+    {
+      "source": "Unity",
+      "uuid": "d15fb950-e74f-4b66-aada-8afb72c41bfa",
+      "duration": "5d 14h",
+      "severity": "critical",
+      "description": "Azure: There are errors in requests to API",
+      "acknowledged": "No",
+      "id": "1498490",
+      "device_name": "test-123-vm"
     }
   ]
 }

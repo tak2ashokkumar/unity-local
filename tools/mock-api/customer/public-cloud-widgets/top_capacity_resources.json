@@ -1,6 +1,17 @@
 {
-  "count": 0,
-  "data": [],
+  "count": 10,
+  "data": [
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a04", "database_instance": "rds-dbs-4", "max_allocated": 200, "max_allocated_display": "200 GB", "allocated": 148, "allocated_display": "148 GB", "space_free": 52, "space_free_display": "52 GB", "utilization": 74.0, "utilization_display": "74%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a05", "database_instance": "aurora-prod-01", "max_allocated": 180, "max_allocated_display": "180 GB", "allocated": 132, "allocated_display": "132 GB", "space_free": 48, "space_free_display": "48 GB", "utilization": 73.33, "utilization_display": "73.33%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a01", "database_instance": "rds-dbs-1", "max_allocated": 150, "max_allocated_display": "150 GB", "allocated": 96, "allocated_display": "96 GB", "space_free": 54, "space_free_display": "54 GB", "utilization": 64.0, "utilization_display": "64%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a06", "database_instance": "aurora-prod-02", "max_allocated": 150, "max_allocated_display": "150 GB", "allocated": 88, "allocated_display": "88 GB", "space_free": 62, "space_free_display": "62 GB", "utilization": 58.67, "utilization_display": "58.67%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a02", "database_instance": "rds-dbs-2", "max_allocated": 120, "max_allocated_display": "120 GB", "allocated": 83, "allocated_display": "83 GB", "space_free": 37, "space_free_display": "37 GB", "utilization": 69.17, "utilization_display": "69.17%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a07", "database_instance": "azure-sql-dbs-1", "max_allocated": 100, "max_allocated_display": "100 GB", "allocated": 71, "allocated_display": "71 GB", "space_free": 29, "space_free_display": "29 GB", "utilization": 71.0, "utilization_display": "71%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a03", "database_instance": "rds-dbs-3", "max_allocated": 100, "max_allocated_display": "100 GB", "allocated": 64, "allocated_display": "64 GB", "space_free": 36, "space_free_display": "36 GB", "utilization": 64.0, "utilization_display": "64%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a08", "database_instance": "azure-sql-dbs-2", "max_allocated": 80, "max_allocated_display": "80 GB", "allocated": 52, "allocated_display": "52 GB", "space_free": 28, "space_free_display": "28 GB", "utilization": 65.0, "utilization_display": "65%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a09", "database_instance": "gcp-cloudsql-01", "max_allocated": 60, "max_allocated_display": "60 GB", "allocated": 41, "allocated_display": "41 GB", "space_free": 19, "space_free_display": "19 GB", "utilization": 68.33, "utilization_display": "68.33%" },
+    { "uuid": "6f1c2a34-8b5d-4e2f-9a01-1c2d3e4f5a10", "database_instance": "oci-adb-01", "max_allocated": 60, "max_allocated_display": "60 GB", "allocated": 35, "allocated_display": "35 GB", "space_free": 25, "space_free_display": "25 GB", "utilization": 58.33, "utilization_display": "58.33%" }
+  ],
   "cloud": "aws",
   "sort_by": "max_allocated"
 }

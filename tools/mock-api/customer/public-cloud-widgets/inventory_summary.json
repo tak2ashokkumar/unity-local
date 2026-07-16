@@ -146,7 +146,7 @@
       "platform_services": 164
     },
     {
-      "warning_alerts": 0,
+      "warning_alerts": 3,
       "clouds": {
         "azure": 148
       },
@@ -157,7 +157,7 @@
       "raw_regions": [
         "eastus"
       ],
-      "total_alerts": 0,
+      "total_alerts": 3,
       "value": 148,
       "accounts": [
         {
@@ -232,7 +232,7 @@
       "platform_services": 58
     },
     {
-      "warning_alerts": 0,
+      "warning_alerts": 12,
       "clouds": {
         "azure": 77
       },
@@ -243,7 +243,7 @@
       "raw_regions": [
         "westus"
       ],
-      "total_alerts": 0,
+      "total_alerts": 12,
       "value": 77,
       "accounts": [
         {
@@ -275,7 +275,7 @@
       "platform_services": 48
     },
     {
-      "warning_alerts": 54,
+      "warning_alerts": 55,
       "clouds": {
         "azure": 69
       },
@@ -286,7 +286,7 @@
       "raw_regions": [
         "westus2"
       ],
-      "total_alerts": 58,
+      "total_alerts": 60,
       "value": 69,
       "accounts": [
         {
@@ -312,7 +312,7 @@
       ],
       "primary_cloud": "azure",
       "information_alerts": 0,
-      "critical_alerts": 4,
+      "critical_alerts": 5,
       "compute_count": 19,
       "other_services": 0,
       "platform_services": 50
@@ -361,7 +361,7 @@
       "platform_services": 43
     },
     {
-      "warning_alerts": 0,
+      "warning_alerts": 4,
       "clouds": {
         "azure": 46
       },
@@ -372,7 +372,7 @@
       "raw_regions": [
         "centralindia"
       ],
-      "total_alerts": 0,
+      "total_alerts": 4,
       "value": 46,
       "accounts": [
         {
@@ -2346,29 +2346,17 @@
     }
   ],
   "distribution": {
-    "azure": 4,
+    "azure": 5,
     "gcp": 4,
     "aws": 2,
     "oci": 1
-  },
-  "tags": {
-    "finaltest2": 3,
-    "03242025": 4,
-    "Unknown": 542,
-    "DevOps": 1,
-    "Dev": 9,
-    "46f40029-a9c3-11f0-b443-9649f923bc04": 1,
-    "test-aks-aks": 2,
-    "unity": 15,
-    "lumi-platform": 72,
-    "New_testssh": 1
   },
   "summary": {
     "services": 59,
     "orphaned_vms": 0,
     "running_resources": 46,
     "idle_vms": 0,
-    "cloud_accounts": 11,
+    "cloud_accounts": 12,
     "active_regions": 71,
     "stopped_resources": 11,
     "vms": 81

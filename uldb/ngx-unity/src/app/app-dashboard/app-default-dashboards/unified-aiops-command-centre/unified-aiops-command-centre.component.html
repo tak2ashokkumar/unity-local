@@ -286,14 +286,17 @@
                     <div class="d-flex coverage-card-body">
                         <div class="coverage-rows-col">
                             <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
-                                <span>
-                                    <button type="button" class="btn btn-link p-0 coverage-link"
+                                <span class="coverage-row-label">
+                                    <i class="coverage-resource-icon fa {{row.iconClass}}" *ngIf="row.iconClass"
+                                        [style.color]="row.iconColor" aria-hidden="true"></i>
+                                    <button type="button" class="btn btn-link p-0 coverage-link coverage-row-name"
                                         *ngIf="canOpenPrivateCloudCoverage(provider, row); else privateCoverageLabelText"
                                         (click)="openPrivateCloudCoverage(provider, row)" [tooltip]="'Open linked page'"
                                         placement="top" container="body">
                                         {{row.label}}
                                     </button>
-                                    <ng-template #privateCoverageLabelText>{{row.label}}</ng-template>
+                                    <ng-template #privateCoverageLabelText><span
+                                            class="coverage-row-name">{{row.label}}</span></ng-template>
                                 </span>
                                 <strong>{{row.value}}</strong>
                             </div>

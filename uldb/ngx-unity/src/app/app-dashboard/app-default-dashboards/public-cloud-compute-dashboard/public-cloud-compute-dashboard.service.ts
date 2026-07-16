@@ -2253,12 +2253,14 @@ export class PublicCloudComputeDashboardService {
       deltaTone: this.getStorageTrendDeltaTone(direction),
       subtitle: '',
       chartType: 'area',
+      hasData: !!points.length,
       options: this.getStorageCardAreaOptions(values, labels, color, unit)
     };
   }
 
   convertToStorageHighLatencyCard(data: PublicCloudStorageHighLatencyResponse, color: string): PublicCloudStoragePerformanceCard {
-    const values = (data?.data || []).map(device => this.getNumericValue(device?.p95_latency));
+    const devices = data?.data || [];
+    const values = devices.map(device => this.getNumericValue(device?.p95_latency));
     return {
       key: 'high_latency_devices',
       title: 'High Latency Devices',
@@ -2269,6 +2271,9 @@ export class PublicCloudComputeDashboardService {
       deltaTone: 'muted',
       subtitle: this.getFirstValue(data?.threshold_display),
       chartType: 'bar',
+      // The title is hardcoded, so data presence comes from the monitored devices: a 0/0 response
+      // (no devices at all) leaves the card with nothing to show.
+      hasData: !!devices.length || this.getNumericValue(data?.total_devices) > 0,
       options: this.getStorageCardBarOptions(values, color)
     };
   }
@@ -2522,6 +2527,7 @@ export class PublicCloudComputeDashboardService {
     return this.getOrphanedDeviceResults(data).map(item => ({
       name: this.getFirstValue(item.name, item.device_name, item.instance_name),
       status: this.getFirstValue(item.status),
+      resourceType: this.getFirstValue(item.resource_type, item.resourceType, item.type),
       lastSeen: this.formatOrphanedDate(this.getFirstValue(item.lastSeen, item.last_seen)),
       datacenter: this.getFirstValue(item.datacenter, item.datacenter_name, item.cloud, item.provider, item.platform, item.account)
     }));
@@ -2548,7 +2554,6 @@ export class PublicCloudComputeDashboardService {
   }
 
   convertToOrphanedByCategoryOptions(data: PublicCloudOrphanedCategoryItem[]): EChartsOption {
-    const total = Number(data?.[0]?.totalCount || 0) || (data || []).reduce((sum, item) => sum + Number(item.count || 0), 0);
     return {
       color: (data || []).map(item => item.color),
       tooltip: {
@@ -2558,29 +2563,23 @@ export class PublicCloudComputeDashboardService {
       legend: {
         show: false
       },
-      graphic: [
-        {
-          type: 'text',
-          left: 'center',
-          top: 'center',
-          style: {
-            text: this.formatNumber(total),
-            fill: '#222222',
-            fontSize: 28,
-            fontWeight: 700
-          }
-        }
-      ],
       series: [
         {
           name: 'Orphaned by Category',
           type: 'pie',
-          roseType: 'radius',
-          radius: ['34%', '82%'],
+          radius: ['42%', '72%'],
           center: ['50%', '48%'],
           avoidLabelOverlap: true,
-          label: { show: false },
-          labelLine: { show: false },
+          label: {
+            show: true,
+            color: '#20272e',
+            fontSize: 13,
+            formatter: '{c}'
+          },
+          labelLine: {
+            length: 18,
+            length2: 14
+          },
           data: (data || []).map(item => ({
             value: item.count,
             name: item.category,

@@ -1,0 +1,365 @@
+{
+  "count": 11,
+  "previous": null,
+  "idleDurationDistribution": [
+    {
+      "duration": "0-7 days",
+      "count": 1
+    },
+    {
+      "duration": "30+ days",
+      "count": 10
+    },
+    {
+      "duration": "7-15 days",
+      "count": 0
+    },
+    {
+      "duration": "15-30 days",
+      "count": 0
+    }
+  ],
+  "results": [
+    {
+      "avgCpu": {
+        "used": 0,
+        "free": 100
+      },
+      "deviceName": "ul-dev-oracle-db1",
+      "networkIO": "N/A",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "184 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "aa66d31d-d0ed-4cc9-a886-a20fbae9e524",
+      "resourceType": "VM",
+      "ssr_os": "Linux",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Oracle Linux 8 (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Oracle Linux 8 (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 25.88,
+        "free": 74.12
+      },
+      "deviceName": "alpha-collector-MTPdemo1_New01",
+      "networkIO": "7.30 Mbps",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "139 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "08b9b43c-bb8a-48eb-955a-92d3ecae1b52",
+      "resourceType": "VM",
+      "ssr_os": "Linux",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Ubuntu Linux (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Ubuntu Linux (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 0,
+        "free": 100
+      },
+      "deviceName": "ul-test-log-metrics01",
+      "networkIO": "N/A",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "106 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "c70db240-f601-4a61-9ea8-bbf29dc3ac7e",
+      "resourceType": "VM",
+      "ssr_os": "Linux",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Ubuntu Linux (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Ubuntu Linux (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 0,
+        "free": 100
+      },
+      "deviceName": "06.unity-lab-Win-vm4",
+      "networkIO": "110.01 Kbps",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "0 days",
+      "device": "Virtual Machines",
+      "status": "success",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "d4e54ec9-eec0-4c1d-b5ea-52f5501d69b1",
+      "resourceType": "VM",
+      "ssr_os": "Windows",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 0,
+        "free": 100
+      },
+      "deviceName": "10.UL-WIN2019-VM01",
+      "networkIO": "16.73 Kbps",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "112 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "bf07039b-108a-4e0a-976f-0339a5e81d86",
+      "resourceType": "VM",
+      "ssr_os": "Windows",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 0,
+        "free": 100
+      },
+      "deviceName": "08.unity-lab-lnx-rocky-vm1",
+      "networkIO": "N/A",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "112 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "03f81768-449e-4b7a-90cb-41dea94175d5",
+      "resourceType": "VM",
+      "ssr_os": "Linux",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Red Hat Enterprise Linux 8 (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Red Hat Enterprise Linux 8 (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 0,
+        "free": 100
+      },
+      "deviceName": "11.UL-WIN2019-VM02",
+      "networkIO": "23.94 Kbps",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "112 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "9c41c4a1-ecd2-4678-940e-2a4b8495dd51",
+      "resourceType": "VM",
+      "ssr_os": "Windows",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 14.74,
+        "free": 85.26
+      },
+      "deviceName": "ul-easy-trade-app01",
+      "networkIO": "190.14 Kbps",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "112 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "29efd749-b065-471f-8dde-f4b7810ff47f",
+      "resourceType": "VM",
+      "ssr_os": "Linux",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Ubuntu Linux (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Ubuntu Linux (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 0,
+        "free": 100
+      },
+      "deviceName": "12.UL-WIN2019-VM03",
+      "networkIO": "16.99 Kbps",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "112 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "c9e80f8f-34cc-46e4-8955-5784afc8e0af",
+      "resourceType": "VM",
+      "ssr_os": "Windows",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    },
+    {
+      "avgCpu": {
+        "used": 0,
+        "free": 100
+      },
+      "deviceName": "07.Unity-VM-Veeam01",
+      "networkIO": "N/A",
+      "avgMem": {
+        "used": 0,
+        "free": 100
+      },
+      "idleDuration": "112 days",
+      "device": "Virtual Machines",
+      "status": "error",
+      "monitoring": {
+        "configured": true,
+        "observium": false,
+        "enabled": true,
+        "zabbix": true
+      },
+      "uuid": "a032acbf-fdfe-4542-b04f-866099798c07",
+      "resourceType": "VM",
+      "ssr_os": "Windows",
+      "deviceType": "Virtual Machine",
+      "os": {
+        "name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "url": null,
+        "platform_type": "",
+        "version": null,
+        "full_name": "Microsoft Windows Server 2016 or later (64-bit)",
+        "id": null
+      },
+      "vmSubType": "Vmware"
+    }
+  ],
+  "next": "https://unity.unitedlayer.com/customer/widgets/idle_devices_analysis/?datacenter=DC3&datacenter=DC1&account=3c874681-c479-497d-9689-9c1c29a85efc&account=d9d24889-8e6c-4b1b-a297-2c50b345f791&account=6165c13d-93bb-439a-a0b8-9d08c5e9ab7e&account=d7d6eab9-21ad-491b-844c-cc657ab94f31&account=bf1e9659-8e80-4770-bfb3-ecc210affbce&account=2fa55012-d137-495f-8462-01d27125ae4a&account=f399797c-e4e9-4741-b5da-75825700a0a1&account=d408e6b1-85cc-4897-81c4-71f57bb8075c&account=4455bf34-7e33-49a2-9da0-e35208096013&account=86992fee-b969-446d-a78d-15cc3aa9fc5e&account=f83bed82-17e7-4b4f-99ba-acfdf02cd4fc&page_size=10&environment=Production&environment=Development&environment=Test&environment=None&platform=Nutanix&platform=vCloud+Director&platform=VMware&platform=Custom&platform=Hyperv&platform=United+Private+Cloud+vCenter&offset=0&page=2"
+}

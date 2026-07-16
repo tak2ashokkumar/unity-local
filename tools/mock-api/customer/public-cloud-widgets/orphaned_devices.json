@@ -1,37 +1,17 @@
 {
-    "count": 3,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "status": "warning",
-            "datacenter": "Microsoft Azure",
-            "days_offline": null,
-            "name": "unitycol01",
-            "category": "Virtual Machines",
-            "reason": "inactive_status: VM stopped",
-            "resource_status": "VM stopped",
-            "last_seen": "Unknown"
-        },
-        {
-            "status": "critical",
-            "datacenter": "Microsoft Azure",
-            "days_offline": null,
-            "name": "vm-monitor-demo",
-            "category": "Virtual Machines",
-            "reason": "inactive_status: VM deallocated",
-            "resource_status": "VM deallocated",
-            "last_seen": "Unknown"
-        },
-        {
-            "status": "critical",
-            "datacenter": "Microsoft Azure",
-            "days_offline": null,
-            "name": "w-test-vm01",
-            "category": "Virtual Machines",
-            "reason": "inactive_status: VM deallocated",
-            "resource_status": "VM deallocated",
-            "last_seen": "Unknown"
-        }
-    ]
+  "count": 14,
+  "previous": null,
+  "results": [
+    { "name": "ret-vm-web-01", "status": "critical", "resource_type": "VM Instance", "last_seen": "2026-07-02 14:32", "datacenter": "Azure / eastus" },
+    { "name": "disposed-vm-db-02", "status": "critical", "resource_type": "VM Instance", "last_seen": "2026-06-28 09:15", "datacenter": "Azure / westus2" },
+    { "name": "legacy-storage-acct-01", "status": "warning", "resource_type": "Storage Volume", "last_seen": "2026-07-08 18:47", "datacenter": "Azure / centralindia" },
+    { "name": "donated-gpu-node-03", "status": "unknown", "resource_type": "GPU", "last_seen": "2026-06-20 11:05", "datacenter": "GCP / us-central1" },
+    { "name": "old-bm-server-07", "status": "critical", "resource_type": "Bare Metal", "last_seen": "2026-05-30 22:41", "datacenter": "AWS / us-east-1" },
+    { "name": "ret-vm-cache-05", "status": "warning", "resource_type": "VM Instance", "last_seen": "2026-07-10 06:22", "datacenter": "GCP / us-east1-b" },
+    { "name": "unused-volume-114", "status": "unknown", "resource_type": "Storage Volume", "last_seen": "2026-07-01 16:58", "datacenter": "AWS / us-west-2" },
+    { "name": "ret-lb-edge-02", "status": "critical", "resource_type": "Network Device", "last_seen": "2026-06-15 08:12", "datacenter": "Azure / eastus2" },
+    { "name": "disposed-vm-ci-09", "status": "success", "resource_type": "VM Instance", "last_seen": "2026-07-12 13:36", "datacenter": "GCP / us-central1-a" },
+    { "name": "legacy-snapshot-store", "status": "warning", "resource_type": "Storage Volume", "last_seen": "2026-06-24 19:03", "datacenter": "OCI / us-sanjose-1" }
+  ],
+  "next": null
 }
