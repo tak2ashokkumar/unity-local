@@ -1,0 +1,125 @@
+{
+    "summary": {
+        "cumulative_reduction_pct": 100.0,
+        "noise_reduction_pct": 0.0,
+        "correlation_pct": 100.0
+    },
+    "events_per_source": [
+        {
+            "source": "Unity",
+            "count": 6433
+        },
+        {
+            "source": "Oci",
+            "count": 1
+        }
+    ],
+    "totals": {
+        "total_events": 6434,
+        "total_alerts": 1522,
+        "total_deduped_events": 6204,
+        "total_suppressed_events": 0
+    },
+    "conditions": {
+        "total": 1137,
+        "mtta_minutes": 0.0,
+        "mttr_minutes": 66.3,
+        "ticket_generated": 749,
+        "ticket_not_generated": 388,
+        "open": {
+            "count": 653,
+            "acknowledged": {
+                "count": 0,
+                "duration": {
+                    "lte_5min": 0,
+                    "lte_30min": 0,
+                    "gt_30min": 0
+                }
+            }
+        },
+        "resolved": {
+            "count": 484,
+            "auto_healed": {
+                "count": 484,
+                "duration": {
+                    "lte_5min": 396,
+                    "lte_30min": 32,
+                    "gt_30min": 56
+                }
+            },
+            "auto_remediation": {
+                "count": 0,
+                "duration": {
+                    "lte_5min": 0,
+                    "lte_30min": 0,
+                    "gt_30min": 0
+                }
+            }
+        }
+    },
+    "view_by": {
+        "type": "source",
+        "breakdown": [
+            {
+                "label": "Unity",
+                "events": 6433,
+                "alerts": 1522
+            },
+            {
+                "label": "Oci",
+                "events": 1,
+                "alerts": 0
+            },
+            {
+                "label": "AppDynamics",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "Aws",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "Azure",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "Custom",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "Email",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "Gcp",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "LogicMonitor",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "Nagios",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "OpsRamp",
+                "events": 0,
+                "alerts": 0
+            },
+            {
+                "label": "Zabbix",
+                "events": 0,
+                "alerts": 0
+            }
+        ]
+    }
+}

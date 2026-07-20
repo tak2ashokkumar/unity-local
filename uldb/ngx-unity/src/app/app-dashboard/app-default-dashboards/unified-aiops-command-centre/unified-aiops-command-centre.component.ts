@@ -209,6 +209,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   alertsSourceTypeOptions: UnifiedAiopsFilterOption[] = [];
   private alertsSourceTypesSeeded = false;
   private alertsFilterSnapshot = '';
+  private alertsLoadedCriteriaKey = '';
   readonly alertsDurationOptions = UNIFIED_AIOPS_ALERT_DURATION_OPTIONS;
   readonly alertsDefaultViewBy = UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY;
   alertsDuration: string = UNIFIED_AIOPS_ALERT_DEFAULT_DURATION;
@@ -588,7 +589,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     // Source Type options load from the API; pre-select them all once they arrive (see getAlertSourceTypeOptions).
     this.alertsSourceTypesSeeded = false;
     // The Alerts widget reloads only when a multiselect closes or View By/Duration changes
-    // (NOT on every option toggle), so trigger the initial / re-synced load explicitly here.
+    // (NOT on every option toggle), so trigger the initial / re-synced load explicitly here. Clearing the
+    // loaded-criteria key first guarantees a global Apply/refresh always refetches, even when unchanged.
+    this.alertsLoadedCriteriaKey = '';
     this.reloadAlerts();
   }
 
@@ -598,6 +601,13 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
     const alertsCriteria = this.getAlertsCriteria();
+    // Skip when the criteria did not actually change - e.g. the Duration dropdown re-emits its default
+    // selection on init/recreation, which would otherwise fire a duplicate alerts request.
+    const criteriaKey = this.getAlertsCriteriaKey(alertsCriteria);
+    if (criteriaKey === this.alertsLoadedCriteriaKey) {
+      return;
+    }
+    this.alertsLoadedCriteriaKey = criteriaKey;
     if (this.alertsSelectedViewBy === 'source') {
       this.getAlertSourceTypeOptions(alertsCriteria);
     }
@@ -689,10 +699,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   /** Handles the Alerts duration dropdown selection (named period or custom range) and reloads the Alerts widget. */
   onAlertsDurationChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
     this.alertsDuration = event?.period || this.alertsDuration;
-    this.alertsDateRange = {
-      from: this.formatAlertsDate(event?.from),
-      to: this.formatAlertsDate(event?.to)
-    };
+    // Named periods are resolved server-side from `duration`; explicit dates are sent only for a custom
+    // range. (The dropdown also emits computed dates for named periods, including once on init.)
+    this.alertsDateRange = event?.period === 'custom'
+      ? { from: this.formatAlertsDate(event?.from), to: this.formatAlertsDate(event?.to) }
+      : null;
     this.reloadAlerts();
   }
 
@@ -1413,6 +1424,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertReductionMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.alertReductionMetrics = [];
+      // Allow a retry with identical criteria after a failed fetch.
+      this.alertsLoadedCriteriaKey = '';
     }, 'alertReduction');
   }
 
@@ -1422,6 +1435,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertResponseMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.alertResponseMetrics = [];
+      this.alertsLoadedCriteriaKey = '';
     }, 'alertResponse');
   }
 
@@ -1431,6 +1445,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertSourceSankeyOptions = this.svc.convertToAlertSourceSankeyOptions(res);
     }, () => {
       this.alertSourceSankeyOptions = {};
+      this.alertsLoadedCriteriaKey = '';
     }, 'alertSourceSankey');
   }
 
@@ -1440,6 +1455,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertLifecycleSankeyOptions = this.svc.convertToAlertLifecycleSankeyOptions(res);
     }, () => {
       this.alertLifecycleSankeyOptions = {};
+      this.alertsLoadedCriteriaKey = '';
     }, 'alertLifecycleSankey');
   }
 

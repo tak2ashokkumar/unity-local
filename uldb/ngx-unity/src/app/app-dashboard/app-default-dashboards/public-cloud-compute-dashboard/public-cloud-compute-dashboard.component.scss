@@ -872,9 +872,6 @@ button.legend-link {
   display: grid;
   grid-template-columns: minmax(0, 1.85fr) minmax(360px, 1fr);
   gap: 10px;
-  // Columns size to their own content: the chart card's height follows its data instead of
-  // stretching both cards to the taller one (which left the list card with empty space).
-  align-items: start;
 }
 
 .orphaned-widgets-grid.single-widget-grid,
@@ -903,8 +900,9 @@ button.legend-link {
   font-weight: 600;
 }
 
-// Each card fills its own column; with the grids aligned to start, every column (and its card)
-// takes only the height its content needs.
+// Both widget cards fill their (grid-stretched, equal-height) columns; the chart cards' content is
+// kept below the list cards' natural height so the LIST drives the shared row height and the chart
+// bodies center their (data-sized) content in the leftover space.
 .orphaned-widget-col>.dashboard-card {
   flex: 1 1 auto;
   display: flex;
@@ -1210,7 +1208,7 @@ button.legend-link {
 
 .idle-duration-bars {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .idle-duration-row {
@@ -1219,17 +1217,17 @@ button.legend-link {
   align-items: center;
   column-gap: 8px;
   color: #2b333c;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .idle-duration-label {
   border-bottom: 1px solid #e1e5e8;
-  line-height: 30px;
+  line-height: 24px;
   white-space: nowrap;
 }
 
 .idle-duration-track {
-  height: 31px;
+  height: 24px;
   overflow: hidden;
   background: #d8d8d8;
   border-radius: 5px;
@@ -1252,10 +1250,13 @@ button.legend-link {
   white-space: nowrap;
 }
 
+// Bars and donut share the height budget so the duration card's worst case (all four buckets +
+// chart) stays below the idle list card's height (legend + 6-row scroll + pager), keeping the
+// list the row-height driver.
 .idle-duration-chart {
   width: 100%;
-  height: 238px;
-  margin: 20px auto 0;
+  height: 185px;
+  margin: 12px auto 0;
 }
 
 .cloud-database-card {

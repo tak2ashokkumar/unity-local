@@ -71,7 +71,8 @@ const queryIdentityParamNames = new Set([
   "type",
   "app_id",
   "graph_type",
-  "device_category"
+  "device_category",
+  "view_by"
 ]);
 
 const ignoredQueryParamNames = new Set([

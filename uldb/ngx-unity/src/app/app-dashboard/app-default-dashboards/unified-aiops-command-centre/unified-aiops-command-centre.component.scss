@@ -1963,7 +1963,7 @@
 .sankey-grid {
   display: grid;
   grid-template-columns: 1.45fr 1fr;
-  gap: 12px;
+  gap: 16px;
   padding: 0 10px 8px 12px;
 }
 
@@ -2365,7 +2365,7 @@
 
 .idle-duration-bars {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .idle-duration-row {
@@ -2374,17 +2374,17 @@
   align-items: center;
   column-gap: 8px;
   color: #2b333c;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .idle-duration-label {
   border-bottom: 1px solid #e1e5e8;
-  line-height: 30px;
+  line-height: 24px;
   white-space: nowrap;
 }
 
 .idle-duration-track {
-  height: 31px;
+  height: 24px;
   overflow: hidden;
   background: #d8d8d8;
   border-radius: 5px;
@@ -2407,10 +2407,13 @@
   white-space: nowrap;
 }
 
+// Bars and donut share the height budget so the duration card's worst case (all four buckets +
+// chart) stays below the idle list card's height (legend + 6-row scroll + pager), keeping the
+// list the row-height driver.
 .idle-duration-chart {
   width: 100%;
-  height: 238px;
-  margin: 20px auto 0;
+  height: 185px;
+  margin: 12px auto 0;
 }
 
 .idle-duration-empty {

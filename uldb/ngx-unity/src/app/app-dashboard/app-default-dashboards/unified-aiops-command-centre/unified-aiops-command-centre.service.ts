@@ -2077,6 +2077,7 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   convertToOrphanedByCategoryOptions(data: UnifiedAiopsOrphanedCategoryItem[]): EChartsOption {
+    const total = Number(data?.[0]?.totalCount || 0) || (data || []).reduce((sum, item) => sum + Number(item.count || 0), 0);
     return {
       color: (data || []).map(item => item.color),
       tooltip: {
@@ -2086,12 +2087,26 @@ export class UnifiedAiopsCommandCentreService {
       legend: {
         show: false
       },
+      // Total orphaned count sits in the donut hole.
+      graphic: [
+        {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          style: {
+            text: this.formatNumber(total),
+            fill: '#222222',
+            fontSize: 28,
+            fontWeight: 700
+          }
+        }
+      ],
       series: [
         {
           name: 'Orphaned by Category',
           type: 'pie',
           radius: ['42%', '72%'],
-          center: ['50%', '48%'],
+          center: ['50%', '50%'],
           avoidLabelOverlap: true,
           label: {
             show: true,
@@ -2587,7 +2602,9 @@ export class UnifiedAiopsCommandCentreService {
     const sources = this.getArrayFromPayload<any>(this.getPayloadByKeys(response, ['events_per_source', 'eventsPerSource']));
     const viewBy = this.getPayloadByKeys(response, ['view_by', 'viewBy']);
     const sourceBreakdown = this.getArrayFromPayload<any>(viewBy?.breakdown);
-    const sourceItems = sources.length ? sources : sourceBreakdown;
+    // Prefer the view_by breakdown - it reflects the selected View By (source or severity); fall back
+    // to events_per_source for responses without a view_by block.
+    const sourceItems = sourceBreakdown.length ? sourceBreakdown : sources;
 
     const totalAlerts = this.getNumberFromPayload(totals, ['total_alerts', 'totalAlerts']);
     const totalDeduped = this.getNumberFromPayload(totals, ['total_deduped_events', 'totalDedupedEvents']);
@@ -2601,7 +2618,8 @@ export class UnifiedAiopsCommandCentreService {
     const SEVERITY_COLORS: { [key: string]: string } = {
       Critical: '#cc0000',
       Warning: '#ff8800',
-      Info: '#378ad8'
+      Info: '#378ad8',
+      Information: '#378ad8'
     };
 
     sourceItems.forEach((item: any) => {
@@ -2645,9 +2663,20 @@ export class UnifiedAiopsCommandCentreService {
         });
       } else {
         // Scenario B: no severity data  single node per source, gradient flow
+        // Skip zero-count entries (the view_by breakdown lists every known source, even with no events).
+        if (totalSourceEvents <= 0) {
+          return;
+        }
         const clampedValue = Math.min(Math.max(totalSourceEvents, minGroupValue), maxGroupValue);
         nodeTotals[sourceName] = totalSourceEvents;
-        links.push({ source: sourceName, target: 'Events', value: clampedValue });
+        // In the severity view the breakdown items ARE severities - color their tiles/flows accordingly.
+        const severityColor = SEVERITY_COLORS[sourceName];
+        if (severityColor) {
+          nodeColors[sourceName] = severityColor;
+          links.push({ source: sourceName, target: 'Events', value: clampedValue, lineStyle: { color: severityColor, opacity: 0.35 } });
+        } else {
+          links.push({ source: sourceName, target: 'Events', value: clampedValue });
+        }
       }
     });
 
@@ -2691,9 +2720,13 @@ export class UnifiedAiopsCommandCentreService {
       'Auto Remediation': this.getNumberFromPayload(flatConditions, ['resolved_auto_remediation_count', 'resolved.autoRemediation.count'])
     };
 
-    // Keep layoutIterations at 0 (the default) so the input order is preserved - Open stays above
-    // Resolved, matching the design - rather than ECharts re-ordering the columns.
-    return this.getSankeyOptions(links, nodeTotals, { ...UNIFIED_AIOPS_SANKEY_NODE_COLORS });
+    // Let ECharts optimize this chart's layout (layoutIterations 32) so each node settles near its
+    // source's band - e.g. Auto Healed aligns with Resolved (not up at Open's level) even when the
+    // Acknowledged branch is absent. Accepted trade-off: the optimizer orders same-parent siblings
+    // by tile height, so the duration buckets may not keep strict 5/30/>30 Min input order (e.g.
+    // > 30 Min lands above 30 Min when its count is larger).
+    // The source sankey keeps 0 to preserve the order of its many parallel source tiles.
+    return this.getSankeyOptions(links, nodeTotals, { ...UNIFIED_AIOPS_SANKEY_NODE_COLORS }, {}, 32);
   }
 
   private addDurationSankeyLinks(links: Array<{ source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } }>, source: string, duration: any) {
@@ -2717,7 +2750,8 @@ export class UnifiedAiopsCommandCentreService {
     links: Array<{ source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } }>,
     nodeTotals: { [name: string]: number } = {},
     nodeColors: { [name: string]: string } = {},
-    nodeLabels: { [name: string]: string } = {}
+    nodeLabels: { [name: string]: string } = {},
+    layoutIterations: number = 0
   ): EChartsOption {
     if (!links.length) {
       return {};
@@ -2763,6 +2797,28 @@ export class UnifiedAiopsCommandCentreService {
     const labelWidth = 86;
     const sideMargin = labelWidth + 10;
 
+    // Hug the side margins to the widest actual edge label (estimated from character count,
+    // 6.5px/char at fontSize 12 plus a 10px cushion) so the flows stretch across unused space.
+    // Edge labels anchor their text to the node (zrender aligns them outward), so the painted
+    // width is the text itself - labelWidth above only controls wrapping and caps the estimate.
+    const estimateLineWidth = (text: string) => Math.ceil(String(text || '').length * 6.5);
+    const estimateLabelWidth = (name: string, count: number) => {
+      const display = name.includes(' :: ') ? (nodeLabels[name] || '') : name;
+      if (!display) {
+        return 0;
+      }
+      const lines = [Math.min(estimateLineWidth(display), labelWidth)];
+      if (count && !name.includes(' :: ')) {
+        lines.push(estimateLineWidth(`(${this.formatNumber(count)})`));
+      }
+      return Math.max(...lines);
+    };
+    const sideLabelWidth = (side: 'left' | 'right') => nodes
+      .filter(node => node.label && node.label.position === side)
+      .reduce((widest, node) => Math.max(widest, estimateLabelWidth(node.name, node.count)), 0);
+    const leftMargin = Math.max(12, Math.min(sideMargin, sideLabelWidth('left') + 10));
+    const rightMargin = Math.max(12, Math.min(sideMargin, sideLabelWidth('right') + 10));
+
     return {
       tooltip: {
         trigger: 'item',
@@ -2772,14 +2828,14 @@ export class UnifiedAiopsCommandCentreService {
         type: 'sankey',
         data: nodes,
         links: layoutLinks,
-        left: sideMargin,
-        right: sideMargin,
+        left: leftMargin,
+        right: rightMargin,
         top: 12,
         bottom: 12,
         nodeWidth: 10,
         nodeGap: 30,
         nodeAlign: 'left',
-        layoutIterations: 0,
+        layoutIterations,
         draggable: false,
         emphasis: { focus: 'adjacency' },
         lineStyle: {

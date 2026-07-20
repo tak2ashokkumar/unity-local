@@ -2554,6 +2554,7 @@ export class PublicCloudComputeDashboardService {
   }
 
   convertToOrphanedByCategoryOptions(data: PublicCloudOrphanedCategoryItem[]): EChartsOption {
+    const total = Number(data?.[0]?.totalCount || 0) || (data || []).reduce((sum, item) => sum + Number(item.count || 0), 0);
     return {
       color: (data || []).map(item => item.color),
       tooltip: {
@@ -2563,12 +2564,26 @@ export class PublicCloudComputeDashboardService {
       legend: {
         show: false
       },
+      // Total orphaned count sits in the donut hole.
+      graphic: [
+        {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          style: {
+            text: this.formatNumber(total),
+            fill: '#222222',
+            fontSize: 28,
+            fontWeight: 700
+          }
+        }
+      ],
       series: [
         {
           name: 'Orphaned by Category',
           type: 'pie',
           radius: ['42%', '72%'],
-          center: ['50%', '48%'],
+          center: ['50%', '50%'],
           avoidLabelOverlap: true,
           label: {
             show: true,
