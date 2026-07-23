@@ -4,7 +4,8 @@ import { AppUtilityService, NoWhitespaceValidator } from '../app-utility/app-uti
 import { ScrollStrategy, ScrollStrategyOptions } from '@angular/cdk/overlay';
 import * as moment from 'moment';
 import { cloneDeep as _clone } from 'lodash-es';
-import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'custom-date-dropdown',
@@ -17,83 +18,74 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
   @Output() onSubmit = new EventEmitter<FormGroup>();
   @Input() default?: string | DateRangeOption = DateRangePeriod.LAST_30_DAYS;
   @Input() customClass?: string;
-  @Input() emitOnInit: boolean = true;
-  @Input() customSelectedLabel: string = 'custom';
-  @Input() popupPanelClass?: string | string[];
-  @Input() viewportSafePopup: boolean = false;
-  @Input() dateOnlyPicker: boolean = false;
 
   private ngUnsubscribe = new Subject();
-  private formValueChangesSub?: Subscription;
   drForm: FormGroup; // date range form
   drFormErrors: any;
   drFormValidationMsgs: any;
   selected: string;
   clickFlag: boolean = false;
-  activePicker: 'from' | 'to' | null = null;
-  isAnyPickerOpen: boolean = false;
-  fromScrollStrategy: ScrollStrategy;
-  toScrollStrategy: ScrollStrategy;
-  private shouldShowValidationErrors: boolean = false;
+  scrollStrategy: ScrollStrategy;
 
   constructor(
-    private elementRef: ElementRef,
     private util: AppUtilityService,
     private builder: FormBuilder,
     private utilSvc: AppUtilityService,
+    private elementRef: ElementRef,
     private readonly sso: ScrollStrategyOptions) {
-    this.fromScrollStrategy = this.sso.noop();
-    this.toScrollStrategy = this.sso.noop();
+    this.scrollStrategy = this.sso.noop();
   }
 
   ngOnInit(): void {
-    this.updateScrollStrategy();
     this.buildForm();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.viewportSafePopup && !changes.viewportSafePopup.firstChange) {
-      this.updateScrollStrategy();
-    }
+    // console.log('changes : ', changes);
+    // this.buildForm();
   }
 
   ngOnDestroy(): void {
-    this.formValueChangesSub?.unsubscribe();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    if (!this.clickFlag) {
+      return;
+    }
     const target = event.target as Node;
-    const isInsideDropdown = this.elementRef?.nativeElement?.contains(target);
-    const isInsideCalendar = this.isDatePickerInteraction(event);
-    if (!isInsideDropdown && !isInsideCalendar) {
+    // Close when the click is outside THIS dropdown instance and outside any open calendar overlay
+    // (the calendar renders in a CDK overlay appended to the body, so it is not inside this element).
+    const clickedInsideDropdown = this.elementRef.nativeElement.contains(target);
+    const calendarElement = document.querySelector('.owl-dt-container');
+    const clickedInsideCalendar = !!calendarElement && calendarElement.contains(target);
+    if (!clickedInsideDropdown && !clickedInsideCalendar) {
       this.clickFlag = false;
     }
   }
 
-
   buildForm() {
     let period: string;
     let dateRange: DateRangeOption = { from: '', to: '' };
-    if (this.isDateRangeOptionValue(this.default)) {
+    if (this.default instanceof DateRangeOption) {
       period = this.default.value ? this.default.value : '';
       if (this.default.from && this.default.to) {
         dateRange = _clone(this.default);
       }
-      this.selected = this.default.label || this.getSelectedText(period, dateRange);
+      this.selected = `${dateRange.from} ~ ${dateRange.to}`;
     } else {
       period = _clone(this.default);
       if (period === 'custom') {
+        // Handle custom separately
         dateRange = {
-          from: this.drForm?.get('from')?.value || '',
-          to: this.drForm?.get('to')?.value || ''
+          from: this.drForm.get('from').value || '', // make sure you store these from user inputs
+          to: this.drForm.get('to').value || ''
         };
-        this.selected = this.customSelectedLabel;
       } else {
         dateRange = this.getDateRangeByPeriod(<DateRangePeriod>period);
-        const selectedOption = this.options?.find(opt => opt.value === period);
+        const selectedOption = this.options.find(opt => opt.value === period);
         this.selected = _clone(selectedOption?.label || '');
       }
     }
@@ -101,17 +93,7 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
     this.drFormErrors = this.resetFormErrors();
     this.drFormValidationMsgs = this.validationMessages;
     this.drForm = this.getForm(period, dateRange);
-    this.shouldShowValidationErrors = false;
-    this.formValueChangesSub?.unsubscribe();
-    this.formValueChangesSub = this.drForm.valueChanges.subscribe(() => {
-      if (!this.shouldShowValidationErrors) {
-        return;
-      }
-      this.drFormErrors = this.utilSvc.validateForm(this.drForm, this.drFormValidationMsgs, this.resetFormErrors());
-    });
-    if (this.emitOnInit) {
-      this.submit();
-    }
+    this.submit();
   }
 
   getForm(period: string, dateRange: DateRangeOption) {
@@ -148,7 +130,6 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
     switch (graphRange) {
       case DateRangePeriod.LAST_30_MINS:
         return { from: moment().subtract(30, 'm').format(), to: moment().subtract(1, 'm').format(format) };
-      case DateRangePeriod.LAST_HOUR:
       case DateRangePeriod.LAST_1_HOUR:
         return { from: moment().subtract(1, 'h').format(), to: moment().subtract(1, 'm').format(format) };
       case DateRangePeriod.LAST_2_HOURS:
@@ -169,7 +150,6 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
         return { from: moment().subtract(30, 'days').startOf('day').format(format), to: moment().endOf('day').format(format) };
       case DateRangePeriod.LAST_60_DAYS:
         return { from: moment().subtract(60, 'days').startOf('day').format(format), to: moment().endOf('day').format(format) };
-      case DateRangePeriod.LAST_QUARTER:
       case DateRangePeriod.LAST_90_DAYS:
         return { from: moment().subtract(90, 'days').startOf('day').format(format), to: moment().endOf('day').format(format) };
       case DateRangePeriod.LAST_180_DAYS:
@@ -191,17 +171,11 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
   }
 
   onSelectPeriod(opt: DateRangeOption) {
-    if (opt?.value === DateRangePeriod.CUSTOM) {
-      this.selected = this.customSelectedLabel;
-      this.drForm.get('period').setValue(DateRangePeriod.CUSTOM);
-      return;
-    }
+    // console.log('onSelectPeriod opt : ', opt);
     this.selected = _clone(opt.label);
     this.drForm.get('period').setValue(opt.value);
     let dateRange = this.getDateRangeByPeriod(<DateRangePeriod>opt.value);
-    if (!dateRange) {
-      return;
-    }
+    // console.log('onSelectPeriod dateRange : ', _clone(dateRange));
     this.drForm.get('from').setValue(dateRange.from);
     this.drForm.get('to').setValue(dateRange.to);
     this.drForm.updateValueAndValidity();
@@ -209,16 +183,14 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
   }
 
   onSelectCustomRange() {
+    const from = this.drForm.get('from').value; // Date object or string
+    const to = this.drForm.get('to').value;
     if (this.drForm.valid) {
-      this.selected = this.customSelectedLabel;
+      this.selected = 'custom';
       this.drForm.get('period').setValue(DateRangePeriod.CUSTOM);
-      if (this.dateOnlyPicker) {
-        this.drForm.patchValue({
-          from: moment(this.drForm.get('from')?.value).startOf('day').toDate(),
-          to: moment(this.drForm.get('to')?.value).endOf('day').toDate()
-        }, { emitEvent: false });
-        this.drForm.updateValueAndValidity({ emitEvent: false });
-      }
+      const from = this.drForm.get('from').value;
+      const to = this.drForm.get('to').value;
+      const range = this.getDateRangeByPeriod(DateRangePeriod.CUSTOM, from, to);
       this.submit();
     }
   }
@@ -233,95 +205,20 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
     event.stopPropagation();
   }
 
-  onDateChange(controlName: 'from' | 'to') {
-    const control = this.drForm?.get(controlName);
-    control?.markAsTouched();
-    control?.updateValueAndValidity({ emitEvent: false });
-    this.drForm?.updateValueAndValidity({ emitEvent: false });
-    if (this.shouldShowValidationErrors) {
-      this.drFormErrors = this.utilSvc.validateForm(this.drForm, this.drFormValidationMsgs, this.resetFormErrors());
-    }
-  }
-
-  onPickerOpened(controlName: 'from' | 'to', picker: any) {
-    this.activePicker = controlName;
-    this.isAnyPickerOpen = true;
-    if (!this.viewportSafePopup) {
-      return;
-    }
-    setTimeout(() => {
-      const popupRef = picker?.popupRef;
-      const positionStrategy = popupRef?.getConfig?.()?.positionStrategy;
-      if (positionStrategy?.withPush) {
-        positionStrategy.withPush(true);
-      }
-      if (positionStrategy?.withFlexibleDimensions) {
-        positionStrategy.withFlexibleDimensions(true);
-      }
-      popupRef?.updatePosition?.();
-    });
-  }
-
-  onPickerClosed(controlName: 'from' | 'to') {
-    if (this.activePicker === controlName) {
-      this.activePicker = null;
-    }
-    this.isAnyPickerOpen = false;
-  }
-
   submit() {
     // console.log('form raw value : ', this.drForm.getRawValue());
     // console.log('form : ', this.drForm);
     // console.log('is Valid : ', this.drForm.valid);
     // console.log('****************************')
     if (this.drForm.invalid) {
-      this.shouldShowValidationErrors = true;
-      this.drFormErrors = this.utilSvc.validateForm(this.drForm, this.drFormValidationMsgs, this.resetFormErrors());
+      this.drFormErrors = this.utilSvc.validateForm(this.drForm, this.drFormValidationMsgs, this.drFormErrors);
+      this.drForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: any) => {
+        this.drFormErrors = this.utilSvc.validateForm(this.drForm, this.drFormValidationMsgs, this.drFormErrors);
+      });
     } else {
-      this.shouldShowValidationErrors = false;
       this.clickFlag = false;
       this.onSubmit.emit(this.drForm.getRawValue());
     }
-  }
-
-  private isDateRangeOptionValue(value: string | DateRangeOption | undefined): value is DateRangeOption {
-    return !!value && typeof value === 'object';
-  }
-
-  private getSelectedText(period: string, dateRange: DateRangeOption): string {
-    if (period === DateRangePeriod.CUSTOM) {
-      return this.customSelectedLabel;
-    }
-    const selectedOption = this.options?.find(opt => opt.value === period);
-    if (selectedOption?.label) {
-      return selectedOption.label;
-    }
-    if (dateRange?.from && dateRange?.to) {
-      return `${dateRange.from} ~ ${dateRange.to}`;
-    }
-    return '';
-  }
-
-  private updateScrollStrategy() {
-    this.fromScrollStrategy = this.viewportSafePopup ? this.sso.reposition() : this.sso.noop();
-    this.toScrollStrategy = this.viewportSafePopup ? this.sso.reposition() : this.sso.noop();
-  }
-
-  private isDatePickerInteraction(event: MouseEvent): boolean {
-    const eventPath = typeof event.composedPath === 'function' ? event.composedPath() : [];
-    const pathHasDatePicker = eventPath.some(node => this.isOwlDateTimeNode(node));
-    if (pathHasDatePicker) {
-      return true;
-    }
-    const target = event.target as HTMLElement | null;
-    return !!target?.closest?.('.owl-dt-container, .owl-dt-popup, .owl-dt-dialog');
-  }
-
-  private isOwlDateTimeNode(node: EventTarget | null): boolean {
-    if (!(node instanceof HTMLElement)) {
-      return false;
-    }
-    return Array.from(node.classList || []).some(className => className.startsWith('owl-dt-'));
   }
 }
 
@@ -335,7 +232,6 @@ export class DateRangeOption {
 
 export enum DateRangePeriod {
   LAST_30_MINS = 'last_30_minutes',
-  LAST_HOUR = 'last_hour',
   LAST_1_HOUR = 'last_1_hour',
   LAST_2_HOURS = 'last_2_hours',
   LAST_24_HOURS = 'last_24_hours',
@@ -347,7 +243,6 @@ export enum DateRangePeriod {
   LAST_MONTH = 'last_month',
   LAST_30_DAYS = 'last_30_days',
   LAST_60_DAYS = 'last_60_days',
-  LAST_QUARTER = 'last_quarter',
   LAST_90_DAYS = 'last_90_days',
   LAST_180_DAYS = 'last_180_days',
   THIS_YEAR = 'this_year',
