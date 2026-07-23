@@ -3,6 +3,25 @@ import {
   PublicCloudProviderDistributionKey,
   PublicCloudTagItem
 } from './public-cloud-compute-dashboard.type';
+import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
+
+// Global Time Range filter options + default. value must match a DateRangePeriod the shared
+// custom-date-dropdown can resolve; the exact backend param string is mapped via
+// PUBLIC_CLOUD_TIME_RANGE_PARAM_MAP (see convertFiltersToApiParams).
+export const PUBLIC_CLOUD_TIME_RANGE_DEFAULT = 'last_30_days';
+
+export const PUBLIC_CLOUD_TIME_RANGE_OPTIONS: DateRangeOption[] = [
+  { label: 'Last 24 Hours', value: 'last_24_hours' },
+  { label: 'Last 7 Days', value: 'last_7_days' },
+  { label: 'Last 30 Days', value: 'last_30_days' },
+  { label: 'Last 60 Days', value: 'last_60_days' },
+  { label: 'Last 90 Days', value: 'last_90_days' }
+];
+
+// Dropdown period value -> exact backend time_range param value (only where the two differ).
+export const PUBLIC_CLOUD_TIME_RANGE_PARAM_MAP: { [period: string]: string } = {
+  last_24_hours: 'last_24_hrs'
+};
 
 export const PUBLIC_CLOUD_INVENTORY_SUMMARY_ENDPOINT = '/customer/public-cloud-widgets/inventory_summary/';
 // Public Cloud Infrastructure Coverage reuses the existing Navigator Central (Unified AIOPS) dashboard endpoint.

@@ -92,7 +92,7 @@ export const UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT = '/customer/public_cloud_
 
 export const UNIFIED_AIOPS_ALERT_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 export const UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY = 'source';
-export const UNIFIED_AIOPS_ALERT_DEFAULT_DURATION = 'last_week';
+export const UNIFIED_AIOPS_TIME_RANGE_DEFAULT = 'last_30_days';
 
 export const UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS: UnifiedAiopsDeviceTypeOption[] = [
   { type: 'Switch', key: 'switch' },
@@ -122,13 +122,21 @@ export const UNIFIED_AIOPS_ALERT_SEVERITY_TYPE_OPTIONS: UnifiedAiopsFilterOption
   { value: 'information', label: 'Information' }
 ];
 
-export const UNIFIED_AIOPS_ALERT_DURATION_OPTIONS: DateRangeOption[] = [
+// Shared Time Range options for the global filter AND the Event & Alert Analytics local filter.
+// value must match a DateRangePeriod the shared custom-date-dropdown can resolve; the exact
+// backend param string is mapped via UNIFIED_AIOPS_TIME_RANGE_PARAM_MAP (see getWidgetFilterParams).
+export const UNIFIED_AIOPS_TIME_RANGE_OPTIONS: DateRangeOption[] = [
   { label: 'Last 24 Hours', value: 'last_24_hours' },
-  { label: 'Yesterday', value: 'yesterday' },
-  { label: 'Last Week', value: 'last_week' },
-  { label: 'Last Month', value: 'last_month' },
-  { label: 'Last Year', value: 'last_year' }
+  { label: 'Last 7 Days', value: 'last_7_days' },
+  { label: 'Last 30 Days', value: 'last_30_days' },
+  { label: 'Last 60 Days', value: 'last_60_days' },
+  { label: 'Last 90 Days', value: 'last_90_days' }
 ];
+
+// Dropdown period value -> exact backend time_range param value (only where the two differ).
+export const UNIFIED_AIOPS_TIME_RANGE_PARAM_MAP: { [period: string]: string } = {
+  last_24_hours: 'last_24_hrs'
+};
 
 export const UNIFIED_AIOPS_DATACENTER_OPTIONS: UnifiedAiopsFilterOption[] = [
   { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Selected' },

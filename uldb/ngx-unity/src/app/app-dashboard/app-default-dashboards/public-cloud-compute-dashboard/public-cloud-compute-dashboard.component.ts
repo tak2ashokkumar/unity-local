@@ -9,6 +9,7 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
+import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import { PublicCloudComputeDashboardService } from './public-cloud-compute-dashboard.service';
 import {
   PUBLIC_CLOUD_DATABASE_CAPACITY_DEFAULT_SORT,
@@ -18,7 +19,9 @@ import {
   PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT,
   PUBLIC_CLOUD_STORAGE_RESOURCE_SORT_COLUMNS,
   PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS,
-  PUBLIC_CLOUD_STORAGE_STATUS_LEGEND
+  PUBLIC_CLOUD_STORAGE_STATUS_LEGEND,
+  PUBLIC_CLOUD_TIME_RANGE_DEFAULT,
+  PUBLIC_CLOUD_TIME_RANGE_OPTIONS
 } from './public-cloud-compute-dashboard.const';
 import {
   PublicCloudAccountOption,
@@ -134,10 +137,15 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   accountOptions: PublicCloudAccountOption[] = [];
   filtersUnavailable = false;
   refreshedText = '';
+  // Global Time Range live selection (applied to every widget only on Apply).
+  readonly timeRangeOptions = PUBLIC_CLOUD_TIME_RANGE_OPTIONS;
+  selectedTimeRange: string = PUBLIC_CLOUD_TIME_RANGE_DEFAULT;
+  private selectedTimeRangeDates: { from: string; to: string } | null = null;
   appliedFilterCriteria: PublicCloudDashboardFilterCriteria = {
     platforms: [],
     regions: [],
-    accounts: []
+    accounts: [],
+    timeRange: PUBLIC_CLOUD_TIME_RANGE_DEFAULT
   };
 
   summaryMetrics: PublicCloudSummaryMetric[] = [];
@@ -278,6 +286,29 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
+  /** Captures the global Time Range selection (named period or custom range). Applied to widgets only on Apply. */
+  onTimeRangeChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
+    this.selectedTimeRange = event?.period || this.selectedTimeRange;
+    this.selectedTimeRangeDates = event?.period === 'custom'
+      ? { from: this.formatTimeRangeDate(event?.from, false), to: this.formatTimeRangeDate(event?.to, true) }
+      : null;
+  }
+
+  /** Formats a custom-range boundary as UTC ISO-8601 (e.g. 2026-07-01T00:00:00Z) for start_datetime / end_datetime. */
+  private formatTimeRangeDate(value: string | Date | undefined, isEnd: boolean): string {
+    if (!value) {
+      return '';
+    }
+    const date = value instanceof Date ? value : new Date(value);
+    if (isNaN(date.getTime())) {
+      return '';
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}T${isEnd ? '23:59:59' : '00:00:00'}Z`;
+  }
+
   /** Reloads the page filters from the source sequence and then refreshes all widgets. */
   refreshData() {
     this.loadFilterOptionsAndDashboard();
@@ -382,10 +413,13 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.accountOptions = [];
     this.allAccountOptions = [];
     this.filtersUnavailable = false;
+    this.selectedTimeRange = PUBLIC_CLOUD_TIME_RANGE_DEFAULT;
+    this.selectedTimeRangeDates = null;
     this.appliedFilterCriteria = {
       platforms: [],
       regions: [],
-      accounts: []
+      accounts: [],
+      timeRange: PUBLIC_CLOUD_TIME_RANGE_DEFAULT
     };
   }
 
@@ -420,10 +454,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   /** Returns the normalized filter form output passed to all dashboard service calls. */
   private getFilterFormOutput(): PublicCloudDashboardFilterCriteria {
+    const isCustom = this.selectedTimeRange === 'custom';
     return {
       platforms: this.getSelectedValues('platforms'),
       regions: this.getSelectedValues('regions'),
-      accounts: this.getSelectedValues('accounts')
+      accounts: this.getSelectedValues('accounts'),
+      timeRange: this.selectedTimeRange,
+      startDate: isCustom ? (this.selectedTimeRangeDates?.from || '') : '',
+      endDate: isCustom ? (this.selectedTimeRangeDates?.to || '') : ''
     };
   }
 

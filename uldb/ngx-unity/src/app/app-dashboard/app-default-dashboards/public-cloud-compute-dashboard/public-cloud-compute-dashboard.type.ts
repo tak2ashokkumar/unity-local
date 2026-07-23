@@ -21,6 +21,10 @@ export interface PublicCloudDashboardFilterCriteria {
   platforms: string[];
   regions: string[];
   accounts: string[];
+  // Global Time Range: startDate/endDate are only sent for the 'custom' range (start_datetime / end_datetime).
+  timeRange?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface PublicCloudFilterAccountResponseItem {

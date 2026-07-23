@@ -6,6 +6,7 @@ import * as moment from 'moment';
 import { forkJoin, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { UnityChartConfigService } from 'src/app/shared/unity-chart-config.service';
 import {
   PUBLIC_CLOUD_ACTIVE_DATABASE_WORKLOAD_ENDPOINT,
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
@@ -67,7 +68,8 @@ import {
   PUBLIC_CLOUD_TRANSACTION_VOLUME_TREND_ENDPOINT,
   PUBLIC_CLOUD_TOP_LOCK_CONTENTION_ENDPOINT,
   PUBLIC_CLOUD_TOP_MEMORY_CONSUMERS_ENDPOINT,
-  PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT
+  PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT,
+  PUBLIC_CLOUD_TIME_RANGE_PARAM_MAP
 } from './public-cloud-compute-dashboard.const';
 import {
   PublicCloudAccountOption,
@@ -165,7 +167,8 @@ import {
 export class PublicCloudComputeDashboardService {
 
   constructor(private builder: FormBuilder,
-    private http: HttpClient) { }
+    private http: HttpClient,
+    private chartConfigSvc: UnityChartConfigService) { }
 
   /*
    * -----Start----- Filters Related -------------------
@@ -269,6 +272,16 @@ export class PublicCloudComputeDashboardService {
   private convertFiltersToApiParams(criteria?: PublicCloudDashboardFilterCriteria): HttpParams {
     let params: HttpParams = new HttpParams();
     params = this.appendMultiValueParam(params, 'account', criteria?.accounts);
+    if (criteria?.timeRange) {
+      // Map the dropdown period to the exact backend value where they differ (e.g. last_24_hours -> last_24_hrs).
+      params = params.set('time_range', PUBLIC_CLOUD_TIME_RANGE_PARAM_MAP[criteria.timeRange] || criteria.timeRange);
+    }
+    if (criteria?.startDate) {
+      params = params.set('start_datetime', criteria.startDate);
+    }
+    if (criteria?.endDate) {
+      params = params.set('end_datetime', criteria.endDate);
+    }
     return params;
   }
 
@@ -1811,7 +1824,7 @@ export class PublicCloudComputeDashboardService {
   private getReadVsWriteLineOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
     const readValues = data.series?.[0]?.values || [];
     const writeValues = data.series?.[1]?.values || [];
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       legend: {
         top: 0,
         left: 'center',
@@ -1855,11 +1868,11 @@ export class PublicCloudComputeDashboardService {
         areaStyle: index === 0 ? { color: 'rgba(47, 115, 196, 0.08)' } : undefined,
         data: item.values
       }))
-    };
+    });
   }
 
   private getStorageMultiLineOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       legend: {
         top: 0,
         left: 'center',
@@ -1904,7 +1917,7 @@ export class PublicCloudComputeDashboardService {
         itemStyle: { color: item.color },
         data: item.values
       }))
-    };
+    });
   }
 
   private getStorageTrafficAxis(name: string, index: number, values: number[]): any {
@@ -2159,7 +2172,7 @@ export class PublicCloudComputeDashboardService {
 
   private getDatabaseTrendOptions(labels: string[], series: Array<{ name: string, color: string, values: number[], axis: number }>, leftName: string, rightName: string): EChartsOption {
     const activeSeries = series.filter(item => !!(item.values || []).length);
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       color: activeSeries.map(item => item.color),
       legend: {
         top: 0,
@@ -2219,7 +2232,7 @@ export class PublicCloudComputeDashboardService {
         itemStyle: { color: item.color },
         data: item.values
       }))
-    };
+    });
   }
   /*
    * ******End ****** Cloud Database Performance (redesigned) Widget Related ********************

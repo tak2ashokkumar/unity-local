@@ -31,6 +31,12 @@
                     [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect" formControlName="clouds">
                 </multiselect-dropdown>
             </div>
+            <div class="filter-control">
+                <label>Time Range</label>
+                <custom-date-dropdown [options]="timeRangeOptions" [enableCustomDateRange]="true"
+                    [default]="selectedTimeRange" (onSubmit)="onTimeRangeChange($event)">
+                </custom-date-dropdown>
+            </div>
             <button class="round-action-btn" type="button" (click)="applyFilters()" [tooltip]="'Apply Filters'"
                 container="body">
                 <i class="fa fa-filter"></i>
@@ -790,8 +796,9 @@
                     </div>
                     <div class="mini-filter">
                         <label>Duration</label>
-                        <custom-date-dropdown [options]="alertsDurationOptions" [enableCustomDateRange]="true"
-                            [default]="alertsDuration" (onSubmit)="onAlertsDurationChange($event)">
+                        <custom-date-dropdown *ngIf="alertsTimeRangeReady" [options]="timeRangeOptions"
+                            [enableCustomDateRange]="true" [default]="alertsTimeRangeDefault"
+                            (onSubmit)="onAlertsTimeRangeChange($event)">
                         </custom-date-dropdown>
                     </div>
                 </div>

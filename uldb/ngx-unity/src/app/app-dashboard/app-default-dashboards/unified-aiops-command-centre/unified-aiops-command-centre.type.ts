@@ -28,7 +28,9 @@ export interface UnifiedAiopsDashboardFilterCriteria {
   sourceTypes?: string[];
   severityTypes?: string[];
   viewBy?: string;
-  duration?: string;
+  // Time Range: global filter value + Event & Alert Analytics local override. startDate/endDate
+  // are only sent for the 'custom' range (as start_datetime / end_datetime).
+  timeRange?: string;
   startDate?: string;
   endDate?: string;
   deviceCategory?: string;

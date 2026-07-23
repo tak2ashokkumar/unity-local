@@ -40,6 +40,12 @@
                     formControlName="accounts">
                 </multiselect-dropdown>
             </div>
+            <div class="filter-control">
+                <label>Time Range</label>
+                <custom-date-dropdown [options]="timeRangeOptions" [enableCustomDateRange]="true"
+                    [default]="selectedTimeRange" (onSubmit)="onTimeRangeChange($event)">
+                </custom-date-dropdown>
+            </div>
             <button class="round-action-btn" type="button" (click)="applyFilters()" [tooltip]="'Apply Filters'"
                 container="body">
                 <i class="fas fa-filter"></i>

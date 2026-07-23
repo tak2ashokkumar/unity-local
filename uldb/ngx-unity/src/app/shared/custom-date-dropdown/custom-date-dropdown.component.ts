@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AppUtilityService, NoWhitespaceValidator } from '../app-utility/app-utility.service';
 import { ScrollStrategy, ScrollStrategyOptions } from '@angular/cdk/overlay';
@@ -31,6 +31,7 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
     private util: AppUtilityService,
     private builder: FormBuilder,
     private utilSvc: AppUtilityService,
+    private elementRef: ElementRef,
     private readonly sso: ScrollStrategyOptions) {
     this.scrollStrategy = this.sso.noop();
   }
@@ -51,15 +52,16 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    const dropdownElement = document.querySelector('.dropdown');
-    const calendarElement = document.querySelector('.owl-dt-container'); // Adjust selector based on your calendar implementation
-    // Close dropdown only if the click is outside both the dropdown and the calendar
-    if (
-      dropdownElement &&
-      !dropdownElement.contains(event.target as Node) &&
-      calendarElement &&
-      !calendarElement.contains(event.target as Node)
-    ) {
+    if (!this.clickFlag) {
+      return;
+    }
+    const target = event.target as Node;
+    // Close when the click is outside THIS dropdown instance and outside any open calendar overlay
+    // (the calendar renders in a CDK overlay appended to the body, so it is not inside this element).
+    const clickedInsideDropdown = this.elementRef.nativeElement.contains(target);
+    const calendarElement = document.querySelector('.owl-dt-container');
+    const clickedInsideCalendar = !!calendarElement && calendarElement.contains(target);
+    if (!clickedInsideDropdown && !clickedInsideCalendar) {
       this.clickFlag = false;
     }
   }

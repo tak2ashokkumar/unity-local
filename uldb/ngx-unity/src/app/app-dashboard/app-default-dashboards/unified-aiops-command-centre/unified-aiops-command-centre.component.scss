@@ -140,6 +140,33 @@
   }
 }
 
+// Global Time Range uses the shared custom-date-dropdown, whose .dropdown defaults to
+// min-width:200px + a left margin and a default form-control height. Constrain it to the 150px
+// filter column and the 28px height of the Datacenter/Cloud filters so the Apply icon and the
+// separator beside it stay visible (mirrors the Alerts-row override).
+:host ::ng-deep .filter-control custom-date-dropdown {
+  .dropdown {
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    display: block;
+  }
+
+  .dropbtn.form-control {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 8px;
+    font-size: 12px;
+    border-color: #b8c2cc;
+  }
+
+  .dropdownClick {
+    z-index: 2050;
+  }
+}
+
 :host ::ng-deep .unified-aiops-dashboard app-spinner {
   position: absolute;
   inset: 0;

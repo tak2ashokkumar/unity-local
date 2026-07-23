@@ -7,6 +7,7 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, shareReplay } from 'rxjs/operators';
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
 import { DataCenterTabs } from 'src/app/united-cloud/datacenter/tabs';
+import { UnityChartConfigService } from 'src/app/shared/unity-chart-config.service';
 import {
   UNIFIED_AIOPS_ALERTS_ENDPOINT,
   UNIFIED_AIOPS_ALERT_SEVERITY_COLORS,
@@ -48,7 +49,8 @@ import {
   UNIFIED_AIOPS_PUBLIC_CLOUD_PROVIDER_ORDER,
   UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT,
   UNIFIED_AIOPS_SANKEY_NODE_COLORS,
-  UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT
+  UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT,
+  UNIFIED_AIOPS_TIME_RANGE_PARAM_MAP
 } from './unified-aiops-command-centre.const';
 import { environment } from 'src/environments/environment';
 import {
@@ -101,7 +103,8 @@ export class UnifiedAiopsCommandCentreService {
 
   constructor(private builder: FormBuilder,
     private http: HttpClient,
-    private datacenterService: DatacenterService) { }
+    private datacenterService: DatacenterService,
+    private chartConfigSvc: UnityChartConfigService) { }
 
   /*
    * -----Start----- Filters Related -------------------
@@ -302,7 +305,7 @@ export class UnifiedAiopsCommandCentreService {
     }
     const categories = viewRows.map(row => row.category);
 
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       color: [UNIFIED_AIOPS_DISCOVERY_COLORS.monitored, UNIFIED_AIOPS_DISCOVERY_COLORS.notMonitored],
       tooltip: {
         trigger: 'axis',
@@ -333,7 +336,7 @@ export class UnifiedAiopsCommandCentreService {
         { name: 'Monitored', type: 'bar', stack: 'discovery', barMaxWidth: 38, data: viewRows.map(row => ({ value: row.coverage, category: row.category, count: row.monitored, coverageLabel: row.coverageLabel })) },
         { name: 'Not Monitored', type: 'bar', stack: 'discovery', barMaxWidth: 38, data: viewRows.map(row => ({ value: this.getNotMonitoredPercent(row.coverage), category: row.category, count: Math.max(row.discovered - row.monitored, 0), coverageLabel: row.coverageLabel })) }
       ]
-    };
+    });
   }
 
   convertToDiscoverySummary(rows: UnifiedAiopsDiscoveryCoverageRow[]): UnifiedAiopsDiscoverySummary {
@@ -527,7 +530,7 @@ export class UnifiedAiopsCommandCentreService {
       data: viewItems.map(item => item.values[index])
     })).reverse();
 
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       color: colors,
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: {
@@ -561,7 +564,7 @@ export class UnifiedAiopsCommandCentreService {
         splitLine: { lineStyle: { color: '#edf0f2' } }
       },
       series
-    };
+    });
   }
 
   private getStackTotal(item: UnifiedAiopsStackItem): number {
@@ -1723,7 +1726,7 @@ export class UnifiedAiopsCommandCentreService {
       return {};
     }
 
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       tooltip: { trigger: 'item' },
       legend: {
         orient: 'vertical',
@@ -1741,7 +1744,7 @@ export class UnifiedAiopsCommandCentreService {
         label: { show: false },
         data
       }]
-    };
+    });
   }
 
   getPerformanceMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
@@ -1821,7 +1824,7 @@ export class UnifiedAiopsCommandCentreService {
       { name: `Unknown ${this.formatPercentage(unknown)}`, value: unknown, color: '#a96a12' }
     ];
 
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       color: availability.map(item => item.color),
       tooltip: {
         trigger: 'item',
@@ -1851,7 +1854,7 @@ export class UnifiedAiopsCommandCentreService {
           itemStyle: { color: item.color }
         }))
       }]
-    };
+    });
   }
 
   getAvailabilityCategory(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsAvailabilityCategoryRow[]> {
@@ -1869,7 +1872,7 @@ export class UnifiedAiopsCommandCentreService {
     const labelCount = categoryLabels.length;
     const axisFontSize = labelCount > 12 ? 9 : (labelCount > 8 ? 10 : 11);
 
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       color: ['#13bd77', UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical, '#5f6d7b'],
       tooltip: {
         trigger: 'axis',
@@ -1896,7 +1899,7 @@ export class UnifiedAiopsCommandCentreService {
         { name: 'Down', type: 'bar', stack: 'availability', barMaxWidth: 20, data: viewRows.map(row => ({ value: row.down, count: row.downCount, coverageLabel: row.upLabel })) },
         { name: 'Unknown', type: 'bar', stack: 'availability', barMaxWidth: 20, data: viewRows.map(row => ({ value: row.unknown, count: row.unknownCount, coverageLabel: row.upLabel })) }
       ]
-    };
+    });
   }
 
   // Averages UP / Down / Unknown across the (client-side filtered) rows for the KPI strip.
@@ -2001,7 +2004,7 @@ export class UnifiedAiopsCommandCentreService {
     const mediumData = dates.map(date => this.getNumberFromPayload(this.flattenPayload(payload[date] || {}), ['information', 'informative', 'medium', 'info']));
     const maxValue = Math.max(...criticalData, ...highData, ...mediumData, 0);
 
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       color: [
         UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical,
         UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.warning,
@@ -2017,7 +2020,7 @@ export class UnifiedAiopsCommandCentreService {
         { name: 'Warning', type: 'line', data: highData, smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 3 } },
         { name: 'Info', type: 'line', data: mediumData, smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 3 } }
       ]
-    };
+    });
   }
   /*
    * ******End ****** Analytics & Health Charts Widget Related ********************
@@ -3218,14 +3221,15 @@ export class UnifiedAiopsCommandCentreService {
     if (criteria?.viewBy) {
       params = params.set('view_by', criteria.viewBy);
     }
-    if (criteria?.duration) {
-      params = params.set('duration', criteria.duration);
+    if (criteria?.timeRange) {
+      // Map the dropdown period to the exact backend value where they differ (e.g. last_24_hours -> last_24_hrs).
+      params = params.set('time_range', UNIFIED_AIOPS_TIME_RANGE_PARAM_MAP[criteria.timeRange] || criteria.timeRange);
     }
     if (criteria?.startDate) {
-      params = params.set('start_date', criteria.startDate);
+      params = params.set('start_datetime', criteria.startDate);
     }
     if (criteria?.endDate) {
-      params = params.set('end_date', criteria.endDate);
+      params = params.set('end_datetime', criteria.endDate);
     }
     return params;
   }
@@ -3547,7 +3551,7 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   private getDonutOptions(data: { name: string; value: number; color: string }[], legendData: string[], colors: string[], showLegend = true): EChartsOption {
-    return {
+    return this.chartConfigSvc.applyScrollableLegend({
       color: colors,
       tooltip: { trigger: 'item' },
       legend: showLegend ? {
@@ -3566,6 +3570,6 @@ export class UnifiedAiopsCommandCentreService {
         labelLine: { show: false },
         data: data.map(item => ({ name: item.name, value: item.value, itemStyle: { color: item.color } }))
       }]
-    };
+    });
   }
 }

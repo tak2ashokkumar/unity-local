@@ -16,21 +16,21 @@ import { MapService } from 'src/app/map.service';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
+import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
 import { environment } from 'src/environments/environment';
 import { UnifiedAiopsCommandCentreService } from './unified-aiops-command-centre.service';
 import {
-  UNIFIED_AIOPS_ALERT_DATE_FORMAT,
-  UNIFIED_AIOPS_ALERT_DEFAULT_DURATION,
   UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY,
   UNIFIED_AIOPS_ALERT_DEVICE_TYPE_OPTIONS,
-  UNIFIED_AIOPS_ALERT_DURATION_OPTIONS,
   UNIFIED_AIOPS_ALERT_SEVERITY_TYPE_OPTIONS,
   UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS,
   UNIFIED_AIOPS_ALL_SELECTED_VALUE,
   UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND,
-  UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL
+  UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL,
+  UNIFIED_AIOPS_TIME_RANGE_DEFAULT,
+  UNIFIED_AIOPS_TIME_RANGE_OPTIONS
 } from './unified-aiops-command-centre.const';
 import {
   UnifiedAiopsAvailabilityCategoryRow,
@@ -210,16 +210,25 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   private alertsSourceTypesSeeded = false;
   private alertsFilterSnapshot = '';
   private alertsLoadedCriteriaKey = '';
-  readonly alertsDurationOptions = UNIFIED_AIOPS_ALERT_DURATION_OPTIONS;
   readonly alertsDefaultViewBy = UNIFIED_AIOPS_ALERT_DEFAULT_VIEW_BY;
-  alertsDuration: string = UNIFIED_AIOPS_ALERT_DEFAULT_DURATION;
-  private alertsDateRange: UnifiedAiopsAlertsDateRange | null = null;
+  // Shared Time Range options drive both the global (page-level) filter and the Alerts local filter.
+  readonly timeRangeOptions = UNIFIED_AIOPS_TIME_RANGE_OPTIONS;
+  readonly timeRangeDefault = UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+  // Global Time Range live selection (applied to every widget only on Apply).
+  selectedTimeRange: string = UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+  private selectedTimeRangeDates: UnifiedAiopsAlertsDateRange | null = null;
+  // Event & Alert Analytics local Time Range (re-synced from the global on Apply, then overridable).
+  alertsTimeRange: string = UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+  alertsTimeRangeDefault: string | DateRangeOption = UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+  alertsTimeRangeReady = true;
+  private alertsTimeRangeDates: UnifiedAiopsAlertsDateRange | null = null;
   datacenterOptions: UnifiedAiopsFilterOption[] = [];
   cloudOptions: UnifiedAiopsCloudFilterOption[] = [];
   refreshedText = '';
   appliedFilterCriteria: UnifiedAiopsDashboardFilterCriteria = {
     datacenters: [],
-    clouds: []
+    clouds: [],
+    timeRange: UNIFIED_AIOPS_TIME_RANGE_DEFAULT
   };
 
   executiveSummarySections: UnifiedAiopsExecutiveSection[] = [];
@@ -470,6 +479,14 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
+  /** Captures the global Time Range selection (named period or custom range). Applied to widgets only on Apply. */
+  onTimeRangeChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
+    this.selectedTimeRange = event?.period || this.selectedTimeRange;
+    this.selectedTimeRangeDates = event?.period === 'custom'
+      ? { from: this.formatTimeRangeDate(event?.from, false), to: this.formatTimeRangeDate(event?.to, true) }
+      : null;
+  }
+
   /** Reloads all filter options and recreates the filter form only after datacenter data is ready. */
   refreshFilters() {
     this.loadFilterOptionsAndDashboard();
@@ -509,15 +526,20 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   private resetFilterState() {
     this.filterForm = null;
     this.alertsFilterForm = null;
-    this.alertsDateRange = null;
-    this.alertsDuration = UNIFIED_AIOPS_ALERT_DEFAULT_DURATION;
+    this.alertsTimeRangeDates = null;
+    this.alertsTimeRange = UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+    this.alertsTimeRangeDefault = UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+    this.alertsTimeRangeReady = true;
+    this.selectedTimeRange = UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+    this.selectedTimeRangeDates = null;
     this.orphanedDevicesPageNo = 1;
     this.idleDevicesPageNo = 1;
     this.datacenterOptions = [];
     this.cloudOptions = [];
     this.appliedFilterCriteria = {
       datacenters: [],
-      clouds: []
+      clouds: [],
+      timeRange: UNIFIED_AIOPS_TIME_RANGE_DEFAULT
     };
     this.datacenterGeographiesLoaded = false;
     this.datacenterGeographiesMapAvailable = false;
@@ -542,9 +564,13 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   /** Returns the normalized filter form output passed to all dashboard service calls. */
   private getFilterFormOutput(): UnifiedAiopsDashboardFilterCriteria {
+    const isCustom = this.selectedTimeRange === 'custom';
     return {
       datacenters: this.getSelectedValues('datacenters'),
-      clouds: this.getSelectedValues('clouds')
+      clouds: this.getSelectedValues('clouds'),
+      timeRange: this.selectedTimeRange,
+      startDate: isCustom ? (this.selectedTimeRangeDates?.from || '') : '',
+      endDate: isCustom ? (this.selectedTimeRangeDates?.to || '') : ''
     };
   }
 
@@ -573,6 +599,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     const clouds = this.clonePageSelection('clouds');
     // Severity Type defaults to every severity selected so the "All Severity" label matches the checked options.
     const severityTypes = [...this.alertsSeverityTypeOptions];
+    // Re-sync the Alerts local Time Range from the applied global Time Range (the user can override it afterwards).
+    this.syncAlertsTimeRangeFromGlobal();
     if (!this.alertsFilterForm) {
       this.alertsFilterForm = this.svc.buildAlertsFilterForm(datacenters, clouds, [], this.alertsDefaultViewBy);
       this.alertsFilterForm.get('severityTypes')?.setValue(severityTypes, { emitEvent: false });
@@ -585,6 +613,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
         sourceTypes: [],
         severityTypes
       });
+      // The shared custom-date-dropdown only reads its default at init, so recreate it to show the re-synced value.
+      this.recreateAlertsTimeRangeDropdown();
     }
     // Source Type options load from the API; pre-select them all once they arrive (see getAlertSourceTypeOptions).
     this.alertsSourceTypesSeeded = false;
@@ -595,7 +625,38 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.reloadAlerts();
   }
 
-  /** Reloads only the Alerts widget APIs using the widget-local filter selections. Called on multiselect close / View By / Duration change. */
+  /** Copies the applied global Time Range (named period or custom range) onto the Alerts local filter. */
+  private syncAlertsTimeRangeFromGlobal() {
+    this.alertsTimeRange = this.appliedFilterCriteria.timeRange || UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+    this.alertsTimeRangeDates = this.alertsTimeRange === 'custom'
+      ? { from: this.appliedFilterCriteria.startDate || '', to: this.appliedFilterCriteria.endDate || '' }
+      : null;
+    this.alertsTimeRangeDefault = this.getAlertsTimeRangeDefault();
+  }
+
+  /** Builds the [default] input for the Alerts time-range dropdown: a DateRangeOption for custom, else the period string. */
+  private getAlertsTimeRangeDefault(): string | DateRangeOption {
+    if (this.alertsTimeRange === 'custom' && this.alertsTimeRangeDates) {
+      return Object.assign(new DateRangeOption(), {
+        value: 'custom',
+        // Strip the trailing Z so the dropdown parses these as local dates - keeps the calendar date stable
+        // through the re-sync round-trip (onAlertsTimeRangeChange re-formats it back to UTC ISO on submit).
+        from: (this.alertsTimeRangeDates.from || '').replace('Z', ''),
+        to: (this.alertsTimeRangeDates.to || '').replace('Z', '')
+      });
+    }
+    return this.alertsTimeRange;
+  }
+
+  /** Forces the Alerts time-range dropdown to re-create so it re-reads its default after a global re-sync. */
+  private recreateAlertsTimeRangeDropdown() {
+    this.alertsTimeRangeReady = false;
+    setTimeout(() => {
+      this.alertsTimeRangeReady = true;
+    }, 0);
+  }
+
+  /** Reloads only the Alerts widget APIs using the widget-local filter selections. Called on multiselect close / View By / Time Range change. */
   reloadAlerts() {
     if (!this.hasFilterFormData() || !this.alertsFilterForm) {
       return;
@@ -664,9 +725,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       clouds,
       deviceTypes,
       viewBy,
-      duration: this.alertsDuration,
-      startDate: this.alertsDateRange?.from || '',
-      endDate: this.alertsDateRange?.to || ''
+      timeRange: this.alertsTimeRange,
+      startDate: this.alertsTimeRange === 'custom' ? (this.alertsTimeRangeDates?.from || '') : '',
+      endDate: this.alertsTimeRange === 'custom' ? (this.alertsTimeRangeDates?.to || '') : ''
     };
     if (viewBy === 'source') {
       criteria.sourceTypes = this.getValuesFromOptions(this.alertsFilterForm?.get('sourceTypes')?.value || []);
@@ -686,7 +747,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       sortedCsv(criteria.sourceTypes),
       sortedCsv(criteria.severityTypes),
       criteria.viewBy || '',
-      criteria.duration || '',
+      criteria.timeRange || '',
       criteria.startDate || '',
       criteria.endDate || ''
     ].join('|');
@@ -696,23 +757,27 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     return this.alertsFilterForm?.get('viewBy')?.value || this.alertsDefaultViewBy;
   }
 
-  /** Handles the Alerts duration dropdown selection (named period or custom range) and reloads the Alerts widget. */
-  onAlertsDurationChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
-    this.alertsDuration = event?.period || this.alertsDuration;
-    // Named periods are resolved server-side from `duration`; explicit dates are sent only for a custom
+  /** Handles the Alerts Time Range dropdown selection (named period or custom range) and reloads the Alerts widget. */
+  onAlertsTimeRangeChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
+    this.alertsTimeRange = event?.period || this.alertsTimeRange;
+    // Named periods are resolved server-side from `time_range`; explicit dates are sent only for a custom
     // range. (The dropdown also emits computed dates for named periods, including once on init.)
-    this.alertsDateRange = event?.period === 'custom'
-      ? { from: this.formatAlertsDate(event?.from), to: this.formatAlertsDate(event?.to) }
+    this.alertsTimeRangeDates = event?.period === 'custom'
+      ? { from: this.formatTimeRangeDate(event?.from, false), to: this.formatTimeRangeDate(event?.to, true) }
       : null;
     this.reloadAlerts();
   }
 
-  private formatAlertsDate(value: string | Date | undefined): string {
+  /** Formats a custom-range boundary as UTC ISO-8601 (e.g. 2026-07-01T00:00:00Z) for start_datetime / end_datetime. */
+  private formatTimeRangeDate(value: string | Date | undefined, isEnd: boolean): string {
     if (!value) {
       return '';
     }
     const date = moment(value);
-    return date.isValid() ? date.format(UNIFIED_AIOPS_ALERT_DATE_FORMAT) : '';
+    if (!date.isValid()) {
+      return '';
+    }
+    return `${date.format('YYYY-MM-DD')}T${isEnd ? '23:59:59' : '00:00:00'}Z`;
   }
 
   private clonePageSelection(controlName: string): UnifiedAiopsFilterOption[] {
