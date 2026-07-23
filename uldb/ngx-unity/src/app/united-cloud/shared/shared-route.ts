@@ -5,15 +5,14 @@ import { ALL_DEVICES_BMS_ROUTES, BMS_ROUTES } from './bm-servers/bm-servers-rout
 import { ZABBIX_CONTAINER_CONTROLLER_ROUTES } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix-routing.const';
 import { ContainerControllersZabbixComponent } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
 import { ContainerControllersComponent } from './container-controllers/container-controllers.component';
-import { DockerContainerComponent } from './container-controllers/docker-containers/docker-container.component';
-import { ZABBIX_DOCKER_CONTAINER_ROUTES } from './container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix-routing.const';
+import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers/docker-tabs/docker-tabs.component';
+import { KubernetesNodesComponent } from 'src/app/shared/shared-container-controllers/kubernetes-nodes/kubernetes-nodes.component';
+import { KubernetesContainersComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
+import { KubernetesPodsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-pods.component';
+import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
+import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
 import { DockerContainersZabbixComponent } from './container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
-import { DockerNodesComponent } from './container-controllers/docker-nodes/docker-nodes.component';
-import { DockerTabsComponent } from './container-controllers/docker-tabs/docker-tabs.component';
-import { KubernetesNodesComponent } from './container-controllers/kubernetes-nodes/kubernetes-nodes.component';
-import { KubernetesContainersComponent } from './container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
-import { KubernetesPodsComponent } from './container-controllers/kubernetes-pods/kubernetes-pods.component';
-import { KubernetesTabsComponent } from './container-controllers/kubernetes-tabs/kubernetes-tabs.component';
+import { ZABBIX_DOCKER_CONTAINER_ROUTES } from './container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix-routing.const';
 import { ZABBIX_DBS_ROUTES } from './database-servers/database-zabbix-routing.const';
 import { ALL_DEVICES_FIREWALL_ROUTES, FIREWALL_ROUTES } from './firewalls/firewalls-routing.const';
 import { ALL_DEVICES_HYPERVISOR_ROUTES, HYPERVISOR_ROUTES } from './hypervisors/hypervisors-routing.const';
@@ -258,35 +257,11 @@ const tempRoute: Routes = [
             }
         },
         children: [
-            {
-                path: 'dockernodes',
-                component: DockerNodesComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'Docker Nodes',
-                        stepbackCount: 0
-                    }
-                }
-            },
-            {
-                path: 'dockercontainers',
-                component: DockerContainerComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'Docker Containers',
-                        stepbackCount: 0
-                    }
-                }
-            },
+            ...DOCKER_TABS_CHILDREN,
             {
                 path: 'dockercontainers/:deviceid/zbx',
                 component: DockerContainersZabbixComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'Docker Container',
-                        stepbackCount: 0
-                    }
-                },
+                data: { breadcrumb: { title: 'Docker Container', stepbackCount: 0 } },
                 children: ZABBIX_DOCKER_CONTAINER_ROUTES
             }
         ]
@@ -300,69 +275,7 @@ const tempRoute: Routes = [
                 stepbackCount: 1
             }
         },
-        children: [
-            {
-                path: 'dockernodes',
-                component: DockerNodesComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'Docker Nodes',
-                        stepbackCount: 0
-                    }
-                }
-            },
-            {
-                path: 'dockercontainers',
-                component: DockerContainerComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'Docker Containers',
-                        stepbackCount: 0
-                    }
-                }
-            },
-            {
-                path: 'pods',
-                component: KubernetesPodsComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'Pods',
-                        stepbackCount: 0
-                    }
-                }
-            },
-            {
-                path: 'pods/:podId',
-                data: {
-                    breadcrumb: {
-                        title: 'Pods',
-                        stepbackCount: 1
-                    }
-                },
-                children: [
-                    {
-                        path: 'containers',
-                        component: KubernetesContainersComponent,
-                        data: {
-                            breadcrumb: {
-                                title: 'Containers',
-                                stepbackCount: 0
-                            }
-                        }
-                    }
-                ]
-            },
-            {
-                path: 'nodes',
-                component: KubernetesNodesComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'Nodes',
-                        stepbackCount: 0
-                    }
-                }
-            },
-        ]
+        children: KUBERNETES_TABS_CHILDREN
     },
     {
         path: 's3account',

@@ -26,6 +26,7 @@ export class PrivateCloudComponent implements OnInit, OnDestroy {
   pcId: string;
   subscr: Subscription;
   tabData: TabData[] = [];
+  isResourceDetailView: boolean = false;
 
   constructor(private pcService: PrivateCloudService,
     private router: Router,
@@ -43,6 +44,7 @@ export class PrivateCloudComponent implements OnInit, OnDestroy {
      */
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
+        this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(event.url);
         if (event.url === '/unitycloud/pccloud' || event.url === '/unitycloud/pccloud/' + this.pcId) {
           this.route.data.pipe(take(1)).subscribe((data: { tabItems: PCTabs[] }) => {
             this.tabItems = data.tabItems;
@@ -83,6 +85,7 @@ export class PrivateCloudComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(this.router.url);
   }
 
   ngOnDestroy() {

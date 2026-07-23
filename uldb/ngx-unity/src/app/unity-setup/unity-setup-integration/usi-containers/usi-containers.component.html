@@ -1,0 +1,61 @@
+<h5 class="mt-4">Containers</h5>
+<div class="row mb-4">
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-8 d-flex align-items-center">
+                        <span class="{{containers.kubernetes.icon}} font-2xl mr-2" [style.color]="containers.kubernetes.color"></span>
+                        <span class="font-lg font-500">Kubernetes</span>
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="containers.kubernetes.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{containers.kubernetes.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <button *ngIf="containers.kubernetes.length" class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                            [tooltip]="viewtooltipMsg" (click)="goToKubernetesList()">
+                        </button>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="goToAddKubernetes()" accessControl [moduleName]="'Datacenter'"
+                            [accessType]="'Manage Datacenter'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0 mb-2">
+                    <div class="col-8 d-flex align-items-center">
+                        <span class="{{containers.docker.icon}} font-2xl mr-2" [style.color]="containers.docker.color"></span>
+                        <span class="font-lg font-500" [style.color]="containers.docker.color">Docker</span>
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="containers.docker.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{containers.docker.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <button *ngIf="containers.docker.length" class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                            [tooltip]="viewtooltipMsg" (click)="goToDockerList()">
+                        </button>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="goToAddDocker()" accessControl [moduleName]="'Datacenter'"
+                            [accessType]="'Manage Datacenter'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

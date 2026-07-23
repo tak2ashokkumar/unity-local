@@ -1,0 +1,29 @@
+{
+  "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+  "name": "Prod Cluster",
+  "hostname": "10.192.25.31",
+  "port": 6443,
+  "username": null,
+  "ca_cert": null,
+  "client_cert": null,
+  "client_key": null,
+  "backend_url": "https://10.192.25.31:6443",
+  "proxy": {
+    "same_tab": false,
+    "proxy_fqdn": "https://proxy.unityone.ai/k8s/b796f727",
+    "backend_url": "https://10.192.25.31:6443"
+  },
+  "monitoring": {
+    "configured": true,
+    "enabled": true,
+    "observium": false,
+    "zabbix": true
+  },
+  "tags": ["production"],
+  "status": "1",
+  "collector": "c431a2cc-ecff-4ff7-9c54-a43786f95cc2",
+  "cloud": null,
+  "created_at": "2026-07-06T10:00:00.000Z",
+  "updated_at": "2026-07-22T08:00:00.000Z",
+  "schedule_meta": { "schedule_type": "none", "run_now": false }
+}

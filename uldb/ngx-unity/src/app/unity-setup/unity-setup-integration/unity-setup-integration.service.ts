@@ -76,6 +76,7 @@ export const Categories = [
   { name: 'Event Ingestion' },
   { name: 'Workflow' },
   { name: 'Network Controllers' },
+  { name: 'Containers' },
   { name: 'Vaults' },
   { name: 'Others' }
 ];

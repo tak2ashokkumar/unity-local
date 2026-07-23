@@ -1,0 +1,60 @@
+[
+  {
+    "id": 1,
+    "uuid": "bb111111-1111-4111-8111-111111111111",
+    "name": "nginx-hpa",
+    "namespace": "default",
+    "min_replicas": 2,
+    "max_replicas": 10,
+    "current_replicas": 4,
+    "desired_replicas": 4,
+    "target_cpu_utilization": 80,
+    "current_cpu_utilization": 45,
+    "scale_target_name": "nginx",
+    "scale_target_kind": "Deployment",
+    "last_scale_time": "2026-07-22T05:45:00Z",
+    "created_at": "2026-07-05T10:20:00Z",
+    "updated_at": "2026-07-22T05:45:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  },
+  {
+    "id": 2,
+    "uuid": "bb222222-2222-4222-8222-222222222222",
+    "name": "api-gateway-hpa",
+    "namespace": "gateway",
+    "min_replicas": 3,
+    "max_replicas": 20,
+    "current_replicas": 8,
+    "desired_replicas": 9,
+    "target_cpu_utilization": 70,
+    "current_cpu_utilization": 66,
+    "scale_target_name": "api-gateway",
+    "scale_target_kind": "Deployment",
+    "last_scale_time": "2026-07-22T06:05:00Z",
+    "created_at": "2026-07-10T09:00:00Z",
+    "updated_at": "2026-07-22T06:05:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  }
+]

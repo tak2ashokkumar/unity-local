@@ -49,14 +49,7 @@ import { BmServersService } from './bm-servers/bm-servers.service';
 import { ContainerControllerCrudComponent } from './container-controllers/container-controller-crud/container-controller-crud.component';
 import { ContainerControllerCrudService } from './container-controllers/container-controller-crud/container-controller-crud.service';
 import { ContainerControllersComponent } from './container-controllers/container-controllers.component';
-import { DockerContainerComponent } from './container-controllers/docker-containers/docker-container.component';
-import { DockerNodesComponent } from './container-controllers/docker-nodes/docker-nodes.component';
-import { DockerTabsComponent } from './container-controllers/docker-tabs/docker-tabs.component';
-import { KubernetesNodesComponent } from './container-controllers/kubernetes-nodes/kubernetes-nodes.component';
-import { KubernetesContainersComponent } from './container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
-import { KubernetesPodsComponent } from './container-controllers/kubernetes-pods/kubernetes-pods.component';
-import { KubernetesPodsService } from './container-controllers/kubernetes-pods/kubernetes-pods.service';
-import { KubernetesTabsComponent } from './container-controllers/kubernetes-tabs/kubernetes-tabs.component';
+import { SharedContainerControllersModule } from 'src/app/shared/shared-container-controllers/shared-container-controllers.module';
 import { DatabaseMonitoringConfigComponent } from './database-servers/database-monitoring/database-monitoring-config/database-monitoring-config.component';
 import { DatabaseMonitoringConfigService } from './database-servers/database-monitoring/database-monitoring-config/database-monitoring-config.service';
 import { DatabaseMonitoringGraphCrudComponent } from './database-servers/database-monitoring/database-monitoring-graph-crud/database-monitoring-graph-crud.component';
@@ -487,8 +480,6 @@ export const MY_NATIVE_FORMATS = {
     SwitchesCrudComponent,
     BmServersCrudComponent,
     ContainerControllersComponent,
-    KubernetesContainersComponent,
-    KubernetesPodsComponent,
     GcpVirtualMachinesComponent,
     PduRecycleComponent,
     VmsMgmtCrudComponent,
@@ -509,11 +500,6 @@ export const MY_NATIVE_FORMATS = {
     HypervisorHealthStorageComponent,
     HypervisorHealthDiskioComponent,
     StorageHealthDiskIOComponent,
-    KubernetesNodesComponent,
-    KubernetesTabsComponent,
-    DockerTabsComponent,
-    DockerNodesComponent,
-    DockerContainerComponent,
     ContainerControllerCrudComponent,
     DevicesCrudMonitoringComponent,
     MacMiniComponent,
@@ -707,7 +693,8 @@ export const MY_NATIVE_FORMATS = {
     ChartsModule,
     CollapseModule.forRoot(),
     EchartsxModule,
-    NgbModule
+    NgbModule,
+    SharedContainerControllersModule
   ],
   exports: [
     DevicesPopoverComponent,
@@ -723,15 +710,14 @@ export const MY_NATIVE_FORMATS = {
     AzureVirtualMachinesComponent,
     GcpVirtualMachinesComponent,
     ContainerControllersComponent,
-    KubernetesPodsComponent,
-    KubernetesContainersComponent,
     PduRecycleComponent,
     OciVirtualMachinesComponent,
     DevicesMonitoringConfigComponent,
     SwitchesZabbixComponent,
     FirewallsZabbixComponent,
     LoadbalancersZabbixComponent,
-    DeviceDetailsComponentsComponent
+    DeviceDetailsComponentsComponent,
+    SharedContainerControllersModule
   ],
   providers: [
     HypervisorsService,
@@ -746,7 +732,6 @@ export const MY_NATIVE_FORMATS = {
     FirewallsService,
     FirewallsOverviewService,
     LoadbalancersService,
-    KubernetesPodsService,
     LoadbalancersOverviewService,
     OtherdevicesService,
     { provide: DateTimeAdapter, useClass: MomentDateTimeAdapter, deps: [OWL_DATE_TIME_LOCALE] },

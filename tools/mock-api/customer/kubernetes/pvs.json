@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "uuid": "b2c3d4e5-0001-4b11-8c01-3f4e5d6a7b81",
+    "name": "pv-data-01",
+    "capacity": "10Gi",
+    "access_modes": "ReadWriteOnce",
+    "reclaim_policy": "Retain",
+    "status": "Bound",
+    "storage_class": "standard",
+    "claim_namespace": "default",
+    "claim_name": "data-pvc-01",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    },
+    "created_at": "2026-05-20T07:30:00Z",
+    "updated_at": "2026-07-19T10:15:40Z"
+  },
+  {
+    "id": 2,
+    "uuid": "b2c3d4e5-0002-4b11-8c02-3f4e5d6a7b82",
+    "name": "pv-logs-02",
+    "capacity": "50Gi",
+    "access_modes": "ReadWriteMany",
+    "reclaim_policy": "Delete",
+    "status": "Available",
+    "storage_class": "fast-ssd",
+    "claim_namespace": "",
+    "claim_name": "",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    },
+    "created_at": "2026-06-10T13:22:15Z",
+    "updated_at": "2026-07-21T09:05:00Z"
+  }
+]

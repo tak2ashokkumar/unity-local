@@ -1,0 +1,145 @@
+<div class="row mt-3 mx-2">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-title mb-2 px-2 py-2 border-bottom d-flex justify-content-between font-weight-bold">
+                <span class="h6 pt-1 font-500">Integration</span>
+                <button class="btn btn-pill btn-warning btn-sm text-right" (click)="goBack()" tooltip="Back">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                        <div class="d-flex flex-column align-items-center step">
+                            <span class="badge icon-wrap pointer-link"
+                                [ngClass]="{'active': activeForm == 'accountDetailsForm', 'success': activeForm == 'scheduleForm'}"
+                                (click)="manageActiveForm('accountDetailsForm')">
+                                <span class="fas fa-cog font-xl"></span>
+                            </span>
+                            <label class="mt-1 font-md">Account Details</label>
+                        </div>
+                        <div class="d-flex flex-column align-items-center step">
+                            <span class="badge icon-wrap pointer-link" [class.active]="activeForm == 'scheduleForm'"
+                                (click)="manageActiveForm('scheduleForm')">
+                                <span class="fas fa-clock font-xl"></span>
+                            </span>
+                            <label class="mt-1 font-md">Schedule</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 offset-4 divider-wrap">
+                        <hr class="divider-line w-90 ml-0" [ngClass]="activeForm == 'scheduleForm' ? 'active' : ''">
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <ng-container [ngSwitch]="activeForm">
+                            <ng-container *ngSwitchCase="'accountDetailsForm'">
+                                <ng-container *ngTemplateOutlet="accountDetailsFormRef"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'scheduleForm'">
+                                <ng-container *ngTemplateOutlet="scheduleFormRef"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #accountDetailsFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form *ngIf="accountDetailsForm" [formGroup]="accountDetailsForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="name" class="form-col-form-label">Name<em>*</em></label>
+                                <input id="name" class="form-control" type="text" formControlName="name"
+                                    autocomplete="off" placeholder="Enter Account Name"
+                                    [class.is-invalid]="accountDetailsFormErrors.name">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.name">
+                                    {{accountDetailsFormErrors.name}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="hostname" class="form-col-form-label">Host IP<em>*</em></label>
+                                <input id="hostname" class="form-control" type="text" formControlName="hostname"
+                                    autocomplete="off" placeholder="Enter Host IP"
+                                    [class.is-invalid]="accountDetailsFormErrors.hostname">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.hostname">
+                                    {{accountDetailsFormErrors.hostname}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="port" class="form-col-form-label">Port<em>*</em></label>
+                                <input id="port" class="form-control" type="number" formControlName="port"
+                                    autocomplete="off" placeholder="Enter Port"
+                                    [class.is-invalid]="accountDetailsFormErrors.port">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.port">
+                                    {{accountDetailsFormErrors.port}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="api_token" class="form-col-form-label">Token<em>*</em></label>
+                                <input id="api_token" class="form-control" type="text" formControlName="api_token"
+                                    autocomplete="off" placeholder="Enter Token"
+                                    [class.is-invalid]="accountDetailsFormErrors.api_token">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.api_token">
+                                    {{accountDetailsFormErrors.api_token}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="collectorId" class="form-col-form-label">Collector<em>*</em></label>
+                                <select id="collectorId" class="form-control" formControlName="collector"
+                                    [ngClass]="{'is-invalid' : accountDetailsFormErrors.collector}">
+                                    <option [value]="''" disabled>Select Collector</option>
+                                    <option *ngFor="let cl of collectors" [value]="cl.uuid">{{cl.name}}</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.collector">
+                                    {{accountDetailsFormErrors.collector}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="cloudId" class="form-col-form-label">Cloud</label>
+                                <select id="cloudId" class="form-control" formControlName="cloud">
+                                    <option [value]="''">Select Cloud</option>
+                                    <option *ngFor="let cloud of clouds" [value]="cloud.uuid">{{cloud.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitAccountDetailsForm()">Next</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="form-group" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials">{{nonFieldErr}}</div>
+                    </div>
+                    <unity-schedule></unity-schedule>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(false)">Save</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(true)">Save &amp; Run</button>
+        </div>
+    </div>
+</ng-template>

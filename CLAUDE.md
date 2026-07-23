@@ -33,6 +33,13 @@
 - Do not rename variables/functions unless required.
 - Avoid clever code when straightforward code is enough.
 
+## API Endpoints
+- ALL API endpoint constants MUST be declared in `uldb/ngx-unity/src/app/shared/api-endpoint.const.ts`.
+  This is the ONLY file intended for endpoint URL structures.
+- Do NOT add API endpoint constants to `app-constants.ts` or any other file. `app-constants.ts`
+  is for non-endpoint constants only (console/message/UI constants, mappings, etc.).
+- When adding or moving an endpoint, place it in `api-endpoint.const.ts` and import it from there.
+
 ## Angular
 - Do not restructure or reorganize component logic unless explicitly asked.
 - Do NOT add new shared helpers unless the same logic is needed in at least 2 places.

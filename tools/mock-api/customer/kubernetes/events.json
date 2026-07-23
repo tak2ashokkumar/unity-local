@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1,
+    "uuid": "d4e5f6a7-0001-4d11-8c01-5f6e7d8a9ba1",
+    "name": "web-app-backoff.17f2a1",
+    "namespace": "default",
+    "event_type": "Warning",
+    "reason": "BackOff",
+    "message": "Back-off restarting failed container app in pod web-app-7d9f8b6c5-x2klm",
+    "count": 12,
+    "involved_object_name": "web-app-7d9f8b6c5-x2klm",
+    "involved_object_kind": "Pod",
+    "first_time": "2026-07-21T18:02:11Z",
+    "last_time": "2026-07-22T06:41:52Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    },
+    "created_at": "2026-07-21T18:02:11Z",
+    "updated_at": "2026-07-22T06:41:52Z"
+  },
+  {
+    "id": 2,
+    "uuid": "d4e5f6a7-0002-4d11-8c02-5f6e7d8a9ba2",
+    "name": "web-app-scaled.17f2b3",
+    "namespace": "default",
+    "event_type": "Normal",
+    "reason": "ScalingReplicaSet",
+    "message": "Scaled up replica set web-app-7d9f8b6c5 to 3",
+    "count": 1,
+    "involved_object_name": "web-app",
+    "involved_object_kind": "Deployment",
+    "first_time": "2026-07-20T09:15:03Z",
+    "last_time": "2026-07-20T09:15:03Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    },
+    "created_at": "2026-07-20T09:15:03Z",
+    "updated_at": "2026-07-20T09:15:03Z"
+  }
+]

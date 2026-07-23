@@ -7,7 +7,7 @@ import { EMPTY, Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { ContainerControllerType, CONTROLLER_TYPE_MAPPING } from 'src/app/shared/SharedEntityTypes/container-contoller.type';
-import { GET_CONTAINER_CONTROLLERS, ADD_KUBERNETES_CONTROLLER, DELETE_KUBERNETES_CONTROLLER, UPDATE_KUBERNETES_CONTROLLER, CHANGE_CONTROLLER_PASSWORD, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
+import { GET_CONTAINER_CONTROLLERS, GET_KUBERNETES_CONTROLLERS, GET_DOCKER_CONTROLLERS, ADD_KUBERNETES_CONTROLLER, DELETE_KUBERNETES_CONTROLLER, UPDATE_KUBERNETES_CONTROLLER, CHANGE_CONTROLLER_PASSWORD, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { Handle404Header } from 'src/app/app-http-interceptor';
@@ -23,6 +23,14 @@ export class ContainerControllersService {
 
   getControllers(criteria: SearchCriteria): Observable<ContainerControllerType[]> {
     return this.tableService.getData<ContainerControllerType[]>(GET_CONTAINER_CONTROLLERS(), criteria);
+  }
+
+  getKubernetesControllers(criteria: SearchCriteria): Observable<any> {
+    return this.tableService.getData<any>(GET_KUBERNETES_CONTROLLERS(), criteria);
+  }
+
+  getDockerControllers(criteria: SearchCriteria): Observable<any> {
+    return this.tableService.getData<any>(GET_DOCKER_CONTROLLERS(), criteria);
   }
 
   convertToViewdata(controllers: ContainerControllerType[]): ContainerControllerViewdata[] {

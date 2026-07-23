@@ -151,6 +151,11 @@ import { UsiVaultsCrudComponent } from './usi-vaults/usi-vaults-crud/usi-vaults-
 import { UsiVaultsCyberarcComponent } from './usi-vaults/usi-vaults-cyberarc/usi-vaults-cyberarc.component';
 import { UsiUnityoneItsmComponent } from './usi-unityone-itsm/usi-unityone-itsm.component';
 import { UsiUnityoneItsmCrudComponent } from './usi-unityone-itsm/usi-unityone-itsm-crud/usi-unityone-itsm-crud.component';
+import { SharedContainerControllersModule } from 'src/app/shared/shared-container-controllers/shared-container-controllers.module';
+import { UsiContainersComponent } from './usi-containers/usi-containers.component';
+import { UsiContainersListComponent } from './usi-containers/usi-containers-list/usi-containers-list.component';
+import { UsiContainersKubernetesCrudComponent } from './usi-containers/usi-containers-kubernetes-crud/usi-containers-kubernetes-crud.component';
+import { UsiContainersDockerCrudComponent } from './usi-containers/usi-containers-docker-crud/usi-containers-docker-crud.component';
 
 @NgModule({
   declarations: [
@@ -282,13 +287,18 @@ import { UsiUnityoneItsmCrudComponent } from './usi-unityone-itsm/usi-unityone-i
     UsiVaultsCrudComponent,
     UsiVaultsCyberarcComponent,
     UsiUnityoneItsmComponent,
-    UsiUnityoneItsmCrudComponent
+    UsiUnityoneItsmCrudComponent,
+    UsiContainersComponent,
+    UsiContainersListComponent,
+    UsiContainersKubernetesCrudComponent,
+    UsiContainersDockerCrudComponent
   ],
   imports: [
     AppCoreModule,
     SharedModule,
     UnitySetupIntegrationRoutingModule,
     CollapseModule,
+    SharedContainerControllersModule,
     // UnitySetupModule
   ],
   providers: [

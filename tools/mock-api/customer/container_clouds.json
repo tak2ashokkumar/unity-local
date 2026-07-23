@@ -1,1 +1,38 @@
-[]
+[
+    {
+        "id": 59,
+        "uuid": "afdee4d4-5a27-4dd9-8508-3ece9c3528be",
+        "name": "docker-test",
+        "hostname": "http://10.192.18.22:2376",
+        "tags": [],
+        "controller_type": "docker",
+        "display_type": "Docker",
+        "monitoring": {
+            "configured": true,
+            "observium": false,
+            "enabled": true,
+            "zabbix": true
+        },
+        "status": "0",
+        "management_ip": "10.192.18.22",
+        "ip_address": "10.192.18.22"
+    },
+    {
+        "id": 60,
+        "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+        "name": "Prod Cluster",
+        "hostname": "https://10.192.25.31:6443",
+        "tags": [],
+        "controller_type": "kubernetes",
+        "display_type": "Kubernetes",
+        "monitoring": {
+            "configured": false,
+            "observium": false,
+            "enabled": false,
+            "zabbix": false
+        },
+        "status": "0",
+        "management_ip": "10.192.25.31",
+        "ip_address": "10.192.25.31"
+    }
+]

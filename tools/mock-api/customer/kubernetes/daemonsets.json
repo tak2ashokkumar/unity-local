@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "uuid": "e5a7b3c6-8f0c-4e54-9d65-5b1a4f2c9e55",
+    "name": "kube-proxy",
+    "namespace": "kube-system",
+    "desired": 5,
+    "current": 5,
+    "ready": 5,
+    "available": 5,
+    "misscheduled": 0,
+    "created_at": "2026-03-02T07:00:00Z",
+    "updated_at": "2026-07-19T14:31:20Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    }
+  },
+  {
+    "id": 2,
+    "uuid": "f6b8c4d7-9a1d-4f65-8e76-6c2b5a3d0f66",
+    "name": "fluentd-logging",
+    "namespace": "kube-system",
+    "desired": 5,
+    "current": 4,
+    "ready": 4,
+    "available": 4,
+    "misscheduled": 1,
+    "created_at": "2026-04-18T10:25:33Z",
+    "updated_at": "2026-07-21T09:47:05Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    }
+  }
+]

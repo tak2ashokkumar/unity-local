@@ -1171,6 +1171,99 @@ export const CHECK_USER_IN_ZENDESK = () => `customer/ticketorganization/check_us
 
 export const GET_CONTAINER_CONTROLLERS = () => `/customer/container_clouds/`;
 
+// ==================== Kubernetes API ====================
+
+// --- Account CRUD (GET list / POST create / GET-PUT-PATCH-DELETE by uuid) ---
+export const KUBERNETES_ACCOUNTS = () => `customer/kubernetes/accounts/`;
+export const KUBERNETES_ACCOUNT_BY_ID = (uuid: string) => `customer/kubernetes/accounts/${uuid}/`;
+
+// --- Account-scoped resource data (support ?namespace=, ?pod_uuid=, ?event_type= query params) ---
+export const KUBERNETES_ACCOUNT_PODS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/pods/`;
+export const KUBERNETES_ACCOUNT_CONTAINERS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/containers/`;
+export const KUBERNETES_ACCOUNT_NODES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/nodes/`;
+export const KUBERNETES_ACCOUNT_NAMESPACES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/namespaces/`;
+export const KUBERNETES_ACCOUNT_DEPLOYMENTS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/deployments/`;
+export const KUBERNETES_ACCOUNT_REPLICASETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/replicasets/`;
+export const KUBERNETES_ACCOUNT_DAEMONSETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/daemonsets/`;
+export const KUBERNETES_ACCOUNT_STATEFULSETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/statefulsets/`;
+export const KUBERNETES_ACCOUNT_SERVICES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/services/`;
+export const KUBERNETES_ACCOUNT_PVS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/pvs/`;
+export const KUBERNETES_ACCOUNT_PVCS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/pvcs/`;
+export const KUBERNETES_ACCOUNT_EVENTS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/events/`;
+export const KUBERNETES_ACCOUNT_CONTROL_PLANE = (uuid: string) => `customer/kubernetes/accounts/${uuid}/control_plane/`;
+export const KUBERNETES_ACCOUNT_STORAGE_CLASSES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/storage_classes/`;
+export const KUBERNETES_ACCOUNT_JOBS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/jobs/`;
+export const KUBERNETES_ACCOUNT_CRONJOBS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/cronjobs/`;
+export const KUBERNETES_ACCOUNT_RESOURCE_QUOTAS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/resource_quotas/`;
+export const KUBERNETES_ACCOUNT_HPAS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/hpas/`;
+
+// --- Account-scoped sync triggers (return { task_id }) ---
+export const KUBERNETES_SYNC_RESOURCES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_resources/`;
+export const KUBERNETES_SYNC_CONTROL_PLANE = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_control_plane/`;
+export const KUBERNETES_SYNC_NAMESPACES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_namespaces/`;
+export const KUBERNETES_SYNC_DEPLOYMENTS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_deployments/`;
+export const KUBERNETES_SYNC_REPLICASETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_replicasets/`;
+export const KUBERNETES_SYNC_DAEMONSETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_daemonsets/`;
+export const KUBERNETES_SYNC_STATEFULSETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_statefulsets/`;
+export const KUBERNETES_SYNC_SERVICES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_services/`;
+export const KUBERNETES_SYNC_PVS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_pvs/`;
+export const KUBERNETES_SYNC_PVCS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_pvcs/`;
+export const KUBERNETES_SYNC_EVENTS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_events/`;
+export const KUBERNETES_SYNC_STORAGE_CLASSES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_storage_classes/`;
+export const KUBERNETES_SYNC_JOBS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_jobs/`;
+export const KUBERNETES_SYNC_CRONJOBS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_cronjobs/`;
+export const KUBERNETES_SYNC_RESOURCE_QUOTAS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_resource_quotas/`;
+export const KUBERNETES_SYNC_HPAS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_hpas/`;
+// Pods/Nodes sync (account-scoped) - kept under these names for the shared node/pod services.
+export const SYNC_KUBERNETES_PODS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_pods/`;
+export const SYNC_KUBERNETES_NODES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_nodes/`;
+
+// --- Standalone resource viewsets (used by the global UnityCloud -> Devices -> Containers view; no account context) ---
+export const GET_KUBERNETES_PODS = () => `customer/kubernetes/pods/`;
+export const KUBERNETES_POD_BY_ID = (uuid: string) => `customer/kubernetes/pods/${uuid}/`;
+export const DELETE_KUBERNETES_PODS = (uuid: string) => `customer/kubernetes/pods/${uuid}/`;
+export const GET_KUBERNETES_CONTAINERS = () => `customer/kubernetes/containers/`;
+export const KUBERNETES_CONTAINER_BY_ID = (uuid: string) => `customer/kubernetes/containers/${uuid}/`;
+export const GET_KUBERNETES_NODES = () => `customer/kubernetes/nodes/`;
+export const KUBERNETES_NODE_BY_ID = (uuid: string) => `customer/kubernetes/nodes/${uuid}/`;
+export const GET_KUBERNETES_NAMESPACES = () => `customer/kubernetes/namespaces/`;
+export const KUBERNETES_NAMESPACE_BY_ID = (uuid: string) => `customer/kubernetes/namespaces/${uuid}/`;
+export const GET_KUBERNETES_DEPLOYMENTS = () => `customer/kubernetes/deployments/`;
+export const KUBERNETES_DEPLOYMENT_BY_ID = (uuid: string) => `customer/kubernetes/deployments/${uuid}/`;
+export const GET_KUBERNETES_REPLICASETS = () => `customer/kubernetes/replicasets/`;
+export const KUBERNETES_REPLICASET_BY_ID = (uuid: string) => `customer/kubernetes/replicasets/${uuid}/`;
+export const GET_KUBERNETES_DAEMONSETS = () => `customer/kubernetes/daemonsets/`;
+export const KUBERNETES_DAEMONSET_BY_ID = (uuid: string) => `customer/kubernetes/daemonsets/${uuid}/`;
+export const GET_KUBERNETES_STATEFULSETS = () => `customer/kubernetes/statefulsets/`;
+export const KUBERNETES_STATEFULSET_BY_ID = (uuid: string) => `customer/kubernetes/statefulsets/${uuid}/`;
+export const GET_KUBERNETES_SERVICES = () => `customer/kubernetes/services/`;
+export const KUBERNETES_SERVICE_BY_ID = (uuid: string) => `customer/kubernetes/services/${uuid}/`;
+export const GET_KUBERNETES_PERSISTENTVOLUMES = () => `customer/kubernetes/pvs/`;
+export const KUBERNETES_PV_BY_ID = (uuid: string) => `customer/kubernetes/pvs/${uuid}/`;
+export const GET_KUBERNETES_PERSISTENTVOLUMECLAIMS = () => `customer/kubernetes/pvcs/`;
+export const KUBERNETES_PVC_BY_ID = (uuid: string) => `customer/kubernetes/pvcs/${uuid}/`;
+export const GET_KUBERNETES_EVENTS = () => `customer/kubernetes/events/`;
+export const KUBERNETES_EVENT_BY_ID = (uuid: string) => `customer/kubernetes/events/${uuid}/`;
+export const GET_KUBERNETES_CONTROLPLANE_COMPONENTS = () => `customer/kubernetes/control-plane/`;
+export const KUBERNETES_CONTROLPLANE_BY_ID = (uuid: string) => `customer/kubernetes/control-plane/${uuid}/`;
+export const GET_KUBERNETES_STORAGECLASSES = () => `customer/kubernetes/storage-classes/`;
+export const KUBERNETES_STORAGECLASS_BY_ID = (uuid: string) => `customer/kubernetes/storage-classes/${uuid}/`;
+export const GET_KUBERNETES_JOBS = () => `customer/kubernetes/jobs/`;
+export const KUBERNETES_JOB_BY_ID = (uuid: string) => `customer/kubernetes/jobs/${uuid}/`;
+export const GET_KUBERNETES_CRONJOBS = () => `customer/kubernetes/cronjobs/`;
+export const KUBERNETES_CRONJOB_BY_ID = (uuid: string) => `customer/kubernetes/cronjobs/${uuid}/`;
+export const GET_KUBERNETES_RESOURCEQUOTAS = () => `customer/kubernetes/resource-quotas/`;
+export const KUBERNETES_RESOURCEQUOTA_BY_ID = (uuid: string) => `customer/kubernetes/resource-quotas/${uuid}/`;
+export const GET_KUBERNETES_HPAS = () => `customer/kubernetes/hpas/`;
+export const KUBERNETES_HPA_BY_ID = (uuid: string) => `customer/kubernetes/hpas/${uuid}/`;
+
+// Docker resource endpoints (nodes/containers).
+export const SYNC_DOCKER_CONTAINERS = (controllerId: string) => `customer/docker/account/${controllerId}/sync_containers`;
+export const GET_DOCKER_CONTAINERS = () => `customer/docker/containers/`;
+export const SYNC_DOCKER_NODES = (controllerId: string) => `customer/docker/account/${controllerId}/sync_nodes`;
+export const GET_DOCKER_NODES = () => `customer/docker/nodes/`;
+export const DELETE_DOCKER_NODE = (nodeId: string) => `customer/docker/nodes/${nodeId}/`;
+
 export const GET_DOCKER_CONTROLLERS = () => `/customer/docker/account`;
 
 export const GET_DOCKER_CONTROLLERS_BY_CLOUD_TYPE_AND_ID = (type: string, uuid: string) => {

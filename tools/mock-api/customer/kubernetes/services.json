@@ -1,0 +1,45 @@
+[
+  {
+    "id": 1,
+    "uuid": "a1b2c3d4-0001-4a11-8c01-2f3e4d5a6b71",
+    "name": "kubernetes",
+    "namespace": "default",
+    "service_type": "ClusterIP",
+    "cluster_ip": "10.96.0.1",
+    "external_ips": null,
+    "ports": [
+      { "port": 443, "nodePort": null, "protocol": "TCP" }
+    ],
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    },
+    "created_at": "2026-06-01T09:12:45Z",
+    "updated_at": "2026-07-18T14:30:10Z"
+  },
+  {
+    "id": 2,
+    "uuid": "a1b2c3d4-0002-4a11-8c02-2f3e4d5a6b72",
+    "name": "nginx-ingress",
+    "namespace": "ingress-nginx",
+    "service_type": "LoadBalancer",
+    "cluster_ip": "10.96.45.12",
+    "external_ips": ["203.0.113.24"],
+    "ports": [
+      { "port": 80, "nodePort": 30080, "protocol": "TCP" },
+      { "port": 443, "nodePort": 30443, "protocol": "TCP" }
+    ],
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    },
+    "created_at": "2026-06-15T11:05:20Z",
+    "updated_at": "2026-07-20T08:44:55Z"
+  }
+]

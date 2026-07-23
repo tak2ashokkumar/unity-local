@@ -296,6 +296,12 @@ app.use((req, res) => {
     return res.json(body);
   }
 
+  // Kubernetes sync triggers are GET requests that kick off a celery task. Return a real
+  // task id so the client's pollForTask() can drive it to SUCCESS via the /task/:id/ route.
+  if (req.method === "GET" && /\/sync_[a-z_]+\/?$/i.test(req.path)) {
+    return res.json({ task_id: createTask() });
+  }
+
   const normalizedUrlPath = req.path
     .replace(/^\/+/g, "")
     .replace(/\/+$/, "")
@@ -335,6 +341,18 @@ app.use((req, res) => {
 
   if (fs.existsSync(exactFilePath)) {
     return sendMockResponse(readMockFile(exactFilePath));
+  }
+
+  // Account-scoped Kubernetes resource lists reuse the standalone resource mocks when no
+  // per-account file exists, so every account shows sample data without duplicating files.
+  const k8sAccountResource = normalizedUrlPath.match(/^customer\/kubernetes\/accounts\/[^/]+\/([a-z_]+)$/i);
+  if (k8sAccountResource) {
+    const resourceFileMap = { control_plane: "control-plane", storage_classes: "storage-classes", resource_quotas: "resource-quotas" };
+    const resourceName = resourceFileMap[k8sAccountResource[1]] || k8sAccountResource[1];
+    const standaloneFilePath = path.join(baseDir, "customer", "kubernetes", resourceName + ".json");
+    if (fs.existsSync(standaloneFilePath)) {
+      return sendMockResponse(readMockFile(standaloneFilePath));
+    }
   }
 
   const detail = splitDetailPath(normalizedUrlPath);

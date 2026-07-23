@@ -79,6 +79,12 @@ import { UsiVaultsCyberarcComponent } from './usi-vaults/usi-vaults-cyberarc/usi
 import { UsiWorkflowIntegrationCrudComponent } from './usi-workflow-integration/usi-workflow-integration-crud/usi-workflow-integration-crud.component';
 import { UsiWorkflowIntegrationHistoryComponent } from './usi-workflow-integration/usi-workflow-integration-history/usi-workflow-integration-history.component';
 import { UsiWorkflowIntegrationComponent } from './usi-workflow-integration/usi-workflow-integration.component';
+import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
+import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers/docker-tabs/docker-tabs.component';
+import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
+import { UsiContainersListComponent } from './usi-containers/usi-containers-list/usi-containers-list.component';
+import { UsiContainersKubernetesCrudComponent } from './usi-containers/usi-containers-kubernetes-crud/usi-containers-kubernetes-crud.component';
+import { UsiContainersDockerCrudComponent } from './usi-containers/usi-containers-docker-crud/usi-containers-docker-crud.component';
 
 const routes: Routes = [
   {
@@ -98,6 +104,48 @@ const routes: Routes = [
       }
     },
     children: [
+      {
+        path: 'containers/kubernetes',
+        component: UsiContainersListComponent,
+        data: { controllerType: 'kubernetes', breadcrumb: { title: 'Kubernetes' } }
+      },
+      {
+        path: 'containers/kubernetes/create',
+        component: UsiContainersKubernetesCrudComponent,
+        data: { breadcrumb: { title: 'Kubernetes' } }
+      },
+      {
+        path: 'containers/kubernetes/:controllerId/edit',
+        component: UsiContainersKubernetesCrudComponent,
+        data: { breadcrumb: { title: 'Kubernetes' } }
+      },
+      {
+        path: 'containers/kubernetes/:controllerId',
+        component: KubernetesTabsComponent,
+        data: { backSteps: 1, breadcrumb: { title: 'Containers', stepbackCount: 1 } },
+        children: KUBERNETES_TABS_CHILDREN
+      },
+      {
+        path: 'containers/docker',
+        component: UsiContainersListComponent,
+        data: { controllerType: 'docker', breadcrumb: { title: 'Docker' } }
+      },
+      {
+        path: 'containers/docker/create',
+        component: UsiContainersDockerCrudComponent,
+        data: { breadcrumb: { title: 'Docker' } }
+      },
+      {
+        path: 'containers/docker/:controllerId/edit',
+        component: UsiContainersDockerCrudComponent,
+        data: { breadcrumb: { title: 'Docker' } }
+      },
+      {
+        path: 'containers/docker/:controllerId',
+        component: DockerTabsComponent,
+        data: { backSteps: 1, breadcrumb: { title: 'Containers', stepbackCount: 1 } },
+        children: DOCKER_TABS_CHILDREN
+      },
       // {
       //   path: 'azure-account',
       //   component: UsiPublicCloudAzureCrudComponent,

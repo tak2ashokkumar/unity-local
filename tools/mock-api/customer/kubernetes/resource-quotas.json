@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "uuid": "a7b8c9d0-0001-4a7b-8c10-700000000001",
+    "name": "compute-quota",
+    "namespace": "database",
+    "hard": {
+      "requests.cpu": "4",
+      "requests.memory": "8Gi",
+      "limits.cpu": "8",
+      "limits.memory": "16Gi",
+      "pods": "20"
+    },
+    "used": {
+      "requests.cpu": "1500m",
+      "requests.memory": "3Gi",
+      "limits.cpu": "3",
+      "limits.memory": "6Gi",
+      "pods": "5"
+    },
+    "created_at": "2026-03-10T07:00:00Z",
+    "updated_at": "2026-07-21T02:03:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  },
+  {
+    "id": 2,
+    "uuid": "a7b8c9d0-0002-4a7b-8c10-700000000002",
+    "name": "object-quota",
+    "namespace": "monitoring",
+    "hard": {
+      "configmaps": "30",
+      "secrets": "30",
+      "services": "15",
+      "persistentvolumeclaims": "10"
+    },
+    "used": {
+      "configmaps": "8",
+      "secrets": "12",
+      "services": "4",
+      "persistentvolumeclaims": "3"
+    },
+    "created_at": "2026-04-05T10:15:00Z",
+    "updated_at": "2026-07-20T23:31:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  }
+]

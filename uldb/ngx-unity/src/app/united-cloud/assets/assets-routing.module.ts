@@ -5,10 +5,10 @@ import { ConsoleAccessComponent } from 'src/app/shared/console-access/console-ac
 import { SWITCH_ROUTES } from 'src/app/united-cloud/shared/switches/switches-routing.const';
 import { AwsDeviceTabComponent } from '../shared/aws-device-tab/aws-device-tab.component';
 import { BMS_ROUTES } from '../shared/bm-servers/bm-servers-routing.const';
-import { KubernetesNodesComponent } from '../shared/container-controllers/kubernetes-nodes/kubernetes-nodes.component';
-import { KubernetesContainersComponent } from '../shared/container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
-import { KubernetesPodsComponent } from '../shared/container-controllers/kubernetes-pods/kubernetes-pods.component';
-import { KubernetesTabsComponent } from '../shared/container-controllers/kubernetes-tabs/kubernetes-tabs.component';
+import { KubernetesNodesComponent } from 'src/app/shared/shared-container-controllers/kubernetes-nodes/kubernetes-nodes.component';
+import { KubernetesContainersComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
+import { KubernetesPodsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-pods.component';
+import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
 import { ZABBIX_DBS_ROUTES } from '../shared/database-servers/database-zabbix-routing.const';
 import { DeviceTabComponent } from '../shared/device-tab/device-tab.component';
 import { FIREWALL_ROUTES } from '../shared/firewalls/firewalls-routing.const';

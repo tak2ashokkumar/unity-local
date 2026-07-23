@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "uuid": "a1c3f9d2-4b6e-4a10-9f21-1d7c0b8e5a11",
+    "name": "nginx-deployment",
+    "namespace": "default",
+    "desired_replicas": 3,
+    "ready_replicas": 3,
+    "available_replicas": 3,
+    "updated_replicas": 3,
+    "created_at": "2026-06-14T09:12:44Z",
+    "updated_at": "2026-07-20T16:05:31Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    }
+  },
+  {
+    "id": 2,
+    "uuid": "b2d4e0f3-5c7f-4b21-8a32-2e8d1c9f6b22",
+    "name": "api-gateway",
+    "namespace": "backend",
+    "desired_replicas": 4,
+    "ready_replicas": 2,
+    "available_replicas": 2,
+    "updated_replicas": 4,
+    "created_at": "2026-05-28T11:40:10Z",
+    "updated_at": "2026-07-21T08:22:47Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
+    }
+  }
+]

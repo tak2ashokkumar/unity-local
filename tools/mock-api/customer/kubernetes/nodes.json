@@ -1,6 +1,60 @@
-{
-  "count": 0,
-  "next": null,
-  "previous": null,
-  "results": []
-}
+[
+  {
+    "id": 1,
+    "uuid": "a1b2c3d4-0001-4a1b-8c1a-100000000001",
+    "name": "k8s-master-01",
+    "status": "True",
+    "role": "control-plane",
+    "internal_ip": "10.0.1.10",
+    "external_ip": "203.0.113.10",
+    "os": "Ubuntu 22.04.3 LTS",
+    "os_type": "linux",
+    "cpu_requests": "1200m",
+    "cpu_limit": "2000m",
+    "memory_requests": "2Gi",
+    "memory_limits": "4Gi",
+    "created_at": "2026-01-15T08:30:00Z",
+    "updated_at": "2026-07-20T11:45:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  },
+  {
+    "id": 2,
+    "uuid": "a1b2c3d4-0002-4a1b-8c1a-100000000002",
+    "name": "k8s-worker-01",
+    "status": "True",
+    "role": "worker",
+    "internal_ip": "10.0.1.21",
+    "external_ip": "203.0.113.21",
+    "os": "Ubuntu 22.04.3 LTS",
+    "os_type": "linux",
+    "cpu_requests": "3500m",
+    "cpu_limit": "8000m",
+    "memory_requests": "12Gi",
+    "memory_limits": "16Gi",
+    "created_at": "2026-01-16T09:10:00Z",
+    "updated_at": "2026-07-21T06:20:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  }
+]

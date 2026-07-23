@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "uuid": "e5f6a7b8-0001-4e5f-8a1e-500000000001",
+    "name": "standard",
+    "provisioner": "kubernetes.io/gce-pd",
+    "reclaim_policy": "Delete",
+    "volume_binding_mode": "WaitForFirstConsumer",
+    "allow_volume_expansion": true,
+    "is_default": true,
+    "parameters": {
+      "type": "pd-standard"
+    },
+    "created_at": "2026-01-15T08:30:00Z",
+    "updated_at": "2026-07-20T11:45:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  },
+  {
+    "id": 2,
+    "uuid": "e5f6a7b8-0002-4e5f-8a1e-500000000002",
+    "name": "fast-ssd",
+    "provisioner": "kubernetes.io/gce-pd",
+    "reclaim_policy": "Retain",
+    "volume_binding_mode": "Immediate",
+    "allow_volume_expansion": false,
+    "is_default": false,
+    "parameters": {
+      "type": "pd-ssd"
+    },
+    "created_at": "2026-02-01T12:00:00Z",
+    "updated_at": "2026-07-19T09:30:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  }
+]

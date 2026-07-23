@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "uuid": "aa111111-1111-4111-8111-111111111111",
+    "name": "db-backup-27458820",
+    "namespace": "default",
+    "active": 0,
+    "succeeded": 1,
+    "failed": 0,
+    "completions": 1,
+    "parallelism": 1,
+    "backoff_limit": 6,
+    "start_time": "2026-07-22T02:00:00Z",
+    "completion_time": "2026-07-22T02:04:30Z",
+    "created_at": "2026-07-22T02:00:00Z",
+    "updated_at": "2026-07-22T02:04:30Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  },
+  {
+    "id": 2,
+    "uuid": "aa222222-2222-4222-8222-222222222222",
+    "name": "report-generator-27458700",
+    "namespace": "batch",
+    "active": 1,
+    "succeeded": 2,
+    "failed": 1,
+    "completions": 3,
+    "parallelism": 2,
+    "backoff_limit": 4,
+    "start_time": "2026-07-22T05:30:00Z",
+    "completion_time": null,
+    "created_at": "2026-07-22T05:30:00Z",
+    "updated_at": "2026-07-22T06:10:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  }
+]

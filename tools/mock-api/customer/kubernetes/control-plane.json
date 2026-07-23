@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "uuid": "c1a11111-1111-4111-8111-111111111111",
+    "component": "kube-apiserver",
+    "pod_name": "kube-apiserver-master-01",
+    "node_name": "master-01",
+    "namespace": "kube-system",
+    "phase": "Running",
+    "restart_count": 0,
+    "ready": true,
+    "healthy": true,
+    "created_at": "2026-07-01T08:15:00Z",
+    "updated_at": "2026-07-22T06:30:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  },
+  {
+    "id": 2,
+    "uuid": "c2a22222-2222-4222-8222-222222222222",
+    "component": "etcd",
+    "pod_name": "etcd-master-01",
+    "node_name": "master-01",
+    "namespace": "kube-system",
+    "phase": "Running",
+    "restart_count": 1,
+    "ready": true,
+    "healthy": true,
+    "created_at": "2026-07-01T08:14:00Z",
+    "updated_at": "2026-07-22T06:29:00Z",
+    "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "account": {
+      "id": 1,
+      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+      "name": "Prod Cluster",
+      "cloud": {
+        "name": "",
+        "platform_type": "",
+        "uuid": "",
+        "id": ""
+      }
+    }
+  }
+]

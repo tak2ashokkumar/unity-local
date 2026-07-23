@@ -20,6 +20,7 @@ export class DatacenterComponent implements OnInit, OnDestroy {
   dcId: string;
   subscr: Subscription;
   tabData: TabData[] = [];
+  isResourceDetailView: boolean = false;
   private ngUnsubscribe = new Subject();
 
 
@@ -35,6 +36,7 @@ export class DatacenterComponent implements OnInit, OnDestroy {
      */
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
+        this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(event.url);
         if (event.url === '/unitycloud/datacenter' || event.url === '/unitycloud/datacenter/' + this.dcId) {
           this.route.data.subscribe((data: { tabItems: DataCenterTabs[] }) => {
             this.tabItems = data.tabItems;
@@ -58,6 +60,7 @@ export class DatacenterComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(this.router.url);
   }
 
   ngOnDestroy() {
