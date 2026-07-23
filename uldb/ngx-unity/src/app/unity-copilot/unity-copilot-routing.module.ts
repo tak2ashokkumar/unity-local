@@ -6,6 +6,7 @@ import { FinopsAiAgentComponent } from './finops-ai-agent/finops-ai-agent.compon
 import { ConditionInvestigationComponent } from '../shared/condition-investigation/condition-investigation.component';
 import { NetworkAiAgentComponent } from './network-ai-agent/network-ai-agent.component';
 import { ComputeAiAgentComponent } from './compute-ai-agent/compute-ai-agent.component';
+import { DatabaseAiAgentComponent } from './database-ai-agent/database-ai-agent.component';
 import { AiAgentEventsAlertsConditionsDashboardComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events-alerts-conditions-dashboard.component';
 import { AiAgentAlertsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-alerts/ai-agent-alerts.component';
 import { AiAgentEventsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events/ai-agent-events.component';
@@ -27,7 +28,7 @@ const routes: Routes = [
         component: NetworkAiAgentComponent,
         data: {
           breadcrumb: {
-            title: 'Network AI Agent',
+            title: 'Network AI Copilot',
             stepbackCount: 0
           }
         },
@@ -95,7 +96,7 @@ const routes: Routes = [
         component: ComputeAiAgentComponent,
         data: {
           breadcrumb: {
-            title: 'Compute AI Agent',
+            title: 'Compute AI Copilot',
             stepbackCount: 0
           }
         },
@@ -158,12 +159,80 @@ const routes: Routes = [
           aiAgentType: 'computeAgent'
         },
       },
+      {
+        path: 'database-ai-agent',
+        component: DatabaseAiAgentComponent,
+        data: {
+          breadcrumb: {
+            title: 'Database AI Copilot',
+            stepbackCount: 0
+          }
+        },
+        children: [
+          {
+            path: 'dashboard',
+            component: AiAgentEventsAlertsConditionsDashboardComponent,
+            data: {
+              breadcrumb: {
+                title: 'Dashboard',
+                stepbackCount: 0
+              }
+            },
+            children: [
+              {
+                path: 'events',
+                component: AiAgentEventsComponent,
+                data: {
+                  breadcrumb: {
+                    title: 'Events',
+                    stepbackCount: 0
+                  },
+                  aiAgentType: 'databaseAgent'
+                }
+              },
+              {
+                path: 'alerts',
+                component: AiAgentAlertsComponent,
+                data: {
+                  breadcrumb: {
+                    title: 'Alerts',
+                    stepbackCount: 0
+                  },
+                  aiAgentType: 'databaseAgent'
+                }
+              },
+              {
+                path: 'conditions',
+                component: AiAgentConditionsComponent,
+                data: {
+                  breadcrumb: {
+                    title: 'Conditions',
+                    stepbackCount: 0
+                  },
+                  aiAgentType: 'databaseAgent'
+                }
+              },
+            ]
+          },
+        ]
+      },
+      {
+        path: 'database-ai-agent/conditions/:conditionId/:conditionUuid/investigate',
+        component: ConditionInvestigationComponent,
+        data: {
+          breadcrumb: {
+            title: 'Investigate',
+            stepbackCount: 0
+          },
+          aiAgentType: 'databaseAgent'
+        },
+      },
       // {
       //   path: 'storage-ai-agent',
       //   component: StorageAiAgentComponent,
       //   data: {
       //     breadcrumb: {
-      //       title: 'Storage AI Agent',
+      //       title: 'Storage AI Copilot',
       //       stepbackCount: 0
       //     }
       //   },

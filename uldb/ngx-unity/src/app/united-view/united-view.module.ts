@@ -37,11 +37,7 @@ import { UnityAlertsViewComponent } from './unity-alerts/unity-alerts-view/unity
 import { UnityAlertsComponent } from './unity-alerts/unity-alerts.component';
 import { VmsAlertsComponent } from './unity-alerts/vms-alerts/vms-alerts.component';
 import { UnityNetworkTopologyComponent } from './unity-network-topology/unity-network-topology.component';
-import { UnityAzureTopologyViewComponent } from './unity-topology/unity-azure-topology-view/unity-azure-topology-view.component';
-import { UnityOciTopologyViewComponent } from './unity-topology/unity-oci-topology-view/unity-oci-topology-view.component';
-import { UnityTopologyViewComponent } from './unity-topology/unity-topology-view/unity-topology-view.component';
-import { UnityTopologyComponent } from './unity-topology/unity-topology.component';
-import { UnityGcpTopologyViewComponent } from './unity-topology/unity-gcp-topology-view/unity-gcp-topology-view.component';
+import { UnityTopologyModule } from './unity-topology/unity-topology.module';
 import { CurrencyPipe } from '@angular/common';
 import { UnityServiceTopologyComponent } from './unity-service-topology/unity-service-topology.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
@@ -75,11 +71,6 @@ import { AppSecToDaysPipe } from 'src/app/app-filters/pipes';
     UnityAlertGraphsComponent,
     MonitoringConfigurationComponent,
     UnityNetworkTopologyComponent,
-    UnityTopologyComponent,
-    UnityTopologyViewComponent,
-    UnityAzureTopologyViewComponent,
-    UnityOciTopologyViewComponent,
-    UnityGcpTopologyViewComponent,
     UnityServiceTopologyComponent
     // UnityZabbixVmsAlertsComponent,
     // UnityObserviumVmsAlertsComponent
@@ -98,7 +89,8 @@ import { AppSecToDaysPipe } from 'src/app/app-filters/pipes';
     CollapseModule.forRoot(),
     DragDropModule,
     InfiniteScrollModule,
-    NgxGraphModule
+    NgxGraphModule,
+    UnityTopologyModule
   ],
   entryComponents: [DevicesIconComponent],
   providers: [DeviceService,

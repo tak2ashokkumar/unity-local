@@ -602,9 +602,9 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
       .subscribe(res => {
         if (res) {
           this.showPerformanceWorkloadInsightsWidget = this.hasPerformanceWorkloadInsightsWidgetData(res);
-          this.diskLatencyWidgetData.chartData = this.svc.convertTodiskLatencyChartData(res.diskLatencyTop10);
-          this.cpuReadyWidgetData.chartData = this.svc.convertToCpuReadyChartData(res.cpuReadyWaitTop10);
-          this.swapBalloonMemoryWidgetData.chartData = this.svc.convertToSwapBalloonMemoryChartData(res.swapBalloonMemoryTop10);
+          this.diskLatencyWidgetData.chartData = this.svc.convertTodiskLatencyChartData(res.diskThroughputTop10);
+          this.cpuReadyWidgetData.chartData = this.svc.convertToCpuReadyChartData(res.cpuReadyTop10);
+          this.swapBalloonMemoryWidgetData.chartData = this.svc.convertToSwapBalloonMemoryChartData(res.swapMemoryTop10);
         }
         this.spinner.stop(this.diskLatencyWidgetData.loader);
         this.spinner.stop(this.cpuReadyWidgetData.loader);
@@ -617,7 +617,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
         this.cpuReadyWidgetData.chartData = null;
         this.swapBalloonMemoryWidgetData.chartData = null;
         this.showPerformanceWorkloadInsightsWidget = false;
-        this.notification.error(new Notification('Failed to get Disk Latency data. Try again later'));
+        this.notification.error(new Notification('Failed to get Performance / Workload Insights data. Try again later'));
       });
   }
 

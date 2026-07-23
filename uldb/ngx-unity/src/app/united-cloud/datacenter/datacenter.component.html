@@ -1,4 +1,4 @@
-<app-main-tab *ngIf="!isResourceDetailView" [tabItems]="tabItems">
+<app-main-tab [tabItems]="tabItems">
   <ng-template>
     <div dropdown placement="bottom right" container="body" accessControl moduleName="Datacenter"
       accessType="Manage Datacenter" elementType="div-hide">
@@ -16,17 +16,17 @@
     </div>
   </ng-template>
 </app-main-tab>
-<div class="container-fluid" [class.px-0]="isResourceDetailView">
+<div class="container-fluid">
   <div class="animated fadeIn">
-    <div class="row" [class.mx-0]="isResourceDetailView">
+    <div class="row">
       <div class="col-12" *ngIf="!tabItems.length">
         <div class="empty-clouds text-center pt-5" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
           elementType="div">No datacenter Configured for this user. <span class="btn-link pointer-link"
             (click)="addDatacenter()">Click
             here</span> to add.</div>
       </div>
-      <div class="col-12" *ngIf="tabItems.length" [class.px-0]="isResourceDetailView">
-        <scrollable-tab [selector]="'active'" *ngIf="!isResourceDetailView">
+      <div class="col-12" *ngIf="tabItems.length">
+        <scrollable-tab [selector]="'active'">
           <div class="nav-item border-right border-light" #scrollLeft>
             <a class="nav-link bg-secondary rounded-top border-bottom-0"><i class="fa fa-angle-left"></i></a>
           </div>

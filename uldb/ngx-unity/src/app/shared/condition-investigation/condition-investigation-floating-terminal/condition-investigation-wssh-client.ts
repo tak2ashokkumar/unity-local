@@ -25,6 +25,8 @@ export interface WSOption {
     collector_uuid?: string;
     user_id?: string;
     connection_type?: string;
+    engine?: string;
+    database?: string;
     transport?: string;
     shell?: string;
 }
@@ -159,6 +161,8 @@ export class WSSHClient {
             org_id: this.wsOptions.org_id,
             user_id: this.wsOptions.user_id,
             connection_type: this.wsOptions.connection_type,
+            engine: this.wsOptions.engine,
+            database: this.wsOptions.database,
             transport: this.wsOptions.transport,
             shell: this.wsOptions.shell,
         }));

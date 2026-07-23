@@ -11,14 +11,26 @@
 
     <form [formGroup]="authForm">
 
-      <!-- OS -->
       <div class="form-group">
-        <label>OS</label>
+        <label>OS/Connection Type</label>
         <select class="form-control" formControlName="connection_type">
           <option value="ssh">Linux / SSH</option>
           <option value="ssh">MacOS / SSH</option>
           <option value="winrm">Windows / WinRM</option>
+          <option [value]="databaseConnectionType">Database</option>
         </select>
+        <div class="text-danger">{{formErrors.connection_type}}</div>
+      </div>
+
+      <div class="form-group" *ngIf="isDatabase">
+        <label>DB Engine</label>
+        <select class="form-control" formControlName="engine">
+          <option value="" disabled>Select DB Engine</option>
+          <option *ngFor="let engine of databaseEngineOptions" [value]="engine.value">
+            {{engine.label}}
+          </option>
+        </select>
+        <div class="text-danger">{{formErrors.engine}}</div>
       </div>
 
       <!-- Host -->
@@ -33,6 +45,12 @@
         <label>Port</label>
         <input type="number" class="form-control" formControlName="port">
         <div class="text-danger">{{formErrors.port}}</div>
+      </div>
+
+      <div class="form-group" *ngIf="isDatabase">
+        <label>Database name</label>
+        <input class="form-control" formControlName="database">
+        <div class="text-danger">{{formErrors.database}}</div>
       </div>
 
       <!-- Username -->
@@ -71,10 +89,10 @@
 
       <!-- Collector -->
       <div class="form-group" formGroupName="collector">
-        <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+        <label class="font-col-form-label" for="collectorid">Collector</label>
         <select id="collectoruuid" class="form-control" formControlName="uuid"
           [class.is-invalid]="formErrors.collector.uuid">
-          <option value="" disabled>Select Collector</option>
+          <option value="">Select Collector</option>
           <option *ngFor="let collector of collectors" [value]="collector.uuid">
             {{collector.name}}
           </option>
@@ -85,6 +103,14 @@
       </div>
 
       <div class="text-danger">{{formErrors.invalidCred}}</div>
+
+      <div class="form-group form-check mt-2" *ngIf="showMakeDefaultCheckbox">
+        <input id="makeDefaultForCondition" type="checkbox" class="form-check-input"
+          formControlName="make_default_for_condition">
+        <label class="form-check-label" for="makeDefaultForCondition">
+          Make this device default for this condition
+        </label>
+      </div>
     </form>
 
   </div>

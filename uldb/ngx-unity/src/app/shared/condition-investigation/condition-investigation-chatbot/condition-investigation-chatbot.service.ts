@@ -28,6 +28,7 @@ export class ConditionInvestigationChatbotService {
     switch (aiAgentType) {
       case 'networkAgent': return 'Network Agent';
       case 'computeAgent': return 'Compute Agent';
+      case 'databaseAgent': return 'Database Agent';
       case 'storageAgent': return 'Storage Agent';
       default: '';
     }
@@ -172,6 +173,7 @@ export class ConditionInvestigationChatbotService {
       case 'Assistant': return 'assistant';
       case 'Network Agent': return 'network_agent';
       case 'Compute Agent': return 'compute_agent';
+      case 'Database Agent': return 'database_agent';
       case 'Storage Agent': return 'storage_agent';
       case 'Workflow Agent': return 'workflow_agent';
       default: return 'assistant';

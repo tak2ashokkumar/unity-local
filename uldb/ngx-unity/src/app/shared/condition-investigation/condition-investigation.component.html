@@ -520,12 +520,18 @@
         <div class="card-body">
             <div>Do you want to Execute this Command ?</div>
             <div class="font-500 mt-2">{{command}}</div>
+            <div *ngIf="commandDefaultDevice" class="mt-2 text-muted font-sm">
+                Current default device:
+                <span class="font-500">{{commandDefaultDevice?.device_name}}</span>
+            </div>
         </div>
         <div class="card-footer">
             <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
                 (click)="confirmExecuteModal('newTab')"> Yes, Manage in New tab</button>
             <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
                 (click)="confirmExecuteModal('sameTab')">Yes, Manage in Same tab</button>
+            <button *ngIf="hasDefaultDeviceForCommand" class="btn btn-sm btn-warning btn-outline pull-right ml-1" type="button"
+                (click)="confirmExecuteModal('sameTab', true)">Change Device</button>
             <button class="btn btn-sm btn-danger pull-right" (click)="confirmExecutionModalRef.hide()"
                 type="button">No</button>
         </div>

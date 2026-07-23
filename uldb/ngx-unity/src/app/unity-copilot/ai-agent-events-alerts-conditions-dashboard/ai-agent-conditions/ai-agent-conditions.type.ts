@@ -9,8 +9,16 @@ export interface AiAgentConditionsSummaryType {
   vm?:number;
 
   storage?:number;
+  database?:number;
 
   total: AiAgentCondtionSummaryTotalType;
+  databases?: AiAgentDatabaseSummary[];
+}
+
+export interface AiAgentDatabaseSummary {
+  database_type: string;
+  alert_count?: number;
+  condition_count?: number;
 }
 
 export interface AiAgentCondtionSummaryTotalType {

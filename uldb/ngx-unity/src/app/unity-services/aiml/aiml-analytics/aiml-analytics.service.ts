@@ -8,7 +8,11 @@ import { Observable, forkJoin, of } from 'rxjs';
 import { AIMLAlertCountByDeviceType, AIMLAnalyticsSummary, AIMLCorrelationRule, AIMLEventCountByDeviceType, AIMLNoisyHosts, AIMLSuppressionRule, AIMLTendsByTimeline } from 'src/app/shared/SharedEntityTypes/aiml.type';
 import { DatacenterFast } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
-import { AIOPS_ANALYTICS_CORRELATION_RULES, AIOPS_ANALYTICS_SUPPRESSION_RULES, AIOPS_TRENDS_BY_TIMELINE, DEVICES_FAST_BY_DEVICE_TYPE, GET_AIOPS_ALERTS_COUNT, GET_AIOPS_ANALYTICS_SUMMARY, GET_AIOPS_EVENT_COUNT_BY_TYPE, GET_AIOPS_EVENT_NOISY_HOSTS, PRIVATE_CLOUD_FAST_BY_DC_ID } from 'src/app/shared/api-endpoint.const';
+import {
+  AIOPS_ANALYTICS_CORRELATION_RULES, AIOPS_ANALYTICS_SUPPRESSION_RULES, DEVICES_FAST_BY_DEVICE_TYPE, PRIVATE_CLOUD_FAST_BY_DC_ID,
+  GET_AIOPS_CONDITION_ANALYTICS_SUMMARY, GET_AIOPS_ALERT_ANALYTICS_COUNT, AIOPS_EVENT_ANALYTICS_TRENDS_BY_TIMELINE,
+  GET_AIOPS_EVENT_ANALYTICS_COUNT_BY_TYPE, GET_AIOPS_EVENT_ANALYTICS_NOISY_HOSTS,
+} from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping, UnityDeviceType, UnityTimeDuration } from 'src/app/shared/app-utility/app-utility.service';
 import { ChartConfigService, UnityChartData } from 'src/app/shared/chart-config.service';
 import { UnityChartConfigService, UnityChartDataType, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
@@ -84,7 +88,7 @@ export class AimlAnalyticsService {
   }
 
   getAnalyticsSummary(formData: any) {
-    return this.http.post<AIMLAnalyticsSummary>(GET_AIOPS_ANALYTICS_SUMMARY(), formData);
+    return this.http.post<AIMLAnalyticsSummary>(GET_AIOPS_CONDITION_ANALYTICS_SUMMARY(), formData);
   }
 
   convertToSummaryViewdata(summary: AIMLAnalyticsSummary): AIMLAnalyticsSummaryViewData {
@@ -99,7 +103,7 @@ export class AimlAnalyticsService {
   }
 
   getAlertsCountByDeviceType(formData: any) {
-    return this.http.post<AIMLAlertCountByDeviceType[]>(GET_AIOPS_ALERTS_COUNT(), formData);
+    return this.http.post<AIMLAlertCountByDeviceType[]>(GET_AIOPS_ALERT_ANALYTICS_COUNT(), formData);
   }
 
   convertToAlertsCountViewdata(alertData: AIMLAlertCountByDeviceType[]): AIMLAlertsCountByDeviceTypeViewData {
@@ -121,7 +125,7 @@ export class AimlAnalyticsService {
   }
 
   getTrendsByTimeline(formData: any) {
-    return this.http.post<AIMLTendsByTimeline>(AIOPS_TRENDS_BY_TIMELINE(), formData);
+    return this.http.post<AIMLTendsByTimeline>(AIOPS_EVENT_ANALYTICS_TRENDS_BY_TIMELINE(), formData);
   }
 
   getLastNHours(numberOfhours: number): any[] {
@@ -180,7 +184,7 @@ export class AimlAnalyticsService {
   }
 
   getEventsCountByDeviceType(formData: any) {
-    return this.http.post<AIMLEventCountByDeviceType[]>(GET_AIOPS_EVENT_COUNT_BY_TYPE(), formData);
+    return this.http.post<AIMLEventCountByDeviceType[]>(GET_AIOPS_EVENT_ANALYTICS_COUNT_BY_TYPE(), formData);
   }
 
   convertToEventsCountByDeviceTypeChartData(eventData: AIMLEventCountByDeviceType[]): UnityChartDetails {
@@ -198,7 +202,7 @@ export class AimlAnalyticsService {
   }
 
   getNoisyHosts(formData: any) {
-    return this.http.post<AIMLNoisyHosts[]>(GET_AIOPS_EVENT_NOISY_HOSTS(), formData);
+    return this.http.post<AIMLNoisyHosts[]>(GET_AIOPS_EVENT_ANALYTICS_NOISY_HOSTS(), formData);
   }
 
   convertToNoisyHostsListData(hosts: AIMLNoisyHosts[]): AIMLNoisyHostsData[] {

@@ -22,7 +22,7 @@ export class ConditionInvestigationTerminalNewTabComponent implements OnInit {
     this.channel = new BroadcastChannel('terminal-tabs');
 
     this.channel.onmessage = (event) => {
-      const { type, tabId } = event.data;
+      const { type, tabId, terminalData } = event.data;
       if (type === 'PING') {
         this.currentTabId = tabId;
         window.focus();
@@ -33,6 +33,8 @@ export class ConditionInvestigationTerminalNewTabComponent implements OnInit {
             localStorage.removeItem('terminal_command');
           }, 300);
         }
+      } else if (type === 'OPEN_TERMINAL' && tabId === this.currentTabId && terminalData) {
+        this.terminalData = terminalData;
       }
     };
 
@@ -43,16 +45,6 @@ export class ConditionInvestigationTerminalNewTabComponent implements OnInit {
     if (conversationId) this.terminalService.setConversationId(conversationId);
 
     this.terminalService.setPendingTabType('newTab');
-    const savedInput = localStorage.getItem('new_tab_input');
-    const savedAuth = localStorage.getItem('new_tab_auth');
-
-    if (savedInput && savedAuth) {
-      const input = JSON.parse(savedInput);
-      const auth = JSON.parse(savedAuth);
-      localStorage.removeItem('new_tab_input');
-      localStorage.removeItem('new_tab_auth');
-      this.terminalData = { input, auth };
-    }
 
     this.terminalService.terminalData$.subscribe(data => {
       this.terminalData = data;

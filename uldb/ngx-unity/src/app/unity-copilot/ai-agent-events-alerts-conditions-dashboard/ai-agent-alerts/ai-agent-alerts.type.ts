@@ -1,6 +1,7 @@
 export interface AiAgentAlertsSummary {
     total: AiAgentAlertsSummaryData;
-    last_7_days: AiAgentAlertsSummaryData;
+    last_7_days?: AiAgentAlertsSummaryData;
+    databases?: AiAgentDatabaseSummary[];
 }
 export interface AiAgentAlertsSummaryData {
     alert_count: number;
@@ -10,6 +11,12 @@ export interface AiAgentAlertsSummaryData {
     critical: number;
     warning: number;
     information: number;
+}
+
+export interface AiAgentDatabaseSummary {
+    database_type: string;
+    alert_count?: number;
+    condition_count?: number;
 }
 
 export interface AiAgentAlerts {

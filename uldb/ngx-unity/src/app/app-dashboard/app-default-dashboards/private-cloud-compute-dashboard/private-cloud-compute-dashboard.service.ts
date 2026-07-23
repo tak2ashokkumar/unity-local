@@ -1244,7 +1244,7 @@ export class PrivateCloudComputeDashboardService {
     view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
 
-    view.options = this.createProgressBarChart('Top 10 - CPU Ready / Wait Time - VMs (%)', data);
+    view.options = this.createProgressBarChart('Top 10 - Disk Read/Write Throughput', data);
 
     return view;
   }
@@ -1256,7 +1256,7 @@ export class PrivateCloudComputeDashboardService {
     view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
 
-    view.options = this.createProgressBarChart('Top 10 Disk Latency (Ms)', data);
+    view.options = this.createProgressBarChart('Top 10 - CPU Ready VMs (%)', data);
 
     return view;
   }

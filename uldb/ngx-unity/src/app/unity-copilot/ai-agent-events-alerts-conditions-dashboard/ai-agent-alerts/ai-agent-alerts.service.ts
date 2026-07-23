@@ -11,7 +11,7 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { GET_AIOPS_ALERTS, GET_AIOPS_SUPPRESSED_ALERTS } from 'src/app/shared/api-endpoint.const';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { AiAgentConfigType } from '../ai-agent-events-alerts-conditions-dashboard.type';
-import { AiAgentAlerts, AiAgentSuppressedDisableTriggerType, AiAgentSuppressedEvents, AiAgentSuppressedResolveType } from './ai-agent-alerts.type';
+import { AiAgentAlerts, AiAgentAlertsSummary, AiAgentDatabaseSummary, AiAgentSuppressedDisableTriggerType, AiAgentSuppressedEvents, AiAgentSuppressedResolveType } from './ai-agent-alerts.type';
 
 @Injectable()
 export class AiAgentAlertsService {
@@ -28,7 +28,16 @@ export class AiAgentAlertsService {
     aiAgentConfig.deviceTypesForApi.forEach((type: string) => {
       params = params.append('device_type', type);
     });
-    return this.http.get<any>(`/customer/aiops/alerts/agent_alert_summary/`, { params: params });
+    return this.http.get<AiAgentAlertsSummary>(`/customer/aiops/alerts/agent_alert_summary/`, { params: params });
+  }
+
+  convertToDatabaseSummaryCards(databases: AiAgentDatabaseSummary[], countKey: 'alert_count' | 'condition_count'): AiAgentDatabaseSummaryCard[] {
+    return (databases || []).map(database => {
+      const view = new AiAgentDatabaseSummaryCard();
+      view.name = database?.database_type || 'Other';
+      view.count = Number(database?.[countKey]) || 0;
+      return view;
+    });
   }
 
   buildFilterForm() {
@@ -184,6 +193,12 @@ export class AiAgentAlertsService {
   resolveSuppressed(eventId: string): Observable<AiAgentSuppressedResolveType> {
     return this.http.post<AiAgentSuppressedResolveType>(`/customer/aiops/events/${eventId}/resolve/`, {});
   }
+}
+
+export class AiAgentDatabaseSummaryCard {
+  constructor() { }
+  name: string;
+  count: number = 0;
 }
 
 export class AiAgentAlertsViewdata {

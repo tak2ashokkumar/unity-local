@@ -18,6 +18,9 @@ import { PaginatedResult } from '../../SharedEntityTypes/paginated.type';
 import { TokenUsageViewData, UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
 import { UnityChartDetails } from '../../unity-chart-config.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CliCommandContext, ConditionInvestigationCliCommandService } from '../condition-investigation-cli-command.service';
+import { CliTerminalLifecycleEvent, ConditionInvestigationFloatingTerminalService } from '../condition-investigation-floating-terminal/condition-investigation-floating-terminal.service';
+import { ConditionInvestigationAuthModalService } from '../condition-investigation-auth-modal/condition-investigation-auth-modal.service';
 
 type ChatInputMode = 'auto' | 'pro';
 
@@ -55,6 +58,13 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   title: string;
 
   command: string = '';
+  commandDetails: any = null;
+  activeCommandContext: CliCommandContext | null = null;
+  commandExecutionStatusMessage: string = '';
+  commandExecutionError: string = '';
+  commandExecutionState: 'idle' | 'pending' | 'executing' | 'analyzing' | 'failed' = 'idle';
+  hasDefaultDeviceForCommand = false;
+  commandDefaultDevice: any = null;
 
   @ViewChild('executeCommand') executeCommand: ElementRef;
   confirmExecutionModalRef: BsModalRef;
@@ -75,7 +85,10 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     private route: ActivatedRoute,
     private modalService: BsModalService,
     private newTerminalService: ConditionInvestigationNewTerminalService,
-    private ucService: UnityChatbotService) {
+    private ucService: UnityChatbotService,
+    private cliCommandService: ConditionInvestigationCliCommandService,
+    private floatingTerminalService: ConditionInvestigationFloatingTerminalService,
+    private authApi: ConditionInvestigationAuthModalService) {
     this.route.queryParams.subscribe(params => {
       this.loadHistory = params['load_history'] || 'false';
       this.conversationId = this.loadHistory == 'true' ? params['conversation_id'] : null;
@@ -98,6 +111,10 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     this.getTokenUsage();
     this.resetChatInputModePayload();
     this.getAIModels();
+    if (this.loadHistory == 'true') {
+      this.clearCommandExecutionState();
+    }
+    this.subscribeToCliCommandFlow();
     const firstQuery = `Create an investigation plan to resolve the condition ${this.conditionId}`;
     if (this.loadHistory == 'true') {
       this.getChats();
@@ -190,8 +207,10 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
         user: (chat.role === 'User' ? 'user' : 'bot') as 'user' | 'bot',
         message: message,
         type: 'text',
-        actions: chat.metadata?.recommended_actions?.map((a: string) => ({ name: a })) || [],
+        actions: chat.metadata?.recommended_actions?.map((a: any) => this.toRecommendedAction(a)) || [],
         showAction: chat.metadata?.recommended_actions?.length > 0,
+        lastCommand: chat.metadata?.last_command,
+        showLastCommandPrompt: chat.role !== 'User' && !!chat.metadata?.last_command && chat.metadata?.command_execute === true,
         botResponseId: chat.chat_message_id
       };
     });
@@ -257,10 +276,13 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   doneData: any = null;
   sectionBreakReached = false;
 
-  getResponse(chat: string, isDefault?: boolean) {
+  getResponse(chat: string, isDefault?: boolean, extraPayload: any = {}, onComplete?: () => void) {
     if (chat.includes('Exit')) {
       this.goBack();
       return;
+    }
+    if (this.isTyping) {
+      return
     }
     this.isTyping = true;
     this.isStreaming = true;
@@ -281,10 +303,12 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       chat_mode: this.chatInputModePayload.chat_mode,
       session_model_uuid: this.chatInputModePayload.chat_mode === 'auto' ? '' : this.chatInputModePayload.session_model_uuid
     }
+    postData = { ...postData, ...extraPayload };
     this.chatHistoryData.push({ user: 'bot', message: '', type: 'text' });
     this.chatHistoryData.getLast()['showAction'] = false;
     const lastIndex = this.chatHistoryData.length - 1;
     this.startWaitMessages();
+    this.doneData = null;
     this.service.getStreamingResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: ({ event, data }) => {
         if (event === 'start') {
@@ -305,13 +329,9 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
           this.tokenUsageData = this.ucService.convertToTokenUsageViewData(this.doneData.meta.token_usage.org);
           this.chatResponse.emit(this.doneData);
           if (this.sectionBreakReached) {
+            this.attachLastCommandPrompt(this.doneData);
             if (this.doneData?.meta?.recommended_actions?.length) {
-              this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => {
-                return {
-                  name: ra,
-                  isDisabled: false
-                }
-              });
+              this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => this.toRecommendedAction(ra));
               setTimeout(() => {
                 this.scrollToBottom();
               });
@@ -331,20 +351,18 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
         this.typingInterval = null;
         this.typingQueue = [];
         this.cleanup();
+        onComplete && onComplete();
       },
       complete: () => {
         this.sectionBreakReached && (this.typingQueue = []);
         // this.sectionBreakReached = false;
         this.isTyping = false;
         this.isStreaming = false;
+        this.attachLastCommandPrompt(this.doneData);
         if (this.doneData?.meta?.recommended_actions?.length) {
-          this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => {
-            return {
-              name: ra,
-              isDisabled: false
-            }
-          });
+          this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => this.toRecommendedAction(ra));
         }
+        onComplete && onComplete();
       }
     });
   }
@@ -373,14 +391,10 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       } else {
         if (this.sectionBreakReached || !this.isStreaming) {
           if (this.doneData) {
+            this.attachLastCommandPrompt(this.doneData);
             const last = this.chatHistoryData[this.chatHistoryData.length - 1];
             if (this.doneData?.meta?.recommended_actions?.length) {
-              last['actions'] = this.doneData.meta.recommended_actions.map(ra => {
-                return {
-                  name: ra,
-                  isDisabled: false
-                }
-              });
+              last['actions'] = this.doneData.meta.recommended_actions.map(ra => this.toRecommendedAction(ra));
               setTimeout(() => {
                 this.scrollToBottom();
               });
@@ -394,6 +408,19 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
         }
       }
     }, 100);
+  }
+
+  private attachLastCommandPrompt(doneData: any) {
+    const lastCommand = doneData?.meta?.last_command;
+    const shouldShow = doneData?.meta?.command_execute === true;
+
+    if (!lastCommand || !shouldShow) {
+      return;
+    }
+
+    const last = this.chatHistoryData.getLast();
+    last['lastCommand'] = lastCommand;
+    last['showLastCommandPrompt'] = true;
   }
 
   // manageResponse(res: any) {
@@ -681,18 +708,212 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     if (codeEl) {
       this.command = codeEl.textContent?.trim();
       if (this.command) {
-        this.confirmExecutionModalRef = this.modalService.show(this.executeCommand, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+        this.openCommandExecutionModal(this.command, { source: 'markdown_code' });
       }
     }
   }
 
-  confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
+  confirmExecuteModal(tabType: 'sameTab' | 'newTab', forceDeviceChange: boolean = false) {
     this.confirmExecutionModalRef.hide();
-    localStorage.setItem('terminal_command', this.command);
-    this.newTerminalService.setPendingTabType(tabType);
-    this.newTerminalService.setConversationId(this.conversationId);
-    this.newTerminalService.setBackendTabId(null);
-    this.newTerminalService.openTerminal();
+    this.runCliCommand(this.command, forceDeviceChange, this.commandDetails || { source: 'confirm_modal' }, tabType);
+  }
+
+  handleRecommendedAction(action: any) {
+    if (this.isCommandExecutionBusy || action?.isDisabled) {
+      return;
+    }
+    const actionCommand = this.getActionCommand(action);
+    if (actionCommand) {
+      this.openCommandExecutionModal(actionCommand, action);
+      return;
+    }
+    const actionName = this.getActionName(action);
+    if (!actionName) {
+      return;
+    }
+    this.submitQuery(actionName);
+  }
+
+  get isCommandExecutionBusy(): boolean {
+    return ['pending', 'executing', 'analyzing'].includes(this.commandExecutionState);
+  }
+
+  dismissCommandExecutionNotification() {
+    this.commandExecutionStatusMessage = '';
+    this.commandExecutionError = '';
+  }
+
+  openCommandExecutionModal(command: string, commandDetails?: any) {
+    const cleanCommand = `${command || ''}`.trim();
+    if (!cleanCommand) {
+      return;
+    }
+    this.command = cleanCommand;
+    this.commandDetails = commandDetails;
+    this.getDefaultDevice();
+    this.confirmExecutionModalRef = this.modalService.show(this.executeCommand, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  getDefaultDevice() {
+    this.commandDefaultDevice = null;
+    this.hasDefaultDeviceForCommand = false;
+    this.authApi.getDefaultDevice(this.conditionId, this.conversationId).pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((device: any) => {
+        this.commandDefaultDevice = device?.id ? device : null;
+        this.hasDefaultDeviceForCommand = !!this.commandDefaultDevice;
+      }, () => {
+        this.commandDefaultDevice = null;
+        this.hasDefaultDeviceForCommand = false;
+      });
+  }
+
+  runCliCommand(command: string, forceDeviceChange: boolean = false, commandDetails?: any, tabType: 'sameTab' | 'newTab' = 'sameTab') {
+    if (this.isCommandExecutionBusy) {
+      return;
+    }
+    const cleanCommand = `${command || ''}`.trim();
+    if (!cleanCommand) {
+      return;
+    }
+
+    this.commandExecutionState = 'pending';
+    this.commandExecutionStatusMessage = forceDeviceChange ? 'Waiting for device credentials...' : 'Preparing terminal...';
+    this.commandExecutionError = '';
+
+    this.cliCommandService.executeCommandFlow({
+      command: cleanCommand,
+      conditionId: this.conditionId,
+      conversationId: this.conversationId,
+      tabType,
+      application: this.application,
+      title: this.title,
+      commandDetails,
+      device: forceDeviceChange ? this.commandDefaultDevice : undefined,
+    }, forceDeviceChange).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { }, (err) => {
+      this.commandExecutionState = 'failed';
+      this.commandExecutionStatusMessage = '';
+      this.commandExecutionError = 'Unable to start command execution.';
+    });
+  }
+
+  private subscribeToCliCommandFlow() {
+    this.cliCommandService.activeCommandContext$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((context: CliCommandContext | null) => {
+        if (!context) {
+          if (this.commandExecutionState === 'pending') {
+            this.clearCommandExecutionState();
+          }
+          return;
+        }
+        if (context.conversationId && this.conversationId && context.conversationId !== this.conversationId) {
+          return;
+        }
+        this.activeCommandContext = context;
+        if (this.commandExecutionState === 'idle' || this.commandExecutionState === 'failed') {
+          this.commandExecutionState = 'pending';
+          this.commandExecutionStatusMessage = context.forceDeviceChange ? 'Waiting for device credentials...' : 'Preparing terminal...';
+          this.commandExecutionError = '';
+        }
+      });
+
+    this.floatingTerminalService.commandLifecycle$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((event: CliTerminalLifecycleEvent) => {
+        if (!this.isLifecycleEventForActiveCommand(event)) {
+          return;
+        }
+        if (event.type === 'command_started') {
+          this.commandExecutionState = 'executing';
+          this.commandExecutionStatusMessage = 'Executing command...';
+          this.commandExecutionError = '';
+        } else if (event.type === 'command_completed') {
+          this.commandExecutionState = 'analyzing';
+          this.commandExecutionStatusMessage = 'Analyzing command output...';
+          this.commandExecutionError = '';
+          this.analyzeCliCommandOutput(event);
+        } else if (event.type === 'command_failed') {
+          if (event.payload?.reason === 'terminal_closed') {
+            this.clearCommandExecutionState();
+            return;
+          }
+          this.commandExecutionState = 'analyzing';
+          this.commandExecutionStatusMessage = 'Analyzing command output...';
+          this.commandExecutionError = '';
+          this.analyzeCliCommandOutput(event);
+        }
+      });
+  }
+
+  private analyzeCliCommandOutput(event: CliTerminalLifecycleEvent) {
+    const context = this.activeCommandContext;
+    if (!context) {
+      this.clearCommandExecutionState();
+      return;
+    }
+
+    const executedCommand = event.command || context.command;
+    const cliAuditLogId = event.cli_audit_log_id || event.payload?.cli_audit_log_id || event.payload?.audit_log_id;
+    const query = `Analyze the CLI output for command: ${executedCommand}`;
+    this.chatHistoryData.push({ user: 'user', message: query, type: 'text' });
+
+    this.getResponse(query, false, {
+      condition_id: Number(this.conditionId),
+      conversation_id: this.conversationId,
+      cli_audit_log_id: cliAuditLogId,
+      executed_command: executedCommand,
+      executed_command_details: {
+        ...context.commandDetails,
+        command: executedCommand,
+        tab_id: event.tabId,
+        terminal_event: event.payload,
+        device: context.device,
+      },
+    }, () => this.clearCommandExecutionState());
+  }
+
+  private clearCommandExecutionState() {
+    this.commandExecutionState = 'idle';
+    this.commandExecutionStatusMessage = '';
+    this.commandExecutionError = '';
+    this.activeCommandContext = null;
+    this.cliCommandService.setActiveCommandContext(null);
+  }
+
+  private isLifecycleEventForActiveCommand(event: CliTerminalLifecycleEvent): boolean {
+    if (!this.activeCommandContext) {
+      return false;
+    }
+    if (event.conversationId && this.activeCommandContext.conversationId && event.conversationId !== this.activeCommandContext.conversationId) {
+      return false;
+    }
+    if (this.activeCommandContext.tabId && event.tabId === this.activeCommandContext.tabId) {
+      return true;
+    }
+    if (event.command && event.command === this.activeCommandContext.command) {
+      return true;
+    }
+    return !this.activeCommandContext.tabId;
+  }
+
+  private toRecommendedAction(action: any) {
+    if (typeof action === 'string') {
+      return { name: action, isDisabled: false };
+    }
+    return {
+      ...action,
+      name: action?.name || action?.label || action?.title || action?.command || '',
+      command: action?.command,
+      isDisabled: !!action?.isDisabled,
+    };
+  }
+
+  private getActionName(action: any): string {
+    return typeof action === 'string' ? action : (action?.name || action?.label || action?.title || '');
+  }
+
+  private getActionCommand(action: any): string {
+    return typeof action === 'string' ? '' : `${action?.command || action?.cli_command || action?.command_text || ''}`.trim();
   }
 
   showTokenUsage: boolean = false;
@@ -718,5 +939,15 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   toggleTokenUsageDropdown() {
     this.showTokenUsage = !this.showTokenUsage
     this.getTokenUsage();
+  }
+
+  executeLastCommand(chat: any) {
+    chat.showLastCommandPrompt = false;
+    this.openCommandExecutionModal(chat.lastCommand, { source: 'last_command' });
+  }
+
+  declineLastCommand(chat: any) {
+    chat.showLastCommandPrompt = false;
+    this.submitQuery(`No, do not execute ${chat.lastCommand}`);
   }
 }

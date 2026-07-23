@@ -5,7 +5,7 @@ import { takeUntil, take } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, PDUTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { AdvancedDiscoveryPdusService, DevDisPDUViewdata, DeviceDiscoveryPDUFormData } from './advanced-discovery-pdus.service';
 

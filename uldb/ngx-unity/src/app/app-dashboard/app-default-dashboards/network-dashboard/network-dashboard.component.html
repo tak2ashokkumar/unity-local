@@ -9,7 +9,12 @@
             </div>
         </div>
 
+        <div class="network-dashboard-filter-loading" *ngIf="!filterForm && !filterLoadFailed">
+            <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
+        </div>
+
         <form class="network-dashboard-filter-form" *ngIf="filterForm" [formGroup]="filterForm">
+            <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
             <div class="form-group mb-0 network-dashboard-filter-group">
                 <label class="m-0 p-0">Datacenter</label>
                 <multiselect-dropdown [options]="datacenterOptions" [settings]="datacenterMultiselectSettings"
@@ -43,65 +48,879 @@
         </form>
     </div>
 
-    <div class="container-fluid px-3 pt-3 pb-2" *ngIf="networkOverviewViewData">
-        <div class="d-flex flex-wrap align-items-start justify-content-between mb-2">
-            <div class="network-dashboard-section-title">Network Overview</div>
-            <div class="network-dashboard-section-note">
-                *The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring Within
-                The Selected Time Range
+    <div class="container-fluid px-3 pt-3 pb-2"
+        *ngIf="networkOverviewViewData || topConversationsWidgetViewData || performanceWorkloadInsightsViewData || interfaceHealthMetricsViewData || networkDeviceAvailabilityViewData || alertEventsViewData || autoRemediationSummaryViewData || isNetworkOverviewLoading || isTopConversationsLoading || isPerformanceWorkloadLoading || isInterfaceHealthMetricsLoading || isNetworkDeviceAvailabilityLoading || isAlertEventsLoading || isAutoRemediationSummaryLoading">
+        <ng-container *ngIf="networkOverviewViewData || isNetworkOverviewLoading">
+            <div class="network-dashboard-overview-head">
+                <div class="network-dashboard-section-title">Network Overview</div>
+                <div class="network-dashboard-section-note">
+                    *The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring Within
+                    The Selected Time Range
+                </div>
+            </div>
+
+            <div class="card network-dashboard-overview-card">
+                <div class="card-body p-0">
+                    <app-spinner [name]="loaderNames.networkOverview" [width]="0"></app-spinner>
+                    <div class="network-dashboard-overview-list">
+                        <div class="network-dashboard-overview-item network-dashboard-overview-item--availability">
+                            <div class="network-dashboard-overview-label network-dashboard-overview-label--availability">
+                                Device Availability
+                            </div>
+                            <div class="network-dashboard-overview-summary">
+                                <div class="network-dashboard-overview-value network-dashboard-overview-value--success">
+                                    {{ networkOverviewViewData.deviceAvailability?.percentage | number:'1.0-1' }}%
+                                </div>
+                                <div class="network-dashboard-overview-subtext">
+                                    {{ networkOverviewViewData.deviceAvailability?.online | number:'1.0-0' }}/{{
+                                    networkOverviewViewData.deviceAvailability?.total | number:'1.0-0' }}
+                                    Online
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="network-dashboard-overview-item network-dashboard-overview-item--summary">
+                            <div class="network-dashboard-overview-label">Discovered Devices</div>
+                            <div class="network-dashboard-overview-value network-dashboard-overview-value--primary">
+                                {{ networkOverviewViewData.discoveredDevices | number:'1.0-0' }}
+                            </div>
+                        </div>
+
+                        <div class="network-dashboard-overview-item network-dashboard-overview-item--summary">
+                            <div class="network-dashboard-overview-label">Monitored Devices</div>
+                            <div class="network-dashboard-overview-value network-dashboard-overview-value--primary">
+                                {{ networkOverviewViewData.monitoredDevices | number:'1.0-0' }}
+                            </div>
+                        </div>
+
+                        <div class="network-dashboard-overview-item network-dashboard-overview-item--device-type"
+                            *ngFor="let item of networkOverviewViewData.deviceTypes">
+                            <div class="network-dashboard-overview-label">{{ item.type }}</div>
+                            <div class="network-dashboard-overview-value">
+                                {{ item.count | number:'1.0-0' }}
+                            </div>
+                            <div class="network-dashboard-overview-status-row">
+                                <span
+                                    class="network-dashboard-overview-status-item network-dashboard-overview-status-item--normal">
+                                    <i [class]="item.normalIconClass"></i>
+                                    <span>{{ item.normal | number:'1.0-0' }}</span>
+                                </span>
+                                <span
+                                    class="network-dashboard-overview-status-item network-dashboard-overview-status-item--critical">
+                                    <i [class]="item.criticalIconClass"></i>
+                                    <span>{{ item.critical | number:'1.0-0' }}</span>
+                                </span>
+                                <span
+                                    class="network-dashboard-overview-status-item network-dashboard-overview-status-item--unknown">
+                                    <i [class]="item.unknownIconClass"></i>
+                                    <span>{{ item.unknown | number:'1.0-0' }}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="network-dashboard-conversations-head" *ngIf="topConversationsWidgetViewData || isTopConversationsLoading">
+            <div class="network-dashboard-section-title">Top 10 Conversations</div>
+            <div class="network-dashboard-view-toggle" role="group" aria-label="Top conversations view toggle">
+                <button type="button" class="network-dashboard-view-toggle-btn"
+                    [class.network-dashboard-view-toggle-btn--active]="topConversationsViewMode === 'table'"
+                    (click)="setTopConversationsViewMode('table')">
+                    Table View
+                </button>
+                <button type="button" class="network-dashboard-view-toggle-btn"
+                    [class.network-dashboard-view-toggle-btn--active]="topConversationsViewMode === 'chart'"
+                    (click)="setTopConversationsViewMode('chart')">
+                    Chart View
+                </button>
             </div>
         </div>
 
-        <div class="card network-dashboard-overview-card">
+        <div class="card network-dashboard-top-conversations-shell" *ngIf="topConversationsWidgetViewData || isTopConversationsLoading">
+            <div class="card-body" [ngClass]="topConversationsViewMode === 'chart' ? 'p-2' : 'p-0'">
+                <app-spinner [name]="loaderNames.topConversations" [width]="0"></app-spinner>
+                <ng-container *ngIf="topConversationsViewMode === 'chart'; else topConversationsTableView">
+                    <div class="row mx-n1">
+                        <div class="col-xl-4 col-lg-4 col-md-6 px-1 mb-2"
+                            *ngFor="let card of topConversationsWidgetViewData.cards; trackBy: trackByTopConversationCard">
+                            <div class="card network-dashboard-conversation-card h-100">
+                                <div class="card-header network-dashboard-conversation-card-header">
+                                    <span class="network-dashboard-conversation-card-title">{{ card.title }}</span>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="network-dashboard-conversation-chart-wrap"
+                                        [ngClass]="card.chartKind === 'bar' ? 'network-dashboard-conversation-chart-wrap--bar' : 'network-dashboard-conversation-chart-wrap--funnel'">
+                                        <div echarts *ngIf="card.chartData" [options]="card.chartData.options"
+                                            [extentions]="card.chartData.extensions" [defaultHeight]="card.chartHeight"
+                                            class="network-dashboard-conversation-chart">
+                                        </div>
+                                        <div *ngIf="!card.chartData"
+                                            class="d-flex justify-content-center align-items-center h-100 text-muted">
+                                            No data available.
+                                        </div>
+                                    </div>
+
+                                    <div class="network-dashboard-conversation-legend" *ngIf="card.legendItems?.length">
+                                        <div class="network-dashboard-conversation-legend-item"
+                                            *ngFor="let legend of card.legendItems">
+                                            <span class="network-dashboard-conversation-legend-swatch"
+                                                [style.backgroundColor]="legend.color"></span>
+                                            <span>{{ legend.label }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-template #topConversationsTableView>
+                    <div *ngIf="topConversationsWidgetViewData.tableRows?.length; else topConversationNoRows"
+                        class="table-responsive network-dashboard-conversation-table-wrap">
+                        <table class="table table-sm mb-0 network-dashboard-conversation-table" sortableTable
+                            (sorted)="onTopConversationTableSorted($event)">
+                            <thead>
+                                <tr>
+                                    <th *ngFor="let column of topConversationsWidgetViewData.tableColumns"
+                                        [sortable-column]="column.sortKey"
+                                        [sort-direction]="getTopConversationSortDirection(column.sortKey)"
+                                        [ngClass]="[
+                                            column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center',
+                                            getTopConversationHeaderClass(column.sortKey),
+                                            column.key === 'bandwidthUsage' ? 'network-dashboard-conversation-table-col--bandwidth' : ''
+                                        ]">
+                                        {{ column.label }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of topConversationsWidgetViewData.tableRows; trackBy: trackByTopConversationRow"
+                                    truncateText>
+                                    <td *ngFor="let column of topConversationsWidgetViewData.tableColumns"
+                                        [ngClass]="[
+                                            column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center',
+                                            column.key === 'bandwidthUsage' ? 'network-dashboard-conversation-table-col--bandwidth' : ''
+                                        ]">
+                                        <ng-container [ngSwitch]="column.type">
+                                            <div *ngSwitchCase="'bandwidth'" class="network-dashboard-bandwidth-cell">
+                                                <div class="progress-track">
+                                                    <div class="progress-fill"
+                                                        [ngClass]="'tone-' + row.bandwidthUsageTone"
+                                                        [style.width.%]="row.bandwidthUsagePercent"></div>
+                                                </div>
+                                                <div class="network-dashboard-bandwidth-meta">
+                                                    Used: {{ row.bandwidthUsageLabel }}
+                                                </div>
+                                            </div>
+                                            <span *ngSwitchDefault [tooltip]="row[column.key]" container="body"
+                                                [ngClass]="column.key === 'name' ? 'network-dashboard-table-link' : ''">
+                                                {{ row[column.key] }}
+                                            </span>
+                                        </ng-container>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <ng-template #topConversationNoRows>
+                        <div class="d-flex justify-content-center align-items-center text-muted py-5">
+                            No data available.
+                        </div>
+                    </ng-template>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="network-dashboard-performance-head" *ngIf="performanceWorkloadInsightsViewData || isPerformanceWorkloadLoading">
+            <div class="network-dashboard-section-title">Performance / Workload Insights</div>
+            <div class="network-dashboard-view-toggle" role="group"
+                aria-label="Performance workload insights view toggle">
+                <button type="button" class="network-dashboard-view-toggle-btn"
+                    [class.network-dashboard-view-toggle-btn--active]="performanceWorkloadInsightsViewMode === 'table'"
+                    (click)="setPerformanceWorkloadInsightsViewMode('table')">
+                    Table View
+                </button>
+                <button type="button" class="network-dashboard-view-toggle-btn"
+                    [class.network-dashboard-view-toggle-btn--active]="performanceWorkloadInsightsViewMode === 'chart'"
+                    (click)="setPerformanceWorkloadInsightsViewMode('chart')">
+                    Chart View
+                </button>
+            </div>
+        </div>
+
+        <div class="card network-dashboard-performance-shell" *ngIf="performanceWorkloadInsightsViewData || isPerformanceWorkloadLoading">
             <div class="card-body p-0">
-                <div class="d-flex flex-nowrap text-center network-dashboard-overview-list">
-                    <div class="network-dashboard-overview-item network-dashboard-overview-item--summary">
-                        <div class="network-dashboard-overview-label">Device Availability</div>
-                        <div
-                            class="network-dashboard-overview-value network-dashboard-overview-value--success text-left ml-3">
-                            {{ networkOverviewViewData.deviceAvailability?.percentage | number:'1.0-1' }}%
+                <app-spinner [name]="loaderNames.performanceWorkload" [width]="0"></app-spinner>
+                <ng-container *ngIf="performanceWorkloadInsightsViewMode === 'chart'; else performanceWorkloadTableView">
+                    <div class="row no-gutters network-dashboard-performance-chart-grid">
+                        <div class="col-lg-6 col-12"
+                            *ngFor="let chart of performanceWorkloadInsightsViewData.charts; trackBy: trackByPerformanceWorkloadChart">
+                            <div class="network-dashboard-performance-chart-panel">
+                                <div class="network-dashboard-performance-chart-head">
+                                    <div class="network-dashboard-performance-chart-y-title">
+                                        {{ chart.chartData ? chart.yAxisTitle : '' }}
+                                    </div>
+                                    <div class="network-dashboard-performance-chart-title">{{ chart.title }}</div>
+                                    <div></div>
+                                </div>
+                                <div echarts *ngIf="chart.chartData" [options]="chart.chartData.options"
+                                    [extentions]="chart.chartData.extensions" [defaultHeight]="chart.chartHeight"
+                                    class="network-dashboard-performance-chart">
+                                </div>
+                                <div *ngIf="!chart.chartData"
+                                    class="d-flex justify-content-center align-items-center text-muted network-dashboard-performance-empty-state">
+                                    No data available.
+                                </div>
+                            </div>
                         </div>
-                        <div class="network-dashboard-overview-subtext">
-                            {{ networkOverviewViewData.deviceAvailability?.online | number:'1.0-0' }}/{{
-                            networkOverviewViewData.deviceAvailability?.total | number:'1.0-0' }}
-                            Online
+                    </div>
+                </ng-container>
+
+                <ng-template #performanceWorkloadTableView>
+                    <div *ngIf="performanceWorkloadInsightsViewData.tableRows?.length; else performanceWorkloadNoRows"
+                        class="table-responsive network-dashboard-performance-table-wrap">
+                        <table class="table table-sm mb-0 network-dashboard-performance-table" sortableTable
+                            (sorted)="onPerformanceWorkloadTableSorted($event)">
+                            <thead>
+                                <tr>
+                                    <th *ngFor="let column of performanceWorkloadInsightsViewData.tableColumns"
+                                        [sortable-column]="column.sortKey"
+                                        [sort-direction]="getPerformanceWorkloadSortDirection(column.sortKey)"
+                                        [ngClass]="[
+                                            column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center',
+                                            getPerformanceWorkloadHeaderClass(column.sortKey)
+                                        ]">
+                                        {{ column.label }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of performanceWorkloadInsightsViewData.tableRows; trackBy: trackByPerformanceWorkloadRow"
+                                    truncateText>
+                                    <td *ngFor="let column of performanceWorkloadInsightsViewData.tableColumns"
+                                        [ngClass]="column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center'">
+                                        <span [tooltip]="row[column.key]" container="body"
+                                            [ngClass]="column.key === 'deviceName' ? 'network-dashboard-table-link' : ''">
+                                            {{ row[column.key] }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <ng-template #performanceWorkloadNoRows>
+                        <div class="d-flex justify-content-center align-items-center text-muted py-5">
+                            No data available.
+                        </div>
+                    </ng-template>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="network-dashboard-interface-health-head" *ngIf="interfaceHealthMetricsViewData || isInterfaceHealthMetricsLoading">
+            <div class="network-dashboard-section-title">Interface Health &amp; Metrics</div>
+            <div class="network-dashboard-view-toggle" role="group" aria-label="Interface health metrics view toggle">
+                <button type="button" class="network-dashboard-view-toggle-btn"
+                    [class.network-dashboard-view-toggle-btn--active]="interfaceHealthMetricsViewMode === 'table'"
+                    (click)="setInterfaceHealthMetricsViewMode('table')">
+                    Table View
+                </button>
+                <button type="button" class="network-dashboard-view-toggle-btn"
+                    [class.network-dashboard-view-toggle-btn--active]="interfaceHealthMetricsViewMode === 'chart'"
+                    (click)="setInterfaceHealthMetricsViewMode('chart')">
+                    Chart View
+                </button>
+            </div>
+        </div>
+
+        <div class="card network-dashboard-interface-health-shell" *ngIf="interfaceHealthMetricsViewData || isInterfaceHealthMetricsLoading">
+            <div class="card-body p-0">
+                <app-spinner [name]="loaderNames.interfaceHealthMetrics" [width]="0"></app-spinner>
+                <ng-container *ngIf="interfaceHealthMetricsViewMode === 'chart'; else interfaceHealthMetricsTableView">
+                    <div class="row no-gutters network-dashboard-interface-chart-grid">
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-12"
+                            *ngFor="let chart of interfaceHealthMetricsViewData.charts; trackBy: trackByInterfaceHealthMetricChart">
+                            <div class="network-dashboard-interface-chart-panel">
+                                <div class="network-dashboard-interface-chart-head">
+                                    <span class="network-dashboard-interface-chart-title">{{ chart.title }}</span>
+                                    <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                        [tooltip]="chart.infoTooltip" container="body">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div echarts *ngIf="chart.chartData" [options]="chart.chartData.options"
+                                    [extentions]="chart.chartData.extensions" [defaultHeight]="chart.chartHeight"
+                                    class="network-dashboard-interface-chart">
+                                </div>
+                                <div *ngIf="!chart.chartData"
+                                    class="d-flex justify-content-center align-items-center text-muted network-dashboard-interface-empty-state">
+                                    No data available.
+                                </div>
+                                <div class="network-dashboard-interface-legend" *ngIf="chart.legendItems?.length">
+                                    <div class="network-dashboard-interface-legend-item"
+                                        *ngFor="let legend of chart.legendItems">
+                                        <span class="network-dashboard-interface-legend-dot"
+                                            [style.backgroundColor]="legend.color"></span>
+                                        <span>{{ legend.label }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-template #interfaceHealthMetricsTableView>
+                    <div *ngIf="interfaceHealthMetricsViewData.tableRows?.length; else interfaceHealthMetricsNoRows"
+                        class="table-responsive network-dashboard-interface-table-wrap">
+                        <table class="table table-sm mb-0 network-dashboard-interface-table" sortableTable
+                            (sorted)="onInterfaceHealthMetricsTableSorted($event)">
+                            <thead>
+                                <tr>
+                                    <th *ngFor="let column of interfaceHealthMetricsViewData.tableColumns"
+                                        [sortable-column]="column.sortKey"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection(column.sortKey)"
+                                        [ngClass]="[
+                                            column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center',
+                                            getInterfaceHealthMetricsHeaderClass(column.sortKey)
+                                        ]">
+                                        {{ column.label }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of interfaceHealthMetricsViewData.tableRows; trackBy: trackByInterfaceHealthMetricRow"
+                                    truncateText>
+                                    <td *ngFor="let column of interfaceHealthMetricsViewData.tableColumns"
+                                        [ngClass]="column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center'">
+                                        <span [tooltip]="row[column.key]" container="body"
+                                            [ngClass]="column.key === 'interfaceName' ? 'network-dashboard-table-link' : ''">
+                                            {{ row[column.key] }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <ng-template #interfaceHealthMetricsNoRows>
+                        <div class="d-flex justify-content-center align-items-center text-muted py-5">
+                            No data available.
+                        </div>
+                    </ng-template>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="network-dashboard-device-availability-head" *ngIf="networkDeviceAvailabilityViewData || isNetworkDeviceAvailabilityLoading">
+            <div class="network-dashboard-section-title">Network Device Availability</div>
+            <div class="network-dashboard-view-toggle" role="group"
+                aria-label="Network device availability view toggle">
+                <button type="button" class="network-dashboard-view-toggle-btn"
+                    [class.network-dashboard-view-toggle-btn--active]="networkDeviceAvailabilityViewMode === 'table'"
+                    (click)="setNetworkDeviceAvailabilityViewMode('table')">
+                    Table View
+                </button>
+                <button type="button" class="network-dashboard-view-toggle-btn"
+                    [class.network-dashboard-view-toggle-btn--active]="networkDeviceAvailabilityViewMode === 'chart'"
+                    (click)="setNetworkDeviceAvailabilityViewMode('chart')">
+                    Chart View
+                </button>
+            </div>
+        </div>
+
+        <div class="card network-dashboard-device-availability-shell" *ngIf="networkDeviceAvailabilityViewData || isNetworkDeviceAvailabilityLoading">
+            <div class="card-body p-0">
+                <app-spinner [name]="loaderNames.networkDeviceAvailability" [width]="0"></app-spinner>
+                <ng-container *ngIf="networkDeviceAvailabilityViewMode === 'chart'; else networkDeviceAvailabilityTableView">
+                    <div class="row no-gutters network-dashboard-device-availability-grid">
+                        <div class="col-xl-4 col-lg-6 col-md-6 col-12"
+                            *ngFor="let card of networkDeviceAvailabilityViewData.cards; trackBy: trackByNetworkDeviceAvailabilityCard">
+                            <div class="network-dashboard-device-availability-card">
+                                <div class="network-dashboard-device-availability-card-header">
+                                    <div class="network-dashboard-device-availability-card-title">{{ card.title }}</div>
+                                    <div class="d-flex align-items-center">
+                                        <span *ngIf="card.badgeLabel"
+                                            class="network-dashboard-device-availability-badge network-dashboard-device-availability-badge--header"
+                                            [ngClass]="'network-dashboard-device-availability-badge--' + card.badgeTone">
+                                            {{ card.badgeLabel }}
+                                        </span>
+                                        <button *ngIf="card.infoTooltip" type="button"
+                                            class="btn btn-link p-0 network-dashboard-chart-info-btn ml-2"
+                                            [tooltip]="card.infoTooltip" container="body">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <ng-container [ngSwitch]="card.cardKind">
+                                    <div *ngSwitchCase="'lowest-availability'"
+                                        class="network-dashboard-device-availability-lowest-wrap">
+                                        <table *ngIf="card.lowestAvailabilityRows?.length; else networkDeviceAvailabilityLowestNoRows"
+                                            class="table table-sm mb-0 network-dashboard-device-availability-lowest-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Device</th>
+                                                    <th>Availability</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of card.lowestAvailabilityRows">
+                                                    <td class="font-weight-bold">{{ row.name }}</td>
+                                                    <td>
+                                                        <span
+                                                            [ngClass]="'network-dashboard-device-availability-text--' + row.statusTone">
+                                                            {{ row.availabilityDisplay }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="network-dashboard-device-availability-badge"
+                                                            [ngClass]="'network-dashboard-device-availability-badge--' + row.statusTone">
+                                                            {{ row.statusLabel }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <ng-template #networkDeviceAvailabilityLowestNoRows>
+                                            <div
+                                                class="d-flex justify-content-center align-items-center text-muted network-dashboard-device-availability-empty-state">
+                                                No data available.
+                                            </div>
+                                        </ng-template>
+                                    </div>
+
+                                    <div *ngSwitchDefault class="network-dashboard-device-availability-chart-wrap">
+                                        <div echarts *ngIf="card.chartData" [options]="card.chartData.options"
+                                            [extentions]="card.chartData.extensions" [defaultHeight]="card.chartHeight"
+                                            class="network-dashboard-device-availability-chart">
+                                        </div>
+                                        <div *ngIf="!card.chartData"
+                                            class="d-flex justify-content-center align-items-center text-muted network-dashboard-device-availability-empty-state">
+                                            No data available.
+                                        </div>
+                                        <div class="network-dashboard-device-availability-legend"
+                                            [ngClass]="card.key === 'manufacturer-model-breakdown' ? 'network-dashboard-device-availability-legend--manufacturer' : ''"
+                                            *ngIf="card.legendItems?.length">
+                                            <ng-container *ngIf="card.key === 'manufacturer-model-breakdown'; else networkDeviceAvailabilityDeviceTypeLegendBlock">
+                                                <div class="network-dashboard-device-availability-legend-row">
+                                                    <div class="network-dashboard-device-availability-legend-track">
+                                                        <div class="d-inline-flex align-items-center network-dashboard-device-availability-legend-item network-dashboard-device-availability-legend-item--manufacturer"
+                                                            *ngFor="let legend of getVisibleManufacturerModelLegendItems()">
+                                                            <span class="network-dashboard-device-availability-legend-dot network-dashboard-device-availability-legend-dot--square"
+                                                                [style.backgroundColor]="legend.color"></span>
+                                                            <span>{{ legend.label }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="network-dashboard-device-availability-legend-pager"
+                                                        *ngIf="getManufacturerModelLegendPageCount() > 1">
+                                                        <button type="button" class="network-dashboard-device-availability-legend-arrow"
+                                                            (click)="previousManufacturerModelLegendPage()"
+                                                            [disabled]="manufacturerModelLegendPage === 0"
+                                                            aria-label="Previous legends">
+                                                            <i class="fas fa-caret-left"></i>
+                                                        </button>
+                                                        <span class="network-dashboard-device-availability-legend-page">
+                                                            {{ manufacturerModelLegendPage + 1 }}/{{ getManufacturerModelLegendPageCount() }}
+                                                        </span>
+                                                        <button type="button" class="network-dashboard-device-availability-legend-arrow"
+                                                            (click)="nextManufacturerModelLegendPage()"
+                                                            [disabled]="manufacturerModelLegendPage >= getManufacturerModelLegendPageCount() - 1"
+                                                            aria-label="Next legends">
+                                                            <i class="fas fa-caret-right"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </ng-container>
+                                            <ng-template #networkDeviceAvailabilityDeviceTypeLegendBlock>
+                                                <ng-container *ngIf="card.key === 'device-type-distribution'; else networkDeviceAvailabilityDefaultLegend">
+                                                    <div class="network-dashboard-device-availability-legend-row">
+                                                        <div class="network-dashboard-device-availability-legend-track">
+                                                            <div class="d-inline-flex align-items-center network-dashboard-device-availability-legend-item network-dashboard-device-availability-legend-item--manufacturer"
+                                                                *ngFor="let legend of getVisibleDeviceTypeLegendItems()">
+                                                                <span class="network-dashboard-device-availability-legend-dot network-dashboard-device-availability-legend-dot--square"
+                                                                    [style.backgroundColor]="legend.color"></span>
+                                                                <span>{{ legend.label }}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="network-dashboard-device-availability-legend-pager"
+                                                            *ngIf="getDeviceTypeLegendPageCount() > 1">
+                                                            <button type="button" class="network-dashboard-device-availability-legend-arrow"
+                                                                (click)="previousDeviceTypeLegendPage()"
+                                                                [disabled]="deviceTypeLegendPage === 0"
+                                                                aria-label="Previous legends">
+                                                                <i class="fas fa-caret-left"></i>
+                                                            </button>
+                                                            <span class="network-dashboard-device-availability-legend-page">
+                                                                {{ deviceTypeLegendPage + 1 }}/{{ getDeviceTypeLegendPageCount() }}
+                                                            </span>
+                                                            <button type="button" class="network-dashboard-device-availability-legend-arrow"
+                                                                (click)="nextDeviceTypeLegendPage()"
+                                                                [disabled]="deviceTypeLegendPage >= getDeviceTypeLegendPageCount() - 1"
+                                                                aria-label="Next legends">
+                                                                <i class="fas fa-caret-right"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </ng-container>
+                                            </ng-template>
+                                            <ng-template #networkDeviceAvailabilityDefaultLegend>
+                                                <div class="network-dashboard-device-availability-legend-item"
+                                                    *ngFor="let legend of card.legendItems">
+                                                    <span class="network-dashboard-device-availability-legend-dot"
+                                                        [style.backgroundColor]="legend.color"></span>
+                                                    <span>{{ legend.label }}</span>
+                                                </div>
+                                            </ng-template>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-template #networkDeviceAvailabilityTableView>
+                    <div *ngIf="networkDeviceAvailabilityViewData.tableRows?.length; else networkDeviceAvailabilityNoRows"
+                        class="table-responsive network-dashboard-device-availability-table-wrap">
+                        <table class="table table-sm mb-0 network-dashboard-device-availability-table" sortableTable
+                            (sorted)="onNetworkDeviceAvailabilityTableSorted($event)">
+                            <thead>
+                                <tr>
+                                    <th *ngFor="let column of networkDeviceAvailabilityViewData.tableColumns"
+                                        [sortable-column]="column.sortKey"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection(column.sortKey)"
+                                        [ngClass]="[
+                                            column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center',
+                                            getNetworkDeviceAvailabilityHeaderClass(column.sortKey)
+                                        ]">
+                                        {{ column.label }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of networkDeviceAvailabilityViewData.tableRows; trackBy: trackByNetworkDeviceAvailabilityRow"
+                                    truncateText>
+                                    <td *ngFor="let column of networkDeviceAvailabilityViewData.tableColumns"
+                                        [ngClass]="column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center'">
+                                        <ng-container [ngSwitch]="column.type">
+                                            <span *ngSwitchCase="'availability'"
+                                                [ngClass]="'network-dashboard-device-availability-text--' + row.statusTone">
+                                                {{ row[column.key] }}
+                                            </span>
+
+                                            <span *ngSwitchCase="'status'" [tooltip]="row.statusLabel" container="body"
+                                                class="network-dashboard-device-availability-status-cell">
+                                                <i [class]="row.statusIconClass"
+                                                    [ngClass]="'network-dashboard-device-status-icon--' + row.statusTone"></i>
+                                            </span>
+
+                                            <span *ngSwitchDefault [tooltip]="row[column.key]" container="body"
+                                                [ngClass]="column.key === 'name' ? 'network-dashboard-table-link' : ''">
+                                                {{ row[column.key] }}
+                                            </span>
+                                        </ng-container>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <ng-template #networkDeviceAvailabilityNoRows>
+                        <div class="d-flex justify-content-center align-items-center text-muted py-5">
+                            No data available.
+                        </div>
+                    </ng-template>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="network-dashboard-topology-head">
+            <div class="network-dashboard-section-title">Network Topology</div>
+        </div>
+
+        <div class="card network-dashboard-topology-shell">
+            <div class="card-body p-0">
+                <unity-topology></unity-topology>
+            </div>
+        </div>
+
+        <div class="network-dashboard-geo-map-head">
+            <div class="network-dashboard-section-title">Availability State By Geo Map</div>
+        </div>
+
+        <div class="network-dashboard-geo-map-shell">
+            <dashboard-map-widget *ngIf="mapSvc.shouldShowMapWidgets(); else networkGeoMapUnavailable">
+            </dashboard-map-widget>
+            <ng-template #networkGeoMapUnavailable>
+                <div class="network-dashboard-geo-map-empty">
+                    Data is unavailable.
+                </div>
+            </ng-template>
+        </div>
+
+        <!-- Environmental Health Summary widget intentionally hidden for now. -->
+
+        <div class="network-dashboard-alert-events-head" *ngIf="alertEventsViewData || isAlertEventsLoading">
+            <div class="network-dashboard-section-title">Alert &amp; Events View</div>
+        </div>
+
+        <div class="card network-dashboard-alert-events-shell" *ngIf="alertEventsViewData || isAlertEventsLoading">
+            <div class="card-body p-0">
+                <app-spinner [name]="loaderNames.alertEvents" [width]="0"></app-spinner>
+                <div class="network-dashboard-alert-events-summary">
+                    <div class="network-dashboard-alert-events-summary-item"
+                        *ngFor="let metric of alertEventsViewData.summaryMetrics">
+                        <div class="network-dashboard-alert-events-summary-label">{{ metric.label }}</div>
+                        <div class="network-dashboard-alert-events-summary-value"
+                            [ngClass]="'network-dashboard-alert-events-summary-value--' + metric.tone">
+                            {{ metric.value }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row no-gutters network-dashboard-alert-events-visuals">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+                        <div class="network-dashboard-alert-events-panel">
+                            <div class="network-dashboard-alert-events-panel-title">
+                                {{ alertEventsViewData.severityChart?.title }}
+                            </div>
+                            <div class="network-dashboard-alert-events-chart-wrap">
+                                <div echarts *ngIf="alertEventsViewData.severityChart?.chartData"
+                                    [options]="alertEventsViewData.severityChart.chartData.options"
+                                    [extentions]="alertEventsViewData.severityChart.chartData.extensions"
+                                    [defaultHeight]="alertEventsViewData.severityChart.chartHeight"
+                                    class="network-dashboard-alert-events-chart">
+                                </div>
+                                <div *ngIf="!alertEventsViewData.severityChart?.chartData"
+                                    class="d-flex justify-content-center align-items-center h-100 text-muted">
+                                    No data available.
+                                </div>
+                            </div>
+                            <div class="network-dashboard-alert-events-legend"
+                                *ngIf="alertEventsViewData.severityChart?.legendItems?.length">
+                                <div class="network-dashboard-alert-events-legend-item"
+                                    *ngFor="let legend of alertEventsViewData.severityChart.legendItems">
+                                    <span class="network-dashboard-alert-events-legend-dot"
+                                        [style.backgroundColor]="legend.color"></span>
+                                    <span>{{ legend.label }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="network-dashboard-overview-item network-dashboard-overview-item--summary">
-                        <div class="network-dashboard-overview-label">Discovered Devices</div>
-                        <div class="network-dashboard-overview-value network-dashboard-overview-value--primary">
-                            {{ networkOverviewViewData.discoveredDevices | number:'1.0-0' }}
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+                        <div class="network-dashboard-alert-events-panel">
+                            <div class="network-dashboard-alert-events-panel-title">
+                                {{ alertEventsViewData.deviceTypeChart?.title }}
+                            </div>
+                            <div class="network-dashboard-alert-events-chart-wrap">
+                                <div echarts *ngIf="alertEventsViewData.deviceTypeChart?.chartData"
+                                    [options]="alertEventsViewData.deviceTypeChart.chartData.options"
+                                    [extentions]="alertEventsViewData.deviceTypeChart.chartData.extensions"
+                                    [defaultHeight]="alertEventsViewData.deviceTypeChart.chartHeight"
+                                    class="network-dashboard-alert-events-chart">
+                                </div>
+                                <div *ngIf="!alertEventsViewData.deviceTypeChart?.chartData"
+                                    class="d-flex justify-content-center align-items-center h-100 text-muted">
+                                    No data available.
+                                </div>
+                            </div>
+                            <div class="network-dashboard-alert-events-legend"
+                                *ngIf="alertEventsViewData.deviceTypeChart?.legendItems?.length">
+                                <div class="network-dashboard-alert-events-legend-item"
+                                    *ngFor="let legend of alertEventsViewData.deviceTypeChart.legendItems">
+                                    <span class="network-dashboard-alert-events-legend-dot"
+                                        [style.backgroundColor]="legend.color"></span>
+                                    <span>{{ legend.label }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="network-dashboard-overview-item network-dashboard-overview-item--summary">
-                        <div class="network-dashboard-overview-label">Monitored Devices</div>
-                        <div class="network-dashboard-overview-value network-dashboard-overview-value--primary">
-                            {{ networkOverviewViewData.monitoredDevices | number:'1.0-0' }}
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+                        <div class="network-dashboard-alert-events-panel">
+                            <div class="network-dashboard-alert-events-panel-title">
+                                {{ alertEventsViewData.itsmTicketsChart?.title }}
+                            </div>
+                            <div class="network-dashboard-alert-events-chart-wrap">
+                                <div echarts *ngIf="alertEventsViewData.itsmTicketsChart?.chartData"
+                                    [options]="alertEventsViewData.itsmTicketsChart.chartData.options"
+                                    [extentions]="alertEventsViewData.itsmTicketsChart.chartData.extensions"
+                                    [defaultHeight]="alertEventsViewData.itsmTicketsChart.chartHeight"
+                                    class="network-dashboard-alert-events-chart">
+                                </div>
+                                <div *ngIf="!alertEventsViewData.itsmTicketsChart?.chartData"
+                                    class="d-flex justify-content-center align-items-center h-100 text-muted">
+                                    No data available.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="network-dashboard-overview-item"
-                        *ngFor="let item of networkOverviewViewData.deviceTypes">
-                        <div class="network-dashboard-overview-label">{{ item.type }}</div>
-                        <div class="network-dashboard-overview-value">
-                            {{ item.count | number:'1.0-0' }}
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+                        <div class="network-dashboard-alert-events-panel network-dashboard-alert-events-panel--stats">
+                            <div class="network-dashboard-alert-events-panel-title">Alert Stats</div>
+                            <div class="network-dashboard-alert-events-stats-card"
+                                *ngFor="let card of alertEventsViewData.statsCards">
+                                <div class="network-dashboard-alert-events-stats-head">
+                                    <span>{{ card.title }}</span>
+                                    <span class="network-dashboard-alert-events-stats-highlight">{{ card.highlightValue }}</span>
+                                </div>
+                                <div class="network-dashboard-alert-events-stats-row"
+                                    *ngFor="let metric of card.metrics">
+                                    <span>{{ metric.label }}</span>
+                                    <span class="network-dashboard-alert-events-stats-value">{{ metric.value }}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div
-                            class="d-flex align-items-center justify-content-center flex-nowrap network-dashboard-overview-status-row">
-                            <span class="mx-1 network-dashboard-overview-status-item">
-                                <i [class]="item.normalIconClass"></i>
-                                <span class="ml-1">{{ item.normal | number:'1.0-0' }}</span>
-                            </span>
-                            <span class="mx-1 network-dashboard-overview-status-item">
-                                <i [class]="item.criticalIconClass"></i>
-                                <span class="ml-1">{{ item.critical | number:'1.0-0' }}</span>
-                            </span>
-                            <span class="mx-1 text-muted network-dashboard-overview-status-item">
-                                <i [class]="item.unknownIconClass"></i>
-                                <span class="ml-1">{{ item.unknown | number:'1.0-0' }}</span>
-                            </span>
+                    </div>
+                </div>
+
+                <div class="network-dashboard-alert-events-table-section">
+                    <div class="network-dashboard-alert-events-table-title">Top 10 Critical Alerts</div>
+                    <div *ngIf="alertEventsViewData.tableRows?.length; else alertEventsNoRows"
+                        class="table-responsive network-dashboard-alert-events-table-wrap">
+                        <table class="table table-sm mb-0 network-dashboard-alert-events-table" sortableTable
+                            (sorted)="onAlertEventsTableSorted($event)">
+                            <thead>
+                                <tr>
+                                    <th *ngFor="let column of alertEventsViewData.tableColumns"
+                                        [sortable-column]="column.sortKey"
+                                        [sort-direction]="getAlertEventsSortDirection(column.sortKey)"
+                                        [ngClass]="[
+                                            column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center',
+                                            getAlertEventsHeaderClass(column.sortKey)
+                                        ]">
+                                        {{ column.label }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of alertEventsViewData.tableRows; trackBy: trackByAlertEventsRow"
+                                    truncateText>
+                                    <td *ngFor="let column of alertEventsViewData.tableColumns"
+                                        [ngClass]="column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center'">
+                                        <ng-container [ngSwitch]="column.type">
+                                            <span *ngSwitchCase="'severity'" [tooltip]="row.severityLabel" container="body"
+                                                class="network-dashboard-alert-events-severity-cell">
+                                                <i [class]="row.severityIconClass"
+                                                    [ngClass]="'network-dashboard-alert-events-severity-icon--' + row.severityTone"></i>
+                                            </span>
+
+                                            <ng-container *ngSwitchDefault>
+                                                <button *ngIf="column.key === 'id'; else alertEventsDefaultText"
+                                                    type="button" class="btn btn-link p-0 network-dashboard-table-link"
+                                                    (click)="viewAlertEventDetails(row.uuid)">
+                                                    {{ row[column.key] }}
+                                                </button>
+
+                                                <ng-template #alertEventsDefaultText>
+                                                    <span [tooltip]="row[column.key]" container="body">
+                                                        {{ row[column.key] }}
+                                                    </span>
+                                                </ng-template>
+                                            </ng-container>
+                                        </ng-container>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <ng-template #alertEventsNoRows>
+                        <div class="d-flex justify-content-center align-items-center text-muted py-5">
+                            No data available.
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+        <div class="network-dashboard-auto-remediation-head" *ngIf="autoRemediationSummaryViewData || isAutoRemediationSummaryLoading">
+            <div class="network-dashboard-section-title">Auto-Remediation Summary</div>
+        </div>
+
+        <div class="card network-dashboard-auto-remediation-shell" *ngIf="autoRemediationSummaryViewData || isAutoRemediationSummaryLoading">
+            <div class="card-body p-0">
+                <app-spinner [name]="loaderNames.autoRemediationSummary" [width]="0"></app-spinner>
+                <div class="row no-gutters network-dashboard-auto-remediation-grid">
+                    <div class="col-xl-4 col-lg-5 col-md-12 col-12">
+                        <div class="network-dashboard-auto-remediation-panel">
+                            <div class="network-dashboard-auto-remediation-donut-row">
+                                <div echarts *ngIf="autoRemediationSummaryViewData.successFailureChart?.chartData"
+                                    [options]="autoRemediationSummaryViewData.successFailureChart.chartData.options"
+                                    [extentions]="autoRemediationSummaryViewData.successFailureChart.chartData.extensions"
+                                    [defaultHeight]="autoRemediationSummaryViewData.successFailureChart.chartHeight"
+                                    class="network-dashboard-auto-remediation-donut">
+                                </div>
+                                <div *ngIf="!autoRemediationSummaryViewData.successFailureChart?.chartData"
+                                    class="d-flex justify-content-center align-items-center text-muted"
+                                    [style.minHeight.px]="148">
+                                    No data available.
+                                </div>
+
+                                <div class="network-dashboard-auto-remediation-summary-block">
+                                    <div class="network-dashboard-auto-remediation-legend"
+                                        *ngIf="autoRemediationSummaryViewData.legendItems?.length">
+                                        <div class="network-dashboard-auto-remediation-legend-item"
+                                            *ngFor="let legend of autoRemediationSummaryViewData.legendItems">
+                                            <span class="network-dashboard-auto-remediation-legend-swatch"
+                                                [style.backgroundColor]="legend.color"></span>
+                                            <span>{{ legend.label }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="network-dashboard-auto-remediation-summary-line">
+                                        <span>Total runs: {{ autoRemediationSummaryViewData.totalRunsDisplay }}</span>
+                                        <span class="network-dashboard-auto-remediation-summary-separator">|</span>
+                                        <span>Avg duration: {{ autoRemediationSummaryViewData.avgDurationDisplay }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-12">
+                        <div class="network-dashboard-auto-remediation-panel">
+                            <div class="network-dashboard-auto-remediation-title">
+                                {{ autoRemediationSummaryViewData.topActionsChart?.title }}
+                            </div>
+                            <div class="network-dashboard-auto-remediation-actions-wrap">
+                                <div echarts *ngIf="autoRemediationSummaryViewData.topActionsChart?.chartData"
+                                    [options]="autoRemediationSummaryViewData.topActionsChart.chartData.options"
+                                    [extentions]="autoRemediationSummaryViewData.topActionsChart.chartData.extensions"
+                                    [defaultHeight]="autoRemediationSummaryViewData.topActionsChart.chartHeight"
+                                    class="network-dashboard-auto-remediation-actions-chart">
+                                </div>
+                                <div *ngIf="!autoRemediationSummaryViewData.topActionsChart?.chartData"
+                                    class="d-flex justify-content-center align-items-center h-100 text-muted">
+                                    No data available.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-3 col-md-12 col-12">
+                        <div class="network-dashboard-auto-remediation-panel network-dashboard-auto-remediation-panel--last">
+                            <div class="network-dashboard-auto-remediation-metrics-card">
+                                <div class="network-dashboard-auto-remediation-metric"
+                                    *ngFor="let metric of autoRemediationSummaryViewData.metrics; let i = index"
+                                    [ngClass]="[
+                                        i > 1 ? 'network-dashboard-auto-remediation-metric--bottom' : '',
+                                        i % 2 === 1 ? 'network-dashboard-auto-remediation-metric--right' : ''
+                                    ]">
+                                    <div class="network-dashboard-auto-remediation-metric-label">{{ metric.label }}</div>
+                                    <div class="network-dashboard-auto-remediation-metric-value"
+                                        [ngClass]="'network-dashboard-auto-remediation-metric-value--' + metric.tone">
+                                        {{ metric.value }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -109,3 +928,4 @@
         </div>
     </div>
 </div>
+<aiml-alert-details></aiml-alert-details>

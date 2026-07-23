@@ -25,7 +25,6 @@ export class DatacenterPrivateCloudsComponent implements OnInit, OnDestroy {
   tabData: TabData[] = [];
   counter: number = 0;
   isRouterEventsElseCaseExecuted: boolean = false;
-  isResourceDetailView: boolean = false;
 
   constructor(private pcService: DatacenterPrivateCloudService,
     private router: Router,
@@ -46,7 +45,6 @@ export class DatacenterPrivateCloudsComponent implements OnInit, OnDestroy {
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.counter++;
-        this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(event.url);
         if (event.url === '/unitycloud/datacenter/' + this.dcId + '/pccloud' || event.url === '/unitycloud/datacenter/' + this.dcId + '/pccloud/' + this.pcId) {
           this.route.data.subscribe((data: { tabItems: PCTabs[] }) => {
             this.tabItems = data.tabItems;
@@ -88,7 +86,6 @@ export class DatacenterPrivateCloudsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(this.router.url);
 
     /*
     * this block will be loaded when there is direct url with end file path

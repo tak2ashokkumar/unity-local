@@ -518,7 +518,7 @@ const UNITY_COST_ANALYSIS_NAV_DATA = (svc: PermissionService, userSvc: UserInfoS
 }
 
 const UNITY_AI_AGENTS_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
-    let networkMenuName = orgName ? `Network Agent` : 'Network AI Agent';
+    let networkMenuName = orgName ? `Network Agent` : 'Network AI Copilot';
     let finopsMenuName = orgName ? `Security Agent` : 'Finops AI Agent';
     let ITSMMenuName = orgName ? `NOC Agent` : 'ITSM AI Agent';
     const navItems = [
@@ -527,11 +527,15 @@ const UNITY_AI_AGENTS_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
             url: '/unity-copilot/network-ai-agent',
         },
         {
-            name: 'Compute AI Agent',
+            name: 'Compute AI Copilot',
             url: '/unity-copilot/compute-ai-agent',
         },
+        {
+            name: 'Database AI Copilot',
+            url: '/unity-copilot/database-ai-agent',
+        },
         // {
-        //     name: 'Storage AI Agent',
+        //     name: 'Storage AI Copilot',
         //     url: '/unity-copilot/storage-ai-agent',
         // },
         {

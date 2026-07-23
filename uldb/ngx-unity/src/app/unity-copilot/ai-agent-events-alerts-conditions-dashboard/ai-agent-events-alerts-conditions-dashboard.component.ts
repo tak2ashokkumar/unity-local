@@ -21,7 +21,7 @@ export class AiAgentEventsAlertsConditionsDashboardComponent implements OnInit, 
     private spinner: AppSpinnerService) {
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        const isAllowedToNavigateToCondtions = event.url == '/unity-copilot/network-ai-agent/dashboard' || event.url == '/unity-copilot/compute-ai-agent/dashboard' || event.url == '/unity-copilot/storage-ai-agent/dashboard';
+        const isAllowedToNavigateToCondtions = event.url == '/unity-copilot/network-ai-agent/dashboard' || event.url == '/unity-copilot/compute-ai-agent/dashboard' || event.url == '/unity-copilot/database-ai-agent/dashboard' || event.url == '/unity-copilot/storage-ai-agent/dashboard';
         if (isAllowedToNavigateToCondtions) {
           this.router.navigate(['conditions'], { relativeTo: this.route });
         }
@@ -52,19 +52,25 @@ export class AiAgentEventsAlertsConditionsDashboardComponent implements OnInit, 
 
 export const aiAgentConfigMap: AiAgentConfigMapType = {
   networkAgent: {
-    title: 'Network AI Agent',
+    title: 'Network AI Copilot',
     aiAgentType: 'networkAgent',
     routeBase: '/unity-copilot/network-ai-agent',
     deviceTypesForApi: ['switch', 'firewall', 'load_balancer'],
   },
   computeAgent: {
-    title: 'Compute AI Agent',
+    title: 'Compute AI Copilot',
     aiAgentType: 'computeAgent',
     routeBase: '/unity-copilot/compute-ai-agent',
     deviceTypesForApi: ['baremetal', 'hypervisor', 'mac_device', 'vm'],
   },
+  databaseAgent: {
+    title: 'Database AI Copilot',
+    aiAgentType: 'databaseAgent',
+    routeBase: '/unity-copilot/database-ai-agent',
+    deviceTypesForApi: ['database'],
+  },
   storageAgent: {
-    title: 'Storage AI Agent',
+    title: 'Storage AI Copilot',
     aiAgentType: 'storageAgent',
     routeBase: '/unity-copilot/storage-ai-agent',
     deviceTypesForApi: ['storage'],

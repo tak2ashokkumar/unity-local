@@ -16,6 +16,18 @@
                     <span class="ml-2 ">Loading</span>
                 </div>
             </ng-container>
+            <div *ngIf="commandExecutionStatusMessage || commandExecutionError"
+                class="mx-1 mb-1 px-2 py-2 d-flex align-items-center justify-content-between border rounded bg-white">
+                <div class="d-flex align-items-center font-sm"
+                    [ngClass]="{'text-danger': commandExecutionError, 'text-muted': !commandExecutionError}">
+                    <span *ngIf="isCommandExecutionBusy" class="fas fa-spinner fa-spin mr-2"></span>
+                    <span>{{commandExecutionError || commandExecutionStatusMessage}}</span>
+                </div>
+                <button type="button" class="p-0 ml-2 border-0 bg-transparent text-muted mr-1" tooltip="Dismiss"
+                    (click)="dismissCommandExecutionNotification()" container="body" placement="left">
+                    <i class="fas fa-times font-sm"></i>
+                </button>
+            </div>
             <div #messagesContainer class="messages-container d-flex flex-column" (scroll)="onScroll()">
                 <div class="d-flex flex-column w-100" style="max-width: 100%;">
                     <div *ngFor="let chat of chatHistoryData;let i = index" class="d-flex flex-column w-100"
@@ -25,12 +37,28 @@
                             <ng-container *ngIf="chat.type == 'text'">
                                 <div class="message-box bot-message">
                                     <markdown (click)="onMarkdownClick($event)" [data]="chat.message"></markdown>
+                                    <ng-container *ngIf="chat.showLastCommandPrompt">
+                                        <div class="mt-2 font-500">Do you want to execute the command?</div>
+                                        <code class="d-block mt-1">{{chat.lastCommand}}</code>
+                                        <div class="d-flex flex-wrap mt-2">
+                                            <div class="suggested-action py-1 px-2 mr-2 mb-2"
+                                                (click)="executeLastCommand(chat)">
+                                                <span>Yes</span>
+                                            </div>
+                                            <div class="suggested-action py-1 px-2 mr-2 mb-2"
+                                                (click)="declineLastCommand(chat)">
+                                                <span>No</span>
+                                            </div>
+                                        </div>
+                                    </ng-container>
                                     <ng-container *ngIf="chat.actions?.length && chat.showAction">
                                         <div class="mt-2 font-500">Recommended Actions:</div>
                                         <div class="d-flex flex-wrap mt-2">
                                             <div class="suggested-action py-1 px-2 mr-2 mb-2"
-                                                *ngFor="let action of chat.actions" (click)="submitQuery(action.name)">
-                                                {{action.name}}
+                                                *ngFor="let action of chat.actions"
+                                                [ngClass]="{'disabled': action.isDisabled || isCommandExecutionBusy}"
+                                                (click)="handleRecommendedAction(action)">
+                                                <span>{{action.name}}</span>
                                             </div>
                                         </div>
                                     </ng-container>
@@ -135,7 +163,8 @@
                                     [disabled]="chatInputModePayload.chat_mode === 'auto'" (click)="toggleDropdown()">
                                     <img *ngIf="selectedChatInputModel?.image" [src]="selectedChatInputModel?.image"
                                         class="active-ai-modal-model-icon mr-1">
-                                    {{chatInputModePayload.chat_mode === 'auto' ? 'Unity AI' : (selectedChatInputModel?.text || 'Select Model')}}
+                                    {{chatInputModePayload.chat_mode === 'auto' ? 'Unity AI' :
+                                    (selectedChatInputModel?.text || 'Select Model')}}
                                     <i class="fas fa-chevron-down ml-1"></i>
                                 </button>
                                 <div *ngIf="showModelDropdown" class="active-ai-modal-model-dropdown">
@@ -298,12 +327,18 @@
         <div class="card-body">
             <div>Do you want to Execute this Command ?</div>
             <div class="font-500 mt-2">{{command}}</div>
+            <div *ngIf="commandDefaultDevice" class="mt-2 text-muted font-sm">
+                Current default device:
+                <span class="font-500">{{commandDefaultDevice?.device_name}}</span>
+            </div>
         </div>
         <div class="card-footer">
             <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
                 (click)="confirmExecuteModal('newTab')"> Yes, Manage in New tab</button>
             <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
                 (click)="confirmExecuteModal('sameTab')">Yes, Manage in Same tab</button>
+            <button *ngIf="hasDefaultDeviceForCommand" class="btn btn-sm btn-warning btn-outline pull-right ml-1"
+                type="button" (click)="confirmExecuteModal('sameTab', true)">Change Device</button>
             <button class="btn btn-sm btn-danger pull-right" (click)="confirmExecutionModalRef.hide()"
                 type="button">No</button>
         </div>

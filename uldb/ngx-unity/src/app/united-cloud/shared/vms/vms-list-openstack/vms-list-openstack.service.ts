@@ -58,8 +58,8 @@ export class VmsListOpenstackService {
 
     if (this.user.isManagementEnabled) {
       a.isPowerButtonEnabled = true;
-      const isWindows: boolean = vm.operating_system ? (vm.operating_system.lastIndexOf('Microsoft', 0) == 0) : false;
-      a.isSameTabEnabled = ((vm.management_ip ? true : false) && a.powerStatusOn && !isWindows);
+      const isWindows: boolean = (vm.ssr_os == 'Windows') || (vm.operating_system ? (vm.operating_system.lastIndexOf('Microsoft', 0) == 0) : false);
+      a.isSameTabEnabled = ((vm.management_ip ? true : false) && a.powerStatusOn);
       if (isWindows) {
         a.sameTabTootipMessage = 'Open in Same tab option is not available for windows based machines';
       } else if (!vm.management_ip) {

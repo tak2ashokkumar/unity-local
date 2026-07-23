@@ -5,13 +5,317 @@ export interface SelectOption {
   label: string;
 }
 
-export interface EventAnalyticsTicketTab {
+export interface DashboardHeaderApiResponse {
+  lastRefreshed: string;
+  scope: {
+    sources: string;
+    deviceTypes: string;
+  };
+  activeSources: string[];
+}
+
+export interface DashboardFiltersApiResponse {
+  source: SelectOption[];
+  timeRange: SelectOption[];
+  deviceType: SelectOption[];
+}
+
+export interface ExecutiveSummaryApiResponse {
+  totalInferenceAlerts: number;
+  events: number;
+  alerts: number;
+  conditions: number;
+  cumulativeReduction: number;
+  severity: {
+    critical: number;
+    warning: number;
+    information: number;
+  };
+  noiseReduction: number;
+  correlationReduction: number;
+}
+
+export interface PipelineStageApiResponse {
+  stage: string;
+  label: string;
+  count: number;
+  kpi: string | null;
+}
+
+export interface PipelineApiResponse {
+  funnel: PipelineStageApiResponse[];
+  kpis: {
+    rawEvents: number;
+    noiseReduction: string;
+    correlationPct: string;
+  };
+}
+
+export interface EventByDeviceTypeApiItem {
   key: string;
+  label: string;
+  count: number;
+  percentage?: number;
+}
+
+export interface CategoryFilterApiResponse {
+  categoryOptions?: SelectOption[];
+  activeCategory?: string | string[];
+}
+
+export interface TimeRangeFilterApiResponse {
+  activeTimeRange?: string;
+  timeRangeOptions?: SelectOption[];
+}
+
+export interface EventByDeviceTypeApiResponse extends CategoryFilterApiResponse {
+  donut: EventByDeviceTypeApiItem[];
+  tiles: EventByDeviceTypeApiItem[];
+  total: number;
+}
+
+export interface AlertMetricApiResponse {
+  key: string;
+  label: string;
+  value: number;
+  tone?: EventAnalyticsTone;
+}
+
+export interface AlertWidgetApiResponse {
+  kpis: AlertMetricApiResponse[];
+  donut: AlertMetricApiResponse[];
+}
+
+export interface TrendByTimelineApiResponse extends TimeRangeFilterApiResponse {
+  series: {
+    events: TrendTimelinePoint[];
+    alerts: TrendTimelinePoint[];
+    conditions: TrendTimelinePoint[];
+  };
+  entityTypeOptions?: SelectOption[];
+  activeEntityType?: string | string[];
+  granularity?: string;
+}
+
+export interface AlertByDeviceTypeApiRow {
+  deviceName: string;
+  deviceType: string;
+  critical: number;
+  information: number;
+  available: number;
+  warning: number;
+  unknown: number;
+  total: number;
+  ticketCount: number;
+}
+
+export interface AlertByDeviceTypeApiResponse extends CategoryFilterApiResponse {
+  rows: AlertByDeviceTypeApiRow[];
+}
+
+export interface IncidentTicketApiRow {
+  uuid: string;
+  ticketId: string;
+  ticketUuid: string;
+  deviceName?: string;
+  affectedService: string;
+  availabilityState: string;
+  ticketCount: number;
+  tone: EventAnalyticsTone;
+  severity: string;
+  firstAlertDatetime?: string;
+  resolvedDatetime?: string;
+}
+
+export interface IncidentTicketApiResponse extends CategoryFilterApiResponse {
+  rows: IncidentTicketApiRow[];
+  total: number;
+}
+
+export interface NoisyEventsApiRow {
+  uuid: string;
+  device: string;
+  deviceType: string;
+  count: number;
+  description?: string;
+  source?: string;
+  lastReported?: string;
+  severity?: string;
+  tone?: EventAnalyticsTone;
+}
+
+export interface NoisyEventsApiResponse extends CategoryFilterApiResponse {
+  rows: NoisyEventsApiRow[];
+}
+
+export interface NoisyHostsApiRow {
+  hostName: string;
+  deviceType: string;
+  count: number;
+  description?: string;
+  managementIp?: string;
+  source?: string;
+  severity?: string;
+  lastReported?: string;
+}
+
+export interface NoisyHostsApiChartRow {
+  hostName: string;
+  critical: number;
+  warning: number;
+  information: number;
+}
+
+export interface NoisyHostsApiResponse extends CategoryFilterApiResponse, TimeRangeFilterApiResponse {
+  rows: NoisyHostsApiRow[];
+  chart: NoisyHostsApiChartRow[];
+}
+
+export interface AlertSegregationApiRow {
+  key: string;
+  label: string;
+  critical: number;
+  warning: number;
+  information: number;
+}
+
+export interface AlertSegregationApiResponse extends CategoryFilterApiResponse {
+  totalCritical: number;
+  totalWarning: number;
+  totalInfo: number;
+  bars: AlertSegregationApiRow[];
+}
+
+export interface EventAlertAnalyticsSourceRowApiResponse {
+  key: string;
+  label: string;
+  critical: number;
+  warning: number;
+  information: number;
+  total: number;
+}
+
+export interface EventAlertAnalyticsSeverityRowApiResponse {
+  key: string;
+  label: string;
+  count: number;
+  tone: EventAnalyticsTone;
+}
+
+export interface EventAlertAnalyticsFlowSourceApiResponse {
   name: string;
-  ticketType?: string | null;
-  projectId?: string;
-  serviceDeskId?: string;
-  drillDownLink: string;
+  label?: string;
+  eventCount: number;
+  flowValue?: number;
+  color?: string;
+}
+
+export interface EventAlertAnalyticsFlowApiResponse {
+  sources: EventAlertAnalyticsFlowSourceApiResponse[];
+  events?: number;
+  alerts: number;
+  dedupeEvents: number;
+  suppressedEvents: number;
+  conditions: number;
+  resolutionCondition?: number;
+  ticketGenerated: number;
+  noTicketGenerated: number;
+  open: number;
+  resolved: number;
+  acknowledged: number;
+  autoHealed: number;
+  autoRemediated: number;
+}
+
+export interface EventAlertAnalyticsKpisApiResponse {
+  cumulativeReduction: string;
+  noiseReduction: string;
+  correlation: string;
+  mtta: string;
+  mttr: string;
+}
+
+export interface EventAlertAnalyticsGraphNodeApiResponse {
+  id: number;
+  name: string;
+  value: number;
+}
+
+export interface EventAlertAnalyticsGraphLinkApiResponse {
+  sourceId: number;
+  targetId: number;
+  value: number;
+}
+
+export interface EventAlertAnalyticsGraphApiResponse {
+  nodes: EventAlertAnalyticsGraphNodeApiResponse[];
+  links: EventAlertAnalyticsGraphLinkApiResponse[];
+}
+
+export interface EventAlertAnalyticsApiResponse extends CategoryFilterApiResponse {
+  viewBy: string;
+  total: number;
+  rows: Array<EventAlertAnalyticsSourceRowApiResponse | EventAlertAnalyticsSeverityRowApiResponse>;
+  viewOptions?: SelectOption[];
+  sourceOptions?: SelectOption[];
+  severityOptions?: SelectOption[];
+  datacenterOptions?: SelectOption[];
+  cloudOptions?: SelectOption[];
+  kpis: EventAlertAnalyticsKpisApiResponse;
+  flow: EventAlertAnalyticsFlowApiResponse;
+  sourceGraph?: EventAlertAnalyticsGraphApiResponse;
+  severityGraph?: EventAlertAnalyticsGraphApiResponse;
+  rightGraph?: EventAlertAnalyticsGraphApiResponse;
+}
+
+export interface ItsmTicketSummaryBucketApiResponse {
+  key: string;
+  label: string;
+  count: number;
+  value: number;
+}
+
+export interface ItsmTicketSolvedByResponseTimeApiResponse {
+  buckets: ItsmTicketSummaryBucketApiResponse[];
+}
+
+export interface ItsmTicketFiltersApiResponse {
+  search: string;
+  state: string;
+  priority: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface ItsmTicketFilterOptionsApiResponse {
+  state: SelectOption[];
+  priority: SelectOption[];
+  type: SelectOption[];
+}
+
+export interface ItsmTicketTableRowApiResponse {
+  ticketId: string;
+  shortDescription: string;
+  state: string;
+  priority: string;
+  createdOn: string;
+  updatedOn: string;
+  resolution: string;
+}
+
+export interface ItsmTicketViewApiResponse {
+  tab: string;
+  tabOptions: SelectOption[];
+  ticketsByPriority: ItsmTicketSummaryBucketApiResponse[];
+  ticketsByStatus: ItsmTicketSummaryBucketApiResponse[];
+  solvedByResponseTime: ItsmTicketSolvedByResponseTimeApiResponse;
+  filters: ItsmTicketFiltersApiResponse;
+  filterOptions: ItsmTicketFilterOptionsApiResponse;
+  tickets: ItsmTicketTableRowApiResponse[];
+  total: number;
+  page: number;
+  perPage: number;
 }
 
 export interface DashboardHeader {
@@ -31,7 +335,7 @@ export interface DashboardFilters {
   analyticsDatacenter: SelectOption[];
   analyticsCloud: SelectOption[];
   analyticsCategory: SelectOption[];
-  analyticsDuration: SelectOption[];
+  eventAndAlertTimeline: SelectOption[];
   noisyEventsCategory: SelectOption[];
   noisyHostsCategory: SelectOption[];
   incidentCategory: SelectOption[];
@@ -53,10 +357,24 @@ export interface DashboardFilterCriteria {
   analyticsDatacenter: string;
   analyticsCloud: string;
   analyticsCategory: string;
-  analyticsDuration: string;
+  eventAndAlertTimeline: string;
+  eventAndAlertTimelineFrom?: Date | string;
+  eventAndAlertTimelineTo?: Date | string;
   noisyEventsCategory: string;
   noisyHostsCategory: string;
   incidentCategory: string;
+  itsmTicketTab: string;
+  itsmTicketSearch: string;
+  itsmTicketState: string;
+  itsmTicketPriority: string;
+  itsmTicketType: string;
+  itsmTicketDateRange?: any[];
+  itsmTicketStartDate?: Date | string;
+  itsmTicketEndDate?: Date | string;
+  itsmTicketPage: number;
+  itsmTicketPerPage: number;
+  itsmTicketSortColumn?: string;
+  itsmTicketSortDirection?: '' | 'asc' | 'desc';
 }
 
 export interface MetricViewData {
@@ -64,22 +382,7 @@ export interface MetricViewData {
   label: string;
   value: string;
   tone?: EventAnalyticsTone;
-}
-
-export interface ExecutiveSummaryResponse {
-  total_inference_alerts: number;
-  events: number;
-  alerts: number;
-  conditions: number;
-  cumulative_reduction: number;
-}
-
-export interface PipelineResponse {
-  raw_events: number;
-  noise_reduction: number;
-  alerts: number;
-  correlation_pct: number;
-  conditions: number;
+  color?: string;
 }
 
 export interface PipelineViewData {
@@ -90,43 +393,6 @@ export interface PipelineViewData {
   conditions: string;
 }
 
-export interface DeviceCategoryItem {
-  key: string;
-  label: string;
-  count: number;
-  percentage?: number;
-}
-
-export interface EventByDeviceCategoryResponse {
-  donut: DeviceCategoryItem[];
-  tiles: DeviceCategoryItem[];
-  active_category: string;
-  category_options: SelectOption[];
-}
-
-export interface AlertMetricResponse {
-  key: string;
-  label: string;
-  value: number;
-  tone: EventAnalyticsTone;
-}
-
-export interface DonutSegmentResponse {
-  key: string;
-  label: string;
-  value: number;
-}
-
-export interface AlertGeneratedResponse {
-  kpis: AlertMetricResponse[];
-  donut: DonutSegmentResponse[];
-}
-
-export interface AlertStatusResponse {
-  kpis: AlertMetricResponse[];
-  donut: DonutSegmentResponse[];
-}
-
 export interface TrendTimelinePoint {
   label?: string;
   start_time?: string;
@@ -134,44 +400,12 @@ export interface TrendTimelinePoint {
   count: number;
 }
 
-export interface TrendTimelineSeries {
-  events: TrendTimelinePoint[];
-  alerts: TrendTimelinePoint[];
-  conditions: TrendTimelinePoint[];
-}
-
-export interface TrendByTimelineResponse {
-  series: TrendTimelineSeries;
-  active_category?: string;
-  active_alert_types?: string[];
-}
-
-export interface SeveritySummary {
-  critical: number;
-  warning: number;
-  information: number;
-}
-
-export interface AlertSegregationRow {
-  key: string;
-  label: string;
-  critical: number;
-  warning: number;
-  information: number;
-}
-
-export interface AlertSegregationResponse {
-  summary: SeveritySummary;
-  rows: AlertSegregationRow[];
-  active_category: string;
-  category_options: SelectOption[];
-}
-
 export interface SankeyNode {
   name: string;
+  labelText?: string;
   value?: number;
   itemStyle?: { color?: string };
-  label?: { color?: string };
+  label?: { color?: string; position?: string };
 }
 
 export interface SankeyLink {
@@ -184,23 +418,6 @@ export interface SankeyLink {
 export interface SankeyData {
   nodes: SankeyNode[];
   links: SankeyLink[];
-}
-
-export interface EventAlertAnalyticsResponse {
-  metrics: MetricViewData[];
-  reductionFlow: SankeyData;
-  resolutionFlow: SankeyData;
-}
-
-export interface NoisyEventRowResponse {
-  uuid: string;
-  device: string;
-  device_type: string;
-  count: number;
-  description: string;
-  source: string;
-  last_reported: string;
-  severity: string;
 }
 
 export interface NoisyEventRowViewData {
@@ -216,51 +433,30 @@ export interface NoisyEventRowViewData {
   severityClass: string;
 }
 
-export interface NoisyEventsResponse {
-  rows: NoisyEventRowResponse[];
-  active_category: string;
-  category_options: SelectOption[];
-}
+export type NoisyTableSortColumn =
+  | 'device'
+  | 'deviceType'
+  | 'count'
+  | 'source'
+  | 'lastReported'
+  | 'severity';
 
-export interface NoisyHostChartRow {
-  host_name: string;
-  critical: number;
-  warning: number;
-  information: number;
-}
+export type IncidentAlertTableSortColumn =
+  | 'deviceName'
+  | 'ticketCount';
 
-export interface NoisyHostsResponse {
-  rows: NoisyEventRowResponse[];
-  chart: NoisyHostChartRow[];
-  active_category: string;
-  category_options: SelectOption[];
-}
-
-export interface IncidentAlertByDeviceRow {
-  key: string;
-  device_name: string;
-  critical: number;
-  warning: number;
-  information: number;
-  ticket_count: number;
-}
+export type IncidentTicketTableSortColumn =
+  | 'ticketId'
+  | 'deviceName'
+  | 'alertType'
+  | 'ticketCount';
 
 export interface IncidentAlertByDeviceViewData {
-  key: string;
   deviceName: string;
   critical: number;
   warning: number;
   information: number;
   ticketCount: number;
-}
-
-export interface IncidentTicketRow {
-  uuid: string;
-  ticket_id: string;
-  device_name: string;
-  alert_type: string;
-  tone: EventAnalyticsTone;
-  ticket_count: number;
 }
 
 export interface IncidentTicketViewData {
@@ -274,10 +470,4 @@ export interface IncidentTicketViewData {
   severityClass: string;
 }
 
-export interface IncidentManagementResponse {
-  alert_generated_by_device_type: IncidentAlertByDeviceRow[];
-  open_incident_tickets: IncidentTicketRow[];
-  resolved_incident_tickets: IncidentTicketRow[];
-  active_category: string;
-  category_options: SelectOption[];
-}
+export type ItsmTicketRowViewData = ItsmTicketTableRowApiResponse;

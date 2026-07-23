@@ -5,7 +5,14 @@ import { Observable, forkJoin, of } from 'rxjs';
 import { AIMLAnalyticsSummary, AIMLEventTimelineByDevice, AIMLEventTimelineItemByDevice, AIMLEventsByDevice, AIMLEventsTrendByDatacenter, AIMLEventsTrendByPrivateCloud, AIMLEventsTrendBySeverity, AIMLNoisyEvents, AIMLNoisyHostEventsByDeviceType, AIMLNoisyHosts } from 'src/app/shared/SharedEntityTypes/aiml.type';
 import { DatacenterFast } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
-import { DEVICES_FAST_BY_DEVICE_TYPE, GET_AIOPS_ANALYTICS_SUMMARY, GET_AIOPS_EVENT_NOISY_HOSTS, PRIVATE_CLOUD_FAST_BY_DC_ID } from 'src/app/shared/api-endpoint.const';
+import {
+  DEVICES_FAST_BY_DEVICE_TYPE, PRIVATE_CLOUD_FAST_BY_DC_ID,
+  GET_AIOPS_CONDITION_ANALYTICS_SUMMARY, GET_AIOPS_EVENT_ANALYTICS_BY_SEVERITY,
+  GET_AIOPS_EVENT_ANALYTICS_BY_DATACENTER, GET_AIOPS_EVENT_ANALYTICS_BY_CLOUD,
+  GET_AIOPS_EVENT_ANALYTICS_NOISY_HOST_BY_DEVICE_TYPE, GET_AIOPS_EVENT_ANALYTICS_NOISY_HOSTS,
+  GET_AIOPS_EVENT_ANALYTICS_NOISY, GET_AIOPS_EVENT_ANALYTICS_BY_DEVICE,
+  GET_AIOPS_EVENT_ANALYTICS_TRENDS_BY_DESCRIPTION,
+} from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping, UnityTimeDuration } from 'src/app/shared/app-utility/app-utility.service';
 import { ChartConfigService, ChartPluginTypes, UnityChartData } from 'src/app/shared/chart-config.service';
 import { AIMLAnalyticsSummaryViewData, AnalyticsFilterFormData } from '../aiml-analytics/aiml-analytics.service';
@@ -45,7 +52,7 @@ export class AimlAnalyticsEventsService {
   }
 
   getAnalyticsSummary(formData: any) {
-    return this.http.post<AIMLAnalyticsSummary>(GET_AIOPS_ANALYTICS_SUMMARY(), formData);
+    return this.http.post<AIMLAnalyticsSummary>(GET_AIOPS_CONDITION_ANALYTICS_SUMMARY(), formData);
   }
 
   convertToSummaryViewdata(summary: AIMLAnalyticsSummary): AIMLAnalyticsSummaryViewData {
@@ -67,7 +74,7 @@ export class AimlAnalyticsEventsService {
   }
 
   getTrendBySeverity(formData: AnalyticsFilterFormData): Observable<AIMLEventsTrendBySeverity[]> {
-    return this.http.post<AIMLEventsTrendBySeverity[]>('/customer/aiops/events/events_by_severity/', formData);
+    return this.http.post<AIMLEventsTrendBySeverity[]>(GET_AIOPS_EVENT_ANALYTICS_BY_SEVERITY(), formData);
   }
 
   convertToTrendBySeverityChartData(eventsBySeverity: AIMLEventsTrendBySeverity[]): UnityChartData {
@@ -88,7 +95,7 @@ export class AimlAnalyticsEventsService {
   }
 
   getTrendByDatacenter(formData: AnalyticsFilterFormData): Observable<TaskStatus> {
-    return this.http.post<CeleryTask>('/customer/aiops/events/events_by_datacenter/', formData)
+    return this.http.post<CeleryTask>(GET_AIOPS_EVENT_ANALYTICS_BY_DATACENTER(), formData)
       .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 2, 200).pipe(take(1))), take(1));
   }
 
@@ -125,7 +132,7 @@ export class AimlAnalyticsEventsService {
   }
 
   getTrendByCloud(formData: AnalyticsFilterFormData): Observable<TaskStatus> {
-    return this.http.post<CeleryTask>('/customer/aiops/events/events_by_cloud/', formData)
+    return this.http.post<CeleryTask>(GET_AIOPS_EVENT_ANALYTICS_BY_CLOUD(), formData)
       .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 2, 200).pipe(take(1))), take(1));
   }
 
@@ -151,7 +158,7 @@ export class AimlAnalyticsEventsService {
   }
 
   getNoisyHostsByType(formData: AnalyticsFilterFormData): Observable<AIMLNoisyHostEventsByDeviceType[]> {
-    return this.http.post<AIMLNoisyHostEventsByDeviceType[]>('/customer/aiops/events/noisy_host_by_device_type/', formData);
+    return this.http.post<AIMLNoisyHostEventsByDeviceType[]>(GET_AIOPS_EVENT_ANALYTICS_NOISY_HOST_BY_DEVICE_TYPE(), formData);
   }
 
   convertToNoisyHostsByTypeChartData(eventsByHostType: AIMLNoisyHostEventsByDeviceType[]): UnityChartData {
@@ -189,11 +196,11 @@ export class AimlAnalyticsEventsService {
 
   getNoisyHosts(formData: AnalyticsFilterFormData): Observable<AIMLNoisyHosts[]> {
     // return of(aimlNoisyHosts);
-    return this.http.post<AIMLNoisyHosts[]>(GET_AIOPS_EVENT_NOISY_HOSTS(), formData);
+    return this.http.post<AIMLNoisyHosts[]>(GET_AIOPS_EVENT_ANALYTICS_NOISY_HOSTS(), formData);
   }
 
   getNoisyEvents(formData: AnalyticsFilterFormData): Observable<AIMLNoisyEvents[]> {
-    return this.http.post<AIMLNoisyEvents[]>('/customer/aiops/events/noisy/', formData);
+    return this.http.post<AIMLNoisyEvents[]>(GET_AIOPS_EVENT_ANALYTICS_NOISY(), formData);
   }
 
   convertToNoisyEventsChartData(noisyEvents: AIMLNoisyEvents[]): UnityChartData {
@@ -217,7 +224,7 @@ export class AimlAnalyticsEventsService {
   }
 
   getEventsByDevice(device: string, source: string): Observable<AIMLEventsByDevice> {
-    return this.http.get<AIMLEventsByDevice>('/customer/aiops/events/events_by_device/', { params: new HttpParams().set('device_name', device).set('source', source) });
+    return this.http.get<AIMLEventsByDevice>(GET_AIOPS_EVENT_ANALYTICS_BY_DEVICE(), { params: new HttpParams().set('device_name', device).set('source', source) });
   }
 
   convertToEventsByDeviceListData(host: AIMLNoisyHosts, events: AIMLEventsByDevice): AIMLEventsByDeviceViewData[] {
@@ -237,7 +244,7 @@ export class AimlAnalyticsEventsService {
 
   getDeviceEventChartData(timeline: string, device: string, source: string, description: string): Observable<AIMLEventTimelineByDevice> {
     let obj = { "timeline": timeline, "device_name": device, "description": description, "source": source };
-    return this.http.post<AIMLEventTimelineByDevice>(`/customer/aiops/events/trends_graph_by_description/`, obj);
+    return this.http.post<AIMLEventTimelineByDevice>(GET_AIOPS_EVENT_ANALYTICS_TRENDS_BY_DESCRIPTION(), obj);
   }
 
   getLastNHours(numberOfhours: number): any[] {

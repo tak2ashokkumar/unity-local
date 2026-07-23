@@ -158,8 +158,7 @@ export class AdvancedDiscoveryPdusService {
     },
     'sockets': {
       'required': 'Number of Sockets are required',
-      'min': 'Minimum value should be greater than or equal to 1',
-      'max': 'Number of sockets exceeds the maximum allowed for the selected PDU type'
+      'min': 'Minimum value should be greater than or equal to 1'
     },
     'management_ip': {
       'ip': 'Invalid IP'

@@ -61,7 +61,7 @@ export class VmsListProxmoxService {
 
     if (this.user.isManagementEnabled && !vm.is_template) {
 
-      const isWindows: boolean = (vm.os.lastIndexOf('Microsoft', 0) == 0);
+      const isWindows: boolean = (vm.ssr_os == 'Windows') || (vm.os.lastIndexOf('Microsoft', 0) == 0);
       a.isSameTabEnabled = ((vm.management_ip ? true : false) && a.powerStatusOn && !isWindows);
       if (!vm.management_ip) {
         a.sameTabTootipMessage = 'Management IP not Configured';

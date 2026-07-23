@@ -42,6 +42,9 @@
         <ng-container *ngSwitchCase="'computeAgent'">
             <ng-container *ngTemplateOutlet="computeAgentSummaryWidget"></ng-container>
         </ng-container>
+        <ng-container *ngSwitchCase="'databaseAgent'">
+            <ng-container *ngTemplateOutlet="databaseAgentSummaryWidget"></ng-container>
+        </ng-container>
         <ng-container *ngSwitchCase="'storageAgent'">
             <ng-container *ngTemplateOutlet="storageAgentSummaryWidget"></ng-container>
         </ng-container>
@@ -125,6 +128,26 @@
                             <span class="font-xl text-primary">{{conditionsSummaryViewdata?.summaryByDeviceType?.vm
                                 || 0}}
                             </span><span class="text-muted font-sm-xs pl-1">Conditions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #databaseAgentSummaryWidget>
+    <div class="col-6" *ngIf="conditionsSummaryViewdata?.databaseSummaryCards?.length">
+        <div class="card mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-center align-items-center">
+                    <div class="d-flex flex-column flex-fill px-3"
+                        *ngFor="let database of conditionsSummaryViewdata?.databaseSummaryCards; let first = first; trackBy: trackByDatabaseSummaryCard"
+                        [class.border-left]="!first">
+                        <span class="text-truncate" [tooltip]="database?.name" container="body">{{database?.name}}</span>
+                        <div>
+                            <span class="font-xl text-primary">{{database?.count}}</span>
+                            <span class="text-muted font-sm-xs pl-1">Conditions</span>
                         </div>
                     </div>
                 </div>

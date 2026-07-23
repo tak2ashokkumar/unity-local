@@ -2,6 +2,7 @@
 export interface AiAgentConfigMapType {
     networkAgent: AiAgentConfigType;
     computeAgent: AiAgentConfigType;
+    databaseAgent: AiAgentConfigType;
     storageAgent:AiAgentConfigType;
 }
 export interface AiAgentConfigType {
@@ -11,4 +12,4 @@ export interface AiAgentConfigType {
     deviceTypesForApi: string[]
 }
 
-export type AiAgentType = 'networkAgent' | 'computeAgent' | 'storageAgent';
+export type AiAgentType = 'networkAgent' | 'computeAgent' | 'databaseAgent' | 'storageAgent';

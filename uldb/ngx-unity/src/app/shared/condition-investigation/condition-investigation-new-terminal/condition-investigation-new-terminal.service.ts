@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { CliCommandContext } from '../condition-investigation-cli-command.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +9,9 @@ export class ConditionInvestigationNewTerminalService {
   private conversationId: string;
   private pendingTabType: 'sameTab' | 'newTab' = 'sameTab';
   private backendTabId: string | null = null;
+  private pendingCommandContext: CliCommandContext | null = null;
 
-  private openModalSource = new Subject<void>();
+  private openModalSource = new Subject<CliCommandContext | null>();
   openModal$ = this.openModalSource.asObservable();
 
   private terminalDataSource = new Subject<any>();
@@ -23,8 +25,11 @@ export class ConditionInvestigationNewTerminalService {
 
   constructor() { }
 
-  openTerminal() {
-    this.openModalSource.next();
+  openTerminal(commandContext?: CliCommandContext | null) {
+    if (commandContext !== undefined) {
+      this.setPendingCommandContext(commandContext);
+    }
+    this.openModalSource.next(this.pendingCommandContext);
   }
 
   openTerminalDirect(input: any, auth: any) {
@@ -55,5 +60,17 @@ export class ConditionInvestigationNewTerminalService {
 
   getBackendTabId(): string | null {
     return this.backendTabId;
+  }
+
+  setPendingCommandContext(context: CliCommandContext | null) {
+    this.pendingCommandContext = context;
+  }
+
+  getPendingCommandContext(): CliCommandContext | null {
+    return this.pendingCommandContext;
+  }
+
+  clearPendingCommandContext() {
+    this.pendingCommandContext = null;
   }
 }

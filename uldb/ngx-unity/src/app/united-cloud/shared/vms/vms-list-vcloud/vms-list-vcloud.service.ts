@@ -51,7 +51,7 @@ export class VmsListVcloudService {
 
     if (this.user.isManagementEnabled) {
       a.isPowerButtonEnabled = true;
-      const isWindows: boolean = (vm.guest_os.lastIndexOf('Microsoft', 0) == 0);
+      const isWindows: boolean = (vm.ssr_os == 'Windows') || (vm.guest_os.lastIndexOf('Microsoft', 0) == 0);
       a.isSameTabEnabled = ((vm.management_ip ? true : false) && a.powerStatusOn && !isWindows);
       if (!vm.management_ip) {
         a.sameTabTootipMessage = 'Management IP not Configured';

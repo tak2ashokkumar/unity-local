@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AiAgentConditionAlertEventViewData, AiAgentConditionAlertsViewData, AiAgentConditionsService, AiAgentConditionsSummaryViewData, AiAgentConditionsViewData, AnalysisLogos, tabData } from './ai-agent-conditions.service';
+import { AiAgentConditionAlertEventViewData, AiAgentConditionAlertsViewData, AiAgentConditionsService, AiAgentConditionsSummaryViewData, AiAgentConditionsViewData, AiAgentDatabaseSummaryCard, AnalysisLogos, tabData } from './ai-agent-conditions.service';
 import { Subject } from 'rxjs';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { FormGroup } from '@angular/forms';
@@ -176,6 +176,10 @@ export class AiAgentConditionsComponent implements OnInit, OnDestroy {
       this.notification.error(new Notification('Error whlie getting Condition summary'));
       this.handleSpinnerStopForConditionSummaryAndList();
     });
+  }
+
+  trackByDatabaseSummaryCard(index: number, card: AiAgentDatabaseSummaryCard): string {
+    return `${card?.name}-${index}`;
   }
 
   handleSpinnerStopForConditionSummaryAndList() {

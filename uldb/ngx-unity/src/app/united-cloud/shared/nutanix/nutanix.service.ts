@@ -5,7 +5,7 @@ import { catchError, map, switchMap, take } from 'rxjs/operators';
 import { MANAGEMENT_NOT_ENABLED_MESSAGE } from 'src/app/app-constants';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
-import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
+import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes-pod.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { PrivateCloudType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';

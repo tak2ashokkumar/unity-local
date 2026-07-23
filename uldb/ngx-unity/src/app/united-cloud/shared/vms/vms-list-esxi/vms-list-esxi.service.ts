@@ -55,7 +55,7 @@ export class VmsListEsxiService {
     a.monitoring = vm.monitoring;
 
     if (this.user.isManagementEnabled) {
-      const isWindows: boolean = (vm.os_name.lastIndexOf('Microsoft', 0) == 0);
+      const isWindows: boolean = (vm.ssr_os == 'Windows') || (vm.os_name.lastIndexOf('Microsoft', 0) == 0);
       a.isSameTabEnabled = ((vm.mgmt_ip_address ? true : false) && a.powerStatusOn && !isWindows);
       if (!vm.mgmt_ip_address) {
         a.sameTabTootipMessage = 'Management IP not Configured';

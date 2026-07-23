@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { AiAgentAlertsService, AiAgentAlertsViewdata } from './ai-agent-alerts.service';
+import { AiAgentAlertsService, AiAgentAlertsViewdata, AiAgentDatabaseSummaryCard } from './ai-agent-alerts.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AimlEventDetailsService } from 'src/app/shared/aiml-event-details/aiml-event-details.service';
@@ -31,6 +31,7 @@ export class AiAgentAlertsComponent implements OnInit, OnDestroy {
   aiAgentConfig: AiAgentConfigType;
 
   summaryViewData: any;
+  databaseSummaryCards: AiAgentDatabaseSummaryCard[] = [];
   count: number;
   viewData: AiAgentAlertsViewdata[] = [];
   selectedViewIndex: number;
@@ -114,9 +115,15 @@ export class AiAgentAlertsComponent implements OnInit, OnDestroy {
   getAlertSummary() {
     this.alertSvc.getAlertsSummary(this.aiAgentConfig).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.summaryViewData = res;
+      this.databaseSummaryCards = this.alertSvc.convertToDatabaseSummaryCards(res?.databases, 'alert_count');
     }, err => {
+      this.databaseSummaryCards = [];
       this.notification.error(new Notification('Error whlie getting alert summary'))
     });
+  }
+
+  trackByDatabaseSummaryCard(index: number, card: AiAgentDatabaseSummaryCard): string {
+    return `${card?.name}-${index}`;
   }
 
   buildFilterForm() {

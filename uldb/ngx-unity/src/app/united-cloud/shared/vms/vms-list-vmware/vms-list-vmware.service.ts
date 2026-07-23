@@ -150,8 +150,8 @@ export class VmsListVmwareService {
     a.rpo = diff ? rpo : 'N/A';
 
     if (this.user.isManagementEnabled && !vm.is_template) {
-      const isWindows: boolean = (vm.os_name.lastIndexOf('Microsoft', 0) == 0);
-      a.isSameTabEnabled = (!isWindows && a.powerStatusOn && (vm.mgmt_ip_address ? true : false));
+      const isWindows: boolean = (vm.ssr_os == 'Windows') || (vm.os_name.lastIndexOf('Microsoft', 0) == 0);
+      a.isSameTabEnabled = ((vm.mgmt_ip_address ? true : false) && a.powerStatusOn && !isWindows);
       if (isWindows) {
         a.sameTabTootipMessage = 'Open in Same tab option is not available for windows based machines';
       } else if (!vm.mgmt_ip_address) {

@@ -22,6 +22,9 @@ import { NetworkAgentsChatResponseType } from './condition-investigation-chatbot
 import { ConditionInvestigationNewTerminalService } from './condition-investigation-new-terminal/condition-investigation-new-terminal.service';
 import { ConditionInvestigationFloatingTerminalService } from './condition-investigation-floating-terminal/condition-investigation-floating-terminal.service';
 import { ConditionInvestigationTerminalWindowRegistryService } from './condition-investigation-new-terminal/condition-investigation-terminal-window-registry.service';
+import { ConditionInvestigationCliCommandService } from './condition-investigation-cli-command.service';
+import { ConditionInvestigationAuthModalService } from './condition-investigation-auth-modal/condition-investigation-auth-modal.service';
+import { DATABASE_AGENT_APPLICATION } from './condition-investigation-db-connection.const';
 
 @Component({
   selector: 'condition-investigation',
@@ -106,6 +109,8 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   @ViewChild('executeCommand') executeCommand: ElementRef;
   confirmExecutionModalRef: BsModalRef;
   command: string = '';
+  hasDefaultDeviceForCommand = false;
+  commandDefaultDevice: any = null;
 
   constructor(private svc: ConditionInvestigationService,
     @Inject(DOCUMENT) private document,
@@ -122,7 +127,9 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     private appService: AppLevelService,
     private newTerminalService: ConditionInvestigationNewTerminalService,
     private floatingTerminalService: ConditionInvestigationFloatingTerminalService,
-    private windowRegistry: ConditionInvestigationTerminalWindowRegistryService,) {
+    private windowRegistry: ConditionInvestigationTerminalWindowRegistryService,
+    private cliCommandService: ConditionInvestigationCliCommandService,
+    private authApi: ConditionInvestigationAuthModalService,) {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.conditionId = params.get('conditionId');
       this.conditionUuid = params.get('conditionUuid');
@@ -704,7 +711,7 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     this.newTerminalService.setBackendTabId(null);
     this.newTerminalService.setPendingTabType('newTab');
     this.newTerminalService.setConversationId(this.conversationId);
-    this.newTerminalService.openTerminal();
+    this.newTerminalService.openTerminal(this.buildTerminalContext('newTab'));
   }
 
   consoleSameTab(view: any) {
@@ -712,7 +719,7 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     this.newTerminalService.setBackendTabId(null);
     this.newTerminalService.setPendingTabType('sameTab');
     this.newTerminalService.setConversationId(this.conversationId);
-    this.newTerminalService.openTerminal();
+    this.newTerminalService.openTerminal(this.buildTerminalContext('sameTab'));
   }
 
   onMarkdownClick(event: MouseEvent) {
@@ -721,7 +728,7 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     if (codeEl) {
       this.command = codeEl.textContent?.trim();
       if (this.command) {
-        this.confirmExecutionModalRef = this.modalService.show(this.executeCommand, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+        this.openCommandExecutionModal(this.command);
       }
     }
 
@@ -784,13 +791,66 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   //   });
   // }
 
-  confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
+  confirmExecuteModal(tabType: 'sameTab' | 'newTab', forceDeviceChange: boolean = false) {
     this.confirmExecutionModalRef.hide();
-    localStorage.setItem('terminal_command', this.command);
-    this.newTerminalService.setPendingTabType(tabType);
-    this.newTerminalService.setConversationId(this.conversationId);
-    this.newTerminalService.setBackendTabId(null);
-    this.newTerminalService.openTerminal();
+    this.executeCliCommand(this.command, forceDeviceChange, tabType);
+  }
+
+  executeCliCommand(command: string, forceDeviceChange: boolean = false, tabType: 'sameTab' | 'newTab' = 'sameTab') {
+    const cleanCommand = `${command || ''}`.trim();
+    if (!cleanCommand) {
+      return;
+    }
+    const application = this.getApplicationByRouteData();
+    this.cliCommandService.executeCommandFlow({
+      command: cleanCommand,
+      conditionId: this.conditionId,
+      conversationId: this.conversationId,
+      tabType,
+      application,
+      title: this.conditionDetailsViewData?.description,
+      commandDetails: { source: 'workspace_markdown' },
+      device: forceDeviceChange ? this.commandDefaultDevice : undefined,
+    }, forceDeviceChange).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { }, () => {
+      this.notification.error(new Notification('Unable to start command execution.'));
+    });
+  }
+
+  private buildTerminalContext(tabType: 'sameTab' | 'newTab') {
+    return {
+      command: '',
+      conditionId: this.conditionId,
+      conversationId: this.conversationId,
+      tabType,
+      application: this.getApplicationByRouteData(),
+      title: this.conditionDetailsViewData?.description,
+    };
+  }
+
+  private getApplicationByRouteData(): string {
+    switch (this.route.snapshot.data.aiAgentType) {
+      case 'computeAgent': return 'Compute Agent';
+      case 'databaseAgent': return DATABASE_AGENT_APPLICATION;
+      case 'storageAgent': return 'Storage Agent';
+      case 'networkAgent':
+      default: return 'Network Agent';
+    }
+  }
+
+  openCommandExecutionModal(command: string) {
+    this.command = command;
+    this.hasDefaultDeviceForCommand = false;
+    this.commandDefaultDevice = null;
+    this.authApi.getDefaultDevice(this.conditionId, this.conversationId)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((device: any) => {
+        this.commandDefaultDevice = device?.id ? device : null;
+        this.hasDefaultDeviceForCommand = !!this.commandDefaultDevice;
+      }, () => {
+        this.commandDefaultDevice = null;
+        this.hasDefaultDeviceForCommand = false;
+      });
+    this.confirmExecutionModalRef = this.modalService.show(this.executeCommand, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
   }
 
 }

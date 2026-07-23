@@ -7,6 +7,7 @@ import {
   DatabaseDashboardDonutItem,
   DatabaseDashboardFilterOption,
   DatabaseDashboardMetricInfoMap,
+  DatabaseDashboardSelectOption,
   DatabaseDashboardStatusInfo,
   DbDashboardHealthGroup,
   DatabaseDashboardMetric,
@@ -20,6 +21,16 @@ export const PROGRESSBARCOLORS = ['#e54b4b', '#f5a623', '#2f80d1', '#5c8f1f'];
 export const DBDASHBOARDCOLORS = ['#f5a623','#2F8BD7','#5B9E29','#D03533','#26A69A','#9B59B6','#B7D99A','#FFD099','#9BC9F0','#F5A3A3']
 
 export const DATABASE_DASHBOARD_ALL_SELECTED_VALUE = 'all';
+export const DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE = 'custom';
+export const DATABASE_DASHBOARD_TIME_RANGE_OPTIONS: DatabaseDashboardSelectOption[] = [
+  // { value: 'last_hour', label: '1 Hour' },
+  { value: 'last_24_hours', label: '24 Hour' },
+  { value: 'last_week', label: '7 Days' },
+  { value: 'last_month', label: '30 Days' },
+  { value: 'last_60_days', label: '60 Days' },
+  { value: 'last_quarter', label: '90 Days' },
+  { value: DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE, label: 'Custom' }
+];
 
 export const DATABASE_DASHBOARD_EFFICIENCY_STATUS_INFO: DatabaseDashboardStatusInfo[] = [
   {

@@ -1171,99 +1171,6 @@ export const CHECK_USER_IN_ZENDESK = () => `customer/ticketorganization/check_us
 
 export const GET_CONTAINER_CONTROLLERS = () => `/customer/container_clouds/`;
 
-// ==================== Kubernetes API ====================
-
-// --- Account CRUD (GET list / POST create / GET-PUT-PATCH-DELETE by uuid) ---
-export const KUBERNETES_ACCOUNTS = () => `customer/kubernetes/accounts/`;
-export const KUBERNETES_ACCOUNT_BY_ID = (uuid: string) => `customer/kubernetes/accounts/${uuid}/`;
-
-// --- Account-scoped resource data (support ?namespace=, ?pod_uuid=, ?event_type= query params) ---
-export const KUBERNETES_ACCOUNT_PODS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/pods/`;
-export const KUBERNETES_ACCOUNT_CONTAINERS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/containers/`;
-export const KUBERNETES_ACCOUNT_NODES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/nodes/`;
-export const KUBERNETES_ACCOUNT_NAMESPACES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/namespaces/`;
-export const KUBERNETES_ACCOUNT_DEPLOYMENTS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/deployments/`;
-export const KUBERNETES_ACCOUNT_REPLICASETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/replicasets/`;
-export const KUBERNETES_ACCOUNT_DAEMONSETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/daemonsets/`;
-export const KUBERNETES_ACCOUNT_STATEFULSETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/statefulsets/`;
-export const KUBERNETES_ACCOUNT_SERVICES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/services/`;
-export const KUBERNETES_ACCOUNT_PVS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/pvs/`;
-export const KUBERNETES_ACCOUNT_PVCS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/pvcs/`;
-export const KUBERNETES_ACCOUNT_EVENTS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/events/`;
-export const KUBERNETES_ACCOUNT_CONTROL_PLANE = (uuid: string) => `customer/kubernetes/accounts/${uuid}/control_plane/`;
-export const KUBERNETES_ACCOUNT_STORAGE_CLASSES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/storage_classes/`;
-export const KUBERNETES_ACCOUNT_JOBS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/jobs/`;
-export const KUBERNETES_ACCOUNT_CRONJOBS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/cronjobs/`;
-export const KUBERNETES_ACCOUNT_RESOURCE_QUOTAS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/resource_quotas/`;
-export const KUBERNETES_ACCOUNT_HPAS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/hpas/`;
-
-// --- Account-scoped sync triggers (return { task_id }) ---
-export const KUBERNETES_SYNC_RESOURCES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_resources/`;
-export const KUBERNETES_SYNC_CONTROL_PLANE = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_control_plane/`;
-export const KUBERNETES_SYNC_NAMESPACES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_namespaces/`;
-export const KUBERNETES_SYNC_DEPLOYMENTS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_deployments/`;
-export const KUBERNETES_SYNC_REPLICASETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_replicasets/`;
-export const KUBERNETES_SYNC_DAEMONSETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_daemonsets/`;
-export const KUBERNETES_SYNC_STATEFULSETS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_statefulsets/`;
-export const KUBERNETES_SYNC_SERVICES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_services/`;
-export const KUBERNETES_SYNC_PVS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_pvs/`;
-export const KUBERNETES_SYNC_PVCS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_pvcs/`;
-export const KUBERNETES_SYNC_EVENTS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_events/`;
-export const KUBERNETES_SYNC_STORAGE_CLASSES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_storage_classes/`;
-export const KUBERNETES_SYNC_JOBS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_jobs/`;
-export const KUBERNETES_SYNC_CRONJOBS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_cronjobs/`;
-export const KUBERNETES_SYNC_RESOURCE_QUOTAS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_resource_quotas/`;
-export const KUBERNETES_SYNC_HPAS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_hpas/`;
-// Pods/Nodes sync (account-scoped) - kept under these names for the shared node/pod services.
-export const SYNC_KUBERNETES_PODS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_pods/`;
-export const SYNC_KUBERNETES_NODES = (uuid: string) => `customer/kubernetes/accounts/${uuid}/sync_nodes/`;
-
-// --- Standalone resource viewsets (used by the global UnityCloud -> Devices -> Containers view; no account context) ---
-export const GET_KUBERNETES_PODS = () => `customer/kubernetes/pods/`;
-export const KUBERNETES_POD_BY_ID = (uuid: string) => `customer/kubernetes/pods/${uuid}/`;
-export const DELETE_KUBERNETES_PODS = (uuid: string) => `customer/kubernetes/pods/${uuid}/`;
-export const GET_KUBERNETES_CONTAINERS = () => `customer/kubernetes/containers/`;
-export const KUBERNETES_CONTAINER_BY_ID = (uuid: string) => `customer/kubernetes/containers/${uuid}/`;
-export const GET_KUBERNETES_NODES = () => `customer/kubernetes/nodes/`;
-export const KUBERNETES_NODE_BY_ID = (uuid: string) => `customer/kubernetes/nodes/${uuid}/`;
-export const GET_KUBERNETES_NAMESPACES = () => `customer/kubernetes/namespaces/`;
-export const KUBERNETES_NAMESPACE_BY_ID = (uuid: string) => `customer/kubernetes/namespaces/${uuid}/`;
-export const GET_KUBERNETES_DEPLOYMENTS = () => `customer/kubernetes/deployments/`;
-export const KUBERNETES_DEPLOYMENT_BY_ID = (uuid: string) => `customer/kubernetes/deployments/${uuid}/`;
-export const GET_KUBERNETES_REPLICASETS = () => `customer/kubernetes/replicasets/`;
-export const KUBERNETES_REPLICASET_BY_ID = (uuid: string) => `customer/kubernetes/replicasets/${uuid}/`;
-export const GET_KUBERNETES_DAEMONSETS = () => `customer/kubernetes/daemonsets/`;
-export const KUBERNETES_DAEMONSET_BY_ID = (uuid: string) => `customer/kubernetes/daemonsets/${uuid}/`;
-export const GET_KUBERNETES_STATEFULSETS = () => `customer/kubernetes/statefulsets/`;
-export const KUBERNETES_STATEFULSET_BY_ID = (uuid: string) => `customer/kubernetes/statefulsets/${uuid}/`;
-export const GET_KUBERNETES_SERVICES = () => `customer/kubernetes/services/`;
-export const KUBERNETES_SERVICE_BY_ID = (uuid: string) => `customer/kubernetes/services/${uuid}/`;
-export const GET_KUBERNETES_PERSISTENTVOLUMES = () => `customer/kubernetes/pvs/`;
-export const KUBERNETES_PV_BY_ID = (uuid: string) => `customer/kubernetes/pvs/${uuid}/`;
-export const GET_KUBERNETES_PERSISTENTVOLUMECLAIMS = () => `customer/kubernetes/pvcs/`;
-export const KUBERNETES_PVC_BY_ID = (uuid: string) => `customer/kubernetes/pvcs/${uuid}/`;
-export const GET_KUBERNETES_EVENTS = () => `customer/kubernetes/events/`;
-export const KUBERNETES_EVENT_BY_ID = (uuid: string) => `customer/kubernetes/events/${uuid}/`;
-export const GET_KUBERNETES_CONTROLPLANE_COMPONENTS = () => `customer/kubernetes/control-plane/`;
-export const KUBERNETES_CONTROLPLANE_BY_ID = (uuid: string) => `customer/kubernetes/control-plane/${uuid}/`;
-export const GET_KUBERNETES_STORAGECLASSES = () => `customer/kubernetes/storage-classes/`;
-export const KUBERNETES_STORAGECLASS_BY_ID = (uuid: string) => `customer/kubernetes/storage-classes/${uuid}/`;
-export const GET_KUBERNETES_JOBS = () => `customer/kubernetes/jobs/`;
-export const KUBERNETES_JOB_BY_ID = (uuid: string) => `customer/kubernetes/jobs/${uuid}/`;
-export const GET_KUBERNETES_CRONJOBS = () => `customer/kubernetes/cronjobs/`;
-export const KUBERNETES_CRONJOB_BY_ID = (uuid: string) => `customer/kubernetes/cronjobs/${uuid}/`;
-export const GET_KUBERNETES_RESOURCEQUOTAS = () => `customer/kubernetes/resource-quotas/`;
-export const KUBERNETES_RESOURCEQUOTA_BY_ID = (uuid: string) => `customer/kubernetes/resource-quotas/${uuid}/`;
-export const GET_KUBERNETES_HPAS = () => `customer/kubernetes/hpas/`;
-export const KUBERNETES_HPA_BY_ID = (uuid: string) => `customer/kubernetes/hpas/${uuid}/`;
-
-// Docker resource endpoints (nodes/containers).
-export const SYNC_DOCKER_CONTAINERS = (controllerId: string) => `customer/docker/account/${controllerId}/sync_containers`;
-export const GET_DOCKER_CONTAINERS = () => `customer/docker/containers/`;
-export const SYNC_DOCKER_NODES = (controllerId: string) => `customer/docker/account/${controllerId}/sync_nodes`;
-export const GET_DOCKER_NODES = () => `customer/docker/nodes/`;
-export const DELETE_DOCKER_NODE = (nodeId: string) => `customer/docker/nodes/${nodeId}/`;
-
 export const GET_DOCKER_CONTROLLERS = () => `/customer/docker/account`;
 
 export const GET_DOCKER_CONTROLLERS_BY_CLOUD_TYPE_AND_ID = (type: string, uuid: string) => {
@@ -3143,6 +3050,33 @@ export const GET_AIOPS_ANALYTICS_SUMMARY = () => `/customer/aiops/conditions/ana
 
 export const AIOPS_TRENDS_BY_TIMELINE = () => `/customer/aiops/events/trends_graph/`;
 
+// AIML Analytics page (whole record set, no open/recently-resolved restriction) —
+// dedicated endpoints so the AIML Summary page and Home dashboard widget (which
+// use the restricted constants above) are unaffected.
+export const GET_AIOPS_CONDITION_ANALYTICS_SUMMARY = () => `/customer/aiops/condition/analytics/analytics_summary/`;
+
+export const GET_AIOPS_ALERT_ANALYTICS_COUNT = () => `/customer/aiops/alert/analytics/count/`;
+
+export const AIOPS_EVENT_ANALYTICS_TRENDS_BY_TIMELINE = () => `/customer/aiops/event/analytics/trends_graph/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_COUNT_BY_TYPE = () => `/customer/aiops/event/analytics/count/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_NOISY_HOSTS = () => `/customer/aiops/event/analytics/noisy_host/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_NOISY = () => `/customer/aiops/event/analytics/noisy/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_BY_SEVERITY = () => `/customer/aiops/event/analytics/events_by_severity/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_BY_DATACENTER = () => `/customer/aiops/event/analytics/events_by_datacenter/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_BY_CLOUD = () => `/customer/aiops/event/analytics/events_by_cloud/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_NOISY_HOST_BY_DEVICE_TYPE = () => `/customer/aiops/event/analytics/noisy_host_by_device_type/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_BY_DEVICE = () => `/customer/aiops/event/analytics/events_by_device/`;
+
+export const GET_AIOPS_EVENT_ANALYTICS_TRENDS_BY_DESCRIPTION = () => `/customer/aiops/event/analytics/trends_graph_by_description/`;
+
 export const GET_TAGGED_DEVICES = () => `customer/tags/devices/`;
 
 export const GET_DATASET_ITEMS = () => `/rest/zabbix/host_items/`;
@@ -3462,6 +3396,39 @@ export const GET_TEANT_USER_GROUPS = () => `customer/mtp/mtp_group_roles/`;
 export const GET_USERS = () => `customer/organizationusers/`;
 
 export const GET_NETWORK_SUMMARY = () => `customer/network_summary/`;
+export const GET_NETWORK_DASHBOARD_OVERVIEW = () => `customer/network-dashboard/network_overview`;
+export const GET_NETWORK_DASHBOARD_FILTERS = () => `customer/network-dashboard/network_filters/`;
+export const GET_NETWORK_DASHBOARD_TOP_10_CONVERSATIONS = () => `customer/network-dashboard/top_10_conversations`;
+export const GET_NETWORK_DASHBOARD_TOP_BITS_RECEIVED = () => `customer/network-dashboard/top_bits_received`;
+export const GET_NETWORK_DASHBOARD_TOP_BITS_SENT = () => `customer/network-dashboard/top_bits_sent`;
+export const GET_NETWORK_DASHBOARD_TOP_BANDWIDTH_USAGE = () => `customer/network-dashboard/top_bandwidth_usage`;
+export const GET_NETWORK_DASHBOARD_PERFORMANCE_INSIGHTS = () => `customer/network-dashboard/performance_insights`;
+export const GET_NETWORK_DASHBOARD_CPU_VS_MEMORY_PERFORMANCE = () => `customer/network-dashboard/cpu_vs_memory_performance`;
+export const GET_NETWORK_DASHBOARD_TRAFFIC_IN_VS_OUT = () => `customer/network-dashboard/traffic_in_vs_out`;
+export const GET_NETWORK_DASHBOARD_INTERFACE_HEALTH_AND_METRICS = () => `customer/network-dashboard/interface_health_and_metrics`;
+export const GET_NETWORK_DASHBOARD_INTERFACE_ERRORS_INBOUND = () => `customer/network-dashboard/interface_errors_inbound`;
+export const GET_NETWORK_DASHBOARD_INTERFACE_ERRORS_OUTBOUND = () => `customer/network-dashboard/interface_errors_outbound`;
+export const GET_NETWORK_DASHBOARD_INTERFACE_DISCARDS_INBOUND = () => `customer/network-dashboard/interface_discards_inbound`;
+export const GET_NETWORK_DASHBOARD_INTERFACE_DISCARDS_OUTBOUND = () => `customer/network-dashboard/interface_discards_outbound`;
+export const GET_NETWORK_DASHBOARD_NETWORK_DEVICE_AVAILIBILITY = () => `customer/network-dashboard/network_device_availibility`;
+export const GET_NETWORK_DASHBOARD_DEVICE_HEALTH_DISTRIBUTION = () => `customer/network-dashboard/device_health_distribution`;
+export const GET_NETWORK_DASHBOARD_DEVICE_TYPE_DISTRIBUTION = () => `customer/network-dashboard/device_type_distribution`;
+export const GET_NETWORK_DASHBOARD_MANUFACTURER_MODEL_BREAKDOWN = () => `customer/network-dashboard/manufacturer_model_breakdown`;
+export const GET_NETWORK_DASHBOARD_DEVICES_BY_LOCATION = () => `customer/network-dashboard/devices_by_location`;
+export const GET_NETWORK_DASHBOARD_AVERAGE_UPTIME_BY_DEVICE_TYPE = () => `customer/network-dashboard/average_uptime_by_device_type`;
+export const GET_NETWORK_DASHBOARD_LOWEST_AVAILIBILITY = () => `customer/network-dashboard/lowest_availibility`;
+export const GET_NETWORK_DASHBOARD_ENVIRONMENTAL_HEALTH_SUMMARY = () => `customer/network-dashboard/environmental_health_summary`;
+export const GET_NETWORK_DASHBOARD_TOP_DEVICES_BY_HOTSPOT_TEMPERATURE = () => `customer/network-dashboard/top_devices_by_hotspot_temperature`;
+export const GET_NETWORK_DASHBOARD_AVERAGE_TEMPERATURE_BY_SENSOR_TYPE = () => `customer/network-dashboard/average_temperature_by_sensor_type`;
+export const GET_NETWORK_DASHBOARD_POWER_SUPPLY_STATUS_DISTRIBUTION = () => `customer/network-dashboard/power_supply_status_distribution`;
+export const GET_NETWORK_DASHBOARD_FAN_HEALTH_BY_DEVICE = () => `customer/network-dashboard/fan_health_by_device`;
+export const GET_NETWORK_DASHBOARD_ALERT_EVENTS_SUMMARY = () => `customer/network-dashboard/alert_events_summary`;
+export const GET_NETWORK_DASHBOARD_ALERTS_BY_SEVERITY = () => `customer/network-dashboard/alerts_by_severity`;
+export const GET_NETWORK_DASHBOARD_ALERTS_BY_DEVICE_TYPE = () => `customer/network-dashboard/alerts_by_device_type`;
+export const GET_NETWORK_DASHBOARD_OPEN_ITSM_TICKETS_BY_DEVICE_TYPE = () => `customer/network-dashboard/open_itsm_tickets_by_device_type`;
+export const GET_NETWORK_DASHBOARD_ALERT_STATS = () => `customer/network-dashboard/alert_stats`;
+export const GET_NETWORK_DASHBOARD_TOP_10_CRITICAL_ALERTS = () => `customer/network-dashboard/top_10_critical_alerts`;
+export const GET_NETWORK_DASHBOARD_AUTO_REMEDIATION_SUMMARY = () => `customer/network-dashboard/auto-remediation-summary/`;
 
 export const GET_ALERT_DETAILS = () => `customer/event_detail_summary/`;
 

@@ -57,6 +57,9 @@
             <ng-container *ngSwitchCase="'computeAgent'">
                 <ng-container *ngTemplateOutlet="computeAgentSummaryWidget"></ng-container>
             </ng-container>
+            <ng-container *ngSwitchCase="'databaseAgent'">
+                <ng-container *ngTemplateOutlet="databaseAgentSummaryWidget"></ng-container>
+            </ng-container>
             <ng-container *ngSwitchCase="'storageAgent'">
                 <ng-container *ngTemplateOutlet="storageAgentSummaryWidget"></ng-container>
             </ng-container>
@@ -127,6 +130,26 @@
             <div class="font-lg font-500 py-1 pl-1">VM</div>
             <div class="d-flex align-items-center pl-1">
                 <div class="font-lg text-primary">{{summaryViewData?.vm}}</div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #databaseAgentSummaryWidget>
+    <div class="col" *ngIf="databaseSummaryCards?.length">
+        <div class="card p-1 border rounded mb-2">
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="d-flex flex-column flex-fill px-3"
+                    *ngFor="let database of databaseSummaryCards; let first = first; trackBy: trackByDatabaseSummaryCard"
+                    [class.border-left]="!first">
+                    <div class="font-lg font-500 py-1 text-truncate" [tooltip]="database?.name" container="body">
+                        {{database?.name}}
+                    </div>
+                    <div>
+                        <span class="font-lg text-primary">{{database?.count}}</span>
+                        <span class="text-muted font-sm-xs pl-1">Alerts</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

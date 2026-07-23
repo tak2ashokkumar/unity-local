@@ -61,6 +61,8 @@ export class AppDefaultDashboardsService {
         return 'event-analytics';
       case 'navigator central':
         return 'navigator-central';
+      case 'network dashboard':
+        return 'network';
       case 'unified aiops command center':
       case 'unified aiops command center dashboard':
       case 'unified aiops command centre':

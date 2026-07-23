@@ -95,6 +95,7 @@ import { PublicCloudComponent } from './infra-as-a-service/public-cloud/public-c
     MarkdownModule
   ],
   exports: [
+    DashboardMapWidgetComponent,
     PrivateCloudComponent,
     PrivateCloudWidgetClustersComponent,
     PrivateCloudWidgetComponent

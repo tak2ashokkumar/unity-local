@@ -37,7 +37,7 @@
                         <div class="font-sm font-500 text-truncate">Cumulative Reduction</div>
                         <div class="d-flex align-items-baseline">
                             <span
-                                class="text-white font-weight-bold font-xl">{{summaryData?.eventReductionPercentage || 0}}%</span>
+                                class="text-white font-weight-bold font-xl">{{(summaryData?.eventReductionPercentage || 0) | number:'1.2-2'}}%</span>
                         </div>
                     </div>
                     <div class="d-flex justify-content-center align-items-center entity-card w-40 p-2 pointer-link"

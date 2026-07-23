@@ -96,10 +96,6 @@ export class PduCrudService {
           form.get('size').disable();
           this.applySocketMax(form, pd.pdu_type);
           this.setDerivedSize(form, pd.pdu_type);
-          // if (pd.snmp_community) {
-          //   form.addControl('snmp_community', new FormControl({ value: pd.snmp_community, disabled: isBillingCRUD }, [NoWhitespaceValidator, Validators.required]));
-          //   form.addControl('ip_address', new FormControl({ value: pd.ip_address, disabled: isBillingCRUD }, [NoWhitespaceValidator]));
-          // }
           if (this.userInfo.linkDeviceToCollector) {
             const collector = this.builder.group({
               'uuid': [pd.collector ? pd.collector.uuid : '', [Validators.required]],

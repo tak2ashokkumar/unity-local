@@ -1,132 +1,114 @@
 <div class="event-analytics-dashboard" *ngIf="filterForm" [formGroup]="filterForm">
 
-    <div class="dashboard-topbar bg-white d-flex align-items-start justify-content-between">
-        <div>
-            <div class="dashboard-title">Event Analytics</div>
+    <div
+        class="dashboard-topbar bg-white d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+        <div class="dashboard-header mb-0">
+            <div class="dashboard-title pb-2">Event Analytics</div>
             <div class="dashboard-subtitle">
                 <span class="pr-2 border-right">Refreshed: {{headerData?.lastRefreshed || 'Loading'}}</span>
-                <span class="pl-2">Scope: {{headerData?.scopeText || 'Loading scope'}}</span>
+                <span class="px-2">Scope: {{headerData?.scopeText || 'Loading scope'}}</span>
             </div>
         </div>
 
-        <form class="dashboard-filters d-flex align-items-end" [formGroup]="filterForm">
-            <div class="filter-control">
-                <label class="m-0">Time Range</label>
-                <select class="form-control form-control-sm" formControlName="timeline" (change)="onTimelineChange()">
-                    <option *ngFor="let option of timeRangeOptions; trackBy: trackByKey" [value]="option.value">
-                        {{option.label}}
-                    </option>
-                </select>
+        <div class="dashboard-filters d-flex align-items-end justify-content-end flex-wrap"
+            [formGroup]="filterForm">
+            <div class="filter-control filter-control-group top-duration-filter">
+                <label class="d-block font-sm text-muted mb-0">Time Range</label>
+                <custom-date-dropdown [options]="timeRangeDropdownOptions" [enableCustomDateRange]="true"
+                    [default]="timelineDropdownDefault" [customClass]="'form-control-sm'" [emitOnInit]="false"
+                    [customSelectedLabel]="'Custom'" [viewportSafePopup]="true" [dateOnlyPicker]="true"
+                    [popupPanelClass]="'event-analytics-date-popup'" (onSubmit)="onTimelineDropdownSubmit($event)">
+                </custom-date-dropdown>
             </div>
-            <ng-container *ngIf="isCustomTimelineSelected()">
-                <div class="filter-control custom-time-filter">
-                    <label class="m-0">From</label>
-                    <div class="input-group input-group-sm">
-                        <owl-date-time #timelineFromPicker [hour12Timer]="true"></owl-date-time>
-                        <input class="form-control form-control-sm rounded-left" formControlName="timelineFrom"
-                            [owlDateTimeTrigger]="timelineFromPicker" [owlDateTime]="timelineFromPicker"
-                            type="text" name="timelineFrom" placeholder="From" [max]="timelineMaxDate"
-                            (dateTimeChange)="onCustomTimelineChange()">
-                        <div class="input-group-append" [owlDateTimeTrigger]="timelineFromPicker">
-                            <span class="input-group-text bg-white">
-                                <i class="fas fa-calendar-alt"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="filter-control custom-time-filter">
-                    <label class="m-0">To</label>
-                    <div class="input-group input-group-sm">
-                        <owl-date-time #timelineToPicker [hour12Timer]="true"></owl-date-time>
-                        <input class="form-control form-control-sm rounded-left" formControlName="timelineTo"
-                            [owlDateTimeTrigger]="timelineToPicker" [owlDateTime]="timelineToPicker"
-                            type="text" name="timelineTo" placeholder="To"
-                            [min]="filterForm.get('timelineFrom')?.value" [max]="timelineMaxDate"
-                            (dateTimeChange)="onCustomTimelineChange()">
-                        <div class="input-group-append" [owlDateTimeTrigger]="timelineToPicker">
-                            <span class="input-group-text bg-white">
-                                <i class="fas fa-calendar-alt"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </ng-container>
-            <button class="round-action-btn ml-2" type="button" (click)="refreshData()" [tooltip]="'Refresh'"
-                container="body">
+            <button class="btn btn-pill btn-warning btn-sm ml-2 mb-1" type="button" (click)="refreshData()"
+                [tooltip]="'Refresh'" container="body">
                 <i class="fas fa-sync-alt"></i>
             </button>
-            <button class="round-action-btn ml-2" type="button" (click)="goBack()" [tooltip]="'Go Back'"
-                container="body">
+            <button class="btn btn-pill btn-warning btn-sm ml-2 mb-1" type="button" (click)="goBack()"
+                [tooltip]="'Go Back'" container="body">
                 <i class="fa fa-arrow-left"></i>
             </button>
-        </form>
+        </div>
     </div>
 
-    <div class="dashboard-content">
-        <div class="section-title">Executive Summary</div>
-        <div class="card bg-white summary-card mb-2">
-            <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
-            <div class="summary-metrics">
-                <div class="summary-metric" *ngFor="let metric of summaryMetrics; trackBy: trackByKey">
-                    <div class="metric-label">{{metric.label}}</div>
-                    <div class="metric-value" [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</div>
-                </div>
-            </div>
-            <div *ngIf="!summaryMetrics?.length" class="no-data-block no-data-block-sm">No data</div>
-        </div>
-
-        <div class="section-title">Event Intelligence</div>
-        <div class="row mb-2">
-            <div class="col-4 pr-1 mb-0">
-                <div class="card bg-white intelligence-card">
-                    <div class="widget-title text-center">Event Processing Pipeline</div>
-                    <app-spinner [name]="loaderNames.pipeline" [width]="0"></app-spinner>
-                    <div class="pipeline-funnel-container position-relative pt-3">
-                        <ng-container *ngIf="pipelineData; else pipelineNoData">
-                            <div class="pipeline-funnel">
-                                <div class="pipeline-funnel-row pipeline-funnel-events">
-                                    <div class="pipeline-funnel-meta">
-                                        <span>Raw Events</span>
-                                        <strong>{{pipelineData.rawEvents}}</strong>
-                                    </div>
-                                    <div class="pipeline-funnel-stage text-white">
-                                        <span>Events</span>
-                                    </div>
-                                </div>
-                                <div class="pipeline-funnel-row pipeline-funnel-alerts">
-                                    <div class="pipeline-funnel-meta">
-                                        <span>Noise Reduction</span>
-                                        <strong>{{pipelineData.noiseReduction}}</strong>
-                                    </div>
-                                    <div class="pipeline-funnel-stage text-white">
-                                        <span>Alerts - {{pipelineData.alerts}}</span>
-                                    </div>
-                                </div>
-                                <div class="pipeline-funnel-row pipeline-funnel-conditions">
-                                    <div class="pipeline-funnel-meta">
-                                        <span>Correlation %</span>
-                                        <strong>{{pipelineData.correlationPct}}</strong>
-                                    </div>
-                                    <div class="pipeline-funnel-stage text-white">
-                                        <span>Conditions - {{pipelineData.conditions}}</span>
-                                    </div>
+    <div class="dashboard-content px-3 pt-2 pb-3">
+        <div class="section-title font-lg font-500 px-1 py-2 mb-0">Executive Summary</div>
+        <div class="row mx-0 mb-2">
+            <div class="col-12 px-0">
+                <div class="card bg-white round-edge equalize-card widget-card summary-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="widget-data-block position-relative">
+                            <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
+                            <div class="summary-metrics d-flex justify-content-center align-items-center flex-wrap">
+                                <div class="summary-metric" *ngFor="let metric of summaryMetrics; trackBy: trackByKey">
+                                    <div class="metric-label">{{metric.label}}</div>
+                                    <div class="metric-value" [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</div>
                                 </div>
                             </div>
-                        </ng-container>
-                        <ng-template #pipelineNoData>
-                            <div class="d-flex justify-content-center align-items-center text-muted" style="height: 150px;">
-                                No data available</div>
-                        </ng-template>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-8 pl-1">
-                <div class="card bg-white intelligence-card">
-                    <div class="d-flex align-items-start justify-content-between mb-1">
-                        <div class="widget-title">Event By Device Category</div>
-                        <div class="filter-control compact-filter">
-                            <label class="m-0">Category</label>
+        <div class="section-title font-lg font-500 px-1 py-2 mb-0">Event Intelligence</div>
+        <div class="row mx-0 mb-2">
+            <div class="col-4 pl-0 mb-0">
+                <div class="card bg-white round-edge equalize-card widget-card mb-0">
+                    <div class="card-header bg-white border-0 p-2 d-flex justify-content-center">
+                        <span class="font-md font-500">Event Processing Pipeline</span>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="widget-data-block position-relative">
+                            <app-spinner [name]="loaderNames.pipeline" [width]="0"></app-spinner>
+                            <div class="pipeline-funnel-container position-relative">
+                                <ng-container *ngIf="pipelineData; else pipelineNoData">
+                                    <div class="pipeline-funnel pt-3">
+                                        <div class="pipeline-funnel-row pipeline-funnel-events">
+                                            <div class="pipeline-funnel-meta">
+                                                <span>Raw Events</span>
+                                                <strong>{{pipelineData.rawEvents}}</strong>
+                                            </div>
+                                            <div class="pipeline-funnel-stage text-white">
+                                                <span>Events</span>
+                                            </div>
+                                        </div>
+                                        <div class="pipeline-funnel-row pipeline-funnel-alerts">
+                                            <div class="pipeline-funnel-meta">
+                                                <span>Noise Reduction</span>
+                                                <strong>{{pipelineData.noiseReduction}}</strong>
+                                            </div>
+                                            <div class="pipeline-funnel-stage text-white">
+                                                <span>Alerts - {{pipelineData.alerts}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="pipeline-funnel-row pipeline-funnel-conditions">
+                                            <div class="pipeline-funnel-meta">
+                                                <span>Correlation %</span>
+                                                <strong>{{pipelineData.correlationPct}}</strong>
+                                            </div>
+                                            <div class="pipeline-funnel-stage text-white">
+                                                <span>Conditions - {{pipelineData.conditions}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-template #pipelineNoData>
+                                    <div
+                                        class="no-data-block intelligence-no-data d-flex align-items-center justify-content-center text-muted w-100">
+                                        No data</div>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-8 px-0">
+                <div class="card bg-white round-edge equalize-card widget-card mb-0">
+                    <div class="card-header bg-white border-0 p-2 d-flex align-items-start justify-content-between">
+                        <span class="font-md font-500">Event By Device Category</span>
+                        <div class="filter-control compact-filter mb-0">
+                            <label class="d-block font-sm text-muted m-0 mb-0">Category</label>
                             <select #eventCategorySelect class="form-control form-control-sm"
                                 formControlName="eventDeviceCategory"
                                 (change)="onEventDeviceCategoryChange(eventCategorySelect.value)">
@@ -135,174 +117,181 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="row no-gutters align-items-center">
-                        <app-spinner [name]="loaderNames.eventByDeviceCategory" [width]="0"></app-spinner>
-                        <div class="col-4">
-                            <div echarts [options]="eventByDeviceCategoryOptions" class="device-category-chart"
-                                *ngIf="eventByDeviceCategoryOptions"></div>
-                            <div *ngIf="!eventByDeviceCategoryOptions" class="no-data-block device-category-chart">
-                                No data</div>
-                        </div>
-                        <div class="col-8">
-                            <div class="device-category-grid">
-                                <button class="device-category-item" type="button"
-                                    *ngFor="let item of eventByDeviceCategoryCards; trackBy: trackByKey"
-                                    (click)="openEventsPage()" [tooltip]="'Open events page'" container="body">
-                                    <span class="legend-dot category-dot"></span>
-                                    <span class="device-category-label">{{item.label}}</span>
-                                    <strong>{{item.value}}</strong>
-                                </button>
-                            </div>
-                            <div *ngIf="!eventByDeviceCategoryCards?.length" class="no-data-block device-category-grid-empty">
-                                No data</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-title">Alert Operations</div>
-        <div class="card bg-white operations-card mb-2">
-            <div class="row no-gutters">
-                <div class="col-4 border-right pr-2 mb-0">
-                    <div class="widget-title text-center">Alert Generated</div>
-                    <app-spinner [name]="loaderNames.alertGenerated" [width]="0"></app-spinner>
-                    <div class="mini-kpi-row border-bottom pb-2 mb-1">
-                        <div class="mini-kpi" *ngFor="let metric of alertGeneratedMetrics; trackBy: trackByKey">
-                            <span>{{metric.label}}</span>
-                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
-                        </div>
-                    </div>
-                    <div echarts [options]="alertGeneratedOptions" class="donut-chart"
-                        *ngIf="alertGeneratedOptions"></div>
-                    <div *ngIf="!alertGeneratedOptions" class="no-data-block donut-chart">No data</div>
-                </div>
-
-                <div class="col-3 border-right px-2 mb-0">
-                    <div class="widget-title text-center">Alert Status</div>
-                    <app-spinner [name]="loaderNames.alertStatus" [width]="0"></app-spinner>
-                    <div class="mini-kpi-row border-bottom pb-2 mb-1">
-                        <div class="mini-kpi" *ngFor="let metric of alertStatusMetrics; trackBy: trackByKey">
-                            <span>{{metric.label}}</span>
-                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
-                        </div>
-                    </div>
-                    <div echarts [options]="alertStatusOptions" class="donut-chart"
-                        *ngIf="alertStatusOptions"></div>
-                    <div *ngIf="!alertStatusOptions" class="no-data-block donut-chart">No data</div>
-                </div>
-
-                <div class="col-5 pl-2">
-                    <div class="d-flex align-items-start justify-content-between">
-                        <div class="widget-title">Trend by Timeline</div>
-                        <div class="d-flex align-items-end flex-wrap justify-content-end trend-filter-row">
-                            <div class="filter-control trend-type-filter mr-2">
-                                <label class="m-0">Alert Type</label>
-                                <multiselect-dropdown [options]="trendAlertTypeOptions"
-                                    [settings]="trendAlertTypeMultiselectSettings"
-                                    [texts]="trendAlertTypeMultiselectTexts"
-                                    class="form-control form-control-sm p-0 dashboard-multiselect"
-                                    formControlName="trendAlertTypes"
-                                    (dropdownClosed)="onTrendAlertTypesChange()">
-                                </multiselect-dropdown>
-                            </div>
-                            <div class="filter-control mini-select">
-                                <label class="m-0">Duration</label>
-                                <select class="form-control form-control-sm" name="trend_timeline"
-                                    formControlName="trendTimeline"
-                                    (change)="onTrendTimelineChange()">
-                                    <option *ngFor="let option of trendTimelineOptions; trackBy: trackByKey"
-                                        [value]="option.value">{{option.label}}</option>
-                                </select>
-                            </div>
-                            <ng-container *ngIf="isTrendCustomTimelineSelected()">
-                                <div class="filter-control trend-custom-time-filter ml-2">
-                                    <label class="m-0">From</label>
-                                    <div class="input-group input-group-sm">
-                                        <owl-date-time #trendTimelineFromPicker [hour12Timer]="true"></owl-date-time>
-                                        <input class="form-control form-control-sm rounded-left"
-                                            formControlName="trendTimelineFrom"
-                                            [owlDateTimeTrigger]="trendTimelineFromPicker"
-                                            [owlDateTime]="trendTimelineFromPicker"
-                                            type="text" name="trendTimelineFrom" placeholder="From"
-                                            [max]="timelineMaxDate"
-                                            (dateTimeChange)="onTrendCustomTimelineChange()">
-                                        <div class="input-group-append" [owlDateTimeTrigger]="trendTimelineFromPicker">
-                                            <span class="input-group-text bg-white">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </span>
-                                        </div>
+                    <div class="card-body p-2">
+                        <div class="widget-data-block position-relative">
+                            <app-spinner [name]="loaderNames.eventByDeviceCategory" [width]="0"></app-spinner>
+                            <ng-container *ngIf="hasEventByDeviceCategoryData; else eventByDeviceCategoryNoData">
+                                <div class="row no-gutters align-items-center device-category-content">
+                                    <div [ngClass]="hasEventByDeviceCategoryCardsData ? 'col-4' : 'col-12'"
+                                        *ngIf="hasEventByDeviceCategoryChart">
+                                        <div echarts [options]="eventByDeviceCategoryOptions"
+                                            class="device-category-chart"></div>
                                     </div>
-                                </div>
-                                <div class="filter-control trend-custom-time-filter ml-2">
-                                    <label class="m-0">To</label>
-                                    <div class="input-group input-group-sm">
-                                        <owl-date-time #trendTimelineToPicker [hour12Timer]="true"></owl-date-time>
-                                        <input class="form-control form-control-sm rounded-left"
-                                            formControlName="trendTimelineTo"
-                                            [owlDateTimeTrigger]="trendTimelineToPicker"
-                                            [owlDateTime]="trendTimelineToPicker"
-                                            type="text" name="trendTimelineTo" placeholder="To"
-                                            [min]="filterForm.get('trendTimelineFrom')?.value"
-                                            [max]="timelineMaxDate"
-                                            (dateTimeChange)="onTrendCustomTimelineChange()">
-                                        <div class="input-group-append" [owlDateTimeTrigger]="trendTimelineToPicker">
-                                            <span class="input-group-text bg-white">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </span>
+                                    <div [ngClass]="hasEventByDeviceCategoryChart ? 'col-8' : 'col-12'"
+                                        *ngIf="hasEventByDeviceCategoryCardsData">
+                                        <div class="device-category-grid">
+                                            <div class="device-category-item" role="button" tabindex="0"
+                                                *ngFor="let item of eventByDeviceCategoryCards; trackBy: trackByKey"
+                                                (click)="openEventsPage()" [tooltip]="'Open events page'"
+                                                container="body" (keydown.enter)="openEventsPage()"
+                                                (keydown.space)="openEventsPage()">
+                                                <span class="legend-dot category-dot"
+                                                    [style.background]="item.color"></span>
+                                                <span class="device-category-label">{{item.label}}</span>
+                                                <strong>{{item.value}}</strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </ng-container>
+                            <ng-template #eventByDeviceCategoryNoData>
+                                <div
+                                    class="no-data-block device-category-no-data d-flex align-items-center justify-content-center text-muted w-100">
+                                    No data</div>
+                            </ng-template>
                         </div>
                     </div>
-                    <app-spinner [name]="loaderNames.trendByTimeline" [width]="0"></app-spinner>
-                    <div echarts [options]="trendByTimelineOptions" class="timeline-chart"
-                        *ngIf="trendByTimelineOptions"></div>
-                    <div *ngIf="!trendByTimelineOptions" class="no-data-block timeline-chart">No data</div>
                 </div>
-            </div>
-
-            <div class="alert-segregation-panel mt-2 pt-2 border-top">
-                <div class="d-flex align-items-start justify-content-center position-relative">
-                    <div class="widget-title text-center">Alert Segregation by Type</div>
-                    <div class="segregation-summary d-flex">
-                        <div class="segregation-kpi" *ngFor="let metric of alertSegregationMetrics; trackBy: trackByKey">
-                            <span>{{metric.label}}</span>
-                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
-                        </div>
-                    </div>
-                    <div class="filter-control compact-filter segregation-filter">
-                        <label class="m-0">Category</label>
-                        <select #alertSegregationSelect class="form-control form-control-sm"
-                            formControlName="alertSegregationCategory"
-                            (change)="onAlertSegregationCategoryChange(alertSegregationSelect.value)">
-                            <option *ngFor="let option of alertSegregationCategoryOptions; trackBy: trackByKey" [value]="option.value">
-                                {{option.label}}</option>
-                        </select>
-                    </div>
-                </div>
-                <app-spinner [name]="loaderNames.alertSegregation" [width]="0"></app-spinner>
-                <div echarts [options]="alertSegregationOptions" class="alert-segregation-chart"
-                    *ngIf="alertSegregationOptions"></div>
-                <div *ngIf="!alertSegregationOptions" class="no-data-block alert-segregation-chart">No data</div>
             </div>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between mb-1">
-            <div class="section-title mb-0">Event and Alert Analytics</div>
-            <div class="analytics-filters d-flex align-items-end">
+        <div class="section-title font-lg font-500 px-1 py-2 mb-0">Alert Operations</div>
+        <div class="row mx-0 mb-2">
+            <div class="col-12 px-0">
+                <div class="card bg-white round-edge equalize-card widget-card operations-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="row mx-0">
+                            <div class="col-4 pr-1 mb-0">
+                                <div class="h-100 border-right px-2">
+                                    <div class="d-flex align-items-center justify-content-center pb-2 text-center">
+                                        <span class="font-md font-500">Alert Generated</span>
+                                    </div>
+                                    <div class="widget-data-block position-relative">
+                                        <app-spinner [name]="loaderNames.alertGenerated" [width]="0"></app-spinner>
+                                        <div class="mini-kpi-row px-2 mb-2">
+                                            <div class="mini-kpi"
+                                                *ngFor="let metric of alertGeneratedMetrics; trackBy: trackByKey">
+                                                <span>{{metric.label}}</span>
+                                                <strong
+                                                    [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+                                            </div>
+                                        </div>
+                                        <div echarts [options]="alertGeneratedOptions" class="donut-chart"
+                                            *ngIf="alertGeneratedOptions"></div>
+                                        <div *ngIf="!alertGeneratedOptions"
+                                            class="no-data-block donut-chart d-flex align-items-center justify-content-center text-muted w-100">No data
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3 px-1 mb-0">
+                                <div class="h-100 border-right px-2">
+                                    <div class="d-flex align-items-center justify-content-center pb-2 text-center">
+                                        <span class="font-md font-500">Alert Status</span>
+                                    </div>
+                                    <div class="widget-data-block position-relative">
+                                        <app-spinner [name]="loaderNames.alertStatus" [width]="0"></app-spinner>
+                                        <div class="mini-kpi-row px-2 mb-2">
+                                            <div class="mini-kpi"
+                                                *ngFor="let metric of alertStatusMetrics; trackBy: trackByKey">
+                                                <span>{{metric.label}}</span>
+                                                <strong
+                                                    [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+                                            </div>
+                                        </div>
+                                        <div echarts [options]="alertStatusOptions" class="donut-chart"
+                                            *ngIf="alertStatusOptions"></div>
+                                        <div *ngIf="!alertStatusOptions"
+                                            class="no-data-block donut-chart d-flex align-items-center justify-content-center text-muted w-100">
+                                            No data</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-5 pl-1 mb-0">
+                                <div class="h-100">
+                                    <div class="d-flex align-items-start justify-content-between pb-2">
+                                        <span class="font-md font-500">Trend by Timeline</span>
+                                        <div class="d-flex align-items-start justify-content-end">
+                                            <div class="filter-control trend-type-filter mr-2">
+                                                <multiselect-dropdown [options]="trendAlertTypeOptions"
+                                                    [settings]="trendAlertTypeMultiselectSettings"
+                                                    [texts]="trendAlertTypeMultiselectTexts"
+                                                    class="form-control form-control-sm p-0 dashboard-multiselect"
+                                                    formControlName="trendAlertTypes"
+                                                    (dropdownClosed)="onTrendAlertTypesChange()">
+                                                </multiselect-dropdown>
+                                            </div>
+                                            <div class="filter-control filter-control-group trend-duration-filter">
+                                                <custom-date-dropdown [options]="trendTimelineDropdownOptions"
+                                                    [enableCustomDateRange]="true"
+                                                    [default]="trendTimelineDropdownDefault"
+                                                    [customClass]="'form-control-sm'" [emitOnInit]="false" [dateOnlyPicker]="true"
+                                                    [customSelectedLabel]="'Custom'" [viewportSafePopup]="true"
+                                                    [popupPanelClass]="'event-analytics-date-popup'"
+                                                    (onSubmit)="onTrendTimelineDropdownSubmit($event)">
+                                                </custom-date-dropdown>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-data-block position-relative">
+                                        <app-spinner [name]="loaderNames.trendByTimeline" [width]="0"></app-spinner>
+                                        <div echarts [options]="trendByTimelineOptions" class="timeline-chart"
+                                            *ngIf="trendByTimelineOptions"></div>
+                                        <div *ngIf="!trendByTimelineOptions"
+                                            class="no-data-block timeline-chart d-flex align-items-center justify-content-center text-muted w-100">
+                                            No data</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mx-0 mt-3 pt-3">
+                            <div class="col-12 px-0">
+                                <div class="d-flex align-items-center justify-content-center pb-2">
+                                    <span class="font-md font-500 mr-3">Alert Segregation by Type</span>
+                                    <div class="segregation-summary d-flex px-3">
+                                        <div class="segregation-kpi px-2" *ngFor="let metric of alertSegregationMetrics; trackBy: trackByKey">
+                                            <span>{{metric.label}}</span>
+                                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+                                        </div>
+                                    </div>
+                                    <div class="form-group filter-control compact-filter mb-0 px-2">
+                                        <label class="d-block font-sm text-muted mb-0">Category</label>
+                                        <select #alertSegregationSelect class="form-control form-control-sm" formControlName="alertSegregationCategory"
+                                            (change)="onAlertSegregationCategoryChange(alertSegregationSelect.value)">
+                                            <option *ngFor="let option of alertSegregationCategoryOptions; trackBy: trackByKey" [value]="option.value">
+                                                {{option.label}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="widget-data-block position-relative">
+                                    <app-spinner [name]="loaderNames.alertSegregation" [width]="0"></app-spinner>
+                                    <div echarts [options]="alertSegregationOptions" class="alert-segregation-chart"
+                                        *ngIf="alertSegregationOptions"></div>
+                                    <div *ngIf="!alertSegregationOptions"
+                                        class="no-data-block alert-segregation-chart d-flex align-items-center justify-content-center text-muted w-100">
+                                        No data</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header-row d-flex align-items-center justify-content-between flex-wrap mb-1">
+            <div class="section-title font-lg font-500 px-1 py-2 mb-0">Event and Alert Analytics</div>
+            <div class="section-header-filters analytics-filters d-flex align-items-end flex-wrap">
                 <div class="filter-control analytics-filter">
-                    <label class="m-0">View By</label>
+                    <label class="d-block font-sm text-muted mb-0">View By</label>
                     <select class="form-control form-control-sm" formControlName="analyticsViewBy"
-                        (change)="onAnalyticsFilterChange()">
+                        (change)="onAnalyticsViewByChange()">
                         <option *ngFor="let option of analyticsViewByOptions; trackBy: trackByKey"
                             [value]="option.value">{{option.label}}</option>
                     </select>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="m-0">Source Type</label>
+                    <label class="d-block font-sm text-muted mb-0">Source Type</label>
                     <select class="form-control form-control-sm" formControlName="analyticsSourceType"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsSourceTypeOptions; trackBy: trackByKey"
@@ -310,7 +299,7 @@
                     </select>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="m-0">Severity Type</label>
+                    <label class="d-block font-sm text-muted mb-0">Severity Type</label>
                     <select class="form-control form-control-sm" formControlName="analyticsSeverityType"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsSeverityTypeOptions; trackBy: trackByKey"
@@ -318,7 +307,7 @@
                     </select>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="m-0">Datacenter</label>
+                    <label class="d-block font-sm text-muted mb-0">Datacenter</label>
                     <select class="form-control form-control-sm" formControlName="analyticsDatacenter"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsDatacenterOptions; trackBy: trackByKey"
@@ -326,7 +315,7 @@
                     </select>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="m-0">Cloud</label>
+                    <label class="d-block font-sm text-muted mb-0">Cloud</label>
                     <select class="form-control form-control-sm" formControlName="analyticsCloud"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsCloudOptions; trackBy: trackByKey"
@@ -334,369 +323,613 @@
                     </select>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="m-0">Category</label>
+                    <label class="d-block font-sm text-muted mb-0">Category</label>
                     <select class="form-control form-control-sm" formControlName="analyticsCategory"
                         (change)="onAnalyticsFilterChange()">
-                        <option *ngFor="let option of analyticsCategoryOptions; trackBy: trackByKey" [value]="option.value">
-                            {{option.label}}</option>
+                        <option *ngFor="let option of analyticsCategoryOptions; trackBy: trackByKey"
+                            [value]="option.value">{{option.label}}</option>
                     </select>
                 </div>
-                <div class="filter-control analytics-filter">
-                    <label class="m-0">Duration</label>
-                    <select class="form-control form-control-sm" formControlName="analyticsDuration"
-                        (change)="onAnalyticsFilterChange()">
-                        <option *ngFor="let option of analyticsDurationOptions; trackBy: trackByKey"
+                <div class="filter-control analytics-filter analytics-duration-filter">
+                    <label class="d-block font-sm text-muted mb-0">Duration</label>
+                    <custom-date-dropdown [options]="eventAndAlertTimelineDropdownOptions"
+                        [enableCustomDateRange]="true" [default]="eventAndAlertTimelineDropdownDefault"
+                        [customClass]="'form-control-sm'" [emitOnInit]="false" [dateOnlyPicker]="true"
+                        [customSelectedLabel]="'Custom'" [viewportSafePopup]="true" [popupPanelClass]="'event-analytics-date-popup'"
+                        (onSubmit)="onEventAndAlertTimelineDropdownSubmit($event)">
+                    </custom-date-dropdown>
+                </div>
+            </div>
+        </div>
+        <div class="row mx-0 mb-2">
+            <div class="col-12 px-0">
+                <div class="card bg-white round-edge equalize-card widget-card analytics-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="widget-data-block position-relative">
+                            <app-spinner [name]="loaderNames.eventAlertAnalytics" [width]="0"></app-spinner>
+                            <div class="row no-gutters">
+                                <div class="col-7 pr-1">
+                                    <div
+                                        class="analytics-metrics-left d-flex align-items-center justify-content-center flex-wrap text-center p-2 mb-2">
+                                        <div class="analytics-metric px-2"
+                                            *ngFor="let metric of eventAlertAnalyticsLeftMetrics; trackBy: trackByKey">
+                                            <span>{{metric.label}}</span>
+                                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+                                        </div>
+                                    </div>
+                                    <div echarts [options]="eventReductionFlowOptions" class="sankey-chart"
+                                        *ngIf="eventReductionFlowOptions"></div>
+                                    <div *ngIf="!eventReductionFlowOptions"
+                                        class="no-data-block sankey-chart d-flex align-items-center justify-content-center text-muted w-100">No data
+                                    </div>
+                                </div>
+                                <div class="col-5 pl-1">
+                                    <div
+                                        class="analytics-metrics-right d-flex align-items-center justify-content-center flex-wrap text-center p-2 mb-2">
+                                        <div class="analytics-metric px-2"
+                                            *ngFor="let metric of eventAlertAnalyticsRightMetrics; trackBy: trackByKey">
+                                            <span>{{metric.label}}</span>
+                                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+                                        </div>
+                                    </div>
+                                    <div echarts [options]="incidentResolutionFlowOptions" class="sankey-chart"
+                                        *ngIf="incidentResolutionFlowOptions"></div>
+                                    <div *ngIf="!incidentResolutionFlowOptions"
+                                        class="no-data-block sankey-chart d-flex align-items-center justify-content-center text-muted w-100">
+                                        No data</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header-row d-flex align-items-center justify-content-between flex-wrap mb-1">
+            <div class="section-title font-lg font-500 px-1 py-2 mb-0">Top 10 Noisy Events</div>
+            <div class="section-header-filters d-flex align-items-end flex-wrap">
+                <div class="filter-control compact-filter mb-0">
+                    <label class="d-block font-sm text-muted mb-0">Category</label>
+                    <select #noisyEventsCategorySelect class="form-control form-control-sm"
+                        formControlName="noisyEventsCategory"
+                        (change)="onNoisyEventsCategoryChange(noisyEventsCategorySelect.value)">
+                        <option *ngFor="let option of noisyEventsCategoryOptions; trackBy: trackByKey"
                             [value]="option.value">{{option.label}}</option>
                     </select>
                 </div>
             </div>
         </div>
-
-        <div class="card bg-white analytics-card mb-2">
-            <app-spinner [name]="loaderNames.eventAlertAnalytics" [width]="0"></app-spinner>
-            <div class="analytics-metrics">
-                <div class="analytics-metric" *ngFor="let metric of eventAlertAnalyticsMetrics; trackBy: trackByKey">
-                    <span>{{metric.label}}</span>
-                    <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
-                </div>
-            </div>
-            <div class="row no-gutters">
-                <div class="col-6">
-                    <div echarts [options]="eventReductionFlowOptions" class="sankey-chart"
-                        *ngIf="eventReductionFlowOptions"></div>
-                    <div *ngIf="!eventReductionFlowOptions" class="no-data-block sankey-chart">No data</div>
-                </div>
-                <div class="col-6">
-                    <div echarts [options]="incidentResolutionFlowOptions" class="sankey-chart"
-                        *ngIf="incidentResolutionFlowOptions"></div>
-                    <div *ngIf="!incidentResolutionFlowOptions" class="no-data-block sankey-chart">No data</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex align-items-center justify-content-between mb-1">
-            <div class="section-title mb-0">Top 10 Noisy Events</div>
-            <div class="filter-control compact-filter">
-                <label class="m-0">Category</label>
-                <select #noisyEventsCategorySelect class="form-control form-control-sm"
-                    formControlName="noisyEventsCategory"
-                    (change)="onNoisyEventsCategoryChange(noisyEventsCategorySelect.value)">
-                    <option *ngFor="let option of noisyEventsCategoryOptions; trackBy: trackByKey" [value]="option.value">
-                        {{option.label}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="card bg-white table-card mb-2">
-            <app-spinner [name]="loaderNames.noisyEvents" [width]="0"></app-spinner>
-            <div class="table-responsive">
-                <table class="table table-sm mb-0">
-                    <thead class="bg-gray-200">
-                        <tr>
-                            <th>Device <i class="fa fa-sort text-muted ml-1"></i></th>
-                            <th>Device Type <i class="fa fa-sort text-muted ml-1"></i></th>
-                            <th class="text-center">Count <i class="fa fa-sort text-muted ml-1"></i></th>
-                            <th>Description</th>
-                            <th>Source <i class="fa fa-sort text-muted ml-1"></i></th>
-                            <th>Last Reported <i class="fa fa-sort text-muted ml-1"></i></th>
-                            <th class="text-center">Severity <i class="fa fa-sort text-muted ml-1"></i></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let event of noisyEvents; trackBy: trackByKey">
-                            <td>
-                                <button class="btn btn-link p-0 table-column-btn" type="button"
-                                    (click)="openEventsPage()" [tooltip]="'Open events page'" container="body">
-                                    {{event.device}}
-                                </button>
-                            </td>
-                            <td>{{event.deviceType}}</td>
-                            <td class="text-center text-primary font-500">{{event.count}}</td>
-                            <td>{{event.description}}</td>
-                            <td>{{event.source}}</td>
-                            <td>{{event.lastReported}}</td>
-                            <td class="text-center">
-                                <i class="fa" [ngClass]="[event.severityIcon, event.severityClass]"
-                                    [tooltip]="event.severity" container="body"></i>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div *ngIf="!noisyEvents?.length" class="no-data-block no-data-block-sm">
-                    No records available.</div>
-            </div>
-        </div>
-
-        <div class="d-flex align-items-center justify-content-between mb-1">
-            <div class="section-title mb-0">Top 10 Noisy Hosts</div>
-            <div class="filter-control compact-filter">
-                <label class="m-0">Category</label>
-                <select #noisyHostsCategorySelect class="form-control form-control-sm"
-                    formControlName="noisyHostsCategory"
-                    (change)="onNoisyHostsCategoryChange(noisyHostsCategorySelect.value)">
-                    <option *ngFor="let option of noisyHostsCategoryOptions; trackBy: trackByKey" [value]="option.value">
-                        {{option.label}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="card bg-white noisy-hosts-card mb-2">
-            <app-spinner [name]="loaderNames.noisyHosts" [width]="0"></app-spinner>
-            <div class="row no-gutters">
-                <div class="col-7 border-right">
-                    <div class="bg-gray-200 p-2 font-500">Noisy Events</div>
-                    <div class="table-responsive">
-                        <table class="table table-sm mb-0">
-                            <thead class="bg-gray-200">
-                                <tr>
-                                    <th>Device</th>
-                                    <th>Device Type</th>
-                                    <th class="text-center">Count</th>
-                                    <th>Description</th>
-                                    <th>Source</th>
-                                    <th>Last Reported</th>
-                                    <th class="text-center">Severity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let host of noisyHosts; trackBy: trackByKey">
-                                    <td>
-                                        <button class="btn btn-link p-0 table-column-btn" type="button"
-                                            (click)="openEventsPage()" [tooltip]="'Open events page'" container="body">
-                                            {{host.device}}
-                                        </button>
-                                    </td>
-                                    <td>{{host.deviceType}}</td>
-                                    <td class="text-center text-primary font-500">{{host.count}}</td>
-                                    <td>{{host.description}}</td>
-                                    <td>{{host.source}}</td>
-                                    <td>{{host.lastReported}}</td>
-                                    <td class="text-center">
-                                        <i class="fa" [ngClass]="[host.severityIcon, host.severityClass]"
-                                            [tooltip]="host.severity" container="body"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div *ngIf="!noisyHosts?.length" class="no-data-block no-data-block-sm">
-                            No records available.</div>
-                    </div>
-                </div>
-                <div class="col-5 p-2">
-                    <div class="font-500 mb-1">Noisy Events</div>
-                    <div echarts [options]="noisyHostsOptions" class="noisy-hosts-chart"
-                        *ngIf="noisyHostsOptions"></div>
-                    <div *ngIf="!noisyHostsOptions" class="no-data-block noisy-hosts-chart">No data</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex align-items-center justify-content-between mb-1">
-            <div class="section-title mb-0">Incident Management</div>
-            <div class="filter-control compact-filter">
-                <label class="m-0">Category</label>
-                <select #incidentCategorySelect class="form-control form-control-sm" formControlName="incidentCategory"
-                    (change)="onIncidentCategoryChange(incidentCategorySelect.value)">
-                    <option *ngFor="let option of incidentCategoryOptions; trackBy: trackByKey" [value]="option.value">
-                        {{option.label}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="card bg-white incident-card">
-            <app-spinner [name]="loaderNames.incidentManagement" [width]="0"></app-spinner>
-            <div class="row no-gutters">
-                <div class="col-4 incident-column border-right">
-                    <div class="widget-title text-center">Alert Generated By Device Type</div>
-                    <div class="severity-legend">
-                        <span><i class="legend-dot dot-critical"></i>Critical</span>
-                        <span><i class="legend-dot dot-warning"></i>Warning</span>
-                        <span><i class="legend-dot dot-info"></i>Information</span>
-                    </div>
-                    <div class="table-responsive incident-table-scroll">
-                        <table class="table table-sm mb-0">
-                            <thead class="bg-gray-200">
-                                <tr>
-                                    <th>Device Name</th>
-                                    <th class="text-center">Alert Type</th>
-                                    <th class="text-center">Ticket Count</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of incidentAlertRows; trackBy: trackByKey">
-                                    <td>{{row.deviceName}}</td>
-                                    <td class="text-center">
-                                        <span class="state-pill state-critical">{{row.critical}}</span>
-                                        <span class="state-pill state-warning">{{row.warning}}</span>
-                                        <span class="state-pill state-info">{{row.information}}</span>
-                                    </td>
-                                    <td class="text-center text-primary">{{row.ticketCount}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div *ngIf="!incidentAlertRows?.length" class="no-data-block no-data-block-sm">
-                            No records available.</div>
-                    </div>
-                </div>
-
-                <div class="col-4 incident-column border-right">
-                    <div class="widget-title text-center">Open Incident Ticket</div>
-                    <div class="severity-legend">
-                        <span><i class="legend-dot dot-critical"></i>Critical</span>
-                        <span><i class="legend-dot dot-warning"></i>Warning</span>
-                        <span><i class="legend-dot dot-info"></i>Information</span>
-                    </div>
-                    <div class="table-responsive incident-table-scroll">
-                        <table class="table table-sm mb-0">
-                            <thead class="bg-gray-200">
-                                <tr>
-                                    <th>Ticket ID</th>
-                                    <th>Device Name</th>
-                                    <th class="text-center">Alert Type</th>
-                                    <th class="text-center">Ticket Count</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let ticket of openIncidentTickets; trackBy: trackByKey">
-                                    <td>
-                                        <button class="btn btn-link p-0 table-column-btn" type="button"
-                                            (click)="openCondition(ticket)" [tooltip]="'Open linked page'"
-                                            container="body">{{ticket.ticketId}}</button>
-                                    </td>
-                                    <td>{{ticket.deviceName}}</td>
-                                    <td class="text-center">
-                                        <i class="fa" [ngClass]="[ticket.severityIcon, ticket.severityClass]"
-                                            [tooltip]="ticket.alertType" container="body"></i>
-                                    </td>
-                                    <td class="text-center">{{ticket.ticketCount}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div *ngIf="!openIncidentTickets?.length" class="no-data-block no-data-block-sm">
-                            No records available.</div>
-                    </div>
-                </div>
-
-                <div class="col-4 incident-column">
-                    <div class="widget-title text-center">Resolved Incident Ticket</div>
-                    <div class="severity-legend">
-                        <span><i class="legend-dot dot-critical"></i>Critical</span>
-                        <span><i class="legend-dot dot-warning"></i>Warning</span>
-                        <span><i class="legend-dot dot-info"></i>Information</span>
-                    </div>
-                    <div class="table-responsive incident-table-scroll">
-                        <table class="table table-sm mb-0">
-                            <thead class="bg-gray-200">
-                                <tr>
-                                    <th>Ticket ID</th>
-                                    <th>Device Name</th>
-                                    <th class="text-center">Alert Type</th>
-                                    <th class="text-center">Ticket Count</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let ticket of resolvedIncidentTickets; trackBy: trackByKey">
-                                    <td>
-                                        <button class="btn btn-link p-0 table-column-btn" type="button"
-                                            (click)="openCondition(ticket)" [tooltip]="'Open linked page'"
-                                            container="body">{{ticket.ticketId}}</button>
-                                    </td>
-                                    <td>{{ticket.deviceName}}</td>
-                                    <td class="text-center">
-                                        <i class="fa" [ngClass]="[ticket.severityIcon, ticket.severityClass]"
-                                            [tooltip]="ticket.alertType" container="body"></i>
-                                    </td>
-                                    <td class="text-center">{{ticket.ticketCount}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div *ngIf="!resolvedIncidentTickets?.length" class="no-data-block no-data-block-sm">
-                            No records available.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex align-items-center justify-content-between mb-1 mt-2">
-            <div class="section-title mb-0">Ticket Management</div>
-            <div class="filter-control compact-filter" *ngIf="ticketManagementAccounts?.length > 1">
-                <label class="m-0">Account</label>
-                <select #ticketAccountSelect class="form-control form-control-sm"
-                    [value]="selectedTicketManagementAccount?.uuid"
-                    (change)="onTicketManagementAccountChange(ticketAccountSelect.value)">
-                    <option *ngFor="let account of ticketManagementAccounts; trackBy: trackByKey"
-                        [value]="account.uuid">{{account.name}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="bg-white ticket-management-widget mb-2">
-            <app-spinner [name]="loaderNames.ticketManagement" [width]="0"></app-spinner>
-            <ng-container *ngIf="selectedTicketManagementAccount; else ticketManagementNoAccounts">
-                <div class="ticket-management-toolbar d-flex align-items-center justify-content-between">
-                    <div class="ticket-management-tab-strip">
-                        <scrollable-tab [selector]="'active'">
-                            <div class="nav-item border-right border-light" #scrollLeft>
-                                <a class="nav-link bg-secondary rounded-top border-bottom-0">
-                                    <i class="fa fa-angle-left"></i>
-                                </a>
+        <div class="row mx-0 mb-2">
+            <div class="col-12 px-0">
+                <div class="card bg-white round-edge equalize-card widget-card table-card mb-0">
+                    <div class="card-body p-0">
+                        <div class="widget-data-block position-relative">
+                            <app-spinner [name]="loaderNames.noisyEvents" [width]="0"></app-spinner>
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0 noisy-events-table" sortableTable
+                                    (sorted)="onNoisyEventsSorted($event)">
+                                    <thead class="bg-gray-200">
+                                        <tr>
+                                            <th sortable-column="device"
+                                                [sort-direction]="getNoisyEventsSortDirection('device')">Device</th>
+                                            <th sortable-column="deviceType"
+                                                [sort-direction]="getNoisyEventsSortDirection('deviceType')">Device
+                                                Type</th>
+                                            <th class="text-center" sortable-column="count"
+                                                [sort-direction]="getNoisyEventsSortDirection('count')">Count</th>
+                                            <th>Description</th>
+                                            <th sortable-column="source"
+                                                [sort-direction]="getNoisyEventsSortDirection('source')">Source</th>
+                                            <th sortable-column="lastReported"
+                                                [sort-direction]="getNoisyEventsSortDirection('lastReported')">Last
+                                                Reported</th>
+                                            <th class="text-center" sortable-column="severity"
+                                                [sort-direction]="getNoisyEventsSortDirection('severity')">Severity
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let event of noisyEvents; trackBy: trackByKey">
+                                            <td>
+                                                <button
+                                                    class="btn btn-link p-0 text-primary text-decoration-none font-sm"
+                                                    type="button" (click)="openEventsPage()"
+                                                    [tooltip]="'Open events page'" container="body">
+                                                    {{event.device}}
+                                                </button>
+                                            </td>
+                                            <td>{{event.deviceType}}</td>
+                                            <td class="text-center">{{event.count}}</td>
+                                            <td>{{event.description}}</td>
+                                            <td>{{event.source}}</td>
+                                            <td>{{event.lastReported}}</td>
+                                            <td class="text-center">
+                                                <i class="fa" [ngClass]="[event.severityIcon, event.severityClass]"
+                                                    [tooltip]="event.severity" container="body"></i>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div *ngIf="!noisyEvents?.length"
+                                    class="no-data-block no-data-block-sm d-flex align-items-center justify-content-center text-muted w-100">
+                                    No records available.</div>
                             </div>
-                            <ul class="nav nav-tabs nav-tabs custom-nav-container border-bottom-0" #tabContent
-                                role="tablist">
-                                <li class="nav-item bg-secondary rounded-top"
-                                    *ngFor="let tab of ticketManagementTabs; trackBy: trackByKey">
-                                    <a class="nav-link"
-                                        [ngClass]="{'active text-success': tab === selectedTicketManagementTab}"
-                                        (click)="selectTicketManagementTab(tab)">
-                                        {{tab.name}}
-                                    </a>
-                                </li>
-                            </ul>
-                            <div class="nav-item border-left border-light" #scrollRight>
-                                <a class="nav-link bg-secondary rounded-top border-bottom-0">
-                                    <i class="fa fa-angle-right"></i>
-                                </a>
-                            </div>
-                        </scrollable-tab>
+                        </div>
                     </div>
-                    <button class="btn btn-link btn-sm p-0 ticket-full-details-btn" type="button"
-                        *ngIf="selectedTicketManagementTab" (click)="openTicketManagementDetails()">
-                        Full Details
-                    </button>
                 </div>
+            </div>
+        </div>
 
-                <ng-container *ngIf="ticketManagementTabs?.length; else ticketManagementNoTabs">
-                    <div class="ticket-management-content" *ngIf="ticketManagementCriteria">
-                        <event-analytics-ticket-route-context
-                            [ticketAccountId]="selectedTicketManagementAccount?.uuid"
-                            [ticketProjectId]="selectedTicketManagementTab?.projectId">
-                            <ng-container [ngSwitch]="selectedTicketManagementAccount?.type">
-                                <now-tckt-mgmt *ngSwitchCase="'ServiceNow'"
-                                    [currentCriteria]="ticketManagementCriteria"
-                                    [spinnerName]="loaderNames.ticketManagement"></now-tckt-mgmt>
-                                <ms-dynamics-tckt-mgmt *ngSwitchCase="'DynamicsCrm'"
-                                    [currentCriteria]="ticketManagementCriteria"
-                                    [spinnerName]="loaderNames.ticketManagement"></ms-dynamics-tckt-mgmt>
-                                <jira-tckt-mgmt *ngSwitchCase="'Jira'"
-                                    [currentCriteria]="ticketManagementCriteria"
-                                    [spinnerName]="loaderNames.ticketManagement"></jira-tckt-mgmt>
-                                <tckt-mgmt *ngSwitchCase="'Zendesk'"
-                                    [currentCriteria]="ticketManagementCriteria"
-                                    [spinnerName]="loaderNames.ticketManagement"></tckt-mgmt>
-                                <div *ngSwitchDefault class="no-data-block no-data-block-sm">
-                                    Ticket management type is not supported in this dashboard widget.
+        <div class="section-header-row d-flex align-items-center justify-content-between flex-wrap mb-1">
+            <div class="section-title font-lg font-500 px-1 py-2 mb-0">Top 10 Noisy Hosts</div>
+            <div class="section-header-filters d-flex align-items-end flex-wrap">
+                <div class="filter-control compact-filter mb-0">
+                    <label class="d-block font-sm text-muted mb-0">Category</label>
+                    <select #noisyHostsCategorySelect class="form-control form-control-sm"
+                        formControlName="noisyHostsCategory"
+                        (change)="onNoisyHostsCategoryChange(noisyHostsCategorySelect.value)">
+                        <option *ngFor="let option of noisyHostsCategoryOptions; trackBy: trackByKey"
+                            [value]="option.value">{{option.label}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row mx-0 mb-2">
+            <div class="col-12 px-0">
+                <div class="widget-data-block position-relative noisy-hosts-widget-block">
+                    <app-spinner [name]="loaderNames.noisyHosts" [width]="0"></app-spinner>
+                    <div class="row mx-0">
+                        <div class="col-8 pl-0 pr-1 mb-0">
+                            <div class="card bg-white round-edge equalize-card widget-card table-card noisy-hosts-table-card mb-0 h-100">
+                                <div class="card-header bg-gray-200 border-bottom d-flex align-items-center px-3 py-2">
+                                    <span class="font-md font-500">Noisy Events</span>
                                 </div>
-                            </ng-container>
-                        </event-analytics-ticket-route-context>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm mb-0 noisy-hosts-table" sortableTable
+                                            (sorted)="onNoisyHostsSorted($event)">
+                                            <thead class="bg-gray-200">
+                                                <tr>
+                                                    <th sortable-column="device"
+                                                        [sort-direction]="getNoisyHostsSortDirection('device')">
+                                                        Device</th>
+                                                    <th sortable-column="deviceType"
+                                                        [sort-direction]="getNoisyHostsSortDirection('deviceType')">
+                                                        Device Type</th>
+                                                    <th class="text-center" sortable-column="count"
+                                                        [sort-direction]="getNoisyHostsSortDirection('count')">
+                                                        Count</th>
+                                                    <th>Description</th>
+                                                    <th sortable-column="source"
+                                                        [sort-direction]="getNoisyHostsSortDirection('source')">
+                                                        Source</th>
+                                                    <th sortable-column="lastReported"
+                                                        [sort-direction]="getNoisyHostsSortDirection('lastReported')">
+                                                        Last Reported</th>
+                                                    <th class="text-center" sortable-column="severity"
+                                                        [sort-direction]="getNoisyHostsSortDirection('severity')">
+                                                        Severity</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let host of noisyHosts; trackBy: trackByKey">
+                                                    <td>
+                                                        <button
+                                                            class="btn btn-link p-0 text-primary text-decoration-none font-sm"
+                                                            type="button" (click)="openEventsPage()"
+                                                            [tooltip]="'Open events page'"
+                                                            container="body">{{host.device}}</button>
+                                                    </td>
+                                                    <td>{{host.deviceType}}</td>
+                                                    <td class="text-center text-primary font-500">{{host.count}}
+                                                    </td>
+                                                    <td>{{host.description}}</td>
+                                                    <td>{{host.source}}</td>
+                                                    <td>{{host.lastReported}}</td>
+                                                    <td class="text-center">
+                                                        <i class="fa"
+                                                            [ngClass]="[host.severityIcon, host.severityClass]"
+                                                            [tooltip]="host.severity" container="body"></i>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div *ngIf="!noisyHosts?.length"
+                                            class="no-data-block no-data-block-sm d-flex align-items-center justify-content-center text-muted w-100">
+                                            No records available.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 pr-0 pl-1 mb-0">
+                            <div class="card bg-white round-edge equalize-card widget-card noisy-hosts-chart-card mb-0 h-100">
+                                <div class="card-header bg-gray-200 border-bottom d-flex align-items-center px-3 py-2">
+                                    <span class="font-md font-500">Noisy Events</span>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div echarts [options]="noisyHostsOptions" class="noisy-hosts-chart"
+                                        *ngIf="noisyHostsOptions"></div>
+                                    <div *ngIf="!noisyHostsOptions"
+                                        class="no-data-block noisy-hosts-chart d-flex align-items-center justify-content-center text-muted w-100">No data
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </ng-container>
-            </ng-container>
-            <ng-template #ticketManagementNoAccounts>
-                <div class="no-data-block no-data-block-sm" *ngIf="ticketManagementLoaded">
-                    No Ticket Management accounts were found.
                 </div>
-            </ng-template>
-            <ng-template #ticketManagementNoTabs>
-                <div class="no-data-block no-data-block-sm" *ngIf="ticketManagementLoaded">
-                    No ticket tabs were found.
-                </div>
-            </ng-template>
+            </div>
         </div>
+
+        <div class="section-header-row d-flex align-items-center justify-content-between flex-wrap mb-1">
+            <div class="section-title font-lg font-500 px-1 py-2 mb-0">Incident Management</div>
+            <div class="section-header-filters d-flex align-items-end flex-wrap">
+                <div class="filter-control compact-filter mb-0">
+                    <label class="d-block font-sm text-muted mb-0">Category</label>
+                    <select #incidentCategorySelect class="form-control form-control-sm"
+                        formControlName="incidentCategory"
+                        (change)="onIncidentCategoryChange(incidentCategorySelect.value)">
+                        <option *ngFor="let option of incidentCategoryOptions; trackBy: trackByKey"
+                            [value]="option.value">{{option.label}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row mx-0 mb-2">
+            <div class="col-12 px-0">
+                <div class="card bg-white round-edge equalize-card widget-card incident-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="row mx-0">
+                            <div class="col-4 pr-1 mb-0">
+                                <div class="incident-column h-100 border-right px-2">
+                                    <div class="d-flex align-items-center justify-content-center pb-2 text-center">
+                                        <span class="font-md font-500">Alert Generated By Device Type</span>
+                                    </div>
+                                    <div class="widget-data-block position-relative">
+                                        <app-spinner [name]="loaderNames.incidentAlertByDeviceType"
+                                            [width]="0"></app-spinner>
+                                        <div class="severity-legend d-flex justify-content-center">
+                                            <span><i class="legend-dot dot-critical"></i>Critical</span>
+                                            <span><i class="legend-dot dot-warning"></i>Warning</span>
+                                            <span><i class="legend-dot dot-info"></i>Information</span>
+                                        </div>
+                                        <div class="table-responsive incident-table-scroll">
+                                            <table class="table table-sm mb-0 incident-table" sortableTable
+                                                (sorted)="onIncidentAlertSorted($event)">
+                                                <thead class="bg-gray-200">
+                                                    <tr>
+                                                        <th sortable-column="deviceName"
+                                                            [sort-direction]="getIncidentAlertSortDirection('deviceName')">
+                                                            Device Name</th>
+                                                        <th class="text-center">Alert Type</th>
+                                                        <th class="text-center" sortable-column="ticketCount"
+                                                            [sort-direction]="getIncidentAlertSortDirection('ticketCount')">
+                                                            Ticket Count</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let row of incidentAlertRows; trackBy: trackByKey">
+                                                        <td>
+                                                            <div class="text-truncate" [tooltip]="row.deviceName"
+                                                                container="body">
+                                                                {{row.deviceName}}
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span
+                                                                class="state-pill state-critical">{{row.critical}}</span>
+                                                            <span
+                                                                class="state-pill state-warning">{{row.warning}}</span>
+                                                            <span
+                                                                class="state-pill state-info">{{row.information}}</span>
+                                                        </td>
+                                                        <td class="text-center text-primary">{{row.ticketCount}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div *ngIf="!incidentAlertRows?.length"
+                                                class="no-data-block no-data-block-sm d-flex align-items-center justify-content-center text-muted w-100">
+                                                No records available.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-4 px-1 mb-0">
+                                <div class="incident-column h-100 border-right px-2">
+                                    <div class="d-flex align-items-center justify-content-center pb-2 text-center">
+                                        <span class="font-md font-500">Open Incident Ticket</span>
+                                    </div>
+                                    <div class="widget-data-block position-relative">
+                                        <app-spinner [name]="loaderNames.openIncidentTickets" [width]="0"></app-spinner>
+                                        <div class="severity-legend d-flex justify-content-center">
+                                            <span><i class="legend-dot dot-critical"></i>Critical</span>
+                                            <span><i class="legend-dot dot-warning"></i>Warning</span>
+                                            <span><i class="legend-dot dot-info"></i>Information</span>
+                                        </div>
+                                        <div class="table-responsive incident-table-scroll">
+                                            <table class="table table-sm mb-0 incident-table" sortableTable
+                                                (sorted)="onOpenIncidentSorted($event)">
+                                                <thead class="bg-gray-200">
+                                                    <tr>
+                                                        <th sortable-column="ticketId"
+                                                            [sort-direction]="getOpenIncidentSortDirection('ticketId')">
+                                                            Ticket ID</th>
+                                                        <th sortable-column="deviceName"
+                                                            [sort-direction]="getOpenIncidentSortDirection('deviceName')">
+                                                            Device Name</th>
+                                                        <th class="text-center" sortable-column="alertType"
+                                                            [sort-direction]="getOpenIncidentSortDirection('alertType')">
+                                                            Alert Type</th>
+                                                        <th class="text-center" sortable-column="ticketCount"
+                                                            [sort-direction]="getOpenIncidentSortDirection('ticketCount')">
+                                                            Ticket Count</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let ticket of openIncidentTickets; trackBy: trackByKey">
+                                                        <td>
+                                                            <button
+                                                                class="btn btn-link p-0 text-primary text-decoration-none font-sm"
+                                                                type="button" (click)="openCondition(ticket)"
+                                                                [tooltip]="'Open linked page'"
+                                                                container="body">{{ticket.ticketId}}</button>
+                                                        </td>
+                                                        <td>
+                                                            <div class="text-truncate" [tooltip]="ticket.deviceName"
+                                                                container="body">
+                                                                {{ticket.deviceName}}
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <i class="fa"
+                                                                [ngClass]="[ticket.severityIcon, ticket.severityClass]"
+                                                                [tooltip]="ticket.alertType" container="body"></i>
+                                                        </td>
+                                                        <td class="text-center">{{ticket.ticketCount}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div *ngIf="!openIncidentTickets?.length"
+                                                class="no-data-block no-data-block-sm d-flex align-items-center justify-content-center text-muted w-100">
+                                                No records available.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-4 pl-1 mb-0">
+                                <div class="incident-column h-100 px-2">
+                                    <div class="d-flex align-items-center justify-content-center pb-2 text-center">
+                                        <span class="font-md font-500">Resolved Incident Ticket</span>
+                                    </div>
+                                    <div class="widget-data-block position-relative">
+                                        <app-spinner [name]="loaderNames.resolvedIncidentTickets"
+                                            [width]="0"></app-spinner>
+                                        <div class="severity-legend d-flex justify-content-center">
+                                            <span><i class="legend-dot dot-critical"></i>Critical</span>
+                                            <span><i class="legend-dot dot-warning"></i>Warning</span>
+                                            <span><i class="legend-dot dot-info"></i>Information</span>
+                                        </div>
+                                        <div class="table-responsive incident-table-scroll">
+                                            <table class="table table-sm mb-0 incident-table" sortableTable
+                                                (sorted)="onResolvedIncidentSorted($event)">
+                                                <thead class="bg-gray-200">
+                                                    <tr>
+                                                        <th sortable-column="ticketId"
+                                                            [sort-direction]="getResolvedIncidentSortDirection('ticketId')">
+                                                            Ticket ID</th>
+                                                        <th sortable-column="deviceName"
+                                                            [sort-direction]="getResolvedIncidentSortDirection('deviceName')">
+                                                            Device Name</th>
+                                                        <th class="text-center" sortable-column="alertType"
+                                                            [sort-direction]="getResolvedIncidentSortDirection('alertType')">
+                                                            Alert Type</th>
+                                                        <th class="text-center" sortable-column="ticketCount"
+                                                            [sort-direction]="getResolvedIncidentSortDirection('ticketCount')">
+                                                            Ticket Count</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr
+                                                        *ngFor="let ticket of resolvedIncidentTickets; trackBy: trackByKey">
+                                                        <td>
+                                                            <button
+                                                                class="btn btn-link p-0 text-primary text-decoration-none font-sm"
+                                                                type="button" (click)="openCondition(ticket)"
+                                                                [tooltip]="'Open linked page'"
+                                                                container="body">{{ticket.ticketId}}</button>
+                                                        </td>
+                                                        <td>
+                                                            <div class="text-truncate" [tooltip]="ticket.deviceName"
+                                                                container="body">
+                                                                {{ticket.deviceName}}
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <i class="fa"
+                                                                [ngClass]="[ticket.severityIcon, ticket.severityClass]"
+                                                                [tooltip]="ticket.alertType" container="body"></i>
+                                                        </td>
+                                                        <td class="text-center">{{ticket.ticketCount}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div *ngIf="!resolvedIncidentTickets?.length"
+                                                class="no-data-block no-data-block-sm d-flex align-items-center justify-content-center text-muted w-100">
+                                                No records available.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title font-lg font-500 px-1 py-2 mb-0">ITSM Ticket View</div>
+        <div class="row mx-0 mb-2">
+            <div class="col-12 px-0">
+                <div class="card bg-white round-edge equalize-card widget-card itsm-ticket-card mb-0">
+                    <div class="card-header bg-gray-200 overflow-hidden p-0">
+                        <div class="itsm-ticket-tabs d-flex align-items-center flex-nowrap">
+                            <button class="btn btn-link itsm-ticket-tab text-decoration-none"
+                                *ngFor="let tab of itsmTicketTabOptions; trackBy: trackByKey" type="button"
+                                [ngClass]="{'active': filterForm.get('itsmTicketTab')?.value === tab.value}"
+                                (click)="onItsmTicketTabChange(tab.value)">
+                                {{tab.label}}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="widget-data-block position-relative">
+                            <app-spinner [name]="loaderNames.itsmTicketView" [width]="0"></app-spinner>
+                            <div class="row mx-0 itsm-ticket-summary-row">
+                                <div class="col-4 px-2 mb-0">
+                                    <div class="h-100 border-right itsm-ticket-summary-panel pr-2">
+                                        <div class="d-flex align-items-center justify-content-center pb-2 text-center">
+                                            <span class="font-md font-500">Tickets by Priority</span>
+                                        </div>
+                                        <div echarts [options]="itsmTicketsByPriorityOptions" class="itsm-ticket-chart"
+                                            *ngIf="itsmTicketsByPriorityOptions"></div>
+                                        <div *ngIf="!itsmTicketsByPriorityOptions"
+                                            class="no-data-block itsm-ticket-chart d-flex align-items-center justify-content-center text-muted w-100">
+                                            No Tickets Found.</div>
+                                    </div>
+                                </div>
+                                <div class="col-4 px-2 mb-0">
+                                    <div class="h-100 border-right itsm-ticket-summary-panel pr-2">
+                                        <div class="d-flex align-items-center justify-content-center pb-2 text-center">
+                                            <span class="font-md font-500">Tickets by Status</span>
+                                        </div>
+                                        <div echarts [options]="itsmTicketsByStatusOptions" class="itsm-ticket-chart"
+                                            *ngIf="itsmTicketsByStatusOptions"></div>
+                                        <div *ngIf="!itsmTicketsByStatusOptions"
+                                            class="no-data-block itsm-ticket-chart d-flex align-items-center justify-content-center text-muted w-100">
+                                            No Tickets Found.</div>
+                                    </div>
+                                </div>
+                                <div class="col-4 px-2 mb-0">
+                                    <div class="h-100 itsm-ticket-summary-panel pl-1">
+                                        <div class="d-flex align-items-center justify-content-center pb-2 text-center">
+                                            <span class="font-md font-500">Solved by Response Time</span>
+                                        </div>
+                                        <div echarts [options]="itsmSolvedByResponseTimeOptions"
+                                            class="itsm-ticket-chart" *ngIf="itsmSolvedByResponseTimeOptions"></div>
+                                        <div *ngIf="!itsmSolvedByResponseTimeOptions"
+                                            class="no-data-block itsm-ticket-chart d-flex align-items-center justify-content-center text-muted w-100">
+                                            No Tickets Found.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mx-0 mt-2 pt-2 border-top align-items-end itsm-ticket-toolbar">
+                                <div class="col-8 px-0">
+                                    <div class="row mx-0">
+                                        <div class="col-3 pl-0 pr-2">
+                                            <label class="font-sm text-muted mb-1">Search</label>
+                                            <input type="text" class="form-control form-control-sm"
+                                                formControlName="itsmTicketSearch" placeholder="Enter Keyword">
+                                        </div>
+                                        <div class="col-2 px-2">
+                                            <label class="font-sm text-muted mb-1">State</label>
+                                            <select class="form-control form-control-sm"
+                                                formControlName="itsmTicketState">
+                                                <option *ngFor="let option of itsmTicketStateOptions; trackBy: trackByKey"
+                                                    [value]="option.value">{{option.label}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-3 px-2">
+                                            <label class="font-sm text-muted mb-1">Date Created</label>
+                                            <owl-date-time #itsmDateRangePicker [hour12Timer]="true"
+                                                [pickerType]="'calendar'"></owl-date-time>
+                                            <input class="form-control form-control-sm rounded-left text-center"
+                                                [owlDateTimeTrigger]="itsmDateRangePicker"
+                                                [owlDateTime]="itsmDateRangePicker" [selectMode]="'range'"
+                                                type="text" formControlName="itsmTicketDateRange">
+                                        </div>
+                                        <div class="col-2 px-2">
+                                            <label class="font-sm text-muted mb-1">Priority</label>
+                                            <select class="form-control form-control-sm"
+                                                formControlName="itsmTicketPriority">
+                                                <option *ngFor="let option of itsmTicketPriorityOptions; trackBy: trackByKey"
+                                                    [value]="option.value">{{option.label}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-2 px-2">
+                                            <label class="font-sm text-muted mb-1">Type</label>
+                                            <select class="form-control form-control-sm" formControlName="itsmTicketType">
+                                                <option *ngFor="let option of itsmTicketTypeOptions; trackBy: trackByKey"
+                                                    [value]="option.value">{{option.label}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 px-0">
+                                    <div class="d-flex align-items-center justify-content-end flex-wrap">
+                                        <button class="btn btn-warning btn-sm px-3 mr-2 mb-1" type="button"
+                                            (click)="applyItsmTicketFilters()">Filter Tickets</button>
+                                        <table-page-size [currentPageSize]="filterForm.get('itsmTicketPerPage')?.value"
+                                            [totalCount]="itsmTicketTotal" class="mr-2 mb-1"
+                                            (pageSizeChange)="onItsmTicketPageSizeChange($event)"></table-page-size>
+                                        <span class="text-muted font-sm mb-1">
+                                            <span class="badge badge-pill badge-secondary">{{itsmTicketTotal}}</span>
+                                            Tickets
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive mt-2">
+                                <table class="table table-sm text-left mb-0 itsm-ticket-table" sortableTable
+                                    (sorted)="onItsmTicketSorted($event)">
+                                    <thead>
+                                        <tr>
+                                            <th sortable-column="ticketId">Ticket ID</th>
+                                            <th class="itsm-ticket-subject">Short Description</th>
+                                            <th sortable-column="state">State</th>
+                                            <th sortable-column="priority">Priority</th>
+                                            <th sortable-column="createdOn">Created On</th>
+                                            <th sortable-column="updatedOn">Updated On</th>
+                                            <th>Resolution</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let ticket of itsmTicketRows; trackBy: trackByKey">
+                                            <td><span class="text-primary font-500">{{ticket.ticketId}}</span></td>
+                                            <td><div [tooltip]="ticket.shortDescription">{{ticket.shortDescription}}</div></td>
+                                            <td><div [tooltip]="ticket.state">{{ticket.state}}</div></td>
+                                            <td><div [tooltip]="ticket.priority">{{ticket.priority}}</div></td>
+                                            <td><div [tooltip]="ticket.createdOn">{{ticket.createdOn}}</div></td>
+                                            <td><div [tooltip]="ticket.updatedOn">{{ticket.updatedOn}}</div></td>
+                                            <td><div [tooltip]="ticket.resolution">{{ticket.resolution}}</div></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div *ngIf="!itsmTicketRows?.length"
+                                    class="no-data-block no-data-block-sm d-flex align-items-center justify-content-center text-muted w-100">
+                                    No Tickets To Display.
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap mt-2"
+                                *ngIf="itsmTicketRows?.length">
+                                <table-entries [pageNo]="filterForm.get('itsmTicketPage')?.value"
+                                    [pageSize]="filterForm.get('itsmTicketPerPage')?.value"
+                                    [totalCount]="itsmTicketTotal"></table-entries>
+                                <table-pager [pageNo]="filterForm.get('itsmTicketPage')?.value"
+                                    [pageSize]="filterForm.get('itsmTicketPerPage')?.value"
+                                    [totalCount]="itsmTicketTotal"
+                                    (pageChange)="onItsmTicketPageChange($event)"></table-pager>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>

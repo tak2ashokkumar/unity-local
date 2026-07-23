@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
+import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes-pod.type';
 import { PRIVATE_CLOUD_CONTAINERS_PODS } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceStatusMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';

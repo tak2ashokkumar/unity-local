@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { EChartsOption } from 'echarts';
 import { Observable, of } from 'rxjs';
 import { DatabaseServersService } from 'src/app/united-cloud/shared/database-servers/database-servers.service';
@@ -9,6 +9,8 @@ import {
   CAPACITY_GROWTH_INSIGHT_TABLE_RESP,
   CAPACITY_RESP,
   DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG,
+  DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE,
+  DATABASE_DASHBOARD_TIME_RANGE_OPTIONS,
   DBDASHBOARDCOLORS,
   HEALTHGROWTH_RESP,
   INVENTORY_RESP,
@@ -25,6 +27,7 @@ import {
   DatabaseDashboardFilterCriteria,
   DatabaseDashboardFilterOption,
   DatabaseDashboardMetric,
+  DatabaseDashboardSelectOption,
   DatabaseDashboardTagItem,
   DatabaseDashboardVersionItem,
   InventoryWidgetType,
@@ -74,6 +77,7 @@ import {
   DatabaseDashboardTone
 } from './database-dashboard.type';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import moment from 'moment';
 
 @Injectable()
 export class DatabaseDashboardService {
@@ -97,9 +101,13 @@ export class DatabaseDashboardService {
    * -----Start----- Filters Related -------------------
    */
   buildFilterForm(databases?: DatabaseDashboardFilterOption[]): FormGroup {
+    const customDurationRange = this.getDefaultCustomDurationRange();
     return this.builder.group({
-      databases: [databases || []]
-    });
+      databases: [databases || []],
+      duration: [this.getDefaultOptionValue(DATABASE_DASHBOARD_TIME_RANGE_OPTIONS, 'last_month')],
+      durationFrom: [{ value: customDurationRange.from, disabled: true }, [Validators.required]],
+      durationTo: [{ value: customDurationRange.to, disabled: true }, [Validators.required]]
+    }, { validators: this.customDurationRangeValidator });
   }
 
   getDatabases(): Observable<DatabaseDashboardFilterOption[]> {
@@ -145,6 +153,11 @@ export class DatabaseDashboardService {
     // console.log("criteria", JSON.parse(JSON.stringify(criteria)), sortColumn, sortDirection);
     let params: HttpParams = new HttpParams();
     params = this.appendMultiValueParam(params, 'database', criteria?.databases);
+    params = this.appendParam(params, 'duration', criteria?.duration);
+    if (criteria?.duration === DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE) {
+      params = this.appendDateParam(params, 'from', criteria?.durationFrom);
+      params = this.appendDateParam(params, 'to', criteria?.durationTo);
+    }
     if (sortColumn) {
       params = params.append('sort_by', sortColumn);
     }
@@ -168,6 +181,54 @@ export class DatabaseDashboardService {
       }
     });
     return params;
+  }
+
+  private appendParam(params: HttpParams, key: string, value?: string): HttpParams {
+    if (value == null || value === '') {
+      return params;
+    }
+    return params.append(key, value);
+  }
+
+  private appendDateParam(params: HttpParams, key: string, value?: Date | string): HttpParams {
+    const formattedDate = this.formatApiDate(value);
+    if (!formattedDate) {
+      return params;
+    }
+    return params.append(key, formattedDate);
+  }
+
+  private formatApiDate(value?: Date | string): string | undefined {
+    const date = moment(value);
+    return date.isValid() ? date.format('YYYY-MM-DD HH:mm:ss') : undefined;
+  }
+
+  private getDefaultOptionValue(options: DatabaseDashboardSelectOption[], preferredValue?: string): string {
+    const availableOptions = options || [];
+    const preferredOption = availableOptions.find(option => option.value === preferredValue);
+    return preferredOption?.value || availableOptions[0]?.value || '';
+  }
+
+  private getDefaultCustomDurationRange(): { from: Date; to: Date } {
+    return {
+      from: moment().subtract(24, 'hours').toDate(),
+      to: moment().toDate()
+    };
+  }
+
+  private customDurationRangeValidator(control: AbstractControl): ValidationErrors | null {
+    const duration = control.get('duration')?.value;
+    const isDurationInvalid = duration === DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE &&
+      DatabaseDashboardService.isSameOrAfterRange(control.get('durationFrom')?.value, control.get('durationTo')?.value);
+
+    return isDurationInvalid ? { durationFromSameAsOrAfterTo: true } : null;
+  }
+
+  private static isSameOrAfterRange(from?: Date | string, to?: Date | string): boolean {
+    if (!from || !to) {
+      return false;
+    }
+    return moment(from).isSameOrAfter(moment(to));
   }
   /*
    * ******End ****** Filters Related ********************

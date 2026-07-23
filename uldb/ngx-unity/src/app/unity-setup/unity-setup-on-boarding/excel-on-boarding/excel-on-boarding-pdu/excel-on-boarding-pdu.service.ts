@@ -48,7 +48,7 @@ export class ExcelOnBoardingPduService {
     const cabinets = this.http.get<PDUCRUDCabinet[]>(FIREWALL_CABINETS());
     const pc = this.http.get<PDUCRUDPowerCircuit[]>(PDU_POWER_CIRCUITS());
     const collectors = this.http.get<DeviceDiscoveryAgentConfigurationType[]>(COLLECTOR_LIST_FOR_MANUAL_ONBOARDING());
-    return forkJoin([manufacturers, cabinets, pc , collectors]);
+    return forkJoin([manufacturers, cabinets, pc, collectors]);
   }
 
   getModels(manufacturer: string) {
@@ -95,7 +95,7 @@ export class ExcelOnBoardingPduService {
           'id': [{ value: '', disabled: view.onboarded }, [Validators.required, NoWhitespaceValidator]],
         }),
         'position': [{ value: d.position, disabled: view.onboarded }, [Validators.min(0), NoWhitespaceValidator]],
-        'size': [{ value: d.size, disabled: true }, [Validators.required, Validators.min(1), NoWhitespaceValidator]],
+        'size': [{ value: d.size, disabled: view.onboarded }, [Validators.required, Validators.min(1), NoWhitespaceValidator]],
         'sockets': [{ value: d.sockets, disabled: view.onboarded }, [Validators.required, Validators.min(1), NoWhitespaceValidator]],
         'management_ip': [{ value: d.ip_address, disabled: view.onboarded }, [NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
         'snmp_ip': [{ value: d.snmp_ip, disabled: view.onboarded }, [NoWhitespaceValidator]],

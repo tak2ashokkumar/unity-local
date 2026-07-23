@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
-import { AuthType, ConditionInvestigationFloatingTerminalService } from '../condition-investigation-floating-terminal.service';
+import { AuthType, CliTerminalLifecycleEvent, ConditionInvestigationFloatingTerminalService } from '../condition-investigation-floating-terminal.service';
 import { Terminal } from 'xterm';
 import { WSSHClient } from '../condition-investigation-wssh-client';
 import { FitAddon } from 'xterm-addon-fit';
@@ -29,6 +29,7 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
   fitAddon = new FitAddon();
   private currentCommand = '';
   private exitCommandSent = false;
+  private lifecycleCompleted = false;
 
   constructor(private termService: ConditionInvestigationFloatingTerminalService) {
     this.termService.resizeAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
@@ -52,22 +53,29 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
   }
 
   ngOnDestroy() {
+    this.emitTerminalClosedIfNeeded('Terminal closed before command completed.');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     this.termService.unregisterTerminal(this.input.tabId);
-    this.term.dispose();
-    this.wsClient.close();
+    this.term?.dispose();
+    this.wsClient?.close();
+  }
+
+  @HostListener('window:beforeunload')
+  onBeforeUnload() {
+    this.emitTerminalClosedIfNeeded('Terminal tab closed before command completed.');
   }
 
   initTerminal() {
     this.currentCommand = '';
     this.exitCommandSent = false;
+    this.lifecycleCompleted = false;
     document.getElementById('term-' + this.index).setAttribute('style', 'height:' + Math.round(window.innerHeight - document.getElementsByClassName('terminal-container')[0].getBoundingClientRect().top) + 'px;');
     this.term = new Terminal({ cursorBlink: true });
     this.term.loadAddon(this.fitAddon);
     this.term.open(document.getElementById('term-' + this.index));
     this.fitAddon.fit();
-    let obj = Object.assign({ hostname: this.auth.host, port: this.auth.port, collector_uuid: this.auth.collector_uuid, password: this.auth.password, username: this.auth.username, conversation_id: this.auth.conversation_id, uuid: this.input.tabId, tab_type: this.auth.tab_type, org_id: this.auth.org_id, user_id: this.auth.user_id, agent_id: this.auth.agent_id, connection_type: this.auth.connection_type,transport: this.auth.transport,shell: this.auth.shell,pkey: this.auth.pkey }, this.getRowsCols());
+    let obj = Object.assign({ hostname: this.auth.host, port: this.auth.port, collector_uuid: this.auth.collector_uuid, password: this.auth.password, username: this.auth.username, conversation_id: this.auth.conversation_id, uuid: this.input.tabId, tab_type: this.auth.tab_type, org_id: this.auth.org_id, user_id: this.auth.user_id, agent_id: this.auth.agent_id, connection_type: this.auth.connection_type, engine: this.auth.engine, database: this.auth.database, transport: this.auth.transport, shell: this.auth.shell, pkey: this.auth.pkey }, this.getRowsCols());
     this.wsClient = new WSSHClient(obj);
     this.termService.registerTerminal(this.input.tabId, this.wsClient, this.tabType);
     this.termService.setTabRunning(this.input.tabId, false);
@@ -87,6 +95,12 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
     });
 
     this.wsClient.onMessage.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      const lifecycleEvent = this.parseLifecycleEvent(res);
+      if (lifecycleEvent) {
+        this.handleLifecycleEvent(lifecycleEvent);
+        return;
+      }
+
       this.term.write(res);
 
       // VERY IMPORTANT: detect command start
@@ -104,6 +118,7 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
 
     this.wsClient.onClose.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.term.write(`\rconnection closed\r\n`);
+      this.emitTerminalClosedIfNeeded('Terminal connection closed before command completed.');
       if (!this.exitCommandSent) {
         this.term.write("Enter Y to reconnect...\r\n");
       }
@@ -112,6 +127,68 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
     this.wsClient.onError.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.term.write('Error: ' + res + '\r\n');
     });
+  }
+
+  private parseLifecycleEvent(raw: any): any | null {
+    if (typeof raw !== 'string') {
+      return null;
+    }
+    const trimmed = raw.trim();
+    if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(trimmed);
+      const type = parsed.type || parsed.event;
+      if (['command_started', 'command_completed', 'command_failed'].includes(type)) {
+        return { ...parsed, type };
+      }
+    } catch { }
+    return null;
+  }
+
+  private handleLifecycleEvent(event: any) {
+    if (event.type === 'command_completed' || event.type === 'command_failed') {
+      this.lifecycleCompleted = true;
+    }
+    if (event.type === 'command_started') {
+      this.isRunning = true;
+      this.termService.setTabRunning(this.input.tabId, true);
+    } else {
+      this.isRunning = false;
+      this.termService.setTabRunning(this.input.tabId, false);
+    }
+
+    this.termService.emitCommandLifecycle({
+      type: event.type,
+      tabId: this.input.tabId,
+      tabType: this.tabType,
+      conversationId: this.auth.conversation_id,
+      command: event.command,
+      cli_audit_log_id: event.cli_audit_log_id || event.cliAuditLogId || event.audit_log_id || event.auditLogId || event.id,
+      error: event.error || event.message,
+      payload: event,
+    });
+  }
+
+  private emitTerminalClosedIfNeeded(error: string) {
+    if (!this.input?.tabId || this.lifecycleCompleted || this.exitCommandSent) {
+      return;
+    }
+    const event: CliTerminalLifecycleEvent = {
+      type: 'command_failed',
+      tabId: this.input.tabId,
+      tabType: this.tabType,
+      conversationId: this.auth?.conversation_id,
+      error,
+      payload: {
+        reason: 'terminal_closed',
+      },
+    };
+    this.lifecycleCompleted = true;
+    this.isRunning = false;
+    this.termService.setTabRunning(this.input.tabId, false);
+    this.termService.emitCommandLifecycle(event);
   }
 
   sendDataToClient(data: any) {

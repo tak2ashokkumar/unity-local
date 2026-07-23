@@ -17,6 +17,7 @@ import {
   DbDashboardHealthGroup,
   DatabaseDashboardMetric,
   DbDashboardSummary,
+  DatabaseDashboardSelectOption,
   DatabaseDashboardTagItem,
   DatabaseDashboardTone,
   DatabaseDashboardVersionItem,
@@ -32,7 +33,9 @@ import {
 } from './database-dashboard.type';
 import {
   DATABASE_DASHBOARD_EFFICIENCY_STATUS_INFO,
-  DATABASE_DASHBOARD_METRIC_INFO_CONFIG
+  DATABASE_DASHBOARD_METRIC_INFO_CONFIG,
+  DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE,
+  DATABASE_DASHBOARD_TIME_RANGE_OPTIONS
 } from './database-dashboard.const';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -42,6 +45,7 @@ import { Location } from '@angular/common';
 import { FormGroup } from '@angular/forms';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import moment from 'moment';
+import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 
 @Component({
   selector: 'database-dashboard',
@@ -52,9 +56,12 @@ import moment from 'moment';
 export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
   private appliedDatabaseFilterKey: string = '';
+  readonly customTimelineValue = DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE;
   refreshedText: string = '';
   filterForm: FormGroup;
   databaseOptions: DatabaseDashboardFilterOption[] = [];
+  timeRangeOptions: DatabaseDashboardSelectOption[] = DATABASE_DASHBOARD_TIME_RANGE_OPTIONS;
+  timeRangeDropdownOptions: DateRangeOption[] = this.getDateDropdownOptions(this.timeRangeOptions);
   metricInfoMap = DATABASE_DASHBOARD_METRIC_INFO_CONFIG;
   databaseEfficiencyStatusInfo: DatabaseDashboardStatusInfo[] = DATABASE_DASHBOARD_EFFICIENCY_STATUS_INFO;
 
@@ -162,13 +169,6 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   sortDirection: string = 'asc';
   databaseEfficiencySortColumn: string = 'buffer_pool_efficiency';
   databaseEfficiencySortDirection: string = 'desc';
-  utilizationSortOptions = [
-    { label: 'CPU', value: 'cpu_usage_system_percent' },
-    { label: 'Memory', value: 'memory_used_percent' },
-    { label: 'Disk', value: 'disk_utilization_percent' },
-    { label: 'Disk IOPS', value: 'disk_iops' },
-    { label: 'Up Time', value: 'system_uptime_seconds' }
-  ];
 
   constructor(private svc: DatabaseDashboardService,
     private router: Router,
@@ -200,8 +200,8 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   /** Applies selected database filters to every database dashboard widget request. */
   applyFilters() {
-    const selectedDatabaseKey = this.getSelectedValues('databases').join('|');
-    if (selectedDatabaseKey === this.appliedDatabaseFilterKey) {
+    const filterFormOutput = this.getFilterFormOutput();
+    if (this.getAppliedFilterKey(filterFormOutput) === this.appliedDatabaseFilterKey) {
       return;
     }
     this.loadData();
@@ -210,6 +210,14 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   /** Reloads database filter options and rebuilds the dashboard after the filter form is ready. */
   refreshData() {
     this.loadFilterOptionsAndDashboard();
+  }
+
+  onDurationDropdownSubmit(event: { period?: string; from?: Date | string; to?: Date | string }) {
+    this.patchDurationRange(event);
+    this.syncCustomDurationControls();
+    if (this.isDurationReady()) {
+      this.loadData();
+    }
   }
 
   // /** Reloads all filter options and recreates the filter form only after database data is ready. */
@@ -236,6 +244,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   private buildFilterForm() {
     const selectedDatabases = this.databaseOptions.slice();
     this.filterForm = this.svc.buildFilterForm(selectedDatabases);
+    this.syncCustomDurationControls();
   }
 
   /** Clears existing filter form/options so a fresh filter loading sequence can run. */
@@ -261,7 +270,27 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   /** Returns the normalized filter form output passed to all dashboard service calls. */
   private getFilterFormOutput(): DatabaseDashboardFilterCriteria {
     return {
-      databases: this.getSelectedValues('databases')
+      databases: this.getSelectedValues('databases'),
+      duration: this.filterForm?.get('duration')?.value || '',
+      durationFrom: this.filterForm?.get('durationFrom')?.value,
+      durationTo: this.filterForm?.get('durationTo')?.value
+    };
+  }
+
+  isCustomDurationSelected(): boolean {
+    return this.filterForm?.get('duration')?.value === this.customTimelineValue;
+  }
+
+  get durationDropdownDefault(): string | DateRangeOption {
+    const period = this.filterForm?.get('duration')?.value;
+    if (period !== this.customTimelineValue) {
+      return period;
+    }
+    return {
+      value: this.customTimelineValue,
+      label: 'Custom',
+      from: this.filterForm?.get('durationFrom')?.value,
+      to: this.filterForm?.get('durationTo')?.value
     };
   }
 
@@ -320,16 +349,6 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     return !!this.getDatabaseEfficiencySortDirection(columnName);
   }
 
-  onUtilizationSortChange(sortColumn: string): void {
-    if (!sortColumn || sortColumn === this.sortColumn) {
-      return;
-    }
-
-    this.sortColumn = sortColumn;
-    this.sortDirection = this.sortDirection || 'asc';
-    this.getWorkloadInsightsTop10UtilData(this.getFilterFormOutput());
-  }
-
   private convertLastRefreshTime(refreshTime?: string): string {
     const istOffsetMinutes = 330;
     const refreshMoment = refreshTime ? moment(refreshTime).utcOffset(istOffsetMinutes) : moment().utcOffset(istOffsetMinutes);
@@ -348,13 +367,70 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     return `${refreshedAt.format('dddd, DD MMM YYYY')} : ${timeText} IST`;
   }
 
+  private syncCustomDurationControls() {
+    const fromControl = this.filterForm?.get('durationFrom');
+    const toControl = this.filterForm?.get('durationTo');
+    if (!fromControl || !toControl) {
+      return;
+    }
+    if (this.isCustomDurationSelected()) {
+      fromControl.enable({ emitEvent: false });
+      toControl.enable({ emitEvent: false });
+    } else {
+      fromControl.disable({ emitEvent: false });
+      toControl.disable({ emitEvent: false });
+    }
+    this.filterForm.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private isDurationReady(): boolean {
+    if (!this.isCustomDurationSelected()) {
+      return true;
+    }
+    const from = this.filterForm?.get('durationFrom')?.value;
+    const to = this.filterForm?.get('durationTo')?.value;
+    return !this.filterForm?.errors?.durationFromSameAsOrAfterTo &&
+      !!from &&
+      !!to &&
+      !isNaN(new Date(from).getTime()) &&
+      !isNaN(new Date(to).getTime());
+  }
+
+  private patchDurationRange(event: { period?: string; from?: Date | string; to?: Date | string }) {
+    if (!this.filterForm) {
+      return;
+    }
+    this.filterForm.patchValue({
+      duration: event?.period || '',
+      durationFrom: event?.from || null,
+      durationTo: event?.to || null
+    }, { emitEvent: false });
+  }
+
+  private getDateDropdownOptions(options: DatabaseDashboardSelectOption[]): DateRangeOption[] {
+    return (options || [])
+      .filter(option => option?.value !== this.customTimelineValue)
+      .map(option => ({ label: option.label, value: option.value }));
+  }
+
+  private getAppliedFilterKey(criteria: DatabaseDashboardFilterCriteria): string {
+    const durationFrom = criteria?.durationFrom ? moment(criteria.durationFrom).format('YYYY-MM-DD HH:mm:ss') : '';
+    const durationTo = criteria?.durationTo ? moment(criteria.durationTo).format('YYYY-MM-DD HH:mm:ss') : '';
+    return [
+      (criteria?.databases || []).join('|'),
+      criteria?.duration || '',
+      durationFrom,
+      durationTo
+    ].join('__');
+  }
+
   /** Loads all dashboard widgets only after the filter form exists and has loaded filter data. */
   loadData() {
     // if (!this.hasFilterFormData()) {
     //   return;
     // }
     const filterFormOutput = this.getFilterFormOutput();
-    this.appliedDatabaseFilterKey = filterFormOutput.databases.join('|');
+    this.appliedDatabaseFilterKey = this.getAppliedFilterKey(filterFormOutput);
     setTimeout(() => {
       this.getInventoryOverviewWidgetData(filterFormOutput);
       this.getWorkloadInsightsTop10UtilData(filterFormOutput);

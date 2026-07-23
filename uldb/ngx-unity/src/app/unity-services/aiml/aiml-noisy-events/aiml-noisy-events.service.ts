@@ -5,6 +5,7 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { AIMLNoisyEvents } from 'src/app/shared/SharedEntityTypes/aiml.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { AnalyticsFilterFormData } from '../aiml-analytics/aiml-analytics.service';
+import { GET_AIOPS_EVENT_ANALYTICS_NOISY } from 'src/app/shared/api-endpoint.const';
 
 @Injectable()
 export class AimlNoisyEventsService {
@@ -20,7 +21,7 @@ export class AimlNoisyEventsService {
     //   console.log(criteria.searchValue,'what the hell')
     // }
     formData.search = criteria.searchValue;
-    return this.http.post<AIMLNoisyEvents[]>('/customer/aiops/events/noisy/', formData);
+    return this.http.post<AIMLNoisyEvents[]>(GET_AIOPS_EVENT_ANALYTICS_NOISY(), formData);
   }
 
   convertToNoisyEventsViewData(events: AIMLNoisyEvents[]): AIMLNoisyEventsViewData[] {

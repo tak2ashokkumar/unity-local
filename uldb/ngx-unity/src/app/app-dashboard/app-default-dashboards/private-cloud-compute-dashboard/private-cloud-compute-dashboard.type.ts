@@ -142,9 +142,9 @@ export interface FanTemperatureSensors {
 }
 
 export interface PerformanceWorkloadDataType {
-  diskLatencyTop10: DiskLatencyTop10Item[];
-  cpuReadyWaitTop10: CpuReadyWaitTop10Item[];
-  swapBalloonMemoryTop10: SwapBalloonMemoryTop10Item[];
+  diskThroughputTop10: DiskLatencyTop10Item[];
+  cpuReadyTop10: CpuReadyWaitTop10Item[];
+  swapMemoryTop10: SwapBalloonMemoryTop10Item[];
   // filters: Filters;
 }
 export interface DiskLatencyTop10Item {

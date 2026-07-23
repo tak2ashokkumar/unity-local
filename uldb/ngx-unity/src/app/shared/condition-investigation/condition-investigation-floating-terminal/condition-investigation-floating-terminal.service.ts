@@ -18,7 +18,30 @@ export class ConditionInvestigationFloatingTerminalService {
   private tabChangeAnnouncedSource = new Subject<{ deviceId: string, deviceType: DeviceMapping }>();
   private isOpenAnnouncedSource = new Subject<boolean>();
   private switchTabSource = new Subject<string>();
-  constructor(private http: HttpClient) { }
+  private commandLifecycleSource = new Subject<CliTerminalLifecycleEvent>();
+  private commandLifecycleChannel: BroadcastChannel | null = null;
+  constructor(private http: HttpClient) {
+    if (typeof BroadcastChannel !== 'undefined') {
+      this.commandLifecycleChannel = new BroadcastChannel('terminal-tabs');
+      this.commandLifecycleChannel.onmessage = (message: MessageEvent) => {
+        const data = message?.data;
+        if (data?.type === 'COMMAND_LIFECYCLE' && data.event) {
+          this.commandLifecycleSource.next(data.event);
+        }
+      };
+    }
+    window.addEventListener('storage', (message: StorageEvent) => {
+      if (message.key !== 'terminal_lifecycle_event' || !message.newValue) {
+        return;
+      }
+      try {
+        const data = JSON.parse(message.newValue);
+        if (data?.event) {
+          this.commandLifecycleSource.next(data.event);
+        }
+      } catch { }
+    });
+  }
 
 
   // Observable string streams
@@ -27,6 +50,7 @@ export class ConditionInvestigationFloatingTerminalService {
   tabChangeAnnounced$ = this.tabChangeAnnouncedSource.asObservable().pipe(shareReplay(1));
   isOpenAnnounced$ = this.isOpenAnnouncedSource.asObservable().pipe(shareReplay(1));
   switchTab$ = this.switchTabSource.asObservable();
+  commandLifecycle$ = this.commandLifecycleSource.asObservable();
 
   getDetails(deviceType: DeviceMapping, deviceId: string): Observable<string> {
     return this.http.get(CONSOLE_ACCESS_DETAILS_BY_DEVICE_TYPE(deviceType, deviceId)).pipe(map((res: { management_ip: string }) => { return res['management_ip'] }));
@@ -123,6 +147,22 @@ export class ConditionInvestigationFloatingTerminalService {
   switchToTab(tabId: string) {
     this.switchTabSource.next(tabId);
   }
+
+  emitCommandLifecycle(event: CliTerminalLifecycleEvent, broadcast: boolean = true) {
+    this.commandLifecycleSource.next(event);
+    if (broadcast && this.commandLifecycleChannel) {
+      this.commandLifecycleChannel.postMessage({
+        type: 'COMMAND_LIFECYCLE',
+        event,
+      });
+    }
+    if (broadcast && event.payload?.reason === 'terminal_closed') {
+      localStorage.setItem('terminal_lifecycle_event', JSON.stringify({
+        event,
+        timestamp: Date.now(),
+      }));
+    }
+  }
 }
 
 export interface FloatingTerminalInput {
@@ -147,6 +187,19 @@ export interface AuthType {
   collector_uuid: string;
   user_id?: string;
   connection_type: string;
+  engine?: string;
+  database?: string;
   transport?: string;
   shell?: string;
+}
+
+export interface CliTerminalLifecycleEvent {
+  type: 'command_started' | 'command_completed' | 'command_failed';
+  tabId: string;
+  tabType?: 'sameTab' | 'newTab';
+  conversationId?: string;
+  command?: string;
+  cli_audit_log_id?: string | number;
+  error?: string;
+  payload?: any;
 }

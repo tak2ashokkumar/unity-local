@@ -1,25 +1,21 @@
 import {
-  AlertGeneratedResponse,
-  AlertSegregationResponse,
-  AlertStatusResponse,
+  AlertByDeviceTypeApiResponse,
+  AlertSegregationApiResponse,
+  AlertWidgetApiResponse,
   DashboardFilters,
-  DashboardHeader,
-  EventAlertAnalyticsResponse,
-  EventAnalyticsTicketTab,
-  EventByDeviceCategoryResponse,
-  ExecutiveSummaryResponse,
-  IncidentManagementResponse,
-  NoisyEventsResponse,
-  NoisyHostsResponse,
-  PipelineResponse,
+  DashboardFiltersApiResponse,
+  DashboardHeaderApiResponse,
+  EventAlertAnalyticsApiResponse,
+  EventByDeviceTypeApiResponse,
+  ExecutiveSummaryApiResponse,
+  IncidentTicketApiResponse,
+  ItsmTicketViewApiResponse,
+  NoisyEventsApiResponse,
+  NoisyHostsApiResponse,
+  PipelineApiResponse,
   SelectOption,
-  TrendByTimelineResponse
+  TrendByTimelineApiResponse
 } from './event-analytics-dashboard.type';
-import {
-  MS_DYNAMICS_TICKET_TYPE,
-  SERVICE_NOW_TICKET_TYPE,
-  TICKET_TYPE
-} from 'src/app/shared/app-utility/app-utility.service';
 
 export const EVENT_ANALYTICS_TOP_HEADER_ENDPOINT = '/customer/persona/event-analytics-dashboard/dashboard-header/';
 export const EVENT_ANALYTICS_DASHBOARD_FILTERS_ENDPOINT = '/customer/persona/event-analytics-dashboard/dashboard-filters/';
@@ -30,33 +26,13 @@ export const EVENT_ANALYTICS_ALERT_GENERATED_ENDPOINT = '/customer/persona/event
 export const EVENT_ANALYTICS_ALERT_STATUS_ENDPOINT = '/customer/persona/event-analytics-dashboard/alert-status/';
 export const EVENT_ANALYTICS_TREND_BY_TIMELINE_ENDPOINT = '/customer/persona/event-analytics-dashboard/trend-by-timeline/';
 export const EVENT_ANALYTICS_ALERT_BY_DEVICE_TYPE_ENDPOINT = '/customer/persona/event-analytics-dashboard/alert-by-device-type/';
+export const EVENT_ANALYTICS_ALERT_SEGREGATION_ENDPOINT = '/customer/persona/event-analytics-dashboard/alert-segregation-by-type/';
 export const EVENT_ANALYTICS_EVENT_ALERT_ANALYTICS_ENDPOINT = '/customer/persona/event-analytics-dashboard/event-alert-analytics/';
 export const EVENT_ANALYTICS_OPEN_INCIDENTS_ENDPOINT = '/customer/persona/event-analytics-dashboard/open-incident-tickets/';
 export const EVENT_ANALYTICS_RESOLVED_INCIDENTS_ENDPOINT = '/customer/persona/event-analytics-dashboard/resolved-incident-tickets/';
 export const EVENT_ANALYTICS_NOISY_EVENTS_ENDPOINT = '/customer/persona/event-analytics-dashboard/noisy-events/';
 export const EVENT_ANALYTICS_NOISY_HOSTS_ENDPOINT = '/customer/persona/event-analytics-dashboard/noisy-hosts/';
-export const EVENT_ANALYTICS_JIRA_PROJECTS_ENDPOINT = (uuid: string) => `/customer/jira/instances/${uuid}/projects_list/`;
-
-export const EVENT_ANALYTICS_ZENDESK_TICKET_TABS = (uuid: string): EventAnalyticsTicketTab[] => [
-  { key: 'alltickets', name: 'All Tickets', ticketType: TICKET_TYPE.ALL, drillDownLink: `/support/ticketmgmt/${uuid}/alltickets` },
-  { key: 'changetickets', name: 'Change Management', ticketType: TICKET_TYPE.TASK, drillDownLink: `/support/ticketmgmt/${uuid}/changetickets` },
-  { key: 'existingtickets', name: 'Incident Management', ticketType: TICKET_TYPE.INCIDENT, drillDownLink: `/support/ticketmgmt/${uuid}/existingtickets` },
-  { key: 'servicerequests', name: 'Service Request', ticketType: TICKET_TYPE.PROBLEM, drillDownLink: `/support/ticketmgmt/${uuid}/servicerequests` }
-];
-
-export const EVENT_ANALYTICS_SERVICE_NOW_TICKET_TABS = (uuid: string): EventAnalyticsTicketTab[] => [
-  { key: 'nowtickets', name: 'All tickets', ticketType: null, drillDownLink: `/support/ticketmgmt/${uuid}/nowtickets` },
-  { key: 'nowchange', name: 'Change Request', ticketType: SERVICE_NOW_TICKET_TYPE.CHANGE_REQUEST, drillDownLink: `/support/ticketmgmt/${uuid}/nowchange` },
-  { key: 'nowincident', name: 'Incident', ticketType: SERVICE_NOW_TICKET_TYPE.INCIDENT, drillDownLink: `/support/ticketmgmt/${uuid}/nowincident` },
-  { key: 'nowproblem', name: 'Problem', ticketType: SERVICE_NOW_TICKET_TYPE.PROBLEM, drillDownLink: `/support/ticketmgmt/${uuid}/nowproblem` }
-];
-
-export const EVENT_ANALYTICS_MS_DYNAMICS_TICKET_TABS = (uuid: string): EventAnalyticsTicketTab[] => [
-  { key: 'dynamics-crm-tickets', name: 'All tickets', ticketType: null, drillDownLink: `/support/ticketmgmt/${uuid}/dynamics-crm-tickets` },
-  { key: 'dynamics-crm-changes', name: 'Change', ticketType: MS_DYNAMICS_TICKET_TYPE.CHANGE, drillDownLink: `/support/ticketmgmt/${uuid}/dynamics-crm-changes` },
-  { key: 'dynamics-crm-incidents', name: 'Incident', ticketType: MS_DYNAMICS_TICKET_TYPE.INCIDENT, drillDownLink: `/support/ticketmgmt/${uuid}/dynamics-crm-incidents` },
-  { key: 'dynamics-crm-problems', name: 'Problem', ticketType: MS_DYNAMICS_TICKET_TYPE.PROBLEM, drillDownLink: `/support/ticketmgmt/${uuid}/dynamics-crm-problems` }
-];
+export const EVENT_ANALYTICS_ITSM_TICKET_VIEW_ENDPOINT = '/customer/persona/event-analytics-dashboard/itsm-ticket-view/';
 
 export const EVENT_ANALYTICS_STATUS_COLORS: Record<string, string> = {
   critical: '#d90000',
@@ -86,7 +62,37 @@ export const EVENT_ANALYTICS_DONUT_COLORS = [
   '#95a0aa'
 ];
 
-export const EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY: SelectOption[] = [
+export const EVENT_ANALYTICS_ITSM_PRIORITY_COLORS = ['#f28c38', '#7c61d1', '#e24c4b', '#4f8ed8', '#8dbb45'];
+export const EVENT_ANALYTICS_ITSM_STATUS_COLORS = ['#77d353', '#f28c38', '#4f8ed8', '#7c61d1', '#e24c4b'];
+export const EVENT_ANALYTICS_ITSM_RESPONSE_TIME_COLORS = ['#77d353', '#4f8ed8', '#f28c38', '#d0d5da'];
+
+export const EVENT_ANALYTICS_CATEGORY_COLOR_MAP: Record<string, string> = {
+  application: '#458bd4',
+  baremetal: '#64cfc1',
+  baremetal_servers: '#64cfc1',
+  container: '#7b61d0',
+  containers: '#7b61d0',
+  database: '#f0c24f',
+  gpu: '#64b6e8',
+  network: '#4a86d8',
+  private_cloud_compute: '#6951c8',
+  public_cloud_compute: '#7e68d5',
+  platform_services: '#39b7a5',
+  sd_wan: '#f39a2f',
+  sensors: '#2f80d1',
+  storage: '#5cc0d0',
+  others: '#95a0aa'
+};
+
+export const EVENT_ALERT_ANALYTICS_NODE_IMAGE_MAP: Record<string, string> = {
+  unityonecloud: '',
+  logicmonitor: '',
+  opsramp: '',
+  dynatrace: '',
+  newrelic: ''
+};
+
+export const EVENT_ANALYTICS_CATEGORY_OPTIONS: SelectOption[] = [
   { value: 'all', label: 'All' },
   { value: 'application', label: 'Application' },
   { value: 'baremetal', label: 'Baremetal Servers' },
@@ -109,39 +115,38 @@ export const EVENT_ANALYTICS_TREND_ALERT_TYPE_OPTIONS: SelectOption[] = [
   { value: 'events', label: 'Events' }
 ];
 
-export const DASHBOARD_HEADER_DUMMY: DashboardHeader = {
-  lastRefreshed: 'Today 10:00 IST',
-  scopeText: 'All providers - All regions - All accounts'
-};
-
 export const EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE = 'custom';
 
 export const EVENT_ANALYTICS_TIME_RANGE_OPTIONS: SelectOption[] = [
-  { value: 'last_1_hour', label: '1 Hour' },
+  // { value: 'last_hour', label: '1 Hour' },
   { value: 'last_24_hours', label: '24 Hour' },
-  { value: 'last_7_days', label: '7 Days' },
+  { value: 'last_week', label: '7 Days' },
   { value: 'last_month', label: '30 Days' },
   { value: 'last_60_days', label: '60 Days' },
-  { value: 'last_90_days', label: '90 Days' },
+  { value: 'last_quarter', label: '90 Days' },
   { value: EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE, label: 'Custom' }
 ];
 
 export const DASHBOARD_FILTERS_DUMMY: DashboardFilters = {
   timeRange: EVENT_ANALYTICS_TIME_RANGE_OPTIONS,
   trendTimeline: EVENT_ANALYTICS_TIME_RANGE_OPTIONS,
-  category: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY,
-  eventDeviceCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY,
-  alertSegregationCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY,
+  category: EVENT_ANALYTICS_CATEGORY_OPTIONS,
+  eventDeviceCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS,
+  alertSegregationCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS,
   analyticsViewBy: [
     { value: 'source', label: 'Source' },
-    { value: 'device_type', label: 'Device Type' },
     { value: 'severity', label: 'Severity' }
   ],
   analyticsSourceType: [
     { value: 'all_source', label: 'All Source' },
     { value: 'unity', label: 'Unity' },
+    { value: 'azure', label: 'Azure' },
+    { value: 'nagios', label: 'Nagios' },
+    { value: 'zabbix', label: 'Zabbix' },
+    { value: 'aws_cloudwatch', label: 'AWS CloudWatch' },
     { value: 'logicmonitor', label: 'LogicMonitor' },
-    { value: 'opsramp', label: 'OpsRamp' }
+    { value: 'opsramp', label: 'OpsRamp' },
+    { value: 'appdynamics', label: 'AppDynamics' }
   ],
   analyticsSeverityType: [
     { value: 'all_severity', label: 'All Severity' },
@@ -159,33 +164,94 @@ export const DASHBOARD_FILTERS_DUMMY: DashboardFilters = {
     { value: 'private_cloud', label: 'Private Cloud' },
     { value: 'public_cloud', label: 'Public Cloud' }
   ],
-  analyticsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY,
-  analyticsDuration: [
-    { value: 'last_7_days', label: 'Last 7 days' },
-    { value: 'last_month', label: 'Last Month' }
+  analyticsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS,
+  eventAndAlertTimeline: EVENT_ANALYTICS_TIME_RANGE_OPTIONS,
+  noisyEventsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS,
+  noisyHostsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS,
+  incidentCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS
+};
+
+export const DASHBOARD_HEADER_API_DUMMY: DashboardHeaderApiResponse = {
+  lastRefreshed: 'Today 00:06 IST',
+  scope: {
+    sources: 'All sources (12)',
+    deviceTypes: 'All device types (16)'
+  },
+  activeSources: ['Unity', 'Azure', 'Nagios', 'Oci', 'Zabbix', 'Gcp', 'Aws', 'Opsramp', 'LogicMonitor', 'AppDynamics', 'Custom', 'Email']
+};
+
+export const DASHBOARD_TOP_FILTERS_API_DUMMY: DashboardFiltersApiResponse = {
+  source: [
+    { value: 'unity', label: 'Unity' },
+    { value: 'azure', label: 'Azure' },
+    { value: 'nagios', label: 'Nagios' },
+    { value: 'oci', label: 'Oci' },
+    { value: 'zabbix', label: 'Zabbix' },
+    { value: 'gcp', label: 'Gcp' },
+    { value: 'aws', label: 'Aws' },
+    { value: 'opsramp', label: 'Opsramp' },
+    { value: 'logicmonitor', label: 'LogicMonitor' },
+    { value: 'appdynamics', label: 'AppDynamics' },
+    { value: 'custom', label: 'Custom' },
+    { value: 'email', label: 'Email' },
+    // { value: 'dynatrace', label: 'Dynatrace' },
+    // { value: 'solarwinds', label: 'SolarWinds' },
+    // { value: 'vmware', label: 'VMware' },
+    // { value: 'splunk', label: 'Splunk' },
   ],
-  noisyEventsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY,
-  noisyHostsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY,
-  incidentCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY
+  timeRange: [
+    // { value: 'last_hour', label: 'Last Hour' },
+    { value: 'last_24_hours', label: 'Last 24 Hours' },
+    { value: 'last_week', label: 'Last 7 Days' },
+    { value: 'last_month', label: 'Last 30 Days' },
+    { value: 'last_60_days', label: 'Last 60 Days' },
+    { value: 'last_quarter', label: 'Last Quarter' },
+    { value: 'custom', label: 'Custom' }
+  ],
+  deviceType: [
+    { value: 'Firewall', label: 'Firewall' },
+    { value: 'Load Balancer', label: 'Load Balancer' },
+    { value: 'Switch', label: 'Switch' },
+    { value: 'Hypervisor', label: 'Hypervisor' },
+    { value: 'Virtual Machine', label: 'Virtual Machine' },
+    { value: 'Storage', label: 'Storage' },
+    { value: 'Cloud Controller', label: 'Cloud Controller' },
+    { value: 'BM Server', label: 'BM Server' },
+    { value: 'Cabinet', label: 'Cabinet' },
+    { value: 'PDU', label: 'PDU' },
+    { value: 'Mac Device', label: 'Mac Device' }
+  ]
 };
 
-export const EXECUTIVE_SUMMARY_DUMMY: ExecutiveSummaryResponse = {
-  total_inference_alerts: 3458,
-  events: 9127,
-  alerts: 3458,
-  conditions: 956,
-  cumulative_reduction: 98
+export const EXECUTIVE_SUMMARY_API_DUMMY: ExecutiveSummaryApiResponse = {
+  totalInferenceAlerts: 318133,
+  events: 663345,
+  alerts: 318133,
+  conditions: 135017,
+  cumulativeReduction: 52.04,
+  severity: {
+    information: 2109,
+    critical: 42051,
+    warning: 90857
+  },
+  noiseReduction: 52.04,
+  correlationReduction: 57.56
 };
 
-export const PIPELINE_DUMMY: PipelineResponse = {
-  raw_events: 28020,
-  noise_reduction: 87.83,
-  alerts: 103,
-  correlation_pct: 83.26,
-  conditions: 56
+export const PIPELINE_API_DUMMY: PipelineApiResponse = {
+  funnel: [
+    { stage: 'Events', label: 'Raw Events', count: 663345, kpi: null },
+    { stage: 'Alerts', label: 'Noise Reduction', count: 318133, kpi: '52.04%' },
+    { stage: 'Conditions', label: 'Correlation %', count: 135017, kpi: '57.56%' }
+  ],
+  kpis: {
+    rawEvents: 663345,
+    noiseReduction: '52.04%',
+    correlationPct: '57.56%'
+  }
 };
 
-export const EVENT_BY_DEVICE_CATEGORY_DUMMY: EventByDeviceCategoryResponse = {
+export const EVENT_BY_DEVICE_TYPE_API_DUMMY: EventByDeviceTypeApiResponse = {
   donut: [
     { key: 'storage', label: 'Storage', count: 991 },
     { key: 'sensors', label: 'Sensors', count: 862 },
@@ -196,15 +262,15 @@ export const EVENT_BY_DEVICE_CATEGORY_DUMMY: EventByDeviceCategoryResponse = {
     { key: 'network', label: 'Network', count: 463 },
     { key: 'gpu', label: 'GPU', count: 309 },
     { key: 'database', label: 'Database', count: 297 },
-    { key: 'container', label: 'Containers', count: 192 },
-    { key: 'baremetal', label: 'Baremetal Servers', count: 80 },
+    { key: 'containers', label: 'Container', count: 192 },
+    { key: 'baremetal_servers', label: 'Baremetals', count: 80 },
     { key: 'application', label: 'Application', count: 2 },
     { key: 'others', label: 'Others', count: 0 }
   ],
   tiles: [
     { key: 'application', label: 'Application', count: 2 },
-    { key: 'baremetal', label: 'Baremetal Servers', count: 80 },
-    { key: 'container', label: 'Containers', count: 192 },
+    { key: 'baremetal_servers', label: 'Baremetals', count: 80 },
+    { key: 'containers', label: 'Container', count: 192 },
     { key: 'database', label: 'Database', count: 297 },
     { key: 'gpu', label: 'GPU', count: 309 },
     { key: 'network', label: 'Network', count: 463 },
@@ -216,287 +282,732 @@ export const EVENT_BY_DEVICE_CATEGORY_DUMMY: EventByDeviceCategoryResponse = {
     { key: 'storage', label: 'Storage', count: 991 },
     { key: 'others', label: 'Others', count: 0 }
   ],
-  active_category: 'application',
-  category_options: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY
+  total: 6086,
+  activeCategory: 'all',
+  categoryOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'application', label: 'Application' },
+    { value: 'baremetal_servers', label: 'Baremetals' },
+    { value: 'containers', label: 'Container' },
+    { value: 'database', label: 'Database' },
+    { value: 'gpu', label: 'GPU' },
+    { value: 'network', label: 'Network' },
+    { value: 'others', label: 'Others' },
+    { value: 'private_cloud_compute', label: 'Private Cloud Compute' },
+    { value: 'public_cloud_compute', label: 'Public Cloud Compute' },
+    { value: 'platform_services', label: 'Platform Services' },
+    { value: 'sensors', label: 'Sensors' },
+    { value: 'storage', label: 'Storage' }
+  ]
 };
 
-export const ALERT_GENERATED_DUMMY: AlertGeneratedResponse = {
+export const ALERT_GENERATED_DUMMY: AlertWidgetApiResponse = {
   kpis: [
-    { key: 'open', label: 'Open', value: 1000, tone: 'primary' },
-    { key: 'correlated', label: 'Correlated', value: 934, tone: 'success' },
-    { key: 'suppressed', label: 'Suppressed', value: 38, tone: 'info' },
+    { key: 'open', label: 'Open', value: 33472, tone: 'primary' },
+    { key: 'correlated', label: 'Correlated', value: 31751, tone: 'success' },
+    { key: 'suppressed', label: 'Suppressed', value: 1721, tone: 'info' },
     { key: 'ticketed', label: 'Ticketed', value: 293, tone: 'danger' },
-    { key: 'closed', label: 'Closed', value: 0, tone: 'success' }
+    { key: 'closed', label: 'Closed', value: 31585, tone: 'success' }
   ],
   donut: [
-    { key: 'open', label: 'Open', value: 4587 },
-    { key: 'correlated', label: 'Correlated', value: 945 },
-    { key: 'suppressed', label: 'Suppressed', value: 658 },
-    { key: 'ticketed', label: 'Ticketed', value: 293 },
-    { key: 'closed', label: 'Closed', value: 567 }
+    { key: 'open', label: 'Open', value: 33472, tone: 'primary' },
+    { key: 'correlated', label: 'Correlated', value: 31751, tone: 'success' },
+    { key: 'suppressed', label: 'Suppressed', value: 1721, tone: 'info' },
+    { key: 'ticketed', label: 'Ticketed', value: 293, tone: 'danger' },
+    { key: 'closed', label: 'Closed', value: 31585, tone: 'success' }
   ]
 };
 
-export const ALERT_STATUS_DUMMY: AlertStatusResponse = {
+export const ALERT_STATUS_DUMMY: AlertWidgetApiResponse = {
   kpis: [
-    { key: 'critical', label: 'Critical', value: 38, tone: 'danger' },
-    { key: 'warning', label: 'Warning', value: 934, tone: 'warning' },
-    { key: 'information', label: 'Information', value: 1585, tone: 'info' }
+    { key: 'critical', label: 'Critical', value: 602, tone: 'danger' },
+    { key: 'warning', label: 'Warning', value: 31547, tone: 'warning' },
+    { key: 'information', label: 'Success', value: 1323, tone: 'success' }
   ],
   donut: [
-    { key: 'information', label: 'Info', value: 986 },
-    { key: 'critical', label: 'Critical', value: 89 },
-    { key: 'warning', label: 'Warning', value: 458 }
+    { key: 'critical', label: 'Critical', value: 602 },
+    { key: 'warning', label: 'Warning', value: 31547 },
+    { key: 'information', label: 'Info', value: 1323 }
   ]
 };
 
-export const TREND_BY_TIMELINE_DUMMY: TrendByTimelineResponse = {
+export const TREND_BY_TIMELINE_API_DUMMY: TrendByTimelineApiResponse = {
   series: {
+    alerts: [
+      { start_time: '06/21/2026, 09:15:25', end_time: '06/22/2026, 09:15:25', count: 609 },
+      { start_time: '06/22/2026, 09:15:25', end_time: '06/23/2026, 09:15:25', count: 1320 },
+      { start_time: '06/23/2026, 09:15:25', end_time: '06/24/2026, 09:15:25', count: 1571 },
+      { start_time: '06/24/2026, 09:15:25', end_time: '06/25/2026, 09:15:25', count: 1607 },
+      { start_time: '06/25/2026, 09:15:25', end_time: '06/26/2026, 09:15:25', count: 1540 },
+      { start_time: '06/26/2026, 09:15:25', end_time: '06/27/2026, 09:15:25', count: 1144 },
+      { start_time: '06/27/2026, 09:15:25', end_time: '06/28/2026, 09:15:25', count: 1324 },
+      { start_time: '06/28/2026, 09:15:25', end_time: '06/29/2026, 09:15:25', count: 1515 },
+      { start_time: '06/29/2026, 09:15:25', end_time: '06/30/2026, 09:15:25', count: 2252 },
+      { start_time: '06/30/2026, 09:15:25', end_time: '07/01/2026, 09:15:25', count: 1428 },
+      { start_time: '07/01/2026, 09:15:25', end_time: '07/02/2026, 09:15:25', count: 1389 },
+      { start_time: '07/02/2026, 09:15:25', end_time: '07/03/2026, 09:15:25', count: 1304 },
+      { start_time: '07/03/2026, 09:15:25', end_time: '07/04/2026, 09:15:25', count: 969 },
+      { start_time: '07/04/2026, 09:15:25', end_time: '07/05/2026, 09:15:25', count: 806 },
+      { start_time: '07/05/2026, 09:15:25', end_time: '07/06/2026, 09:15:25', count: 1075 },
+      { start_time: '07/06/2026, 09:15:25', end_time: '07/07/2026, 09:15:25', count: 1263 },
+      { start_time: '07/07/2026, 09:15:25', end_time: '07/08/2026, 09:15:25', count: 1248 },
+      { start_time: '07/08/2026, 09:15:25', end_time: '07/09/2026, 09:15:25', count: 1226 },
+      { start_time: '07/09/2026, 09:15:25', end_time: '07/10/2026, 09:15:25', count: 1153 },
+      { start_time: '07/10/2026, 09:15:25', end_time: '07/11/2026, 09:15:25', count: 828 },
+      { start_time: '07/11/2026, 09:15:25', end_time: '07/12/2026, 09:15:25', count: 701 },
+      { start_time: '07/12/2026, 09:15:25', end_time: '07/13/2026, 09:15:25', count: 647 },
+      { start_time: '07/13/2026, 09:15:25', end_time: '07/14/2026, 09:15:25', count: 1152 },
+      { start_time: '07/14/2026, 09:15:25', end_time: '07/15/2026, 09:15:25', count: 963 },
+      { start_time: '07/15/2026, 09:15:25', end_time: '07/16/2026, 09:15:25', count: 1472 },
+      { start_time: '07/16/2026, 09:15:25', end_time: '07/17/2026, 09:15:25', count: 485 },
+      { start_time: '07/17/2026, 09:15:25', end_time: '07/18/2026, 09:15:25', count: 0 },
+      { start_time: '07/18/2026, 09:15:25', end_time: '07/19/2026, 09:15:25', count: 0 },
+      { start_time: '07/19/2026, 09:15:25', end_time: '07/20/2026, 09:15:25', count: 761 },
+      { start_time: '07/20/2026, 09:15:25', end_time: '07/21/2026, 09:15:25', count: 1077 }
+    ],
     conditions: [
-      { label: 'May 01', count: 3 },
-      { label: 'May 02', count: 26 },
-      { label: 'May 03', count: 7 },
-      { label: 'May 04', count: 4 },
-      { label: 'May 05', count: 4 },
-      { label: 'May 06', count: 82 },
-      { label: 'May 07', count: 63 },
-      { label: 'May 08', count: 4 },
-      { label: 'May 09', count: 3 },
-      { label: 'May 10', count: 3 },
-      { label: 'May 11', count: 4 },
-      { label: 'May 12', count: 2 },
-      { label: 'May 13', count: 5 },
-      { label: 'May 14', count: 5 },
-      { label: 'May 15', count: 7 },
-      { label: 'May 16', count: 8 },
-      { label: 'May 17', count: 5 },
-      { label: 'May 18', count: 6 },
-      { label: 'May 19', count: 8 },
-      { label: 'May 20', count: 24 },
-      { label: 'May 21', count: 41 }
+      { start_time: '06/21/2026, 09:15:26', end_time: '06/22/2026, 09:15:26', count: 587 },
+      { start_time: '06/22/2026, 09:15:26', end_time: '06/23/2026, 09:15:26', count: 1274 },
+      { start_time: '06/23/2026, 09:15:26', end_time: '06/24/2026, 09:15:26', count: 1512 },
+      { start_time: '06/24/2026, 09:15:26', end_time: '06/25/2026, 09:15:26', count: 1548 },
+      { start_time: '06/25/2026, 09:15:26', end_time: '06/26/2026, 09:15:26', count: 1485 },
+      { start_time: '06/26/2026, 09:15:26', end_time: '06/27/2026, 09:15:26', count: 1106 },
+      { start_time: '06/27/2026, 09:15:26', end_time: '06/28/2026, 09:15:26', count: 1272 },
+      { start_time: '06/28/2026, 09:15:26', end_time: '06/29/2026, 09:15:26', count: 1394 },
+      { start_time: '06/29/2026, 09:15:26', end_time: '06/30/2026, 09:15:26', count: 2214 },
+      { start_time: '06/30/2026, 09:15:26', end_time: '07/01/2026, 09:15:26', count: 1370 },
+      { start_time: '07/01/2026, 09:15:26', end_time: '07/02/2026, 09:15:26', count: 1355 },
+      { start_time: '07/02/2026, 09:15:26', end_time: '07/03/2026, 09:15:26', count: 1244 },
+      { start_time: '07/03/2026, 09:15:26', end_time: '07/04/2026, 09:15:26', count: 909 },
+      { start_time: '07/04/2026, 09:15:26', end_time: '07/05/2026, 09:15:26', count: 760 },
+      { start_time: '07/05/2026, 09:15:26', end_time: '07/06/2026, 09:15:26', count: 1001 },
+      { start_time: '07/06/2026, 09:15:26', end_time: '07/07/2026, 09:15:26', count: 1179 },
+      { start_time: '07/07/2026, 09:15:26', end_time: '07/08/2026, 09:15:26', count: 1107 },
+      { start_time: '07/08/2026, 09:15:26', end_time: '07/09/2026, 09:15:26', count: 1124 },
+      { start_time: '07/09/2026, 09:15:26', end_time: '07/10/2026, 09:15:26', count: 1102 },
+      { start_time: '07/10/2026, 09:15:26', end_time: '07/11/2026, 09:15:26', count: 784 },
+      { start_time: '07/11/2026, 09:15:26', end_time: '07/12/2026, 09:15:26', count: 650 },
+      { start_time: '07/12/2026, 09:15:26', end_time: '07/13/2026, 09:15:26', count: 607 },
+      { start_time: '07/13/2026, 09:15:26', end_time: '07/14/2026, 09:15:26', count: 1083 },
+      { start_time: '07/14/2026, 09:15:26', end_time: '07/15/2026, 09:15:26', count: 909 },
+      { start_time: '07/15/2026, 09:15:26', end_time: '07/16/2026, 09:15:26', count: 1399 },
+      { start_time: '07/16/2026, 09:15:26', end_time: '07/17/2026, 09:15:26', count: 464 },
+      { start_time: '07/17/2026, 09:15:26', end_time: '07/18/2026, 09:15:26', count: 0 },
+      { start_time: '07/18/2026, 09:15:26', end_time: '07/19/2026, 09:15:26', count: 0 },
+      { start_time: '07/19/2026, 09:15:26', end_time: '07/20/2026, 09:15:26', count: 703 },
+      { start_time: '07/20/2026, 09:15:26', end_time: '07/21/2026, 09:15:26', count: 1001 }
     ],
     events: [
-      { label: 'May 01', count: 20 },
-      { label: 'May 02', count: 935 },
-      { label: 'May 03', count: 35 },
-      { label: 'May 04', count: 24 },
-      { label: 'May 05', count: 18 },
-      { label: 'May 06', count: 888 },
-      { label: 'May 07', count: 798 },
-      { label: 'May 08', count: 29 },
-      { label: 'May 09', count: 26 },
-      { label: 'May 10', count: 25 },
-      { label: 'May 11', count: 23 },
-      { label: 'May 12', count: 19 },
-      { label: 'May 13', count: 22 },
-      { label: 'May 14', count: 28 },
-      { label: 'May 15', count: 31 },
-      { label: 'May 16', count: 35 },
-      { label: 'May 17', count: 26 },
-      { label: 'May 18', count: 24 },
-      { label: 'May 19', count: 32 },
-      { label: 'May 20', count: 260 },
-      { label: 'May 21', count: 430 }
-    ],
-    alerts: [
-      { label: 'May 01', count: 8 },
-      { label: 'May 02', count: 86 },
-      { label: 'May 03', count: 18 },
-      { label: 'May 04', count: 10 },
-      { label: 'May 05', count: 12 },
-      { label: 'May 06', count: 212 },
-      { label: 'May 07', count: 188 },
-      { label: 'May 08', count: 14 },
-      { label: 'May 09', count: 12 },
-      { label: 'May 10', count: 12 },
-      { label: 'May 11', count: 11 },
-      { label: 'May 12', count: 10 },
-      { label: 'May 13', count: 13 },
-      { label: 'May 14', count: 15 },
-      { label: 'May 15', count: 17 },
-      { label: 'May 16', count: 19 },
-      { label: 'May 17', count: 15 },
-      { label: 'May 18', count: 16 },
-      { label: 'May 19', count: 21 },
-      { label: 'May 20', count: 82 },
-      { label: 'May 21', count: 146 }
+      { start_time: '06/21/2026, 09:15:24', end_time: '06/22/2026, 09:15:24', count: 707 },
+      { start_time: '06/22/2026, 09:15:24', end_time: '06/23/2026, 09:15:24', count: 1437 },
+      { start_time: '06/23/2026, 09:15:24', end_time: '06/24/2026, 09:15:24', count: 1713 },
+      { start_time: '06/24/2026, 09:15:24', end_time: '06/25/2026, 09:15:24', count: 1734 },
+      { start_time: '06/25/2026, 09:15:24', end_time: '06/26/2026, 09:15:24', count: 1682 },
+      { start_time: '06/26/2026, 09:15:24', end_time: '06/27/2026, 09:15:24', count: 1219 },
+      { start_time: '06/27/2026, 09:15:24', end_time: '06/28/2026, 09:15:24', count: 1392 },
+      { start_time: '06/28/2026, 09:15:24', end_time: '06/29/2026, 09:15:24', count: 1058 },
+      { start_time: '06/29/2026, 09:15:24', end_time: '06/30/2026, 09:15:24', count: 1953 },
+      { start_time: '06/30/2026, 09:15:24', end_time: '07/01/2026, 09:15:24', count: 1914 },
+      { start_time: '07/01/2026, 09:15:24', end_time: '07/02/2026, 09:15:24', count: 1706 },
+      { start_time: '07/02/2026, 09:15:24', end_time: '07/03/2026, 09:15:24', count: 1427 },
+      { start_time: '07/03/2026, 09:15:24', end_time: '07/04/2026, 09:15:24', count: 1028 },
+      { start_time: '07/04/2026, 09:15:24', end_time: '07/05/2026, 09:15:24', count: 846 },
+      { start_time: '07/05/2026, 09:15:24', end_time: '07/06/2026, 09:15:24', count: 1092 },
+      { start_time: '07/06/2026, 09:15:24', end_time: '07/07/2026, 09:15:24', count: 1301 },
+      { start_time: '07/07/2026, 09:15:24', end_time: '07/08/2026, 09:15:24', count: 1283 },
+      { start_time: '07/08/2026, 09:15:24', end_time: '07/09/2026, 09:15:24', count: 1259 },
+      { start_time: '07/09/2026, 09:15:24', end_time: '07/10/2026, 09:15:24', count: 1191 },
+      { start_time: '07/10/2026, 09:15:24', end_time: '07/11/2026, 09:15:24', count: 850 },
+      { start_time: '07/11/2026, 09:15:24', end_time: '07/12/2026, 09:15:24', count: 727 },
+      { start_time: '07/12/2026, 09:15:24', end_time: '07/13/2026, 09:15:24', count: 666 },
+      { start_time: '07/13/2026, 09:15:24', end_time: '07/14/2026, 09:15:24', count: 1198 },
+      { start_time: '07/14/2026, 09:15:24', end_time: '07/15/2026, 09:15:24', count: 1000 },
+      { start_time: '07/15/2026, 09:15:24', end_time: '07/16/2026, 09:15:24', count: 1539 },
+      { start_time: '07/16/2026, 09:15:24', end_time: '07/17/2026, 09:15:24', count: 1021 },
+      { start_time: '07/17/2026, 09:15:24', end_time: '07/18/2026, 09:15:24', count: 767 },
+      { start_time: '07/18/2026, 09:15:24', end_time: '07/19/2026, 09:15:24', count: 785 },
+      { start_time: '07/19/2026, 09:15:24', end_time: '07/20/2026, 09:15:24', count: 861 },
+      { start_time: '07/20/2026, 09:15:24', end_time: '07/21/2026, 09:15:24', count: 1121 }
     ]
   },
-  active_category: 'application'
+  entityTypeOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'event', label: 'Events' },
+    { value: 'alert', label: 'Alerts' },
+    { value: 'condition', label: 'Conditions' }
+  ],
+  activeEntityType: 'all',
+  granularity: 'daily',
+  activeTimeRange: 'last_month',
+  timeRangeOptions: [
+    { value: 'last_24_hours', label: 'Last 24 Hours' },
+    { value: 'last_week', label: 'Last 7 Days' },
+    { value: 'last_month', label: 'Last Month' },
+    { value: 'last_60_days', label: 'Last 60 Days' },
+    { value: 'last_quarter', label: 'Last Quarter' }
+  ],
 };
 
-export const ALERT_SEGREGATION_DUMMY: AlertSegregationResponse = {
-  summary: {
-    critical: 2285,
-    warning: 1485,
-    information: 327
-  },
+export const ALERT_SEGREGATION_API_DUMMY: AlertSegregationApiResponse = {
+  totalCritical: 544,
+  totalWarning: 31547,
+  totalInfo: 1323,
+  bars: [
+    { key: 'application', label: 'Application', critical: 0, warning: 0, information: 0 },
+    { key: 'baremetal_servers', label: 'Baremetals', critical: 44, warning: 2527, information: 3 },
+    { key: 'containers', label: 'Container', critical: 0, warning: 0, information: 0 },
+    { key: 'database', label: 'Database', critical: 76, warning: 9316, information: 98 },
+    { key: 'gpu', label: 'GPU', critical: 0, warning: 0, information: 0 },
+    { key: 'network', label: 'Network', critical: 0, warning: 0, information: 0 },
+    { key: 'others', label: 'Others', critical: 0, warning: 0, information: 0 },
+    { key: 'private_cloud_compute', label: 'Private Cloud Compute', critical: 424, warning: 19704, information: 1222 },
+    { key: 'public_cloud_compute', label: 'Public Cloud Compute', critical: 0, warning: 0, information: 0 },
+    { key: 'platform_services', label: 'Platform Services', critical: 0, warning: 0, information: 0 },
+    { key: 'sd_wan', label: 'SD-WAN', critical: 0, warning: 0, information: 0 },
+    { key: 'sensors', label: 'Sensors', critical: 0, warning: 0, information: 0 },
+    { key: 'storage', label: 'Storage', critical: 0, warning: 0, information: 0 }
+  ],
+  activeCategory: 'all',
+  categoryOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'application', label: 'Application' },
+    { value: 'baremetal_servers', label: 'Baremetals' },
+    { value: 'containers', label: 'Container' },
+    { value: 'database', label: 'Database' },
+    { value: 'gpu', label: 'GPU' },
+    { value: 'network', label: 'Network' },
+    { value: 'others', label: 'Others' },
+    { value: 'private_cloud_compute', label: 'Private Cloud Compute' },
+    { value: 'public_cloud_compute', label: 'Public Cloud Compute' },
+    { value: 'platform_services', label: 'Platform Services' },
+    { value: 'sd_wan', label: 'SD-WAN' },
+    { value: 'sensors', label: 'Sensors' },
+    { value: 'storage', label: 'Storage' }
+  ]
+};
+
+export const EVENT_ALERT_ANALYTICS_API_DUMMY: EventAlertAnalyticsApiResponse = {
+  viewBy: 'source',
+  total: 33472,
   rows: [
-    { key: 'application', label: 'Application', critical: 32, warning: 48, information: 54 },
-    { key: 'baremetal', label: 'Baremetals', critical: 28, warning: 50, information: 72 },
-    { key: 'container', label: 'Container', critical: 31, warning: 42, information: 97 },
-    { key: 'database', label: 'Database', critical: 29, warning: 49, information: 56 },
-    { key: 'gpu', label: 'GPU', critical: 27, warning: 50, information: 35 },
-    { key: 'network', label: 'Network', critical: 31, warning: 42, information: 100 },
-    { key: 'private_cloud_compute', label: 'Private Cloud Compute', critical: 29, warning: 47, information: 72 },
-    { key: 'public_cloud_compute', label: 'Public Cloud Compute', critical: 30, warning: 42, information: 101 },
-    { key: 'platform_services', label: 'Platform Services', critical: 31, warning: 50, information: 55 },
-    { key: 'sd_wan', label: 'SD-WAN', critical: 24, warning: 42, information: 42 },
-    { key: 'sensors', label: 'Sensors', critical: 24, warning: 42, information: 40 },
-    { key: 'storage', label: 'Storage', critical: 25, warning: 45, information: 40 },
-    { key: 'others', label: 'Others', critical: 25, warning: 50, information: 72 }
+    { information: 1323, label: 'Unity', critical: 602, key: 'unity', total: 33472, warning: 31547 }
+  ],  
+  viewOptions: [
+    { value: 'source', label: 'View By Source' },
+    { value: 'severity', label: 'View By Severity' }
   ],
-  active_category: 'application',
-  category_options: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY
-};
-
-export const EVENT_ALERT_ANALYTICS_DUMMY: EventAlertAnalyticsResponse = {
-  metrics: [
-    { key: 'cumulative_reduction', label: 'Cumulative Reduction', value: '97%', tone: 'primary' },
-    { key: 'noise_reduction', label: 'Noise Reduction', value: '94%', tone: 'primary' },
-    { key: 'correlation', label: 'Correlation', value: '89%', tone: 'primary' },
-    { key: 'mtta', label: 'MTTA', value: '6 min 51 Sec', tone: 'primary' },
-    { key: 'mttr', label: 'MTTR', value: '15 min 26 Sec', tone: 'primary' }
+  sourceOptions: DASHBOARD_FILTERS_DUMMY.analyticsSourceType,
+  severityOptions: DASHBOARD_FILTERS_DUMMY.analyticsSeverityType,
+  datacenterOptions: DASHBOARD_FILTERS_DUMMY.analyticsDatacenter,
+  cloudOptions: DASHBOARD_FILTERS_DUMMY.analyticsCloud,
+  kpis: {
+    mttr: '81 min 7 Sec',
+    mtta: '0 min 0 Sec',
+    noiseReduction: '9.9%',
+    correlation: '5.1%',
+    cumulativeReduction: '14.5%'
+  },
+  flow: {
+    sources: [
+      { name: 'Unity', eventCount: 37148 }
+    ],
+    resolved: 31585,
+    autoRemediated: 0,
+    ticketGenerated: 293,
+    dedupeEvents: 149,
+    open: 166,
+    suppressedEvents: 3527,
+    autoHealed: 31299,
+    alerts: 33472,
+    acknowledged: 0,
+    noTicketGenerated: 31458,
+    conditions: 31751,
+    events: 37148
+  }, 
+  categoryOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'application', label: 'Application' },
+    { value: 'baremetal_servers', label: 'Baremetals' },
+    { value: 'containers', label: 'Container' },
+    { value: 'database', label: 'Database' },
+    { value: 'gpu', label: 'GPU' },
+    { value: 'network', label: 'Network' },
+    { value: 'others', label: 'Others' },
+    { value: 'private_cloud_compute', label: 'Private Cloud Compute' },
+    { value: 'public_cloud_compute', label: 'Public Cloud Compute' },
+    { value: 'platform_services', label: 'Platform Services' },
+    { value: 'sd_wan', label: 'SD-WAN' },
+    { value: 'sensors', label: 'Sensors' },
+    { value: 'storage', label: 'Storage' }
   ],
-  reductionFlow: {
+  activeCategory: 'all',
+  sourceGraph: {
     nodes: [
-      { name: 'UNITYONECLOUD (42)', itemStyle: { color: '#00ad73' } },
-      { name: 'LogicMonitor (42)', itemStyle: { color: '#31426f' } },
-      { name: 'OpsRamp (32)', itemStyle: { color: '#6f89a5' } },
-      { name: 'dynatrace (56)', itemStyle: { color: '#72bf44' } },
-      { name: 'new relic (45)', itemStyle: { color: '#19a974' } },
-      { name: 'Events 950', itemStyle: { color: '#39c8c7' } },
-      { name: 'Alerts 142', itemStyle: { color: '#7c62c8' } },
-      { name: 'Dedupe Events 305', itemStyle: { color: '#cbc7f5' } },
-      { name: 'Suppressed Events 503', itemStyle: { color: '#cbc7f5' } },
-      { name: 'Conditions 21', itemStyle: { color: '#95d9c6' } },
-      { name: 'Ticket Generated 18', itemStyle: { color: '#e3c0c6' } },
-      { name: 'No Ticket Generated 3', itemStyle: { color: '#d96267' } }
+      { id: 1, value: 37148, name: 'Unity' },
+      { id: 2, value: 37148, name: 'Events' },
+      { id: 3, value: 33472, name: 'Alerts' },
+      { id: 4, value: 149, name: 'Dedupe Events' },
+      { id: 5, value: 3527, name: 'Suppressed Events' },
+      { id: 6, value: 31751, name: 'Conditions' },
+      { id: 7, value: 293, name: 'Ticket Generated' },
+      { id: 8, value: 31458, name: 'No Ticket Generated' }
     ],
     links: [
-      { source: 'UNITYONECLOUD (42)', target: 'Events 950', value: 42, lineStyle: { color: '#c9f1ef', opacity: 0.55 } },
-      { source: 'LogicMonitor (42)', target: 'Events 950', value: 42, lineStyle: { color: '#f5c7cf', opacity: 0.55 } },
-      { source: 'OpsRamp (32)', target: 'Events 950', value: 32, lineStyle: { color: '#e9e0fa', opacity: 0.55 } },
-      { source: 'dynatrace (56)', target: 'Events 950', value: 56, lineStyle: { color: '#fee1bf', opacity: 0.55 } },
-      { source: 'new relic (45)', target: 'Events 950', value: 45, lineStyle: { color: '#b9e6e9', opacity: 0.55 } },
-      { source: 'Events 950', target: 'Alerts 142', value: 142, lineStyle: { color: '#c9f1ef', opacity: 0.55 } },
-      { source: 'Events 950', target: 'Dedupe Events 305', value: 305, lineStyle: { color: '#e9e0fa', opacity: 0.55 } },
-      { source: 'Events 950', target: 'Suppressed Events 503', value: 503, lineStyle: { color: '#f5c7cf', opacity: 0.55 } },
-      { source: 'Alerts 142', target: 'Conditions 21', value: 21, lineStyle: { color: '#c9f1ef', opacity: 0.55 } },
-      { source: 'Conditions 21', target: 'Ticket Generated 18', value: 18, lineStyle: { color: '#e9e0fa', opacity: 0.55 } },
-      { source: 'Conditions 21', target: 'No Ticket Generated 3', value: 3, lineStyle: { color: '#f5c7cf', opacity: 0.55 } }
+      { sourceId: 1, targetId: 2, value: 37148 },
+      { sourceId: 2, targetId: 3, value: 33472 },
+      { sourceId: 2, targetId: 4, value: 149 },
+      { sourceId: 2, targetId: 5, value: 3527 },
+      { sourceId: 3, targetId: 6, value: 31751 },
+      { sourceId: 6, targetId: 7, value: 293 },
+      { sourceId: 6, targetId: 8, value: 31458 }
     ]
   },
-  resolutionFlow: {
+  severityGraph: {
     nodes: [
-      { name: 'Condition 164', itemStyle: { color: '#39c8c7' } },
-      { name: 'Open 21', itemStyle: { color: '#7c62c8' } },
-      { name: 'Resolved 143', itemStyle: { color: '#7c62c8' } },
-      { name: 'Acknowledged 143', itemStyle: { color: '#f3b7be' } },
-      { name: 'Auto Healed 143', itemStyle: { color: '#f3b7be' } },
-      { name: 'Auto Remediation 143', itemStyle: { color: '#f3b7be' } },
-      { name: '5 Min : 56', itemStyle: { color: '#24a864' } },
-      { name: '30 Min : 51', itemStyle: { color: '#ff8a00' } },
-      { name: '> 30 Min : 36', itemStyle: { color: '#d90000' } },
-      { name: '5 Min : 56 ', itemStyle: { color: '#24a864' } },
-      { name: '30 Min : 51 ', itemStyle: { color: '#ff8a00' } },
-      { name: '> 30 Min : 36 ', itemStyle: { color: '#d90000' } }
+      { id: 1, value: 1455, name: 'Information' },
+      { id: 2, value: 33997, name: 'Warning' },
+      { id: 3, value: 1696, name: 'Critical' },
+      { id: 4, value: 37148, name: 'Events' },
+      { id: 5, value: 33472, name: 'Alerts' },
+      { id: 6, value: 149, name: 'Dedupe Events' },
+      { id: 7, value: 3527, name: 'Suppressed Events' },
+      { id: 8, value: 31751, name: 'Conditions' },
+      { id: 9, value: 293, name: 'Root Cause Identified' },
+      { id: 10, value: 31458, name: 'Root Cause Unknown' }
     ],
     links: [
-      { source: 'Condition 164', target: 'Open 21', value: 21, lineStyle: { color: '#e9e0fa', opacity: 0.55 } },
-      { source: 'Condition 164', target: 'Resolved 143', value: 143, lineStyle: { color: '#b9e6e9', opacity: 0.55 } },
-      { source: 'Resolved 143', target: 'Acknowledged 143', value: 48, lineStyle: { color: '#f5c7cf', opacity: 0.55 } },
-      { source: 'Resolved 143', target: 'Auto Healed 143', value: 48, lineStyle: { color: '#e9e0fa', opacity: 0.55 } },
-      { source: 'Resolved 143', target: 'Auto Remediation 143', value: 47, lineStyle: { color: '#f5c7cf', opacity: 0.55 } },
-      { source: 'Acknowledged 143', target: '5 Min : 56', value: 56, lineStyle: { color: '#c9f1ef', opacity: 0.55 } },
-      { source: 'Acknowledged 143', target: '30 Min : 51', value: 51, lineStyle: { color: '#fee1bf', opacity: 0.55 } },
-      { source: 'Acknowledged 143', target: '> 30 Min : 36', value: 36, lineStyle: { color: '#f5c7cf', opacity: 0.55 } },
-      { source: 'Auto Healed 143', target: '5 Min : 56 ', value: 56, lineStyle: { color: '#c9f1ef', opacity: 0.55 } },
-      { source: 'Auto Healed 143', target: '30 Min : 51 ', value: 51, lineStyle: { color: '#fee1bf', opacity: 0.55 } },
-      { source: 'Auto Remediation 143', target: '> 30 Min : 36 ', value: 36, lineStyle: { color: '#f5c7cf', opacity: 0.55 } }
+      { sourceId: 1, targetId: 4, value: 1455 },
+      { sourceId: 2, targetId: 4, value: 33997 },
+      { sourceId: 3, targetId: 4, value: 1696 },
+      { sourceId: 4, targetId: 5, value: 33472 },
+      { sourceId: 4, targetId: 6, value: 149 },
+      { sourceId: 4, targetId: 7, value: 3527 },
+      { sourceId: 5, targetId: 8, value: 31751 },
+      { sourceId: 8, targetId: 9, value: 293 },
+      { sourceId: 8, targetId: 10, value: 31458 }
     ]
-  }
+  },
+  rightGraph: {
+    nodes: [
+      { id: 1, value: 31751, name: 'Condition' },
+      { id: 2, value: 166, name: 'Open' },
+      { id: 3, value: 31585, name: 'Resolved' },
+      { id: 4, value: 0, name: 'Acknowledged' },
+      { id: 5, value: 31299, name: 'Auto Healed' },
+      { id: 6, value: 0, name: 'Auto Remediation' },
+      { id: 7, value: 14826, name: '5 Min' },
+      { id: 8, value: 8759, name: '30 Min' },
+      { id: 9, value: 7714, name: '>30 Min' }
+    ],
+    links: [
+      { sourceId: 1, targetId: 2, value: 166 },
+      { sourceId: 1, targetId: 3, value: 31585 },
+      { sourceId: 3, targetId: 5, value: 31299 },
+      { sourceId: 5, targetId: 8, value: 8759 },
+      { sourceId: 5, targetId: 9, value: 7714 },
+      { sourceId: 5, targetId: 7, value: 14826 }
+    ]
+  },
 };
 
-export const NOISY_EVENTS_DUMMY: NoisyEventsResponse = {
+export const ALERT_BY_DEVICE_TYPE_API_DUMMY: AlertByDeviceTypeApiResponse = {
   rows: [
-    { uuid: 'event-01', device: 'ul-easy-trade-app0', device_type: 'Vmware', count: 4650, description: 'Getting flag data for id ergo_a', source: 'Unity', last_reported: '2026-05-20T09:30:44', severity: 'Information' },
-    { uuid: 'event-02', device: 'ul-easy-trade-app0', device_type: 'Vmware', count: 3564, description: 'An unhandled exception has occurred', source: 'Unity', last_reported: '2026-05-20T09:30:22', severity: 'Critical' },
-    { uuid: 'event-03', device: 'alpha-collector-MT', device_type: 'Vmware', count: 3539, description: 'Product Found', source: 'Unity', last_reported: '2026-05-18T16:40:38', severity: 'Information' },
-    { uuid: 'event-04', device: 'ul-easy-trade-app0', device_type: 'Vmware', count: 2380, description: 'Exception not handled: System', source: 'Unity', last_reported: '2026-05-20T09:30:21', severity: 'Critical' },
-    { uuid: 'event-05', device: 'ul-easy-trade-app0', device_type: 'Vmware', count: 1743, description: 'Getting default accounts', source: 'Unity', last_reported: '2026-05-20T08:30:15', severity: 'Information' },
-    { uuid: 'event-06', device: 'alpha-collector-MT', device_type: 'Vm', count: 957, description: 'Linux: High swap space usage', source: 'Unity', last_reported: '2026-03-19T18:17:04', severity: 'Warning' },
-    { uuid: 'event-07', device: 'ul-BankOfAnthos-a', device_type: 'Vmware', count: 888, description: 'Session Metrics 0 nanoseconds', source: 'Unity', last_reported: '2026-05-20T06:31:28', severity: 'Information' },
-    { uuid: 'event-08', device: 'alpha-collector-MT', device_type: 'Vm', count: 538, description: 'Exception not handled: System', source: 'Unity', last_reported: '2026-03-19T18:17:04', severity: 'Information' },
-    { uuid: 'event-09', device: 'alpha-collector-MT', device_type: 'Vmware', count: 528, description: 'Failed to export logs to 10.192', source: 'Unity', last_reported: '2026-05-04T20:05:02', severity: 'Critical' },
-    { uuid: 'event-10', device: 'alpha-collector-MT', device_type: 'Vmware', count: 527, description: 'Convert conversion successful', source: 'Unity', last_reported: '2026-05-19T21:06:39', severity: 'Information' }
+    {
+      deviceName: 'VMDB01',
+      deviceType: 'vm',
+      critical: 1,
+      information: 1,
+      available: 1,
+      warning: 2910,
+      unknown: 0,
+      total: 2912,
+      ticketCount: 2
+    },
+    {
+      deviceName: 'STGPRINP1017',
+      deviceType: 'vm',
+      critical: 0,
+      information: 0,
+      available: 0,
+      warning: 1928,
+      unknown: 0,
+      total: 1928,
+      ticketCount: 0
+    }
   ],
-  active_category: 'application',
-  category_options: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY
+  categoryOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'vm_host', label: 'VM Host' },
+    { value: 'k8s_pod', label: 'K8s Pod' },
+    { value: 'vmware_vcenter', label: 'VMware Vcenter' },
+    { value: 'storage', label: 'Storage' },
+    { value: 'network', label: 'Network' },
+    { value: 'database', label: 'Database' },
+    { value: 'application', label: 'Applications' }
+  ],
+  activeCategory: 'all'
 };
 
-export const NOISY_HOSTS_DUMMY: NoisyHostsResponse = {
+export const OPEN_INCIDENT_TICKETS_API_DUMMY: IncidentTicketApiResponse = {
   rows: [
-    { uuid: 'host-event-01', device: 'ul-easy-trade-app0', device_type: 'Vmware', count: 5006, description: 'Getting flag data for id ergo_a', source: 'Unity', last_reported: '2026-05-27T11:11:13', severity: 'Information' },
-    { uuid: 'host-event-02', device: 'alpha-collector-MT', device_type: 'Vmware', count: 3836, description: 'Product Found', source: 'Unity', last_reported: '2026-06-17T17:31:16', severity: 'Information' },
-    { uuid: 'host-event-03', device: 'ul-easy-trade-app0', device_type: 'Vmware', count: 3684, description: 'An unhandled exception has occurred', source: 'Unity', last_reported: '2026-05-27T11:10:46', severity: 'Critical' },
-    { uuid: 'host-event-04', device: 'ul-easy-trade-app0', device_type: 'Vmware', count: 2483, description: 'Exception not handled: System', source: 'Unity', last_reported: '2026-05-27T11:10:45', severity: 'Critical' },
-    { uuid: 'host-event-05', device: 'ul-easy-trade-app0', device_type: 'Vmware', count: 1779, description: 'Getting default accounts', source: 'Unity', last_reported: '2026-05-27T10:30:05', severity: 'Information' },
-    { uuid: 'host-event-06', device: 'alpha-collector-MT', device_type: 'Vm', count: 957, description: 'Linux: High swap space usage', source: 'Unity', last_reported: '2026-03-19T18:17:04', severity: 'Warning' },
-    { uuid: 'host-event-07', device: 'ul-BankOfAnthos-a', device_type: 'Vmware', count: 888, description: 'Session Metrics 0 nanoseconds', source: 'Unity', last_reported: '2026-05-20T06:31:28', severity: 'Information' },
-    { uuid: 'host-event-08', device: 'alpha-collector-MT', device_type: 'Vmware', count: 562, description: 'Convert conversion successful', source: 'Unity', last_reported: '2026-06-17T08:30:19', severity: 'Information' },
-    { uuid: 'host-event-09', device: 'alpha-collector-MT', device_type: 'Vm', count: 538, description: 'Exception not handled: System', source: 'Unity', last_reported: '2026-03-19T18:17:04', severity: 'Information' },
-    { uuid: 'host-event-10', device: 'alpha-collector-MT', device_type: 'Vmware', count: 528, description: 'Failed to export logs to 10.192', source: 'Unity', last_reported: '2026-05-04T20:05:02', severity: 'Critical' }
+    {
+      uuid: '3cd5cb67-c570-4051-9f30-557a63867e36',
+      ticketId: 'INC0384809',
+      ticketUuid: '80659aef3b0e031036f2a71864e45a3c',
+      deviceName: 'VMDB01',
+      affectedService: 'VMDB01',
+      availabilityState: 'Warning \u0014 Degraded',
+      ticketCount: 1,
+      tone: 'warning',
+      severity: 'Warning',
+      firstAlertDatetime: '2026-07-16T14:12:39.416029+00:00'
+    }
+  ],
+  total: 7,
+  categoryOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'vm_host', label: 'VM Host' },
+    { value: 'k8s_pod', label: 'K8s Pod' },
+    { value: 'vmware_vcenter', label: 'VMware Vcenter' },
+    { value: 'storage', label: 'Storage' },
+    { value: 'network', label: 'Network' },
+    { value: 'database', label: 'Database' },
+    { value: 'application', label: 'Applications' }
+  ],
+  activeCategory: 'all'
+};
+
+export const RESOLVED_INCIDENT_TICKETS_API_DUMMY: IncidentTicketApiResponse = {
+  rows: [
+    {
+      uuid: 'f5f0265d-c583-48dd-8e58-d1560cde5fd3',
+      ticketId: 'INC0385996',
+      ticketUuid: '9306421c3b168b1036f2a71864e45aee',
+      deviceName: 'STGCOGNOS005',
+      availabilityState: 'Critical \u0014 Unavailable',
+      affectedService: 'STGCOGNOS005',
+      ticketCount: 1,
+      tone: 'danger',
+      severity: 'Critical',
+      resolvedDatetime: '2026-07-21T13:57:55+00:00'
+    }
+  ],
+  total: 286,
+  categoryOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'vm_host', label: 'VM Host' },
+    { value: 'k8s_pod', label: 'K8s Pod' },
+    { value: 'vmware_vcenter', label: 'VMware Vcenter' },
+    { value: 'storage', label: 'Storage' },
+    { value: 'network', label: 'Network' },
+    { value: 'database', label: 'Database' },
+    { value: 'application', label: 'Applications' }
+  ],
+  activeCategory: 'all'
+};
+
+export const NOISY_EVENTS_API_DUMMY: NoisyEventsApiResponse = {
+  rows: [
+    { uuid: 'ffd71b8c-ad10-463e-bf84-aad4afe1e698', device: 'STGPRINP1017', deviceType: 'vm', count: 1872, description: 'CPU queue length is too high (over 3 for 5m)', source: 'Unity', lastReported: '2026-07-21T15:49:45+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: '8d9d004a-465d-4ff9-b2ae-42ad518e1c12', device: 'VMDB01', deviceType: 'database', count: 1254, description: 'MSSQL: Too many physical reads occurring', source: 'Unity', lastReported: '2026-07-21T15:15:22+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: '07c9ff22-5b3d-4192-aeb8-8710df488033', device: 'W2K8FTP1', deviceType: 'vm', count: 1178, description: 'The Memory Pages/sec is too high (over 1000 for 5m)', source: 'Unity', lastReported: '2026-07-15T10:15:52+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: '7251d99a-0cda-4491-980f-a025ae0f640a', device: 'a04697.d2kmeta.dansketraelast.com', deviceType: 'database', count: 884, description: 'MSSQL: Too many physical reads occurring', source: 'Unity', lastReported: '2026-07-21T15:37:59+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: 'ce400bea-049b-4df1-a093-ba9283c78ea9', device: 'E01043', deviceType: 'vm', count: 787, description: 'CPU queue length is too high (over 3 for 5m)', source: 'Unity', lastReported: '2026-07-21T15:11:59+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: '5bfd1913-3fe9-437e-bcdc-0cb4c8f55fcd', device: 'STGNASTFRPRD02', deviceType: 'vm', count: 589, description: 'The Memory Pages/sec is too high (over 1000 for 5m)', source: 'Unity', lastReported: '2026-07-21T13:39:48+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: 'dce7e43c-1125-4030-8886-33f6fddc916d', device: 'a04697.d2kmeta.dansketraelast.com', deviceType: 'database', count: 471, description: 'MSSQL: Total number of locks per second is high (over 1000 for 5m)', source: 'Unity', lastReported: '2026-07-21T13:32:59+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: '6bd0eccc-7d14-48a4-88c7-0ab4b4d791ae', device: 'VMDB01', deviceType: 'database', count: 462, description: 'MSSQL: Total number of locks per second is high (over 1000 for 5m)', source: 'Unity', lastReported: '2026-07-21T13:15:22+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: 'f25e1ea4-8115-4efd-9dbb-9043a9874d3a', device: 'VMDB01', deviceType: 'vm', count: 400, description: 'The Memory Pages/sec is too high (over 1000 for 5m)', source: 'Unity', lastReported: '2026-07-21T13:06:12+00:00', severity: 'Warning', tone: 'warning' },
+    { uuid: 'b8fd8532-8ac4-4b41-95f7-86decc73ab67', device: 'STGAUTOP1063', deviceType: 'database', count: 368, description: 'MSSQL DB \'eManager_P\': Total wait time to flush the log is high (over 1ms for 5m)', source: 'Unity', lastReported: '2026-07-21T16:08:42+00:00', severity: 'Warning', tone: 'warning' }
+  ],
+  categoryOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'application', label: 'Application' },
+    { value: 'baremetal_servers', label: 'Baremetals' },
+    { value: 'containers', label: 'Container' },
+    { value: 'database', label: 'Database' },
+    { value: 'gpu', label: 'GPU' },
+    { value: 'network', label: 'Network' },
+    { value: 'others', label: 'Others' },
+    { value: 'private_cloud_compute', label: 'Private Cloud Compute' },
+    { value: 'public_cloud_compute', label: 'Public Cloud Compute' },
+    { value: 'platform_services', label: 'Platform Services' },
+    { value: 'sd_wan', label: 'SD-WAN' },
+    { value: 'sensors', label: 'Sensors' },
+    { value: 'storage', label: 'Storage' }
+  ],
+  activeCategory: 'all'
+};
+
+export const NOISY_HOSTS_API_DUMMY: NoisyHostsApiResponse = {
+  rows: [
+    {
+      count: 118442,
+      source: 'Unity',
+      deviceType: 'NA',
+      description: 'Azure: Virtual machine is unavailable',
+      severity: 'Critical',
+      managementIp: '{HOST.IP}',
+      hostName: 'N/A',
+      lastReported: '2024-06-07T08:36:43Z'
+    },
+    {
+      count: 70006,
+      source: 'Unity',
+      deviceType: 'storage_device',
+      description: 'Read IOps is more than 10',
+      severity: 'Critical',
+      managementIp: '192.168.232.17',
+      hostName: 'Nimble Storage - SF',
+      lastReported: '2025-10-19T10:59:43Z'
+    },
+    {
+      count: 66603,
+      source: 'Unity',
+      deviceType: 'vm',
+      description: 'Test Otel',
+      severity: 'Critical',
+      managementIp: '10.128.7.175',
+      hostName: 'ul-test-log-metrics02',
+      lastReported: '2025-10-08T07:24:28Z'
+    },
+    {
+      count: 55343,
+      source: 'Unity',
+      deviceType: 'NA',
+      description: 'SD-WAN: There are errors in the \'Get routes data\' metric',
+      severity: 'Warning',
+      managementIp: '10.10.1.15',
+      hostName: 'site2-cedge01',
+      lastReported: '2025-10-16T10:50:45Z'
+    },
+    {
+      count: 44982,
+      source: 'Unity',
+      deviceType: 'NA',
+      description: 'SD-WAN: There are errors in the \'Get routes data\' metric',
+      severity: 'Warning',
+      managementIp: '10.10.1.13',
+      hostName: 'site1-cedge01',
+      lastReported: '2025-10-16T10:49:45Z'
+    },
+    {
+      count: 42129,
+      source: 'Unity',
+      deviceType: 'load_balancer',
+      description: 'Load balancer memory usage is high',
+      severity: 'Critical',
+      managementIp: '10.192.17.9',
+      hostName: 'UnityDemo-mtinfralb02.unitedlayer.com',
+      lastReported: '2025-10-14T15:33:21Z'
+    },
+    {
+      count: 26255,
+      source: 'Unity',
+      deviceType: 'NA',
+      description: 'SD-WAN: There are errors in the \'Get routes data\' metric',
+      severity: 'Warning',
+      managementIp: '10.10.1.1',
+      hostName: 'vmanage',
+      lastReported: '2025-10-16T10:45:45Z'
+    },
+    {
+      count: 25894,
+      source: 'Unity',
+      deviceType: 'NA',
+      description: 'SD-WAN: There are errors in the \'Get routes data\' metric',
+      severity: 'Warning',
+      managementIp: '10.10.1.5',
+      hostName: 'vsmart',
+      lastReported: '2025-10-16T10:46:45Z'
+    },
+    {
+      count: 25856,
+      source: 'Unity',
+      deviceType: 'NA',
+      description: 'SD-WAN: There are errors in the \'Get routes data\' metric',
+      severity: 'Warning',
+      managementIp: '10.10.1.3',
+      hostName: 'vbond',
+      lastReported: '2025-10-16T10:47:46Z'
+    },
+    {
+      count: 24031,
+      source: 'Unity',
+      deviceType: 'switch',
+      description: 'Interface Ethernet1/4: Link down',
+      severity: 'Critical',
+      managementIp: '10.1.0.1',
+      hostName: 'sw2-mgmt.sf10.unitedlayer.com',
+      lastReported: '2025-10-15T21:11:41Z'
+    }
   ],
   chart: [
-    { host_name: 'ul-easy-trade-app0', critical: 4100, warning: 0, information: 5000 },
-    { host_name: 'alpha-collector-MT', critical: 860, warning: 0, information: 4720 },
-    { host_name: 'ul-BankOfAnthos-app', critical: 260, warning: 120, information: 970 },
-    { host_name: 'Azure LAB', critical: 0, warning: 240, information: 0 },
-    { host_name: 'unity', critical: 290, warning: 0, information: 0 },
-    { host_name: 'SCOMDMH01', critical: 0, warning: 340, information: 0 }
+    {
+      information: 1,
+      hostName: 'N/A',
+      warning: 112334,
+      critical: 6107
+    },
+    {
+      information: 2,
+      hostName: 'Nimble Storage - SF',
+      warning: 587,
+      critical: 69417
+    },
+    {
+      information: 574,
+      hostName: 'ul-test-log-metrics02',
+      warning: 1,
+      critical: 66028
+    },
+    {
+      information: 1,
+      hostName: 'site2-cedge01',
+      warning: 55342,
+      critical: 0
+    },
+    {
+      information: 2,
+      hostName: 'site1-cedge01',
+      warning: 44980,
+      critical: 0
+    },
+    {
+      information: 20,
+      hostName: 'UnityDemo-mtinfralb02.unitedlayer.com',
+      warning: 42084,
+      critical: 25
+    },
+    {
+      information: 0,
+      hostName: 'vmanage',
+      warning: 26255,
+      critical: 0
+    },
+    {
+      information: 0,
+      hostName: 'vsmart',
+      warning: 25894,
+      critical: 0
+    },
+    {
+      information: 0,
+      hostName: 'vbond',
+      warning: 25856,
+      critical: 0
+    },
+    {
+      information: 20711,
+      hostName: 'sw2-mgmt.sf10.unitedlayer.com',
+      warning: 3204,
+      critical: 116
+    }
   ],
-  active_category: 'application',
-  category_options: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY
+  activeTimeRange: 'last_month',
+  timeRangeOptions: [
+    { value: 'last_24_hours', label: 'Last 24 Hours' },
+    { value: 'last_week', label: 'Last 7 Days' },
+    { value: 'last_month', label: 'Last Month' },
+    { value: 'last_60_days', label: 'Last 60 Days' },
+    { value: 'last_quarter', label: 'Last Quarter' }
+  ],
+  categoryOptions: [
+    { value: 'all', label: 'All' },
+    { value: 'baremetal_servers', label: 'Baremetals' },
+    { value: 'database', label: 'Database' },
+    { value: 'network', label: 'Network' },
+    { value: 'others', label: 'Others' },
+    { value: 'private_cloud_compute', label: 'Private Cloud Compute' },
+    { value: 'public_cloud_compute', label: 'Public Cloud Compute' },
+    { value: 'storage', label: 'Storage' }
+  ],
+  activeCategory: 'all'
 };
 
-export const INCIDENT_MANAGEMENT_DUMMY: IncidentManagementResponse = {
-  alert_generated_by_device_type: [
-    { key: 'ul_switch_01', device_name: 'UL-switch-01', critical: 5, warning: 15, information: 19, ticket_count: 15 },
-    { key: 'router_x2', device_name: 'Router-X2', critical: 7, warning: 16, information: 20, ticket_count: 20 },
-    { key: 'firewall_pro_3000', device_name: 'Firewall-Pro 3000', critical: 8, warning: 17, information: 21, ticket_count: 16 },
-    { key: 'loadbalancer_alpha', device_name: 'LoadBalancer-Alpha', critical: 9, warning: 18, information: 22, ticket_count: 21 },
-    { key: 'storage_node_45', device_name: 'StorageNode-45', critical: 10, warning: 19, information: 23, ticket_count: 17 },
-    { key: 'database_server_77', device_name: 'DatabaseServer-77', critical: 11, warning: 20, information: 24, ticket_count: 22 },
-    { key: 'app_gateway_03', device_name: 'AppGateway-03', critical: 6, warning: 14, information: 18, ticket_count: 13 },
-    { key: 'gpu_worker_02', device_name: 'GPU-Worker-02', critical: 4, warning: 11, information: 16, ticket_count: 10 },
-    { key: 'container_node_09', device_name: 'ContainerNode-09', critical: 5, warning: 12, information: 17, ticket_count: 12 },
-    { key: 'db_cache_01', device_name: 'DB-Cache-01', critical: 3, warning: 10, information: 14, ticket_count: 9 }
+export const ITSM_TICKET_VIEW_API_DUMMY: ItsmTicketViewApiResponse = {
+  tab: 'all',
+  tabOptions: [
+    { value: 'all', label: 'All tickets' },
+    { value: 'change_request', label: 'Change Request' },
+    { value: 'incident', label: 'Incident' },
+    { value: 'problem', label: 'Problem' }
   ],
-  open_incident_tickets: [
-    { uuid: 'open-01', ticket_id: 'INC1804025', device_name: 'UL-Switch-1', alert_type: 'Information', tone: 'info', ticket_count: 1 },
-    { uuid: 'open-02', ticket_id: 'INC1804026', device_name: 'UL-Switch-2', alert_type: 'Critical', tone: 'danger', ticket_count: 1 },
-    { uuid: 'open-03', ticket_id: 'INC1804027', device_name: 'UL-Switch-3', alert_type: 'Warning', tone: 'warning', ticket_count: 2 },
-    { uuid: 'open-04', ticket_id: 'INC1804028', device_name: 'UL-Switch-4', alert_type: 'Information', tone: 'info', ticket_count: 1 },
-    { uuid: 'open-05', ticket_id: 'INC1804029', device_name: 'UL-Switch-5', alert_type: 'Warning', tone: 'warning', ticket_count: 1 },
-    { uuid: 'open-06', ticket_id: 'INC1804030', device_name: 'UL-Switch-6', alert_type: 'Critical', tone: 'danger', ticket_count: 3 },
-    { uuid: 'open-07', ticket_id: 'INC1804031', device_name: 'UL-Switch-7', alert_type: 'Information', tone: 'info', ticket_count: 1 },
-    { uuid: 'open-08', ticket_id: 'INC1804032', device_name: 'UL-Switch-8', alert_type: 'Warning', tone: 'warning', ticket_count: 2 },
-    { uuid: 'open-09', ticket_id: 'INC1804033', device_name: 'UL-Switch-9', alert_type: 'Critical', tone: 'danger', ticket_count: 1 },
-    { uuid: 'open-10', ticket_id: 'INC1804034', device_name: 'UL-Switch-10', alert_type: 'Information', tone: 'info', ticket_count: 1 }
+  ticketsByPriority: [
+    { key: '3 - Moderate', label: '3 - Moderate', count: 180, value: 180 },
+    { key: '2 - High', label: '2 - High', count: 45, value: 45 },
+    { key: '1 - Critical', label: '1 - Critical', count: 18, value: 18 },
+    { key: '4 - Low', label: '4 - Low', count: 5, value: 5 },
+    { key: '5 - Planning', label: '5 - Planning', count: 2, value: 2 }
   ],
-  resolved_incident_tickets: [
-    { uuid: 'resolved-01', ticket_id: 'INC1804025', device_name: 'UL-Switch-1', alert_type: 'Information', tone: 'info', ticket_count: 1 },
-    { uuid: 'resolved-02', ticket_id: 'INC1804026', device_name: 'UL-Switch-2', alert_type: 'Critical', tone: 'danger', ticket_count: 1 },
-    { uuid: 'resolved-03', ticket_id: 'INC1804027', device_name: 'UL-Switch-3', alert_type: 'Warning', tone: 'warning', ticket_count: 2 },
-    { uuid: 'resolved-04', ticket_id: 'INC1804028', device_name: 'UL-Switch-4', alert_type: 'Information', tone: 'info', ticket_count: 1 },
-    { uuid: 'resolved-05', ticket_id: 'INC1804029', device_name: 'UL-Switch-5', alert_type: 'Warning', tone: 'warning', ticket_count: 1 },
-    { uuid: 'resolved-06', ticket_id: 'INC1804030', device_name: 'UL-Switch-6', alert_type: 'Critical', tone: 'danger', ticket_count: 3 },
-    { uuid: 'resolved-07', ticket_id: 'INC1804031', device_name: 'UL-Switch-7', alert_type: 'Information', tone: 'info', ticket_count: 1 },
-    { uuid: 'resolved-08', ticket_id: 'INC1804032', device_name: 'UL-Switch-8', alert_type: 'Warning', tone: 'warning', ticket_count: 2 },
-    { uuid: 'resolved-09', ticket_id: 'INC1804033', device_name: 'UL-Switch-9', alert_type: 'Critical', tone: 'danger', ticket_count: 1 },
-    { uuid: 'resolved-10', ticket_id: 'INC1804034', device_name: 'UL-Switch-10', alert_type: 'Information', tone: 'info', ticket_count: 1 }
+  ticketsByStatus: [
+    { key: 'New', label: 'New', count: 210, value: 210 },
+    { key: 'In Progress', label: 'In Progress', count: 22, value: 22 },
+    { key: 'On Hold', label: 'On Hold', count: 8, value: 8 },
+    { key: 'Resolved', label: 'Resolved', count: 6, value: 6 },
+    { key: 'Closed', label: 'Closed', count: 4, value: 4 }
   ],
-  active_category: 'application',
-  category_options: EVENT_ANALYTICS_CATEGORY_OPTIONS_DUMMY
+  solvedByResponseTime: {
+    buckets: [
+      { key: 'one_day', label: '1 Day', count: 6, value: 6 },
+      { key: 'one_week', label: '1 Week', count: 3, value: 3 },
+      { key: 'one_month', label: '1 Month', count: 1, value: 1 },
+      { key: 'greaterthan_month', label: '> Month', count: 0, value: 0 }
+    ]
+  },
+  filters: {
+    search: '',
+    state: '',
+    priority: '',
+    type: '',
+    startDate: '2026-06-19',
+    endDate: '2026-07-03'
+  },
+  filterOptions: {
+    state: [
+      { value: '', label: 'All' },
+      { value: '1', label: 'New' },
+      { value: '2', label: 'In Progress' },
+      { value: '3', label: 'On Hold' },
+      { value: '6', label: 'Resolved' },
+      { value: '7', label: 'Closed' },
+      { value: '8', label: 'Canceled' }
+    ],
+    priority: [
+      { value: '', label: 'All' },
+      { value: '1', label: '1 - Critical' },
+      { value: '2', label: '2 - High' },
+      { value: '3', label: '3 - Moderate' },
+      { value: '4', label: '4 - Low' },
+      { value: '5', label: '5 - Planning' }
+    ],
+    type: [
+      { value: 'all', label: 'All' },
+      { value: 'incident', label: 'Incident' },
+      { value: 'change_request', label: 'Change Request' },
+      { value: 'problem', label: 'Problem' }
+    ]
+  },
+  tickets: [
+    {
+      ticketId: 'INC0012381',
+      shortDescription: 'Linux: agent is not available',
+      state: 'New',
+      priority: '3 - Moderate',
+      createdOn: '2026-06-03 11:57:30',
+      updatedOn: '2026-06-03 11:57:30',
+      resolution: 'New'
+    },
+    {
+      ticketId: 'INC0012382',
+      shortDescription: 'trigger-1 for Switch-UN',
+      state: 'New',
+      priority: '3 - Moderate',
+      createdOn: '2026-06-03 13:21:33',
+      updatedOn: '2026-06-03 13:21:33',
+      resolution: 'New'
+    }
+  ],
+  total: 250,
+  page: 1,
+  perPage: 10
 };

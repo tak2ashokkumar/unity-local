@@ -987,28 +987,6 @@ export class UnityChartConfigService {
     return legend;
   }
 
-  // Turns a chart's legend into a single-line / single-column paginated (scroll) legend,
-  // preserving its existing orient. No-ops when there is no legend or the legend is hidden.
-  applyScrollableLegend(options: EChartsOption): EChartsOption {
-    if (!options || !options.legend) {
-      return options;
-    }
-    // typed so 'scroll' is not widened to string against LegendComponentOption['type']
-    const scrollStyle: Partial<LegendComponentOption> = {
-      type: 'scroll',
-      pageIconSize: 10,
-      pageTextStyle: { color: '#999' }
-    };
-    if (Array.isArray(options.legend)) {
-      options.legend = options.legend.map(lg =>
-        lg && (lg as LegendComponentOption).show !== false ? { ...lg, ...scrollStyle } : lg
-      );
-    } else if ((options.legend as LegendComponentOption).show !== false) {
-      options.legend = { ...options.legend, ...scrollStyle };
-    }
-    return options;
-  }
-
   setDataZoom(orient: string, position?: string): DataZoomComponentOption[] {
     let filters: DataZoomComponentOption[] = [];
     switch (orient) {

@@ -68,7 +68,7 @@ export class AimlSummaryService {
     a.noiseReductionPercentage = summary.total.noise_reduction;
     a.correlationPercentage = summary.total.correlation_reduction;
 
-    a.eventReductionPercentage = summary.total.event_count ? Math.round(((summary.total.event_count - summary.total.condition_count) / summary.total.event_count) * 100) : 0;
+    a.eventReductionPercentage = summary.total.event_count ? ((summary.total.event_count - summary.total.condition_count) / summary.total.event_count) * 100 : 0;
     return a;
   }
 

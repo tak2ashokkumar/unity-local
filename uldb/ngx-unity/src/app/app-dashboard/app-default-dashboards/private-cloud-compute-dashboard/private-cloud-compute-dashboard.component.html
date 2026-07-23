@@ -734,7 +734,7 @@
             <div class="row workload-chart-row">
                 <div class="col-4">
                     <div class="text-center p-2 font-500">
-                        Top 10 - Disk Latency (Ms)
+                        Top 10 - Disk Read/Write Throughput
                     </div>
                     <div class="card-body position-relative workload-chart-body">
                         <app-spinner [name]="diskLatencyWidgetData.loader"></app-spinner>
@@ -771,7 +771,7 @@
                 </div>
                 <div class="col-4">
                     <div class="text-center p-2 font-500">
-                        Top 10 - CPU Ready / Wait Time VMs (%)
+                        Top 10 - CPU Ready VMs (%)
                     </div>
                     <div class="card-body position-relative workload-chart-body">
                         <app-spinner [name]="cpuReadyWidgetData.loader"></app-spinner>
@@ -807,7 +807,7 @@
                 </div>
                 <div class="col-4">
                     <div class="text-center p-2 font-500">
-                        Top 10 - Swap Balloon Memory (GB)
+                        Top 10 - Swap Memory (GB)
                     </div>
                     <div class="card-body position-relative workload-chart-body">
                         <app-spinner [name]="swapBalloonMemoryWidgetData.loader"></app-spinner>
@@ -1047,9 +1047,7 @@
                     </div>
                 </div>
                 <div class="orphaned-pagination-row" *ngIf="orphanedDeviceListViewData.orphanList">
-                    <p class="text-muted font-italic m-0">*Device Discovered But No Longer Reachable,Reporting, Or
-                        Mapped To
-                        An Active Source </p>
+                    <p class="text-muted font-italic m-0">*Devices With Lifecycle Stages Classified As Retired, Disposed, Or Donated Are Considered Orphaned Devices. </p>
                     <!-- <div class="orphaned-page-size">
                         <span>Show</span>
                         <select class="form-control form-control-sm" [value]="orphanedDevicesPageSize"

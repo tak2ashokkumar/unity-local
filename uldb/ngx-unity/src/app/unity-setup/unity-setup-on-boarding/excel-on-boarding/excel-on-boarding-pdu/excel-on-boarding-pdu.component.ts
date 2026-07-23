@@ -6,7 +6,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
-import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, PDUTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { PDUCRUDCabinet, PDUCRUDPowerCircuit, PDUCRUDManufacturer, PDUCRUDModel } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { ExcelOnBoardingNextPrevService } from '../excel-on-boarding-next-prev/excel-on-boarding-next-prev.service';
 import { ExcelOnBoardingPduService, ExcelOnBoardingPDUViewdata } from './excel-on-boarding-pdu.service';
@@ -96,7 +96,7 @@ export class ExcelOnBoardingPduComponent implements OnInit, OnDestroy {
         });
 
         this.collectors.forEach(collector => {
-          if(collector.ip_address == data.data.collector){
+          if (collector.ip_address == data.data.collector) {
             data.form.patchValue({ collector: { uuid: collector.uuid } });
           }
         });

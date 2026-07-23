@@ -4,8 +4,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, from } from 'rxjs';
 import { filter, mergeMap, takeUntil } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
-import { PcCrudService } from 'src/app/app-shared-crud/pc-crud/pc-crud.service';
-import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
+import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes-pod.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { PrivateCloudType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { UsageStatistics } from 'src/app/shared/SharedEntityTypes/usage-statistics.type';
@@ -16,11 +15,12 @@ import { StorageType } from 'src/app/shared/app-storage/storage-type';
 import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService, DeviceMapping, FaIconMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { SUMMARY_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
+import { PcCrudService } from 'src/app/app-shared-crud/pc-crud/pc-crud.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { UsageData, UsageStatsPercent } from '../entities/usage-data.type';
 import { CustomVirtualMachine, VCenterDataStore, VirtualMachine } from '../entities/vm.type';
-import { UnitedCloudSharedService } from '../united-cloud-shared.service';
 import { EsxiHypervisorUsageData, IconViewData, SummaryService, SummaryUsageViewData, SummaryViewData } from './summary.service';
+import { UnitedCloudSharedService } from '../united-cloud-shared.service';
 
 @Component({
   selector: 'pc-summary',

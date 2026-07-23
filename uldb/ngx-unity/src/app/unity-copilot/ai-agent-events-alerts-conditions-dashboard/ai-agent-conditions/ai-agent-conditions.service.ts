@@ -15,7 +15,7 @@ import moment from 'moment';
 import { environment } from 'src/environments/environment';
 import { TabData } from 'src/app/shared/tabdata';
 import { AiAgentConfigType } from '../ai-agent-events-alerts-conditions-dashboard.type';
-import { AiAgentConditionActivityDetail, AiAgentConditionAlertDetail, AiAgentConditionAlertEventDetail, AiAgentConditionAlerts, AiAgentConditionAnalysisData, AiAgentConditionDetails, AiAgentConditionDeviceEventTimeline, AiAgentConditions, AiAgentConditionsSummaryType } from './ai-agent-conditions.type';
+import { AiAgentConditionActivityDetail, AiAgentConditionAlertDetail, AiAgentConditionAlertEventDetail, AiAgentConditionAlerts, AiAgentConditionAnalysisData, AiAgentConditionDetails, AiAgentConditionDeviceEventTimeline, AiAgentConditions, AiAgentConditionsSummaryType, AiAgentDatabaseSummary } from './ai-agent-conditions.type';
 
 @Injectable()
 export class AiAgentConditionsService {
@@ -55,11 +55,22 @@ export class AiAgentConditionsService {
     summaryByDeviceType.macDevice = data.mac_device;
     summaryByDeviceType.vm = data.vm;
 
+    summaryByDeviceType.database = data.database;
     summaryByDeviceType.storage = data.storage;
 
     viewData.summaryByDeviceType = summaryByDeviceType;
+    viewData.databaseSummaryCards = this.convertToDatabaseSummaryCards(data?.databases, 'condition_count');
 
     return viewData;
+  }
+
+  convertToDatabaseSummaryCards(databases: AiAgentDatabaseSummary[], countKey: 'alert_count' | 'condition_count'): AiAgentDatabaseSummaryCard[] {
+    return (databases || []).map(database => {
+      const view = new AiAgentDatabaseSummaryCard();
+      view.name = database?.database_type || 'Other';
+      view.count = Number(database?.[countKey]) || 0;
+      return view;
+    });
   }
 
   getConditions(criteria: SearchCriteria, aiAgentConfig: AiAgentConfigType): Observable<PaginatedResult<AiAgentConditions>> {
@@ -474,6 +485,13 @@ export class AiAgentConditionsSummaryViewData {
   totalConditions: number;
   summaryBySeverity: AiAgentConditionsSummaryBySeverityViewData;
   summaryByDeviceType: AiAgentConditionSummaryByDeviceTypeViewData;
+  databaseSummaryCards: AiAgentDatabaseSummaryCard[] = [];
+}
+
+export class AiAgentDatabaseSummaryCard {
+  constructor() { }
+  name: string;
+  count: number = 0;
 }
 
 export class AiAgentConditionsSummaryBySeverityViewData {
@@ -492,6 +510,7 @@ export class AiAgentConditionSummaryByDeviceTypeViewData {
   hypervisor: number;
   macDevice: number;
   vm: number;
+  database: number;
   storage:number;
 }
 

@@ -41,5 +41,8 @@ export interface SupportedLLMConfigData {
 export interface LLMCompatibleModules {
     assistant: string;
     network_agent: string;
+    compute_agent?: string;
+    database_agent?: string;
+    storage_agent?: string;
     workflow_agent: string;
 }

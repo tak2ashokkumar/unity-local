@@ -14,8 +14,16 @@ export interface DatabaseDashboardFilterOption {
   name: string;
 }
 
+export interface DatabaseDashboardSelectOption {
+  value: string;
+  label: string;
+}
+
 export interface DatabaseDashboardFilterCriteria {
   databases: string[];
+  duration: string;
+  durationFrom?: Date | string;
+  durationTo?: Date | string;
 }
 
 export interface DatabaseDashboardMetric {

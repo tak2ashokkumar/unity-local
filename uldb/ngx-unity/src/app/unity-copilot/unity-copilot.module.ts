@@ -19,6 +19,7 @@ import { AiAgentEventsAlertsConditionsDashboardComponent } from './ai-agent-even
 import { AiAgentAlertsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-alerts/ai-agent-alerts.component';
 import { AiAgentEventsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-events/ai-agent-events.component';
 import { ComputeAiAgentComponent } from './compute-ai-agent/compute-ai-agent.component';
+import { DatabaseAiAgentComponent } from './database-ai-agent/database-ai-agent.component';
 import { AiAgentConditionsComponent } from './ai-agent-events-alerts-conditions-dashboard/ai-agent-conditions/ai-agent-conditions.component';
 import { StorageAiAgentComponent } from './storage-ai-agent/storage-ai-agent.component';
 
@@ -34,6 +35,7 @@ import { StorageAiAgentComponent } from './storage-ai-agent/storage-ai-agent.com
     NetworkAiAgentDashboardAlertsComponent,
     NetworkAiAgentDashboardConditionsComponent,
     ComputeAiAgentComponent,
+    DatabaseAiAgentComponent,
     AiAgentEventsAlertsConditionsDashboardComponent,
     AiAgentEventsComponent,
     AiAgentAlertsComponent,
