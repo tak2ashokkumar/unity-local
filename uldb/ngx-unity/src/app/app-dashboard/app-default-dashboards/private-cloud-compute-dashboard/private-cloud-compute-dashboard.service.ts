@@ -9,7 +9,7 @@ import { Observable, of } from 'rxjs';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
-import { PRIVATE_CLOUD_ALERT_TREND_STACK_GROUPS, PRIVATE_CLOUD_TICKETS_TOTAL, VmDensityPerHostChartColors } from './private-cloud-compute-dashboard.const';
+import { PRIVATE_CLOUD_ALERT_TREND_STACK_GROUPS, PRIVATE_CLOUD_TICKETS_TOTAL, PRIVATE_CLOUD_TIME_RANGE_DEFAULT, PRIVATE_CLOUD_TIME_RANGE_PARAM_MAP, VmDensityPerHostChartColors } from './private-cloud-compute-dashboard.const';
 import { AlertsSeverityItem, CapacityAndGrowthDataType, CapacityTrendAndForecastItem, CloudTypeDistributionItem, ClusterCapacityUtilTrendData, EnvironmentCriticalityItem, ExecutiveSummaryItem, ExecutiveSummaryWidgetType, FiltersCriteriaType, IdleDevices, IdleDurationDistributionItem, InfrahealthstatusDataType, OrphanedCategory, OrphanedDevice, OrphanedResourcesResponse, PerformanceHotspots, PerformanceWorkloadDataType, PowerActivityStateItem, PrivateCloudAlertSideCard, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudStatusTone, PrivateCloudTicketDonutItem, PrivateCloudUtilization, PrivateCloudUtilizationRow, PrivateCloudUtilizationViewRow, ProvisioningStatus, RecentAlerts, RecentAlertsItem, Top10ClustersByVMsData, TopHeaderDataType, TopHostUtilizationItem, VmCountByOSTypeItem, } from './private-cloud-compute-dashboard.type';
 
 
@@ -29,6 +29,16 @@ export class PrivateCloudComputeDashboardService {
     params = this.appendMultiValueParam(params, 'datacenter', criteria?.datacenters);
     params = this.appendMultiValueParam(params, 'environment', criteria?.environments);
     params = this.appendMultiValueParam(params, 'account', criteria?.accounts);
+    if (criteria?.timeRange) {
+      // Map the dropdown period to the exact backend value where they differ (e.g. last_24_hours -> last_24_hrs).
+      params = params.set('time_range', PRIVATE_CLOUD_TIME_RANGE_PARAM_MAP[criteria.timeRange] || criteria.timeRange);
+    }
+    if (criteria?.startDate) {
+      params = params.set('start_datetime', criteria.startDate);
+    }
+    if (criteria?.endDate) {
+      params = params.set('end_datetime', criteria.endDate);
+    }
     return params;
   }
 
@@ -59,7 +69,11 @@ export class PrivateCloudComputeDashboardService {
       platforms: [platforms],
       datacenters: [datacenters],
       environments: [environments],
-      accounts: [accounts]
+      accounts: [accounts],
+      // Global Time Range - patched by the component's dropdown; read via getRawValue() by every widget.
+      timeRange: [PRIVATE_CLOUD_TIME_RANGE_DEFAULT],
+      startDate: [''],
+      endDate: ['']
     });
   }
 
@@ -128,14 +142,32 @@ export class PrivateCloudComputeDashboardService {
         }
       },
       legend: {
-        show: false
+        show: true,
+        type: 'scroll',
+        bottom: 0,
+        left: 'center',
+        icon: 'circle',
+        itemWidth: 11,
+        itemHeight: 11,
+        itemGap: 12,
+        selectedMode: false,
+        pageIconSize: 10,
+        pageTextStyle: { color: '#999' },
+        textStyle: {
+          color: '#8a8a8a',
+          fontSize: 12
+        },
+        formatter: (name: string) => {
+          const item = filteredData.find(d => d.type === name);
+          return item ? `${name} ${item.percentage}%` : name;
+        }
       },
       series: [
         {
           name: 'Cloud Type',
           type: 'pie',
-          radius: ['43%', '72%'],
-          center: ['50%', '45%'],
+          radius: ['40%', '66%'],
+          center: ['50%', '40%'],
           label: {
             show: true,
             position: 'outside',
@@ -339,6 +371,7 @@ export class PrivateCloudComputeDashboardService {
         }
       ]
     }
+    view.options = this.chartConfigSvc.applyScrollableLegend(view.options);
     return view;
   }
 
@@ -451,6 +484,7 @@ export class PrivateCloudComputeDashboardService {
       ]
     };
 
+    view.options = this.chartConfigSvc.applyScrollableLegend(view.options);
     return view;
   }
 

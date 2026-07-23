@@ -26,6 +26,10 @@ export interface FiltersCriteriaType {
   datacenters: string[];
   accounts: string[];
   environments: string[];
+  // Global Time Range: startDate/endDate are only sent for the 'custom' range (start_datetime / end_datetime).
+  timeRange?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 //------Executive Summary-------------

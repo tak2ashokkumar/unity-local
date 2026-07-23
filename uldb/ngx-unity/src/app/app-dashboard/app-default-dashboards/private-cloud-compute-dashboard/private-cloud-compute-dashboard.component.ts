@@ -18,7 +18,7 @@ import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/s
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
 import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
-import { DEVICE_OPTIONS, DEVICE_TYPE_MAP, PLATFORM_OPTIONS, privateCloudTabItems } from './private-cloud-compute-dashboard.const';
+import { DEVICE_OPTIONS, DEVICE_TYPE_MAP, PLATFORM_OPTIONS, privateCloudTabItems, PRIVATE_CLOUD_TIME_RANGE_DEFAULT, PRIVATE_CLOUD_TIME_RANGE_OPTIONS } from './private-cloud-compute-dashboard.const';
 import { CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DevicesRowViewData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceList, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, SwapBalloonMemoryWidgetData, Top10ClustersByVMsWidgetData, TopCriticalAlertsViewData, VmDensityHost } from './private-cloud-compute-dashboard.service';
 import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
 
@@ -41,6 +41,11 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   readonly compactBarLabelThreshold = 10;
 
   filterForm: FormGroup;
+  // Global Time Range (top filter): timeRangeOptions/selectedTimeRange drive the shared dropdown;
+  // onTimeRangeChange patches timeRange/startDate/endDate into filterForm so getRawValue() carries them.
+  readonly timeRangeOptions = PRIVATE_CLOUD_TIME_RANGE_OPTIONS;
+  selectedTimeRange: string = PRIVATE_CLOUD_TIME_RANGE_DEFAULT;
+  private selectedTimeRangeDates: { from: string; to: string } | null = null;
   platformOptions: labelAndValueType[] = [];
   timeRanges: any[] = []
   eventDatacenters: any[] = []
@@ -288,6 +293,8 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   private resetFilterState() {
     this.filterFormUnsubscribe.next();
     this.filterForm = null;
+    this.selectedTimeRange = PRIVATE_CLOUD_TIME_RANGE_DEFAULT;
+    this.selectedTimeRangeDates = null;
     this.platformOptions = [];
     this.datacenterOptions = [];
     this.environmentOptions = [];
@@ -949,6 +956,35 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     this.orphanedDevicesPageNo = 1;
     this.idleDevicesPageNo = 1;
     this.loadWidgets();
+  }
+
+  /** Captures the global Time Range selection (named period or custom range). Applied to widgets only on Apply. */
+  onTimeRangeChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
+    this.selectedTimeRange = event?.period || this.selectedTimeRange;
+    this.selectedTimeRangeDates = event?.period === 'custom'
+      ? { from: this.formatTimeRangeDate(event?.from, false), to: this.formatTimeRangeDate(event?.to, true) }
+      : null;
+    // Store into the form so every widget's getRawValue() picks up the Time Range on the next Apply.
+    this.filterForm?.patchValue({
+      timeRange: this.selectedTimeRange,
+      startDate: this.selectedTimeRange === 'custom' ? (this.selectedTimeRangeDates?.from || '') : '',
+      endDate: this.selectedTimeRange === 'custom' ? (this.selectedTimeRangeDates?.to || '') : ''
+    }, { emitEvent: false });
+  }
+
+  /** Formats a custom-range boundary as UTC ISO-8601 (e.g. 2026-07-01T00:00:00Z) for start_datetime / end_datetime. */
+  private formatTimeRangeDate(value: string | Date | undefined, isEnd: boolean): string {
+    if (!value) {
+      return '';
+    }
+    const date = value instanceof Date ? value : new Date(value);
+    if (isNaN(date.getTime())) {
+      return '';
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}T${isEnd ? '23:59:59' : '00:00:00'}Z`;
   }
 
   refreshData() {
