@@ -1,0 +1,29 @@
+.business-summary-metric-card,
+.business-summary-submetric-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.business-summary-metric-card {
+  min-height: 70px;
+}
+
+.business-summary-submetric-card {
+  min-height: 36px;
+}
+
+.business-summary-metric-value {
+  white-space: nowrap;
+}
+
+:host-context(body.unity-chatbot-open) {
+  .business-summary-metric-card,
+  .business-summary-submetric-card {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+  }
+}

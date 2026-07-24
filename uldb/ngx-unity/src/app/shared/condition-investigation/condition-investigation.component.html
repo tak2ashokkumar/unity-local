@@ -1,6 +1,6 @@
 <div class="container-fluid pt-2">
     <div class="animated-fadeIn">
-        <div class="row" style="height:calc(100vh - 75px)">
+        <div class="row" [style.height]="investigationHeight" [class.d-none]="isTerminalMaximized">
             <div class="col-8 condition-detail h-100 d-flex flex-column">
                 <div class="card mb-0" *ngIf="conditionDetailsViewData">
                     <div class="card-header border-bottom bg-white p-2 d-flex flex-column position-relative">

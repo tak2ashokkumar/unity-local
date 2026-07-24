@@ -59,6 +59,8 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   lastOpenedWindow: any;
 
   isTerminalReady = false;
+  investigationHeight = 'calc(100vh - 75px)';
+  isTerminalMaximized = false;
 
   @ViewChild('chatResponsHistoryScrollContainer') chatResponsHistoryScrollContainer: ElementRef;
   @ViewChild('chatResponseHistoryCardBody') chatResponseHistoryCardBody: ElementRef;
@@ -149,6 +151,18 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
         this.registryChannel.postMessage({ type: 'REGISTER_ACK', tabId: e.data.tabId });
       }
     };
+    this.floatingTerminalService.resizeAnnounced$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((terminalHeight: string) => {
+        this.isTerminalMaximized = terminalHeight === 'calc(100% - 55px)';
+        if (terminalHeight === '0px') {
+          this.investigationHeight = 'calc(100vh - 75px)';
+        } else if (this.isTerminalMaximized) {
+          this.investigationHeight = '0px';
+        } else {
+          this.investigationHeight = `calc(100vh - 75px - ${terminalHeight})`;
+        }
+      });
   }
 
   ngOnInit(): void {

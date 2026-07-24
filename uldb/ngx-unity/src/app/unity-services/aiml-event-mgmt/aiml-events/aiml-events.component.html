@@ -158,7 +158,8 @@
                     <td class="tdw-9 text-primary">
                         <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
                     </td>
-                    <td *ngFor="let col of columnsSelected">
+                    <td *ngFor="let col of columnsSelected"
+                        [ngClass]="{'description-td-width': (!col.type || col.type=='text') && (col.key == 'description')}">
                         <ng-container *ngIf="col.type == 'btn-link'">
                             <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
                                 [tooltip]="col.name" (click)="loadDetails(view)">{{view[col.key]}}</button>
@@ -168,7 +169,11 @@
                         </ng-container>
                         <ng-container *ngIf="!col.type || col.type=='text'">
                             <div [tooltip]="view[col.key]"
-                                *ngIf="col.key !== 'status' && col.key !== 'severity' && col.key !== 'eventMetric'">
+                                *ngIf="col.key !== 'status' && col.key !== 'severity' && col.key !== 'eventMetric' && col.key !== 'description'">
+                                {{view[col.key]}}</div>
+                            <div class="text-truncate w-97"
+                                *ngIf="col.key == 'description'"
+                                [tooltip]="view[col.key]">
                                 {{view[col.key]}}</div>
                             <div [tooltip]="view[col.key]" [ngClass]="[view.statusTextColor, 'text-capitalize']"
                                 *ngIf="col.key == 'status'">{{view[col.key]}}</div>

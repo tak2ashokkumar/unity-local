@@ -250,9 +250,9 @@ export class AstronomyShopApplicationDashboardService {
       labelLine: { length: 12, lineStyle: { width: 1, type: 'solid', color: '#999' } },
       itemStyle: { borderColor: '#fff', borderWidth: 1 },
       data: [
-        { value: 100,            actualValue: graphData.sessions, name: 'Sum of sessions', itemStyle: { color: '#03A9F4' } },
-        { value: cartNormValue,  actualValue: graphData.carts,    name: 'Sum of carts',    itemStyle: { color: '#FF9800' } },
-        { value: orderNormValue, actualValue: graphData.orders,   name: 'Sum of orders',   itemStyle: { color: '#3F51B5' } }
+        { value: 100, actualValue: graphData.sessions, name: 'Sum of sessions', itemStyle: { color: '#03A9F4' } },
+        { value: cartNormValue, actualValue: graphData.carts, name: 'Sum of carts', itemStyle: { color: '#FF9800' } },
+        { value: orderNormValue, actualValue: graphData.orders, name: 'Sum of orders', itemStyle: { color: '#3F51B5' } }
       ] as any[]
     }];
     return view;
@@ -273,7 +273,7 @@ export class AstronomyShopApplicationDashboardService {
       textStyle: { fontFamily: UNITY_FONT_FAMILY(), fontSize: 13, fontWeight: 500, color: UNITY_TEXT_DEFAULT_COLOR() }
     };
     view.options.grid = { top: '12%', left: '5%', right: '10%', bottom: '8%', containLabel: true };
-    view.options.xAxis = { type: 'value', axisLabel: { formatter: (val: number) => val.toLocaleString() } };
+    view.options.xAxis = { type: 'value', axisLabel: { rotate: 35, formatter: (val: number) => val.toLocaleString() } };
     view.options.yAxis = {
       type: 'category', data: Object.keys(graphData),
       axisTick: { show: true }, axisLine: { show: true },
@@ -567,7 +567,7 @@ export class AstronomyShopApplicationDashboardService {
       textStyle: { fontFamily: UNITY_FONT_FAMILY(), fontSize: 13, fontWeight: 500, color: UNITY_TEXT_DEFAULT_COLOR() }
     };
     view.options.grid = { top: '15%', left: '5%', right: '10%', bottom: '15%', containLabel: true };
-    view.options.xAxis = { type: 'value', min: 0, axisLabel: { formatter: (val: number) => val.toLocaleString() } };
+    view.options.xAxis = { type: 'value', min: 0, axisLabel: { rotate: 35, formatter: (val: number) => val.toLocaleString() } };
     view.options.yAxis = {
       type: 'category', data: yAxisData, axisTick: { show: true }, axisLine: { show: true },
       axisLabel: { width: 120, overflow: 'truncate', formatter: (value: string) => value }, tooltip: { show: true }
@@ -1027,7 +1027,7 @@ export class AstronomyShopApplicationDashboardService {
         { text: totalCount.toString(), subtext: 'Total Count', left: 'center', top: '60%', textStyle: { fontSize: 20, fontWeight: 'bold' }, subtextStyle: { fontSize: 12 } }
       ],
       tooltip: { trigger: 'item', formatter: tooltipFormatter },
-      legend: { orient: 'vertical', left: 'right', top: 'middle', data: ['Up', 'Down', 'Unknown'], itemWidth: 12, itemHeight: 12, textStyle: { fontSize: 14 } },
+      legend: { orient: 'horizontal', left: 'center', top: 'bottom', data: ['Up', 'Down', 'Unknown'], itemWidth: 12, itemHeight: 12, textStyle: { fontSize: 14 } },
       series: [{
         name: 'Status', type: 'pie', radius: ['50%', '80%'], center: ['50%', '70%'], startAngle: 180,
         avoidLabelOverlap: false, label: { show: false },

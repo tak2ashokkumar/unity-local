@@ -15,13 +15,13 @@ import { DcCrudService } from 'src/app/app-shared-crud/dc-crud/dc-crud.service';
   styleUrls: ['./datacenter.component.scss']
 })
 export class DatacenterComponent implements OnInit, OnDestroy {
+  private ngUnsubscribe = new Subject();
 
   tabItems: DataCenterTabs[] = [];
   dcId: string;
   subscr: Subscription;
   tabData: TabData[] = [];
-  private ngUnsubscribe = new Subject();
-
+  isResourceDetailView: boolean = false;
 
   constructor(private dcService: DatacenterService,
     private spinnerService: AppSpinnerService,
@@ -35,6 +35,7 @@ export class DatacenterComponent implements OnInit, OnDestroy {
      */
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
+        this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(event.url);
         if (event.url === '/unitycloud/datacenter' || event.url === '/unitycloud/datacenter/' + this.dcId) {
           this.route.data.subscribe((data: { tabItems: DataCenterTabs[] }) => {
             this.tabItems = data.tabItems;
@@ -58,6 +59,7 @@ export class DatacenterComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(this.router.url);
   }
 
   ngOnDestroy() {

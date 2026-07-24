@@ -252,7 +252,7 @@ export interface EventAlertAnalyticsGraphApiResponse {
   links: EventAlertAnalyticsGraphLinkApiResponse[];
 }
 
-export interface EventAlertAnalyticsApiResponse extends CategoryFilterApiResponse {
+export interface EventAlertAnalyticsApiResponse extends CategoryFilterApiResponse, TimeRangeFilterApiResponse {
   viewBy: string;
   total: number;
   rows: Array<EventAlertAnalyticsSourceRowApiResponse | EventAlertAnalyticsSeverityRowApiResponse>;

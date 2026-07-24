@@ -18,22 +18,22 @@
                             (searched)="onSearched($event)"></search-box>
                     </div>
                     <div class="d-flex justify-content-end align-items-center w-78">
-                        <select name="device_type" id="device_type" class="form-control w-15 mr-2 p-1 h-80"
+                        <select name="device_type" id="device_type" class="form-control w-18 mr-2 p-1 h-80"
                             [(ngModel)]="currentCriteria.params[0].device_type"
                             (ngModelChange)="onDeviceTypeOrManufacturerFilterChange()">
                             <option value="null">Select Device Type</option>
                             <option [value]="dt.value" *ngFor="let dt of deviceTypeList">{{dt.label}}</option>
                         </select>
-                        <multiselect-dropdown class="form-control p-0 w-15 mr-2" style="height:auto;"
+                        <multiselect-dropdown class="form-control p-0 w-18 mr-2" style="height:auto;"
                             [options]="manufacturerList" [settings]="manufacturerSettings" [texts]="manufacturerTexts"
                             (dropdownClosed)="onDeviceTypeOrManufacturerFilterChange()"
                             [(ngModel)]="currentCriteria.multiValueParam.manufacturer">
                         </multiselect-dropdown>
-                        <multiselect-dropdown class="form-control p-0 w-15 mr-2" style="height:auto;"
+                        <multiselect-dropdown class="form-control p-0 w-18 mr-2" style="height:auto;"
                             [options]="modelList" [settings]="modelSettings" [texts]="modelTexts"
                             (dropdownClosed)="onModelFilterChange()"
                             [(ngModel)]="currentCriteria.multiValueParam.model"></multiselect-dropdown>
-                        <multiselect-dropdown class="form-control p-0 w-15 mr-2" style="height:auto;"
+                        <multiselect-dropdown class="form-control p-0 w-18 mr-2" style="height:auto;"
                             [options]="statusList" [settings]="statusSettings" [texts]="statusTypeTexts"
                             (dropdownClosed)="onFilterChange()"
                             [(ngModel)]="currentCriteria.multiValueParam.status"></multiselect-dropdown>

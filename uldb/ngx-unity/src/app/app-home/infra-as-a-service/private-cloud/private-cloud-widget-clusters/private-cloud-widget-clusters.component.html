@@ -4,7 +4,8 @@
     <div class="row border-bottom">
       <div class="col-12 py-2 d-flex justify-content-between align-items-center">
         <div class="pr-1 d-flex">
-          <shared-device-status [status]="pcData.status" class="align-start mr-1" *ngIf="pcData.status"></shared-device-status>
+          <shared-device-status [status]="pcData.status" class="align-start mr-1"
+            *ngIf="pcData.status"></shared-device-status>
           <a class="d-inline-block font-500 font-lg text-decoration-none text-primary"
             (click)="goTo(pcData.drillDownLink)">{{pcData.name}}</a>
         </div>
@@ -12,10 +13,12 @@
           <div *ngIf="!dataError && showCost" class="px-1">
             <div class="font-xs text-muted text-truncate">Month To Date Cost</div>
             <div class="text-primary font-md font-500 text-right">{{view?.monthToDateCost}}</div>
-          </div>     
+          </div>
           <div class="p-1">
-            <span *ngIf="!dataError" class="fas fa-eye font-sm p-1 text-primary border rounded-circle pointer-link" [tooltip]="'View cloud details'" container="body" (click)="goTo(pcData.drillDownLink)"></span>  
-            <span *ngIf="dataError" class="fas fa-exclamation-triangle font-lg p-1 text-warning" [tooltip]="dataError" container="body"></span>
+            <span *ngIf="!dataError" class="fas fa-eye font-sm p-1 text-primary border rounded-circle pointer-link"
+              [tooltip]="'View cloud details'" container="body" (click)="goTo(pcData.drillDownLink)"></span>
+            <span *ngIf="dataError" class="fas fa-exclamation-triangle font-lg p-1 text-warning" [tooltip]="dataError"
+              container="body"></span>
           </div>
         </div>
       </div>
@@ -39,19 +42,19 @@
             [outsideClick]="true">+{{view.extraHighestHosts?.length}}</span>
         </div>
       </div>
-      <div class="w-30 pr-2 pb-2 pl-2">
+      <div class="w-30 pr-2 pb-2 pl-2" style="min-width:0">
         <div class="font-md text-muted text-truncate">Alerts</div>
-        <div class="d-flex align-items-baseline justify-content-between">
+        <div class="text-truncate" [tooltip]="alertsTooltipRef">
           <span class="text-primary font-md">{{view?.alerts?.total || 0}}</span>
-          <span class="align-items-center d-flex pl-1">
+          <span class="d-inline-flex align-items-center pl-3">
             <span class="fas fa-exclamation-circle text-danger"></span>
             <span class="text-primary font-sm pl-1">{{view?.alerts?.critical || 0}}</span>
           </span>
-          <span class="align-items-center d-flex pl-1">
+          <span class="d-inline-flex align-items-center pl-3">
             <span class="fas fa-exclamation-circle text-warning"></span>
             <span class="text-primary font-sm pl-1">{{view?.alerts?.warning || 0}}</span>
           </span>
-          <span class="align-items-center d-flex pl-1">
+          <span class="d-inline-flex align-items-center pl-3">
             <span class="fas fa-info-circle text-primary"></span>
             <span class="text-primary font-sm pl-1">{{view?.alerts?.information || 0}}</span>
           </span>
@@ -154,7 +157,8 @@
               </div>
             </div>
           </div>
-          <div *ngIf="!view.topStorageUsage?.length" class="text-center font-sm text-muted py-3">No Clusters found!</div>
+          <div *ngIf="!view.topStorageUsage?.length" class="text-center font-sm text-muted py-3">No Clusters found!
+          </div>
         </div>
       </div>
     </div>
@@ -163,4 +167,20 @@
 
 <ng-template #popTemplate let-list="dataList">
   <div *ngFor="let name of list">{{ name }}</div>
+</ng-template>
+
+<ng-template #alertsTooltipRef>
+  <div class="font-md">{{view?.alerts?.total || 0}}</div>
+    <div class="d-flex align-items-center ml-3">
+      <span>Critical </span>
+      <span class="font-sm pl-1">{{view?.alerts?.critical || 0}}</span>
+    </div>
+    <div class="d-flex align-items-center ml-3">
+      <span>Warning </span>
+      <span class="font-sm pl-1">{{view?.alerts?.warning || 0}}</span>
+    </div>
+    <div class="d-flex align-items-center ml-3">
+      <span>Information </span>
+      <span class="font-sm pl-1">{{view?.alerts?.information || 0}}</span>
+    </div>
 </ng-template>

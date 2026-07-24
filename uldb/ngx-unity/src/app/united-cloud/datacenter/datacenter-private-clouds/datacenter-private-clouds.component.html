@@ -1,5 +1,5 @@
-<div class="row">
-  <div class="col-12">
+<div class="row" [class.mx-0]="isResourceDetailView">
+  <div class="col-12" *ngIf="!isResourceDetailView">
     <div class="tab-content">
       <div class="tab-pane active p-1">
         <!-- <ul class="nav">
@@ -44,8 +44,8 @@
       </div>
     </div>
   </div>
-  <div class="col-12 mt-3" *ngIf="tabItems.length">
-    <scrollable-tab [selector]="'active'">
+  <div class="col-12 mt-3" *ngIf="tabItems.length" [class.px-0]="isResourceDetailView" [class.mt-0]="isResourceDetailView">
+    <scrollable-tab [selector]="'active'" *ngIf="!isResourceDetailView">
       <div class="nav-item border-right border-light" #scrollLeft>
         <a class="nav-link bg-secondary rounded-top border-bottom-0"><i class="fa fa-angle-left"></i></a>
       </div>

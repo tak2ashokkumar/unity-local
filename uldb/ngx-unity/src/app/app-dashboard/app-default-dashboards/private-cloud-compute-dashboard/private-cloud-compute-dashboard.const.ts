@@ -1,26 +1,22 @@
-import { PerformanceHotspots, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudCriticalAlert, PrivateCloudTicketDonutItem, PrivateCloudTicketRow, labelAndValueType } from "./private-cloud-compute-dashboard.type";
 import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
+import { PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudCriticalAlert, PrivateCloudTicketDonutItem, PrivateCloudTicketRow, labelAndValueType } from "./private-cloud-compute-dashboard.type";
 
-// Global Time Range filter options + default. value must be a DateRangePeriod the shared
-// custom-date-dropdown can resolve (it computes a range for it); the exact backend param string
-// is mapped via PRIVATE_CLOUD_TIME_RANGE_PARAM_MAP (see convertFiltersToParams). Where a backend
-// value has no matching DateRangePeriod (last_hour, last_quarter), we use the nearest resolvable
-// period as the dropdown value (last_1_hour, last_90_days) and map it to the backend string.
-export const PRIVATE_CLOUD_TIME_RANGE_DEFAULT = 'last_month';
+// Global Time Range filter options + default. value must match a DateRangePeriod the shared
+// custom-date-dropdown can resolve; the exact backend param string is mapped via
+// PRIVATE_CLOUD_TIME_RANGE_PARAM_MAP (see convertFiltersToParams).
+export const PRIVATE_CLOUD_TIME_RANGE_DEFAULT = 'last_30_days';
 
 export const PRIVATE_CLOUD_TIME_RANGE_OPTIONS: DateRangeOption[] = [
-  { label: 'Last Hour', value: 'last_1_hour' },
   { label: 'Last 24 Hours', value: 'last_24_hours' },
-  { label: 'Last Week', value: 'last_week' },
-  { label: 'Last Month', value: 'last_month' },
+  { label: 'Last 7 Days', value: 'last_7_days' },
+  { label: 'Last 30 Days', value: 'last_30_days' },
   { label: 'Last 60 Days', value: 'last_60_days' },
-  { label: 'Last Quarter', value: 'last_90_days' }
+  { label: 'Last 90 Days', value: 'last_90_days' }
 ];
 
 // Dropdown period value -> exact backend time_range param value (only where the two differ).
 export const PRIVATE_CLOUD_TIME_RANGE_PARAM_MAP: { [period: string]: string } = {
-  last_1_hour: 'last_hour',
-  last_90_days: 'last_quarter'
+  last_24_hours: 'last_24_hrs'
 };
 
 

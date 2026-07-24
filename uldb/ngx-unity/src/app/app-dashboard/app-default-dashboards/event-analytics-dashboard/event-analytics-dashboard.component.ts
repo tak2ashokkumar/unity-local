@@ -471,12 +471,18 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
       this.analyticsDatacenterOptions = res.datacenterOptions?.length ? res.datacenterOptions : this.analyticsDatacenterOptions;
       this.analyticsCloudOptions = res.cloudOptions?.length ? res.cloudOptions : this.analyticsCloudOptions;
       this.analyticsCategoryOptions = this.svc.getCategoryOptions(res.categoryOptions);
+      if (res.timeRangeOptions?.length) {
+        const eventAndAlertTimelineOptions = this.svc.getTimeRangeOptions(res.timeRangeOptions);
+        this.eventAndAlertTimelineOptions = eventAndAlertTimelineOptions;
+        this.eventAndAlertTimelineDropdownOptions = this.getDateDropdownOptions(eventAndAlertTimelineOptions);
+      }
       this.ensureSelectSelection('analyticsViewBy', this.analyticsViewByOptions, criteria.analyticsViewBy || res.viewBy);
       this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, criteria.analyticsSourceType);
       this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, criteria.analyticsSeverityType);
       this.ensureSelectSelection('analyticsDatacenter', this.analyticsDatacenterOptions, criteria.analyticsDatacenter);
       this.ensureSelectSelection('analyticsCloud', this.analyticsCloudOptions, criteria.analyticsCloud);
       this.ensureSelectSelection('analyticsCategory', this.analyticsCategoryOptions, this.svc.getActiveCategory(res.activeCategory, criteria.analyticsCategory));
+      this.ensureSelectSelection('eventAndAlertTimeline', this.eventAndAlertTimelineOptions, this.svc.getActiveTimeRange(res.activeTimeRange, criteria.eventAndAlertTimeline));
       this.applyEventAlertAnalyticsView();
     }, () => {
       this.eventAlertAnalyticsResponse = null;

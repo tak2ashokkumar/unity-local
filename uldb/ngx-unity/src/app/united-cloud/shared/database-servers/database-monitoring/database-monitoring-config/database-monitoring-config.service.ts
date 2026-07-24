@@ -40,14 +40,10 @@ export class DatabaseMonitoringConfigService {
   createODBCForm(details: DBMonitoringDetailsType): FormGroup {
     let odbcForm = this.builder.group({});
     if (details) {
-      odbcForm.addControl('data_source_name', new FormControl(details.data_source_name, [Validators.required, NoWhitespaceValidator]));
-      odbcForm.addControl('driver', new FormControl(details.driver, [Validators.required, NoWhitespaceValidator]))
       odbcForm.addControl('username', new FormControl(details.username, [Validators.required, NoWhitespaceValidator]))
       odbcForm.addControl('service_name', new FormControl(details.service_name, [Validators.required, NoWhitespaceValidator]))
       odbcForm.addControl('password', new FormControl('', [Validators.required, NoWhitespaceValidator]))
     } else {
-      odbcForm.addControl('data_source_name', new FormControl('', [Validators.required, NoWhitespaceValidator]));
-      odbcForm.addControl('driver', new FormControl('', [Validators.required, NoWhitespaceValidator]));
       odbcForm.addControl('username', new FormControl('', [Validators.required, NoWhitespaceValidator]));
       odbcForm.addControl('service_name', new FormControl('', [Validators.required, NoWhitespaceValidator]));
       odbcForm.addControl('password', new FormControl('', [Validators.required, NoWhitespaceValidator]));
@@ -89,8 +85,6 @@ export class DatabaseMonitoringConfigService {
 
   resetODBCFormErrors() {
     return {
-      'data_source_name': '',
-      'driver': '',
       'username': '',
       'password': '',
       'service_name': ''
@@ -115,12 +109,6 @@ export class DatabaseMonitoringConfigService {
   }
 
   odbcFormValidationMessages = {
-    'data_source_name': {
-      'required': 'Data Source Name is required'
-    },
-    'driver': {
-      'required': 'Driver is required'
-    },
     'username': {
       'required': 'Username is required'
     },
@@ -171,8 +159,6 @@ export class DatabaseMonitoringConfigService {
 }
 export class DBMonitoringDetailsType {
   connection_type: string;
-  data_source_name?: string;
-  driver?: string;
   username?: string;
   password?: string;
   service_name?: string;

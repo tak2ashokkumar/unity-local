@@ -54,7 +54,7 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let user of viewData; let i = index; trackBy: trackByUser" truncateText>
-                            <td class="tdw-30">
+                            <td class="tdw-28">
                                 <div [tooltip]="user.email">
                                     <span>{{user.email}}</span>
                                     <span *ngIf="user.isCustomerAdmin" class="ml-2 fa fa-check-circle text-muted"></span>
@@ -69,7 +69,7 @@
                             <td class="tdw-20">
                                 <div [tooltip]="user.createdOn">{{user.createdOn}}</div>
                             </td>
-                            <td class="tdw-10">
+                            <td class="tdw-12">
                                 <i class="fa" [ngClass]="user.activeIcon"></i>
                             </td>
                             <td class="action-icons-column">

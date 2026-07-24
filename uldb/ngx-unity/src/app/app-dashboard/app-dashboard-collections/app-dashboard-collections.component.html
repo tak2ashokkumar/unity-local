@@ -49,7 +49,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let view of viewData; let i = index" truncateText>
-                                    <td class="text-primary tdw-20">
+                                    <td class="text-primary tdw-17">
                                         <span class="pointer-link" [tooltip]="view.name"
                                             (click)="viewCollection(view)">{{view.name}}</span>
                                     </td>
@@ -73,7 +73,7 @@
                                     <td class="tdw-15">
                                         <div [tooltip]="view.lastModified">{{view.lastModified}}</div>
                                     </td>
-                                    <td class="text-center tdw-15">
+                                    <td class="text-center tdw-18">
                                         <div class="d-inline-block" accessControl moduleName="Dashboard"
                                             accessType="Manage Dashboard" elementType="div">
                                             <ul class="status-toggle px-0 mb-0 ml-0">

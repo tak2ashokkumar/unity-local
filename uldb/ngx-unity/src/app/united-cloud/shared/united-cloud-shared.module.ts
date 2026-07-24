@@ -20,6 +20,9 @@ import { AllDevicesComponent } from './all-devices/all-devices.component';
 import { AwsDeviceTabComponent } from './aws-device-tab/aws-device-tab.component';
 import { AwsVirtualMachinesComponent } from './aws-virtual-machines/aws-virtual-machines.component';
 import { AzureVirtualMachinesComponent } from './azure-virtual-machines/azure-virtual-machines.component';
+import { AzureZabbixComponent } from './azure-zabbix/azure-zabbix.component';
+import { ZabbixAzureGraphsCrudComponent } from './azure-zabbix/zabbix-azure-graphs-crud/zabbix-azure-graphs-crud.component';
+import { ZabbixAzureMonitoringConfigComponent } from './azure-zabbix/zabbix-azure-monitoring-config/zabbix-azure-monitoring-config.component';
 import { BmServersCrudComponent } from './bm-servers/bm-servers-crud/bm-servers-crud.component';
 import { BmServersCrudService } from './bm-servers/bm-servers-crud/bm-servers-crud.service';
 import { BmServersMonitoringConfigComponent } from './bm-servers/bm-servers-monitoring-config/bm-servers-monitoring-config.component';
@@ -49,14 +52,6 @@ import { BmServersService } from './bm-servers/bm-servers.service';
 import { ContainerControllerCrudComponent } from './container-controllers/container-controller-crud/container-controller-crud.component';
 import { ContainerControllerCrudService } from './container-controllers/container-controller-crud/container-controller-crud.service';
 import { ContainerControllersComponent } from './container-controllers/container-controllers.component';
-import { DockerContainerComponent } from './container-controllers/docker-containers/docker-container.component';
-import { DockerNodesComponent } from './container-controllers/docker-nodes/docker-nodes.component';
-import { DockerTabsComponent } from './container-controllers/docker-tabs/docker-tabs.component';
-import { KubernetesNodesComponent } from './container-controllers/kubernetes-nodes/kubernetes-nodes.component';
-import { KubernetesContainersComponent } from './container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
-import { KubernetesPodsComponent } from './container-controllers/kubernetes-pods/kubernetes-pods.component';
-import { KubernetesPodsService } from './container-controllers/kubernetes-pods/kubernetes-pods.service';
-import { KubernetesTabsComponent } from './container-controllers/kubernetes-tabs/kubernetes-tabs.component';
 import { DatabaseMonitoringConfigComponent } from './database-servers/database-monitoring/database-monitoring-config/database-monitoring-config.component';
 import { DatabaseMonitoringConfigService } from './database-servers/database-monitoring/database-monitoring-config/database-monitoring-config.service';
 import { DatabaseMonitoringGraphCrudComponent } from './database-servers/database-monitoring/database-monitoring-graph-crud/database-monitoring-graph-crud.component';
@@ -227,6 +222,7 @@ import { VmsListVcloudComponent } from './vms/vms-list-vcloud/vms-list-vcloud.co
 import { VmsListVmwareAddComponent } from './vms/vms-list-vmware/vms-list-vmware-add/vms-list-vmware-add.component';
 import { VmsListVmwareAddService } from './vms/vms-list-vmware/vms-list-vmware-add/vms-list-vmware-add.service';
 import { VmsListVmwareDeployOvaComponent } from './vms/vms-list-vmware/vms-list-vmware-deploy-ova/vms-list-vmware-deploy-ova.component';
+import { VmsListVmwareDeployOvaService } from './vms/vms-list-vmware/vms-list-vmware-deploy-ova/vms-list-vmware-deploy-ova.service';
 import { VmsListVmwareDeployOvfComponent } from './vms/vms-list-vmware/vms-list-vmware-deploy-ovf/vms-list-vmware-deploy-ovf.component';
 import { VmsListVmwareDeployOvfService } from './vms/vms-list-vmware/vms-list-vmware-deploy-ovf/vms-list-vmware-deploy-ovf.service';
 import { VmsListVmwareComponent } from './vms/vms-list-vmware/vms-list-vmware.component';
@@ -250,6 +246,7 @@ import { VmPortUsageGraphsComponent } from './vms/vms-observium/vms-port/vm-port
 import { VmsPortComponent } from './vms/vms-observium/vms-port/vms-port.component';
 import { VmsTagsCrudComponent } from './vms/vms-tags-crud/vms-tags-crud.component';
 import { VmsZabbixComponent } from './vms/vms-zabbix/vms-zabbix.component';
+import { ZabbixVmsDetailsComponent } from './vms/vms-zabbix/zabbix-vms-details/zabbix-vms-details.component';
 import { ZabbixVmsGraphCrudComponent } from './vms/vms-zabbix/zabbix-vms-graph-crud/zabbix-vms-graph-crud.component';
 import { ZabbixVmsGraphsComponent } from './vms/vms-zabbix/zabbix-vms-graphs/zabbix-vms-graphs.component';
 import { VmsComponent } from './vms/vms.component';
@@ -257,120 +254,116 @@ import { WebAccessComponent } from './web-access/web-access.component';
 import { ZabbixGraphCrudComponent } from './zabbix-graph-crud/zabbix-graph-crud.component';
 import { ZabbixTriggerCrudComponent } from './zabbix-trigger-crud/zabbix-trigger-crud.component';
 import { ZabbixTriggersComponent } from './zabbix-triggers/zabbix-triggers.component';
-import { VmsListVmwareDeployOvaService } from './vms/vms-list-vmware/vms-list-vmware-deploy-ova/vms-list-vmware-deploy-ova.service';
-import { AzureZabbixComponent } from './azure-zabbix/azure-zabbix.component';
-import { ZabbixAzureGraphsCrudComponent } from './azure-zabbix/zabbix-azure-graphs-crud/zabbix-azure-graphs-crud.component';
-import { ZabbixAzureMonitoringConfigComponent } from './azure-zabbix/zabbix-azure-monitoring-config/zabbix-azure-monitoring-config.component';
-import { ZabbixVmsDetailsComponent } from './vms/vms-zabbix/zabbix-vms-details/zabbix-vms-details.component';
 
-import { ZabbixTriggerScriptsComponent } from './zabbix-trigger-scripts/zabbix-trigger-scripts.component';
-import { StorageOntapComponent } from './storage-devices/storage-ontap/storage-ontap.component';
-import { StorageOntapSummaryComponent } from './storage-devices/storage-ontap/storage-ontap-summary/storage-ontap-summary.component';
-import { StorageOntapNodesComponent } from './storage-devices/storage-ontap/storage-ontap-nodes/storage-ontap-nodes.component';
-import { StorageOntapAggregatesComponent } from './storage-devices/storage-ontap/storage-ontap-aggregates/storage-ontap-aggregates.component';
-import { StorageOntapVolumesComponent } from './storage-devices/storage-ontap/storage-ontap-volumes/storage-ontap-volumes.component';
-import { StorageOntapLunsComponent } from './storage-devices/storage-ontap/storage-ontap-luns/storage-ontap-luns.component';
-import { StorageOntapSvmsComponent } from './storage-devices/storage-ontap/storage-ontap-svms/storage-ontap-svms.component';
-import { StorageMonitoringConfigComponent } from './storage-devices/storage-monitoring-config/storage-monitoring-config.component';
-import { StorageOntapDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-details/storage-ontap-details.component';
-import { StorageOntapNodeDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-node-details/storage-ontap-node-details.component';
-import { StorageOntapAggregateDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-aggregate-details/storage-ontap-aggregate-details.component';
-import { StorageOntapSvmDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-svm-details/storage-ontap-svm-details.component';
-import { StorageOntapVolumeDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-volume-details/storage-ontap-volume-details.component';
-import { StorageOntapLunDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-lun-details/storage-ontap-lun-details.component';
-import { StorageOntapDetailsTabComponent } from './storage-devices/storage-ontap/storage-ontap-details-tab/storage-ontap-details-tab.component';
-import { StorageOntapEventsComponent } from './storage-devices/storage-ontap/storage-ontap-events/storage-ontap-events.component';
-import { StorageOntapTriggersComponent } from './storage-devices/storage-ontap/storage-ontap-triggers/storage-ontap-triggers.component';
-import { StorageOntapStatisticsComponent } from './storage-devices/storage-ontap/storage-ontap-statistics/storage-ontap-statistics.component';
-import { StorageOntapDisksComponent } from './storage-devices/storage-ontap/storage-ontap-disks/storage-ontap-disks.component';
-import { StorageOntapShelvesComponent } from './storage-devices/storage-ontap/storage-ontap-shelves/storage-ontap-shelves.component';
-import { StorageOntapEthernetPortsComponent } from './storage-devices/storage-ontap/storage-ontap-ethernet-ports/storage-ontap-ethernet-ports.component';
-import { StorageOntapFcPortsComponent } from './storage-devices/storage-ontap/storage-ontap-fc-ports/storage-ontap-fc-ports.component';
-import { StorageOntapSnapMirrorsComponent } from './storage-devices/storage-ontap/storage-ontap-snap-mirrors/storage-ontap-snap-mirrors.component';
-import { StorageOntapClusterPeersComponent } from './storage-devices/storage-ontap/storage-ontap-cluster-peers/storage-ontap-cluster-peers.component';
+import { TitleCasePipe } from '@angular/common';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { EchartsxModule } from 'echarts-for-angular';
+import { FileSizeConversionPipe } from 'src/app/app-filters/pipes';
+import { SharedContainerControllersModule } from 'src/app/shared/shared-container-controllers/shared-container-controllers.module';
+import { AwsZabbixComponent } from './aws-zabbix/aws-zabbix.component';
+import { ZabbixAwsMonitoringConfigComponent } from './aws-zabbix/zabbix-aws-monitoring-config/zabbix-aws-monitoring-config.component';
+import { ContainerControllersZabbixComponent } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
+import { DockerContainersZabbixComponent } from './container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
+import { DatabaseDetailsComponent } from './database-servers/database-monitoring/database-zabbix-details/database-details/database-details.component';
+import { DatabaseZabbixDetailsComponent } from './database-servers/database-monitoring/database-zabbix-details/database-zabbix-details.component';
+import { DeviceDetailsBulkUpdatePopupComponent } from './device-details-bulk-update-popup/device-details-bulk-update-popup.component';
+import { BaremetalDetailsComponentsComponent } from './device-details-components/baremetal-details-components/baremetal-details-components.component';
+import { DeviceDetailsComponentsComponent } from './device-details-components/device-details-components.component';
+import { NetworkDevicesDetailsComponentsComponent } from './device-details-components/network-devices-details-components/network-devices-details-components.component';
+import { StorageDetailsComponentsComponent } from './device-details-components/storage-details-components/storage-details-components.component';
+import { VmDetailsComponentsComponent } from './device-details-components/vm-details-components/vm-details-components.component';
+import { DeviceOverviewComponent } from './device-overview/device-overview.component';
+import { GcpZabbixComponent } from './gcp-zabbix/gcp-zabbix.component';
+import { ZabbixGcpGraphsCrudComponent } from './gcp-zabbix/zabbix-gcp-graphs-crud/zabbix-gcp-graphs-crud.component';
+import { ZabbixGcpGraphsComponent } from './gcp-zabbix/zabbix-gcp-graphs/zabbix-gcp-graphs.component';
+import { ZabbixGcpMonitoringConfigComponent } from './gcp-zabbix/zabbix-gcp-monitoring-config/zabbix-gcp-monitoring-config.component';
+import { IotDevicesZabbixComponent } from './iot-devices/iot-devices-zabbix/iot-devices-zabbix.component';
+import { ZabbixIotDeviceRfidReaderDetailsComponent } from './iot-devices/iot-devices-zabbix/zabbix-iot-device-rfid-reader-details/zabbix-iot-device-rfid-reader-details.component';
+import { ZabbixIotDeviceSensorDetailsComponent } from './iot-devices/iot-devices-zabbix/zabbix-iot-device-sensor-details/zabbix-iot-device-sensor-details.component';
+import { ZabbixIotDeviceSensorOverviewComponent } from './iot-devices/iot-devices-zabbix/zabbix-iot-device-sensor-overview/zabbix-iot-device-sensor-overview.component';
+import { ZabbixIotDeviceSmartPduDetailsComponent } from './iot-devices/iot-devices-zabbix/zabbix-iot-device-smart-pdu-details/zabbix-iot-device-smart-pdu-details.component';
+import { IotDevicesComponent } from './iot-devices/iot-devices.component';
+import { NetworkControllersCiscoMerakiDevicesZabbixComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-devices/network-controllers-cisco-meraki-devices-zabbix/network-controllers-cisco-meraki-devices-zabbix.component';
+import { ZabbixNetworkControllersCiscoMerakiDevicesDetailsComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-devices/network-controllers-cisco-meraki-devices-zabbix/zabbix-network-controllers-cisco-meraki-devices-details/zabbix-network-controllers-cisco-meraki-devices-details.component';
+import { NetworkControllersCiscoMerakiDevicesComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-devices/network-controllers-cisco-meraki-devices.component';
+import { NetworkControllersCiscoMerakiOrganizationsZabbixComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-organizations/network-controllers-cisco-meraki-organizations-zabbix/network-controllers-cisco-meraki-organizations-zabbix.component';
+import { ZabbixNetworkControllersCiscoMerakiOrganizationsDetailsComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-organizations/network-controllers-cisco-meraki-organizations-zabbix/zabbix-network-controllers-cisco-meraki-organizations-details/zabbix-network-controllers-cisco-meraki-organizations-details.component';
+import { NetworkControllersCiscoMerakiOrganizationsComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-organizations/network-controllers-cisco-meraki-organizations.component';
+import { NetworkControllersCiscoMerakiComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki.component';
+import { NetworkControllersViptelaComponentZabbixComponent } from './network-controllers/network-controllers-viptela-components/network-controllers-viptela-component-zabbix/network-controllers-viptela-component-zabbix.component';
+import { ZabbixNetworkControllersViptelaComponentDetailsComponent } from './network-controllers/network-controllers-viptela-components/network-controllers-viptela-component-zabbix/zabbix-network-controllers-viptela-component-details/zabbix-network-controllers-viptela-component-details.component';
+import { NetworkControllersViptelaComponentsComponent } from './network-controllers/network-controllers-viptela-components/network-controllers-viptela-components.component';
+import { NetworkControllersZabbixComponent } from './network-controllers/network-controllers-zabbix/network-controllers-zabbix.component';
+import { NetworkControllersComponent } from './network-controllers/network-controllers.component';
+import { NutanixClusterDetailsComponent } from './nutanix/nutanix-clusters/nutanix-cluster-details/nutanix-cluster-details.component';
+import { NutanixClustersComponent } from './nutanix/nutanix-clusters/nutanix-clusters.component';
+import { NutanixDiskDetailsComponent } from './nutanix/nutanix-disks/nutanix-disk-details/nutanix-disk-details.component';
+import { NutanixDisksComponent } from './nutanix/nutanix-disks/nutanix-disks.component';
+import { NutanixHostDetailsComponent } from './nutanix/nutanix-hosts/nutanix-host-details/nutanix-host-details.component';
+import { NutanixHostsComponent } from './nutanix/nutanix-hosts/nutanix-hosts.component';
+import { NutanixStorageContainersDetailsComponent } from './nutanix/nutanix-storage-containers/nutanix-storage-containers-details/nutanix-storage-containers-details.component';
+import { NutanixStorageContainersComponent } from './nutanix/nutanix-storage-containers/nutanix-storage-containers.component';
+import { NutanixStoragePoolsDetailsComponent } from './nutanix/nutanix-storage-pools/nutanix-storage-pools-details/nutanix-storage-pools-details.component';
+import { NutanixStoragePoolsComponent } from './nutanix/nutanix-storage-pools/nutanix-storage-pools.component';
+import { NutanixVirtualDisksDetailsComponent } from './nutanix/nutanix-virtual-disks/nutanix-virtual-disks-details/nutanix-virtual-disks-details.component';
+import { NutanixVirtualDisksComponent } from './nutanix/nutanix-virtual-disks/nutanix-virtual-disks.component';
+import { NutanixDetailsComponent } from './nutanix/nutanix-zabbix/nutanix-details/nutanix-details.component';
+import { NutanixZabbixComponent } from './nutanix/nutanix-zabbix/nutanix-zabbix.component';
+import { NutanixComponent } from './nutanix/nutanix.component';
 import { OtherdevicesCrudComponent } from './otherdevices/otherdevices-crud/otherdevices-crud.component';
 import { OtherdevicesZabbixComponent } from './otherdevices/otherdevices-zabbix/otherdevices-zabbix.component';
 import { ZabbixOtherdeviceDetailsComponent } from './otherdevices/otherdevices-zabbix/zabbix-otherdevice-details/zabbix-otherdevice-details.component';
 import { ZabbixOtherdeviceMonitoringConfigComponent } from './otherdevices/otherdevices-zabbix/zabbix-otherdevice-monitoring-config/zabbix-otherdevice-monitoring-config.component';
-import { AwsZabbixComponent } from './aws-zabbix/aws-zabbix.component';
-import { ZabbixAwsMonitoringConfigComponent } from './aws-zabbix/zabbix-aws-monitoring-config/zabbix-aws-monitoring-config.component';
-import { ZabbixEventsComponent } from './zabbix-events/zabbix-events.component';
-import { NutanixComponent } from './nutanix/nutanix.component';
-import { NutanixClustersComponent } from './nutanix/nutanix-clusters/nutanix-clusters.component';
-import { NutanixClusterDetailsComponent } from './nutanix/nutanix-clusters/nutanix-cluster-details/nutanix-cluster-details.component';
-import { NutanixHostsComponent } from './nutanix/nutanix-hosts/nutanix-hosts.component';
-import { NutanixHostDetailsComponent } from './nutanix/nutanix-hosts/nutanix-host-details/nutanix-host-details.component';
-import { NutanixDisksComponent } from './nutanix/nutanix-disks/nutanix-disks.component';
-import { NutanixDiskDetailsComponent } from './nutanix/nutanix-disks/nutanix-disk-details/nutanix-disk-details.component';
-import { NutanixStorageContainersComponent } from './nutanix/nutanix-storage-containers/nutanix-storage-containers.component';
-import { NutanixStorageContainersDetailsComponent } from './nutanix/nutanix-storage-containers/nutanix-storage-containers-details/nutanix-storage-containers-details.component';
-import { NutanixStoragePoolsComponent } from './nutanix/nutanix-storage-pools/nutanix-storage-pools.component';
-import { NutanixStoragePoolsDetailsComponent } from './nutanix/nutanix-storage-pools/nutanix-storage-pools-details/nutanix-storage-pools-details.component';
-import { VmsListNutanixComponent } from './vms/vms-list-nutanix/vms-list-nutanix.component';
-import { NutanixVmsDetailsComponent } from './vms/vms-list-nutanix/nutanix-vms-details/nutanix-vms-details.component';
-import { NutanixVirtualDisksComponent } from './nutanix/nutanix-virtual-disks/nutanix-virtual-disks.component';
-import { NutanixVirtualDisksDetailsComponent } from './nutanix/nutanix-virtual-disks/nutanix-virtual-disks-details/nutanix-virtual-disks-details.component';
-import { NutanixZabbixComponent } from './nutanix/nutanix-zabbix/nutanix-zabbix.component';
-import { NutanixDetailsComponent } from './nutanix/nutanix-zabbix/nutanix-details/nutanix-details.component';
-import { ContainerControllersZabbixComponent } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
-import { ZabbixGraphsComponent } from './zabbix-graphs/zabbix-graphs.component';
-import { DeviceDetailsComponentsComponent } from './device-details-components/device-details-components.component';
-import { GcpZabbixComponent } from './gcp-zabbix/gcp-zabbix.component';
-import { ZabbixGcpGraphsComponent } from './gcp-zabbix/zabbix-gcp-graphs/zabbix-gcp-graphs.component';
-import { ZabbixGcpGraphsCrudComponent } from './gcp-zabbix/zabbix-gcp-graphs-crud/zabbix-gcp-graphs-crud.component';
-import { ZabbixGcpMonitoringConfigComponent } from './gcp-zabbix/zabbix-gcp-monitoring-config/zabbix-gcp-monitoring-config.component';
-import { DockerContainersZabbixComponent } from './container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
+import { SdwanDetailsZabbixComponent } from './sdwans/sdwans-details/sdwan-details-zabbix/sdwan-details-zabbix.component';
+import { ZabbixSdwanDeviceDetailsComponent } from './sdwans/sdwans-details/sdwan-details-zabbix/zabbix-sdwan-device-details/zabbix-sdwan-device-details.component';
+import { SdwansDetailsComponent } from './sdwans/sdwans-details/sdwans-details.component';
+import { SdwansZabbixComponent } from './sdwans/sdwans-zabbix/sdwans-zabbix.component';
+import { SdwansComponent } from './sdwans/sdwans.component';
+import { StorageMonitoringConfigComponent } from './storage-devices/storage-monitoring-config/storage-monitoring-config.component';
+import { StorageOntapAggregateDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-aggregate-details/storage-ontap-aggregate-details.component';
+import { StorageOntapAggregatesComponent } from './storage-devices/storage-ontap/storage-ontap-aggregates/storage-ontap-aggregates.component';
+import { StorageOntapClusterPeersComponent } from './storage-devices/storage-ontap/storage-ontap-cluster-peers/storage-ontap-cluster-peers.component';
+import { StorageOntapDetailsTabComponent } from './storage-devices/storage-ontap/storage-ontap-details-tab/storage-ontap-details-tab.component';
+import { StorageOntapDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-details/storage-ontap-details.component';
+import { StorageOntapDisksComponent } from './storage-devices/storage-ontap/storage-ontap-disks/storage-ontap-disks.component';
+import { StorageOntapEthernetPortsComponent } from './storage-devices/storage-ontap/storage-ontap-ethernet-ports/storage-ontap-ethernet-ports.component';
+import { StorageOntapEventsComponent } from './storage-devices/storage-ontap/storage-ontap-events/storage-ontap-events.component';
+import { StorageOntapFcPortsComponent } from './storage-devices/storage-ontap/storage-ontap-fc-ports/storage-ontap-fc-ports.component';
+import { StorageOntapLunDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-lun-details/storage-ontap-lun-details.component';
+import { StorageOntapLunsComponent } from './storage-devices/storage-ontap/storage-ontap-luns/storage-ontap-luns.component';
+import { StorageOntapNodeDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-node-details/storage-ontap-node-details.component';
+import { StorageOntapNodesComponent } from './storage-devices/storage-ontap/storage-ontap-nodes/storage-ontap-nodes.component';
+import { StorageOntapShelvesComponent } from './storage-devices/storage-ontap/storage-ontap-shelves/storage-ontap-shelves.component';
+import { StorageOntapSnapMirrorsComponent } from './storage-devices/storage-ontap/storage-ontap-snap-mirrors/storage-ontap-snap-mirrors.component';
+import { StorageOntapStatisticsComponent } from './storage-devices/storage-ontap/storage-ontap-statistics/storage-ontap-statistics.component';
+import { StorageOntapSummaryComponent } from './storage-devices/storage-ontap/storage-ontap-summary/storage-ontap-summary.component';
+import { StorageOntapSvmDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-svm-details/storage-ontap-svm-details.component';
+import { StorageOntapSvmsComponent } from './storage-devices/storage-ontap/storage-ontap-svms/storage-ontap-svms.component';
+import { StorageOntapTriggersComponent } from './storage-devices/storage-ontap/storage-ontap-triggers/storage-ontap-triggers.component';
+import { StorageOntapVolumeDetailsComponent } from './storage-devices/storage-ontap/storage-ontap-volume-details/storage-ontap-volume-details.component';
+import { StorageOntapVolumesComponent } from './storage-devices/storage-ontap/storage-ontap-volumes/storage-ontap-volumes.component';
+import { StorageOntapComponent } from './storage-devices/storage-ontap/storage-ontap.component';
+import { PureStorageHostGroupsComponent } from './storage-devices/storage-pure/pure-storage-host-groups/pure-storage-host-groups.component';
+import { PureStorageHostsComponent } from './storage-devices/storage-pure/pure-storage-hosts/pure-storage-hosts.component';
+import { PureStoragePodsComponent } from './storage-devices/storage-pure/pure-storage-pods/pure-storage-pods.component';
+import { PureStorageProtectionGroupSnapshotsComponent } from './storage-devices/storage-pure/pure-storage-protection-group-snapshots/pure-storage-protection-group-snapshots.component';
+import { PureStorageProtectionGroupsComponent } from './storage-devices/storage-pure/pure-storage-protection-groups/pure-storage-protection-groups.component';
+import { PureStorageVolumeGroupsComponent } from './storage-devices/storage-pure/pure-storage-volume-groups/pure-storage-volume-groups.component';
+import { PureStorageVolumeSnapshotsComponent } from './storage-devices/storage-pure/pure-storage-volume-snapshots/pure-storage-volume-snapshots.component';
+import { PureStorageVolumesComponent } from './storage-devices/storage-pure/pure-storage-volumes/pure-storage-volumes.component';
+import { StoragePureComponent } from './storage-devices/storage-pure/storage-pure.component';
 import { VcenterCloudComponent } from './vcenter-cloud/vcenter-cloud.component';
+import { VcenterClusterItemsComponent } from './vcenter-cloud/vcenter-clusters/vcenter-cluster-items/vcenter-cluster-items.component';
 import { VcenterClustersComponent } from './vcenter-cloud/vcenter-clusters/vcenter-clusters.component';
 import { VcenterDatastoresComponent } from './vcenter-cloud/vcenter-datastores/vcenter-datastores.component';
 import { VcenterNetworksComponent } from './vcenter-cloud/vcenter-networks/vcenter-networks.component';
-import { VcenterClusterItemsComponent } from './vcenter-cloud/vcenter-clusters/vcenter-cluster-items/vcenter-cluster-items.component';
-import { StoragePureComponent } from './storage-devices/storage-pure/storage-pure.component';
-import { PureStorageHostsComponent } from './storage-devices/storage-pure/pure-storage-hosts/pure-storage-hosts.component';
-import { PureStorageHostGroupsComponent } from './storage-devices/storage-pure/pure-storage-host-groups/pure-storage-host-groups.component';
-import { PureStorageVolumesComponent } from './storage-devices/storage-pure/pure-storage-volumes/pure-storage-volumes.component';
-import { PureStorageVolumeSnapshotsComponent } from './storage-devices/storage-pure/pure-storage-volume-snapshots/pure-storage-volume-snapshots.component';
-import { PureStorageVolumeGroupsComponent } from './storage-devices/storage-pure/pure-storage-volume-groups/pure-storage-volume-groups.component';
-import { PureStoragePodsComponent } from './storage-devices/storage-pure/pure-storage-pods/pure-storage-pods.component';
-import { PureStorageProtectionGroupsComponent } from './storage-devices/storage-pure/pure-storage-protection-groups/pure-storage-protection-groups.component';
-import { PureStorageProtectionGroupSnapshotsComponent } from './storage-devices/storage-pure/pure-storage-protection-group-snapshots/pure-storage-protection-group-snapshots.component';
-import { EchartsxModule } from 'echarts-for-angular';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { SdwansComponent } from './sdwans/sdwans.component';
-import { SdwansDetailsComponent } from './sdwans/sdwans-details/sdwans-details.component';
-import { SdwansZabbixComponent } from './sdwans/sdwans-zabbix/sdwans-zabbix.component';
-import { SdwanDetailsZabbixComponent } from './sdwans/sdwans-details/sdwan-details-zabbix/sdwan-details-zabbix.component';
-import { ZabbixSdwanDeviceDetailsComponent } from './sdwans/sdwans-details/sdwan-details-zabbix/zabbix-sdwan-device-details/zabbix-sdwan-device-details.component';
-import { DeviceDetailsBulkUpdatePopupComponent } from './device-details-bulk-update-popup/device-details-bulk-update-popup.component';
 import { VcenterZabbixComponent } from './vcenter-cloud/vcenter-zabbix/vcenter-zabbix.component';
 import { ZabbixVcenterMonitoringConfigComponent } from './vcenter-cloud/vcenter-zabbix/zabbix-vcenter-monitoring-config/zabbix-vcenter-monitoring-config.component';
-import { NetworkControllersComponent } from './network-controllers/network-controllers.component';
-import { NetworkControllersZabbixComponent } from './network-controllers/network-controllers-zabbix/network-controllers-zabbix.component';
-import { NetworkControllersViptelaComponentsComponent } from './network-controllers/network-controllers-viptela-components/network-controllers-viptela-components.component';
-import { NetworkControllersViptelaComponentZabbixComponent } from './network-controllers/network-controllers-viptela-components/network-controllers-viptela-component-zabbix/network-controllers-viptela-component-zabbix.component';
-import { ZabbixNetworkControllersViptelaComponentDetailsComponent } from './network-controllers/network-controllers-viptela-components/network-controllers-viptela-component-zabbix/zabbix-network-controllers-viptela-component-details/zabbix-network-controllers-viptela-component-details.component';
-import { NetworkControllersCiscoMerakiComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki.component';
-import { NetworkControllersCiscoMerakiOrganizationsComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-organizations/network-controllers-cisco-meraki-organizations.component';
-import { NetworkControllersCiscoMerakiDevicesComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-devices/network-controllers-cisco-meraki-devices.component';
-import { NetworkControllersCiscoMerakiOrganizationsZabbixComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-organizations/network-controllers-cisco-meraki-organizations-zabbix/network-controllers-cisco-meraki-organizations-zabbix.component';
-import { ZabbixNetworkControllersCiscoMerakiOrganizationsDetailsComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-organizations/network-controllers-cisco-meraki-organizations-zabbix/zabbix-network-controllers-cisco-meraki-organizations-details/zabbix-network-controllers-cisco-meraki-organizations-details.component';
-import { NetworkControllersCiscoMerakiDevicesZabbixComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-devices/network-controllers-cisco-meraki-devices-zabbix/network-controllers-cisco-meraki-devices-zabbix.component';
-import { ZabbixNetworkControllersCiscoMerakiDevicesDetailsComponent } from './network-controllers/network-controllers-cisco-meraki/network-controllers-cisco-meraki-devices/network-controllers-cisco-meraki-devices-zabbix/zabbix-network-controllers-cisco-meraki-devices-details/zabbix-network-controllers-cisco-meraki-devices-details.component';
-import { IotDevicesComponent } from './iot-devices/iot-devices.component';
-import { IotDevicesZabbixComponent } from './iot-devices/iot-devices-zabbix/iot-devices-zabbix.component';
-import { ZabbixIotDeviceSensorDetailsComponent } from './iot-devices/iot-devices-zabbix/zabbix-iot-device-sensor-details/zabbix-iot-device-sensor-details.component';
-import { ZabbixIotDeviceSmartPduDetailsComponent } from './iot-devices/iot-devices-zabbix/zabbix-iot-device-smart-pdu-details/zabbix-iot-device-smart-pdu-details.component';
-import { ZabbixIotDeviceRfidReaderDetailsComponent } from './iot-devices/iot-devices-zabbix/zabbix-iot-device-rfid-reader-details/zabbix-iot-device-rfid-reader-details.component';
-import { ZabbixIotDeviceSensorOverviewComponent } from './iot-devices/iot-devices-zabbix/zabbix-iot-device-sensor-overview/zabbix-iot-device-sensor-overview.component';
-import { TitleCasePipe } from '@angular/common';
-import { DeviceOverviewComponent } from './device-overview/device-overview.component';
-import { DatabaseZabbixDetailsComponent } from './database-servers/database-monitoring/database-zabbix-details/database-zabbix-details.component';
-import { DatabaseDetailsComponent } from './database-servers/database-monitoring/database-zabbix-details/database-details/database-details.component';
-import { NetworkDevicesDetailsComponentsComponent } from './device-details-components/network-devices-details-components/network-devices-details-components.component';
-import { BaremetalDetailsComponentsComponent } from './device-details-components/baremetal-details-components/baremetal-details-components.component';
-import { StorageDetailsComponentsComponent } from './device-details-components/storage-details-components/storage-details-components.component';
-import { VmDetailsComponentsComponent } from './device-details-components/vm-details-components/vm-details-components.component';
-import { FileSizeConversionPipe } from 'src/app/app-filters/pipes';
+import { NutanixVmsDetailsComponent } from './vms/vms-list-nutanix/nutanix-vms-details/nutanix-vms-details.component';
+import { VmsListNutanixComponent } from './vms/vms-list-nutanix/vms-list-nutanix.component';
+import { ZabbixEventsComponent } from './zabbix-events/zabbix-events.component';
+import { ZabbixGraphsComponent } from './zabbix-graphs/zabbix-graphs.component';
+import { ZabbixTriggerScriptsComponent } from './zabbix-trigger-scripts/zabbix-trigger-scripts.component';
 /**
  * Change format according to need
  */
@@ -487,8 +480,6 @@ export const MY_NATIVE_FORMATS = {
     SwitchesCrudComponent,
     BmServersCrudComponent,
     ContainerControllersComponent,
-    KubernetesContainersComponent,
-    KubernetesPodsComponent,
     GcpVirtualMachinesComponent,
     PduRecycleComponent,
     VmsMgmtCrudComponent,
@@ -509,11 +500,6 @@ export const MY_NATIVE_FORMATS = {
     HypervisorHealthStorageComponent,
     HypervisorHealthDiskioComponent,
     StorageHealthDiskIOComponent,
-    KubernetesNodesComponent,
-    KubernetesTabsComponent,
-    DockerTabsComponent,
-    DockerNodesComponent,
-    DockerContainerComponent,
     ContainerControllerCrudComponent,
     DevicesCrudMonitoringComponent,
     MacMiniComponent,
@@ -707,7 +693,8 @@ export const MY_NATIVE_FORMATS = {
     ChartsModule,
     CollapseModule.forRoot(),
     EchartsxModule,
-    NgbModule
+    NgbModule,
+    SharedContainerControllersModule
   ],
   exports: [
     DevicesPopoverComponent,
@@ -723,15 +710,14 @@ export const MY_NATIVE_FORMATS = {
     AzureVirtualMachinesComponent,
     GcpVirtualMachinesComponent,
     ContainerControllersComponent,
-    KubernetesPodsComponent,
-    KubernetesContainersComponent,
     PduRecycleComponent,
     OciVirtualMachinesComponent,
     DevicesMonitoringConfigComponent,
     SwitchesZabbixComponent,
     FirewallsZabbixComponent,
     LoadbalancersZabbixComponent,
-    DeviceDetailsComponentsComponent
+    DeviceDetailsComponentsComponent,
+    SharedContainerControllersModule
   ],
   providers: [
     HypervisorsService,
@@ -746,7 +732,6 @@ export const MY_NATIVE_FORMATS = {
     FirewallsService,
     FirewallsOverviewService,
     LoadbalancersService,
-    KubernetesPodsService,
     LoadbalancersOverviewService,
     OtherdevicesService,
     { provide: DateTimeAdapter, useClass: MomentDateTimeAdapter, deps: [OWL_DATE_TIME_LOCALE] },

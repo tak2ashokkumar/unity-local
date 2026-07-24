@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { PRIVATE_CLOUD_BY_ID, PRIVATE_CLOUD_CONTAINERS_PODS, PRIVATE_CLOUD_STORAGE, DEVICE_LIST_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes-pod.type';
+import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { StorageDevice } from '../entities/storage-device.type';
 import { MacMini } from '../entities/mac-mini.type';

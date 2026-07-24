@@ -4,7 +4,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, from } from 'rxjs';
 import { filter, mergeMap, takeUntil } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
-import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes-pod.type';
+import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { PrivateCloudType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { UsageStatistics } from 'src/app/shared/SharedEntityTypes/usage-statistics.type';

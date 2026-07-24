@@ -3,6 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { PcCrudComponent } from 'src/app/app-shared-crud/pc-crud/pc-crud.component';
 import { UnitySetupLdapCrudComponent } from 'src/app/app-shared-crud/unity-setup-ldap-crud/unity-setup-ldap-crud.component';
 import { UsiOntapCrudNewComponent } from 'src/app/app-shared-crud/usi-ontap-crud-new/usi-ontap-crud-new.component';
+import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
+import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers/docker-tabs/docker-tabs.component';
+import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
 import { VmBackupHistoryComponent } from 'src/app/shared/vm-backup-history/vm-backup-history.component';
 import { ZABBIX_AWS_ACCOUNT_ROUTES } from 'src/app/united-cloud/shared/aws-zabbix/aws-zabbix-routing.const';
 import { AwsZabbixComponent } from 'src/app/united-cloud/shared/aws-zabbix/aws-zabbix.component';
@@ -11,6 +14,9 @@ import { UnitySetupLdapUserImportComponent } from '../unity-setup-ldap-config/un
 import { UnitySetupIntegrationComponent } from './unity-setup-integration.component';
 import { UsiBmcHelixCrudComponent } from './usi-bmc-helix/usi-bmc-helix-crud/usi-bmc-helix-crud.component';
 import { UsiBmcHelixComponent } from './usi-bmc-helix/usi-bmc-helix.component';
+import { UsiContainersDockerCrudComponent } from './usi-containers/usi-containers-docker-crud/usi-containers-docker-crud.component';
+import { UsiContainersKubernetesCrudComponent } from './usi-containers/usi-containers-kubernetes-crud/usi-containers-kubernetes-crud.component';
+import { UsiContainersListComponent } from './usi-containers/usi-containers-list/usi-containers-list.component';
 import { UsiEventIngestionAppDynamicsComponent } from './usi-event-ingestion-app-dynamics/usi-event-ingestion-app-dynamics.component';
 import { UsiEventIngestionAwsComponent } from './usi-event-ingestion-aws/usi-event-ingestion-aws.component';
 import { UsiEventIngestionAzureComponent } from './usi-event-ingestion-azure/usi-event-ingestion-azure.component';
@@ -98,6 +104,48 @@ const routes: Routes = [
       }
     },
     children: [
+      {
+        path: 'containers/kubernetes',
+        component: UsiContainersListComponent,
+        data: { controllerType: 'kubernetes', breadcrumb: { title: 'Kubernetes' } }
+      },
+      {
+        path: 'containers/kubernetes/create',
+        component: UsiContainersKubernetesCrudComponent,
+        data: { breadcrumb: { title: 'Kubernetes' } }
+      },
+      {
+        path: 'containers/kubernetes/:controllerId/edit',
+        component: UsiContainersKubernetesCrudComponent,
+        data: { breadcrumb: { title: 'Kubernetes' } }
+      },
+      {
+        path: 'containers/kubernetes/:controllerId',
+        component: KubernetesTabsComponent,
+        data: { backSteps: 1, breadcrumb: { title: 'Containers', stepbackCount: 1 } },
+        children: KUBERNETES_TABS_CHILDREN
+      },
+      {
+        path: 'containers/docker',
+        component: UsiContainersListComponent,
+        data: { controllerType: 'docker', breadcrumb: { title: 'Docker' } }
+      },
+      {
+        path: 'containers/docker/create',
+        component: UsiContainersDockerCrudComponent,
+        data: { breadcrumb: { title: 'Docker' } }
+      },
+      {
+        path: 'containers/docker/:controllerId/edit',
+        component: UsiContainersDockerCrudComponent,
+        data: { breadcrumb: { title: 'Docker' } }
+      },
+      {
+        path: 'containers/docker/:controllerId',
+        component: DockerTabsComponent,
+        data: { backSteps: 1, breadcrumb: { title: 'Containers', stepbackCount: 1 } },
+        children: DOCKER_TABS_CHILDREN
+      },
       // {
       //   path: 'azure-account',
       //   component: UsiPublicCloudAzureCrudComponent,

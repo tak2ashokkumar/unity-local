@@ -1,7 +1,4 @@
-<div class="card mb-0 border-0 floating-terminal-card" mwlResizable [validateResize]="validate"
-    [enableGhostResize]="true" [ngStyle]="style" [resizeEdges]="{top: true}" (resizeEnd)="onResizeEnd($event)"
-    *ngIf="show">
-    <div class="resize-handle-top" mwlResizeHandle [resizeEdges]="{ top: true }"></div>
+<div class="card mb-0 border-0 floating-terminal-card" [ngStyle]="style" *ngIf="show">
     <div class="card-body terminal-body text-white p-0">
         <scrollable-tab [selector]="'active'">
             <div class="nav-item floating-tabs pl-0" #scrollLeft>

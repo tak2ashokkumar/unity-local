@@ -4,7 +4,8 @@
             <div class="card mb-0">
                 <div class="card-body py-2 my-1">
                     <div class="card-title mb-0">Repo Name</div>
-                    <span class="text-primary text-value-sm">{{listSummaryViewData.repoName}}</span>
+                    <span class="text-primary text-value-sm text-truncate d-block"
+                        [tooltip]="listSummaryViewData.repoName">{{listSummaryViewData.repoName}}</span>
                 </div>
             </div>
         </div>
@@ -36,13 +37,13 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="row m-0 p-0">
-                                <span class="col-2 m-0 p-0 align-items-center" style="height: 26px;"
+                                <span class="m-0 p-0 d-flex align-items-center" style="height: 26px;"
                                     *ngFor="let type of listSummaryViewData?.byScriptType; let i=index">
                                     <span class="mr-1" [tooltip]="type.tooltipMessage"><img class="mt--1"
                                             [src]="type?.icon" alt="" style="height:20px"></span>
                                     <span class="text-primary mr-2 text-value-sm pointer-link">{{type?.count}}</span>
-                                    <span class="border border-secondary mb-5 mr-2"
-                                        *ngIf="i !== listSummaryViewData?.byScriptType.length-1"></span>
+                                    <span *ngIf="i !== listSummaryViewData?.byScriptType.length-1"
+                                        class="border border-secondary mr-2" style="height: 20px;"></span>
                                 </span>
                             </div>
                         </div>

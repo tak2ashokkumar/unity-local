@@ -31,8 +31,8 @@ export class ServiceCatalogOrdersService {
       view.count = c.count;
       view.image = c.cloud_image ? `${environment.assetsUrl + c.cloud_image}` : '';
       view.name = c.cloud_name;
-      //7 is based on the width of the div element
-      if (index < 7) {
+      //6 is based on the width of the div element
+      if (index < 6) {
         viewData.ordersByCloudViewData.push(view);
       } else {
         viewData.extraBadgeCount += 1;

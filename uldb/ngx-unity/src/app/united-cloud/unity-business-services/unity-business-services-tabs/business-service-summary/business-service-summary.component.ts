@@ -155,10 +155,10 @@ export class BusinessServiceSummaryComponent implements OnInit, OnDestroy {
 
   ondurationDropdownChanged(event: any) {
     this.dropdownsViewData.selectedDateRangeFormData = event;
-    if(this.firstLoad){
+    if (this.firstLoad) {
       this.firstLoad = false;
     }
-    else{
+    else {
       this.getWidgetsData();
     }
   }

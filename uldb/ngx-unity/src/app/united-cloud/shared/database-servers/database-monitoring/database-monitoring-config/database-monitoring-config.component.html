@@ -23,20 +23,6 @@
                         <!-- </form> -->
                     </ng-container>
                     <ng-container *ngIf="odbcForm" [formGroup]="odbcForm">
-                        <div class="form-group col-4" *ngIf="odbcForm.controls.data_source_name">
-                            <label class="form-col-form-label" for="data_source_name">Data Source
-                                Name(DSN)<em>*</em></label>
-                            <input id="data_source_name" class="form-control" type="text"
-                                formControlName="data_source_name" [class.is-invalid]="odbcFormErrors.data_source_name">
-                            <div class="invalid-feedback" *ngIf="odbcFormErrors.data_source_name">
-                                {{odbcFormErrors.data_source_name}}</div>
-                        </div>
-                        <div class="form-group col-4" *ngIf="odbcForm.controls.driver">
-                            <label class="form-col-form-label" for="driver">Driver Name<em>*</em></label>
-                            <input id="driver" class="form-control" type="text" formControlName="driver"
-                                [class.is-invalid]="odbcFormErrors.driver">
-                            <div class="invalid-feedback" *ngIf="odbcFormErrors.driver">{{odbcFormErrors.driver}}</div>
-                        </div>
                         <div class="form-group col-4" *ngIf="odbcForm.controls.username">
                             <label class="form-col-form-label" for="username">SQL Login<em>*</em></label>
                             <input id="username" class="form-control" type="text" formControlName="username"

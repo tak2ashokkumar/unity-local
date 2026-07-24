@@ -58,7 +58,8 @@
                     <ng-container
                         *ngIf="orderSummaryViewData?.ordersByCloudViewData && orderSummaryViewData?.ordersByCloudViewData.length">
                         <div *ngFor="let data of orderSummaryViewData?.ordersByCloudViewData; let i=index"
-                            class="w-13 d-flex justify-content-center align-items-center border-right border-secondary custom-border-right px-1">
+                            class="d-flex justify-content-center align-items-center"
+                            [ngClass]="{'border-left px-2':i !== 0, 'pr-2':i==0}">
                             <span *ngIf="data.image" [tooltip]="data.name"><img [src]="data.image"
                                     [alt]="data.name"></span>
                             <span *ngIf="!data.image" [tooltip]="data.name" class="text-truncate">{{data.name}}</span>
@@ -105,7 +106,8 @@
                     <div class="d-flex justify-content-end w-80">
                         <div class="w-15 mx-2" *ngIf="!catalogId">
                             <select class="form-control form-control-sm"
-                                [(ngModel)]="currentCriteria.params[0].order_type" (ngModelChange)="onOrderTypeChange()">
+                                [(ngModel)]="currentCriteria.params[0].order_type"
+                                (ngModelChange)="onOrderTypeChange()">
                                 <option [value]="''">Order Type</option>
                                 <option [value]="'Draft'">Draft</option>
                                 <option [value]="'Ordered'">Ordered</option>

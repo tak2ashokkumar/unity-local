@@ -758,19 +758,27 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   }
 
   private buildFilterForm() {
+    const defaultTimeRange = this.timeRangeOptions.includes('last_month')
+      ? 'last_month'
+      : (this.timeRangeOptions[0] || 'last_month');
+
     this.filterForm = new FormGroup({
       datacenters: new FormControl(this.datacenterOptions.slice()),
-      timeRange: new FormControl(this.timeRangeOptions[0] || 'last_month')
+      timeRange: new FormControl(defaultTimeRange)
     });
   }
 
   private getFilterFormOutput(): NetworkDashboardFilterCriteria {
     const selectedDatacenters = this.filterForm.get('datacenters')?.value || [];
+    const defaultTimeRange = this.timeRangeOptions.includes('last_month')
+      ? 'last_month'
+      : (this.timeRangeOptions[0] || 'last_month');
+
     return {
       datacenterIds: (selectedDatacenters || [])
         .map(item => item?.id)
         .filter(id => typeof id === 'number'),
-      timeRange: this.filterForm.get('timeRange')?.value || this.timeRangeOptions[0] || 'last_month'
+      timeRange: this.filterForm.get('timeRange')?.value || defaultTimeRange
     };
   }
 

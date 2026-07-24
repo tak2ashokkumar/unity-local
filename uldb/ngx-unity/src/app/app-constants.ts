@@ -31,34 +31,6 @@ export const CRYPTO_ALGOS = [
 ];
 
 
-
-
-
-
-
-
-export const SYNC_KUBERNETES_PODS = (controllerId: string) => `customer/kubernetes/account/${controllerId}/sync_pods`;
-
-export const GET_KUBERNETES_PODS = () => `customer/kubernetes/pods/`;
-
-export const DELETE_KUBERNETES_PODS = (controllerId: string) => `customer/kubernetes/pods/${controllerId}/`;
-
-export const GET_KUBERNETES_CONTAINERS = () => `customer/kubernetes/containers/`;
-
-export const SYNC_KUBERNETES_NODES = (controllerId: string) => `customer/kubernetes/account/${controllerId}/sync_nodes`;
-
-export const GET_KUBERNETES_NODES = () => `customer/kubernetes/nodes/`;
-
-export const SYNC_DOCKER_CONTAINERS = (controllerId: string) => `customer/docker/account/${controllerId}/sync_containers`;
-
-export const GET_DOCKER_CONTAINERS = () => `customer/docker/containers/`;
-
-export const SYNC_DOCKER_NODES = (controllerId: string) => `customer/docker/account/${controllerId}/sync_nodes`;
-
-export const GET_DOCKER_NODES = () => `customer/docker/nodes/`;
-
-export const DELETE_DOCKER_NODE = (nodeId: string) => `customer/docker/nodes/${nodeId}/`;
-
 //below mapping of ssh,ssh key,snmpv1,snmpv2,snmpv3 is commented, has now in the credential dropdown on selection of ssh credential type credential
 //we need to disable all the other ssh credential type credentials not both ssh and ssh key Credentials types credentials disable and similarly snmpv1,snmpv2,snmpv3
 export const CredentialMap = {

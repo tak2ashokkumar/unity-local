@@ -489,9 +489,9 @@ export class BusinessServiceSummaryService {
       },
       tooltip: { trigger: 'item', formatter: tooltipFormatter },
       legend: {
-        orient: 'vertical',
-        left: 'right',
-        top: 'middle',
+        orient: 'horizontal',
+        left: 'center',
+        top: 'bottom',
         data: ['Up', 'Down', 'Unknown'],
         itemWidth: 12,
         itemHeight: 12,
