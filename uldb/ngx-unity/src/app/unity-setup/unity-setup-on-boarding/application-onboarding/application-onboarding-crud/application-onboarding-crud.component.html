@@ -1,0 +1,399 @@
+<div class="card m-4">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <span class="font-lg font-500">APM Platform</span>
+    <button class="btn btn-pill btn-sm btn-warning" type="button" container="body" tooltip="Back" (click)="goBack()">
+      <span class="fas fa-arrow-left"></span>
+    </button>
+  </div>
+
+  <div class="card-body">
+    <!-- Wizard step indicator: completed=green, active=blue, future=gray -->
+    <div class="row py-3">
+      <div class="col-7 mx-auto">
+        <ol class="apm-step-indicator">
+          <li *ngFor="let step of wizardSteps; let i = index"
+            [ngClass]="{'completed': i < activeStepIndex, 'active': i === activeStepIndex}">
+            <span class="icon-wrap" [ngClass]="stepClass(i)" (click)="goToStep(i)">
+              <span [ngClass]="step.icon"></span>
+            </span>
+            <div class="apm-caption">{{step.label}}</div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="nonFieldErr">
+      <div class="col-8 offset-2">
+        <div class="invalid-credentials text-center">{{nonFieldErr}}</div>
+      </div>
+    </div>
+
+    <ng-container *ngIf="applicationForm" [ngSwitch]="activeStepIndex">
+
+      <!-- Step 1: Application -->
+      <ng-container *ngSwitchCase="0">
+        <div class="row">
+          <div class="col-8 offset-2">
+            <form [formGroup]="applicationForm">
+              <div class="row">
+                <div class="col-6 form-group">
+                  <label for="application_name">Application Name<em>*</em></label>
+                  <input id="application_name" class="form-control" type="text" formControlName="application_name"
+                    placeholder="Enter Application Name"
+                    [ngClass]="{'is-invalid': applicationFormErrors.application_name}">
+                  <div class="invalid-feedback" *ngIf="applicationFormErrors.application_name">
+                    {{applicationFormErrors.application_name}}</div>
+                </div>
+                <div class="col-6 form-group">
+                  <label>Tags</label>
+                  <multiselect-dropdown [options]="tags" [settings]="tagsSettings" [texts]="tagsTexts"
+                    class="form-control p-0" style="height:auto;" formControlName="tags"></multiselect-dropdown>
+                </div>
+                <div class="col-6 form-group">
+                  <label>Runtime<em>*</em></label>
+                  <multiselect-dropdown [options]="runtimeOptions" [settings]="runtimeSettings" [texts]="runtimeTexts"
+                    class="form-control p-0" style="height:auto;" formControlName="runtime"
+                    [ngClass]="{'is-invalid': applicationFormErrors.runtime}"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="applicationFormErrors.runtime">{{applicationFormErrors.runtime}}
+                  </div>
+                </div>
+                <div class="col-6 form-group">
+                  <label for="collector">Collector<em>*</em></label>
+                  <select id="collector" class="form-control" formControlName="collector"
+                    [ngClass]="{'is-invalid': applicationFormErrors.collector}">
+                    <option [ngValue]="null" disabled>Select Collector</option>
+                    <option *ngFor="let collector of collectors" [ngValue]="collector.id">{{collector.name}}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="applicationFormErrors.collector">
+                    {{applicationFormErrors.collector}}</div>
+                </div>
+                <div class="col-6 form-group">
+                  <label for="project_dir">Project Directory<em>*</em></label>
+                  <input id="project_dir" class="form-control" type="text" formControlName="project_dir"
+                    placeholder="Enter Project Directory" [ngClass]="{'is-invalid': applicationFormErrors.project_dir}">
+                  <div class="invalid-feedback" *ngIf="applicationFormErrors.project_dir">
+                    {{applicationFormErrors.project_dir}}</div>
+                </div>
+                <div class="col-6 form-group">
+                  <label for="log_file_path">Log file Path</label>
+                  <input id="log_file_path" class="form-control" type="text" formControlName="log_file_path"
+                    placeholder="Enter Logs">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Step 2: Host Config -->
+      <ng-container *ngSwitchCase="1">
+        <div class="row">
+          <div class="col-8 offset-2">
+            <form [formGroup]="hostConfigForm">
+              <div class="row">
+                <div class="col-6 form-group">
+                  <label for="target_type">Target Type</label>
+                  <select id="target_type" class="form-control" formControlName="target_type">
+                    <option value="host">Host</option>
+                  </select>
+                </div>
+                <div class="col-6 form-group">
+                  <label for="device_id">Target<em>*</em></label>
+                  <input id="device_id" class="form-control" type="text" formControlName="device_id"
+                    placeholder="Search Target by IP Address or IP Name"
+                    [ngClass]="{'is-invalid': hostConfigFormErrors.device_id}">
+                  <div class="invalid-feedback" *ngIf="hostConfigFormErrors.device_id">
+                    {{hostConfigFormErrors.device_id}}</div>
+                </div>
+                <div class="col-12 form-group">
+                  <label class="d-block">Credential<em>*</em></label>
+                  <div class="row align-items-center">
+                    <div class="col-auto">
+                      <div class="form-check">
+                        <input id="cred_local" class="form-check-input" type="radio" formControlName="credential_type"
+                          value="local">
+                        <label class="form-check-label" for="cred_local">Local</label>
+                      </div>
+                    </div>
+                    <div class="col-4" *ngIf="hostConfigForm.get('credential_type').value === 'local'">
+                      <select class="form-control" formControlName="credentials"
+                        [ngClass]="{'is-invalid': hostConfigFormErrors.credentials}">
+                        <option [ngValue]="null" disabled>Select Credentials</option>
+                        <option *ngFor="let credential of credentials" [ngValue]="credential.id">{{credential.name}}
+                        </option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="hostConfigFormErrors.credentials">
+                        {{hostConfigFormErrors.credentials}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <div class="form-check">
+                        <input id="cred_mine" class="form-check-input" type="radio" formControlName="credential_type"
+                          value="my_credential">
+                        <label class="form-check-label" for="cred_mine">My Credential</label>
+                      </div>
+                    </div>
+                    <ng-container *ngIf="hostConfigForm.get('credential_type').value === 'my_credential'">
+                      <div class="col-3">
+                        <input class="form-control" type="text" formControlName="username" placeholder="User Name"
+                          [ngClass]="{'is-invalid': hostConfigFormErrors.username}">
+                        <div class="invalid-feedback" *ngIf="hostConfigFormErrors.username">
+                          {{hostConfigFormErrors.username}}</div>
+                      </div>
+                      <div class="col-3">
+                        <custom-password-field formControlName="password"
+                          [options]="{id:'host_password', placeholder:'Password', errors: hostConfigFormErrors.password}"></custom-password-field>
+                        <div class="invalid-feedback d-block" *ngIf="hostConfigFormErrors.password">
+                          {{hostConfigFormErrors.password}}</div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Step 3: Configuration (sections shown for the selected runtimes) -->
+      <ng-container *ngSwitchCase="2">
+        <div class="row">
+          <div class="col-8 offset-2">
+            <form [formGroup]="configurationForm">
+              <div class="border rounded px-3 pt-4 pb-3 mb-4 position-relative" formGroupName="java"
+                *ngIf="hasRuntime('java')">
+                <span class="section-title">Java</span>
+                <button type="button" class="btn btn-sm section-instruction" (click)="openInstruction('Java')">
+                  <span class="fas fa-link"></span> Instruction</button>
+                <div class="row">
+                  <div class="col-6 form-group">
+                    <label>Agent Directory<em>*</em></label>
+                    <input class="form-control" type="text" formControlName="agent_dir"
+                      placeholder="Enter Agent Directory"
+                      [ngClass]="{'is-invalid': configurationFormErrors.java.agent_dir}">
+                    <div class="invalid-feedback" *ngIf="configurationFormErrors.java.agent_dir">
+                      {{configurationFormErrors.java.agent_dir}}</div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label>Java Tool Option<em>*</em></label>
+                    <input class="form-control" type="text" formControlName="tool_option"
+                      placeholder="Enter Java Tool Option"
+                      [ngClass]="{'is-invalid': configurationFormErrors.java.tool_option}">
+                    <div class="invalid-feedback" *ngIf="configurationFormErrors.java.tool_option">
+                      {{configurationFormErrors.java.tool_option}}</div>
+                  </div>
+                  <div class="col-6 form-group mb-0">
+                    <label>Service Name<em>*</em></label>
+                    <input class="form-control" type="text" formControlName="service_name"
+                      placeholder="Enter Service Name"
+                      [ngClass]="{'is-invalid': configurationFormErrors.java.service_name}">
+                    <div class="invalid-feedback" *ngIf="configurationFormErrors.java.service_name">
+                      {{configurationFormErrors.java.service_name}}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border rounded px-3 pt-4 pb-3 mb-4 position-relative" formGroupName="dotnet"
+                *ngIf="hasRuntime('dotnet')">
+                <span class="section-title">Dot Net</span>
+                <div class="row">
+                  <div class="col-6 form-group mb-0">
+                    <label>Runtime Directory<em>*</em></label>
+                    <input class="form-control" type="text" formControlName="runtime_dir"
+                      placeholder="Enter Runtime Directory"
+                      [ngClass]="{'is-invalid': configurationFormErrors.dotnet.runtime_dir}">
+                    <div class="invalid-feedback" *ngIf="configurationFormErrors.dotnet.runtime_dir">
+                      {{configurationFormErrors.dotnet.runtime_dir}}</div>
+                  </div>
+                  <div class="col-6 form-group mb-0">
+                    <label>Service Name<em>*</em></label>
+                    <input class="form-control" type="text" formControlName="service_name"
+                      placeholder="Enter Service Name"
+                      [ngClass]="{'is-invalid': configurationFormErrors.dotnet.service_name}">
+                    <div class="invalid-feedback" *ngIf="configurationFormErrors.dotnet.service_name">
+                      {{configurationFormErrors.dotnet.service_name}}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border rounded px-3 pt-4 pb-3 mb-4 position-relative" formGroupName="python"
+                *ngIf="hasRuntime('python')">
+                <span class="section-title">Python</span>
+                <button type="button" class="btn btn-sm section-instruction" (click)="openInstruction('Python')">
+                  <span class="fas fa-link"></span> Instruction</button>
+                <div class="row">
+                  <div class="col-6 form-group mb-0">
+                    <label>Service Name<em>*</em></label>
+                    <input class="form-control" type="text" formControlName="service_name"
+                      placeholder="Enter Service Name"
+                      [ngClass]="{'is-invalid': configurationFormErrors.python.service_name}">
+                    <div class="invalid-feedback" *ngIf="configurationFormErrors.python.service_name">
+                      {{configurationFormErrors.python.service_name}}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border rounded px-3 pt-4 pb-3 mb-4 position-relative" formGroupName="php"
+                *ngIf="hasRuntime('php')">
+                <span class="section-title">php</span>
+                <button type="button" class="btn btn-sm section-instruction" (click)="openInstruction('php')">
+                  <span class="fas fa-link"></span> Instruction</button>
+                <div class="row">
+                  <div class="col-6 form-group mb-0">
+                    <label>Service Name<em>*</em></label>
+                    <input class="form-control" type="text" formControlName="service_name"
+                      placeholder="Enter Service Name"
+                      [ngClass]="{'is-invalid': configurationFormErrors.php.service_name}">
+                    <div class="invalid-feedback" *ngIf="configurationFormErrors.php.service_name">
+                      {{configurationFormErrors.php.service_name}}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border rounded px-3 pt-4 pb-3 mb-0 position-relative" formGroupName="cpp"
+                *ngIf="hasRuntime('cpp')">
+                <span class="section-title">c++</span>
+                <button type="button" class="btn btn-sm section-instruction" (click)="openInstruction('c++')">
+                  <span class="fas fa-link"></span> Instruction</button>
+                <div class="row">
+                  <div class="col-6 form-group mb-0">
+                    <label>Service Name<em>*</em></label>
+                    <input class="form-control" type="text" formControlName="service_name"
+                      placeholder="Enter Service Name"
+                      [ngClass]="{'is-invalid': configurationFormErrors.cpp.service_name}">
+                    <div class="invalid-feedback" *ngIf="configurationFormErrors.cpp.service_name">
+                      {{configurationFormErrors.cpp.service_name}}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center text-muted py-3" *ngIf="!applicationForm.value.runtime?.length">
+                Select at least one runtime in the Application step to configure services.
+              </div>
+            </form>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Step 4: Review -->
+      <ng-container *ngSwitchCase="3">
+        <div class="row">
+          <div class="col-8 offset-2">
+            <div class="row">
+              <div class="col-6">
+                <div class="card h-100">
+                  <div class="card-header bg-white font-500">Application</div>
+                  <div class="card-body">
+                    <div class="row mb-2">
+                      <div class="col-5 text-right text-muted">Name :</div>
+                      <div class="col-7">{{applicationForm.value.application_name}}</div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="col-5 text-right text-muted">Tags :</div>
+                      <div class="col-7">{{getTagNames()}}</div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="col-5 text-right text-muted">Runtime :</div>
+                      <div class="col-7">{{getRuntimeLabels()}}</div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="col-5 text-right text-muted">Project dir :</div>
+                      <div class="col-7">{{applicationForm.value.project_dir}}</div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="col-5 text-right text-muted">Log file path :</div>
+                      <div class="col-7">{{applicationForm.value.log_file_path}}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-5 text-right text-muted">Collector :</div>
+                      <div class="col-7">{{getCollectorName(applicationForm.value.collector)}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card h-100">
+                  <div class="card-header bg-white font-500">Host Config</div>
+                  <div class="card-body">
+                    <div class="row mb-2">
+                      <div class="col-5 text-right text-muted">Target Type :</div>
+                      <div class="col-7 text-capitalize">{{hostConfigForm.value.target_type}}</div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="col-5 text-right text-muted">Target :</div>
+                      <div class="col-7">{{hostConfigForm.value.device_id}}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-5 text-right text-muted">Credential :</div>
+                      <div class="col-7">
+                        {{hostConfigForm.value.credential_type === 'local' ?
+                        getCredentialName(hostConfigForm.value.credentials) : hostConfigForm.value.username}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 mt-3">
+                <div class="card mb-0">
+                  <div class="card-header bg-white font-500">Configuration</div>
+                  <div class="card-body">
+                    <div class="border rounded p-2 mb-2" *ngIf="hasRuntime('java')">
+                      <div class="text-muted small">Java</div>
+                      <div>Agent Directory : {{configurationForm.value.java.agent_dir}}</div>
+                      <div>Java Tool Option : {{configurationForm.value.java.tool_option}}</div>
+                      <div>Service Name : {{configurationForm.value.java.service_name}}</div>
+                    </div>
+                    <div class="border rounded p-2 mb-2" *ngIf="hasRuntime('dotnet')">
+                      <div class="text-muted small">Dot Net</div>
+                      <div>Runtime Directory : {{configurationForm.value.dotnet.runtime_dir}}</div>
+                      <div>Service Name : {{configurationForm.value.dotnet.service_name}}</div>
+                    </div>
+                    <div class="border rounded p-2 mb-2" *ngIf="hasRuntime('python')">
+                      <div class="text-muted small">Python</div>
+                      <div>Service Name : {{configurationForm.value.python.service_name}}</div>
+                    </div>
+                    <div class="border rounded p-2 mb-2" *ngIf="hasRuntime('php')">
+                      <div class="text-muted small">php</div>
+                      <div>Service Name : {{configurationForm.value.php.service_name}}</div>
+                    </div>
+                    <div class="border rounded p-2 mb-0" *ngIf="hasRuntime('cpp')">
+                      <div class="text-muted small">c++</div>
+                      <div>Service Name : {{configurationForm.value.cpp.service_name}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+    </ng-container>
+
+    <!-- Footer navigation -->
+    <div class="d-flex justify-content-center mt-4">
+      <button *ngIf="activeStepIndex === 0" class="btn btn-outline-danger" type="button"
+        (click)="cancel()">Cancel</button>
+      <button *ngIf="activeStepIndex > 0" class="btn btn-outline-danger" type="button" (click)="back()">Back</button>
+      <button *ngIf="activeStepIndex < wizardSteps.length - 1" class="btn btn-success ml-3" type="button"
+        (click)="next()">Next</button>
+      <button *ngIf="activeStepIndex === wizardSteps.length - 1" class="btn btn-success ml-3" type="button"
+        (click)="submit()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<ng-template #instructionModal>
+  <div class="card mb-0">
+    <div class="card-header bg-white text-capitalize">
+      {{activeInstructionLang}} Instructions
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="instructionModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="text-muted mb-0">Setup instructions for {{activeInstructionLang}} will be provided here.</p>
+    </div>
+  </div>
+</ng-template>

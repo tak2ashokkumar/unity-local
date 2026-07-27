@@ -1103,6 +1103,18 @@ export const UPDATE_AGENT_CONFIGURATION_TTL = (uuid: string) => `customer/agent/
 
 export const UPDATE_AGENT_CONFIGURATION_IP_ADDRESS = (uuid: string) => `customer/agent/config/${uuid}/update-ip-address/`;
 
+// ==================== Application Onboarding (APM) ====================
+// Base APM onboarding resource. List (GET), create (POST) use APM_ONBOARDING();
+// single record (GET), update (PUT) and delete (DELETE) use APM_ONBOARDING_BY_ID(id).
+export const APM_ONBOARDING = () => `apm/apm_onboarding/`;
+
+export const APM_ONBOARDING_BY_ID = (id: string) => `apm/apm_onboarding/${id}/`;
+
+// Target (device) search source is still pending the backend contract -
+// placeholder path, only the URL string needs updating.
+// Credentials reuse the existing UNITY_CREDENTIALS (customer/unity_discovery/credential/).
+export const GET_APM_TARGETS = (search: string) => `apm/apm_onboarding/targets/?search=${search}`;
+
 export const STOP_IMPERSONATING = () => `hijack/release-hijack/`;
 
 export const GET_GCP_REGION_LIST = () => `${environment.staticData}gcp-data/gcp-regions.json`;

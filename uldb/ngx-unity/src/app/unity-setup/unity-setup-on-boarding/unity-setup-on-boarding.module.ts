@@ -74,6 +74,8 @@ import { UnitySetupOnBoardingRoutingModule } from './unity-setup-on-boarding-rou
 import { UnitySetupOnBoardingSummaryComponent } from './unity-setup-on-boarding-summary/unity-setup-on-boarding-summary.component';
 import { UnitySetupOnBoardingComponent } from './unity-setup-on-boarding.component';
 import { AdvancedDiscoveryConnectivityRequestComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity-request/advanced-discovery-connectivity-request.component';
+import { ApplicationOnboardingComponent } from './application-onboarding/application-onboarding.component';
+import { ApplicationOnboardingCrudComponent } from './application-onboarding/application-onboarding-crud/application-onboarding-crud.component';
 
 
 @NgModule({
@@ -146,6 +148,8 @@ import { AdvancedDiscoveryConnectivityRequestComponent } from './advanced-discov
     AdvancedDiscoveryConnectivityCrudComponent,
     AdvancedDiscoveryConnectivityRequestComponent,
     AdvancedDiscoveryPolicyCrudComponent,
+    ApplicationOnboardingComponent,
+    ApplicationOnboardingCrudComponent,
   ],
   imports: [
     AppCoreModule,

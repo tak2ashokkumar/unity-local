@@ -82,7 +82,7 @@ export class UnitySetupOnBoardingComponent implements OnInit, OnDestroy {
         className: 'btn-secondary',
         module: UnityModules.ONBOARDING,
       };
-      this.steps = [steps[0], temp, steps[1]];
+      this.steps = [steps[0], temp, steps[1], steps[2]];
     } else {
       let temp: OnboardingTabStepType = {
         stepName: 'Discovery',
@@ -93,7 +93,7 @@ export class UnitySetupOnBoardingComponent implements OnInit, OnDestroy {
         className: 'btn-secondary',
         module: UnityModules.ONBOARDING,
       };
-      this.steps = [steps[0], temp, steps[1]];
+      this.steps = [steps[0], temp, steps[1], steps[2]];
     }
     if (!this.collectorsCount) {
       this.steps[1].disabled = true;
@@ -174,6 +174,14 @@ const steps: OnboardingTabStepType[] = [
     stepName: 'Import Inventory',
     icon: 'fas fa-file-upload',
     url: 'onboarding',
+    active: false,
+    className: 'btn-secondary',
+    module: UnityModules.ONBOARDING
+  },
+  {
+    stepName: 'Application Onboarding',
+    icon: 'fab fa-app-store-ios',
+    url: 'application-onboarding',
     active: false,
     className: 'btn-secondary',
     module: UnityModules.ONBOARDING

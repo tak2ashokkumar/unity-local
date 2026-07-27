@@ -1,0 +1,43 @@
+// Types for the Application Onboarding (APM) feature - flat shape matching the
+// /apm/apm_onboarding/ contract.
+
+// A single onboarded-application record (list row / detail / create-update payload).
+export interface OnboardedApplication {
+  id?: number;
+  application_name: string;
+  service_name: string;
+  runtime: string[];
+  host?: string;
+  status?: string;
+  deployed_date?: string;
+  device_id: number;
+  project_dir: string;
+  log_file_path: string;
+  java_agent_dir?: string;
+  java_tool_option?: string;
+  dotnet_runtime_dir?: string;
+  content_type?: number;
+  collector: number;
+  credentials?: number;
+  tags: number[];
+  created_at?: string;
+  updated_at?: string;
+
+  // Only sent when the "My Credential" option is used (mapping pending confirmation).
+  username?: string;
+  password?: string;
+}
+
+// Runtime / language option (static list - drives the Configuration sections).
+export interface RuntimeOption {
+  label: string;
+  value: string;
+}
+
+// Tag option from customer/tags/ (id + tag_name).
+export interface ApmTag {
+  id: number;
+  tag_name: string;
+  uuid: string;
+  customer: number;
+}

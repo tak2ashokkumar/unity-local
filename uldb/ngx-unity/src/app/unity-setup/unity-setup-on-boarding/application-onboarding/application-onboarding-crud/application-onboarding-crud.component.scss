@@ -1,0 +1,110 @@
+// Step indicator: circles joined by a visible connector line.
+// future = light gray, active = blue, completed (circle + connector) = green.
+.apm-step-indicator {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    flex: 1;
+    text-align: center;
+    position: relative;
+
+    // Connector to the next step - spans from this circle's center to the next.
+    &:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 1.125rem;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background-color: #c8ced3;
+      z-index: 0;
+    }
+
+    &.completed::after {
+      background-color: #0cbb70;
+    }
+
+    .icon-wrap {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      vertical-align: top;
+      align-items: center;
+      justify-content: center;
+      height: 2.25rem;
+      width: 2.25rem;
+      border: 2px solid #c8ced3;
+      border-radius: 50%;
+      background-color: #ffffff;
+      color: #9aa4b2;
+      cursor: pointer;
+
+      span {
+        font-size: 0.95rem;
+        line-height: 1;
+      }
+    }
+
+    .icon-wrap.active {
+      border-color: #378ad8;
+      background-color: #378ad8;
+      color: #ffffff;
+    }
+
+    .icon-wrap.success {
+      border-color: #0cbb70;
+      background-color: #0cbb70;
+      color: #ffffff;
+    }
+
+    .apm-caption {
+      margin-top: 0.35rem;
+      font-weight: 500 !important;
+      font-size: 0.8125rem;
+      color: #9aa4b2;
+    }
+
+    &.active .apm-caption {
+      color: #378ad8;
+    }
+
+    &.completed .apm-caption {
+      color: #0cbb70;
+    }
+  }
+}
+
+// Fieldset-style section header and instruction button on the Configuration step.
+.section-title {
+  position: absolute;
+  top: -0.7rem;
+  left: 1rem;
+  z-index: 1;
+  padding: 0 0.5rem;
+  background-color: #ffffff;
+  font-size: 0.9rem;
+  color: #3e515b;
+}
+
+.section-instruction {
+  position: absolute;
+  top: -0.85rem;
+  right: 1rem;
+  z-index: 1;
+  padding: 0.15rem 0.85rem;
+  border-radius: 1rem;
+  font-size: 0.8125rem;
+  background-color: #378ad8;
+  border-color: #378ad8;
+  color: #ffffff;
+
+  &:hover,
+  &:focus {
+    background-color: #2f7ac0;
+    border-color: #2f7ac0;
+    color: #ffffff;
+  }
+}

@@ -8,6 +8,8 @@ import { UnitySetupOnBoardingComponent } from './unity-setup-on-boarding.compone
 import { AdvancedDiscoveryConnectivityComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity.component';
 import { AdvancedDiscoveryPolicyCrudComponent } from './advanced-device-discovery/advanced-discovery-network-scan/advanced-discovery-policy-crud/advanced-discovery-policy-crud.component';
 import { AdvancedDiscoveryConnectivityRequestComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity-request/advanced-discovery-connectivity-request.component';
+import { ApplicationOnboardingComponent } from './application-onboarding/application-onboarding.component';
+import { ApplicationOnboardingCrudComponent } from './application-onboarding/application-onboarding-crud/application-onboarding-crud.component';
 
 const routes: Routes = [
   {
@@ -40,6 +42,15 @@ const routes: Routes = [
           }
         }
       },
+      {
+        path: 'application-onboarding',
+        component: ApplicationOnboardingComponent,
+        data: {
+          breadcrumb: {
+            title: 'Application Onboarding'
+          }
+        }
+      },
       ...DEVICE_DISCOVERY_ON_BOARDING_ROUTES,
       ...ADVANCE_DICOVERY_ON_BOARDING_ROUTES,
       ...EXCEL_ON_BOARDING_ROUTES
@@ -56,6 +67,26 @@ const routes: Routes = [
       breadcrumb: {
         title: 'Edit',
         stepbackCount: 0
+      }
+    }
+  },
+  // Top-level (outside the onboarding host) so the outer stepper is not rendered
+  // on the APM wizard - same pattern as the discovery-policy routes above.
+  {
+    path: 'application-onboarding/create',
+    component: ApplicationOnboardingCrudComponent,
+    data: {
+      breadcrumb: {
+        title: 'Onboard Application'
+      }
+    }
+  },
+  {
+    path: 'application-onboarding/:id/edit',
+    component: ApplicationOnboardingCrudComponent,
+    data: {
+      breadcrumb: {
+        title: 'Edit Application'
       }
     }
   },

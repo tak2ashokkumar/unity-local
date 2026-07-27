@@ -1,0 +1,108 @@
+<!-- Empty state: shown when nothing is onboarded and no search is active (Image 3). -->
+<div class="card text-center" *ngIf="!viewData.length && !currentCriteria.searchValue">
+  <div class="card-body py-5">
+    <h4 class="text-success font-500 mb-3">Welcome to Application Onboarding!</h4>
+    <p class="text-muted mb-4">Get started by onboarding your first application.</p>
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-outline-warning btn-sm btn-pill" type="button" (click)="onboard()" accessControl
+        moduleName="Onboarding" accessType="Manage Onboarding" elementType="btn">Onboard Application</button>
+    </div>
+  </div>
+</div>
+
+<!-- List state: paginated table of onboarded applications (Image 4). -->
+<div class="card" *ngIf="viewData.length || currentCriteria.searchValue">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+    <div class="d-flex align-items-center font-500">
+      <span class="badge badge-secondary font-sm">{{count}}</span>
+      <span class="ml-2 font-lg">Application</span>
+    </div>
+    <div class="d-flex justify-content-end align-items-center">
+      <button class="btn btn-sm btn-warning font-500 px-3" type="button" (click)="onboard()" accessControl
+        moduleName="Onboarding" accessType="Manage Onboarding" elementType="btn">Onboard Application</button>
+      <data-refresh-btn class="ml-2" [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+      <button class="btn btn-pill btn-sm btn-warning ml-2" type="button" container="body" tooltip="Back"
+        (click)="goBack()">
+        <span class="fas fa-arrow-left"></span>
+      </button>
+    </div>
+  </div>
+  <div class="card-body py-2">
+    <div class="row pb-2">
+      <div class="col-3">
+        <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+      </div>
+      <div class="col d-flex justify-content-end">
+        <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+          (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+      </div>
+    </div>
+    <table class="table table-sm text-left">
+      <thead class="bg-light">
+        <tr>
+          <th>Application Name</th>
+          <th>Service Name</th>
+          <th>Language</th>
+          <th>Host</th>
+          <th>Tags</th>
+          <th class="text-center">Status</th>
+          <th>Deployed Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let app of viewData; trackBy: trackByApplication" truncateText>
+          <td class="tdw-18">
+            <div [tooltip]="app.applicationName">{{app.applicationName}}</div>
+          </td>
+          <td class="tdw-16">
+            <div [tooltip]="app.serviceName">{{app.serviceName}}</div>
+          </td>
+          <td class="tdw-12">
+            <div [tooltip]="app.language">{{app.language}}</div>
+          </td>
+          <td class="tdw-14">
+            <div [tooltip]="app.host">{{app.host}}</div>
+          </td>
+          <td class="tdw-12">
+            <div [tooltip]="app.tags">{{app.tags}}</div>
+          </td>
+          <td class="text-center tdw-8">
+            <i class="fas" [ngClass]="app.statusIcon" container="body" [tooltip]="app.statusTooltip"></i>
+          </td>
+          <td class="tdw-20">
+            <div [tooltip]="app.deployedDate">{{app.deployedDate}}</div>
+          </td>
+          <td class="action-icons-column">
+            <button class="action-icons mb-0 fas fa-history font-sm" container="body" tooltip="History"
+              (click)="viewHistory(app)"></button>
+            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" container="body" tooltip="Edit"
+              (click)="edit(app)" accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+              elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" container="body" tooltip="Delete"
+              (click)="confirmDeleteApplication(app)" accessControl moduleName="Onboarding"
+              accessType="Manage Onboarding" elementType="actionbtn"></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+      [totalCount]="count"></table-entries>
+    <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+      [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+    <div class="text-center text-muted py-4" *ngIf="!viewData.length">No applications found.</div>
+  </div>
+</div>
+
+<ng-template #confirmDelete>
+  <div class="card mb-0">
+    <div class="card-body text-center pb-2">
+      <div>Are you sure you want to delete this application?</div>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+      <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="deleteApplication()">Delete</button>
+      <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+        (click)="confirmDeleteModalRef.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
