@@ -1115,6 +1115,14 @@ export const APM_ONBOARDING_BY_ID = (id: string) => `apm/apm_onboarding/${id}/`;
 // Credentials reuse the existing UNITY_CREDENTIALS (customer/unity_discovery/credential/).
 export const GET_APM_TARGETS = (search: string) => `apm/apm_onboarding/targets/?search=${search}`;
 
+// Host Config target search reuses the shared advanced-search source (same source
+// the DevOps "Execute Task" host page uses). Pass search + host-type filter params
+// via HttpParams. Credentials reuse UNITY_CREDENTIALS (customer/unity_discovery/credential/).
+export const ADVANCED_SEARCH_FAST = () => `customer/advanced_search_fast/`;
+
+// Cloud accounts for the Host Config "Cloud" filter (filtered by cloud_type).
+export const CLOUD_FAST = () => `customer/cloud_fast/`;
+
 export const STOP_IMPERSONATING = () => `hijack/release-hijack/`;
 
 export const GET_GCP_REGION_LIST = () => `${environment.staticData}gcp-data/gcp-regions.json`;

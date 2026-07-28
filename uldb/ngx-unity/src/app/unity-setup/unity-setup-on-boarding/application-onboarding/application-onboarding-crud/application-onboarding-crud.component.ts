@@ -4,23 +4,29 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { isString } from 'lodash-es';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { Subject } from 'rxjs';
-import { finalize, takeUntil } from 'rxjs/operators';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
+import { Observable, of, Subject } from 'rxjs';
+import { catchError, finalize, mergeMap, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { CONFIRM_MODAL_CONFIG } from 'src/app/shared/shared.const';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
+import { deviceTypes as ALL_DEVICE_TYPES } from 'src/app/unity-services/orchestration/orchestration-tasks/orchestration-task-execute/orchestration-task-execute.service';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 import { DeviceDiscoveryAgentConfigurationType } from '../../advanced-discovery-connectivity/agent-config.type';
-import { ApmTag, RuntimeOption } from '../application-onboarding.type';
+import { ApmTag, RuntimeOption, TargetOption } from '../application-onboarding.type';
 import { ApplicationOnboardingCrudService } from './application-onboarding-crud.service';
 
 interface WizardStep {
   label: string;
   icon: string;
 }
+
+// Application Onboarding targets are compute hosts only, so the Device Type filter
+// is limited to bare metal + virtual machines (other device types are excluded).
+const APM_TARGET_DEVICE_TYPES = ['baremetal', 'virtual_machine', 'vmware'];
 
 @Component({
   selector: 'application-onboarding-crud',
@@ -65,6 +71,16 @@ export class ApplicationOnboardingCrudComponent implements OnInit, OnDestroy {
   credentials: DeviceDiscoveryCredentials[] = [];
   tags: ApmTag[] = [];
 
+  // Host Config filter (host-type) option sources.
+  cloudTypes: any[] = [];
+  cloudAccounts: any[] = [];
+  deviceTypes = ALL_DEVICE_TYPES.filter(d => APM_TARGET_DEVICE_TYPES.indexOf(d.name) !== -1);
+
+  // Target typeahead (single-select, async). asyncSelected holds the input text;
+  // the picked device fills device_id + host on the form.
+  asyncSelected: string = '';
+  targetSource: Observable<TargetOption[]>;
+
   // Runtime multi-select renders as a single-line dropdown; control holds the
   // selected `value` strings (e.g. ['java','php']).
   runtimeSettings: IMultiSelectSettings = {
@@ -94,6 +110,22 @@ export class ApplicationOnboardingCrudComponent implements OnInit, OnDestroy {
   };
   tagsTexts: IMultiSelectTexts = { defaultTitle: 'Select Tags', allSelected: 'All Tags' };
 
+  // Device Type filter (host-type = 'device_type') - multi-select of device categories.
+  deviceTypeSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: 'displayName',
+    keyToSelect: 'name',
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block text-left',
+    dynamicTitleMaxItems: 1,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    appendToBody: true
+  };
+  deviceTypeTexts: IMultiSelectTexts = { defaultTitle: 'Select Device Type', allSelected: 'All Device Types' };
+
   activeInstructionLang: string;
   @ViewChild('instructionModal') instructionModal: TemplateRef<void>;
   instructionModalRef: BsModalRef;
@@ -109,6 +141,10 @@ export class ApplicationOnboardingCrudComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinnerSvc.start('main');
     this.runtimeOptions = this.svc.runtimeOptions;
+    // Async source for the Target typeahead - re-queried on each keystroke.
+    this.targetSource = new Observable<string>(observer => {
+      observer.next(this.asyncSelected);
+    }).pipe(mergeMap((token: string) => this.searchTargets(token)));
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.applicationId = params.get('id');
     });
@@ -178,9 +214,12 @@ export class ApplicationOnboardingCrudComponent implements OnInit, OnDestroy {
     this.applicationFormValidationMessages = this.svc.applicationFormValidationMessages;
 
     this.hostConfigForm = this.svc.buildHostConfigForm(record);
+    // Only the IP is on the record; the device name is not returned, so show the IP on edit.
+    this.asyncSelected = record && record.host ? record.host : '';
     this.hostConfigFormErrors = this.svc.resetHostConfigFormErrors();
     this.hostConfigFormValidationMessages = this.svc.hostConfigFormValidationMessages;
     this.bindCredentialTypeToggle();
+    this.bindHostTypeToggle();
 
     this.configurationForm = this.svc.buildConfigurationForm(record);
     this.configurationFormErrors = this.svc.resetConfigurationFormErrors();
@@ -226,6 +265,117 @@ export class ApplicationOnboardingCrudComponent implements OnInit, OnDestroy {
         this.hostConfigForm.addControl('credentials', new FormControl(null, [Validators.required]));
       }
     });
+  }
+
+  // ---------------------------------- Host Config filters ----------------------------------
+
+  // Swap the cascading sub-filter controls whenever the Host Type changes.
+  private bindHostTypeToggle(): void {
+    this.hostConfigForm.get('host_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((type: string) => {
+      this.handleHostTypeChange(type);
+    });
+  }
+
+  // Add/remove the sub-filter controls for the chosen host type, load its options,
+  // and clear any already-picked targets so the selection matches the new filter.
+  private handleHostTypeChange(type: string): void {
+    this.clearSelectedTarget();
+    this.hostConfigForm.removeControl('cloud');
+    this.hostConfigForm.removeControl('account_name');
+    this.hostConfigForm.removeControl('tag');
+    this.hostConfigForm.removeControl('device_type');
+    this.cloudAccounts = [];
+
+    if (type === 'cloud') {
+      this.getCloudTypes();
+      this.hostConfigForm.addControl('cloud', new FormControl('', [Validators.required]));
+      this.hostConfigForm.addControl('account_name', new FormControl('', [Validators.required]));
+      this.hostConfigForm.get('cloud').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((cloudType: string) => {
+        this.clearSelectedTarget();
+        this.hostConfigForm.get('account_name').setValue('', { emitEvent: false });
+        this.getCloudAccounts(cloudType);
+      });
+      this.hostConfigForm.get('account_name').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.clearSelectedTarget();
+      });
+    } else if (type === 'tag') {
+      this.hostConfigForm.addControl('tag', new FormControl('', [Validators.required]));
+      this.hostConfigForm.get('tag').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.clearSelectedTarget();
+      });
+    } else if (type === 'device_type') {
+      this.hostConfigForm.addControl('device_type', new FormControl([], [Validators.required]));
+      this.hostConfigForm.get('device_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.clearSelectedTarget();
+      });
+    }
+  }
+
+  // Async fetch behind the Target typeahead. Arrow property so `this` binds to the
+  // component. Reads the active host-type filter and narrows the target search accordingly.
+  searchTargets = (query: string): Observable<TargetOption[]> => {
+    if (!query || !query.trim()) {
+      return of([]);
+    }
+    const hostType: string = this.hostConfigForm.get('host_type') ? this.hostConfigForm.get('host_type').value : '';
+    const filters: { tag?: string; deviceType?: string[]; publicCloud?: string; privateCloud?: string } = {};
+
+    if (hostType === 'tag') {
+      filters.tag = this.hostConfigForm.get('tag') ? this.hostConfigForm.get('tag').value : null;
+    } else if (hostType === 'device_type') {
+      filters.deviceType = this.hostConfigForm.get('device_type') ? this.hostConfigForm.get('device_type').value : [];
+    } else if (hostType === 'cloud') {
+      const cloudType: string = this.hostConfigForm.get('cloud') ? this.hostConfigForm.get('cloud').value : '';
+      const account: string = this.hostConfigForm.get('account_name') ? this.hostConfigForm.get('account_name').value : '';
+      if (['aws', 'azure', 'gcp', 'oci'].indexOf((cloudType || '').toLowerCase()) !== -1) {
+        filters.publicCloud = account;
+      } else {
+        filters.privateCloud = account;
+      }
+    }
+
+    return this.svc.getTargets(query, filters).pipe(catchError(() => {
+      this.notificationSvc.error(new Notification('Failed to fetch targets. Please try again later.'));
+      return of([]);
+    }));
+  };
+
+  private getCloudTypes(): void {
+    this.svc.getCloudTypes().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.cloudTypes = res && res.cloud ? res.cloud : [];
+    }, () => {
+      this.cloudTypes = [];
+    });
+  }
+
+  private getCloudAccounts(cloudType: string): void {
+    if (!cloudType) {
+      this.cloudAccounts = [];
+      return;
+    }
+    this.svc.getCloudAccounts(cloudType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.cloudAccounts = res || [];
+    }, () => {
+      this.cloudAccounts = [];
+    });
+  }
+
+  // Store the picked device as device_id + host (the server contract), and show name (ip).
+  // Per the backend contract, device_id is the device's ctype_id; host is its ip_address.
+  typeaheadOnSelect(match: TypeaheadMatch): void {
+    const item: any = (match && match.item) ? match.item : {};
+    this.hostConfigForm.get('device_id').setValue(item.ctype_id);
+    this.hostConfigForm.get('host').setValue(item.ip_address);
+    this.hostConfigForm.get('device_id').markAsDirty();
+    this.hostConfigForm.get('device_id').updateValueAndValidity();
+    this.hostConfigFormErrors.device_id = '';
+    this.asyncSelected = (item.name || '') + (item.ip_address ? ' (' + item.ip_address + ')' : '');
+  }
+
+  private clearSelectedTarget(): void {
+    this.hostConfigForm.get('device_id').setValue(null);
+    this.hostConfigForm.get('host').setValue(null);
+    this.asyncSelected = '';
   }
 
   // ---------------------------------- Step navigation ----------------------------------
@@ -339,6 +489,13 @@ export class ApplicationOnboardingCrudComponent implements OnInit, OnDestroy {
   getCredentialName(id: number): string {
     const credential = this.credentials.find(c => c.id === id);
     return credential ? credential.name : (id != null ? String(id) : '');
+  }
+
+  // Readable Host Type label for the Review step.
+  getHostTypeLabel(): string {
+    const labels: { [key: string]: string } = { cloud: 'Cloud', tag: 'Tag', device_type: 'Device Type' };
+    const type: string = this.hostConfigForm.value.host_type;
+    return type ? (labels[type] || type) : '-';
   }
 
   getTagNames(): string {

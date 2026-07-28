@@ -10,6 +10,7 @@ export interface OnboardedApplication {
   host?: string;
   status?: string;
   deployed_date?: string;
+  // device_id is the selected device's ctype_id (numeric); host is its IP.
   device_id: number;
   project_dir: string;
   log_file_path: string;
@@ -26,6 +27,17 @@ export interface OnboardedApplication {
   // Only sent when the "My Credential" option is used (mapping pending confirmation).
   username?: string;
   password?: string;
+}
+
+// A selected Host Config target (device) from customer/advanced_search_fast/.
+// The search exposes the device by uuid (there is no numeric id) + ip_address;
+// ctype_id is the device's content-type id.
+export interface TargetOption {
+  uuid: string;
+  name: string;
+  ip_address: string;
+  device_type?: string;
+  ctype_id?: number;
 }
 
 // Runtime / language option (static list - drives the Configuration sections).

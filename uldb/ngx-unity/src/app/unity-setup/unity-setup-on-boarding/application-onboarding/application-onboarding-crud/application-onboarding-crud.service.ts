@@ -3,16 +3,19 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import {
+  ADVANCED_SEARCH_FAST,
   APM_ONBOARDING,
   APM_ONBOARDING_BY_ID,
+  CLOUD_FAST,
   GET_AGENT_CONFIGURATIONS,
   GET_ALL_DEVICES_TAGS,
+  ORCHESTRATION_GET_META_DATA,
   UNITY_CREDENTIALS
 } from 'src/app/shared/api-endpoint.const';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
-import { ApmTag, OnboardedApplication, RuntimeOption } from '../application-onboarding.type';
+import { ApmTag, OnboardedApplication, RuntimeOption, TargetOption } from '../application-onboarding.type';
 
 @Injectable()
 export class ApplicationOnboardingCrudService {
@@ -43,6 +46,39 @@ export class ApplicationOnboardingCrudService {
   getCredentials(): Observable<DeviceDiscoveryCredentials[]> {
     const params: HttpParams = new HttpParams().set('page_size', '0');
     return this.http.get<DeviceDiscoveryCredentials[]>(UNITY_CREDENTIALS(), { params });
+  }
+
+  // Target search for the Host Config step - same source as the DevOps "Execute Task"
+  // host page. The host-type filter selection narrows results via the extra params.
+  getTargets(search: string, filters: { tag?: string; deviceType?: string[]; publicCloud?: string; privateCloud?: string } = {}): Observable<TargetOption[]> {
+    let params: HttpParams = new HttpParams().set('page_size', '0').set('search', search);
+    if (filters.tag) {
+      params = params.append('tag', filters.tag);
+    }
+    if (filters.deviceType && filters.deviceType.length) {
+      params = params.append('device_type', filters.deviceType.join(','));
+    }
+    if (filters.publicCloud) {
+      params = params.append('public_cloud', filters.publicCloud);
+    }
+    if (filters.privateCloud) {
+      params = params.append('private_cloud', filters.privateCloud);
+    }
+    return this.http.get<TargetOption[]>(ADVANCED_SEARCH_FAST(), { params });
+  }
+
+  // Cloud types for the "Cloud" host-type filter (response shape: { cloud: [...] }).
+  getCloudTypes(): Observable<any> {
+    return this.http.get<any>(ORCHESTRATION_GET_META_DATA());
+  }
+
+  // Cloud accounts for the selected cloud type.
+  getCloudAccounts(cloudType: string): Observable<any[]> {
+    let params: HttpParams = new HttpParams().set('page_size', '0');
+    if (cloudType) {
+      params = params.append('cloud_type', cloudType);
+    }
+    return this.http.get<any[]>(CLOUD_FAST(), { params });
   }
 
   getApplication(id: string): Observable<OnboardedApplication> {
@@ -90,8 +126,9 @@ export class ApplicationOnboardingCrudService {
 
   buildHostConfigForm(record?: any): FormGroup {
     const form: FormGroup = this.builder.group({
-      target_type: [record && record.target_type ? record.target_type : 'host'],
+      host_type: [''],
       device_id: [record ? record.device_id : null, [Validators.required]],
+      host: [record ? record.host : null],
       credential_type: ['local']
     });
     // A persisted record always carries a credential id, so edit opens on Local.
@@ -101,6 +138,11 @@ export class ApplicationOnboardingCrudService {
 
   resetHostConfigFormErrors(): any {
     return {
+      host_type: '',
+      cloud: '',
+      account_name: '',
+      tag: '',
+      device_type: '',
       device_id: '',
       credentials: '',
       username: '',
@@ -111,6 +153,18 @@ export class ApplicationOnboardingCrudService {
   hostConfigFormValidationMessages = {
     device_id: {
       required: 'Target is required'
+    },
+    cloud: {
+      required: 'Cloud is required'
+    },
+    account_name: {
+      required: 'Account is required'
+    },
+    tag: {
+      required: 'Tag is required'
+    },
+    device_type: {
+      required: 'Device Type is required'
     },
     credentials: {
       required: 'Credential is required'
@@ -201,6 +255,7 @@ export class ApplicationOnboardingCrudService {
       log_file_path: applicationForm.value.log_file_path,
       tags: applicationForm.value.tags,
       device_id: hostConfigForm.value.device_id,
+      host: hostConfigForm.value.host,
       java_agent_dir: config.java.agent_dir,
       java_tool_option: config.java.tool_option,
       dotnet_runtime_dir: config.dotnet.runtime_dir

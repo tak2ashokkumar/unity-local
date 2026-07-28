@@ -1,0 +1,62 @@
+[
+  {
+    "monitoring": { "configured": true, "observium": false, "enabled": true, "zabbix": true },
+    "uuid": "08b9b43c-bb8a-48eb-955a-92d3ecae1b52",
+    "name": "alpha-collector-MTPdemo1_New01",
+    "device_type": "vmware",
+    "tags": ["Astronomy Shop Host"],
+    "dc_uuid": null,
+    "ctype_id": 325,
+    "os": "",
+    "ip_address": "10.192.25.24",
+    "private_cloud": ["1.DemoVcenter - GlobalVCS-Lab"]
+  },
+  {
+    "monitoring": { "configured": false, "observium": false, "enabled": false, "zabbix": true },
+    "uuid": "0e76da0f-0971-4faf-9a37-285b87827301",
+    "name": "windowsvm2-unitydemo",
+    "device_type": "virtual_machine",
+    "tags": [],
+    "dc_uuid": null,
+    "ctype_id": 244,
+    "os": "Microsoft Windows Multiprocessor Server 2019 (NT 6.3)",
+    "ip_address": "10.192.10.31",
+    "private_cloud": ["Custom DC3"]
+  },
+  {
+    "monitoring": { "configured": false, "observium": false, "enabled": false, "zabbix": true },
+    "uuid": "c7ad3b59-8323-416c-a17a-3f1a0e7057bc",
+    "name": "UL-SV1-UNITY-LAB-F5-LB-01",
+    "device_type": "load_balancer",
+    "tags": [],
+    "dc_uuid": null,
+    "ctype_id": 55,
+    "os": "",
+    "ip_address": "10.192.17.9",
+    "private_cloud": []
+  },
+  {
+    "monitoring": { "configured": false, "observium": false, "enabled": false, "zabbix": true },
+    "uuid": "abca4471-3b88-4a6c-a134-cd41c116b41d",
+    "name": "Core-Router-Demo",
+    "device_type": "switch",
+    "tags": [],
+    "dc_uuid": null,
+    "ctype_id": 49,
+    "os": "",
+    "ip_address": "10.192.10.12",
+    "private_cloud": ["Custom DC3"]
+  },
+  {
+    "monitoring": { "configured": true, "observium": false, "enabled": true, "zabbix": true },
+    "uuid": "f6c8c659-d821-4e58-ad13-f20e78f41310",
+    "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+    "device_type": "hypervisor",
+    "tags": ["UnityDemo"],
+    "dc_uuid": null,
+    "ctype_id": 245,
+    "os": "ESXi 6.7.0",
+    "ip_address": "10.192.17.21",
+    "private_cloud": ["New Vcentre"]
+  }
+]

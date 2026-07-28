@@ -33,37 +33,37 @@ export class ApplicationDiscoveryFailuresService {
     let seriesData = [];
     data.forEach(d => {
       axisLabels.push(d.label);
-      seriesData.push(d.error_rate);
+      seriesData.push(d.error_count);
     })
 
     view.options.grid = {
-      left: 60,
+      left: 40,
       right: 40,
       top: 20,
-      bottom: 30
+      bottom: 30,
+      containLabel: true
     };
     view.options.tooltip = {
       trigger: 'axis',
-      valueFormatter: v => `${v}/min`,
+      valueFormatter: v => `Errors : ${v}`,
     }
 
     view.options.xAxis = {
       type: 'category',
-      boundaryGap: false,
+      boundaryGap: true,
       data: axisLabels
     }
 
     view.options.yAxis = {
       type: 'value',
+      name: 'Error Count',
+      nameLocation: 'middle',
+      nameGap: 40,
       min: 0,
-      max: 'dataMax',
-      axisLabel: {
-        formatter: '{value}/min',
-      },
       splitLine: {
         show: true,
         lineStyle: {
-          type: 'dotted'  // dotted lines from Y-axis ✅
+          type: 'dotted'  // dotted grid lines
         }
       }
     }
@@ -71,7 +71,7 @@ export class ApplicationDiscoveryFailuresService {
       {
         data: seriesData,
         type: 'bar',
-        barWidth: 40, // 🔹 Fixed width in pixels
+        barWidth: 40, // fixed width in pixels
       }
     ]
     return view;
@@ -131,7 +131,6 @@ export const customDateRangeOptions: CustomDateRangeType[] = [
   { label: 'Last 30 days', value: 'last_30_days' },
   { label: 'Last 60 days', value: 'last_60_days' },
   { label: 'Last 90 days', value: 'last_90_days' },
-  { label: 'Last 1 year', value: 'last_1_year' },
 ]
 
 export class ApplicationFailureEventsViewData {

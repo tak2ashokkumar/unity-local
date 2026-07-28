@@ -91,17 +91,64 @@
           <div class="col-8 offset-2">
             <form [formGroup]="hostConfigForm">
               <div class="row">
-                <div class="col-6 form-group">
-                  <label for="target_type">Target Type</label>
-                  <select id="target_type" class="form-control" formControlName="target_type">
-                    <option value="host">Host</option>
-                  </select>
+                <div class="col-12 form-group">
+                  <label>Filters</label>
+                  <div class="row">
+                    <div class="col-4">
+                      <select id="host_type" class="form-control" formControlName="host_type">
+                        <option value="">Select Host Type</option>
+                        <option value="cloud">Cloud</option>
+                        <option value="tag">Tag</option>
+                        <option value="device_type">Device Type</option>
+                      </select>
+                    </div>
+                    <div class="col-4" *ngIf="hostConfigForm.get('host_type').value === 'cloud'">
+                      <select id="cloud" class="form-control" formControlName="cloud"
+                        [ngClass]="{'is-invalid': hostConfigFormErrors.cloud}">
+                        <option value="">Select Cloud</option>
+                        <option *ngFor="let cloud of cloudTypes" [value]="cloud.type">{{cloud.type}}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="hostConfigFormErrors.cloud">{{hostConfigFormErrors.cloud}}
+                      </div>
+                    </div>
+                    <div class="col-4" *ngIf="hostConfigForm.get('host_type').value === 'cloud'">
+                      <select id="account_name" class="form-control" formControlName="account_name"
+                        [ngClass]="{'is-invalid': hostConfigFormErrors.account_name}">
+                        <option value="">Select Account</option>
+                        <option *ngFor="let account of cloudAccounts" [value]="account.uuid">{{account.account_name}}
+                        </option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="hostConfigFormErrors.account_name">
+                        {{hostConfigFormErrors.account_name}}</div>
+                    </div>
+                    <div class="col-4" *ngIf="hostConfigForm.get('host_type').value === 'tag'">
+                      <select id="tag" class="form-control" formControlName="tag"
+                        [ngClass]="{'is-invalid': hostConfigFormErrors.tag}">
+                        <option value="">Select Tag</option>
+                        <option *ngFor="let tag of tags" [value]="tag.tag_name">{{tag.tag_name}}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="hostConfigFormErrors.tag">{{hostConfigFormErrors.tag}}</div>
+                    </div>
+                    <div class="col-4" *ngIf="hostConfigForm.get('host_type').value === 'device_type'">
+                      <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings"
+                        [texts]="deviceTypeTexts" class="form-control p-0" style="height:auto;"
+                        formControlName="device_type" [ngClass]="{'is-invalid': hostConfigFormErrors.device_type}">
+                      </multiselect-dropdown>
+                      <div class="invalid-feedback d-block" *ngIf="hostConfigFormErrors.device_type">
+                        {{hostConfigFormErrors.device_type}}</div>
+                    </div>
+                  </div>
                 </div>
-                <div class="col-6 form-group">
+                <div class="col-12 form-group">
                   <label for="device_id">Target<em>*</em></label>
-                  <input id="device_id" class="form-control" type="text" formControlName="device_id"
+                  <input id="device_id" class="form-control" type="text" autocomplete="off"
+                    [(ngModel)]="asyncSelected" [ngModelOptions]="{standalone: true}" [typeahead]="targetSource"
+                    [typeaheadAsync]="true" typeaheadOptionField="name" typeaheadWaitMs="1000"
+                    [typeaheadMinLength]="1" [typeaheadScrollable]="true" [typeaheadItemTemplate]="targetItemTpl"
+                    (typeaheadOnSelect)="typeaheadOnSelect($event)"
                     placeholder="Search Target by IP Address or IP Name"
                     [ngClass]="{'is-invalid': hostConfigFormErrors.device_id}">
+                  <ng-template #targetItemTpl let-model="item">{{model.name}} ({{model.ip_address}})</ng-template>
                   <div class="invalid-feedback" *ngIf="hostConfigFormErrors.device_id">
                     {{hostConfigFormErrors.device_id}}</div>
                 </div>
@@ -315,12 +362,12 @@
                   <div class="card-header bg-white font-500">Host Config</div>
                   <div class="card-body">
                     <div class="row mb-2">
-                      <div class="col-5 text-right text-muted">Target Type :</div>
-                      <div class="col-7 text-capitalize">{{hostConfigForm.value.target_type}}</div>
+                      <div class="col-5 text-right text-muted">Host Type :</div>
+                      <div class="col-7">{{getHostTypeLabel()}}</div>
                     </div>
                     <div class="row mb-2">
                       <div class="col-5 text-right text-muted">Target :</div>
-                      <div class="col-7">{{hostConfigForm.value.device_id}}</div>
+                      <div class="col-7">{{asyncSelected || hostConfigForm.value.host || '-'}}</div>
                     </div>
                     <div class="row">
                       <div class="col-5 text-right text-muted">Credential :</div>

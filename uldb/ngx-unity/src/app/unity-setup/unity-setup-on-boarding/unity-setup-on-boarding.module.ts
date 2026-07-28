@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AppCoreModule } from 'src/app/app-core/app-core.module';
 import { AppSharedCrudModule } from 'src/app/app-shared-crud/app-shared-crud.module';
@@ -156,6 +157,7 @@ import { ApplicationOnboardingCrudComponent } from './application-onboarding/app
     SharedModule,
     AppSharedCrudModule,
     PerfectScrollbarModule,
+    TypeaheadModule.forRoot(),
     UnitySetupOnBoardingRoutingModule,
     // ChartsModule
   ],
