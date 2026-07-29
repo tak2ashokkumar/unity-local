@@ -103,7 +103,7 @@ export class DashboardNativeDockerWidgetComponent implements OnInit, OnDestroy {
   }
 
   goTo(path: string) {
-    if (this.user.isDashboardOnlyUser) {
+    if (this.user.isDashboardOnlyUser || !path) {
       return;
     }
     this.router.navigate([path]);

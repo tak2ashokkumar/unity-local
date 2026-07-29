@@ -36,12 +36,16 @@ export class DashboardKubernetesControllersService {
       let a: DashboardKubernetesControllersViewData = new DashboardKubernetesControllersViewData();
       a.controllerId = controller.uuid;
       a.name = controller.name;
-      a.cloudId = controller.cloud.id ? controller.cloud.id : controller.cloud.uuid;
-      a.cloudUUID = controller.cloud.uuid;
-      a.cloudName = controller.cloud.name;
-      a.platformType = controller.cloud.platform_type;
+      // cloud is null when the controller is not tied to a cloud - keep the widget usable
+      // (name + charts) and skip the cloud label / drill-down instead of crashing.
+      if (controller.cloud) {
+        a.cloudId = controller.cloud.id ? controller.cloud.id : controller.cloud.uuid;
+        a.cloudUUID = controller.cloud.uuid;
+        a.cloudName = controller.cloud.name;
+        a.platformType = controller.cloud.platform_type;
+        a.drillDownLink = this.getDrilldownLink(a.platformType, a.cloudId, a.controllerId);
+      }
       a.loaderName = `${controller.name}${controller.uuid}`;
-      a.drillDownLink = this.getDrilldownLink(a.platformType, a.cloudId, a.controllerId);
       viewData.push(a);
     })
 

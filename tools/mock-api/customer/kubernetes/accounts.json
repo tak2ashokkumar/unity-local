@@ -1,71 +1,66 @@
-{
-  "count": 2,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
-      "name": "Prod Cluster",
-      "hostname": "10.192.25.31",
-      "port": 6443,
-      "username": null,
-      "ca_cert": null,
-      "client_cert": null,
-      "client_key": null,
-      "backend_url": "https://10.192.25.31:6443",
-      "proxy": {
-        "same_tab": false,
-        "proxy_fqdn": "https://proxy.unityone.ai/k8s/b796f727",
-        "backend_url": "https://10.192.25.31:6443"
-      },
-      "monitoring": {
-        "configured": true,
-        "enabled": true,
-        "observium": false,
-        "zabbix": true
-      },
-      "tags": ["production", "k8s"],
-      "status": "1",
-      "collector": "c431a2cc-ecff-4ff7-9c54-a43786f95cc2",
-      "cloud": null,
-      "created_at": "2026-07-06T10:00:00.000Z",
-      "updated_at": "2026-07-22T08:00:00.000Z",
-      "schedule_meta": {
-        "schedule_type": "none",
-        "run_now": false
-      }
+[
+  {
+    "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
+    "name": "Prod Cluster",
+    "hostname": "10.192.25.31",
+    "port": 6443,
+    "username": null,
+    "ca_cert": null,
+    "client_cert": null,
+    "client_key": null,
+    "backend_url": "https://10.192.25.31:6443",
+    "proxy": {
+      "same_tab": false,
+      "proxy_fqdn": "https://proxy.unityone.ai/k8s/b796f727",
+      "backend_url": "https://10.192.25.31:6443"
     },
-    {
-      "uuid": "a1c2e3f4-1111-2222-3333-444455556666",
-      "name": "Staging Cluster",
-      "hostname": "10.192.25.41",
-      "port": 6443,
-      "username": null,
-      "ca_cert": null,
-      "client_cert": null,
-      "client_key": null,
-      "backend_url": "https://10.192.25.41:6443",
-      "proxy": {
-        "same_tab": false,
-        "proxy_fqdn": "https://proxy.unityone.ai/k8s/a1c2e3f4",
-        "backend_url": "https://10.192.25.41:6443"
-      },
-      "monitoring": {
-        "configured": false,
-        "enabled": false,
-        "observium": false,
-        "zabbix": false
-      },
-      "tags": ["staging"],
-      "status": "0",
-      "collector": "c431a2cc-ecff-4ff7-9c54-a43786f95cc2",
-      "cloud": null,
-      "created_at": "2026-07-10T10:00:00.000Z",
-      "updated_at": "2026-07-22T08:00:00.000Z",
-      "schedule_meta": {
-        "schedule_type": "none",
-        "run_now": false
-      }
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "observium": false,
+      "zabbix": true
+    },
+    "tags": ["production", "k8s"],
+    "status": "1",
+    "collector": "c431a2cc-ecff-4ff7-9c54-a43786f95cc2",
+    "cloud": null,
+    "created_at": "2026-07-06T10:00:00.000Z",
+    "updated_at": "2026-07-22T08:00:00.000Z",
+    "schedule_meta": {
+      "schedule_type": "none",
+      "run_now": false
     }
-  ]
-}
+  },
+  {
+    "uuid": "a1c2e3f4-1111-2222-3333-444455556666",
+    "name": "Staging Cluster",
+    "hostname": "10.192.25.41",
+    "port": 6443,
+    "username": null,
+    "ca_cert": null,
+    "client_cert": null,
+    "client_key": null,
+    "backend_url": "https://10.192.25.41:6443",
+    "proxy": {
+      "same_tab": false,
+      "proxy_fqdn": "https://proxy.unityone.ai/k8s/a1c2e3f4",
+      "backend_url": "https://10.192.25.41:6443"
+    },
+    "monitoring": {
+      "configured": false,
+      "enabled": false,
+      "observium": false,
+      "zabbix": false
+    },
+    "tags": ["staging"],
+    "status": "0",
+    "collector": "c431a2cc-ecff-4ff7-9c54-a43786f95cc2",
+    "cloud": null,
+    "created_at": "2026-07-10T10:00:00.000Z",
+    "updated_at": "2026-07-22T08:00:00.000Z",
+    "schedule_meta": {
+      "schedule_type": "none",
+      "run_now": false
+    }
+  }
+]

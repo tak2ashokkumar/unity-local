@@ -2,10 +2,11 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { ConsoleAccessComponent } from 'src/app/shared/console-access/console-access.component';
-import { KubernetesNodesComponent } from 'src/app/shared/shared-container-controllers/kubernetes-nodes/kubernetes-nodes.component';
 import { KubernetesContainersComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
 import { KubernetesPodsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-pods.component';
 import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
+import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers/docker-tabs/docker-tabs.component';
+import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
 import { VmBackupHistoryComponent } from 'src/app/shared/vm-backup-history/vm-backup-history.component';
 import { SWITCH_ROUTES } from 'src/app/united-cloud/shared/switches/switches-routing.const';
 import { AwsDeviceTabComponent } from '../shared/aws-device-tab/aws-device-tab.component';
@@ -551,49 +552,18 @@ const tempRoutes: Routes = [
         stepbackCount: 0
       }
     },
-    children: [
-      {
-        path: 'pods',
-        component: KubernetesPodsComponent,
-        data: {
-          breadcrumb: {
-            title: 'Pods',
-            stepbackCount: 1
-          }
-        },
-      },
-      {
-        path: 'pods/:podId',
-        data: {
-          breadcrumb: {
-            title: 'Pods',
-            stepbackCount: 1
-          }
-        },
-        children: [
-          {
-            path: 'containers',
-            component: KubernetesContainersComponent,
-            data: {
-              breadcrumb: {
-                title: 'Containers',
-                stepbackCount: 0
-              }
-            }
-          }
-        ]
-      },
-      {
-        path: 'nodes',
-        component: KubernetesNodesComponent,
-        data: {
-          breadcrumb: {
-            title: 'Nodes',
-            stepbackCount: 1
-          }
-        },
-      },
-    ]
+    children: KUBERNETES_TABS_CHILDREN
+  },
+  {
+    path: 'docker',
+    component: DockerTabsComponent,
+    data: {
+      breadcrumb: {
+        title: 'Docker',
+        stepbackCount: 0
+      }
+    },
+    children: DOCKER_TABS_CHILDREN
   },
   {
     path: 'pods',

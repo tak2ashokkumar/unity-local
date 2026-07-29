@@ -85,6 +85,7 @@ const tabData: TabData[] = [
   {
     name: 'Containers',
     url: '/unitycloud/devices/kubernetes',
+    activeMatch: '/unitycloud/devices/(kubernetes|docker)',
     icon: FaIconMapping.KUBERNETES
   },
   {

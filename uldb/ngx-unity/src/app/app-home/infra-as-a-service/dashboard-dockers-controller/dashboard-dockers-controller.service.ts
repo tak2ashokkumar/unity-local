@@ -16,15 +16,15 @@ export class DashboardDockersControllerService {
 
   getDrilldownLink(cloudType: string, cloudId: string, controllerId: string) {
     switch (cloudType) {
-      case PlatFormMapping.AWS: return `/unitycloud/publiccloud/aws/overview/${cloudId}/us-east-1/containercontrollers/docker/${controllerId}/dockernodes`;
-      case PlatFormMapping.AZURE: return `/unitycloud/publiccloud/azure/dashboard/${cloudId}/resourcegroups/Kubernetes/overview/containercontrollers/docker/${controllerId}/dockernodes`;
-      case PlatFormMapping.GCP: return `/unitycloud/publiccloud/gcp/overview/${cloudId}/us-east1/containercontrollers/docker/${controllerId}/dockernodes`;
+      case PlatFormMapping.AWS: return `/unitycloud/publiccloud/aws/overview/${cloudId}/us-east-1/containercontrollers/docker/${controllerId}/nodes`;
+      case PlatFormMapping.AZURE: return `/unitycloud/publiccloud/azure/dashboard/${cloudId}/resourcegroups/Kubernetes/overview/containercontrollers/docker/${controllerId}/nodes`;
+      case PlatFormMapping.GCP: return `/unitycloud/publiccloud/gcp/overview/${cloudId}/us-east1/containercontrollers/docker/${controllerId}/nodes`;
       case PlatFormMapping.VMWARE:
       case PlatFormMapping.VMWARE_TYPE:
       case PlatFormMapping.UNITED_PRIVATE_CLOUD_VCENTER:
       case PlatFormMapping.OPENSTACKClOUD:
       case PlatFormMapping.VCLOUD:
-      case PlatFormMapping.CUSTOM: return `/unitycloud/pccloud/${cloudId}/containercontrollers/docker/${controllerId}/dockernodes`;
+      case PlatFormMapping.CUSTOM: return `/unitycloud/pccloud/${cloudId}/containercontrollers/docker/${controllerId}/nodes`;
       default: console.log('cloud type not listed for : ', cloudType);
     }
   }
@@ -36,12 +36,16 @@ export class DashboardDockersControllerService {
       let a: DashboardDockerControllersView = new DashboardDockerControllersView();
       a.controllerId = controller.uuid;
       a.name = controller.name;
-      a.cloudId = controller.cloud.id ? controller.cloud.id : controller.cloud.uuid;
-      a.cloudUUID = controller.cloud.uuid;
-      a.cloudName = controller.cloud.name;
-      a.platformType = controller.cloud.platform_type;
+      // cloud is null when the controller is not tied to a cloud - keep the widget usable
+      // (name + charts) and skip the cloud label / drill-down instead of crashing.
+      if (controller.cloud) {
+        a.cloudId = controller.cloud.id ? controller.cloud.id : controller.cloud.uuid;
+        a.cloudUUID = controller.cloud.uuid;
+        a.cloudName = controller.cloud.name;
+        a.platformType = controller.cloud.platform_type;
+        a.drillDownLink = this.getDrilldownLink(a.platformType, a.cloudId, a.controllerId);
+      }
       a.loaderName = `${controller.name}${controller.uuid}`;
-      a.drillDownLink = this.getDrilldownLink(a.platformType, a.cloudId, a.controllerId);
       controller.is_native ? viewData.nativeDockers.push(a) : viewData.dockerSwarms.push(a);
     });
     return viewData;

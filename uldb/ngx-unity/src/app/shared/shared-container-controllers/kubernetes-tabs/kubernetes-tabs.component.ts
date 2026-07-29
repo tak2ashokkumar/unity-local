@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap, UrlSegment, NavigationEnd } from '@angular/router';
+import { Router, ActivatedRoute, ParamMap, NavigationEnd } from '@angular/router';
 import { TabData } from 'src/app/shared/tabdata';
 import { Subscription } from 'rxjs';
+import { ContainerResourceSection } from '../container-resource-accordion/container-resource-accordion.component';
+import { KUBERNETES_RESOURCE_TABS, buildGlobalContainerSections } from '../container-resource-tabs.const';
 
 @Component({
   selector: 'kubernetes-tabs',
@@ -10,8 +12,10 @@ import { Subscription } from 'rxjs';
 })
 export class KubernetesTabsComponent implements OnInit {
   controllerId: string;
-  tabData: TabData[] = tabData;
+  tabData: TabData[] = KUBERNETES_RESOURCE_TABS;
   tabItems: TabData[] = [];
+  sections: ContainerResourceSection[] = [];
+  activeHeading: string;
   subscr: Subscription;
   constructor(private router: Router,
     private route: ActivatedRoute) {
@@ -24,32 +28,25 @@ export class KubernetesTabsComponent implements OnInit {
     });
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.controllerId = params.get('controllerId');
-      if (this.controllerId) {
-        this.buildTabItems();
-      }
+      this.buildTabItems();
     });
   }
 
   ngOnInit() { }
 
   buildTabItems() {
-    let url = this.router.url.split('?')[0];
-    let idx = url.indexOf(this.controllerId);
-    let base = idx > -1 ? url.substring(0, idx + this.controllerId.length) : url;
-    this.tabItems = this.tabData.map(t => ({ name: t.name, url: base + '/' + t.url }));
-  }
-
-  isActive(tab: TabData) {
-    const url = this.router.url.split('?')[0];
-    const isMatch = url.endsWith('/' + tab.url) || url.includes('/' + tab.url + '/');
-    return isMatch ? 'active text-success' : '';
-  }
-
-  goTo(tab: TabData) {
     if (this.controllerId) {
-      this.router.navigate([tab.url], { relativeTo: this.route });
+      let url = this.router.url.split('?')[0];
+      let idx = url.indexOf(this.controllerId);
+      let base = idx > -1 ? url.substring(0, idx + this.controllerId.length) : url;
+      this.tabItems = this.tabData.map(t => ({ name: t.name, url: base + '/' + t.url }));
+      this.sections = [{ heading: 'Kubernetes Resources', items: this.tabItems }];
     } else {
-      this.router.navigate(['/unitycloud/devices/kubernetes', tab.url]);
+      // Global Devices -> Containers: one accordion with both Kubernetes and Docker
+      // sections (only one open at a time), Kubernetes open by default. Docker items
+      // point at the separate global 'docker' route, so the URL reads docker/...
+      this.sections = buildGlobalContainerSections();
+      this.activeHeading = 'Kubernetes Resources';
     }
   }
 
@@ -58,24 +55,3 @@ export class KubernetesTabsComponent implements OnInit {
     this.router.navigate(['../'.repeat(backSteps)], { relativeTo: this.route });
   }
 }
-
-const tabData: TabData[] = [
-  { name: 'Nodes', url: 'nodes' },
-  { name: 'Pods', url: 'pods' },
-  { name: 'Namespaces', url: 'namespaces' },
-  { name: 'Deployments', url: 'deployments' },
-  { name: 'ReplicaSets', url: 'replicasets' },
-  { name: 'DaemonSets', url: 'daemonsets' },
-  { name: 'StatefulSets', url: 'statefulsets' },
-  { name: 'Services', url: 'services' },
-  { name: 'PersistentVolumes', url: 'persistentvolumes' },
-  { name: 'PersistentVolumeClaims', url: 'persistentvolumeclaims' },
-  { name: 'Events', url: 'events' },
-  { name: 'ControlPlane Components', url: 'controlplane-components' },
-  { name: 'StorageClasses', url: 'storageclasses' },
-  { name: 'Jobs', url: 'jobs' },
-  { name: 'CronJobs', url: 'cronjobs' },
-  { name: 'ResourceQuotas', url: 'resourcequotas' },
-  { name: 'HPAs', url: 'hpas' }
-];
-

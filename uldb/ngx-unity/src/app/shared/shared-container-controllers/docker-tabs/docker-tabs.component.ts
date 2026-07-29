@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap, UrlSegment, NavigationEnd } from '@angular/router';
+import { Router, ActivatedRoute, ParamMap, NavigationEnd } from '@angular/router';
 import { TabData } from 'src/app/shared/tabdata';
 import { Subscription } from 'rxjs';
+import { ContainerResourceSection } from '../container-resource-accordion/container-resource-accordion.component';
+import { DOCKER_RESOURCE_TABS, buildGlobalContainerSections } from '../container-resource-tabs.const';
 
 @Component({
   selector: 'docker-tabs',
@@ -10,8 +12,10 @@ import { Subscription } from 'rxjs';
 })
 export class DockerTabsComponent implements OnInit {
   controllerId: string;
-  tabData: TabData[] = tabData;
+  tabData: TabData[] = DOCKER_RESOURCE_TABS;
   tabItems: TabData[] = [];
+  sections: ContainerResourceSection[] = [];
+  activeHeading: string;
   subscr: Subscription;
   constructor(private router: Router,
     private route: ActivatedRoute) {
@@ -24,34 +28,25 @@ export class DockerTabsComponent implements OnInit {
     });
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.controllerId = params.get('controllerId');
-      if (this.controllerId) {
-        this.buildTabItems();
-      }
+      this.buildTabItems();
     });
   }
 
   ngOnInit() { }
 
   buildTabItems() {
-    let url = this.router.url.split('?')[0];
-    let idx = url.indexOf(this.controllerId);
-    let base = idx > -1 ? url.substring(0, idx + this.controllerId.length) : url;
-    this.tabItems = this.tabData.map(t => ({ name: t.name, url: base + '/' + t.url }));
-  }
-
-  isActive(tab: TabData) {
     if (this.controllerId) {
-      return this.router.url.match(tab.url) ? 'text-success' : '';
+      let url = this.router.url.split('?')[0];
+      let idx = url.indexOf(this.controllerId);
+      let base = idx > -1 ? url.substring(0, idx + this.controllerId.length) : url;
+      this.tabItems = this.tabData.map(t => ({ name: t.name, url: base + '/' + t.url }));
+      this.sections = [{ heading: 'Docker Resources', items: this.tabItems }];
     } else {
-      return this.router.url.match(tab.url) ? 'active text-success' : '';
-    }
-  }
-
-  goTo(tab: TabData) {
-    if (this.controllerId) {
-      this.router.navigate([tab.url], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['/unitycloud/devices/docker', tab.url]);
+      // Global Devices -> Containers: one accordion with both Kubernetes and Docker
+      // sections (only one open at a time), Docker open by default. Kubernetes items
+      // point at the separate global 'kubernetes' route.
+      this.sections = buildGlobalContainerSections();
+      this.activeHeading = 'Docker Resources';
     }
   }
 
@@ -60,15 +55,3 @@ export class DockerTabsComponent implements OnInit {
     this.router.navigate(['../'.repeat(backSteps)], { relativeTo: this.route });
   }
 }
-
-const tabData: TabData[] = [
-  {
-    name: 'Nodes',
-    url: 'dockernodes',
-  },
-  {
-    name: 'Containers',
-    url: 'dockercontainers',
-  },
-];
-

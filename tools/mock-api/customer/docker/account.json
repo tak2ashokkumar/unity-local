@@ -1,52 +1,48 @@
-{
-    "count": 1,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "id": 59,
-            "status": "0",
-            "tags": [],
-            "monitoring": {
-                "configured": true,
-                "observium": false,
-                "enabled": true,
-                "zabbix": true
-            },
-            "connection_type": "SSH",
-            "ip_address": "10.192.18.22",
-            "snmp_version": "v2c",
-            "snmp_community": null,
-            "snmp_authlevel": null,
-            "snmp_authname": null,
-            "snmp_authpass": null,
-            "snmp_authalgo": null,
-            "snmp_cryptopass": null,
-            "snmp_cryptoalgo": null,
-            "mtp_templates": [
-                14282
-            ],
-            "mon_connection_type": "SSH",
-            "mon_port": 3131,
-            "mon_credential_mode": "my_cred",
-            "mon_credential_id": null,
-            "mon_username": "vsekar",
-            "mon_password": "s70e71v1xCdS7U",
-            "alerts_notification_enabled": false,
-            "notify_alerts_to": [],
-            "uuid": "afdee4d4-5a27-4dd9-8508-3ece9c3528be",
-            "name": "docker-test",
-            "hostname": "http://10.192.18.22:2376",
-            "cert": "https://unity.unitedlayer.com/media/docker/417/blob_GQm7jj1",
-            "key": "https://unity.unitedlayer.com/media/docker/417/blob_TlomQO9",
-            "ca": "https://unity.unitedlayer.com/media/docker/417/blob_CjPeNYa",
-            "created_at": "2026-06-17T23:13:03.604770-07:00",
-            "updated_at": "2026-06-17T23:22:52.565489-07:00",
-            "cloud": 1016,
-            "aws_account": null,
-            "gcp_account": null,
-            "azure_account": null,
-            "user": 1881
-        }
-    ]
-}
+[
+    {
+        "id": 59,
+        "status": "0",
+        "tags": [],
+        "is_native": false,
+        "monitoring": {
+            "configured": true,
+            "observium": false,
+            "enabled": true,
+            "zabbix": true
+        },
+        "connection_type": "SSH",
+        "ip_address": "10.192.18.22",
+        "snmp_version": "v2c",
+        "snmp_community": null,
+        "snmp_authlevel": null,
+        "snmp_authname": null,
+        "snmp_authpass": null,
+        "snmp_authalgo": null,
+        "snmp_cryptopass": null,
+        "snmp_cryptoalgo": null,
+        "mtp_templates": [
+            14282
+        ],
+        "mon_connection_type": "SSH",
+        "mon_port": 3131,
+        "mon_credential_mode": "my_cred",
+        "mon_credential_id": null,
+        "mon_username": "vsekar",
+        "mon_password": "s70e71v1xCdS7U",
+        "alerts_notification_enabled": false,
+        "notify_alerts_to": [],
+        "uuid": "afdee4d4-5a27-4dd9-8508-3ece9c3528be",
+        "name": "docker-test",
+        "hostname": "http://10.192.18.22:2376",
+        "cert": "https://unity.unitedlayer.com/media/docker/417/blob_GQm7jj1",
+        "key": "https://unity.unitedlayer.com/media/docker/417/blob_TlomQO9",
+        "ca": "https://unity.unitedlayer.com/media/docker/417/blob_CjPeNYa",
+        "created_at": "2026-06-17T23:13:03.604770-07:00",
+        "updated_at": "2026-06-17T23:22:52.565489-07:00",
+        "cloud": null,
+        "aws_account": null,
+        "gcp_account": null,
+        "azure_account": null,
+        "user": 1881
+    }
+]

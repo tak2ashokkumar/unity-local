@@ -259,7 +259,7 @@ const tempRoute: Routes = [
         children: [
             ...DOCKER_TABS_CHILDREN,
             {
-                path: 'dockercontainers/:deviceid/zbx',
+                path: 'containers/:deviceid/zbx',
                 component: DockerContainersZabbixComponent,
                 data: { breadcrumb: { title: 'Docker Container', stepbackCount: 0 } },
                 children: ZABBIX_DOCKER_CONTAINER_ROUTES

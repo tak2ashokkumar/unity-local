@@ -107,7 +107,7 @@ export class UsiContainersListComponent implements OnInit, OnDestroy {
   }
 
   goToDetails(view: UsiContainersListViewdata) {
-    let firstTab = this.controllerType == CONTROLLER_TYPE_MAPPING.DOCKER ? 'dockernodes' : 'nodes';
+    let firstTab = 'nodes';
     this.router.navigate([view.controllerId, firstTab], { relativeTo: this.route });
   }
 

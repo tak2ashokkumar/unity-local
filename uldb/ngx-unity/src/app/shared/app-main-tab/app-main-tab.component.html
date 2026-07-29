@@ -23,7 +23,7 @@
   </ul> -->
   <ul class="nav nav-tabs tabs-level1 custom-nav-container" [ngClass]="{ 'no-bg mb-0 mt-4': removeBg }" #tabContent>
     <ng-template ngFor let-tabitem [ngForOf]="tabItems">
-      <li class="nav-item rounded-top tabs-level1-item" [ngClass]="isActive(tabitem.url)" (click)="goTo(tabitem)">
+      <li class="nav-item rounded-top tabs-level1-item" [ngClass]="isActive(tabitem.activeMatch || tabitem.url)" (click)="goTo(tabitem)">
         <a class="nav-link tabs-level1-link border-0"><i class="fa" *ngIf="tabitem.icon" [ngClass]="tabitem.icon">&nbsp;</i>{{tabitem.name}}</a>
       </li>
     </ng-template>

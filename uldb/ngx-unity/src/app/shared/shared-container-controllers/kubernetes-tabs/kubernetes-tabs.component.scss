@@ -1,0 +1,47 @@
+// Container-resource shell styling.
+// Scoped with :host ::ng-deep so it reaches ONLY the resource lists rendered in
+// THIS shell's <router-outlet> (they are DOM descendants of the emulated shell
+// host) and never any other listing page. ::ng-deep is the codebase's standard
+// piercing idiom and is required because the shell is ViewEncapsulation.Emulated
+// and the tables live in a routed child component.
+//
+// Intent: make the right-hand list panel read as a coordinated pair with the
+// left resource accordion by reusing the accordion's frame tokens on the card,
+// while keeping the table itself identical to the app's standard listing tables.
+:host ::ng-deep {
+
+  // Card frame -> adopt the accordion's exact frame tokens (border 1px #e6e9ec,
+  // radius 6px, shadow 0 1px 2px rgba(60,75,100,0.05)) so the two panels match.
+  // The resource cards ship Bootstrap's .rounded-0 (border-radius:0 !important)
+  // and, on Kubernetes lists, .border-top-0 (border-top:0 !important). Those are
+  // !important utilities, so border-radius and border-top can only be overridden
+  // by matching !important at higher specificity - the sole CSS-only way that
+  // avoids editing the 19 resource HTML files. !important is used on exactly
+  // those two declarations and nowhere else. No background is set, so light/dark
+  // theme keeps ownership of the card fill.
+  .card.rounded-0 {
+    border: 1px solid #e6e9ec;
+    border-top: 1px solid #e6e9ec !important; // beats Bootstrap .border-top-0
+    border-radius: 6px !important;            // beats Bootstrap .rounded-0
+    box-shadow: 0 1px 2px rgba(60, 75, 100, 0.05);
+  }
+
+  // Table stays canonical: header (#f0f3f5 via .bg-light), #dee2e6 separators,
+  // padding and typography are left exactly as every other listing renders them,
+  // so at rest these tables are identical to usum-users / firewalls. Only the
+  // hover transition is declared here; the hover colour is applied light-theme
+  // only below. Anchored on .table-sm + thead.bg-light, which are present on all
+  // unified lists and absent on the pods->containers drilldown, so the drilldown
+  // table keeps its own look.
+  table.table.table-sm tbody tr {
+    transition: background-color 0.13s ease;
+  }
+}
+
+// Light theme only: reuse the accordion's exact idle-hover grey (#f2f4f6) as a
+// whisper-subtle row hover so both panels answer the pointer the same way.
+// Guarded via :host-context to the light theme (the app toggles body.theme-dark)
+// so it never fights the dark-theme row colours in the global overrides.
+:host-context(body:not(.theme-dark)) ::ng-deep table.table.table-sm tbody tr:hover {
+  background-color: #f2f4f6;
+}

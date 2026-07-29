@@ -1,0 +1,13 @@
+<div class="resource-accordion" [ngClass]="{ 'multi-section': sections.length > 1 }">
+  <div class="resource-section" *ngFor="let section of sections">
+    <div class="accordion-header" (click)="toggle(section.heading)">
+      <span class="font-500">{{section.heading}}</span>
+      <i class="fa arrow" *ngIf="sections.length > 1"
+        [ngClass]="isSectionOpen(section.heading) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+    </div>
+    <div class="accordion-body" [ngClass]="{'active': isSectionOpen(section.heading)}">
+      <a class="resource-item text-truncate" *ngFor="let item of section.items" [routerLink]="item.url"
+        routerLinkActive="active" [tooltip]="item.name">{{item.name}}</a>
+    </div>
+  </div>
+</div>

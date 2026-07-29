@@ -174,7 +174,7 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
 
   goTo(view: ContainerControllerViewdata) {
     if (view.controllerType == CONTROLLER_TYPE_MAPPING.DOCKER) {
-      this.router.navigate(['docker', view.controllerId, 'dockernodes'], { relativeTo: this.route });
+      this.router.navigate(['docker', view.controllerId, 'nodes'], { relativeTo: this.route });
     } else {
       this.router.navigate(['kubernetes', view.controllerId, 'nodes'], { relativeTo: this.route });
     }

@@ -24,15 +24,13 @@ import { KubernetesStorageclassesComponent } from './kubernetes-storageclasses/k
 // Datacenter -> Private Cloud and Unity Setup -> Integration. Docker container-level monitoring
 // (zabbix) is NOT included here; united-cloud adds it on top of these children where needed.
 export const DOCKER_TABS_CHILDREN: Routes = [
-    { path: 'dockernodes', component: DockerNodesComponent, data: { breadcrumb: { title: 'Docker Nodes', stepbackCount: 0 } } },
-    { path: 'dockercontainers', component: DockerContainerComponent, data: { breadcrumb: { title: 'Docker Containers', stepbackCount: 0 } } }
+    { path: 'nodes', component: DockerNodesComponent, data: { breadcrumb: { title: 'Docker Nodes', stepbackCount: 0 } } },
+    { path: 'containers', component: DockerContainerComponent, data: { breadcrumb: { title: 'Docker Containers', stepbackCount: 0 } } }
 ];
 
 // Children of the Kubernetes controller details page (KubernetesTabsComponent). The 17 resource
 // tabs are defined once here and reused across all three container locations.
 export const KUBERNETES_TABS_CHILDREN: Routes = [
-    { path: 'dockernodes', component: DockerNodesComponent, data: { breadcrumb: { title: 'Docker Nodes', stepbackCount: 0 } } },
-    { path: 'dockercontainers', component: DockerContainerComponent, data: { breadcrumb: { title: 'Docker Containers', stepbackCount: 0 } } },
     { path: 'pods', component: KubernetesPodsComponent, data: { breadcrumb: { title: 'Pods', stepbackCount: 0 } } },
     {
         path: 'pods/:podId', data: { breadcrumb: { title: 'Pods', stepbackCount: 1 } },

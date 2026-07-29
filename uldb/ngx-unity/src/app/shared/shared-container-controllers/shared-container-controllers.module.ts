@@ -24,11 +24,15 @@ import { KubernetesServicesComponent } from './kubernetes-services/kubernetes-se
 import { KubernetesStatefulsetsComponent } from './kubernetes-statefulsets/kubernetes-statefulsets.component';
 import { KubernetesStorageclassesComponent } from './kubernetes-storageclasses/kubernetes-storageclasses.component';
 import { KubernetesTabsComponent } from './kubernetes-tabs/kubernetes-tabs.component';
+import { ContainerResourceAccordionComponent } from './container-resource-accordion/container-resource-accordion.component';
+import { ContainerResourceBackBtnComponent } from './container-resource-back-btn/container-resource-back-btn.component';
 
 // Container resource-DISPLAY components (Kubernetes/Docker detail tabs and resource lists).
 // Lives under app/shared so ANY lazy feature module can render container detail pages by
 // importing just this small module - without pulling in the heavy UnitedCloudSharedModule.
 const COMPONENTS = [
+  ContainerResourceAccordionComponent,
+  ContainerResourceBackBtnComponent,
   KubernetesTabsComponent,
   KubernetesNodesComponent,
   KubernetesPodsComponent,

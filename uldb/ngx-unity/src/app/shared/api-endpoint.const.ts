@@ -80,7 +80,7 @@ export const POLL_PRIVATE_CLOUD_UPDATE = (pcId: string) => `customer/private_clo
 
 export const PRIVATE_CLOUD_CUSTOM_DEVICES = (uuid: string) => CUSTOM_DEVICES(uuid);
 
-export const PRIVATE_CLOUD_CONTAINERS = (uuid: string) => `customer/kubernetes/account/?cloud_uuid=${uuid}`;
+export const PRIVATE_CLOUD_CONTAINERS = (uuid: string) => `customer/kubernetes/accounts/?cloud_uuid=${uuid}`;
 
 export const PRIVATE_CLOUD_CONTAINERS_PODS = (uuid: string) => `customer/kubernetes/pods/?cloud_uuid=${uuid}`;
 
@@ -1288,13 +1288,13 @@ export const DELETE_DOCKER_NODE = (nodeId: string) => `customer/docker/nodes/${n
 export const GET_DOCKER_CONTROLLERS = () => `/customer/docker/account`;
 
 export const GET_DOCKER_CONTROLLERS_BY_CLOUD_TYPE_AND_ID = (type: string, uuid: string) => {
-    const KUBERNETES_BASE_URL = `/customer/docker/account`
+    const DOCKER_BASE_URL = `/customer/docker/account/`
     switch (type) {
-        case 'AWS': return `${KUBERNETES_BASE_URL}/?aws_uuid=${uuid}&page_size=0`;
-        case 'GCP': return `${KUBERNETES_BASE_URL}/?gcp_uuid=${uuid}&page_size=0`;
-        case 'Azure': return `${KUBERNETES_BASE_URL}/?azure_uuid=${uuid}&page_size=0`;
+        case 'AWS': return `${DOCKER_BASE_URL}?aws_uuid=${uuid}&page_size=0`;
+        case 'GCP': return `${DOCKER_BASE_URL}?gcp_uuid=${uuid}&page_size=0`;
+        case 'Azure': return `${DOCKER_BASE_URL}?azure_uuid=${uuid}&page_size=0`;
         default:
-            return `${KUBERNETES_BASE_URL}/?cloud_uuid=${uuid}&page_size=0`;
+            return `${DOCKER_BASE_URL}?cloud_uuid=${uuid}&page_size=0`;
             break;
     }
 }
@@ -1306,56 +1306,48 @@ export const DELETE_DOCKER_CONTROLLER = (controllerId: string) => `/customer/doc
 
 export const CHANGE_DOCKER_CREDENTIALS = (controllerId: string) => `customer/docker/account/${controllerId}/change_password/`;
 
-export const GET_KUBERNETES_CONTROLLERS = () => `/customer/kubernetes/account`;
-
-// export const GET_KUBERNETE_CONTROLLERS = (urlParam: string, accountId: string) => {
-//     if(urlParam){
-//         return `/customer/kubernetes/account/?${urlParam}=${accountId}`;
-//     }else{
-//         return `/customer/kubernetes/account`;
-//     }
-// };
+export const GET_KUBERNETES_CONTROLLERS = () => `/customer/kubernetes/accounts/`;
 
 export const GET_KUBERNETES_CONTROLLERS_BY_CLOUD_TYPE_AND_ID = (type: string, uuid: string) => {
-    const KUBERNETES_BASE_URL = `/customer/kubernetes/account`
+    const KUBERNETES_BASE_URL = `customer/kubernetes/accounts/`;
     switch (type) {
-        case 'AWS': return `${KUBERNETES_BASE_URL}/?aws_uuid=${uuid}&page_size=0`;
-        case 'GCP': return `${KUBERNETES_BASE_URL}/?gcp_uuid=${uuid}&page_size=0`;
-        case 'Azure': return `${KUBERNETES_BASE_URL}/?azure_uuid=${uuid}&page_size=0`;
+        case 'AWS': return `${KUBERNETES_BASE_URL}?aws_uuid=${uuid}&page_size=0`;
+        case 'GCP': return `${KUBERNETES_BASE_URL}?gcp_uuid=${uuid}&page_size=0`;
+        case 'Azure': return `${KUBERNETES_BASE_URL}?azure_uuid=${uuid}&page_size=0`;
         default:
-            return `${KUBERNETES_BASE_URL}/?cloud_uuid=${uuid}&page_size=0`;
+            return `${KUBERNETES_BASE_URL}?cloud_uuid=${uuid}&page_size=0`;
             break;
     }
 }
-export const ADD_KUBERNETES_CONTROLLER = () => `/customer/kubernetes/account/`;
+export const ADD_KUBERNETES_CONTROLLER = () => `/customer/kubernetes/accounts/`;
 
-export const UPDATE_KUBERNETES_CONTROLLER = (controllerId: string) => `/customer/kubernetes/account/${controllerId}/`;
+export const UPDATE_KUBERNETES_CONTROLLER = (controllerId: string) => `/customer/kubernetes/accounts/${controllerId}/`;
 
-export const DELETE_KUBERNETES_CONTROLLER = (controllerId: string) => `/customer/kubernetes/account/${controllerId}`;
+export const DELETE_KUBERNETES_CONTROLLER = (controllerId: string) => `/customer/kubernetes/accounts/${controllerId}`;
 
-export const CHANGE_CONTROLLER_PASSWORD = (controllerId: string) => `customer/kubernetes/account/${controllerId}/change_password/`;
+export const CHANGE_CONTROLLER_PASSWORD = (controllerId: string) => `customer/kubernetes/accounts/${controllerId}/change_password/`;
 
 
-export const GET_AWS_KUBERNETES_CONTROLLERS = (accountId: string) => `/customer/kubernetes/account/?aws_id=${accountId}`;
+export const GET_AWS_KUBERNETES_CONTROLLERS = (accountId: string) => `/customer/kubernetes/accounts/?aws_id=${accountId}`;
 
-export const ADD_AWS_KUBERNETES_CONTROLLERS = () => `/customer/kubernetes/account/`;
+export const ADD_AWS_KUBERNETES_CONTROLLERS = () => `/customer/kubernetes/accounts/`;
 
-export const UPDATE_AWS_KUBERNETES_CONTROLLERS = (controllerId: string) => `/customer/kubernetes/account/${controllerId}/`;
+export const UPDATE_AWS_KUBERNETES_CONTROLLERS = (controllerId: string) => `/customer/kubernetes/accounts/${controllerId}/`;
 
-export const DELETE_AWS_KUBERNETES_CONTROLLER = (controllerId: string) => `/customer/kubernetes/account/${controllerId}`;
+export const DELETE_AWS_KUBERNETES_CONTROLLER = (controllerId: string) => `/customer/kubernetes/accounts/${controllerId}`;
 
-export const GET_GCP_KUBERNETES_CONTROLLERS = (accountId: string) => `/customer/kubernetes/account/?gcp_uuid=${accountId}`;
+export const GET_GCP_KUBERNETES_CONTROLLERS = (accountId: string) => `/customer/kubernetes/accounts/?gcp_uuid=${accountId}`;
 
-export const ADD_GCP_KUBERNETES_CONTROLLERS = () => `/customer/kubernetes/account/`;
+export const ADD_GCP_KUBERNETES_CONTROLLERS = () => `/customer/kubernetes/accounts/`;
 
-export const UPDATE_GCP_KUBERNETES_CONTROLLERS = (controllerId: string) => `/customer/kubernetes/account/${controllerId}/`;
+export const UPDATE_GCP_KUBERNETES_CONTROLLERS = (controllerId: string) => `/customer/kubernetes/accounts/${controllerId}/`;
 
-export const DELETE_GCP_KUBERNETES_CONTROLLER = (controllerId: string) => `/customer/kubernetes/account/${controllerId}`;
+export const DELETE_GCP_KUBERNETES_CONTROLLER = (controllerId: string) => `/customer/kubernetes/accounts/${controllerId}`;
 
 export const CONTAINER_CONTROLLER_BY_ID_AND_TYPE = (svcId: string, type: CONTROLLER_TYPE_MAPPING) => {
     switch (type) {
-        case CONTROLLER_TYPE_MAPPING.KUBERNETES: return `customer/kubernetes/account/${svcId}/?`;
-        case CONTROLLER_TYPE_MAPPING.DOCKER: return `customer/docker/account/${svcId}/`;
+        case CONTROLLER_TYPE_MAPPING.KUBERNETES: return `customer/kubernetes/accounts/${svcId}/?`;
+        case CONTROLLER_TYPE_MAPPING.DOCKER: return `customer/docker/accounts/${svcId}/`;
 
         default: console.error('Invalid type : ', type);
             break;
@@ -1397,7 +1389,7 @@ export const MESH_SERVICE_MANAGER_BY_ID_AND_TYPE = (svcId: string, type: MESH_SE
     switch (type) {
         case MESH_SERVICE_TYPE_MAPPING.ANTHOS: return `customer/gcp/account/${svcId}/?service_mesh=True`;
         case MESH_SERVICE_TYPE_MAPPING.AWS: return `customer/aws/${svcId}/?service_mesh=True`;
-        case MESH_SERVICE_TYPE_MAPPING.ISTIO: return `customer/kubernetes/account/${svcId}/?service_mesh=True`;
+        case MESH_SERVICE_TYPE_MAPPING.ISTIO: return `customer/kubernetes/accounts/${svcId}/?service_mesh=True`;
 
         default: console.error('Invalid type : ', type);
             break;
@@ -1457,7 +1449,7 @@ export const GET_MESH_SERVICE_WIDGET_DATA = (svcId: string, type: MESH_SERVICE_T
     switch (type) {
         case MESH_SERVICE_TYPE_MAPPING.ANTHOS: return `customer/gcp/account/${svcId}/get_traffic_director_widget_data/`;
         case MESH_SERVICE_TYPE_MAPPING.AWS: return `customer/aws/${svcId}/app_mesh_widget/`;
-        case MESH_SERVICE_TYPE_MAPPING.ISTIO: return `customer/kubernetes/account/${svcId}/get_widget_status/`;
+        case MESH_SERVICE_TYPE_MAPPING.ISTIO: return `customer/kubernetes/accounts/${svcId}/get_widget_status/`;
 
         default: console.error('Invalid type : ', type);
             break;
@@ -1468,15 +1460,15 @@ export const AWS_VIRTUAL_ROUTERS = (accountId: string, regionId: string, meshNam
 
 export const AWS_VIRTUAL_NODES = (accountId: string, regionId: string, meshName: string, nodeName: string) => `customer/aws/${accountId}/region/${regionId}/app_mesh/${meshName}/virtual_services/${nodeName}/virtual_node`;
 
-export const GET_ISTIO_VIRTUAL_SERVICE = (meshId: string) => `customer/kubernetes/account/${meshId}/list_virtual_services/`;
+export const GET_ISTIO_VIRTUAL_SERVICE = (meshId: string) => `customer/kubernetes/accounts/${meshId}/list_virtual_services/`;
 
-export const GET_ISTIO_DESTINATION_RULES = (meshId: string, namespace: string) => `customer/kubernetes/account/${meshId}/list_destination_rules/?namespace=${namespace}`;
+export const GET_ISTIO_DESTINATION_RULES = (meshId: string, namespace: string) => `customer/kubernetes/accounts/${meshId}/list_destination_rules/?namespace=${namespace}`;
 
-export const GET_ISTIO_SERVICES = (meshId: string, namespace: string) => `customer/kubernetes/account/${meshId}/list_services/?namespace=${namespace}`;
+export const GET_ISTIO_SERVICES = (meshId: string, namespace: string) => `customer/kubernetes/accounts/${meshId}/list_services/?namespace=${namespace}`;
 
-export const GET_ISTIO_SERVICE_PODS = (meshId: string, namespace: string, serviceName: string) => `customer/kubernetes/account/${meshId}/list_service_pods/?namespace=${namespace}&service_name=${serviceName}`;
+export const GET_ISTIO_SERVICE_PODS = (meshId: string, namespace: string, serviceName: string) => `customer/kubernetes/accounts/${meshId}/list_service_pods/?namespace=${namespace}&service_name=${serviceName}`;
 
-export const GET_ISTIO_SERVICE_CONTAINERS = (meshId: string, namespace: string, podName: string) => `customer/kubernetes/account/${meshId}/get_containers/?namespace=${namespace}&pod_name=${podName}`;
+export const GET_ISTIO_SERVICE_CONTAINERS = (meshId: string, namespace: string, podName: string) => `customer/kubernetes/accounts/${meshId}/get_containers/?namespace=${namespace}&pod_name=${podName}`;
 
 export const AWS_BACKEND_VIRTUAL_NODES = (accountId: string, regionId: string, meshName: string, nodeName: string) => AWS_VIRTUAL_NODES(accountId, regionId, meshName, nodeName);
 
@@ -1526,7 +1518,7 @@ export const GET_TRAFFIC_DIRECTORS_NETWORK_DATA = (meshId: string, serviceName: 
 
 export const GET_AWS_NETWORK_GRAPH_DATA = (accountId: string, regionId: string, meshName: string) => `customer/aws/${accountId}/region/${regionId}/app_mesh/${meshName}/service_tree_view_data`;
 
-export const GET_ISTIO_NETWORK_GRAPH_DATA = (accountId: string, namespace: string, gateway: string) => `customer/kubernetes/account/${accountId}/get_service_tree_view_data/?namespace=${namespace}&virtual_service=${gateway}`;
+export const GET_ISTIO_NETWORK_GRAPH_DATA = (accountId: string, namespace: string, gateway: string) => `customer/kubernetes/accounts/${accountId}/get_service_tree_view_data/?namespace=${namespace}&virtual_service=${gateway}`;
 
 export const UPDATE_VM_MGMT_IP = (vmId: string, type: PlatFormMapping) => {
     switch (type) {
@@ -1563,13 +1555,13 @@ export const UPDATE_DEVICE_TAGS = (deviceType: DeviceMapping, deviceId: string,)
     }
 };
 
-export const GET_DASHBOARD_KUBERNETES_CONTROLLERS = () => `customer/kubernetes/account/get_kubernetes_controller_fast/`;
+export const GET_DASHBOARD_KUBERNETES_CONTROLLERS = () => `customer/kubernetes/accounts/?page_size=0`;
 
-export const GET_DASHBOARD_KUBERNETES_CONTROLLER_WIDGET_DATA = (controllerId: string) => `customer/kubernetes/account/${controllerId}/get_kubernetes_widget_data/`;
+export const GET_DASHBOARD_KUBERNETES_CONTROLLER_WIDGET_DATA = (controllerId: string) => `customer/kubernetes/accounts/${controllerId}/get_kubernetes_widget_data/`;
 
-export const GET_ISTIO_VIRTUAL_SERVICE_STATUS = (meshId: string, serviceName: string, namespace: string) => `/customer/kubernetes/account/${meshId}/get_virtual_service_status/?namespace=${namespace}&virtual_service=${serviceName}&service_mesh=True`;
+export const GET_ISTIO_VIRTUAL_SERVICE_STATUS = (meshId: string, serviceName: string, namespace: string) => `/customer/kubernetes/accounts/${meshId}/get_virtual_service_status/?namespace=${namespace}&virtual_service=${serviceName}&service_mesh=True`;
 
-export const GET_ISTIO_SERVICE_STATUS = (meshId: string, serviceName: string, namespace: string) => `/customer/kubernetes/account/${meshId}/get_service_status/?namespace=${namespace}&service_name=${serviceName}&service_mesh=True`;
+export const GET_ISTIO_SERVICE_STATUS = (meshId: string, serviceName: string, namespace: string) => `/customer/kubernetes/accounts/${meshId}/get_service_status/?namespace=${namespace}&service_name=${serviceName}&service_mesh=True`;
 
 export const MESH_MAP_VM = (meshId: string) => `customer/gcp/tfd_nw_endpoints/${meshId}/map_cloud_vm/`;
 
@@ -1750,7 +1742,7 @@ export const CLOUD_COST_GCP_SUMMARY_DATA = () => `/customer/cloudbilling/gcp/sum
 
 export const GET_SERVICE_PROVIDERS = () => `customer/service_catalogues/providers/`;
 
-export const GET_DASHBOARD_DOCKERS_CONTROLLERS = () => `customer/docker/account/get_docker_controller_fast/`;
+export const GET_DASHBOARD_DOCKERS_CONTROLLERS = () => `customer/docker/account/?page_size=0`;
 
 export const GET_DASHBOARD_DOCKERS_CONTROLLER_WIDGET_DATA = (controllerId: string) => `customer/docker/account/${controllerId}/get_docker_widget_data/`;
 
