@@ -104,8 +104,8 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       DeviceMapping.VMWARE_VIRTUAL_MACHINE,
       DeviceMapping.RFID_READER
     ]);
-    this.isAPIOptionRequired = apiDeviceTypes.has(this.device?.deviceType) || this.device?.hasPureOs;
-    this.isAgentOptionRequired = !(this.device?.isCluster || this.device?.hasPureOs || this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT || this.device?.deviceType == DeviceMapping.SENSOR || this.device?.deviceType == DeviceMapping.SMART_PDU || this.device?.deviceType == DeviceMapping.RFID_READER);
+    this.isAPIOptionRequired = apiDeviceTypes.has(this.device?.deviceType) || this.device?.hasPureOs || this.device?.devicePlatform === 'Dell Storage';
+    this.isAgentOptionRequired = !(this.device?.deviceType == DeviceMapping.STORAGE_DEVICES || this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT || this.device?.deviceType == DeviceMapping.SENSOR || this.device?.deviceType == DeviceMapping.SMART_PDU || this.device?.deviceType == DeviceMapping.RFID_READER);
     this.isSNMPOptionRequired = !(this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT);
     this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
 
@@ -199,7 +199,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.nonFieldErr = '';
     this.showSNMPTrap = this.device.deviceType == DeviceMapping.STORAGE_DEVICES &&
       this.monitoringDetails.is_snmptrap_enabled != null;
-    this.form = this.configSvc.buildForm(this.monitoringDetails, this.device.deviceType, this.onPublicCloudVmConfig);
+    this.form = this.configSvc.buildForm(this.monitoringDetails, this.device.deviceType, this.onPublicCloudVmConfig, this.device.devicePlatform);
     this.formErrors = this.configSvc.resetFormErrors();
     this.formValidationMessages = this.configSvc.switchValidationMessages;
     const connectionTypeValue = this.form.get('connection_type')?.value;
@@ -224,7 +224,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     } else if (this.form.get('connection_type').value == "API") {
       this.form.removeControl('ip_address');
       this.form.removeControl('mtp_templates');
-      this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs;
+      this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs || this.device.devicePlatform === 'Dell Storage';
       this.showSNMPTrap = false;
     } else {
       if (!this.deviceId) {
@@ -272,9 +272,14 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       } else if (val == 'API') {
         this.configSvc.clearSshWinRmFields();
         this.onPublicCloudVmConfig && this.form.removeControl('collector');
-        this.configSvc.setAPIField();
-        this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs;
         this.showSNMPTrap = false;
+        if (this.device.devicePlatform === 'Dell Storage') {
+          this.configSvc.setStorageAPIFields();
+          this.formButtons = true;
+        } else {
+          this.configSvc.setAPIField();
+          this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs;
+        }
       } else if ((val === 'SSH' || val === 'WinRM') && this.isWmiSshOptionRequired) {
         this.configSvc.setSshWinRmFields(val);
         this.form.patchValue({

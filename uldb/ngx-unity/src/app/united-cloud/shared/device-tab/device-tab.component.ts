@@ -132,6 +132,7 @@ export class DeviceTabComponent implements OnInit, OnDestroy {
 export interface DeviceTabData {
   name: string;
   deviceType: DeviceMapping;
+  devicePlatform?: string;
   configured?: boolean;
   monitoringEnabled?: boolean;
   uuid?: string;

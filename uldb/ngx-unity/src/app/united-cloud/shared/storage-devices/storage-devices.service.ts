@@ -61,22 +61,26 @@ export class StorageDevicesService {
 
       a.editBtnTooltipMsg = 'Edit';
       a.deleteBtnTooltipMsg = 'Delete';
-      if (s.status) {
-        a.deviceStatus = this.utilService.getDeviceStatus(s.status);
-      }
 
       if (s.is_cluster) {
+        // for for Ontap / Nimble storage devices.
+        a.storageType = 'Ontap`';
         a.isCluster = true;
         a.detailIconEnabled = true;
         a.detailsTooltipMessage = 'View Details';
       } else if (s.is_purity) {
+        // for pure storage devices.
+        a.storageType = 'Pure Storage';
         a.hasPureOs = true;
         a.detailIconEnabled = true;
         a.detailsTooltipMessage = 'View Details';
+      } else if (s.manufacturer && s.manufacturer.name.toLowerCase().includes('dell')) {
+        a.storageType = 'Dell Storage';
       } else {
-        a.isCluster = false;
-        a.detailIconEnabled = false;
         a.detailsTooltipMessage = 'Device is neither of Cluster type nor has Pure OS.';
+      }
+      if (s.status) {
+        a.deviceStatus = this.utilService.getDeviceStatus(s.status);
       }
 
       if (this.user.isManagementEnabled) {
@@ -188,7 +192,7 @@ export class StorageDeviceViewData {
   deviceId: string;
   name: string;
   deviceStatus: string;
-  type: string;
+  storageType: string;
   os: string;
   cloud: string;
   managementIp: string;
@@ -229,12 +233,12 @@ export class StorageDeviceViewData {
 
   monitoring: DeviceMonitoringType;
 
-  isCluster: boolean;
-  hasPureOs: boolean;
+  isCluster: boolean = false;
+  hasPureOs: boolean = false;
   // clusterDetailIconEnabled: boolean;
   // clusterDetailsTooltipMessage: string;
 
-  detailIconEnabled: boolean;
+  detailIconEnabled: boolean = false;
   detailsTooltipMessage: string;
 
   isSelected: boolean;

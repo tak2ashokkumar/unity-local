@@ -195,7 +195,7 @@ export class StorageDevicesComponent implements OnInit, OnDestroy {
       return;
     }
     this.saveCriteria();
-    this.storageService.put('device', { name: view.name, deviceType: DeviceMapping.STORAGE_DEVICES, configured: view.monitoring.configured, isCluster: view.isCluster, hasPureOs: view.hasPureOs, redfish: view.redfish }, StorageType.SESSIONSTORAGE);
+    this.storageService.put('device', { name: view.name, deviceType: DeviceMapping.STORAGE_DEVICES, configured: view.monitoring.configured, isCluster: view.isCluster, hasPureOs: view.hasPureOs, redfish: view.redfish, devicePlatform: view.storageType }, StorageType.SESSIONSTORAGE);
     // this.router.navigate([view.deviceId, 'zbx', 'details'], { relativeTo: this.route });
     if (view.redfish) {
       this.router.navigate([view.deviceId, 'zbx', 'overview'], { relativeTo: this.route });
@@ -206,7 +206,7 @@ export class StorageDevicesComponent implements OnInit, OnDestroy {
 
   goToStats(view: StorageDeviceViewData) {
     this.saveCriteria();
-    this.storageService.put('device', { name: view.name, deviceType: DeviceMapping.STORAGE_DEVICES, configured: view.monitoring.configured, isCluster: view.isCluster, hasPureOs: view.hasPureOs, redfish: view.redfish }, StorageType.SESSIONSTORAGE);
+    this.storageService.put('device', { name: view.name, deviceType: DeviceMapping.STORAGE_DEVICES, configured: view.monitoring.configured, isCluster: view.isCluster, hasPureOs: view.hasPureOs, redfish: view.redfish, devicePlatform: view.storageType }, StorageType.SESSIONSTORAGE);
     if (view.monitoring.observium) {
       if (view.monitoring.configured && view.monitoring.enabled) {
         this.router.navigate([view.deviceId, 'obs', 'overview'], { relativeTo: this.route });

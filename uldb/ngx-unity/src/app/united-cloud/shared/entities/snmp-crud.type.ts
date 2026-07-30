@@ -21,6 +21,11 @@ export interface SNMPCrudType {
     mon_credential_id?: string;
     mon_username?: string;
     mon_password?: string;
+    // adding for API Connection Type for Storage platform == 'Dell Storage'
+    host_url?: string;
+    username?: string;
+    password?: string;
+    port?: number;
 }
 
 export interface CollectorType {

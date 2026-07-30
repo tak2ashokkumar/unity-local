@@ -91,7 +91,7 @@ export class DevicesMonitoringConfigService {
     return formData;
   }
 
-  buildForm(obj: SNMPCrudType, deviceType?: string, onPublicCloudVmConfig?: boolean) {
+  buildForm(obj: SNMPCrudType, deviceType?: string, onPublicCloudVmConfig?: boolean, devicePlatform?: string) {
     //TODO:Remove after server side fixed
     if (obj?.mon_connection_type === 'SSH' || obj?.mon_connection_type === 'WinRM') {
       this.form = this.builder.group({
@@ -153,12 +153,18 @@ export class DevicesMonitoringConfigService {
     } else if (this.form.get('connection_type').value == 'Agent') {
       this.form.addControl('ip_address', new FormControl({ value: (obj && obj.ip_address) ? obj.ip_address : '', disabled: false }, [Validators.required, NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]));
       this.form.addControl('mtp_templates', new FormControl(obj && obj.mtp_templates ? obj.mtp_templates : [], [Validators.required]));
+    } else if (this.form.get('connection_type').value == 'API' && devicePlatform === 'Dell Storage') {
+      this.form.addControl('host_url', new FormControl({ value: (obj && obj.host_url) ? obj.host_url : '', disabled: false }, [Validators.required, NoWhitespaceValidator]));
+      this.form.addControl('username', new FormControl({ value: (obj && obj.username) ? obj.username : '', disabled: false }, [Validators.required, NoWhitespaceValidator]));
+      this.form.addControl('password', new FormControl({ value: (obj && obj.password) ? obj.password : '', disabled: false }, [Validators.required, NoWhitespaceValidator]));
+      this.form.addControl('port', new FormControl({ value: (obj && obj.port) ? obj.port : '', disabled: false }, [NoWhitespaceValidator]));
     }
     if (onPublicCloudVmConfig && (this.form.get('connection_type').value == 'SNMP' || this.form.get('connection_type').value == 'Agent')) {
       this.form.addControl('collector', this.builder.group({
         uuid: [obj?.collector ? obj.collector.uuid : '', [Validators.required]]
       }));
     }
+    console.log('form', this.form.getRawValue());
     return this.form;
   }
 
@@ -227,25 +233,21 @@ export class DevicesMonitoringConfigService {
     this.form.get('snmp_cryptopass') ? this.form.removeControl('snmp_cryptopass') : null;
   }
 
+  private addStorageAPIFields(val?: SNMPCrudType) {
+    this.form.get('host_url') ? null : this.form.addControl('host_url', new FormControl(val && val.host_url ? val.host_url : '',
+      [NoWhitespaceValidator, Validators.required]));
+    this.form.get('username') ? null : this.form.addControl('username', new FormControl(val && val.username ? val.username : '',
+      [NoWhitespaceValidator, Validators.required]));
+    this.form.get('password') ? null : this.form.addControl('password', new FormControl(val && val.password ? val.password : '',
+      [NoWhitespaceValidator, Validators.required]));
+    this.form.get('port') ? null : this.form.addControl('port', new FormControl(val && val.port ? val.port : '',
+      [NoWhitespaceValidator]));
+  }
+
   setSnmpFields() {
+    this.removeStorageAPIFields();
     this.addIpandtemplateField();
     this.addSnmpField();
-  }
-
-  setAgentField() {
-    this.addIpandtemplateField();
-    this.removeSnmpField();
-    this.removeV1_V2Field();
-    this.removeAuthLevelField();
-    return this.form;
-  }
-
-  setHTTPField() {
-    this.addIpandtemplateField();
-    this.removeSnmpField();
-    this.removeV1_V2Field();
-    this.removeAuthLevelField();
-    return this.form;
   }
 
   setV3Fields() {
@@ -284,12 +286,47 @@ export class DevicesMonitoringConfigService {
     return this.form;
   }
 
+  setAgentField() {
+    this.addIpandtemplateField();
+    this.removeSnmpField();
+    this.removeV1_V2Field();
+    this.removeAuthLevelField();
+    this.removeStorageAPIFields();
+    return this.form;
+  }
+
+  setHTTPField() {
+    this.addIpandtemplateField();
+    this.removeSnmpField();
+    this.removeV1_V2Field();
+    this.removeAuthLevelField();
+    this.removeStorageAPIFields();
+    return this.form;
+  }
+
   setAPIField() {
     this.removeIpAndTemplateField();
     this.removeSnmpField();
     this.removeV1_V2Field();
     this.removeAuthLevelField();
+    this.removeStorageAPIFields();
     return this.form;
+  }
+
+  setStorageAPIFields() {
+    this.addStorageAPIFields();
+    this.removeIpAndTemplateField();
+    this.removeSnmpField();
+    this.removeV1_V2Field();
+    this.removeAuthLevelField();
+    return this.form;
+  }
+
+  removeStorageAPIFields() {
+    this.form.get('host_url') ? this.form.removeControl('host_url') : null;
+    this.form.get('username') ? this.form.removeControl('username') : null;
+    this.form.get('password') ? this.form.removeControl('password') : null;
+    this.form.get('port') ? this.form.removeControl('port') : null;
   }
 
   setSshWinRmFields(connectionType: 'SSH' | 'WinRM') {
@@ -299,7 +336,7 @@ export class DevicesMonitoringConfigService {
     this.removeAuthNameField();
     this.removeAuthFields();
     this.removeCryptoFields();
-
+    this.removeStorageAPIFields();
     this._preservedIpAddress = this.form.get('ip_address')?.value || '';
     this.form.get('ip_address') ? this.form.removeControl('ip_address') : null;
     // this.form.get('mtp_templates') ? this.form.removeControl('mtp_templates') : null;
