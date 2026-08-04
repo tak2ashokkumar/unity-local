@@ -63,12 +63,12 @@
                                             elementType="actionbtn">
                                         </button>
 
-                                        <button *ngIf="view"
+                                        <button *ngIf="view?.showRemoteWebAccessButton"
                                             class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
-                                            [tooltip]="view.newTabTooltipMessage"
-                                            [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}"
-                                            (click)="webAccessNewTab(view)" accessControl moduleName="Private Cloud"
-                                            accessType="Manage Private Cloud" elementType="actionbtn"></button>
+                                            [tooltip]="remoteWebLaunching ? 'Opening Remote Web Viewer' : view.newTabTooltipMessage"
+                                            [disabled]="remoteWebLaunching"
+                                            [ngClass]="{'action-icons-disabled': remoteWebLaunching || !view.isNewTabEnabled}"
+                                            (click)="webAccessNewTab(view)"></button>
 
                                         <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
                                             tooltip="Manage by creating support ticket"

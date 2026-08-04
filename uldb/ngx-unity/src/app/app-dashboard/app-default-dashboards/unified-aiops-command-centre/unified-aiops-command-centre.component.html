@@ -34,7 +34,9 @@
             <div class="filter-control">
                 <label>Time Range</label>
                 <custom-date-dropdown [options]="timeRangeOptions" [enableCustomDateRange]="true"
-                    [default]="selectedTimeRange" (onSubmit)="onTimeRangeChange($event)">
+                    [default]="selectedTimeRange" [customClass]="'form-control-sm'" [emitOnInit]="false"
+                    [emitOnExternalChanges]="false" [viewportSafePopup]="true"
+                    [popupPanelClass]="'unified-aiops-dashboard-date-popup'" (onSubmit)="onTimeRangeChange($event)">
                 </custom-date-dropdown>
             </div>
             <button class="round-action-btn" type="button" (click)="applyFilters()" [tooltip]="'Apply Filters'"

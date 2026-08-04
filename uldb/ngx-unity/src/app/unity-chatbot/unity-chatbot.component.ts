@@ -170,7 +170,12 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
       this.isDashboard();
     }
     if (this.userInfoService.isChatbotEnabled) {
-      this.getAIModels();
+      this.getAIModels(() => this.applyAiAgentDefaultMode());
+      this.service.aiAgentProModeDefault$.pipe(takeUntil(this.annoucedNgUnsubscribe)).subscribe(enabled => {
+        if (enabled !== null) {
+          this.applyAiAgentDefaultModeValue(enabled);
+        }
+      });
       this.buildForm();
       this.getModuleNames();
       this.modalService.onShown.subscribe(() => {
@@ -466,7 +471,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     const insightsbuttonElement = document.getElementById('insightsButton');
 
     if (!this.llmModels.length) {
-      this.getAIModels();
+      this.getAIModels(() => this.applyAiAgentDefaultMode());
     }
     if (this.selectedTab === 'Assistant' && this.modules.length) {
       this.findCurrentModule();
@@ -800,10 +805,15 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.conversationId = null;
     this.chatHistoryData = [];
     this.resetChatInputModePayload();
+    if (this.llmModels.length) {
+      this.applyAiAgentDefaultMode();
+    } else {
+      this.getAIModels(() => this.applyAiAgentDefaultMode());
+    }
     this.expandDefaultQueries();
   }
 
-  getAIModels() {
+  getAIModels(onComplete?: () => void) {
     this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.llmModels = res;
       this.llmModels.forEach(m => {
@@ -811,10 +821,12 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
           this.activeModel = m;
         }
       })
+      onComplete && onComplete();
     }, err => {
       this.llmModels = [];
       this.activeModel = null;
       this.selectedChatInputModel = null;
+      onComplete && onComplete();
     })
   }
 
@@ -919,6 +931,33 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.showModelDropdown = false;
     this.selectedChatInputModel = null;
     this.persistChatInputModePayload('auto', '');
+  }
+
+  private applyAiAgentDefaultMode() {
+    if (!this.llmModels.length) {
+      return;
+    }
+
+    this.service.getAiAgentProModeDefault().pipe(takeUntil(this.ngUnsubscribe)).subscribe(enabled => {
+      this.applyAiAgentDefaultModeValue(enabled);
+    });
+  }
+
+  private applyAiAgentDefaultModeValue(enabled: boolean) {
+    if (!this.isNewConversation() || !this.llmModels.length) {
+      return;
+    }
+
+    if (enabled && this.getConfiguredModels().length) {
+      this.selectMostCostEffectiveConfiguredModel();
+      return;
+    }
+
+    this.resetChatInputModePayload();
+  }
+
+  private isNewConversation(): boolean {
+    return !this.conversationId && !this.chatHistoryData.length;
   }
 
   private persistChatInputModePayload(chatMode: ChatInputMode, sessionModelUuid: string) {

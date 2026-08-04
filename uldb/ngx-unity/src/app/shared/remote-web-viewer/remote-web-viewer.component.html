@@ -1,0 +1,72 @@
+<div class="remote-web-viewer">
+  <div class="viewer-toolbar">
+    <div class="viewer-title">
+      <span>UnityOne Remote Web Viewer</span>
+      <small>{{statusLabel}} · {{connectionStatus}}</small>
+    </div>
+
+    <div class="viewer-metrics">
+      <span class="viewer-pill">{{durationLabel}}</span>
+      <span class="viewer-pill viewer-pill-warning" *ngIf="idleWarningMessage">{{idleWarningMessage}}</span>
+      <span class="viewer-pill viewer-pill-warning" *ngIf="reconnectMessage">{{reconnectMessage}}</span>
+    </div>
+
+    <div class="viewer-actions">
+      <button class="viewer-icon-button" type="button" (click)="returnToSource()" [title]="returnLabel">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <button class="viewer-icon-button" type="button" (click)="toggleFullscreen()" title="Full screen">
+        <i class="fas" [ngClass]="isFullscreen ? 'fa-compress' : 'fa-expand'"></i>
+      </button>
+      <button class="viewer-icon-button" type="button" (click)="retry()" [disabled]="isClosing || state === 'authorizing'" title="Reconnect">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+      <button class="viewer-end-button" type="button" (click)="endSession()" [disabled]="isClosing || state === 'terminated'">
+        End Session
+      </button>
+    </div>
+  </div>
+
+  <div class="viewer-capabilities">
+    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('clipboard')">
+      <i class="fas fa-clipboard"></i>
+      <span>Clipboard</span>
+    </button>
+    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('upload')">
+      <i class="fas fa-upload"></i>
+      <span>Upload</span>
+    </button>
+    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('download')">
+      <i class="fas fa-download"></i>
+      <span>Download</span>
+    </button>
+    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('printing')">
+      <i class="fas fa-print"></i>
+      <span>Print</span>
+    </button>
+    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('recording')">
+      <i class="fas fa-record-vinyl"></i>
+      <span>Recording</span>
+    </button>
+  </div>
+
+  <div class="viewer-error" *ngIf="errorMessage">
+    {{errorMessage}}
+  </div>
+
+  <div #viewport class="viewer-viewport" tabindex="0"
+    [class.viewer-viewport-disabled]="!canSendInput"
+    (keydown)="onKeyboardEvent($event, 'keydown')"
+    (keyup)="onKeyboardEvent($event, 'keyup')"
+    (mousedown)="onMouseEvent($event, 'mousedown')"
+    (mouseup)="onMouseEvent($event, 'mouseup')"
+    (mousemove)="onMouseEvent($event, 'mousemove')"
+    (wheel)="onWheel($event)">
+    <img *ngIf="frameUrl" class="viewer-frame" [src]="frameUrl" alt="Remote browser display">
+    <pre *ngIf="!frameUrl && textFrame" class="viewer-text">{{textFrame}}</pre>
+    <div *ngIf="!frameUrl && !textFrame" class="viewer-empty">
+      <div class="viewer-empty-status">{{statusLabel}}</div>
+      <div class="viewer-empty-detail">{{connectionStatus}}</div>
+    </div>
+  </div>
+</div>

@@ -273,9 +273,31 @@
                     <div
                         class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
                         <span>LLM Model Configuration</span>
-                        <button class="btn btn-warning btn-sm btn-pill" (click)="goToAddModel()">
-                            Add Model
-                        </button>
+                        <div class="llm-config-header-actions d-flex align-items-center">
+                            <span class="mr-2">Default mode to start the conversation</span>
+                            <div class="chat-mode-toggle d-flex align-items-center"
+                                [ngClass]="{'disabled': !hasUserOwnedLlms}" role="group"
+                                aria-label="Default conversation mode">
+                                <button type="button" class="chat-mode-toggle-option"
+                                    [ngClass]="{'selected': !isAiAgentProModeDefaultEnabled}"
+                                    [disabled]="!hasUserOwnedLlms" [attr.aria-pressed]="!isAiAgentProModeDefaultEnabled"
+                                    (click)="setAiAgentProModeDefault(false)">
+                                    AUTO
+                                </button>
+                                <button type="button" class="chat-mode-toggle-option"
+                                    [ngClass]="{'selected': isAiAgentProModeDefaultEnabled}"
+                                    [disabled]="!hasUserOwnedLlms" [attr.aria-pressed]="isAiAgentProModeDefaultEnabled"
+                                    (click)="setAiAgentProModeDefault(true)">
+                                    PRO
+                                </button>
+                            </div>
+                            <i class="fas fa-info-circle text-muted mr-2 ml-1"
+                                tooltip="Use this toggle switch to select your preference mode to start a new conversation."
+                                container="body" placement="top"></i>
+                            <button class="btn btn-warning btn-sm btn-pill" (click)="goToAddModel()">
+                                Add Model
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-sm text-left mb-0 align-middle" *ngIf="userOwnedLlms?.length">

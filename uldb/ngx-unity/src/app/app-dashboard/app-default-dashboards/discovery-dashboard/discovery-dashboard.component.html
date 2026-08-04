@@ -21,11 +21,11 @@
 
             <div class="discovery-filter-control discovery-filter-control--small">
                 <label>Time Range</label>
-                <select class="form-control form-control-sm" formControlName="timeRange" (change)="applyFilters()">
-                    <option *ngFor="let option of timeRangeOptions" [value]="option.value">
-                        {{option.label}}
-                    </option>
-                </select>
+                <custom-date-dropdown [options]="timeRangeOptions" [enableCustomDateRange]="true"
+                    [default]="selectedTimeRange" [customClass]="'form-control-sm'" [emitOnInit]="false"
+                    [emitOnExternalChanges]="false" [viewportSafePopup]="true"
+                    [popupPanelClass]="'discovery-dashboard-date-popup'" (onSubmit)="onTimeRangeChange($event)">
+                </custom-date-dropdown>
             </div>
 
             <button class="discovery-action-button" type="button" (click)="applyFilters(); loadData()"

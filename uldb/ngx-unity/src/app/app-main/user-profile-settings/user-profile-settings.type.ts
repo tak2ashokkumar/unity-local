@@ -26,6 +26,7 @@ export interface UnityOrganizationSettings {
     organization: number;
     content_type: string;
     ticket_subject_format: string;
+    is_pro_ai_enabled: boolean;
 }
 
 export interface UnityOrganizationSettingsTicketInstance {

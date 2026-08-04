@@ -25,11 +25,11 @@
 
             <div class="form-group mb-0 network-dashboard-filter-group network-dashboard-filter-group--small">
                 <label class="m-0 p-0">Time Range</label>
-                <select class="form-control form-control-sm" formControlName="timeRange" (change)="applyFilters()">
-                    <option *ngFor="let option of timeRangeOptions" [value]="option">
-                        {{ getTimeRangeLabel(option) }}
-                    </option>
-                </select>
+                <custom-date-dropdown [options]="timeRangeOptions" [enableCustomDateRange]="true"
+                    [default]="selectedTimeRange" [customClass]="'form-control-sm'" [emitOnInit]="false"
+                    [emitOnExternalChanges]="false" [viewportSafePopup]="true"
+                    [popupPanelClass]="'network-dashboard-date-popup'" (onSubmit)="onTimeRangeChange($event)">
+                </custom-date-dropdown>
             </div>
 
             <button class="network-dashboard-action-btn" type="button" (click)="applyFilters(); loadData()"
@@ -177,8 +177,14 @@
                 </ng-container>
 
                 <ng-template #topConversationsTableView>
-                    <div *ngIf="topConversationsWidgetViewData.tableRows?.length; else topConversationNoRows"
-                        class="table-responsive network-dashboard-conversation-table-wrap">
+                    <div class="network-dashboard-conversation-table-toolbar">
+                        <div class="network-dashboard-conversation-search">
+                            <search-box [searchValue]="topConversationsSearch" [customClass]="'form-control-sm'"
+                                (searched)="onTopConversationsSearched($event)"></search-box>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive network-dashboard-conversation-table-wrap">
                         <table class="table table-sm mb-0 network-dashboard-conversation-table" sortableTable
                             (sorted)="onTopConversationTableSorted($event)">
                             <thead>
@@ -196,7 +202,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of topConversationsWidgetViewData.tableRows; trackBy: trackByTopConversationRow"
+                                <tr *ngFor="let row of getVisibleTopConversationRows(); trackBy: trackByTopConversationRow"
                                     truncateText>
                                     <td *ngFor="let column of topConversationsWidgetViewData.tableColumns"
                                         [ngClass]="[
@@ -211,7 +217,9 @@
                                                         [style.width.%]="row.bandwidthUsagePercent"></div>
                                                 </div>
                                                 <div class="network-dashboard-bandwidth-meta">
-                                                    Used: {{ row.bandwidthUsageLabel }}
+                                                    <span>Used: {{ row.bandwidthUsageLabel }}</span>
+                                                    <span>Free: {{ (100 - row.bandwidthUsagePercent) | number:'1.0-0'
+                                                        }}%</span>
                                                 </div>
                                             </div>
                                             <span *ngSwitchDefault [tooltip]="row[column.key]" container="body"
@@ -221,15 +229,15 @@
                                         </ng-container>
                                     </td>
                                 </tr>
+                                <tr *ngIf="!getVisibleTopConversationRows().length">
+                                    <td [attr.colspan]="topConversationsWidgetViewData.tableColumns?.length || 7"
+                                        class="network-dashboard-conversation-table-empty">
+                                        No data available.
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-
-                    <ng-template #topConversationNoRows>
-                        <div class="d-flex justify-content-center align-items-center text-muted py-5">
-                            No data available.
-                        </div>
-                    </ng-template>
                 </ng-template>
             </div>
         </div>
@@ -280,8 +288,14 @@
                 </ng-container>
 
                 <ng-template #performanceWorkloadTableView>
-                    <div *ngIf="performanceWorkloadInsightsViewData.tableRows?.length; else performanceWorkloadNoRows"
-                        class="table-responsive network-dashboard-performance-table-wrap">
+                    <div class="network-dashboard-performance-table-toolbar">
+                        <div class="network-dashboard-performance-search">
+                            <search-box [searchValue]="performanceWorkloadSearch" [customClass]="'form-control-sm'"
+                                (searched)="onPerformanceWorkloadSearched($event)"></search-box>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive network-dashboard-performance-table-wrap">
                         <table class="table table-sm mb-0 network-dashboard-performance-table" sortableTable
                             (sorted)="onPerformanceWorkloadTableSorted($event)">
                             <thead>
@@ -298,25 +312,49 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of performanceWorkloadInsightsViewData.tableRows; trackBy: trackByPerformanceWorkloadRow"
+                                <tr *ngFor="let row of getVisiblePerformanceWorkloadRows(); trackBy: trackByPerformanceWorkloadRow"
                                     truncateText>
                                     <td *ngFor="let column of performanceWorkloadInsightsViewData.tableColumns"
                                         [ngClass]="column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center'">
-                                        <span [tooltip]="row[column.key]" container="body"
-                                            [ngClass]="column.key === 'deviceName' ? 'network-dashboard-table-link' : ''">
-                                            {{ row[column.key] }}
-                                        </span>
+                                        <ng-container [ngSwitch]="column.key">
+                                            <div *ngSwitchCase="'cpuDisplay'" class="network-dashboard-utilization-cell">
+                                                <div class="progress-track">
+                                                    <div class="progress-fill"
+                                                        [ngClass]="'tone-' + row.cpuTone"
+                                                        [style.width.%]="row.cpuPercent"></div>
+                                                </div>
+                                                <div class="network-dashboard-bandwidth-meta">
+                                                    <span>Used: {{ row.cpuDisplay }}</span>
+                                                    <span>Free: {{ (100 - row.cpuPercent) | number:'1.0-0' }}%</span>
+                                                </div>
+                                            </div>
+                                            <div *ngSwitchCase="'memoryDisplay'" class="network-dashboard-utilization-cell">
+                                                <div class="progress-track">
+                                                    <div class="progress-fill"
+                                                        [ngClass]="'tone-' + row.memoryTone"
+                                                        [style.width.%]="row.memoryPercent"></div>
+                                                </div>
+                                                <div class="network-dashboard-bandwidth-meta">
+                                                    <span>Used: {{ row.memoryDisplay }}</span>
+                                                    <span>Free: {{ (100 - row.memoryPercent) | number:'1.0-0' }}%</span>
+                                                </div>
+                                            </div>
+                                            <span *ngSwitchDefault [tooltip]="row[column.key]" container="body"
+                                                [ngClass]="column.key === 'deviceName' ? 'network-dashboard-table-link' : ''">
+                                                {{ row[column.key] }}
+                                            </span>
+                                        </ng-container>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="!getVisiblePerformanceWorkloadRows().length">
+                                    <td [attr.colspan]="performanceWorkloadInsightsViewData.tableColumns?.length || 5"
+                                        class="network-dashboard-performance-table-empty">
+                                        No data available.
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-
-                    <ng-template #performanceWorkloadNoRows>
-                        <div class="d-flex justify-content-center align-items-center text-muted py-5">
-                            No data available.
-                        </div>
-                    </ng-template>
                 </ng-template>
             </div>
         </div>
@@ -374,8 +412,14 @@
                 </ng-container>
 
                 <ng-template #interfaceHealthMetricsTableView>
-                    <div *ngIf="interfaceHealthMetricsViewData.tableRows?.length; else interfaceHealthMetricsNoRows"
-                        class="table-responsive network-dashboard-interface-table-wrap">
+                    <div class="network-dashboard-interface-table-toolbar">
+                        <div class="network-dashboard-interface-search">
+                            <search-box [searchValue]="interfaceHealthMetricsSearch" [customClass]="'form-control-sm'"
+                                (searched)="onInterfaceHealthMetricsSearched($event)"></search-box>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive network-dashboard-interface-table-wrap">
                         <table class="table table-sm mb-0 network-dashboard-interface-table" sortableTable
                             (sorted)="onInterfaceHealthMetricsTableSorted($event)">
                             <thead>
@@ -392,7 +436,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of interfaceHealthMetricsViewData.tableRows; trackBy: trackByInterfaceHealthMetricRow"
+                                <tr *ngFor="let row of getVisibleInterfaceHealthMetricsRows(); trackBy: trackByInterfaceHealthMetricRow"
                                     truncateText>
                                     <td *ngFor="let column of interfaceHealthMetricsViewData.tableColumns"
                                         [ngClass]="column.align === 'left' ? 'text-left' : column.align === 'right' ? 'text-right' : 'text-center'">
@@ -402,15 +446,15 @@
                                         </span>
                                     </td>
                                 </tr>
+                                <tr *ngIf="!getVisibleInterfaceHealthMetricsRows().length">
+                                    <td [attr.colspan]="interfaceHealthMetricsViewData.tableColumns?.length || 6"
+                                        class="network-dashboard-interface-table-empty">
+                                        No data available.
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-
-                    <ng-template #interfaceHealthMetricsNoRows>
-                        <div class="d-flex justify-content-center align-items-center text-muted py-5">
-                            No data available.
-                        </div>
-                    </ng-template>
                 </ng-template>
             </div>
         </div>

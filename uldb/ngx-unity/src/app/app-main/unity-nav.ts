@@ -656,20 +656,12 @@ const UNITY_SERVICES_NAV_ITEMS = (svc: PermissionService, orgName: string, isTen
             icon: 'fas fa-coins',
             routeAccess: UNITY_ROUTE_ACCESS.SERVICES_TOKEN_BILLING,
         },
+        {
+            name: 'Knowledge Management',
+            url: '/services/knowledge-management',
+            icon: 'fas fa-brain',
+        }
     ]
-    if (isTenantOrg) {
-        navItems = [
-            ...navItems,
-            {
-                name: 'Knowledge Management',
-                url: '/services/knowledge-management',
-                icon: 'fas fa-brain',
-                // attributes: {
-                //     module: ,
-                // }
-            },
-        ];
-    }
     if (orgName) {
         let removableItems: string[] = ['Sustainability', 'Network Configuration', 'Log Management', 'Knowledge Management']
         navItems = removeNavItem(navItems, removableItems);

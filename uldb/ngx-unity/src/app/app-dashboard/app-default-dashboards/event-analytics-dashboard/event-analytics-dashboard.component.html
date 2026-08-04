@@ -13,10 +13,11 @@
         <div class="dashboard-filters d-flex align-items-end justify-content-end flex-wrap"
             [formGroup]="filterForm">
             <div class="filter-control filter-control-group top-duration-filter">
-                <label class="d-block font-sm text-muted mb-0">Time Range</label>
+                <label class="d-block font-sm-xs text-muted mb-0">Time Range</label>
                 <custom-date-dropdown [options]="timeRangeDropdownOptions" [enableCustomDateRange]="true"
                     [default]="timelineDropdownDefault" [customClass]="'form-control-sm'" [emitOnInit]="false"
-                    [customSelectedLabel]="'Custom'" [viewportSafePopup]="true" [dateOnlyPicker]="true"
+                    [emitOnExternalChanges]="false"
+                    [viewportSafePopup]="true"
                     [popupPanelClass]="'event-analytics-date-popup'" (onSubmit)="onTimelineDropdownSubmit($event)">
                 </custom-date-dropdown>
             </div>
@@ -108,7 +109,7 @@
                     <div class="card-header bg-white border-0 p-2 d-flex align-items-start justify-content-between">
                         <span class="font-md font-500">Event By Device Category</span>
                         <div class="filter-control compact-filter mb-0">
-                            <label class="d-block font-sm text-muted m-0 mb-0">Category</label>
+                            <label class="d-block font-sm-xs text-muted m-0 mb-0">Category</label>
                             <select #eventCategorySelect class="form-control form-control-sm"
                                 formControlName="eventDeviceCategory"
                                 (change)="onEventDeviceCategoryChange(eventCategorySelect.value)">
@@ -225,8 +226,8 @@
                                                 <custom-date-dropdown [options]="trendTimelineDropdownOptions"
                                                     [enableCustomDateRange]="true"
                                                     [default]="trendTimelineDropdownDefault"
-                                                    [customClass]="'form-control-sm'" [emitOnInit]="false" [dateOnlyPicker]="true"
-                                                    [customSelectedLabel]="'Custom'" [viewportSafePopup]="true"
+                                                    [customClass]="'form-control-sm'" [emitOnInit]="false" [emitOnExternalChanges]="false"
+                                                    [viewportSafePopup]="true"
                                                     [popupPanelClass]="'event-analytics-date-popup'"
                                                     (onSubmit)="onTrendTimelineDropdownSubmit($event)">
                                                 </custom-date-dropdown>
@@ -256,7 +257,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group filter-control compact-filter mb-0 px-2">
-                                        <label class="d-block font-sm text-muted mb-0">Category</label>
+                                        <label class="d-block font-sm-xs text-muted mb-0">Category</label>
                                         <select #alertSegregationSelect class="form-control form-control-sm" formControlName="alertSegregationCategory"
                                             (change)="onAlertSegregationCategoryChange(alertSegregationSelect.value)">
                                             <option *ngFor="let option of alertSegregationCategoryOptions; trackBy: trackByKey" [value]="option.value">
@@ -283,23 +284,23 @@
             <div class="section-title font-lg font-500 px-1 py-2 mb-0">Event and Alert Analytics</div>
             <div class="section-header-filters analytics-filters d-flex align-items-end flex-wrap">
                 <div class="filter-control analytics-filter">
-                    <label class="d-block font-sm text-muted mb-0">View By</label>
+                    <label class="d-block font-sm-xs text-muted mb-0">View By</label>
                     <select class="form-control form-control-sm" formControlName="analyticsViewBy"
                         (change)="onAnalyticsViewByChange()">
                         <option *ngFor="let option of analyticsViewByOptions; trackBy: trackByKey"
                             [value]="option.value">{{option.label}}</option>
                     </select>
                 </div>
-                <div class="filter-control analytics-filter">
-                    <label class="d-block font-sm text-muted mb-0">Source Type</label>
+                <div class="filter-control analytics-filter" *ngIf="showAnalyticsSourceTypeFilter">
+                    <label class="d-block font-sm-xs text-muted mb-0">Source Type</label>
                     <select class="form-control form-control-sm" formControlName="analyticsSourceType"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsSourceTypeOptions; trackBy: trackByKey"
                             [value]="option.value">{{option.label}}</option>
                     </select>
                 </div>
-                <div class="filter-control analytics-filter">
-                    <label class="d-block font-sm text-muted mb-0">Severity Type</label>
+                <div class="filter-control analytics-filter" *ngIf="showAnalyticsSeverityTypeFilter">
+                    <label class="d-block font-sm-xs text-muted mb-0">Severity Type</label>
                     <select class="form-control form-control-sm" formControlName="analyticsSeverityType"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsSeverityTypeOptions; trackBy: trackByKey"
@@ -307,7 +308,7 @@
                     </select>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="d-block font-sm text-muted mb-0">Datacenter</label>
+                    <label class="d-block font-sm-xs text-muted mb-0">Datacenter</label>
                     <select class="form-control form-control-sm" formControlName="analyticsDatacenter"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsDatacenterOptions; trackBy: trackByKey"
@@ -315,7 +316,7 @@
                     </select>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="d-block font-sm text-muted mb-0">Cloud</label>
+                    <label class="d-block font-sm-xs text-muted mb-0">Cloud</label>
                     <select class="form-control form-control-sm" formControlName="analyticsCloud"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsCloudOptions; trackBy: trackByKey"
@@ -323,7 +324,7 @@
                     </select>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="d-block font-sm text-muted mb-0">Category</label>
+                    <label class="d-block font-sm-xs text-muted mb-0">Category</label>
                     <select class="form-control form-control-sm" formControlName="analyticsCategory"
                         (change)="onAnalyticsFilterChange()">
                         <option *ngFor="let option of analyticsCategoryOptions; trackBy: trackByKey"
@@ -331,11 +332,11 @@
                     </select>
                 </div>
                 <div class="filter-control analytics-filter analytics-duration-filter">
-                    <label class="d-block font-sm text-muted mb-0">Duration</label>
+                    <label class="d-block font-sm-xs text-muted mb-0">Duration</label>
                     <custom-date-dropdown [options]="eventAndAlertTimelineDropdownOptions"
                         [enableCustomDateRange]="true" [default]="eventAndAlertTimelineDropdownDefault"
-                        [customClass]="'form-control-sm'" [emitOnInit]="false" [dateOnlyPicker]="true"
-                        [customSelectedLabel]="'Custom'" [viewportSafePopup]="true" [popupPanelClass]="'event-analytics-date-popup'"
+                        [customClass]="'form-control-sm'" [emitOnInit]="false" [emitOnExternalChanges]="false"
+                        [viewportSafePopup]="true" [popupPanelClass]="'event-analytics-date-popup'"
                         (onSubmit)="onEventAndAlertTimelineDropdownSubmit($event)">
                     </custom-date-dropdown>
                 </div>
@@ -389,7 +390,7 @@
             <div class="section-title font-lg font-500 px-1 py-2 mb-0">Top 10 Noisy Events</div>
             <div class="section-header-filters d-flex align-items-end flex-wrap">
                 <div class="filter-control compact-filter mb-0">
-                    <label class="d-block font-sm text-muted mb-0">Category</label>
+                    <label class="d-block font-sm-xs text-muted mb-0">Category</label>
                     <select #noisyEventsCategorySelect class="form-control form-control-sm"
                         formControlName="noisyEventsCategory"
                         (change)="onNoisyEventsCategoryChange(noisyEventsCategorySelect.value)">
@@ -401,7 +402,7 @@
         </div>
         <div class="row mx-0 mb-2">
             <div class="col-12 px-0">
-                <div class="card bg-white round-edge equalize-card widget-card table-card mb-0">
+                <div class="card bg-white round-edge equalize-card widget-card table-card mb-0 overflow-hidden">
                     <div class="card-body p-0">
                         <div class="widget-data-block position-relative">
                             <app-spinner [name]="loaderNames.noisyEvents" [width]="0"></app-spinner>
@@ -464,7 +465,7 @@
             <div class="section-title font-lg font-500 px-1 py-2 mb-0">Top 10 Noisy Hosts</div>
             <div class="section-header-filters d-flex align-items-end flex-wrap">
                 <div class="filter-control compact-filter mb-0">
-                    <label class="d-block font-sm text-muted mb-0">Category</label>
+                    <label class="d-block font-sm-xs text-muted mb-0">Category</label>
                     <select #noisyHostsCategorySelect class="form-control form-control-sm"
                         formControlName="noisyHostsCategory"
                         (change)="onNoisyHostsCategoryChange(noisyHostsCategorySelect.value)">
@@ -565,7 +566,7 @@
             <div class="section-title font-lg font-500 px-1 py-2 mb-0">Incident Management</div>
             <div class="section-header-filters d-flex align-items-end flex-wrap">
                 <div class="filter-control compact-filter mb-0">
-                    <label class="d-block font-sm text-muted mb-0">Category</label>
+                    <label class="d-block font-sm-xs text-muted mb-0">Category</label>
                     <select #incidentCategorySelect class="form-control form-control-sm"
                         formControlName="incidentCategory"
                         (change)="onIncidentCategoryChange(incidentCategorySelect.value)">

@@ -1,0 +1,97 @@
+<div class="netapp-storage-dashboard">
+  <div class="card main-section-card cluster-overview-card">
+    <div class="card-header">{{ data.clusterOverview.title }}</div>
+    <div class="card-body">
+      <div class="cluster-overview-note">{{ clusterOverviewNote }}</div>
+      <div class="row align-items-center no-gutters">
+        <div class="col text-center"
+          *ngFor="let metric of data.clusterOverview.metrics; trackBy: trackByMetric">
+          <div class="stat-val-big" [ngClass]="toneClass(metric.tone)">{{ metric.value }}</div>
+          <div class="text-muted metric-label">{{ metric.label }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card main-section-card" *ngFor="let section of sections; trackBy: trackByKey">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>{{ section.title }}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="viewModes[section.key] !== 'table'" [class.btn-primary]="viewModes[section.key] === 'table'" (click)="toggleView(section.key, 'table')">Table View</button>
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="viewModes[section.key] !== 'chart'" [class.btn-primary]="viewModes[section.key] === 'chart'" (click)="toggleView(section.key, 'chart')">Chart View</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row align-items-center mb-3 text-center">
+        <div class="col" *ngFor="let metric of section.metrics; trackBy: trackByMetric">
+          <div class="stat-val-big" [ngClass]="toneClass(metric.tone)">{{ metric.value }}</div>
+          <div class="text-muted metric-label">{{ metric.label }}</div>
+        </div>
+      </div>
+
+      <ng-container *ngIf="viewModes[section.key] === 'table'; else chartView">
+        <div class="table-responsive border rounded storage-table-wrap">
+          <table class="table custom-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th *ngFor="let col of section.columns; trackBy: trackByIndex">{{ col }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of section.rows; trackBy: trackByIndex">
+                <td *ngFor="let cell of row; trackBy: trackByIndex">{{ cell }}</td>
+              </tr>
+              <tr *ngIf="!section.rows.length">
+                <td class="text-center text-muted" [attr.colspan]="section.columns.length">
+                  No data available for the selected filters.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+      <ng-template #chartView>
+        <div class="row">
+          <div class="mb-3" [class.col-md-12]="(chart.span || 12) === 12"
+            [class.col-md-6]="chart.span === 6" [class.col-md-4]="chart.span === 4"
+            [class.col-md-3]="chart.span === 3"
+            *ngFor="let chart of section.charts; trackBy: trackByChart">
+            <div class="card border mb-0 chart-card">
+              <div class="card-header bg-light py-2 small font-weight-bold">{{ chart.title }}</div>
+              <div class="card-body p-1">
+                <div echarts [options]="chart.option" [autoResize]="true" class="netapp-chart"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="card main-section-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Auto-Remediation Summary</span>
+    </div>
+    <div class="card-body">
+      <div class="row align-items-center text-center">
+        <div class="col border-right">
+          <div class="stat-val-big text-green">1</div>
+          <div class="text-muted metric-label">Auto-Remediations</div>
+        </div>
+        <div class="col border-right">
+          <div class="stat-val-big text-green">0 sec</div>
+          <div class="text-muted metric-label">Avg MTTR</div>
+        </div>
+        <div class="col border-right">
+          <div class="stat-val-big text-green">0%</div>
+          <div class="text-muted metric-label">Runbook Success</div>
+        </div>
+        <div class="col">
+          <div class="stat-val-big text-danger">0</div>
+          <div class="text-muted metric-label">Runbook Failures</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -43,7 +43,9 @@
                 <div class="form-group mb-0 private-cloud-filter-group">
                     <label class="m-0 p-0">Time Range</label>
                     <custom-date-dropdown [options]="timeRangeOptions" [enableCustomDateRange]="true"
-                        [default]="selectedTimeRange" (onSubmit)="onTimeRangeChange($event)">
+                        [default]="selectedTimeRange" [customClass]="'form-control-sm'" [emitOnInit]="false"
+                        [emitOnExternalChanges]="false" [viewportSafePopup]="true"
+                        [popupPanelClass]="'private-cloud-compute-dashboard-date-popup'" (onSubmit)="onTimeRangeChange($event)">
                     </custom-date-dropdown>
                 </div>
                 <button class="round-action-btn private-cloud-filter-btn" type="button" (click)="applyFilters()"

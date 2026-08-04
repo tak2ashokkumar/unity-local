@@ -78,3 +78,9 @@
   padding-top: 0.5rem;
   font-size: 0.65rem;
 }
+
+::ng-deep .custom-date-dropdown-panel--safe .owl-dt-container,
+::ng-deep .custom-date-dropdown-panel--safe .owl-dt-container-inner {
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+}

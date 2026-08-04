@@ -33,6 +33,8 @@ import { UnifiedAiopsCommandCentreComponent } from "./unified-aiops-command-cent
 import { EventAnalyticsDashboardComponent } from "./event-analytics-dashboard/event-analytics-dashboard.component";
 import { DiscoveryDashboardComponent } from "./discovery-dashboard/discovery-dashboard.component";
 import { NetworkDashboardComponent } from "./network-dashboard/network-dashboard.component";
+import { StorageDashboardComponent } from "./storage-dashboard/storage-dashboard.component";
+// import { MockStorageDashboardComponent } from "./mock-storage-dashboard/mock-storage-dashboard.component";
 
 export const DEFAULT_DASHBOARD_ROUTES: Routes = [
     {
@@ -383,6 +385,26 @@ export const DEFAULT_DASHBOARD_ROUTES: Routes = [
             }
         },
     },
+    // {
+    //     path: 'default/mock-storage',
+    //     component: MockStorageDashboardComponent,
+    //     data: {
+    //         breadcrumb: {
+    //             title: 'Storage Dashboard',
+    //             stepbackCount: 1
+    //         }
+    //     },
+    // },
+    // {
+    //     path: 'default/storage',
+    //     component: StorageDashboardComponent,
+    //     data: {
+    //         breadcrumb: {
+    //             title: 'Storage Dashboard',
+    //             stepbackCount: 1
+    //         }
+    //     },
+    // },
     {
         path: 'default/database',
         component: DatabaseDashboardComponent,

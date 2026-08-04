@@ -117,7 +117,7 @@
 }
 
 .discovery-filter-control--small {
-  width: 90px;
+  width: 116px;
 }
 
 .discovery-filter-control label {
@@ -149,6 +149,55 @@
   background: #f9fbfc;
   border: 1px solid #bfc9d3;
   border-radius: 2px;
+}
+
+:host ::ng-deep .discovery-filter-control custom-date-dropdown {
+  .dropdown {
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    display: block;
+  }
+
+  .dropbtn.form-control {
+    height: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 9px;
+    color: #2f3b46;
+    background: #f9fbfc;
+    font-size: 12px;
+    line-height: 20px;
+    border-color: #bfc9d3;
+    border-radius: 2px;
+  }
+
+  .dropdownClick {
+    z-index: 2050;
+  }
+}
+
+:host ::ng-deep .discovery-dashboard-date-popup,
+:host ::ng-deep .cdk-overlay-pane.discovery-dashboard-date-popup {
+  max-width: calc(100vw - 16px) !important;
+}
+
+:host ::ng-deep .discovery-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .discovery-dashboard-date-popup .owl-dt-container-inner,
+:host ::ng-deep .cdk-overlay-pane.discovery-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .cdk-overlay-pane.discovery-dashboard-date-popup .owl-dt-container-inner {
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: none;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .discovery-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .discovery-dashboard-date-popup .owl-dt-container-inner,
+:host ::ng-deep .cdk-overlay-pane.discovery-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .cdk-overlay-pane.discovery-dashboard-date-popup .owl-dt-container-inner {
+  overflow: visible;
 }
 
 .discovery-action-button {

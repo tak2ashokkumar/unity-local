@@ -5,7 +5,7 @@ import * as echarts from 'echarts';
 import { EChartsOption } from 'echarts';
 import { Observable, of } from 'rxjs';
 import { CiDistributionByDevice, CiDistributionByDeviceData, CiDistributionByDeviceSortColumn, CiDistributionByDeviceTableRowViewData, CiDistributionByDiscovery, CiDistributionByDiscoverySortColumn, CiDistributionByDiscoveryTableRowViewData, CiDistributionSortColumn, CiDistributionTableRowViewData, CmdbSyncInsights, CmdbSyncInsightsMetric, CmdbSyncInsightsMetricViewData, CmdbSyncInsightsViewData, CmdbSyncTrend, CmdbSyncTrendSortColumn, CmdbSyncTrendTableRowViewData, DiscoveryDashboardFilterCriteria, DiscoveryDashboardFilterFormValue, DiscoveryDashboardFilterOptions, DiscoverySuccessFailureData, DiscoverySuccessFailureSortColumn, DiscoverySuccessFailureTableRowViewData, DiscoveryTrendAnalyticsData, DiscoveryTrendAnalyticsSortColumn, DiscoveryTrendAnalyticsTableRowViewData, ExecutiveKpiData, ExecutiveKpiViewData, NewlyDiscoveredDatacenterDistribution, NewlyDiscoveredDatacenterDistributionItem, NewlyDiscoveredDevice, NewlyDiscoveredDeviceItem, NewlyDiscoveredDeviceItemViewData, NewlyDiscoveredDevicesSortColumn, NewlyDiscoveredManufacturerDistributionItem, NewlyDiscoveredManufacturerModelDistribution, NewlyDiscoveredStatusByDatacenterDistribution, NewlyDiscoveredStatusByDatacenterItem, OperatingSystems, OperatingSystemsItem, OperatingSystemsItemViewData, OperatingSystemsSortColumn, OrphanedDeviceByTypeItem, OrphanedDeviceByTypeItemViewData, OrphanedDeviceByTypeResponse, OrphanedDeviceByTypeSortColumn, OrphanedDevicesBreakdownItem, OrphanedDevicesBreakdownResponse, ResourceDiscoveryData, ResourceDiscoveryViewData, TopDiscoveryFailures, TopDiscoveryFailuresItem, TopDiscoveryFailuresItemViewData, TopDiscoveryFailuresSortColumn } from './discovery-dashboard.type';
-import { NEWLY_DISCOVERED_DEVICE } from './discovery-dashboard.const';
+import { DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT, NEWLY_DISCOVERED_DEVICE } from './discovery-dashboard.const';
 
 
 @Injectable()
@@ -24,11 +24,15 @@ export class DiscoveryDashboardService {
 
   buildFilterForm(defaults: DiscoveryDashboardFilterFormValue = {
     region: [],
-    timeRange: 'last_30_days'
+    timeRange: DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT,
+    startDate: '',
+    endDate: ''
   }): FormGroup {
     return this.builder.group({
       region: [defaults.region],
-      timeRange: [defaults.timeRange]
+      timeRange: [defaults.timeRange],
+      startDate: [defaults.startDate || ''],
+      endDate: [defaults.endDate || '']
     });
   }
 
@@ -875,444 +879,27 @@ export class DiscoveryDashboardService {
     params = params.set('page_size', String(pageSize));
     params = params.set('offset', String((page - 1) * pageSize));
 
-    // return this.http.get<NewlyDiscoveredDevice>(`/customer/discovery-dashboard/newly_discovered_device/`, { params });
-    return of({
-      "count": 249,
-      "next": "http://10.192.11.73:8000/customer/discovery-dashboard/newly_discovered_device/?page=2&region=all&time_range=last_year",
-      "previous": null,
-      "results": [
-        {
-          "ci_type": "Firewall",
-          "uptime": "37 days, 17:06:31.09",
-          "availability_status": "Unknown",
-          "model": "Dummy model",
-          "manufacturer": "Adaptec",
-          "datacenter": "DC1",
-          "last_discovered": "1 day ago",
-          "discovery_method": "SNMP",
-          "ci_name": "12",
-          "last_discovered_at": "2026-07-10T10:37:53.922505+00:00",
-          "platform": "N/A",
-          "serial_number": "619f26c4-9a4b-4cd8-a85f-908087085455",
-          "os_type": "N/A"
-        },
-        {
-          "ci_type": "Firewall",
-          "uptime": "N/A",
-          "availability_status": "Unknown",
-          "model": "ASA 5585-X 10",
-          "manufacturer": "cisco Systems Inc.",
-          "datacenter": "DC1",
-          "last_discovered": "05 Feb 2026 06:11",
-          "discovery_method": "N/A",
-          "ci_name": "UnityDemo-fw1-mgmt.sf10",
-          "last_discovered_at": "2026-02-05T06:11:03.552153+00:00",
-          "platform": "N/A",
-          "serial_number": "1817ec5b-17c4-424f-8198-c2a6d780af7b",
-          "os_type": "N/A"
-        },
-        {
-          "ci_type": "Firewall",
-          "uptime": "N/A",
-          "availability_status": "Unknown",
-          "model": "SRX345",
-          "manufacturer": "Juniper",
-          "datacenter": "DC1",
-          "last_discovered": "05 Feb 2026 06:11",
-          "discovery_method": "SNMP",
-          "ci_name": "UnityDemo-fw1-505.sf10.unitedlayer.com",
-          "last_discovered_at": "2026-02-05T06:11:03.549290+00:00",
-          "platform": "Juniper JunOS 15.1X49-D70.3 (Internet Router)",
-          "serial_number": "ebc7b21b-90cc-407c-9f81-466a5ba74a1c",
-          "os_type": "Juniper JunOS 15.1X49-D70.3 (Internet Router)"
-        },
-        {
-          "ci_type": "Firewall",
-          "uptime": "339 days, 7:06:54.35",
-          "availability_status": "Unknown",
-          "model": "SRX240H",
-          "manufacturer": "Juniper",
-          "datacenter": "DC1",
-          "last_discovered": "05 Feb 2026 06:11",
-          "discovery_method": "N/A",
-          "ci_name": "UnityDemo-fw1-313.sf10.unitedlayer.com",
-          "last_discovered_at": "2026-02-05T06:11:03.544653+00:00",
-          "platform": "Juniper JunOS 15.1X49-D160.2 (Router)",
-          "serial_number": "3F9E185027CD",
-          "os_type": "Juniper JunOS 15.1X49-D160.2 (Router)"
-        },
-        {
-          "ci_type": "Firewall",
-          "uptime": "N/A",
-          "availability_status": "Unknown",
-          "model": "FortiGate 50E",
-          "manufacturer": "FortiGate",
-          "datacenter": "DC1",
-          "last_discovered": "05 Feb 2026 06:11",
-          "discovery_method": "SNMP",
-          "ci_name": "Fortinet- NCM Demo",
-          "last_discovered_at": "2026-02-05T06:11:02.963107+00:00",
-          "platform": "N/A",
-          "serial_number": "FGVMSLTM25002732",
-          "os_type": "N/A"
-        },
-        {
-          "ci_type": "Firewall",
-          "uptime": "N/A",
-          "availability_status": "Unknown",
-          "model": "PA-820",
-          "manufacturer": "Paloalto",
-          "datacenter": "DC1",
-          "last_discovered": "05 Feb 2026 06:11",
-          "discovery_method": "SNMP",
-          "ci_name": "Palo Alto- NCM Demo",
-          "last_discovered_at": "2026-02-05T06:11:02.684169+00:00",
-          "platform": "N/A",
-          "serial_number": "009401008455",
-          "os_type": "N/A"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "10 days, 19:22:20.694322",
-          "availability_status": "Up",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:05",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-vm1",
-          "last_discovered_at": "2026-01-02T15:05:01.488830+00:00",
-          "platform": "VMware",
-          "serial_number": "420a3bc0-a875-1164-24ff-4482fb568a73",
-          "os_type": "Ubuntu Linux (64-bit)"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "10 days, 19:22:20.694322",
-          "availability_status": "Up",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:05",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-vm1",
-          "last_discovered_at": "2026-01-02T15:05:01.488830+00:00",
-          "platform": "VMware",
-          "serial_number": "420a3bc0-a875-1164-24ff-4482fb568a73",
-          "os_type": "Ubuntu Linux (64-bit)"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "2 days, 1:56:39.502206",
-          "availability_status": "Up",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:04",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-Win-vm3",
-          "last_discovered_at": "2026-01-02T15:04:09.905478+00:00",
-          "platform": "VMware",
-          "serial_number": "420ac530-0c2d-b91b-446b-d5fbc2a5fd76",
-          "os_type": "Microsoft Windows Server 2016 or later (64-bit)"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "2 days, 1:56:39.502206",
-          "availability_status": "Up",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:04",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-Win-vm3",
-          "last_discovered_at": "2026-01-02T15:04:09.905478+00:00",
-          "platform": "VMware",
-          "serial_number": "420ac530-0c2d-b91b-446b-d5fbc2a5fd76",
-          "os_type": "Microsoft Windows Server 2016 or later (64-bit)"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:02",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-Win-vm10",
-          "last_discovered_at": "2026-01-02T15:02:16.547888+00:00",
-          "platform": "VMware",
-          "serial_number": "420a0ac3-fbde-2626-6b0e-6f61d7438456",
-          "os_type": "None"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:01",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-vm4",
-          "last_discovered_at": "2026-01-02T15:01:59.441390+00:00",
-          "platform": "VMware",
-          "serial_number": "420a07b3-8cfb-b378-6630-3289e6ce3dda",
-          "os_type": "None"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:01",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-vm4",
-          "last_discovered_at": "2026-01-02T15:01:59.441390+00:00",
-          "platform": "VMware",
-          "serial_number": "420a07b3-8cfb-b378-6630-3289e6ce3dda",
-          "os_type": "None"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:01",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-vm8",
-          "last_discovered_at": "2026-01-02T15:01:56.762042+00:00",
-          "platform": "VMware",
-          "serial_number": "420a8b0f-5983-532f-b9ed-472faf058477",
-          "os_type": "None"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:01",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-ubuntu-vm1",
-          "last_discovered_at": "2026-01-02T15:01:33.222723+00:00",
-          "platform": "VMware",
-          "serial_number": "420acbec-0846-5c7c-0c60-8f242668e158",
-          "os_type": "None"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:01",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-ubuntu-vm1",
-          "last_discovered_at": "2026-01-02T15:01:33.222723+00:00",
-          "platform": "VMware",
-          "serial_number": "420acbec-0846-5c7c-0c60-8f242668e158",
-          "os_type": "None"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "255 days, 1:28:25.500272",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:01",
-          "discovery_method": "API",
-          "ci_name": "UL-Template-RockyLinux9.5-40GB",
-          "last_discovered_at": "2026-01-02T15:01:17.517272+00:00",
-          "platform": "VMware",
-          "serial_number": "420aa0a2-1b2d-86e0-f913-7fab3dd26af9",
-          "os_type": "Red Hat Enterprise Linux 8 (64-bit)"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:00",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-vm5",
-          "last_discovered_at": "2026-01-02T15:00:56.010375+00:00",
-          "platform": "VMware",
-          "serial_number": "420a4475-e98f-b39c-b54b-e562f32a9b31",
-          "os_type": "None"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:00",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-lnx-vm5",
-          "last_discovered_at": "2026-01-02T15:00:56.010375+00:00",
-          "platform": "VMware",
-          "serial_number": "420a4475-e98f-b39c-b54b-e562f32a9b31",
-          "os_type": "None"
-        },
-        {
-          "ci_type": "VMware VM",
-          "uptime": "N/A",
-          "availability_status": "Down",
-          "model": "N/A",
-          "manufacturer": "VMware",
-          "datacenter": "DC1",
-          "last_discovered": "02 Jan 2026 15:00",
-          "discovery_method": "API",
-          "ci_name": "unity-lab-Win-vm8",
-          "last_discovered_at": "2026-01-02T15:00:37.573308+00:00",
-          "platform": "VMware",
-          "serial_number": "420ad540-47e7-2a84-c64f-f892f5b612a2",
-          "os_type": "None"
-        }
-      ]
-    })
-
+    return this.http.get<NewlyDiscoveredDevice>(`/customer/discovery-dashboard/newly_discovered_device/`, { params });
   }
 
   getNewlyDiscoveredManufacturerModelDistribution(filters?: DiscoveryDashboardFilterCriteria): Observable<NewlyDiscoveredManufacturerModelDistribution> {
-    // return this.http.get<NewlyDiscoveredManufacturerModelDistribution>('customer/discovery-dashboard/manufacturer_model_distribution/', {
-    //   params: this.buildFilterParams(filters)
-    // });
-    return of({
-      "total": 249,
-      "results": [
-        {
-          "models": [
-            {
-              "count": 231,
-              "model": "Unknown"
-            }
-          ],
-          "total": 231,
-          "manufacturer": "VMware"
-        },
-        {
-          "models": [
-            {
-              "count": 11,
-              "model": "Unknown"
-            }
-          ],
-          "total": 11,
-          "manufacturer": "Unknown"
-        },
-        {
-          "models": [
-            {
-              "count": 2,
-              "model": "ASA 5585-X 10"
-            }
-          ],
-          "total": 2,
-          "manufacturer": "cisco Systems Inc."
-        },
-        {
-          "models": [
-            {
-              "count": 1,
-              "model": "SRX240H"
-            },
-            {
-              "count": 1,
-              "model": "SRX345"
-            }
-          ],
-          "total": 2,
-          "manufacturer": "Juniper"
-        },
-        {
-          "models": [
-            {
-              "count": 1,
-              "model": "Dummy model"
-            }
-          ],
-          "total": 1,
-          "manufacturer": "Adaptec"
-        },
-        {
-          "models": [
-            {
-              "count": 1,
-              "model": "FortiGate 50E"
-            }
-          ],
-          "total": 1,
-          "manufacturer": "FortiGate"
-        },
-        {
-          "models": [
-            {
-              "count": 1,
-              "model": "PA-820"
-            }
-          ],
-          "total": 1,
-          "manufacturer": "Paloalto"
-        }
-      ]
-    })
+    return this.http.get<NewlyDiscoveredManufacturerModelDistribution>('customer/discovery-dashboard/manufacturer_model_distribution/', {
+      params: this.buildFilterParams(filters)
+    });
   }
 
   getNewlyDiscoveredDatacenterDistribution(filters?: DiscoveryDashboardFilterCriteria): Observable<NewlyDiscoveredDatacenterDistribution> {
-    // return this.http.get<NewlyDiscoveredDatacenterDistribution>('customer/discovery-dashboard/datacenter_asset_distribution', {
-    //   params: this.buildFilterParams(filters)
-    // });
-    return of({
-      "total": 249,
-      "results": [
-        {
-          "count": 237,
-          "datacenter": "DC1"
-        },
-        {
-          "count": 12,
-          "datacenter": "Unknown"
-        }
-      ]
+    return this.http.get<NewlyDiscoveredDatacenterDistribution>('customer/discovery-dashboard/datacenter_asset_distribution', {
+      params: this.buildFilterParams(filters)
     });
+
   }
 
   getNewlyDiscoveredStatusByDatacenterDistribution(filters?: DiscoveryDashboardFilterCriteria): Observable<NewlyDiscoveredStatusByDatacenterDistribution> {
-    // return this.http.get<NewlyDiscoveredStatusByDatacenterDistribution>('customer/discovery-dashboard/device_status_by_datacenter', {
-    //   params: this.buildFilterParams(filters)
-    // });
-    return of({
-      "total": 249,
-      "results": [
-        {
-          "down": 105,
-          "datacenter": "DC1",
-          "total": 237,
-          "up": 126,
-          "unknown": 6
-        },
-        {
-          "down": 0,
-          "datacenter": "Unknown",
-          "total": 12,
-          "up": 0,
-          "unknown": 12
-        }
-      ]
+    return this.http.get<NewlyDiscoveredStatusByDatacenterDistribution>('customer/discovery-dashboard/device_status_by_datacenter', {
+      params: this.buildFilterParams(filters)
     });
+
   }
 
   convertToNewlyDiscoveredDeviceViewData(data: NewlyDiscoveredDeviceItem[]): NewlyDiscoveredDeviceItemViewData[] {
@@ -1908,213 +1495,6 @@ export class DiscoveryDashboardService {
     return this.http.get<OrphanedDeviceByTypeResponse>('customer/discovery-dashboard/orphaned_devices/', {
       params
     });
-    // return of({
-    //   "count": 69,
-    //   "next": "https://unity.unitedlayer.com/customer/discovery-dashboard/orphaned_devices/?page=2&region=all&time_range=last_month",
-    //   "previous": null,
-    //   "results": [
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": true,
-    //         "observium": false,
-    //         "enabled": true,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "a22df4f2-2e16-4929-b047-34b99a98b8b5",
-    //       "configured": true,
-    //       "device_name": "unity-lab-lnx-ubuntu-vm5",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": "Linux",
-    //       "os": "Ubuntu Linux (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": true,
-    //         "observium": false,
-    //         "enabled": true,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "23807365-b737-467b-9325-02fcf99394cb",
-    //       "configured": true,
-    //       "device_name": "unity-lab-lnx-vm9",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": "Linux",
-    //       "os": "Ubuntu Linux (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": true,
-    //         "observium": false,
-    //         "enabled": true,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "3498e937-0a0f-4fb6-b609-b1d5886eccc9",
-    //       "configured": true,
-    //       "device_name": "UL-Template-Centos9-40GB",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": null,
-    //       "os": "CentOS 8 (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": false,
-    //         "observium": false,
-    //         "enabled": false,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "72bbc76c-28fb-464d-8037-c9583aea46fb",
-    //       "configured": false,
-    //       "device_name": "devopscentos9-template",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": null,
-    //       "os": "CentOS 8 (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": false,
-    //         "observium": false,
-    //         "enabled": false,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "02b1685e-f35a-4304-b291-f8b35f9690d1",
-    //       "configured": false,
-    //       "device_name": "devopsubt24-template",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": "Linux",
-    //       "os": "Ubuntu Linux (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": true,
-    //         "observium": false,
-    //         "enabled": true,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "61657101-2158-46c0-affe-b41d7fd488ed",
-    //       "configured": true,
-    //       "device_name": "unity-lab-lnx-suse-vm1",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": "Linux",
-    //       "os": "SUSE Linux Enterprise 15 (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": false,
-    //         "observium": false,
-    //         "enabled": false,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "cfee324f-eae0-43e2-8dc4-1f786df705d3",
-    //       "configured": false,
-    //       "device_name": "unity-lab-lnx-vm14",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": "Linux",
-    //       "os": "Ubuntu Linux (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": true,
-    //         "observium": false,
-    //         "enabled": true,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "49197e0e-4030-40bc-ac83-63817cf4e12e",
-    //       "configured": true,
-    //       "device_name": "unity-lab-lnx-vm7",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": "Linux",
-    //       "os": "Ubuntu Linux (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": true,
-    //         "observium": false,
-    //         "enabled": true,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "053a5d92-e3e1-4bed-8c59-e00b7dda3497",
-    //       "configured": true,
-    //       "device_name": "unity-lab-Win-vm5",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": "Windows",
-    //       "os": "Microsoft Windows Server 2016 or later (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     },
-    //     {
-    //       "status": "down",
-    //       "datacenter": "DC1",
-    //       "monitoring": {
-    //         "configured": true,
-    //         "observium": false,
-    //         "enabled": true,
-    //         "zabbix": true
-    //       },
-    //       "uuid": "ad6ff217-ee58-4d9c-a0e6-ff91712c7cc2",
-    //       "configured": true,
-    //       "device_name": "unity-lab-Win-vm13",
-    //       "deviceType": "Virtual Machine",
-    //       "device_type": "VMware VM",
-    //       "device": "virtual machine",
-    //       "ssr_os": "Windows",
-    //       "os": "Microsoft Windows Server 2016 or later (64-bit)",
-    //       "vmSubType": "VMware",
-    //       "last_seen": "N/A"
-    //     }
-    //   ]
-    // })
 
   }
 
@@ -2921,8 +2301,25 @@ export class DiscoveryDashboardService {
       params = params.append('region', region);
     });
 
-    params = params.set('time_range', filters?.timeRange || 'last_30_days');
+    params = params.set('time_range', this.mapTimeRangeToApiValue(filters?.timeRange || DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT));
+    if (filters?.startDate) {
+      params = params.set('start_datetime', filters.startDate);
+    }
+    if (filters?.endDate) {
+      params = params.set('end_datetime', filters.endDate);
+    }
     return params;
+  }
+
+  private mapTimeRangeToApiValue(value: string): string {
+    switch (value) {
+      case 'last_7_days':
+        return 'last_week';
+      case 'last_30_days':
+        return 'last_month';
+      default:
+        return value;
+    }
   }
 
 

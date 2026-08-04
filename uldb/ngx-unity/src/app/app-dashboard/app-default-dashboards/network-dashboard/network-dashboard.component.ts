@@ -18,30 +18,19 @@ import {
   NetworkAlertsByDeviceTypeResponse,
   NetworkAlertsBySeverityResponse,
   NetworkAverageTemperatureBySensorTypeResponse,
-  NetworkAverageUptimeByDeviceTypeResponse,
-  NetworkCpuVsMemoryPerformanceResponse,
   NetworkDashboardDatacenterOption,
   NetworkDashboardFilterCriteria,
-  NetworkDeviceAvailabilityTableResponse,
-  NetworkDeviceHealthDistributionResponse,
-  NetworkDeviceTypeDistributionResponse,
-  NetworkDevicesByLocationResponse,
   NetworkEnvironmentalHealthSummaryTableResponse,
   NetworkFanHealthByDeviceResponse,
-  NetworkInterfaceHealthMetricChartResponse,
-  NetworkInterfaceHealthMetricsTableResponse,
-  NetworkLowestAvailabilityResponse,
-  NetworkManufacturerModelBreakdownResponse,
   NetworkOpenItsmTicketsByDeviceTypeResponse,
-  NetworkPerformanceInsightsTableResponse,
   NetworkPowerSupplyStatusDistributionResponse,
-  NetworkTopBandwidthUsageResponse,
-  NetworkTopConversationMetricResponse,
-  NetworkTopConversationsTableResponse,
   NetworkTopCriticalAlertsResponse,
-  NetworkTopDevicesByHotspotTemperatureResponse,
-  NetworkTrafficInVsOutResponse
+  NetworkTopDevicesByHotspotTemperatureResponse
 } from './network-dashboard.type';
+import {
+  NETWORK_DASHBOARD_TIME_RANGE_DEFAULT,
+  NETWORK_DASHBOARD_TIME_RANGE_OPTIONS
+} from './network-dashboard.const';
 import {
   AlertEventsChartViewData,
   AlertEventsViewWidgetViewData,
@@ -71,10 +60,14 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   filterForm: FormGroup;
   filterLoadFailed = false;
   datacenterOptions: NetworkDashboardDatacenterOption[] = [];
-  timeRangeOptions: string[] = [];
+  readonly timeRangeOptions = NETWORK_DASHBOARD_TIME_RANGE_OPTIONS;
+  selectedTimeRange: string = NETWORK_DASHBOARD_TIME_RANGE_DEFAULT;
+  private selectedTimeRangeDates: { from: string; to: string } | null = null;
   appliedFilters: NetworkDashboardFilterCriteria = {
     datacenterIds: [],
-    timeRange: 'last_month'
+    timeRange: NETWORK_DASHBOARD_TIME_RANGE_DEFAULT,
+    startDate: '',
+    endDate: ''
   };
   loaderNames = {
     filters: 'networkDashboardFiltersLoader',
@@ -104,8 +97,11 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   alertEventsViewData: AlertEventsViewWidgetViewData;
   autoRemediationSummaryViewData: AutoRemediationSummaryWidgetViewData;
   topConversationsViewMode: 'table' | 'chart' = 'chart';
+  topConversationsSearch: string = '';
   performanceWorkloadInsightsViewMode: 'table' | 'chart' = 'chart';
+  performanceWorkloadSearch: string = '';
   interfaceHealthMetricsViewMode: 'table' | 'chart' = 'chart';
+  interfaceHealthMetricsSearch: string = '';
   networkDeviceAvailabilityViewMode: 'table' | 'chart' = 'chart';
   environmentalHealthSummaryViewMode: 'table' | 'chart' = 'chart';
   manufacturerModelLegendPage = 0;
@@ -165,7 +161,9 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.startLoader(this.loaderNames.filters);
     this.svc.getFilterOptions().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.datacenterOptions = res?.datacenters || [];
-      this.timeRangeOptions = res?.time_range || [];
+      this.appliedFilters.timeRange = this.getDefaultTimeRangeSelection();
+      this.selectedTimeRange = this.appliedFilters.timeRange;
+      this.selectedTimeRangeDates = null;
       this.buildFilterForm();
       this.applyFilters();
       this.stopLoader(this.loaderNames.filters);
@@ -217,21 +215,12 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.isTopConversationsLoading = true;
     this.topConversationsWidgetViewData = this.topConversationsWidgetViewData || new TopConversationsWidgetViewData();
     this.startLoader(this.loaderNames.topConversations);
-    const emptyMetricResponse: NetworkTopConversationMetricResponse = { data: [] };
-    const emptyBandwidthResponse: NetworkTopBandwidthUsageResponse = { data: [] };
-    const emptyTableResponse: NetworkTopConversationsTableResponse = { data: [] };
-    forkJoin({
-      topBitsReceived: this.svc.getTopBitsReceived(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Top Bits Receive data. Showing available Top 10 Conversations data.', emptyMetricResponse))),
-      topBitsSent: this.svc.getTopBitsSent(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Top Bits Sent data. Showing available Top 10 Conversations data.', emptyMetricResponse))),
-      topBandwidthUsage: this.svc.getTopBandwidthUsage(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Top Bandwidth Usage data. Showing available Top 10 Conversations data.', emptyBandwidthResponse))),
-      tableData: this.svc.getTopConversationsTable(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Top 10 Conversations table data. Showing available Top 10 Conversations data.', emptyTableResponse)))
-    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      const view = this.svc.convertToTopConversationsChartViewData(
-        res.topBitsReceived,
-        res.topBitsSent,
-        res.topBandwidthUsage
-      );
-      this.topConversationsWidgetViewData = this.svc.applyTopConversationsTableData(view, res.tableData);
+    this.svc.getTopConversationsTable(
+      this.appliedFilters,
+      this.getTopConversationOrdering(),
+      this.topConversationsSearch
+    ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.topConversationsWidgetViewData = this.svc.convertToTopConversationsViewDataFromTable(res);
       this.initializeTopConversationSortState();
       this.isTopConversationsLoading = false;
       this.stopLoader(this.loaderNames.topConversations);
@@ -246,16 +235,12 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.isPerformanceWorkloadLoading = true;
     this.performanceWorkloadInsightsViewData = this.performanceWorkloadInsightsViewData || new PerformanceWorkloadInsightsWidgetViewData();
     this.startLoader(this.loaderNames.performanceWorkload);
-    const emptyPerformanceTable: NetworkPerformanceInsightsTableResponse = { data: [] };
-    const emptyCpuVsMemory: NetworkCpuVsMemoryPerformanceResponse = { data: [] };
-    const emptyTrafficInVsOut: NetworkTrafficInVsOutResponse = { data: [] };
-    forkJoin({
-      tableData: this.svc.getPerformanceInsightsTable(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Performance / Workload Insights table data. Showing available Performance / Workload Insights data.', emptyPerformanceTable))),
-      cpuVsMemory: this.svc.getCpuVsMemoryPerformance(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load CPU Vs Memory Performance data. Showing available Performance / Workload Insights data.', emptyCpuVsMemory))),
-      trafficInVsOut: this.svc.getTrafficInVsOut(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Traffic In Vs Traffic Out data. Showing available Performance / Workload Insights data.', emptyTrafficInVsOut)))
-    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      const view = this.svc.convertToPerformanceWorkloadChartViewData(res.cpuVsMemory, res.trafficInVsOut);
-      this.performanceWorkloadInsightsViewData = this.svc.applyPerformanceWorkloadTableData(view, res.tableData);
+    this.svc.getPerformanceInsightsTable(
+      this.appliedFilters,
+      this.getPerformanceWorkloadOrdering(),
+      this.performanceWorkloadSearch
+    ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.performanceWorkloadInsightsViewData = this.svc.convertToPerformanceWorkloadViewDataFromTable(res);
       this.initializePerformanceWorkloadSortState();
       this.isPerformanceWorkloadLoading = false;
       this.stopLoader(this.loaderNames.performanceWorkload);
@@ -270,22 +255,12 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.isInterfaceHealthMetricsLoading = true;
     this.interfaceHealthMetricsViewData = this.interfaceHealthMetricsViewData || new InterfaceHealthMetricsWidgetViewData();
     this.startLoader(this.loaderNames.interfaceHealthMetrics);
-    const emptyInterfaceTable: NetworkInterfaceHealthMetricsTableResponse = { data: [] };
-    const emptyInterfaceChart: NetworkInterfaceHealthMetricChartResponse = { data: [] };
-    forkJoin({
-      tableData: this.svc.getInterfaceHealthMetricsTable(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Interface Health & Metrics table data. Showing available Interface Health & Metrics data.', emptyInterfaceTable))),
-      errorsInbound: this.svc.getInterfaceErrorsInbound(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Interface Errors (Inbound) data. Showing available Interface Health & Metrics data.', emptyInterfaceChart))),
-      errorsOutbound: this.svc.getInterfaceErrorsOutbound(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Interface Errors (Outbound) data. Showing available Interface Health & Metrics data.', emptyInterfaceChart))),
-      discardsInbound: this.svc.getInterfaceDiscardsInbound(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Interface Discards (Inbound) data. Showing available Interface Health & Metrics data.', emptyInterfaceChart))),
-      discardsOutbound: this.svc.getInterfaceDiscardsOutbound(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Interface Discards (Outbound) data. Showing available Interface Health & Metrics data.', emptyInterfaceChart)))
-    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      const view = this.svc.convertToInterfaceHealthMetricsChartViewData(
-        res.errorsInbound,
-        res.errorsOutbound,
-        res.discardsInbound,
-        res.discardsOutbound
-      );
-      this.interfaceHealthMetricsViewData = this.svc.applyInterfaceHealthMetricsTableData(view, res.tableData);
+    this.svc.getInterfaceHealthMetricsTable(
+      this.appliedFilters,
+      this.getInterfaceHealthMetricsOrdering(),
+      this.interfaceHealthMetricsSearch
+    ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.interfaceHealthMetricsViewData = this.svc.convertToInterfaceHealthMetricsViewDataFromTable(res);
       this.initializeInterfaceHealthMetricsSortState();
       this.isInterfaceHealthMetricsLoading = false;
       this.stopLoader(this.loaderNames.interfaceHealthMetrics);
@@ -300,31 +275,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.isNetworkDeviceAvailabilityLoading = true;
     this.networkDeviceAvailabilityViewData = this.networkDeviceAvailabilityViewData || new NetworkDeviceAvailabilityWidgetViewData();
     this.startLoader(this.loaderNames.networkDeviceAvailability);
-    const emptyDeviceAvailabilityTable: NetworkDeviceAvailabilityTableResponse = { data: [] };
-    const emptyDeviceHealthDistribution: NetworkDeviceHealthDistributionResponse = { data: [] };
-    const emptyDeviceTypeDistribution: NetworkDeviceTypeDistributionResponse = { data: [] };
-    const emptyManufacturerModelBreakdown: NetworkManufacturerModelBreakdownResponse = { data: [] };
-    const emptyDevicesByLocation: NetworkDevicesByLocationResponse = { data: [] };
-    const emptyAverageUptime: NetworkAverageUptimeByDeviceTypeResponse = { data: [] };
-    const emptyLowestAvailability: NetworkLowestAvailabilityResponse = { data: [] };
-    forkJoin({
-      tableData: this.svc.getNetworkDeviceAvailabilityTable(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Network Device Availability table data. Showing available Network Device Availability data.', emptyDeviceAvailabilityTable))),
-      deviceHealthDistribution: this.svc.getDeviceHealthDistribution(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Device Health Distribution data. Showing available Network Device Availability data.', emptyDeviceHealthDistribution))),
-      deviceTypeDistribution: this.svc.getDeviceTypeDistribution(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Device Type Distribution data. Showing available Network Device Availability data.', emptyDeviceTypeDistribution))),
-      manufacturerModelBreakdown: this.svc.getManufacturerModelBreakdown(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Manufacturer & Model Breakdown data. Showing available Network Device Availability data.', emptyManufacturerModelBreakdown))),
-      devicesByLocation: this.svc.getDevicesByLocation(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Devices by Location data. Showing available Network Device Availability data.', emptyDevicesByLocation))),
-      averageUptimeByDeviceType: this.svc.getAverageUptimeByDeviceType(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Average Uptime by Category data. Showing available Network Device Availability data.', emptyAverageUptime))),
-      lowestAvailability: this.svc.getLowestAvailability(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Lowest Availability data. Showing available Network Device Availability data.', emptyLowestAvailability)))
-    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      const view = this.svc.convertToNetworkDeviceAvailabilityChartViewData(
-        res.deviceHealthDistribution,
-        res.deviceTypeDistribution,
-        res.manufacturerModelBreakdown,
-        res.devicesByLocation,
-        res.averageUptimeByDeviceType,
-        res.lowestAvailability
-      );
-      this.networkDeviceAvailabilityViewData = this.svc.applyNetworkDeviceAvailabilityTableData(view, res.tableData);
+    this.svc.getNetworkDeviceAvailabilityTable(this.appliedFilters).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.networkDeviceAvailabilityViewData = this.svc.convertToNetworkDeviceAvailabilityViewDataFromTable(res);
       this.manufacturerModelLegendPage = 0;
       this.deviceTypeLegendPage = 0;
       this.initializeNetworkDeviceAvailabilitySortState();
@@ -465,11 +417,16 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortColumn: event.sortColumn,
       sortDirection: event.sortDirection
     };
-    this.topConversationsWidgetViewData.tableRows = this.svc.sortTopConversationRows(
-      this.topConversationsWidgetViewData.tableRows,
-      event.sortColumn,
-      event.sortDirection
-    );
+    this.getTopConversations();
+  }
+
+  onTopConversationsSearched(value: string) {
+    this.topConversationsSearch = value || '';
+    this.getTopConversations();
+  }
+
+  getVisibleTopConversationRows() {
+    return this.topConversationsWidgetViewData?.tableRows || [];
   }
 
   getTopConversationSortDirection(sortColumn: string): string {
@@ -494,11 +451,16 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortColumn: event.sortColumn,
       sortDirection: event.sortDirection
     };
-    this.performanceWorkloadInsightsViewData.tableRows = this.svc.sortPerformanceWorkloadRows(
-      this.performanceWorkloadInsightsViewData.tableRows,
-      event.sortColumn,
-      event.sortDirection
-    );
+    this.getPerformanceWorkloadInsights();
+  }
+
+  onPerformanceWorkloadSearched(value: string) {
+    this.performanceWorkloadSearch = value || '';
+    this.getPerformanceWorkloadInsights();
+  }
+
+  getVisiblePerformanceWorkloadRows() {
+    return this.performanceWorkloadInsightsViewData?.tableRows || [];
   }
 
   getPerformanceWorkloadSortDirection(sortColumn: string): string {
@@ -523,11 +485,16 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortColumn: event.sortColumn,
       sortDirection: event.sortDirection
     };
-    this.interfaceHealthMetricsViewData.tableRows = this.svc.sortInterfaceHealthMetricRows(
-      this.interfaceHealthMetricsViewData.tableRows,
-      event.sortColumn,
-      event.sortDirection
-    );
+    this.getInterfaceHealthMetrics();
+  }
+
+  onInterfaceHealthMetricsSearched(value: string) {
+    this.interfaceHealthMetricsSearch = value || '';
+    this.getInterfaceHealthMetrics();
+  }
+
+  getVisibleInterfaceHealthMetricsRows() {
+    return this.interfaceHealthMetricsViewData?.tableRows || [];
   }
 
   getInterfaceHealthMetricsSortDirection(sortColumn: string): string {
@@ -757,29 +724,81 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  getTimeRangeDropdownLabel(value: string): string {
+    switch (value) {
+      case 'last_24_hours':
+        return 'Last 24 Hours';
+      case 'last_week':
+        return 'Last 7 Days';
+      case 'last_month':
+        return 'Last 30 Days';
+      case 'last_60_days':
+        return 'Last 60 Days';
+      case 'last_90_days':
+        return 'Last 90 Days';
+      case 'last_year':
+        return 'Last 1 Year';
+      default:
+        return this.getTimeRangeLabel(value);
+    }
+  }
+
   private buildFilterForm() {
-    const defaultTimeRange = this.timeRangeOptions.includes('last_month')
-      ? 'last_month'
-      : (this.timeRangeOptions[0] || 'last_month');
+    const defaultTimeRange = this.getDefaultTimeRangeSelection();
+    this.selectedTimeRange = this.appliedFilters.timeRange || defaultTimeRange;
 
     this.filterForm = new FormGroup({
       datacenters: new FormControl(this.datacenterOptions.slice()),
-      timeRange: new FormControl(defaultTimeRange)
+      timeRange: new FormControl(this.selectedTimeRange),
+      startDate: new FormControl(this.appliedFilters.startDate || ''),
+      endDate: new FormControl(this.appliedFilters.endDate || '')
     });
+    this.onTimeRangeChange({ period: this.selectedTimeRange });
   }
 
   private getFilterFormOutput(): NetworkDashboardFilterCriteria {
     const selectedDatacenters = this.filterForm.get('datacenters')?.value || [];
-    const defaultTimeRange = this.timeRangeOptions.includes('last_month')
-      ? 'last_month'
-      : (this.timeRangeOptions[0] || 'last_month');
+    const defaultTimeRange = this.getDefaultTimeRangeSelection();
 
     return {
       datacenterIds: (selectedDatacenters || [])
         .map(item => item?.id)
         .filter(id => typeof id === 'number'),
-      timeRange: this.filterForm.get('timeRange')?.value || defaultTimeRange
+      timeRange: this.filterForm.get('timeRange')?.value || defaultTimeRange,
+      startDate: this.filterForm.get('timeRange')?.value === 'custom' ? (this.filterForm.get('startDate')?.value || '') : '',
+      endDate: this.filterForm.get('timeRange')?.value === 'custom' ? (this.filterForm.get('endDate')?.value || '') : ''
     };
+  }
+
+  private getDefaultTimeRangeSelection(): string {
+    const preferredOption = this.timeRangeOptions.find(option => option?.value === NETWORK_DASHBOARD_TIME_RANGE_DEFAULT);
+    return preferredOption?.value || this.timeRangeOptions[0]?.value || NETWORK_DASHBOARD_TIME_RANGE_DEFAULT;
+  }
+
+  onTimeRangeChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
+    this.selectedTimeRange = event?.period || this.selectedTimeRange;
+    this.selectedTimeRangeDates = event?.period === 'custom'
+      ? { from: this.formatTimeRangeDate(event?.from, false), to: this.formatTimeRangeDate(event?.to, true) }
+      : null;
+    this.filterForm?.patchValue({
+      timeRange: this.selectedTimeRange,
+      startDate: this.selectedTimeRange === 'custom' ? (this.selectedTimeRangeDates?.from || '') : '',
+      endDate: this.selectedTimeRange === 'custom' ? (this.selectedTimeRangeDates?.to || '') : ''
+    }, { emitEvent: false });
+  }
+
+  private formatTimeRangeDate(value: string | Date | undefined, isEnd: boolean): string {
+    if (!value) {
+      return '';
+    }
+    const date = value instanceof Date ? value : new Date(value);
+    if (isNaN(date.getTime())) {
+      return '';
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}T${isEnd ? '23:59:59' : '00:00:00'}Z`;
   }
 
   private stopLoader(loaderName: string) {
@@ -794,7 +813,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.filterForm = null;
     this.filterLoadFailed = false;
     this.datacenterOptions = [];
-    this.timeRangeOptions = [];
+    this.selectedTimeRange = NETWORK_DASHBOARD_TIME_RANGE_DEFAULT;
+    this.selectedTimeRangeDates = null;
     this.isNetworkOverviewLoading = false;
     this.isTopConversationsLoading = false;
     this.isPerformanceWorkloadLoading = false;
@@ -812,8 +832,11 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.alertEventsViewData = null;
     this.autoRemediationSummaryViewData = null;
     this.topConversationsViewMode = 'chart';
+    this.topConversationsSearch = '';
     this.performanceWorkloadInsightsViewMode = 'chart';
+    this.performanceWorkloadSearch = '';
     this.interfaceHealthMetricsViewMode = 'chart';
+    this.interfaceHealthMetricsSearch = '';
     this.networkDeviceAvailabilityViewMode = 'chart';
     this.manufacturerModelLegendPage = 0;
     this.deviceTypeLegendPage = 0;
@@ -828,65 +851,101 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
 
   private initializeTopConversationSortState() {
     if (!this.topConversationsWidgetViewData?.tableRows?.length) {
-      this.topConversationSortState = { sortColumn: '', sortDirection: '' };
+      if (!this.topConversationSortState.sortColumn || !this.topConversationSortState.sortDirection) {
+        this.topConversationSortState = {
+          sortColumn: this.topConversationsWidgetViewData?.defaultSortColumn || 'bitsReceiveValue',
+          sortDirection: this.topConversationsWidgetViewData?.defaultSortDirection || 'desc'
+        };
+      }
       return;
     }
 
-    this.topConversationSortState = {
-      sortColumn: this.topConversationsWidgetViewData.defaultSortColumn,
-      sortDirection: this.topConversationsWidgetViewData.defaultSortDirection
+    if (!this.topConversationSortState.sortColumn || !this.topConversationSortState.sortDirection) {
+      this.topConversationSortState = {
+        sortColumn: this.topConversationsWidgetViewData.defaultSortColumn,
+        sortDirection: this.topConversationsWidgetViewData.defaultSortDirection
+      };
+    }
+  }
+
+  private getTopConversationOrdering(): string {
+    const sortColumn = this.topConversationSortState.sortColumn || 'bitsReceiveValue';
+    const sortDirection = this.topConversationSortState.sortDirection || 'desc';
+    const orderingKeyMap: { [key: string]: string } = {
+      name: 'name',
+      bitsReceiveValue: 'bits_received',
+      bitsSentValue: 'bits_sent',
+      interfaceType: 'interface_type',
+      operationalStatus: 'operational_status',
+      speedValue: 'speed',
+      bandwidthUsagePercent: 'bandwidth_usage'
     };
-    this.topConversationsWidgetViewData.tableRows = this.svc.sortTopConversationRows(
-      this.topConversationsWidgetViewData.tableRows,
-      this.topConversationsWidgetViewData.defaultSortColumn,
-      this.topConversationsWidgetViewData.defaultSortDirection
-    );
+    const orderingKey = orderingKeyMap[sortColumn] || 'bits_received';
+    return sortDirection === 'desc' ? `-${orderingKey}` : orderingKey;
   }
 
   private initializePerformanceWorkloadSortState() {
     if (!this.performanceWorkloadInsightsViewData?.tableRows?.length) {
-      this.performanceWorkloadSortState = { sortColumn: '', sortDirection: '' };
+      if (!this.performanceWorkloadSortState.sortColumn || !this.performanceWorkloadSortState.sortDirection) {
+        this.performanceWorkloadSortState = {
+          sortColumn: this.performanceWorkloadInsightsViewData?.defaultSortColumn || 'cpuPercent',
+          sortDirection: this.performanceWorkloadInsightsViewData?.defaultSortDirection || 'desc'
+        };
+      }
       return;
     }
 
-    this.performanceWorkloadSortState = {
-      sortColumn: this.performanceWorkloadInsightsViewData.defaultSortColumn,
-      sortDirection: this.performanceWorkloadInsightsViewData.defaultSortDirection
+    if (!this.performanceWorkloadSortState.sortColumn || !this.performanceWorkloadSortState.sortDirection) {
+      this.performanceWorkloadSortState = {
+        sortColumn: this.performanceWorkloadInsightsViewData.defaultSortColumn,
+        sortDirection: this.performanceWorkloadInsightsViewData.defaultSortDirection
+      };
+    }
+  }
+
+  private getPerformanceWorkloadOrdering(): string {
+    const sortColumn = this.performanceWorkloadSortState.sortColumn || 'cpuPercent';
+    const sortDirection = this.performanceWorkloadSortState.sortDirection || 'desc';
+    const orderingKeyMap: { [key: string]: string } = {
+      cpuPercent: 'cpu_utilization',
+      memoryPercent: 'memory_utilization',
+      interfaceTrafficInMbps: 'traffic_in',
+      interfaceTrafficOutMbps: 'traffic_out'
     };
-
-    if (!this.performanceWorkloadInsightsViewData.defaultSortColumn || !this.performanceWorkloadInsightsViewData.defaultSortDirection) {
-      this.performanceWorkloadInsightsViewData.tableRows = this.performanceWorkloadInsightsViewData.tableRows.slice();
-      return;
-    }
-
-    this.performanceWorkloadInsightsViewData.tableRows = this.svc.sortPerformanceWorkloadRows(
-      this.performanceWorkloadInsightsViewData.tableRows,
-      this.performanceWorkloadInsightsViewData.defaultSortColumn,
-      this.performanceWorkloadInsightsViewData.defaultSortDirection
-    );
+    const orderingKey = orderingKeyMap[sortColumn] || 'cpu_utilization';
+    return sortDirection === 'desc' ? `-${orderingKey}` : orderingKey;
   }
 
   private initializeInterfaceHealthMetricsSortState() {
     if (!this.interfaceHealthMetricsViewData?.tableRows?.length) {
-      this.interfaceHealthMetricsSortState = { sortColumn: '', sortDirection: '' };
+      if (!this.interfaceHealthMetricsSortState.sortColumn || !this.interfaceHealthMetricsSortState.sortDirection) {
+        this.interfaceHealthMetricsSortState = {
+          sortColumn: this.interfaceHealthMetricsViewData?.defaultSortColumn || 'errorsInValue',
+          sortDirection: this.interfaceHealthMetricsViewData?.defaultSortDirection || 'desc'
+        };
+      }
       return;
     }
 
-    this.interfaceHealthMetricsSortState = {
-      sortColumn: this.interfaceHealthMetricsViewData.defaultSortColumn,
-      sortDirection: this.interfaceHealthMetricsViewData.defaultSortDirection
+    if (!this.interfaceHealthMetricsSortState.sortColumn || !this.interfaceHealthMetricsSortState.sortDirection) {
+      this.interfaceHealthMetricsSortState = {
+        sortColumn: this.interfaceHealthMetricsViewData.defaultSortColumn,
+        sortDirection: this.interfaceHealthMetricsViewData.defaultSortDirection
+      };
+    }
+  }
+
+  private getInterfaceHealthMetricsOrdering(): string {
+    const sortColumn = this.interfaceHealthMetricsSortState.sortColumn || 'errorsInValue';
+    const sortDirection = this.interfaceHealthMetricsSortState.sortDirection || 'desc';
+    const orderingKeyMap: { [key: string]: string } = {
+      errorsInValue: 'errors_inbound',
+      errorsOutValue: 'errors_outbound',
+      discardsInValue: 'discards_inbound',
+      discardsOutValue: 'discards_outbound'
     };
-
-    if (!this.interfaceHealthMetricsViewData.defaultSortColumn || !this.interfaceHealthMetricsViewData.defaultSortDirection) {
-      this.interfaceHealthMetricsViewData.tableRows = this.interfaceHealthMetricsViewData.tableRows.slice();
-      return;
-    }
-
-    this.interfaceHealthMetricsViewData.tableRows = this.svc.sortInterfaceHealthMetricRows(
-      this.interfaceHealthMetricsViewData.tableRows,
-      this.interfaceHealthMetricsViewData.defaultSortColumn,
-      this.interfaceHealthMetricsViewData.defaultSortDirection
-    );
+    const orderingKey = orderingKeyMap[sortColumn] || '';
+    return orderingKey ? (sortDirection === 'desc' ? `-${orderingKey}` : orderingKey) : '';
   }
 
   private initializeNetworkDeviceAvailabilitySortState() {

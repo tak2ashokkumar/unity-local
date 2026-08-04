@@ -100,10 +100,6 @@ export const VMS_ROUTES: Routes = [
         }
     },
     {
-        path: 'vcenter/:deviceId/webaccess',
-        component: WebAccessComponent
-    },
-    {
         path: 'vcenter/:deviceId/console',
         component: ConsoleAccessComponent
     },

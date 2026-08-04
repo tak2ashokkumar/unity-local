@@ -21,7 +21,7 @@
                 <div class="input-group">
                   <owl-date-time #from [hour12Timer]="true" [scrollStrategy]="fromScrollStrategy"
                     [pickerType]="dateOnlyPicker ? 'calendar' : 'both'"
-                    [panelClass]="popupPanelClass" (afterPickerOpen)="onPickerOpened('from', from)"
+                    [panelClass]="resolvedPopupPanelClass" (afterPickerOpen)="onPickerOpened('from', from)"
                     (afterPickerClosed)="onPickerClosed('from')"></owl-date-time>
                   <input class="form-control form-control-sm rounded-left" formControlName="from"
                     [owlDateTimeTrigger]="from" [owlDateTime]="from" type="text" name="from" placeholder="From"
@@ -38,7 +38,7 @@
                 <div class="input-group">
                   <owl-date-time #to [hour12Timer]="true" [scrollStrategy]="toScrollStrategy"
                     [pickerType]="dateOnlyPicker ? 'calendar' : 'both'"
-                    [panelClass]="popupPanelClass" (afterPickerOpen)="onPickerOpened('to', to)"
+                    [panelClass]="resolvedPopupPanelClass" (afterPickerOpen)="onPickerOpened('to', to)"
                     (afterPickerClosed)="onPickerClosed('to')"></owl-date-time>
                   <input class="form-control form-control-sm rounded-left" formControlName="to"
                     [owlDateTimeTrigger]="to" [owlDateTime]="to" type="text" name="to" placeholder="To"

@@ -399,6 +399,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   private buildFilterForm() {
     this.filterFormUnsubscribe.next();
     this.filterForm = this.svc.buildFilterForm(this.platformOptions, this.regionOptions, this.accountOptions);
+    this.onTimeRangeChange({ period: this.selectedTimeRange });
     this.watchFilterChanges();
   }
 

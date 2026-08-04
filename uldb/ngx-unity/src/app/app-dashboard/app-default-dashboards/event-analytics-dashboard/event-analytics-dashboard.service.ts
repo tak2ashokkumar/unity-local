@@ -4,11 +4,19 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators }
 import { EChartsOption } from 'echarts';
 import * as moment from 'moment';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { DataCenterTabs } from 'src/app/united-cloud/datacenter/tabs';
+import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
 import {
   ALERT_BY_DEVICE_TYPE_API_DUMMY,
   DASHBOARD_FILTERS_DUMMY,
   DASHBOARD_TOP_FILTERS_API_DUMMY,
   DASHBOARD_HEADER_API_DUMMY,
+  EVENT_ANALYTICS_ALL_DATACENTER_OPTION,
+  EVENT_ANALYTICS_ALL_DATACENTER_VALUE,
+  EVENT_ANALYTICS_ALL_SEVERITY_VALUE,
+  EVENT_ANALYTICS_ALL_SOURCE_OPTION,
+  EVENT_ANALYTICS_ALL_SOURCE_VALUE,
   EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE,
   EVENT_ANALYTICS_CATEGORY_OPTIONS,
   EVENT_ANALYTICS_DONUT_COLORS,
@@ -34,6 +42,7 @@ import {
   EVENT_ANALYTICS_RESOLVED_INCIDENTS_ENDPOINT,
   EVENT_ANALYTICS_STATUS_COLORS,
   EVENT_ANALYTICS_SUMMARY_ENDPOINT,
+  EVENT_ANALYTICS_TOP_TIME_RANGE_OPTIONS,
   EVENT_ANALYTICS_TIME_RANGE_OPTIONS,
   EVENT_ANALYTICS_TOP_HEADER_ENDPOINT,
   EVENT_ANALYTICS_TREND_ALERT_TYPE_OPTIONS,
@@ -100,7 +109,8 @@ import {
 export class EventAnalyticsDashboardService {
 
   constructor(private builder: FormBuilder,
-    private http: HttpClient) { }
+    private http: HttpClient,
+    private datacenterService: DatacenterService) { }
 
   buildFilterForm(filters?: DashboardFilters): FormGroup {
     const dashboardFilters = filters || DASHBOARD_FILTERS_DUMMY;
@@ -108,7 +118,7 @@ export class EventAnalyticsDashboardService {
     const customTimelineRange = this.getDefaultCustomTimelineRange();
     const itsmRange = this.getDefaultItsmTicketRange();
     return this.builder.group({
-      timeline: [this.getDefaultOptionValue(dashboardFilters.timeRange, 'last_month')],
+      timeline: [this.getDefaultOptionValue(dashboardFilters.timeRange, 'last_30_days')],
       timelineFrom: [{ value: customTimelineRange.from, disabled: true }, [Validators.required]],
       timelineTo: [{ value: customTimelineRange.to, disabled: true }, [Validators.required]],
       eventDeviceCategory: [this.getDefaultOptionValue(dashboardFilters.eventDeviceCategory, 'all')],
@@ -118,9 +128,9 @@ export class EventAnalyticsDashboardService {
       trendTimelineTo: [{ value: customTimelineRange.to, disabled: true }, [Validators.required]],
       alertSegregationCategory: [this.getDefaultOptionValue(dashboardFilters.alertSegregationCategory, 'all')],
       analyticsViewBy: [this.getDefaultOptionValue(dashboardFilters.analyticsViewBy, 'source')],
-      analyticsSourceType: [this.getDefaultOptionValue(dashboardFilters.analyticsSourceType, 'all_source')],
-      analyticsSeverityType: [this.getDefaultOptionValue(dashboardFilters.analyticsSeverityType, 'all_severity')],
-      analyticsDatacenter: [this.getDefaultOptionValue(dashboardFilters.analyticsDatacenter, 'all_datacenter')],
+      analyticsSourceType: [this.getDefaultOptionValue(dashboardFilters.analyticsSourceType, EVENT_ANALYTICS_ALL_SOURCE_VALUE)],
+      analyticsSeverityType: [this.getDefaultOptionValue(dashboardFilters.analyticsSeverityType, EVENT_ANALYTICS_ALL_SEVERITY_VALUE)],
+      analyticsDatacenter: [this.getDefaultOptionValue(dashboardFilters.analyticsDatacenter, EVENT_ANALYTICS_ALL_DATACENTER_VALUE)],
       analyticsCloud: [this.getDefaultOptionValue(dashboardFilters.analyticsCloud, 'all_cloud')],
       analyticsCategory: [this.getDefaultOptionValue(dashboardFilters.analyticsCategory, 'all')],
       eventAndAlertTimeline: [this.getDefaultOptionValue(dashboardFilters.eventAndAlertTimeline, 'last_week')],
@@ -154,6 +164,36 @@ export class EventAnalyticsDashboardService {
 
   buildDashboardFilters(response?: DashboardFiltersApiResponse): DashboardFilters {
     return this.mapDashboardFiltersResponse(response);
+  }
+
+  getAnalyticsDatacenters(): Observable<SelectOption[]> {
+    return this.datacenterService.getDataCenters().pipe(
+      map(datacenters => this.getAnalyticsDatacenterOptions(datacenters))
+    );
+  }
+
+  getFallbackAnalyticsDatacenters(): SelectOption[] {
+    return [{ ...EVENT_ANALYTICS_ALL_DATACENTER_OPTION }];
+  }
+
+  getAnalyticsSeverityTypeOptions(): SelectOption[] {
+    return DASHBOARD_FILTERS_DUMMY.analyticsSeverityType.map(option => ({ ...option }));
+  }
+
+  getAnalyticsSourceTypeOptions(rows?: EventAlertAnalyticsApiResponse['rows']): SelectOption[] {
+    const sourceOptions = (rows || []).reduce((options: SelectOption[], row) => {
+      if (row?.key && row?.label) {
+        options.push({
+          value: row.key,
+          label: row.label
+        });
+      }
+      return options;
+    }, []);
+    return [
+      { ...EVENT_ANALYTICS_ALL_SOURCE_OPTION },
+      ...sourceOptions
+    ];
   }
 
   getHeaderTextData(): Observable<DashboardHeaderApiResponse> {
@@ -216,15 +256,20 @@ export class EventAnalyticsDashboardService {
 
   getEventAlertAnalytics(criteria: DashboardFilterCriteria): Observable<EventAlertAnalyticsApiResponse> {
     // return of(EVENT_ALERT_ANALYTICS_API_DUMMY);
+    const viewBy = criteria?.analyticsViewBy || 'source';
     const analyticsParams: Record<string, string | undefined> = {
-      view_by: criteria?.analyticsViewBy,
-      source_type: criteria?.analyticsSourceType,
-      severity_type: criteria?.analyticsSeverityType,
+      view_by: viewBy,
       datacenter: criteria?.analyticsDatacenter,
       cloud: criteria?.analyticsCloud,
       analytics_category: criteria?.analyticsCategory,
       event_and_alert_timeline: criteria?.eventAndAlertTimeline
     };
+    if (viewBy === 'source') {
+      analyticsParams.source_type = criteria?.analyticsSourceType;
+    }
+    if (viewBy === 'severity') {
+      analyticsParams.severity_type = criteria?.analyticsSeverityType;
+    }
     if (criteria?.eventAndAlertTimeline === EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE) {
       analyticsParams.event_and_alert_timeline_from = this.formatApiDate(criteria?.eventAndAlertTimelineFrom);
       analyticsParams.event_and_alert_timeline_to = this.formatApiDate(criteria?.eventAndAlertTimelineTo);
@@ -547,32 +592,46 @@ export class EventAnalyticsDashboardService {
     };
   }
 
-  convertToEventReductionSankeyOptions(data: SankeyData): EChartsOption {
+  convertToEventReductionSankeyOptions(data: SankeyData, selectedView: 'source' | 'severity' = 'source'): EChartsOption {
     return this.convertToSankeyOptions(data, {
-      left: '2%',
-      right: '2%',
-      top: '5%',
-      bottom: '5%',
+      graphProfile: selectedView === 'severity' ? 'left_severity' : 'left_source',
+      top: 34,
+      bottom: 18,
       nodeWidth: 10,
-      nodeGap: 18,
-      lineCurveness: 0.4
+      nodeGap: 30,
+      layoutIterations: 0,
+      lineCurveness: 0.55,
+      lineOpacity: 0.46,
+      sourceLabelWidth: 150,
+      sourceLabelDistance: 4,
+      sinkLabelWidth: 130,
+      sinkLabelDistance: 6
     });
   }
 
   convertToEventResolutionSankeyOptions(data: SankeyData): EChartsOption {
     return this.convertToSankeyOptions(data, {
-      left: '2%',
-      right: '2%',
-      top: '5%',
-      bottom: '5%',
+      graphProfile: 'right',
+      top: 34,
+      bottom: 18,
       nodeWidth: 10,
-      nodeGap: 20,
-      lineCurveness: 0.4
+      nodeGap: 30,
+      layoutIterations: 0,
+      lineCurveness: 0.55,
+      lineOpacity: 0.46,
+      sinkLabelWidth: 120,
+      sinkLabelDistance: 6
     });
   }
 
-  convertToEventAlertAnalyticsLeftGraphOptions(graph?: EventAlertAnalyticsGraphApiResponse): EChartsOption {
-    return this.convertToEventReductionSankeyOptions(this.convertEventAlertAnalyticsGraphToSankeyData(graph, 'left'));
+  convertToEventAlertAnalyticsLeftGraphOptions(
+    graph?: EventAlertAnalyticsGraphApiResponse,
+    selectedView: 'source' | 'severity' = 'source'
+  ): EChartsOption {
+    return this.convertToEventReductionSankeyOptions(
+      this.convertEventAlertAnalyticsGraphToSankeyData(graph, 'left'),
+      selectedView
+    );
   }
 
   convertToEventAlertAnalyticsRightGraphOptions(graph?: EventAlertAnalyticsGraphApiResponse): EChartsOption {
@@ -587,66 +646,150 @@ export class EventAnalyticsDashboardService {
     const sankeyConfig = typeof configOrLeftPadding === 'number'
       ? { left: configOrLeftPadding }
       : (configOrLeftPadding || {});
+    const rawLinks = (sankeyData.links || [])
+      .map(link => ({ ...link, value: this.getNumber(link?.value) }))
+      .filter(link => !!link.source && !!link.target && link.value > 0);
+    if (!rawLinks.length) {
+      return null;
+    }
+    const sourceNodeNames = new Set(rawLinks.map(link => link.source));
+    const targetNodeNames = new Set(rawLinks.map(link => link.target));
+    const nodeValueMap = new Map<string, number>((sankeyData.nodes || []).map(node => {
+      return [node.name, this.getNumber((node as any)?.count ?? node?.value)];
+    }));
+    const getNodeFlowValue = (name: string): number => {
+      const explicitValue = nodeValueMap.get(name) || 0;
+      if (explicitValue > 0) {
+        return explicitValue;
+      }
+      const incoming = rawLinks.filter(link => link.target === name).reduce((total, link) => total + link.value, 0);
+      const outgoing = rawLinks.filter(link => link.source === name).reduce((total, link) => total + link.value, 0);
+      return Math.max(incoming, outgoing);
+    };
     const nodes = (sankeyData.nodes || []).map((node, index) => {
+      const chartNode = { ...node } as any;
+      delete chartNode.value;
       const imagePath = this.getEventAlertAnalyticsNodeImage(node?.name || node?.labelText);
       const richLogoKey = imagePath ? `logo_${index}` : '';
+      const role = this.getSankeyNodeRole(node?.name, sourceNodeNames, targetNodeNames);
+      const labelConfig = this.getSankeyNodeLabelConfig(node, role, sankeyConfig);
+      const depth = this.getSankeyNodeDepth(node, role, sankeyConfig);
       return {
-        ...node,
+        ...chartNode,
+        count: getNodeFlowValue(node.name),
+        ...(typeof depth === 'number' ? { depth } : {}),
+        label: labelConfig,
         richLogoKey,
-        imagePath
+        imagePath,
+        sankeyNodeRole: role
       };
     });
     const richStyles: any = {
       label: {
         color: '#26313b',
         fontSize: 11,
-        lineHeight: 14
+        lineHeight: 12
       }
     };
     nodes.forEach((node: any) => {
       if (node.imagePath && node.richLogoKey) {
         richStyles[node.richLogoKey] = {
-          width: 66,
+          width: 80,
           height: 14,
           align: 'center',
           backgroundColor: { image: node.imagePath }
         };
       }
     });
+    const maxFlow = Math.max(1, ...rawLinks.map(link => link.value));
+    const compress = (value: number): number => Math.sqrt(Math.max(value, 0));
+    const minLayoutValue = compress(maxFlow) * 0.2;
+    const linkOpacity = sankeyConfig.lineOpacity ?? 0.35;
+    const layoutLinks = rawLinks.map(link => {
+      const chartLink = { ...link } as any;
+      delete chartLink.lineStyle;
+      return {
+        ...chartLink,
+        rawValue: link.value,
+        value: Math.max(compress(link.value), minLayoutValue)
+      };
+    });
+    const estimateLineWidth = (text: string): number => Math.ceil(String(text || '').length * 6.5);
+    const estimateLabelWidth = (node: any): number => {
+      if (!node?.label || node.label.show === false) {
+        return 0;
+      }
+      const labelText = String(node?.labelText || node?.name || '');
+      const lines = labelText.split('\n').map(line => estimateLineWidth(line));
+      const textWidth = Math.max(...lines, 0);
+      const cappedTextWidth = Math.min(textWidth, node.label.width || sankeyConfig.sinkLabelWidth || 110);
+      const logoWidth = node.richLogoKey && node.label.position === 'left' ? 84 : 0;
+      return cappedTextWidth + logoWidth;
+    };
+    const sideLabelWidth = (side: 'left' | 'right'): number => nodes
+      .filter((node: any) => {
+        if (!node?.label || node.label.position !== side || node.label.show === false) {
+          return false;
+        }
+        return side === 'left'
+          ? !targetNodeNames.has(node.name)
+          : !sourceNodeNames.has(node.name);
+      })
+      .reduce((widest: number, node: any) => Math.max(widest, estimateLabelWidth(node)), 0);
+    const leftMarginLimit = (sankeyConfig.sourceLabelWidth ?? 110) + 18;
+    const rightMarginLimit = (sankeyConfig.sinkLabelWidth ?? 110) + 18;
+    const leftMargin = sankeyConfig.left ?? Math.max(12, Math.min(leftMarginLimit, sideLabelWidth('left') + 10));
+    const rightMargin = sankeyConfig.right ?? Math.max(12, Math.min(rightMarginLimit, sideLabelWidth('right') + 10));
     return {
       animation: false,
-      tooltip: { trigger: 'item', triggerOn: 'mousemove' },
+      tooltip: {
+        trigger: 'item',
+        triggerOn: 'mousemove',
+        formatter: (params: any) => {
+          const data = params?.data || {};
+          if (data?.source && data?.target) {
+            return `${data.source} > ${data.target}: ${this.formatNumber(data.rawValue ?? data.value)}`;
+          }
+          return `${params?.name || ''}: ${this.formatNumber(data.count ?? data.value)}`;
+        }
+      },
       series: [
         {
           type: 'sankey',
-          left: sankeyConfig.left ?? 8,
-          right: sankeyConfig.right ?? 10,
+          left: leftMargin,
+          right: rightMargin,
           top: sankeyConfig.top ?? 10,
           bottom: sankeyConfig.bottom ?? 10,
-          nodeWidth: sankeyConfig.nodeWidth ?? 9,
-          nodeGap: sankeyConfig.nodeGap ?? 13,
+          nodeWidth: sankeyConfig.nodeWidth ?? 10,
+          nodeGap: sankeyConfig.nodeGap ?? 12,
           nodeAlign: 'left',
           layoutIterations: sankeyConfig.layoutIterations ?? 32,
           draggable: false,
-          emphasis: { focus: 'adjacency' },
+          emphasis: { focus: 'adjacency' , disabled: true},
           label: {
             color: '#26313b',
-            fontSize: 11,
+            fontSize: 12,
             lineHeight: 14,
             formatter: (params: any) => {
+              if (params?.data?.label?.show === false) {
+                return '';
+              }
               const labelText = params?.data?.labelText || params?.name || '';
               const logoKey = params?.data?.richLogoKey;
-              return logoKey ? `{${logoKey}|}\n{label|${labelText}}` : labelText;
+              const labelPosition = params?.data?.label?.position;
+              return logoKey && labelPosition === 'left'
+                ? `{${logoKey}|} {label|${labelText}}`
+                : logoKey ? `{${logoKey}|}\n{label|${labelText}}` : labelText;
             },
             rich: richStyles
           },
           lineStyle: {
             color: 'gradient',
             curveness: sankeyConfig.lineCurveness ?? 0.52,
-            opacity: 0.46
+            opacity: linkOpacity
           },
           data: nodes,
-          links: sankeyData.links
+          links: layoutLinks
         }
       ]
     } as EChartsOption;
@@ -828,7 +971,7 @@ export class EventAnalyticsDashboardService {
     return {
       animation: false,
       color: [EVENT_ANALYTICS_STATUS_COLORS.critical, EVENT_ANALYTICS_STATUS_COLORS.warning, EVENT_ANALYTICS_STATUS_COLORS.information],
-      grid: { left: 10, right: 10, top: 10, bottom: 10, containLabel: true },
+      grid: { left: 10, right: 30, top: 10, bottom: 30, containLabel: true },
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: {
         bottom: 0,
@@ -984,9 +1127,9 @@ export class EventAnalyticsDashboardService {
   }
 
   private mapDashboardFiltersResponse(res?: DashboardFiltersApiResponse): DashboardFilters {
-    const timeRange = this.buildTimeRangeOptions( EVENT_ANALYTICS_TIME_RANGE_OPTIONS);
-    const trendTimeline = this.buildTimeRangeOptions(timeRange);
-    const eventAndAlertTimeline = this.buildTimeRangeOptions(timeRange);
+    const timeRange = EVENT_ANALYTICS_TOP_TIME_RANGE_OPTIONS.map(option => ({ ...option }));
+    const trendTimeline = this.buildTimeRangeOptions(EVENT_ANALYTICS_TIME_RANGE_OPTIONS);
+    const eventAndAlertTimeline = this.buildTimeRangeOptions(EVENT_ANALYTICS_TIME_RANGE_OPTIONS);
     const category = this.getCategoryOptions();
     return {
       timeRange,
@@ -1006,6 +1149,32 @@ export class EventAnalyticsDashboardService {
       incidentCategory: category
     };
   }
+
+  private getAnalyticsDatacenterOptions(datacenters: DataCenterTabs[]): SelectOption[] {
+    const options = (datacenters || [])
+      .map(datacenter => ({
+        // value: this.getDatacenterOptionValue(datacenter),
+        // label: this.getDatacenterOptionLabel(datacenter)
+        value: datacenter.name,
+        label: datacenter.name
+      }))
+      .filter(option => !!option.value && !!option.label);
+
+    return [
+      { ...EVENT_ANALYTICS_ALL_DATACENTER_OPTION },
+      ...options
+    ];
+  }
+
+  // private getDatacenterOptionValue(datacenter: DataCenterTabs): string {
+  //   const dc = datacenter as DataCenterTabs & { key?: string; dc_uuid?: string };
+  //   return String(dc?.key || dc?.uuid || dc?.dc_uuid || '').trim();
+  // }
+
+  // private getDatacenterOptionLabel(datacenter: DataCenterTabs): string {
+  //   const dc = datacenter as DataCenterTabs & { dc_name?: string; datacenter_name?: string };
+  //   return String(dc?.dc_name || dc?.name || dc?.datacenter_name || '').trim();
+  // }
 
   private mapEventAlertAnalyticsMetrics(payload: any): MetricViewData[] {
     if (Array.isArray(payload?.metrics)) {
@@ -1034,11 +1203,13 @@ export class EventAnalyticsDashboardService {
     const nodes = (graph.nodes || []).map((node, index) => {
       nodeMap.set(node.id, node);
       const color = this.getEventAlertAnalyticsGraphNodeColor(node.name, index, side);
+      const nodeValue = this.getNumber(node.value);
       return {
         name: node.name,
-        labelText: this.getEventAlertAnalyticsGraphLabel(node.name, node.value),
-        itemStyle: { color },
-        label: this.getEventAlertAnalyticsGraphLabelConfig(node.name, side)
+        value: nodeValue,
+        count: nodeValue,
+        labelText: this.getEventAlertAnalyticsGraphLabel(node.name, nodeValue),
+        itemStyle: { color }
       };
     });
     const links: any[] = (graph.links || []).reduce((acc: any[], link: EventAlertAnalyticsGraphLinkApiResponse) => {
@@ -1048,12 +1219,10 @@ export class EventAnalyticsDashboardService {
       if (!sourceNode || !targetNode || linkValue <= 0) {
         return acc;
       }
-      const sourceColor = this.getEventAlertAnalyticsGraphNodeColor(sourceNode.name, 0, side);
       acc.push({
         source: sourceNode.name,
         target: targetNode.name,
-        value: linkValue,
-        lineStyle: { color: this.hexToRgba(sourceColor, 0.24), opacity: 0.55 }
+        value: linkValue
       });
       return acc;
     }, []);
@@ -1076,7 +1245,9 @@ export class EventAnalyticsDashboardService {
     const rows = payload?.rows || [];
     const nodes: any[] = [];
     const links: any[] = [];
-    const bridgeNodeName = 'reduction_events';
+    const bridgeNodeName = 'events';
+    const finalSuccessNodeName = viewBy === 'severity' ? 'root_cause_identified' : 'ticket_generated';
+    const finalFailureNodeName = viewBy === 'severity' ? 'root_cause_unknown' : 'no_ticket_generated';
 
     const sourceRows = (flow?.sources || []).map((source: EventAlertAnalyticsFlowSourceApiResponse, index: number) => ({
       key: this.normalizeKey(source?.name || source?.label || `source_${index}`),
@@ -1098,7 +1269,7 @@ export class EventAnalyticsDashboardService {
           source: `${viewBy}_${item.key}`,
           target: bridgeNodeName,
           value: item.flowValue,
-          lineStyle: { color: this.hexToRgba(item.color, 0.25), opacity: 0.55 }
+          lineStyle: { color: this.hexToRgba(item.color, 0.25), opacity: 0.35 }
         });
       });
     } else if (viewBy === 'severity') {
@@ -1121,7 +1292,7 @@ export class EventAnalyticsDashboardService {
           source: `severity_${item.key}`,
           target: bridgeNodeName,
           value: Math.max(scaledValue, 1),
-          lineStyle: { color: this.hexToRgba(item.color, 0.28), opacity: 0.55 }
+          lineStyle: { color: this.hexToRgba(item.color, 0.28), opacity: 0.35 }
         });
       });
     } else {
@@ -1142,7 +1313,7 @@ export class EventAnalyticsDashboardService {
           source: `source_${this.normalizeKey(rowLabel)}`,
           target: bridgeNodeName,
           value: rowCount,
-          lineStyle: { color: this.hexToRgba(rowColor, 0.25), opacity: 0.55 }
+          lineStyle: { color: this.hexToRgba(rowColor, 0.25), opacity: 0.35 }
         });
       });
     }
@@ -1155,53 +1326,53 @@ export class EventAnalyticsDashboardService {
         label: { position: 'inside', width: 64, overflow: 'truncate', align: 'left' }
       },
       {
-        name: 'reduction_alerts',
+        name: 'alerts',
         labelText: `Alerts ${this.formatNumber(alertCount)}`,
         itemStyle: { color: '#6e56c7' },
         label: { position: 'right', width: 82, overflow: 'truncate', align: 'left' }
       },
       {
-        name: 'reduction_dedupe',
+        name: 'dedupe_events',
         labelText: `Dedupe Events\n${this.formatNumber(dedupeCount)}`,
         itemStyle: { color: '#c8c1f0' },
         label: { position: 'right', width: 86, overflow: 'break', align: 'left' }
       },
       {
-        name: 'reduction_suppressed',
+        name: 'suppressed_events',
         labelText: `Suppressed\nEvents ${this.formatNumber(suppressedCount)}`,
         itemStyle: { color: '#c8c1f0' },
         label: { position: 'right', width: 92, overflow: 'break', align: 'left' }
       },
       {
-        name: 'reduction_conditions',
+        name: 'conditions',
         labelText: `Conditions ${this.formatNumber(conditionsCount)}`,
         itemStyle: { color: '#6b6f73' },
         label: { position: 'right', width: 86, overflow: 'truncate', align: 'left' }
       },
       {
-        name: 'reduction_ticket_generated',
+        name: finalSuccessNodeName,
         labelText: viewBy === 'severity'
-          ? `Root Cause\nIdentified\n${this.formatNumber(ticketGeneratedCount)}`
-          : `Ticket\nGenerated\n${this.formatNumber(ticketGeneratedCount)}`,
+          ? `Root Cause Identified\n${this.formatNumber(ticketGeneratedCount)}`
+          : `Ticket Generated\n${this.formatNumber(ticketGeneratedCount)}`,
         itemStyle: { color: '#59c798' },
         label: { position: 'right', width: 72, overflow: 'break', align: 'left' }
       },
       {
-        name: 'reduction_no_ticket_generated',
+        name: finalFailureNodeName,
         labelText: viewBy === 'severity'
-          ? `Root Cause\nUnknown\n${this.formatNumber(noTicketGeneratedCount)}`
-          : `No Ticket\nGenerated\n${this.formatNumber(noTicketGeneratedCount)}`,
+          ? `Root Cause Unknown\n${this.formatNumber(noTicketGeneratedCount)}`
+          : `No Ticket Generated\n${this.formatNumber(noTicketGeneratedCount)}`,
         itemStyle: { color: '#e59095' },
         label: { position: 'right', width: 76, overflow: 'break', align: 'left' }
       }
     );
 
-    this.pushSankeyLink(links, bridgeNodeName, 'reduction_alerts', alertCount, '#d8c8f6');
-    this.pushSankeyLink(links, bridgeNodeName, 'reduction_dedupe', dedupeCount, '#e3ddfb');
-    this.pushSankeyLink(links, bridgeNodeName, 'reduction_suppressed', suppressedCount, '#ead8ea');
-    this.pushSankeyLink(links, 'reduction_alerts', 'reduction_conditions', conditionsCount, '#d1ebdf');
-    this.pushSankeyLink(links, 'reduction_conditions', 'reduction_ticket_generated', ticketGeneratedCount, '#d6efe2');
-    this.pushSankeyLink(links, 'reduction_conditions', 'reduction_no_ticket_generated', noTicketGeneratedCount, '#f0d5d8');
+    this.pushSankeyLink(links, bridgeNodeName, 'alerts', alertCount, '#d8c8f6');
+    this.pushSankeyLink(links, bridgeNodeName, 'dedupe_events', dedupeCount, '#e3ddfb');
+    this.pushSankeyLink(links, bridgeNodeName, 'suppressed_events', suppressedCount, '#ead8ea');
+    this.pushSankeyLink(links, 'alerts', 'conditions', conditionsCount, '#d1ebdf');
+    this.pushSankeyLink(links, 'conditions', finalSuccessNodeName, ticketGeneratedCount, '#d6efe2');
+    this.pushSankeyLink(links, 'conditions', finalFailureNodeName, noTicketGeneratedCount, '#f0d5d8');
 
     return this.pruneUnusedSankeyNodes({
       nodes,
@@ -1287,7 +1458,7 @@ export class EventAnalyticsDashboardService {
           source: item.nodeName,
           target: bucket.key,
           value: bucket.value,
-          lineStyle: { color: this.hexToRgba(bucket.color, 0.24), opacity: 0.55 }
+          lineStyle: { color: this.hexToRgba(bucket.color, 0.24), opacity: 0.35 }
         });
       });
     });
@@ -1306,7 +1477,7 @@ export class EventAnalyticsDashboardService {
       source,
       target,
       value,
-      lineStyle: { color, opacity: 0.55 }
+      lineStyle: { color, opacity: 0.35 }
     });
   }
 
@@ -1403,8 +1574,8 @@ export class EventAnalyticsDashboardService {
     let params = new HttpParams();
     params = this.appendParam(params, 'timeline', criteria?.timeline);
     if (criteria?.timeline === EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE) {
-      params = this.appendDateParam(params, 'from', criteria?.timelineFrom);
-      params = this.appendDateParam(params, 'to', criteria?.timelineTo);
+      params = this.appendDateParam(params, 'start_datetime', criteria?.timelineFrom);
+      params = this.appendDateParam(params, 'end_datetime', criteria?.timelineTo);
     }
     const requestParams = extraParams || {};
     Object.keys(requestParams).forEach(key => {
@@ -1607,24 +1778,161 @@ export class EventAnalyticsDashboardService {
         return `Auto Remediation\n${formattedValue}`;
       case '5_min':
       case '30_min':
-      case '>30_min':
         return `${label} : ${formattedValue}`;
+      case '>30_min':
+      case '>_30_min':
+        return `> 30 Min : ${formattedValue}`;
       default:
         return `${label} ${formattedValue}`;
     }
   }
 
-  private getEventAlertAnalyticsGraphLabelConfig(name: string, side: 'left' | 'right'): { position: string; width: number; overflow: string; align: string } {
-    const key = this.normalizeKey(name);
-    const insideLeftKeys = ['events', 'conditions', 'condition', 'resolved', 'acknowledged', 'auto_healed', 'auto_remediation'];
-    const insideRightKeys = ['open'];
-    const isInside = insideLeftKeys.indexOf(key) > -1 || (side === 'right' && insideRightKeys.indexOf(key) > -1);
+  private getSankeyNodeRole(name: string, sourceNodeNames: Set<string>, targetNodeNames: Set<string>): 'source' | 'sink' | 'internal' {
+    const hasOutgoing = sourceNodeNames.has(name);
+    const hasIncoming = targetNodeNames.has(name);
+    if (hasOutgoing && !hasIncoming) {
+      return 'source';
+    }
+    if (hasIncoming && !hasOutgoing) {
+      return 'sink';
+    }
+    return 'internal';
+  }
+
+  private getSankeyNodeLabelConfig(node: any, role: 'source' | 'sink' | 'internal', config: any): any {
+    const baseLabel = node?.label || {};
+    const key = this.normalizeKey(node?.name || node?.labelText || '');
+    const graphProfile = config?.graphProfile;
+    // if (this.shouldHideSankeyNodeLabel(key, graphProfile)) {
+    //   return {
+    //     ...baseLabel,
+    //     show: false
+    //   };
+    // }
+    const explicitPosition = this.getSankeyNodeLabelPosition(key, role, graphProfile);
+
+    if (explicitPosition === 'left') {
+      return {
+        ...baseLabel,
+        position: 'left',
+        align: 'right',
+        width: config?.sourceLabelWidth ?? 140,
+        overflow: 'break',
+        distance: config?.sourceLabelDistance ?? 2
+      };
+    }
+    if (explicitPosition === 'right' || role === 'sink') {
+      return {
+        ...baseLabel,
+        position: 'right',
+        align: 'left',
+        width: config?.sinkLabelWidth ?? 110,
+        overflow: 'break',
+        distance: config?.sinkLabelDistance ?? 2
+      };
+    }
     return {
-      position: isInside ? 'inside' : 'right',
-      width: side === 'right' ? 88 : 92,
-      overflow: 'break',
-      align: 'left'
+      ...baseLabel,
+      align: baseLabel?.align || 'left'
     };
+  }
+
+  private getSankeyNodeDepth(node: any, role: 'source' | 'sink' | 'internal', config: any): number | undefined {
+    const key = this.normalizeKey(node?.name || node?.labelText || '');
+    switch (config?.graphProfile) {
+      case 'left_source':
+        if (role === 'source') {
+          return 0;
+        }
+        if (this.isSankeyLevelKey(key, ['events'])) {
+          return 1;
+        }
+        if (this.isSankeyLevelKey(key, ['alerts', 'dedupe_events', 'suppressed_events'])) {
+          return 2;
+        }
+        if (this.isSankeyLevelKey(key, ['conditions', 'condition'])) {
+          return 3;
+        }
+        if (this.isSankeyLevelKey(key, ['ticket_generated', 'no_ticket_generated'])) {
+          return 4;
+        }
+        return undefined;
+      case 'left_severity':
+        if (this.isSankeyLevelKey(key, ['information', 'info', 'warning', 'critical'])) {
+          return 0;
+        }
+        if (this.isSankeyLevelKey(key, ['events'])) {
+          return 1;
+        }
+        if (this.isSankeyLevelKey(key, ['alerts', 'dedupe_events', 'suppressed_events'])) {
+          return 2;
+        }
+        if (this.isSankeyLevelKey(key, ['conditions', 'condition'])) {
+          return 3;
+        }
+        if (this.isSankeyLevelKey(key, ['root_cause_identified', 'root_cause_unknown'])) {
+          return 4;
+        }
+        return undefined;
+      case 'right':
+        if (this.isSankeyLevelKey(key, ['condition', 'conditions', 'resolution_condition'])) {
+          return 0;
+        }
+        if (this.isSankeyLevelKey(key, ['open', 'resolution_open', 'resolved', 'resolution_resolved'])) {
+          return 1;
+        }
+        if (this.isSankeyLevelKey(key, ['acknowledged', 'resolution_acknowledged', 'auto_healed', 'resolution_auto_healed', 'auto_remediation', 'resolution_auto_remediated'])) {
+          return 2;
+        }
+        if (this.isSankeyBucketKey(key)) {
+          return 3;
+        }
+        return undefined;
+      default:
+        return undefined;
+    }
+  }
+
+  private getSankeyNodeLabelPosition(
+    key: string,
+    role: 'source' | 'sink' | 'internal',
+    graphProfile: 'left_source' | 'left_severity' | 'right' | undefined
+  ): 'left' | 'right' {
+    switch (graphProfile) {
+      case 'left_source':
+        return role === 'source' ? 'left' : 'right';
+      case 'left_severity':
+        return this.isSankeyLevelKey(key, ['information', 'info', 'warning', 'critical']) ? 'left' : 'right';
+      case 'right':
+        return 'right';
+      default:
+        return role === 'source' ? 'left' : 'right';
+    }
+  }
+
+  private shouldHideSankeyNodeLabel(
+    key: string,
+    graphProfile: 'left_source' | 'left_severity' | 'right' | undefined
+  ): boolean {
+    return graphProfile === 'left_severity' && this.isSankeyLevelKey(key, ['events']);
+  }
+
+  private isSankeyLevelKey(key: string, keys: string[]): boolean {
+    const unprefixedKey = key.replace(/^(resolution|severity)_/, '');
+    return keys.some(item => key === item || unprefixedKey === item);
+  }
+
+  private isSankeyBucketKey(key: string): boolean {
+    return key === '5_min'
+      || key === '30_min'
+      || key === 'gt_30_min'
+      || key === '>30_min'
+      || key === '>_30_min'
+      || key.endsWith('_5_min')
+      || key.endsWith('_30_min')
+      || key.endsWith('_gt_30_min')
+      || key.endsWith('_>30_min')
+      || key.endsWith('_>_30_min');
   }
 
   private getEventAlertAnalyticsGraphNodeColor(name: string, index: number, side: 'left' | 'right'): string {
@@ -1663,7 +1971,8 @@ export class EventAnalyticsDashboardService {
       auto_remediation: '#f3b7be',
       '5_min': '#24a864',
       '30_min': '#ff8a00',
-      '>30_min': '#d90000'
+      '>30_min': '#d90000',
+      '>_30_min': '#d90000'
     };
     const palette = side === 'right' ? rightColorMap : leftColorMap;
     return palette[key] || EVENT_ANALYTICS_DONUT_COLORS[index % EVENT_ANALYTICS_DONUT_COLORS.length];

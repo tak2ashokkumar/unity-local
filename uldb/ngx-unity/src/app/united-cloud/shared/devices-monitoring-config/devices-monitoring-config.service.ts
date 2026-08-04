@@ -117,8 +117,8 @@ export class DevicesMonitoringConfigService {
     }
     if (this.form.get('connection_type').value == 'SNMP') {
       this.form.addControl('mtp_templates', new FormControl(obj && obj.mtp_templates ? obj.mtp_templates : [], [Validators.required]));
+      this.form.addControl('ip_address', new FormControl({ value: (obj && obj.ip_address) ? obj.ip_address : '', disabled: false }, [Validators.required, NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]))
       if (obj && obj.ip_address) {
-        this.form.addControl('ip_address', new FormControl({ value: (obj && obj.ip_address) ? obj.ip_address : '', disabled: false }, [Validators.required, NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]))
         switch (obj.snmp_version) {
           case SNMPVersionMapping.V1:
           case SNMPVersionMapping.V2C:
@@ -164,7 +164,6 @@ export class DevicesMonitoringConfigService {
         uuid: [obj?.collector ? obj.collector.uuid : '', [Validators.required]]
       }));
     }
-    console.log('form', this.form.getRawValue());
     return this.form;
   }
 
@@ -423,6 +422,10 @@ export class DevicesMonitoringConfigService {
       'mon_credential_id': '',
       'mon_username': '',
       'mon_password': '',
+      'host_url': '',
+      'username': '',
+      'password': '',
+      'port': '',
     }
   }
 
@@ -475,6 +478,18 @@ export class DevicesMonitoringConfigService {
     },
     'mon_password': {
       'required': 'Password is required'
+    },
+    'host_url': {
+      'required': 'Host URL is required',
+    },
+    'username': {
+      'required': 'Username is required'
+    },
+    'password': {
+      'required': 'Password is required'
+    },
+    'port': {
+      'required': 'Port should be a valid'
     },
   }
 

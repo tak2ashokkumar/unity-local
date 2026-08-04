@@ -36,7 +36,10 @@
       <!-- Host -->
       <div class="form-group">
         <label>Host</label>
-        <input class="form-control" formControlName="host">
+        <ng-select [items]="hosts" formControlName="host" placeholder="Select or enter Host" [multiple]="false"
+          [closeOnSelect]="true" [hideSelected]="false" [addTag]="addCustomValue('host')"
+          [class.is-invalid]="formErrors.host">
+        </ng-select>
         <div class="text-danger">{{formErrors.host}}</div>
       </div>
 

@@ -1,4 +1,15 @@
 import { CiDistributionByDevice, CiDistributionByDeviceData, CiDistributionByDiscovery, CmdbSyncInsights, CmdbSyncTrend, DiscoveryDashboardFilterOptions, DiscoverySuccessFailureData, DiscoveryTrendAnalyticsData, ExecutiveKpiData, NewlyDiscoveredDevice, OperatingSystemsItem, ResourceDiscoveryData, TopDiscoveryFailuresItem } from './discovery-dashboard.type';
+import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
+
+export const DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT = 'last_30_days';
+
+export const DISCOVERY_DASHBOARD_TIME_RANGE_OPTIONS: DateRangeOption[] = [
+  { label: 'Last 24 Hours', value: 'last_24_hours' },
+  { label: 'Last 7 Days', value: 'last_7_days' },
+  { label: 'Last 30 Days', value: 'last_30_days' },
+  { label: 'Last 60 Days', value: 'last_60_days' },
+  { label: 'Last 90 Days', value: 'last_90_days' }
+];
 
 // export const DISCOVERY_DASHBOARD_FILTER_OPTIONS: DiscoveryDashboardFilterOptions = {
 //   time_range: [

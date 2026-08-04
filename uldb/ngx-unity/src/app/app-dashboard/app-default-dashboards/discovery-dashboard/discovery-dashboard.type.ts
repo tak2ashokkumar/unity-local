@@ -12,11 +12,15 @@ export interface DiscoveryDashboardFilterOptions {
 export interface DiscoveryDashboardFilterCriteria {
   region: string[];
   timeRange: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface DiscoveryDashboardFilterFormValue {
   region: DiscoveryDashboardFilterOption[];
   timeRange: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ExecutiveKpiData {

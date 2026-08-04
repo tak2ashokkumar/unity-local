@@ -166,6 +166,27 @@
   }
 }
 
+:host ::ng-deep .public-cloud-compute-dashboard-date-popup,
+:host ::ng-deep .cdk-overlay-pane.public-cloud-compute-dashboard-date-popup {
+  max-width: calc(100vw - 16px) !important;
+}
+
+:host ::ng-deep .public-cloud-compute-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .public-cloud-compute-dashboard-date-popup .owl-dt-container-inner,
+:host ::ng-deep .cdk-overlay-pane.public-cloud-compute-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .cdk-overlay-pane.public-cloud-compute-dashboard-date-popup .owl-dt-container-inner {
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: none;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .public-cloud-compute-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .public-cloud-compute-dashboard-date-popup .owl-dt-container-inner,
+:host ::ng-deep .cdk-overlay-pane.public-cloud-compute-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .cdk-overlay-pane.public-cloud-compute-dashboard-date-popup .owl-dt-container-inner {
+  overflow: visible;
+}
+
 :host ::ng-deep .public-cloud-compute-dashboard app-spinner .spinner-wrapper {
   background: rgba(255, 255, 255, 0.72);
   opacity: 1;

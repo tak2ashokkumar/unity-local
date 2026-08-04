@@ -44,6 +44,53 @@
 	}
 }
 
+.llm-config-header-actions {
+	min-width: 0;
+
+	.unity-switch-container-disabled {
+		opacity: 0.55;
+		cursor: not-allowed;
+
+		.unity-toggle-button {
+			cursor: not-allowed;
+		}
+	}
+}
+
+.chat-mode-toggle {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 1rem;
+	padding: 1px;
+	flex-shrink: 0;
+}
+
+.chat-mode-toggle.disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.chat-mode-toggle-option {
+	padding: 5px 5px;
+	border: 0;
+	border-radius: 0.85rem;
+	background: #fff;
+	color: #0cbb70;
+	font-size: 9px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.chat-mode-toggle-option.selected {
+	background: #0cbb70;
+	color: #fff;
+}
+
+.chat-mode-toggle-option:focus {
+	outline: none;
+	box-shadow: none;
+}
+
 // Profile identity avatar (fixed pixel size cannot be achieved with utilities)
 .profile-avatar {
 	width: 56px;

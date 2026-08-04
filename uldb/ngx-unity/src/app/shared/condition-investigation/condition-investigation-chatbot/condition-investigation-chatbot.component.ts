@@ -60,9 +60,11 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   command: string = '';
   commandDetails: any = null;
   activeCommandContext: CliCommandContext | null = null;
+  readonly proModeBannerMessage = "You're currently in Pro mode, which may result in higher token usage. For lower token usage, switch to Auto mode.";
   commandExecutionStatusMessage: string = '';
   commandExecutionError: string = '';
   commandExecutionState: 'idle' | 'pending' | 'executing' | 'analyzing' | 'failed' = 'idle';
+  proModeBannerDismissed = false;
   hasDefaultDeviceForCommand = false;
   commandDefaultDevice: any = null;
 
@@ -110,17 +112,11 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   ngOnInit(): void {
     this.getTokenUsage();
     this.resetChatInputModePayload();
-    this.getAIModels();
     if (this.loadHistory == 'true') {
       this.clearCommandExecutionState();
     }
     this.subscribeToCliCommandFlow();
-    const firstQuery = `Create an investigation plan to resolve the condition ${this.conditionId}`;
-    if (this.loadHistory == 'true') {
-      this.getChats();
-    } else {
-      this.getResponse(firstQuery);
-    }
+    this.getAIModels(() => this.startInitialConversation());
     // this.getResponse(firstQuery);
     this.buildForm();
   }
@@ -210,6 +206,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
         actions: chat.metadata?.recommended_actions?.map((a: any) => this.toRecommendedAction(a)) || [],
         showAction: chat.metadata?.recommended_actions?.length > 0,
         lastCommand: chat.metadata?.last_command,
+        lastCommandType: chat.metadata?.last_command_type,
         showLastCommandPrompt: chat.role !== 'User' && !!chat.metadata?.last_command && chat.metadata?.command_execute === true,
         botResponseId: chat.chat_message_id
       };
@@ -420,6 +417,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
 
     const last = this.chatHistoryData.getLast();
     last['lastCommand'] = lastCommand;
+    last['lastCommandType'] = doneData?.meta?.last_command_type;
     last['showLastCommandPrompt'] = true;
   }
 
@@ -500,7 +498,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     this.router.navigate(['../../../../', 'dashboard', 'conditions'], { relativeTo: this.route })
   }
 
-  getAIModels() {
+  getAIModels(onComplete?: () => void) {
     this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.llmModels = res;
       this.llmModels.forEach(m => {
@@ -511,10 +509,12 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       if (this.chatInputModePayload.chat_mode === 'pro' && !this.selectedChatInputModel) {
         this.selectMostCostEffectiveConfiguredModel();
       }
+      onComplete && onComplete();
     }, err => {
       this.llmModels = [];
       this.activeModel = null;
       this.selectedChatInputModel = null;
+      onComplete && onComplete();
     })
   }
 
@@ -608,6 +608,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
       return;
     }
     this.selectMostCostEffectiveConfiguredModel();
+    this.showProModeBanner();
   }
 
   showEnableProModeModal() {
@@ -632,6 +633,35 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     this.persistChatInputModePayload('auto', '');
   }
 
+  private startInitialConversation() {
+    if (this.loadHistory == 'true') {
+      this.getChats();
+      return;
+    }
+
+    this.applyAiAgentDefaultMode(() => {
+      const firstQuery = `Create an investigation plan to resolve the condition ${this.conditionId}`;
+      this.getResponse(firstQuery);
+    });
+  }
+
+  private applyAiAgentDefaultMode(onComplete: () => void) {
+    if (!this.application) {
+      onComplete();
+      return;
+    }
+
+    this.service.getAiAgentProModeDefault().pipe(takeUntil(this.ngUnsubscribe)).subscribe(enabled => {
+      if (enabled && this.getConfiguredModels().length) {
+        this.selectMostCostEffectiveConfiguredModel();
+        this.showProModeBanner();
+      }
+      onComplete();
+    }, err => {
+      onComplete();
+    });
+  }
+
   private persistChatInputModePayload(chatMode: ChatInputMode, sessionModelUuid: string) {
     this.chatInputModePayload = {
       chat_mode: chatMode,
@@ -649,6 +679,11 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     this.selectedChatInputModel = selectedModel;
     this.activeModel = selectedModel || this.activeModel;
     this.persistChatInputModePayload('pro', this.getModelUuid(selectedModel));
+  }
+
+  private showProModeBanner() {
+    this.proModeBannerDismissed = false;
+    this.commandExecutionStatusMessage = this.proModeBannerMessage;
   }
 
   private canSubmitQuery(): boolean {
@@ -707,8 +742,20 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     const codeEl = target.closest('code');
     if (codeEl) {
       this.command = codeEl.textContent?.trim();
+      const classes = Array.from(codeEl.classList);
+      const commandType = classes.find(name => name.startsWith('commandType-'))
+        ?.replace('commandType-', '');
+      const shellType = classes.find(name => name.startsWith('shellType-'))
+        ?.replace('shellType-', '');
+      const dbEngine = classes.find(name => name.startsWith('dbEngine-'))
+        ?.replace('dbEngine-', '');
       if (this.command) {
-        this.openCommandExecutionModal(this.command, { source: 'markdown_code' });
+        this.openCommandExecutionModal(this.command, {
+          source: 'markdown_code',
+          commandType: commandType || null,
+          shellType: shellType || null,
+          dbEngine: dbEngine || null
+        });
       }
     }
   }
@@ -738,7 +785,20 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     return ['pending', 'executing', 'analyzing'].includes(this.commandExecutionState);
   }
 
+  get isProModeBannerMessage(): boolean {
+    return this.commandExecutionStatusMessage === this.proModeBannerMessage;
+  }
+
+  get shouldShowProModeBanner(): boolean {
+    return this.chatInputModePayload.chat_mode === 'pro' &&
+      this.isProModeBannerMessage &&
+      !this.proModeBannerDismissed;
+  }
+
   dismissCommandExecutionNotification() {
+    if (this.isProModeBannerMessage) {
+      this.proModeBannerDismissed = true;
+    }
     this.commandExecutionStatusMessage = '';
     this.commandExecutionError = '';
   }
@@ -943,7 +1003,10 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
 
   executeLastCommand(chat: any) {
     chat.showLastCommandPrompt = false;
-    this.openCommandExecutionModal(chat.lastCommand, { source: 'last_command' });
+    this.openCommandExecutionModal(chat.lastCommand, {
+      source: 'last_command',
+      commandType: chat.lastCommandType || null
+    });
   }
 
   declineLastCommand(chat: any) {

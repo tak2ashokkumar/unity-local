@@ -272,7 +272,7 @@
 }
 
 .chat-mode-toggle {
-  background:#0cbb70;
+  background:#fff;
   border: 1px solid #cbd5e1;;
   border-radius: 1rem;
   padding: 1px;
@@ -285,8 +285,8 @@
 .chat-mode-toggle-option {
   border: 0;
   border-radius: 0.85rem;
-  background:#0cbb70;
-  color: #fff;
+  background: #fff;
+  color:#0cbb70;
   font-weight: 600;
   line-height: 1;
 
@@ -295,8 +295,8 @@ font-size: 9px;
 }
 
 .chat-mode-toggle-option.selected {
-  background: #fff;
-  color:#0cbb70;
+  background:#0cbb70;
+  color: #fff;
 }
 
 .chat-mode-toggle-option:focus {

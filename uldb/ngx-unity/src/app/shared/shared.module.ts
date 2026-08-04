@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { ResizableModule } from 'angular-resizable-element';
 import { ChartsModule } from 'ng2-charts';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { CookieService } from 'ngx-cookie-service';
 import { AppCoreModule } from '../app-core/app-core.module';
 import { AppMainTabComponent } from './app-main-tab/app-main-tab.component';
@@ -97,10 +98,12 @@ import { ConditionInvestigationTerminalNewTabComponent } from './condition-inves
 import { ConditionInvestigationFloatingTerminalComponent } from './condition-investigation/condition-investigation-floating-terminal/condition-investigation-floating-terminal.component';
 import { ConditionInvestigationFloatingTerminalItemComponent } from './condition-investigation/condition-investigation-floating-terminal/condition-investigation-floating-terminal-item/condition-investigation-floating-terminal-item.component';
 import { EchartsxModule } from 'echarts-for-angular';
+import { RemoteWebViewerComponent } from './remote-web-viewer/remote-web-viewer.component';
 
 @NgModule({
   imports: [AppCoreModule, ChartsModule, ResizableModule, PerfectScrollbarModule,
-    TypeaheadModule.forRoot(), AppDirectivesModule, AppFiltersModule, AppSharedCrudModule, MarkdownModule, EchartsxModule],
+    TypeaheadModule.forRoot(), AppDirectivesModule, AppFiltersModule, AppSharedCrudModule, MarkdownModule, EchartsxModule,
+    NgSelectModule],
   exports: [
     AppMainTabComponent,
     ComingSoonComponent,
@@ -166,6 +169,7 @@ import { EchartsxModule } from 'echarts-for-angular';
     AutoCompleteMultiComponent,
     DevicesFileUploadComponent,
     SharedApplicationTopologyComponent,
+    RemoteWebViewerComponent,
     AppDirectivesModule,
     AppFiltersModule,
     AppSharedCrudModule
@@ -260,6 +264,7 @@ import { EchartsxModule } from 'echarts-for-angular';
     ConditionInvestigationTerminalNewTabComponent,
     ConditionInvestigationFloatingTerminalComponent,
     ConditionInvestigationFloatingTerminalItemComponent,
+    RemoteWebViewerComponent,
   ],
   providers: [
     CookieService,

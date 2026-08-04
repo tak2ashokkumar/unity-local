@@ -4,16 +4,20 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EChartsOption } from 'echarts';
-import { Observable, Subject } from 'rxjs';
-import { finalize, takeUntil } from 'rxjs/operators';
+import { forkJoin, Observable, of, Subject } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
+import { DateRangeOption, DateRangeSubmitPayload } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { ColumnSortedEvent } from 'src/app/shared/table-functionality/sortable-column/sort.service';
+import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import {
+  EVENT_ANALYTICS_ALL_DATACENTER_VALUE,
+  EVENT_ANALYTICS_ALL_SEVERITY_VALUE,
+  EVENT_ANALYTICS_ALL_SOURCE_VALUE,
   EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE,
   EVENT_ANALYTICS_TREND_ALERT_TYPE_OPTIONS
 } from './event-analytics-dashboard.const';
@@ -41,7 +45,7 @@ import {
   selector: 'event-analytics-dashboard',
   templateUrl: './event-analytics-dashboard.component.html',
   styleUrls: ['./event-analytics-dashboard.component.scss'],
-  providers: [EventAnalyticsDashboardService]
+  providers: [EventAnalyticsDashboardService, DatacenterService]
 })
 export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
@@ -176,7 +180,7 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  onTimelineDropdownSubmit(event: { period?: string; from?: Date | string; to?: Date | string }) {
+  onTimelineDropdownSubmit(event: DateRangeSubmitPayload) {
     this.patchTimelineRange('timeline', 'timelineFrom', 'timelineTo', event);
     this.syncCustomTimelineControls();
     if (this.isTimelineReady()) {
@@ -193,7 +197,7 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     this.getTrendByTimeline(this.getFilterCriteria());
   }
 
-  onTrendTimelineDropdownSubmit(event: { period?: string; from?: Date | string; to?: Date | string }) {
+  onTrendTimelineDropdownSubmit(event: DateRangeSubmitPayload) {
     this.patchTimelineRange('trendTimeline', 'trendTimelineFrom', 'trendTimelineTo', event);
     this.syncTrendCustomTimelineControls();
     if (this.isTrendTimelineReady()) {
@@ -207,14 +211,15 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
   }
 
   onAnalyticsViewByChange() {
-    this.applyEventAlertAnalyticsView();
+    this.resetAnalyticsViewSpecificFilters();
+    this.getEventAlertAnalytics(this.getFilterCriteria());
   }
 
   onAnalyticsFilterChange() {
     this.getEventAlertAnalytics(this.getFilterCriteria());
   }
 
-  onEventAndAlertTimelineDropdownSubmit(event: { period?: string; from?: Date | string; to?: Date | string }) {
+  onEventAndAlertTimelineDropdownSubmit(event: DateRangeSubmitPayload) {
     this.patchTimelineRange('eventAndAlertTimeline', 'eventAndAlertTimelineFrom', 'eventAndAlertTimelineTo', event);
     this.syncEventAndAlertTimelineControls();
     if (this.isEventAndAlertTimelineReady()) {
@@ -292,6 +297,18 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     return this.hasEventByDeviceCategoryChart || this.hasEventByDeviceCategoryCardsData;
   }
 
+  get selectedAnalyticsViewBy(): string {
+    return this.filterForm?.get('analyticsViewBy')?.value || 'source';
+  }
+
+  get showAnalyticsSourceTypeFilter(): boolean {
+    return this.selectedAnalyticsViewBy === 'source';
+  }
+
+  get showAnalyticsSeverityTypeFilter(): boolean {
+    return this.selectedAnalyticsViewBy === 'severity';
+  }
+
   getHeaderData() {
     this.svc.getHeaderTextData().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.headerData = this.svc.buildHeaderData(res);
@@ -301,18 +318,17 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
   }
 
   getDashboardFilters() {
-    this.svc.getDashboardFilters().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      const filters = this.svc.buildDashboardFilters(res);
-      this.applyDashboardFilters(filters);
-      this.buildFilterForm(filters);
-      this.ensureFilterSelections();
-      this.syncCustomTimelineControls();
-      this.syncTrendCustomTimelineControls();
-      this.syncEventAndAlertTimelineControls();
-      this.loadData();
-    }, (_err: HttpErrorResponse) => {
-      this.notification.error(new Notification('Failed to get event analytics filters. Try again later.'));
-      const filters = this.svc.getDefaultDashboardFilters();
+    forkJoin({
+      filters: this.svc.getDashboardFilters().pipe(catchError(() => {
+        this.notification.error(new Notification('Failed to get event analytics filters. Try again later.'));
+        return of(null);
+      })),
+      datacenters: this.svc.getAnalyticsDatacenters().pipe(catchError(() => of(this.svc.getFallbackAnalyticsDatacenters())))
+    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      const filters = {
+        ...(res.filters ? this.svc.buildDashboardFilters(res.filters) : this.svc.getDefaultDashboardFilters()),
+        analyticsDatacenter: res.datacenters
+      };
       this.applyDashboardFilters(filters);
       this.buildFilterForm(filters);
       this.ensureFilterSelections();
@@ -466,9 +482,10 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
       this.eventAlertAnalyticsLeftMetrics = metricGroups.left;
       this.eventAlertAnalyticsRightMetrics = metricGroups.right;
       this.analyticsViewByOptions = res.viewOptions?.length ? res.viewOptions : this.analyticsViewByOptions;
-      this.analyticsSourceTypeOptions = res.sourceOptions?.length ? res.sourceOptions : this.analyticsSourceTypeOptions;
-      this.analyticsSeverityTypeOptions = res.severityOptions?.length ? res.severityOptions : this.analyticsSeverityTypeOptions;
-      this.analyticsDatacenterOptions = res.datacenterOptions?.length ? res.datacenterOptions : this.analyticsDatacenterOptions;
+      if ((criteria.analyticsViewBy || res.viewBy) === 'source') {
+        this.analyticsSourceTypeOptions = this.svc.getAnalyticsSourceTypeOptions(res.rows);
+      }
+      this.analyticsSeverityTypeOptions = this.svc.getAnalyticsSeverityTypeOptions();
       this.analyticsCloudOptions = res.cloudOptions?.length ? res.cloudOptions : this.analyticsCloudOptions;
       this.analyticsCategoryOptions = this.svc.getCategoryOptions(res.categoryOptions);
       if (res.timeRangeOptions?.length) {
@@ -503,11 +520,24 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     const selectedView = this.filterForm?.get('analyticsViewBy')?.value || response.viewBy || 'source';
     const leftGraph = selectedView === 'severity' ? response.severityGraph : response.sourceGraph;
     this.eventReductionFlowOptions = leftGraph
-      ? this.svc.convertToEventAlertAnalyticsLeftGraphOptions(leftGraph)
-      : this.svc.convertToEventReductionSankeyOptions(this.svc.buildEventAlertAnalyticsReductionFlow(response, selectedView));
+      ? this.svc.convertToEventAlertAnalyticsLeftGraphOptions(leftGraph, selectedView)
+      : this.svc.convertToEventReductionSankeyOptions(this.svc.buildEventAlertAnalyticsReductionFlow(response, selectedView), selectedView);
     this.incidentResolutionFlowOptions = response.rightGraph
       ? this.svc.convertToEventAlertAnalyticsRightGraphOptions(response.rightGraph)
       : this.svc.convertToEventResolutionSankeyOptions(this.svc.buildEventAlertAnalyticsResolutionFlow(response));
+  }
+
+  private resetAnalyticsViewSpecificFilters() {
+    if (!this.filterForm) {
+      return;
+    }
+    if (this.selectedAnalyticsViewBy === 'source') {
+      this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, EVENT_ANALYTICS_ALL_SOURCE_VALUE);
+      this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, EVENT_ANALYTICS_ALL_SEVERITY_VALUE);
+      return;
+    }
+    this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, EVENT_ANALYTICS_ALL_SEVERITY_VALUE);
+    this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, EVENT_ANALYTICS_ALL_SOURCE_VALUE);
   }
 
   getNoisyEvents(criteria: DashboardFilterCriteria) {
@@ -733,14 +763,14 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
   }
 
   private ensureFilterSelections() {
-    this.ensureSelectSelection('timeline', this.timeRangeOptions, 'last_month');
+    this.ensureSelectSelection('timeline', this.timeRangeOptions, 'last_30_days');
     this.ensureSelectSelection('trendTimeline', this.trendTimelineOptions, 'last_month');
     this.ensureSelectSelection('eventDeviceCategory', this.eventDeviceCategoryOptions, 'all');
     this.ensureSelectSelection('alertSegregationCategory', this.alertSegregationCategoryOptions, 'all');
     this.ensureSelectSelection('analyticsViewBy', this.analyticsViewByOptions, 'source');
-    this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, 'all_source');
-    this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, 'all_severity');
-    this.ensureSelectSelection('analyticsDatacenter', this.analyticsDatacenterOptions, 'all_datacenter');
+    this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, EVENT_ANALYTICS_ALL_SOURCE_VALUE);
+    this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, EVENT_ANALYTICS_ALL_SEVERITY_VALUE);
+    this.ensureSelectSelection('analyticsDatacenter', this.analyticsDatacenterOptions, EVENT_ANALYTICS_ALL_DATACENTER_VALUE);
     this.ensureSelectSelection('analyticsCloud', this.analyticsCloudOptions, 'all_cloud');
     this.ensureSelectSelection('analyticsCategory', this.analyticsCategoryOptions, 'all');
     this.ensureSelectSelection('eventAndAlertTimeline', this.eventAndAlertTimelineOptions, 'last_week');
@@ -869,7 +899,7 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     return this.filterForm?.get('eventAndAlertTimeline')?.value === this.customTimelineValue;
   }
 
-  private patchTimelineRange(periodControlName: string, fromControlName: string, toControlName: string, event: { period?: string; from?: Date | string; to?: Date | string }) {
+  private patchTimelineRange(periodControlName: string, fromControlName: string, toControlName: string, event: DateRangeSubmitPayload) {
     if (!this.filterForm) {
       return;
     }

@@ -70,7 +70,7 @@
                 <div class="col-12">
                     <label class="d-inline-block">Monitoring Configuration :</label>
                     <div class="d-inline-block ml-2">
-                        <ul class="d-flex px-0 mb-0">
+                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                             <li>
                                 <label class="pointer-link pl-1" [class.active]="form.controls.is_monitoring.value">
                                     <input type="radio" [value]="true" formControlName="is_monitoring">
@@ -116,11 +116,11 @@
                                     <div class="invalid-feedback" *ngIf="formErrors.urls[i].url">
                                         {{formErrors.urls[i].url}}</div>
                                 </div>
-                                <div class="col-2 pl-0 form-group">
+                                <div class="col-auto pl-0 form-group enable-disable-toggle-col">
                                     <label for="url_availabilty" class="form-col-form-label">URL
                                         Availability</label><br>
                                     <div class="d-inline-block">
-                                        <ul class="d-flex px-0 mb-0">
+                                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                                             <li>
                                                 <label class="pointer-link pl-1"
                                                     [class.active]="form.controls.urls.controls[i].controls.url_availabilty.value">
@@ -140,11 +140,11 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="col-2 pl-0 form-group">
+                                <div class="col-auto pl-0 form-group enable-disable-toggle-col">
                                     <label for="response_availability" class="form-col-form-label">Response
                                         Code Availability</label>
                                     <div class="d-inline-block">
-                                        <ul class="d-flex px-0 mb-0">
+                                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                                             <li>
                                                 <label class="pointer-link pl-1"
                                                     [class.active]="form.controls.urls.controls[i].controls.response_availability.value">
@@ -164,11 +164,11 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="col-3 form-group">
+                                <div class="col-auto form-group enable-disable-toggle-col">
                                     <label for="string_availabilty" class="form-col-form-label">String
                                         Pattern Availability</label>
                                     <div class="d-inline-block">
-                                        <ul class="d-flex px-0 mb-0">
+                                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                                             <li>
                                                 <label class="pointer-link pl-1"
                                                     [class.active]="form.controls.urls.controls[i].controls.string_availabilty.value">
@@ -188,11 +188,11 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="col-2 form-group">
+                                <div class="col-auto form-group enable-disable-toggle-col">
                                     <label for="login_availability" class="form-col-form-label">Login
                                         Availability</label><br>
                                     <div class="d-inline-block">
-                                        <ul class="d-flex px-0 mb-0">
+                                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                                             <li>
                                                 <label class="pointer-link pl-1"
                                                     [class.active]="form.controls.urls.controls[i].controls.login_availability.value">
@@ -276,7 +276,7 @@
                         </ul>
                     </div>
                     <div class="d-inline-block ml-2" *ngIf="instanceData.monitoring.configured">
-                        <ul class="d-flex px-0 mb-0">
+                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                             <li>
                                 <label class="pointer-link pl-1" [class.active]="instanceData.monitoring.enabled">
                                     <input type="radio" [value]="true" (click)="statusChange(true)">

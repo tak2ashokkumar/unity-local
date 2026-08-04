@@ -72,6 +72,7 @@ export class ConditionInvestigationService {
     }
 
     viewdata.hosts = Array.from(new Set(data.hosts));
+    viewdata.hostIpAddresses = Array.from(new Set(data.hosts_ip_address || []));
     viewdata.conditionSource = data.condition_source_account;
     viewdata.correlator = data.correlators ? data.correlators : [];
     viewdata.correlationWindow = data.correlation_window;
@@ -270,6 +271,7 @@ export class ConditionDetailsViewData {
   conditionSeverity: string;
   severityBg: string = "";
   hosts: string[];
+  hostIpAddresses: string[];
   conditionSource: string;
   correlator: string[];
   correlationWindow: string;
@@ -311,6 +313,7 @@ export interface ConditionDetailsType {
   correlators: null;
   correlation_window: string;
   hosts: string[];
+  hosts_ip_address: string[];
   recovered_datetime: null;
   is_acknowledged: boolean;
   acknowledged_by: string;

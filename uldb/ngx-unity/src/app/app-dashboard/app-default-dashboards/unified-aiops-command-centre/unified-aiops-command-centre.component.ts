@@ -520,6 +520,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   /** Creates the filter form with all currently loaded datacenter options selected by default. */
   private buildFilterForm() {
     this.filterForm = this.svc.buildFilterForm(this.datacenterOptions, this.cloudOptions);
+    this.onTimeRangeChange({ period: this.selectedTimeRange });
   }
 
   /** Clears existing filter form/options so a fresh filter loading sequence can run. */

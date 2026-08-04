@@ -1,10 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { EMPTY, Observable } from 'rxjs';
-import { MANAGEMENT_NOT_ENABLED_MESSAGE } from 'src/app/app-constants';
+import { Observable } from 'rxjs';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PrivateCloudType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
-import { UserInfoService } from 'src/app/shared/user-info.service';
 import { UsageData } from '../entities/usage-data.type';
 import { VcenterComponentSummary, VcenterSummaryAlerts } from './vcenter-cloud.type';
 import { map } from 'rxjs/operators';
@@ -16,7 +14,6 @@ import { Handle404Header } from 'src/app/app-http-interceptor';
 export class VcenterCloudService {
 
   constructor(private http: HttpClient,
-    private user: UserInfoService,
     private utilService: AppUtilityService) { }
 
   getCloudDetails(pcId: string, type: string): Observable<PrivateCloudType> {
@@ -58,21 +55,15 @@ export class VcenterCloudService {
     let view = new VcenterIconViewData();
     view.vmId = data.uuid;
     view.vmName = data.name;
-    if (this.user.isManagementEnabled) {
-      view.isSameTabEnabled = ((data.proxy?.same_tab && data.proxy?.proxy_fqdn ? true : false));
-      view.sameTabWebAccessUrl = data.proxy?.proxy_fqdn;
-      view.sameTabTooltipMessage = view.isSameTabEnabled ? 'Manage In Same Tab' : 'Device Not Configured';
-
-      view.isNewTabEnabled = (data.proxy?.proxy_fqdn ? true : false);
-      view.newTabWebAccessUrl = view.sameTabWebAccessUrl;
-      view.newTabTooltipMessage = view.isNewTabEnabled ? 'Manage In New Tab' : 'Device Not Configured';
-      view.deviceType = 'vcenter';
-    } else {
-      view.isSameTabEnabled = false;
-      view.sameTabTooltipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
-      view.isNewTabEnabled = false;
-      view.newTabTooltipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
-    }
+    view.remoteWebAccess = data.remote_web_access;
+    view.isSameTabEnabled = false;
+    view.sameTabWebAccessUrl = null;
+    view.sameTabTooltipMessage = 'Remote web access opens in a new viewer tab';
+    view.isNewTabEnabled = !!data.remote_web_access?.can_create_session;
+    view.showRemoteWebAccessButton = view.isNewTabEnabled;
+    view.newTabWebAccessUrl = null;
+    view.newTabTooltipMessage = data.remote_web_access?.message || 'Remote web access unavailable';
+    view.deviceType = 'vcenter';
     view.canChangePassword = true;
 
     view.monitoring = data.monitoring;
@@ -200,6 +191,8 @@ export class VcenterIconViewData {
   isNewTabEnabled: boolean;
   newTabTooltipMessage: string;
   newTabWebAccessUrl: string;
+  showRemoteWebAccessButton: boolean = false;
+  remoteWebAccess: any;
   statsTooltipMessage: string;
   isStatsButtonEnabled: boolean = false;
   monitoring?: DeviceMonitoringType;

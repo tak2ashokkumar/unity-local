@@ -6,6 +6,48 @@
   background: transparent;
 }
 
+:host ::ng-deep .network-dashboard-shell app-spinner {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+:host ::ng-deep .network-dashboard-shell app-spinner .spinner-wrapper {
+  position: absolute;
+  inset: 0;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.72);
+  opacity: 1;
+  border-radius: inherit;
+}
+
+:host ::ng-deep .network-dashboard-shell app-spinner .wave-spinner {
+  position: static;
+  top: auto;
+  left: auto;
+  margin: 0;
+  transform: none;
+  width: 34px;
+  height: 20px;
+}
+
+:host ::ng-deep .network-dashboard-shell app-spinner .wave-spinner > div {
+  width: 4px;
+  margin-right: 3px;
+  background-color: #ff8900 !important;
+}
+
 .network-dashboard-header {
   display: flex;
   align-items: flex-start;
@@ -62,7 +104,7 @@
 }
 
 .network-dashboard-filter-group--small {
-  width: 108px;
+  width: 116px;
 }
 
 .network-dashboard-filter-group label {
@@ -114,6 +156,55 @@
   min-width: 220px;
   font-size: 12px;
   z-index: 2050;
+}
+
+:host ::ng-deep .network-dashboard-filter-group custom-date-dropdown {
+  .dropdown {
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    display: block;
+  }
+
+  .dropbtn.form-control {
+    height: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 9px;
+    color: #2f3b46;
+    background: #f9fbfc;
+    font-size: 12px;
+    line-height: 20px;
+    border-color: #bfc9d3;
+    border-radius: 2px;
+  }
+
+  .dropdownClick {
+    z-index: 2050;
+  }
+}
+
+:host ::ng-deep .network-dashboard-date-popup,
+:host ::ng-deep .cdk-overlay-pane.network-dashboard-date-popup {
+  max-width: calc(100vw - 16px) !important;
+}
+
+:host ::ng-deep .network-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .network-dashboard-date-popup .owl-dt-container-inner,
+:host ::ng-deep .cdk-overlay-pane.network-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .cdk-overlay-pane.network-dashboard-date-popup .owl-dt-container-inner {
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: none;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .network-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .network-dashboard-date-popup .owl-dt-container-inner,
+:host ::ng-deep .cdk-overlay-pane.network-dashboard-date-popup .owl-dt-container,
+:host ::ng-deep .cdk-overlay-pane.network-dashboard-date-popup .owl-dt-container-inner {
+  overflow: visible;
 }
 
 .network-dashboard-action-btn {
@@ -344,6 +435,28 @@
   box-shadow: none;
 }
 
+.network-dashboard-top-conversations-shell > .card-body,
+.network-dashboard-performance-shell > .card-body,
+.network-dashboard-interface-health-shell > .card-body,
+.network-dashboard-device-availability-shell > .card-body,
+.network-dashboard-alert-events-shell > .card-body,
+.network-dashboard-auto-remediation-shell > .card-body {
+  position: relative;
+}
+
+.network-dashboard-top-conversations-shell > .card-body {
+  min-height: 346px;
+}
+
+.network-dashboard-performance-shell > .card-body,
+.network-dashboard-interface-health-shell > .card-body {
+  min-height: 282px;
+}
+
+.network-dashboard-device-availability-shell > .card-body {
+  min-height: 612px;
+}
+
 .network-dashboard-conversation-card {
   border: 1px solid #dbe4ed;
   border-radius: 8px;
@@ -407,6 +520,9 @@
 
 .network-dashboard-conversation-table-wrap {
   min-height: 250px;
+  max-height: 420px;
+  overflow: auto;
+  padding: 0 16px 16px;
 }
 
 .network-dashboard-performance-table-wrap,
@@ -417,9 +533,88 @@
   min-height: 250px;
 }
 
+.network-dashboard-conversation-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 16px 10px;
+}
+
+.network-dashboard-performance-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 16px 10px;
+}
+
+.network-dashboard-interface-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 16px 10px;
+}
+
+.network-dashboard-conversation-search {
+  width: 220px;
+  max-width: 100%;
+}
+
+.network-dashboard-performance-search {
+  width: 220px;
+  max-width: 100%;
+}
+
+.network-dashboard-interface-search {
+  width: 220px;
+  max-width: 100%;
+}
+
+:host ::ng-deep .network-dashboard-conversation-search search-box .input-group,
+:host ::ng-deep .network-dashboard-conversation-search search-box .form-group,
+:host ::ng-deep .network-dashboard-conversation-search search-box .search-box {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+:host ::ng-deep .network-dashboard-performance-search search-box .input-group,
+:host ::ng-deep .network-dashboard-performance-search search-box .form-group,
+:host ::ng-deep .network-dashboard-performance-search search-box .search-box {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+:host ::ng-deep .network-dashboard-interface-search search-box .input-group,
+:host ::ng-deep .network-dashboard-interface-search search-box .form-group,
+:host ::ng-deep .network-dashboard-interface-search search-box .search-box {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+:host ::ng-deep .network-dashboard-conversation-search .form-control {
+  height: 32px;
+  border-color: #cfd6dc;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+:host ::ng-deep .network-dashboard-performance-search .form-control {
+  height: 32px;
+  border-color: #cfd6dc;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+:host ::ng-deep .network-dashboard-interface-search .form-control {
+  height: 32px;
+  border-color: #cfd6dc;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
 .network-dashboard-conversation-table {
   min-width: 1180px;
   margin-bottom: 0;
+  table-layout: fixed;
 }
 
 .network-dashboard-performance-table,
@@ -429,6 +624,28 @@
 .network-dashboard-alert-events-table {
   min-width: 1040px;
   margin-bottom: 0;
+}
+
+.network-dashboard-performance-table-wrap {
+  min-height: 250px;
+  max-height: 420px;
+  overflow: auto;
+  padding: 0 16px 16px;
+}
+
+.network-dashboard-interface-table-wrap {
+  min-height: 250px;
+  max-height: 420px;
+  overflow: auto;
+  padding: 0 16px 16px;
+}
+
+.network-dashboard-performance-table {
+  table-layout: fixed;
+}
+
+.network-dashboard-interface-table {
+  table-layout: fixed;
 }
 
 .network-dashboard-device-availability-table {
@@ -455,6 +672,10 @@
   cursor: pointer;
   text-align: center;
   vertical-align: middle;
+}
+
+.network-dashboard-conversation-table thead th:first-child {
+  width: 210px;
 }
 
 .network-dashboard-conversation-table thead th:first-child,
@@ -486,6 +707,10 @@
   color: #0b66c3;
 }
 
+.network-dashboard-performance-table thead th:first-child {
+  width: 180px;
+}
+
 .network-dashboard-interface-table thead th {
   border: 0;
   background: #eef1f3;
@@ -503,6 +728,10 @@
 .network-dashboard-interface-table thead th.network-dashboard-conversation-table-head-cell--active {
   background: #cfe4fb;
   color: #0b66c3;
+}
+
+.network-dashboard-interface-table thead th:first-child {
+  width: 180px;
 }
 
 .network-dashboard-device-availability-table thead th {
@@ -573,6 +802,24 @@
   white-space: nowrap;
 }
 
+.network-dashboard-conversation-table tbody td.network-dashboard-conversation-table-empty {
+  padding: 48px 12px;
+  color: #6f7f8d;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  white-space: normal;
+}
+
+.network-dashboard-conversation-table tbody td:nth-child(2),
+.network-dashboard-conversation-table tbody td:nth-child(3),
+.network-dashboard-conversation-table tbody td:nth-child(4),
+.network-dashboard-conversation-table tbody td:nth-child(5),
+.network-dashboard-conversation-table tbody td:nth-child(6),
+.network-dashboard-conversation-table tbody td:nth-child(7) {
+  text-align: left;
+}
+
 .network-dashboard-performance-table tbody td {
   padding: 10px 14px;
   border-color: #dce2e6;
@@ -583,6 +830,19 @@
   white-space: nowrap;
 }
 
+.network-dashboard-performance-table tbody td.network-dashboard-performance-table-empty {
+  padding: 48px 12px;
+  color: #6f7f8d;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  white-space: normal;
+}
+
+.network-dashboard-utilization-cell {
+  min-width: 180px;
+}
+
 .network-dashboard-interface-table tbody td {
   padding: 10px 14px;
   border-color: #dce2e6;
@@ -591,6 +851,15 @@
   line-height: 18px;
   vertical-align: middle;
   white-space: nowrap;
+}
+
+.network-dashboard-interface-table tbody td.network-dashboard-interface-table-empty {
+  padding: 48px 12px;
+  color: #6f7f8d;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  white-space: normal;
 }
 
 .network-dashboard-device-availability-table tbody td {
@@ -624,7 +893,7 @@
 }
 
 .network-dashboard-conversation-table-col--bandwidth {
-  width: 180px;
+  width: 240px;
 }
 
 .network-dashboard-table-link {
@@ -635,15 +904,19 @@
 }
 
 .network-dashboard-bandwidth-cell {
-  min-width: 136px;
+  min-width: 180px;
 }
 
 .network-dashboard-bandwidth-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 4px;
   color: #6f7f8d;
   font-size: 11px;
   line-height: 14px;
-  text-align: right;
+  text-align: left;
 }
 
 .progress-track {
@@ -1135,7 +1408,7 @@
   background: transparent;
 }
 
-:host ::ng-deep .network-dashboard-topology-shell .topology-card > .card-body:first-child {
+:host ::ng-deep .network-dashboard-topology-shell .topology-card>.card-body:first-child {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -1144,8 +1417,8 @@
   padding: 12px 16px 0;
 }
 
-:host ::ng-deep .network-dashboard-topology-shell .topology-card > .card-body:first-child > .w-40,
-:host ::ng-deep .network-dashboard-topology-shell .topology-card > .card-body:first-child > .d-flex.w-40 {
+:host ::ng-deep .network-dashboard-topology-shell .topology-card>.card-body:first-child>.w-40,
+:host ::ng-deep .network-dashboard-topology-shell .topology-card>.card-body:first-child>.d-flex.w-40 {
   width: auto !important;
   flex: 1 1 320px;
   min-width: 0;
@@ -1177,18 +1450,18 @@
   gap: 8px;
 }
 
-:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center > .w-70,
-:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center > form.w-100,
-:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center > .w-10 {
+:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center>.w-70,
+:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center>form.w-100,
+:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center>.w-10 {
   width: auto !important;
 }
 
-:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center > form.w-100 {
+:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center>form.w-100 {
   flex: 1 1 310px;
   min-width: 220px;
 }
 
-:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center > .w-10 {
+:host ::ng-deep .network-dashboard-topology-shell .topology-card .d-flex.w-40.align-items-center>.w-10 {
   display: flex;
   align-items: center;
   margin-left: 0 !important;
@@ -1483,7 +1756,7 @@
   background: #ffffff;
 }
 
-.network-dashboard-alert-events-stats-card + .network-dashboard-alert-events-stats-card {
+.network-dashboard-alert-events-stats-card+.network-dashboard-alert-events-stats-card {
   margin-top: 10px;
 }
 
@@ -1762,7 +2035,7 @@
     padding: 0;
   }
 
-  .network-dashboard-performance-chart-panel + .network-dashboard-performance-chart-panel {
+  .network-dashboard-performance-chart-panel+.network-dashboard-performance-chart-panel {
     margin-top: 18px;
   }
 
@@ -1869,7 +2142,7 @@
     border-top: 0;
   }
 
-  .network-dashboard-auto-remediation-metric + .network-dashboard-auto-remediation-metric {
+  .network-dashboard-auto-remediation-metric+.network-dashboard-auto-remediation-metric {
     border-top: 1px solid #dfe6ee;
   }
 }

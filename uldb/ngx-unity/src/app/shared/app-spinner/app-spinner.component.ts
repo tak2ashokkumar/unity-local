@@ -40,7 +40,7 @@ export class AppSpinnerComponent implements OnInit, OnDestroy {
       }
     });
     this.modalService.onShown.subscribe(() => {
-      this.zIndex = this.name == 'main' ? '2190' : '1950';
+      this.zIndex = this.name == 'main' ? '2210' : '1950';
     });
     this.modalService.onHidden.subscribe(() => {
       this.zIndex = this.name == 'main' ? '2150' : '1950';

@@ -25,8 +25,11 @@ import { AdvancedDiscoverySummaryComponent } from './advanced-device-discovery/a
 import { AdvancedDiscoverySwitchesComponent } from './advanced-device-discovery/advanced-discovery-switches/advanced-discovery-switches.component';
 import { AdvancedDiscoveryConnectivityCrudComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity-crud/advanced-discovery-connectivity-crud.component';
 import { AdvancedDiscoveryConnectivityCrudService } from './advanced-discovery-connectivity/advanced-discovery-connectivity-crud/advanced-discovery-connectivity-crud.service';
+import { AdvancedDiscoveryConnectivityRequestComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity-request/advanced-discovery-connectivity-request.component';
 import { AdvancedDiscoveryConnectivityComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity.component';
 import { AdvancedDiscoveryConnectivityService } from './advanced-discovery-connectivity/advanced-discovery-connectivity.service';
+import { ApplicationOnboardingCrudComponent } from './application-onboarding/application-onboarding-crud/application-onboarding-crud.component';
+import { ApplicationOnboardingComponent } from './application-onboarding/application-onboarding.component';
 import { ExcelOnBoardFilesComponent } from './excel-on-boarding/excel-on-board-files/excel-on-board-files.component';
 import { ExcelOnBoardingInventoryComponent } from './excel-on-boarding/excel-on-board-inventory/excel-on-boarding-inventory.component';
 import { ExcelOnBoardingBmsComponent } from './excel-on-boarding/excel-on-boarding-bms/excel-on-boarding-bms.component';
@@ -74,9 +77,6 @@ import { UnitySetupOnBoardingResolverService } from './unity-setup-on-boarding-r
 import { UnitySetupOnBoardingRoutingModule } from './unity-setup-on-boarding-routing.module';
 import { UnitySetupOnBoardingSummaryComponent } from './unity-setup-on-boarding-summary/unity-setup-on-boarding-summary.component';
 import { UnitySetupOnBoardingComponent } from './unity-setup-on-boarding.component';
-import { AdvancedDiscoveryConnectivityRequestComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity-request/advanced-discovery-connectivity-request.component';
-import { ApplicationOnboardingComponent } from './application-onboarding/application-onboarding.component';
-import { ApplicationOnboardingCrudComponent } from './application-onboarding/application-onboarding-crud/application-onboarding-crud.component';
 
 
 @NgModule({

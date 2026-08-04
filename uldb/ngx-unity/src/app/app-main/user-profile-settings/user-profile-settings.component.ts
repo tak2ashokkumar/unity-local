@@ -19,6 +19,7 @@ import { LlmConfigViewData, providerImages, UserProfileGroupViewData, UserProfil
 import { UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
 import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
 import { UnityModules, UnityPermissionSet } from 'src/app/shared/unity-rbac-permissions/unity-permission-set';
+import { UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
 
 @Component({
   selector: 'user-profile-settings',
@@ -117,6 +118,7 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     private permissionService: PermissionService,
     private notification: AppNotificationService,
     private spinner: AppSpinnerService,
+    private unityChatbotService: UnityChatbotService,
     private router: Router,
     private route: ActivatedRoute) {
     this.aimlPermissionSet = this.permissionService.getPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
@@ -158,6 +160,14 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     }
 
     return this.user.activeRbacRoles === 'Global Read-Only';
+  }
+
+  get hasUserOwnedLlms(): boolean {
+    return this.userOwnedLlms && this.userOwnedLlms.length > 0;
+  }
+
+  get isAiAgentProModeDefaultEnabled(): boolean {
+    return this.hasUserOwnedLlms && !!this.orgSettings?.is_pro_ai_enabled;
   }
 
   getOrganizationSettings() {
@@ -390,6 +400,26 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     }, (err: HttpErrorResponse) => {
       this.notification.error(new Notification('Failed to get Supported Llms'));
       this.spinner.stop('main');
+    });
+  }
+
+  setAiAgentProModeDefault(enabled: boolean) {
+    if (!this.orgSettings || !this.hasUserOwnedLlms) {
+      return;
+    }
+    if (this.orgSettings.is_pro_ai_enabled === enabled) {
+      return;
+    }
+    const previousValue = this.orgSettings.is_pro_ai_enabled;
+    this.orgSettings.is_pro_ai_enabled = enabled;
+    let mode = this.orgSettings.is_pro_ai_enabled ? 'Pro' : 'Auto';
+    this.profileSvc.updateOrgSettings(this.orgSettings).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.orgSettings = res;
+      this.unityChatbotService.setAiAgentProModeDefault(this.orgSettings.is_pro_ai_enabled);
+      this.notification.success(new Notification(`Default conversation mode set to ${mode} successfully.`));
+    }, (err: HttpErrorResponse) => {
+      this.orgSettings.is_pro_ai_enabled = previousValue;
+      this.notification.error(new Notification('Failed to update default conversation mode.'));
     });
   }
 

@@ -13,6 +13,8 @@ export interface NetworkDashboardFiltersResponse {
 export interface NetworkDashboardFilterCriteria {
     datacenterIds: number[];
     timeRange: string;
+    startDate?: string;
+    endDate?: string;
 }
 
 export interface NetworkOverview {
@@ -282,7 +284,8 @@ export interface NetworkDeviceAvailabilityTableApiItem {
     datacenter?: string;
     uptime?: NetworkDeviceAvailabilityUptime;
     availability?: number;
-    status?: NetworkDeviceAvailabilityStatus;
+    health_state?: 'up' | 'down' | 'unknown';
+    status?: NetworkDeviceAvailabilityStatus | 'Up' | 'Down' | 'Unknown' | 'up' | 'down' | 'unknown';
     last_discovered?: string;
     monitored?: boolean;
 }
@@ -362,7 +365,7 @@ export interface NetworkLowestAvailabilityApiItem {
     device?: string;
     device_type?: string;
     availability?: number;
-    status?: NetworkDeviceAvailabilityStatus;
+    status?: NetworkDeviceAvailabilityStatus | 'Up' | 'Down' | 'Unknown' | 'up' | 'down' | 'unknown';
     location?: string;
     datacenter?: string;
 }

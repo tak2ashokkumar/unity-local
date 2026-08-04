@@ -5,8 +5,26 @@
 ul {
     list-style: none;
 }
- 
-ul li {
+
+.enable-disable-toggle {
+    flex: 0 0 148px;
+    width: 148px;
+    min-width: 148px;
+    max-width: 148px;
+}
+
+.enable-disable-toggle-col {
+    flex: 0 0 160px;
+    max-width: 160px;
+}
+
+.enable-disable-toggle li {
+    flex: 0 0 74px;
+    width: 74px;
+    min-width: 74px;
+    max-width: 74px;
+    height: 31px;
+    box-sizing: border-box;
     text-align: center;
     background: #f0f3f5;
     cursor: pointer;
@@ -16,15 +34,22 @@ ul li {
     label {
         border-radius: 25px;
         width: 100%;
-        padding: 0.25rem 0.5rem;
-        display: inherit;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
         color: #73818f;
         border-color: #73818f;
         font-size: 0.765625rem;
         line-height: 1.5;
         margin-bottom: 0px !important;
         input {
-            visibility: hidden;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
         }
     }
  
@@ -32,15 +57,19 @@ ul li {
         background-color: #378ad8 !important;
         color: #ffffff !important;
     }
+
+    .font-sm {
+        margin-right: 0 !important;
+    }
 }
  
-ul li:first-child {
+.enable-disable-toggle li:first-child {
     border-top-left-radius: 25px;
     border-bottom-left-radius: 25px;
     border-right: none !important;
 }
  
-ul li:last-child {
+.enable-disable-toggle li:last-child {
     border-top-right-radius: 25px;
     border-bottom-right-radius: 25px;
     border-left: none !important;

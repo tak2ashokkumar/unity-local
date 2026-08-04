@@ -1,0 +1,267 @@
+:host {
+  display: block;
+}
+
+.storage-dashboard-shell {
+  min-height: 100%;
+  color: #202a33;
+  background: #f4f3ef;
+  font-size: 13px;
+}
+
+.storage-dashboard-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 18px 8px;
+  margin: 0;
+  background: #ffffff;
+  border-bottom: 1px solid #cfd6dc;
+}
+
+.storage-dashboard-filter-loading {
+  position: relative;
+  min-height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #cfd6dc;
+}
+
+.storage-dashboard-heading {
+  min-width: 260px;
+  padding-right: 16px;
+}
+
+.storage-dashboard-title-row {
+  display: flex;
+  align-items: center;
+}
+
+.storage-dashboard-title {
+  color: #00ad73;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.storage-vendor-select {
+  width: 150px;
+  height: 28px;
+  margin-left: 8px;
+  border-color: #b8c2cc;
+  color: #405162;
+  font-size: 12px;
+}
+
+.storage-dashboard-subtitle {
+  margin-top: 2px;
+  color: #7b8794;
+  font-size: 12px;
+}
+
+.scope-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.scope-separator {
+  margin: 0 3px;
+}
+
+.scope-more-count {
+  color: #2d86dd;
+  cursor: default;
+  font-weight: 600;
+}
+
+.scope-popover-list {
+  max-width: 240px;
+  max-height: 180px;
+  overflow-y: auto;
+  color: #202a33;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.scope-popover-item + .scope-popover-item {
+  margin-top: 4px;
+}
+
+.storage-dashboard-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.storage-filter-control {
+  flex: 0 0 150px;
+  width: 150px;
+
+  label {
+    display: block;
+    margin: 0 0 2px;
+    color: #202a33;
+    font-size: 11px;
+    line-height: 13px;
+  }
+
+  .form-control {
+    height: 28px;
+    padding: 3px 8px;
+    border-color: #b8c2cc;
+    font-size: 12px;
+  }
+}
+
+.storage-multiselect-control {
+  width: 150px;
+
+  .storage-dashboard-multiselect {
+    height: 28px;
+    padding: 0;
+    background: #ffffff;
+  }
+}
+
+.storage-time-range-control {
+  width: 150px;
+}
+
+.storage-dashboard-action-separator {
+  flex: 0 0 1px;
+  width: 1px;
+  height: 30px;
+  margin: 0 6px 0 12px;
+  background: #b8c2cc;
+}
+
+.storage-dashboard-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  padding-left: 3px;
+}
+
+.storage-round-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #ff8900;
+  margin-bottom: 0;
+
+  &:focus {
+    outline: 2px solid rgba(255, 137, 0, 0.35);
+    outline-offset: 2px;
+  }
+}
+
+.storage-dashboard-content {
+  padding: 10px 18px 18px;
+}
+
+:host ::ng-deep .storage-dashboard-multiselect {
+  .dropdown {
+    width: 100%;
+  }
+
+  .btn,
+  .dropdown-toggle {
+    height: 26px;
+    min-height: 26px;
+    padding: 3px 8px;
+    border: 0;
+    color: #405162;
+    background: #ffffff;
+    font-size: 12px;
+    line-height: 18px;
+    box-shadow: none;
+  }
+
+  .dropdown-menu {
+    min-width: 190px;
+    z-index: 2050;
+    font-size: 12px;
+  }
+}
+
+:host ::ng-deep .storage-time-range-control custom-date-dropdown {
+  display: block;
+  width: 100%;
+
+  .dropdown {
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .dropbtn {
+    width: 100%;
+    height: 28px;
+    border-color: #b8c2cc;
+    color: #405162;
+    font-size: 12px;
+  }
+
+  .dropdownClick {
+    right: 0;
+    left: auto;
+    width: 100%;
+    z-index: 2050;
+  }
+}
+
+@media (max-width: 1100px) {
+  .storage-dashboard-topbar {
+    display: block;
+  }
+
+  .storage-dashboard-heading {
+    padding-right: 0;
+    margin-bottom: 8px;
+  }
+
+  .storage-dashboard-filters {
+    justify-content: flex-start;
+  }
+
+}
+
+@media (max-width: 620px) {
+  .storage-dashboard-topbar,
+  .storage-dashboard-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .storage-dashboard-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .storage-vendor-select {
+    margin-left: 0;
+  }
+
+  .storage-dashboard-filters {
+    display: block;
+  }
+
+  .storage-filter-control {
+    width: 100%;
+    margin: 0 0 8px;
+  }
+
+  .storage-dashboard-action-separator {
+    display: none;
+  }
+}

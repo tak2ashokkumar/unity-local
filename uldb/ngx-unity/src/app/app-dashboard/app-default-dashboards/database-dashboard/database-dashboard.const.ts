@@ -6,6 +6,7 @@ import {
   DatabaseDashboardCriticalAlertViewData,
   DatabaseDashboardDonutItem,
   DatabaseDashboardFilterOption,
+  DatabaseDashboardHeaderInfoResponse,
   DatabaseDashboardMetricInfoMap,
   DatabaseDashboardSelectOption,
   DatabaseDashboardStatusInfo,
@@ -23,13 +24,39 @@ export const DBDASHBOARDCOLORS = ['#f5a623','#2F8BD7','#5B9E29','#D03533','#26A6
 export const DATABASE_DASHBOARD_ALL_SELECTED_VALUE = 'all';
 export const DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE = 'custom';
 export const DATABASE_DASHBOARD_TIME_RANGE_OPTIONS: DatabaseDashboardSelectOption[] = [
-  // { value: 'last_hour', label: '1 Hour' },
-  { value: 'last_24_hours', label: '24 Hour' },
-  { value: 'last_week', label: '7 Days' },
-  { value: 'last_month', label: '30 Days' },
-  { value: 'last_60_days', label: '60 Days' },
-  { value: 'last_quarter', label: '90 Days' },
-  { value: DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE, label: 'Custom' }
+  { value: 'last_24_hours', label: 'Last 24 Hours' },
+  { value: 'last_7_days', label: 'Last 7 Days' },
+  { value: 'last_30_days', label: 'Last 30 Days' },
+  { value: 'last_60_days', label: 'Last 60 Days' },
+  { value: 'last_90_days', label: 'Last 90 Days' },
+  // { value: DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE, label: 'Custom' }
+];
+
+export const DATABASE_DASHBOARD_HEADER_INFO_RESP: DatabaseDashboardHeaderInfoResponse = {
+  refresh_time: '2026-07-28T10:35:04.203527+00:00'
+};
+
+export const DATABASE_DASHBOARD_DATABASES_RESP: DatabaseDashboardFilterOption[] = [
+  {
+    id: 186,
+    name: 'sdxdclpostgressrc_postgres',
+    uuid: '02b747a7-71d3-429f-a636-42bae9be9b50'
+  },
+  {
+    id: 170,
+    name: 'sdxdclmysqlappd01_MYSQLSERVER',
+    uuid: '9ebb1436-790d-410a-84f5-071f86685c91'
+  },
+  {
+    id: 173,
+    name: 'sdxdcwmssql_2022_MSSQLSERVER',
+    uuid: '9b46dbf9-b00e-4141-8e3f-810173e5fbe8'
+  },
+  {
+    id: 172,
+    name: 'sdxdclOracleFPPServer_oracledb',
+    uuid: '24fa0c07-8eeb-48e6-8989-b0eb5ace24f6'
+  }
 ];
 
 export const DATABASE_DASHBOARD_EFFICIENCY_STATUS_INFO: DatabaseDashboardStatusInfo[] = [
@@ -584,9 +611,21 @@ export const INVENTORY_RESP = {
     }
   ],
   "by_environment": [
-    { "environment": "Production", "count": 20, "percentage": 47.62 },
-    { "environment": "Development", "count": 14, "percentage": 33.33 },
-    { "environment": "Test", "count": 8, "percentage": 19.05 }
+    {
+      "environment": "Production",
+      "count": 20,
+      "percentage": 47.62
+    },
+    {
+      "environment": "Development",
+      "count": 14,
+      "percentage": 33.33
+    },
+    {
+      "environment": "Test",
+      "count": 8,
+      "percentage": 19.05
+    }
   ],
   "by_version": [
     {
@@ -607,72 +646,63 @@ export const INVENTORY_RESP = {
     {
       "count": 1,
       "percentage": 25,
-      "version": "PostgreSQL 13.22"
+      "version": "PostgreSQL Unknown"
     }
   ],
   "by_tags": [
     {
       "count": 4,
       "percentage": 100,
-      "tag": "Untagged"
+      "tag": "Monitoring"
     }
-  ],
+  ]
 }
 
 export const TOPUTIL_RESP = [
   {
-    "disk_used_gb": 44.54,
-    "cpu_usage_system_percent": 4.31,
-    "name": "Db_instance_psql",
-    "disk_capacity_gb": 95.9,
-    "disk_iops_max": 4.56,
-    "disk_write_ops_per_sec": 2.5571,
-    "disk_read_latency_ms": 0.0,
-    "host_uuid": "d6945ffb-523a-4465-8ba5-a2feb7460c05",
-    "disk_read_ops_per_sec": 0.0,
-    "cpu_trend": [
-      { "ts": 1782273600, "value": 2.75 },
-      { "ts": 1782277200, "value": 2.31 },
-      { "ts": 1782280800, "value": 2.26 },
-      { "ts": 1782284400, "value": 2.31 },
-      { "ts": 1782288000, "value": 2.28 },
-      { "ts": 1782291600, "value": 2.3 },
-      { "ts": 1782295200, "value": 2.32 },
-      { "ts": 1782298800, "value": 2.35 },
-      { "ts": 1782302400, "value": 2.26 },
-      { "ts": 1782306000, "value": 2.28 },
-      { "ts": 1782309600, "value": 2.28 },
-      { "ts": 1782313200, "value": 2.29 },
-      { "ts": 1782316800, "value": 2.39 }
-    ],
-    "disk_utilization_percent": 21.005,
-    "system_uptime_seconds": 7203334.0,
-    "disk_iops": 2.5571,
-    "host_id": 10901,
-    "memory_used_percent": 68.14,
-    "db_uuid": "3516d387-024f-439f-8ed6-305df19ddcbf",
-    "memory_trend": [
-      { "ts": 1782273600, "value": 68.55 },
-      { "ts": 1782277200, "value": 68.4 },
-      { "ts": 1782280800, "value": 66.37 },
-      { "ts": 1782284400, "value": 67.52 },
-      { "ts": 1782288000, "value": 68.23 },
-      { "ts": 1782291600, "value": 66.7 },
-      { "ts": 1782295200, "value": 68.02 },
-      { "ts": 1782298800, "value": 68.88 },
-      { "ts": 1782302400, "value": 67.33 },
-      { "ts": 1782306000, "value": 67.96 },
-      { "ts": 1782309600, "value": 68.15 },
-      { "ts": 1782313200, "value": 67.16 },
-      { "ts": 1782316800, "value": 67.54 }
-    ]
+    "disk_used_gb": 17.09,
+    "cpu_usage_system_percent": 5,
+    "name": "sdxdclmysqlappd01_MYSQLSERVER",
+    "disk_capacity_gb": 66.08,
+    "disk_utilization_percent": 25.8626,
+    "system_uptime_seconds": 8810004,
+    "host_id": 15270,
+    "memory_used_percent": 56.64,
+    "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
+    "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
   },
   {
-    "host_id": 10902,
-    "db_uuid": "79b3351a-03c4-475f-8617-98dab7c02e8c",
-    "host_uuid": "2297b248-095c-47ce-8a1e-e466772b95e2",
-    "system_uptime_seconds": 0.0,
-    "name": "mssql_mon"
+    "disk_used_gb": 13.87,
+    "cpu_usage_system_percent": 6,
+    "name": "sdxdclpostgressrc_postgres",
+    "disk_capacity_gb": 45.96,
+    "disk_utilization_percent": 30.1784,
+    "system_uptime_seconds": 2954207,
+    "host_id": 15304,
+    "memory_used_percent": 36.52,
+    "db_uuid": "02b747a7-71d3-429f-a636-42bae9be9b50",
+    "host_uuid": "45fc9a5e-2f3b-46fa-9ac5-54a6a699d625"
+  },
+  {
+    "disk_used_gb": 172.73,
+    "cpu_usage_system_percent": 12,
+    "name": "sdxdclOracleFPPServer_oracledb",
+    "disk_capacity_gb": 415.87,
+    "disk_utilization_percent": 41.5346,
+    "system_uptime_seconds": 11838779,
+    "host_id": 15124,
+    "memory_used_percent": 68.26,
+    "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+    "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
+  },
+  {
+    "disk_utilization_percent": 17.195,
+    "cpu_usage_system_percent": 32,
+    "name": "sdxdcwmssql_2022_MSSQLSERVER",
+    "host_id": 15380,
+    "memory_used_percent": 54.33,
+    "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+    "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
   }
 ]
 
@@ -680,30 +710,30 @@ export const TOPQUERY_RESP = {
   "top_cache_hit_ratio": [
     {
       "status": "critical",
-      "hit_ratio_pct": 0.595,
+      "hit_ratio_pct": 0.495,
       "name": "sdxdclmysqlappd01_MYSQLSERVER",
       "db_type": "MySQL",
-      "host_id": 14673,
+      "host_id": 15270,
       "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
       "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
-    },
-    {
-      "status": "healthy",
-      "hit_ratio_pct": 99.882,
-      "name": "sdxdclOracleFPPServer_oracledb",
-      "db_type": "Oracle",
-      "host_id": 14674,
-      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
-      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
     },
     {
       "status": "healthy",
       "hit_ratio_pct": 100,
       "name": "sdxdcwmssql_2022_MSSQLSERVER",
       "db_type": "MSSQL Server",
-      "host_id": 14583,
+      "host_id": 15380,
       "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
       "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
+    },
+    {
+      "status": "healthy",
+      "hit_ratio_pct": 100,
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "db_type": "Oracle",
+      "host_id": 15124,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
     }
   ],
   "top_latency": [
@@ -711,56 +741,47 @@ export const TOPQUERY_RESP = {
       "status": "critical",
       "name": "sdxdclmysqlappd01_MYSQLSERVER",
       "db_type": "MySQL",
-      "host_id": 14673,
+      "host_id": 15270,
       "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
       "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf",
-      "response_time_ms": 4620.839
+      "response_time_ms": 4240.037
     },
     {
       "status": "healthy",
-      "name": "sdxdclOracleFPPServer_oracledb",
-      "db_type": "Oracle",
-      "host_id": 14674,
-      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
-      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340",
+      "name": "sdxdclpostgressrc_postgres",
+      "db_type": "PostgreSQL",
+      "host_id": 15304,
+      "db_uuid": "02b747a7-71d3-429f-a636-42bae9be9b50",
+      "host_uuid": "45fc9a5e-2f3b-46fa-9ac5-54a6a699d625",
       "response_time_ms": 0
     },
     {
       "status": "healthy",
       "name": "sdxdcwmssql_2022_MSSQLSERVER",
       "db_type": "MSSQL Server",
-      "host_id": 14583,
+      "host_id": 15380,
       "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
       "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c",
+      "response_time_ms": 0
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "db_type": "Oracle",
+      "host_id": 15124,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340",
       "response_time_ms": 0
     }
   ],
   "top_errors_deadlocks": [
     {
       "status": "healthy",
-      "name": "sdxdclmysqlappd01_MYSQLSERVER",
-      "db_type": "MySQL",
-      "deadlock_count": 0,
-      "host_id": 14673,
-      "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
-      "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
-    },
-    {
-      "status": "healthy",
-      "name": "sdxdclOracleFPPServer_oracledb",
-      "db_type": "Oracle",
-      "deadlock_count": 0,
-      "host_id": 14674,
-      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
-      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
-    },
-    {
-      "status": "healthy",
-      "name": "sdxdclpostgressrc_POSTGRES_SERVER",
+      "name": "sdxdclpostgressrc_postgres",
       "db_type": "PostgreSQL",
       "deadlock_count": 0,
-      "host_id": 14871,
-      "db_uuid": "2e91b612-220a-4861-b1df-56879b0a2695",
+      "host_id": 15304,
+      "db_uuid": "02b747a7-71d3-429f-a636-42bae9be9b50",
       "host_uuid": "45fc9a5e-2f3b-46fa-9ac5-54a6a699d625"
     },
     {
@@ -768,47 +789,295 @@ export const TOPQUERY_RESP = {
       "name": "sdxdcwmssql_2022_MSSQLSERVER",
       "db_type": "MSSQL Server",
       "deadlock_count": 0,
-      "host_id": 14583,
+      "host_id": 15380,
       "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
       "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclOracleFPPServer_oracledb",
+      "db_type": "Oracle",
+      "deadlock_count": 0,
+      "host_id": 15124,
+      "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
+      "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclmysqlappd01_MYSQLSERVER",
+      "db_type": "MySQL",
+      "deadlock_count": 0,
+      "host_id": 15270,
+      "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
+      "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
     }
   ],
   "top_throughput": [
     {
+      "status": "warning",
+      "name": "sdxdclpostgressrc_postgres",
+      "trend": [
+        {
+          "date": "2026-06-28",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-29",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-06-30",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-01",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-02",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-03",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-04",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-05",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-06",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-07",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-08",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-09",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-10",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-11",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-12",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-13",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-14",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-15",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-16",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-17",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-18",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-19",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-20",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-21",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-22",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-23",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-24",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-25",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-26",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-27",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-28",
+          "transactions_per_sec": 0
+        }
+      ],
+      "db_type": "PostgreSQL",
+      "host_id": 15304,
+      "db_uuid": "02b747a7-71d3-429f-a636-42bae9be9b50",
+      "host_uuid": "45fc9a5e-2f3b-46fa-9ac5-54a6a699d625"
+    },
+    {
       "status": "healthy",
       "name": "sdxdcwmssql_2022_MSSQLSERVER",
       "trend": [
         {
-          "date": "2026-06-19",
-          "transactions_per_sec": 0.62
+          "date": "2026-06-28",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-20",
-          "transactions_per_sec": 0.619
+          "date": "2026-06-29",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-21",
-          "transactions_per_sec": 0.62
+          "date": "2026-06-30",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-22",
-          "transactions_per_sec": 0.62
+          "date": "2026-07-01",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-23",
-          "transactions_per_sec": 0.62
+          "date": "2026-07-02",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-24",
-          "transactions_per_sec": 0.619
+          "date": "2026-07-03",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-25",
-          "transactions_per_sec": 0.618
+          "date": "2026-07-04",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-05",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-06",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-07",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-08",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-09",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-10",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-11",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-12",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-13",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-14",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-15",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-16",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-17",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-18",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-19",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-20",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-21",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-22",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-23",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-24",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-25",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-26",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-27",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-28",
+          "transactions_per_sec": 0
         }
       ],
       "db_type": "MSSQL Server",
-      "host_id": 14583,
+      "host_id": 15380,
       "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
       "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
     },
@@ -817,36 +1086,132 @@ export const TOPQUERY_RESP = {
       "name": "sdxdclOracleFPPServer_oracledb",
       "trend": [
         {
-          "date": "2026-06-19",
+          "date": "2026-06-28",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-20",
+          "date": "2026-06-29",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-21",
+          "date": "2026-06-30",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-22",
-          "transactions_per_sec": 0.188
+          "date": "2026-07-01",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-23",
-          "transactions_per_sec": 0.19
+          "date": "2026-07-02",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-24",
-          "transactions_per_sec": 0.193
+          "date": "2026-07-03",
+          "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-25",
-          "transactions_per_sec": 0.198
+          "date": "2026-07-04",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-05",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-06",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-07",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-08",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-09",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-10",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-11",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-12",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-13",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-14",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-15",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-16",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-17",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-18",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-19",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-20",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-21",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-22",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-23",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-24",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-25",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-26",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-27",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-28",
+          "transactions_per_sec": 0
         }
       ],
       "db_type": "Oracle",
-      "host_id": 14674,
+      "host_id": 15124,
       "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
       "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
     },
@@ -855,76 +1220,134 @@ export const TOPQUERY_RESP = {
       "name": "sdxdclmysqlappd01_MYSQLSERVER",
       "trend": [
         {
-          "date": "2026-06-19",
+          "date": "2026-06-28",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-20",
+          "date": "2026-06-29",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-21",
+          "date": "2026-06-30",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-22",
+          "date": "2026-07-01",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-23",
+          "date": "2026-07-02",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-24",
+          "date": "2026-07-03",
           "transactions_per_sec": 0
         },
         {
-          "date": "2026-06-25",
+          "date": "2026-07-04",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-05",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-06",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-07",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-08",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-09",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-10",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-11",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-12",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-13",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-14",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-15",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-16",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-17",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-18",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-19",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-20",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-21",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-22",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-23",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-24",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-25",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-26",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-27",
+          "transactions_per_sec": 0
+        },
+        {
+          "date": "2026-07-28",
           "transactions_per_sec": 0
         }
       ],
       "db_type": "MySQL",
-      "host_id": 14673,
+      "host_id": 15270,
       "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
       "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
-    },
-    {
-      "status": "healthy",
-      "name": "sdxdclpostgressrc_POSTGRES_SERVER",
-      "trend": [
-        {
-          "date": "2026-06-19",
-          "transactions_per_sec": 0
-        },
-        {
-          "date": "2026-06-20",
-          "transactions_per_sec": 0
-        },
-        {
-          "date": "2026-06-21",
-          "transactions_per_sec": 0
-        },
-        {
-          "date": "2026-06-22",
-          "transactions_per_sec": 0
-        },
-        {
-          "date": "2026-06-23",
-          "transactions_per_sec": 0
-        },
-        {
-          "date": "2026-06-24",
-          "transactions_per_sec": 0
-        },
-        {
-          "date": "2026-06-25",
-          "transactions_per_sec": 0
-        }
-      ],
-      "db_type": "PostgreSQL",
-      "host_id": 14871,
-      "db_uuid": "2e91b612-220a-4861-b1df-56879b0a2695",
-      "host_uuid": "45fc9a5e-2f3b-46fa-9ac5-54a6a699d625"
     }
   ],
   "top_response_time": [
@@ -932,16 +1355,25 @@ export const TOPQUERY_RESP = {
       "status": "healthy",
       "name": "sdxdclOracleFPPServer_oracledb",
       "db_type": "Oracle",
-      "host_id": 14674,
+      "host_id": 15124,
       "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
       "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340",
-      "response_time_ms": 1.21
+      "response_time_ms": 0.47
+    },
+    {
+      "status": "healthy",
+      "name": "sdxdclpostgressrc_postgres",
+      "db_type": "PostgreSQL",
+      "host_id": 15304,
+      "db_uuid": "02b747a7-71d3-429f-a636-42bae9be9b50",
+      "host_uuid": "45fc9a5e-2f3b-46fa-9ac5-54a6a699d625",
+      "response_time_ms": 0
     },
     {
       "status": "healthy",
       "name": "sdxdcwmssql_2022_MSSQLSERVER",
       "db_type": "MSSQL Server",
-      "host_id": 14583,
+      "host_id": 15380,
       "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
       "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c",
       "response_time_ms": 0
@@ -952,8 +1384,8 @@ export const TOPQUERY_RESP = {
       "status": "healthy",
       "name": "sdxdclOracleFPPServer_oracledb",
       "db_type": "Oracle",
-      "active_connections": 58,
-      "host_id": 14674,
+      "active_connections": 57,
+      "host_id": 15124,
       "db_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
       "host_uuid": "47fbd374-cccb-458f-b70e-5906c4a5d340"
     },
@@ -961,8 +1393,8 @@ export const TOPQUERY_RESP = {
       "status": "healthy",
       "name": "sdxdcwmssql_2022_MSSQLSERVER",
       "db_type": "MSSQL Server",
-      "active_connections": 15,
-      "host_id": 14583,
+      "active_connections": 19,
+      "host_id": 15380,
       "db_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
       "host_uuid": "86e0d5ef-7d2d-4104-928e-61742f77196c"
     },
@@ -971,11 +1403,12 @@ export const TOPQUERY_RESP = {
       "name": "sdxdclmysqlappd01_MYSQLSERVER",
       "db_type": "MySQL",
       "active_connections": 5,
-      "host_id": 14673,
+      "host_id": 15270,
       "db_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
       "host_uuid": "a85b4772-6b77-4ace-a43b-1d4ea6c9ffbf"
     }
-  ]
+  ],
+  "duration": "last_month"
 }
 
 export const CAPACITY_RESP = {
@@ -1078,27 +1511,27 @@ export const CAPACITY_GROWTH_INSIGHT_SUMMARY_RESP = {
     "status": "critical",
     "subtitle": "Buffer Pool Efficiency (%)",
     "title": "Buffer Cache Efficiency",
-    "value": 66.82,
+    "value": 66.83,
     "gauge": {
       "max": 100,
       "min": 0
     },
     "stats": {
       "max": 100,
-      "avg": 66.82,
-      "min": 0.59
+      "avg": 66.83,
+      "min": 0.49
     },
     "unit": "%"
   },
   "temporary_table_performance": {
     "stats": {
       "max": {
-        "disk": 2.39,
-        "memory": 0.76
+        "disk": 2.4,
+        "memory": 0.62
       },
       "avg": {
         "disk": 0.62,
-        "memory": 0.43
+        "memory": 0.39
       },
       "min": {
         "disk": 0,
@@ -1116,11 +1549,21 @@ export const CAPACITY_GROWTH_INSIGHT_SUMMARY_RESP = {
       ],
       "datasets": [
         {
-          "data": [0.5445, 0.7589, null, 0],
+          "data": [
+            0.5469,
+            0.6225,
+            null,
+            0
+          ],
           "label": "In Memory / sec"
         },
         {
-          "data": [2.3942, 0.0675, 0, 0],
+          "data": [
+            2.4048,
+            0.0673,
+            0,
+            0
+          ],
           "label": "On Disk / sec"
         }
       ]
@@ -1131,12 +1574,12 @@ export const CAPACITY_GROWTH_INSIGHT_SUMMARY_RESP = {
   "database_object_utilization": {
     "status": "healthy",
     "stats": {
-      "display_max": "2.27 K",
-      "min": 1064,
-      "max": 2272,
-      "display_avg": "1.67 K",
-      "avg": 1668,
-      "display_min": "1.06 K"
+      "display_max": "2.21 K",
+      "min": 562,
+      "max": 2208,
+      "display_avg": "1.39 K",
+      "avg": 1385,
+      "display_min": "562"
     },
     "subtitle": "Open Tables",
     "unit": "tables",
@@ -1145,38 +1588,22 @@ export const CAPACITY_GROWTH_INSIGHT_SUMMARY_RESP = {
       "max": 3000,
       "min": 0
     },
-    "display_value": "1.67 K",
-    "value": 1668
+    "display_value": "1.39 K",
+    "value": 1385
   }
 }
 
 export const CAPACITY_GROWTH_INSIGHT_TABLE_RESP = {
-  "count": 4,
-  "limit": 4,
-  "total_pages": 1,
+  "count": 0,
+  "limit": 10,
+  "total_pages": 0,
   "page": 1,
   "servers": [
     {
-      "status": "critical",
-      "rank": 1,
-      "open_tables_status": "healthy",
-      "host_id": 14583,
-      "host_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
-      "temp_tables_in_memory_per_sec": 0.5445,
-      "temp_tables_on_disk_per_sec": 2.3942,
-      "name": "sdxdcwmssql_2022_MSSQLSERVER",
-      "open_tables": 1064,
-      "db_type": "MSSQL Server",
-      "temp_tables_in_memory_status": "critical",
-      "buffer_pool_efficiency": 100,
-      "temp_tables_on_disk_status": "critical",
-      "buffer_pool_efficiency_status": "healthy"
-    },
-    {
       "status": "healthy",
-      "rank": 2,
+      "rank": 1,
       "open_tables_status": "unknown",
-      "host_id": 14674,
+      "host_id": 15124,
       "host_uuid": "24fa0c07-8eeb-48e6-8989-b0eb5ace24f6",
       "temp_tables_in_memory_per_sec": null,
       "temp_tables_on_disk_per_sec": 0,
@@ -1184,23 +1611,39 @@ export const CAPACITY_GROWTH_INSIGHT_TABLE_RESP = {
       "open_tables": null,
       "db_type": "Oracle",
       "temp_tables_in_memory_status": "unknown",
-      "buffer_pool_efficiency": 99.88,
+      "buffer_pool_efficiency": 100,
       "temp_tables_on_disk_status": "unknown",
+      "buffer_pool_efficiency_status": "healthy"
+    },
+    {
+      "status": "critical",
+      "rank": 2,
+      "open_tables_status": "healthy",
+      "host_id": 15380,
+      "host_uuid": "9b46dbf9-b00e-4141-8e3f-810173e5fbe8",
+      "temp_tables_in_memory_per_sec": 0.5469,
+      "temp_tables_on_disk_per_sec": 2.4048,
+      "name": "sdxdcwmssql_2022_MSSQLSERVER",
+      "open_tables": 562,
+      "db_type": "MSSQL Server",
+      "temp_tables_in_memory_status": "critical",
+      "buffer_pool_efficiency": 100,
+      "temp_tables_on_disk_status": "critical",
       "buffer_pool_efficiency_status": "healthy"
     },
     {
       "status": "critical",
       "rank": 3,
       "open_tables_status": "warning",
-      "host_id": 14673,
+      "host_id": 15270,
       "host_uuid": "9ebb1436-790d-410a-84f5-071f86685c91",
-      "temp_tables_in_memory_per_sec": 0.7589,
-      "temp_tables_on_disk_per_sec": 0.0675,
+      "temp_tables_in_memory_per_sec": 0.6225,
+      "temp_tables_on_disk_per_sec": 0.0673,
       "name": "sdxdclmysqlappd01_MYSQLSERVER",
-      "open_tables": 2272,
+      "open_tables": 2208,
       "db_type": "MySQL",
       "temp_tables_in_memory_status": "warning",
-      "buffer_pool_efficiency": 0.59,
+      "buffer_pool_efficiency": 0.49,
       "temp_tables_on_disk_status": "healthy",
       "buffer_pool_efficiency_status": "critical"
     },
@@ -1208,11 +1651,11 @@ export const CAPACITY_GROWTH_INSIGHT_TABLE_RESP = {
       "status": "unknown",
       "rank": 4,
       "open_tables_status": "unknown",
-      "host_id": 14871,
-      "host_uuid": "2e91b612-220a-4861-b1df-56879b0a2695",
+      "host_id": 15304,
+      "host_uuid": "02b747a7-71d3-429f-a636-42bae9be9b50",
       "temp_tables_in_memory_per_sec": 0,
       "temp_tables_on_disk_per_sec": 0,
-      "name": "sdxdclpostgressrc_POSTGRES_SERVER",
+      "name": "sdxdclpostgressrc_postgres",
       "open_tables": null,
       "db_type": "PostgreSQL",
       "temp_tables_in_memory_status": "unknown",
@@ -1226,47 +1669,46 @@ export const CAPACITY_GROWTH_INSIGHT_TABLE_RESP = {
 export const HEALTHGROWTH_RESP = {
   "servers": [
     {
-      "status": "online",
+      "status": "unreachable",
       "name": "sdxdclOracleFPPServer_oracledb"
     },
     {
-      "status": "online",
+      "status": "unreachable",
       "name": "sdxdclmysqlappd01_MYSQLSERVER"
     },
     {
       "status": "unreachable",
-      "name": "sdxdclpostgressrc_POSTGRES_SERVER"
+      "name": "sdxdclpostgressrc_postgres"
     },
     {
-      "status": "online",
+      "status": "unreachable",
       "name": "sdxdcwmssql_2022_MSSQLSERVER"
     }
   ],
   "replication_sync": {
     "servers": [
       {
-        "lag_sec": 0,
         "name": "sdxdclOracleFPPServer_oracledb",
-        "replication_status": "sync_healthy"
+        "replication_status": "no_replication"
       },
       {
         "name": "sdxdclmysqlappd01_MYSQLSERVER",
-        "replication_status": "sync_healthy"
+        "replication_status": "no_replication"
       },
       {
-        "name": "sdxdclpostgressrc_POSTGRES_SERVER",
-        "replication_status": "sync_healthy"
+        "name": "sdxdclpostgressrc_postgres",
+        "replication_status": "no_replication"
       },
       {
         "name": "sdxdcwmssql_2022_MSSQLSERVER",
-        "replication_status": "sync_healthy"
+        "replication_status": "no_replication"
       }
     ],
     "summary": {
       "deadlocks": 0,
-      "no_replication": 0,
+      "no_replication": 4,
       "errors_per_second": 0,
-      "sync_healthy": 4,
+      "sync_healthy": 0,
       "connection_errors": 0,
       "lag_over_30s": 0
     }
@@ -1274,8 +1716,8 @@ export const HEALTHGROWTH_RESP = {
   "summary": {
     "inactive": 0,
     "maintenance": 0,
-    "online": 3,
-    "unreachable": 1,
+    "online": 0,
+    "unreachable": 4,
     "degraded": 0,
     "total": 4
   }
@@ -1285,87 +1727,66 @@ export const ALERTS_RESP = {
   "critical_alerts": [
     {
       "source": "Unity",
-      "uuid": "344f3580-de37-472e-bee1-719058a4a926",
-      "event_count": 3,
+      "uuid": "dc2b383a-bd34-46c8-a8a4-cf73c0cff260",
+      "event_count": 1,
       "severity": "Critical",
-      "description": "PostgreSQL: Service is down",
-      "age": "1d 2h",
+      "description": "MSSQL: Failed to fetch info data (or no data for 30m)",
+      "age": "7d 3h",
       "acknowledged": false,
-      "id": "1408866",
-      "device_name": "sdxdclpostgressrc_POSTGRES_SERVER"
+      "id": "1523422",
+      "device_name": "sdxdcwmssql_2022_MSSQLSERVER"
     },
     {
       "source": "Unity",
-      "uuid": "06f268ab-5632-43d9-870e-de618277028b",
-      "event_count": 2,
+      "uuid": "a1072913-7a8f-442b-ada9-0a888f26057b",
+      "event_count": 1,
       "severity": "Critical",
-      "description": "PostgreSQL: Service is down",
-      "age": "7d 1h",
+      "description": "MSSQL: Service is unavailable",
+      "age": "15d 2h",
       "acknowledged": false,
-      "id": "1345651",
-      "device_name": "sdxdclpostgressrc_POSTGRES_SERVER"
+      "id": "1499621",
+      "device_name": "sdxdcwmssql_2022_MSSQLSERVER"
     },
     {
       "source": "Unity",
-      "uuid": "773ce847-880d-4aae-92aa-c19a4a79a085",
+      "uuid": "6705e5ff-7c8d-4d16-9f50-03fc981eb58c",
       "event_count": 1,
       "severity": "Critical",
       "description": "Oracle 'DB' TBS 'SYSTEM': Tablespace usage is too high (over 95% for 5m).",
-      "age": "2d 18h",
+      "age": "15d 3h",
       "acknowledged": false,
-      "id": "1396779",
+      "id": "1499511",
       "device_name": "sdxdclOracleFPPServer_oracledb"
     },
     {
       "source": "Unity",
-      "uuid": "719ee4b7-39d6-40d0-bd94-fa22fdd64ff4",
+      "uuid": "5b8e3cd7-9e5b-4984-8aff-e06d927fbbcf",
       "event_count": 1,
       "severity": "Critical",
       "description": "MSSQL: Failed to fetch info data (or no data for 30m)",
-      "age": "5d 8h",
+      "age": "18d 1h",
       "acknowledged": false,
-      "id": "1367484",
+      "id": "1498176",
       "device_name": "sdxdcwmssql_2022_MSSQLSERVER"
     },
     {
       "source": "Unity",
-      "uuid": "a27d78d6-ac04-4c5d-b1dd-79d5438aafee",
-      "event_count": 1,
-      "severity": "Critical",
-      "description": "MSSQL: Failed to fetch info data (or no data for 30m)",
-      "age": "64d 20h",
-      "acknowledged": false,
-      "id": "1017477",
-      "device_name": "sdxdcwmssql_2022_MSSQLSERVER"
-    },
-    {
-      "source": "Unity",
-      "uuid": "9a649486-55c5-4829-beac-d81d8fb06386",
-      "event_count": 1,
-      "severity": "Critical",
-      "description": "PostgreSQL: DB is down",
-      "age": "64d 21h",
-      "acknowledged": false,
-      "id": "1017279",
-      "device_name": "sdxdclpostgressrc_POSTGRES_SERVER"
-    },
-    {
-      "source": "Unity",
-      "uuid": "3880f120-c960-4b0b-8015-1b6fd93d2968",
+      "uuid": "69f978f9-43dd-427d-bc11-e19a656414d2",
       "event_count": 1,
       "severity": "Critical",
       "description": "MSSQL: Service is unavailable",
-      "age": "72d 1h",
+      "age": "28d 3h",
       "acknowledged": false,
-      "id": "979334",
-      "device_name": "sdxdclmysqlappd01_MYSQLSERVER"
+      "id": "1447630",
+      "device_name": "sdxdcwmssql_2022_MSSQLSERVER"
     }
   ],
   "summary": {
-    "open_itsm_tickets": 21,
-    "critical_alerts": 7,
+    "open_itsm_tickets": 16,
+    "critical_alerts": 5,
     "high_alerts": 10,
     "automation_total_runs": 0,
     "automation_success_pct": 0
-  }
+  },
+  "duration": "last_month"
 }

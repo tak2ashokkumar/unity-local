@@ -1,11 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DiscoveryDashboardService } from './discovery-dashboard.service';
+import { DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT, DISCOVERY_DASHBOARD_TIME_RANGE_OPTIONS } from './discovery-dashboard.const';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { takeUntil } from 'rxjs/operators';
 import { forkJoin, Subject } from 'rxjs';
 import { FormGroup } from '@angular/forms';
+import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { CiDistributionByDeviceSortColumn, CiDistributionByDeviceTableRowViewData, CiDistributionByDiscoverySortColumn, CiDistributionByDiscoveryTableRowViewData, CiDistributionSortColumn, CiDistributionTableRowViewData, CmdbSyncInsightsViewData, CmdbSyncTrendSortColumn, CmdbSyncTrendTableRowViewData, DiscoveryDashboardFilterCriteria, DiscoveryDashboardFilterFormValue, DiscoveryDashboardFilterOption, DiscoverySuccessFailureSortColumn, DiscoverySuccessFailureTableRowViewData, DiscoveryTrendAnalyticsSortColumn, DiscoveryTrendAnalyticsTableRowViewData, ExecutiveKpiViewData, NewlyDiscoveredDeviceItemViewData, NewlyDiscoveredDevicesSortColumn, OperatingSystemsItemViewData, OperatingSystemsSortColumn, OrphanedDeviceByTypeItemViewData, OrphanedDeviceByTypeSortColumn, OrphanedDevicesBreakdownItem, TopDiscoveryFailuresItemViewData, TopDiscoveryFailuresSortColumn } from './discovery-dashboard.type';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -27,7 +29,9 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   private filterFormUnsubscribe = new Subject<void>();
   filterForm: FormGroup;
   filterLoadFailed = false;
-  timeRangeOptions: DiscoveryDashboardFilterOption[] = [];
+  readonly timeRangeOptions: DateRangeOption[] = DISCOVERY_DASHBOARD_TIME_RANGE_OPTIONS;
+  selectedTimeRange: string = DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT;
+  private selectedTimeRangeDates: { from: string; to: string } | null = null;
   regionOptions: DiscoveryDashboardFilterOption[] = [];
   executiveKpiViewData: ExecutiveKpiViewData = new ExecutiveKpiViewData();
   cmdbSyncInsights: CmdbSyncInsightsViewData = new CmdbSyncInsightsViewData();
@@ -86,7 +90,9 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   appliedFilters: DiscoveryDashboardFilterCriteria = {
     region: [],
-    timeRange: 'last_30_days'
+    timeRange: DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT,
+    startDate: '',
+    endDate: ''
   };
   loaderNames = {
     filters: 'dashboardFiltersLoader',
@@ -149,10 +155,11 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.resetFilterState();
     this.spinner.start(this.loaderNames.filters);
     this.svc.getFilterOptions().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.timeRangeOptions = this.normalizeFilterOptions(res?.time_range);
       this.regionOptions = this.convertRegionOptions(res?.regions || []);
       this.appliedFilters.region = this.getDefaultRegionSelectionValues();
       this.appliedFilters.timeRange = this.getDefaultTimeRangeSelection();
+      this.selectedTimeRange = this.appliedFilters.timeRange;
+      this.selectedTimeRangeDates = null;
       this.buildFilterForm();
       this.applyFilters();
       this.stopFilterLoader();
@@ -197,7 +204,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
         this.spinner.stop(this.loaderNames.executiveKpis);
       }
     }, (_err: HttpErrorResponse) => {
-      this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+      this.notification.error(new Notification('Failed to load Executive KPIs widget data. Try again later.'));
     });
   }
 
@@ -216,7 +223,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
         }
       }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+        this.notification.error(new Notification('Failed to load Discovery Trend Analytics widget data. Try again later.'));
       });
   }
 
@@ -232,7 +239,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
         this.spinner.stop(this.loaderNames.successAndFailure);
       }
     }, (_err: HttpErrorResponse) => {
-      this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+      this.notification.error(new Notification('Failed to load Discovery Success vs Failure widget data. Try again later.'));
     });
   }
 
@@ -244,7 +251,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
         this.spinner.stop(this.loaderNames.cmdbSyncInsights);
       }
     }, (_err: HttpErrorResponse) => {
-      this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+      this.notification.error(new Notification('Failed to load CMDB Sync Insights widget data. Try again later.'));
     });
   }
 
@@ -263,7 +270,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
         }
       }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+        this.notification.error(new Notification('Failed to load CI Distribution by Device Type widget data. Try again later.'));
       });
   }
 
@@ -282,7 +289,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
         }
       }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+        this.notification.error(new Notification('Failed to load CI Distribution by Discovery Method widget data. Try again later.'));
       });
   }
 
@@ -331,7 +338,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
           this.spinner.stop(this.loaderNames.newlyDiscoveredDevices);
         }
       }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+        this.notification.error(new Notification('Failed to load Newly Discovered Devices widget data. Try again later.'));
       });
   }
 
@@ -624,7 +631,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
         }
       }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+        this.notification.error(new Notification('Failed to load Top Discovery Failures widget data. Try again later.'));
       });
   }
 
@@ -686,7 +693,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
         }
       }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+        this.notification.error(new Notification('Failed to load OS Overview widget data. Try again later.'));
       });
   }
 
@@ -774,7 +781,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
         }
       }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+        this.notification.error(new Notification('Failed to load CMDB Sync Trend widget data. Try again later.'));
       });
   }
 
@@ -794,7 +801,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
           this.spinner.stop(this.loaderNames.ciDistribution);
         }
       }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+        this.notification.error(new Notification('Failed to load CI Distribution Overview widget data. Try again later.'));
       });
   }
 
@@ -1064,6 +1071,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   private buildFilterForm() {
     this.filterFormUnsubscribe.next();
     this.filterForm = this.svc.buildFilterForm(this.getFilterFormDefaults());
+    this.onTimeRangeChange({ period: this.selectedTimeRange });
     this.watchFilterChanges();
   }
 
@@ -1071,7 +1079,6 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.filterFormUnsubscribe.next();
     this.filterForm = null;
     this.filterLoadFailed = false;
-    this.timeRangeOptions = [];
     this.regionOptions = [];
     this.executiveKpiViewData = new ExecutiveKpiViewData();
     this.cmdbSyncInsights = new CmdbSyncInsightsViewData();
@@ -1132,8 +1139,12 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.sucessAndFailureChartOptions = null;
     this.appliedFilters = {
       region: [],
-      timeRange: 'last_30_days'
+      timeRange: DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT,
+      startDate: '',
+      endDate: ''
     };
+    this.selectedTimeRange = DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT;
+    this.selectedTimeRangeDates = null;
     this.newlyDiscoveredDevicesSearch = '';
     this.newlyDiscoveredDevicesPageNo = 1;
   }
@@ -1142,7 +1153,9 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     const rawValue = this.filterForm?.getRawValue() || {};
     return {
       region: this.getSelectedRegionValues(rawValue.region),
-      timeRange: rawValue.timeRange || this.getDefaultTimeRangeSelection()
+      timeRange: rawValue.timeRange || this.getDefaultTimeRangeSelection(),
+      startDate: rawValue.timeRange === 'custom' ? (rawValue.startDate || '') : '',
+      endDate: rawValue.timeRange === 'custom' ? (rawValue.endDate || '') : ''
     };
   }
 
@@ -1204,7 +1217,9 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   private getFilterFormDefaults(): DiscoveryDashboardFilterFormValue {
     return {
       region: this.getSelectedRegionOptions(this.appliedFilters.region),
-      timeRange: this.appliedFilters.timeRange
+      timeRange: this.appliedFilters.timeRange,
+      startDate: this.appliedFilters.startDate || '',
+      endDate: this.appliedFilters.endDate || ''
     };
   }
 
@@ -1242,7 +1257,34 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   }
 
   private getDefaultTimeRangeSelection(): string {
-    return this.timeRangeOptions[0]?.value || 'last_30_days';
+    const preferredOption = this.timeRangeOptions.find(option => option?.value === DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT);
+    return preferredOption?.value || this.timeRangeOptions[0]?.value || DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT;
+  }
+
+  onTimeRangeChange(event: { period?: string; from?: string | Date; to?: string | Date }) {
+    this.selectedTimeRange = event?.period || this.selectedTimeRange;
+    this.selectedTimeRangeDates = event?.period === 'custom'
+      ? { from: this.formatTimeRangeDate(event?.from, false), to: this.formatTimeRangeDate(event?.to, true) }
+      : null;
+    this.filterForm?.patchValue({
+      timeRange: this.selectedTimeRange,
+      startDate: this.selectedTimeRange === 'custom' ? (this.selectedTimeRangeDates?.from || '') : '',
+      endDate: this.selectedTimeRange === 'custom' ? (this.selectedTimeRangeDates?.to || '') : ''
+    }, { emitEvent: false });
+  }
+
+  private formatTimeRangeDate(value: string | Date | undefined, isEnd: boolean): string {
+    if (!value) {
+      return '';
+    }
+    const date = value instanceof Date ? value : new Date(value);
+    if (isNaN(date.getTime())) {
+      return '';
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}T${isEnd ? '23:59:59' : '00:00:00'}Z`;
   }
 
   private stopFilterLoader() {

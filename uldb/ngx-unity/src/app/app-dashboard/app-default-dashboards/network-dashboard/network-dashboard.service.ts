@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   GET_NETWORK_DASHBOARD_FILTERS,
   GET_NETWORK_DASHBOARD_OVERVIEW,
@@ -38,6 +38,7 @@ import {
 } from 'src/app/shared/api-endpoint.const';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import {
+  NETWORK_DASHBOARD_TIME_RANGE_DEFAULT,
   NETWORK_AVERAGE_TEMPERATURE_BY_SENSOR_TYPE_RESPONSE,
   NETWORK_ENVIRONMENTAL_HEALTH_SUMMARY_TABLE_RESPONSE,
   NETWORK_FAN_HEALTH_BY_DEVICE_RESPONSE,
@@ -66,10 +67,16 @@ import {
   NetworkDeviceAvailabilityStatus,
   NetworkDeviceAvailabilityTableApiItem,
   NetworkDeviceAvailabilityTableResponse,
+  NetworkDeviceAvailabilityUptime,
+  NetworkDeviceHealthDistributionApiItem,
   NetworkDeviceHealthDistributionResponse,
+  NetworkDeviceTypeDistributionApiItem,
   NetworkDeviceTypeDistributionResponse,
+  NetworkManufacturerModelBreakdownApiItem,
   NetworkManufacturerModelBreakdownResponse,
+  NetworkDevicesByLocationApiItem,
   NetworkDevicesByLocationResponse,
+  NetworkAverageUptimeByDeviceTypeApiItem,
   NetworkAverageUptimeByDeviceTypeResponse,
   NetworkLowestAvailabilityApiItem,
   NetworkLowestAvailabilityResponse,
@@ -152,15 +159,37 @@ export class NetworkDashboardService {
     });
   }
 
-  getTopConversationsTable(filters?: NetworkDashboardFilterCriteria): Observable<NetworkTopConversationsTableResponse> {
+  getTopConversationsTable(
+    filters?: NetworkDashboardFilterCriteria,
+    ordering?: string,
+    searchValue: string = ''
+  ): Observable<NetworkTopConversationsTableResponse> {
+    let params = this.buildFilterParams(filters);
+    if (ordering) {
+      params = params.set('ordering', ordering);
+    }
+    if (searchValue?.trim()) {
+      params = params.set('search', searchValue.trim());
+    }
     return this.http.get<NetworkTopConversationsTableResponse>(GET_NETWORK_DASHBOARD_TOP_10_CONVERSATIONS(), {
-      params: this.buildFilterParams(filters)
+      params
     });
   }
 
-  getPerformanceInsightsTable(filters?: NetworkDashboardFilterCriteria): Observable<NetworkPerformanceInsightsTableResponse> {
+  getPerformanceInsightsTable(
+    filters?: NetworkDashboardFilterCriteria,
+    ordering?: string,
+    searchValue: string = ''
+  ): Observable<NetworkPerformanceInsightsTableResponse> {
+    let params = this.buildFilterParams(filters);
+    if (ordering) {
+      params = params.set('ordering', ordering);
+    }
+    if (searchValue?.trim()) {
+      params = params.set('search', searchValue.trim());
+    }
     return this.http.get<NetworkPerformanceInsightsTableResponse>(GET_NETWORK_DASHBOARD_PERFORMANCE_INSIGHTS(), {
-      params: this.buildFilterParams(filters)
+      params
     });
   }
 
@@ -176,9 +205,20 @@ export class NetworkDashboardService {
     });
   }
 
-  getInterfaceHealthMetricsTable(filters?: NetworkDashboardFilterCriteria): Observable<NetworkInterfaceHealthMetricsTableResponse> {
+  getInterfaceHealthMetricsTable(
+    filters?: NetworkDashboardFilterCriteria,
+    ordering?: string,
+    searchValue: string = ''
+  ): Observable<NetworkInterfaceHealthMetricsTableResponse> {
+    let params = this.buildFilterParams(filters);
+    if (ordering) {
+      params = params.set('ordering', ordering);
+    }
+    if (searchValue?.trim()) {
+      params = params.set('search', searchValue.trim());
+    }
     return this.http.get<NetworkInterfaceHealthMetricsTableResponse>(GET_NETWORK_DASHBOARD_INTERFACE_HEALTH_AND_METRICS(), {
-      params: this.buildFilterParams(filters)
+      params
     });
   }
 
@@ -370,8 +410,25 @@ export class NetworkDashboardService {
       params = params.set('datacenter_ids', filters.datacenterIds.join(','));
     }
 
-    params = params.set('time_range', filters?.timeRange || 'last_month');
+    params = params.set('time_range', this.mapTimeRangeToApiValue(filters?.timeRange || NETWORK_DASHBOARD_TIME_RANGE_DEFAULT));
+    if (filters?.startDate) {
+      params = params.set('start_datetime', filters.startDate);
+    }
+    if (filters?.endDate) {
+      params = params.set('end_datetime', filters.endDate);
+    }
     return params;
+  }
+
+  private mapTimeRangeToApiValue(value: string): string {
+    switch (value) {
+      case 'last_7_days':
+        return 'last_week';
+      case 'last_30_days':
+        return 'last_month';
+      default:
+        return value;
+    }
   }
 
   convertToTopConversationsChartViewData(
@@ -406,6 +463,34 @@ export class NetworkDashboardService {
     ];
 
     return view;
+  }
+
+  convertToTopConversationsViewDataFromTable(data: NetworkTopConversationsTableResponse): TopConversationsWidgetViewData {
+    const view = new TopConversationsWidgetViewData();
+    const items = data?.data || [];
+
+    view.cards = [
+      this.buildBitsConversationCard(
+        'receive',
+        'Top Bits Receive',
+        this.convertTopBitsMetricItemsFromTable(items, 'received'),
+        this.buildTopBitsLegendsFromTable(items, 'received')
+      ),
+      this.buildBitsConversationCard(
+        'sent',
+        'Top Bits Sent',
+        this.convertTopBitsMetricItemsFromTable(items, 'sent'),
+        this.buildTopBitsLegendsFromTable(items, 'sent')
+      ),
+      this.buildBandwidthConversationCard(
+        'bandwidth',
+        'Top Bandwidth Usage',
+        this.convertTopBandwidthUsageItemsFromTable(items),
+        this.buildTopBandwidthUsageLegendsFromTable(items)
+      )
+    ];
+
+    return this.applyTopConversationsTableData(view, data);
   }
 
   applyTopConversationsTableData(
@@ -468,6 +553,52 @@ export class NetworkDashboardService {
       )
     ];
     return view;
+  }
+
+  convertToPerformanceWorkloadViewDataFromTable(
+    data: NetworkPerformanceInsightsTableResponse
+  ): PerformanceWorkloadInsightsWidgetViewData {
+    const view = new PerformanceWorkloadInsightsWidgetViewData();
+    const tableItems = data?.data || [];
+    const chartItems = this.convertPerformanceTableItems(tableItems);
+
+    view.charts = [
+      this.buildPerformanceScatterChart(
+        'cpu-memory',
+        'CPU Vs Memory Performance',
+        'CPU Utilization (%)',
+        'Memory Utilization (%)',
+        chartItems.filter(item => item.cpu_utilization_percent > 0 || item.memory_utilization_percent > 0),
+        item => item.memory_utilization_percent,
+        item => item.cpu_utilization_percent,
+        (item: NetworkPerformanceWorkloadInsightItem) => `Device: ${item.device_name}<br>CPU: ${item.cpu_utilization_percent}%<br>Memory: ${item.memory_utilization_percent}%`,
+        30,
+        100,
+        10,
+        30,
+        100,
+        10
+      ),
+      this.buildPerformanceScatterChart(
+        'traffic',
+        'Traffic In Vs Traffic Out',
+        'Traffic In (Mbps)',
+        'Traffic Out (Mbps)',
+        chartItems.filter(item => item.interface_traffic_in_mbps > 0 || item.interface_traffic_out_mbps > 0),
+        item => item.interface_traffic_out_mbps,
+        item => item.interface_traffic_in_mbps,
+        (item: NetworkPerformanceWorkloadInsightItem) =>
+          `Device: ${item.device_name}<br>Traffic In: ${item.interface_traffic_in_mbps} Mbps<br>Traffic Out: ${item.interface_traffic_out_mbps} Mbps`,
+        0,
+        this.getRoundedAxisMax(chartItems.map(item => item.interface_traffic_out_mbps), 10, 10),
+        50,
+        30,
+        this.getRoundedAxisMax(chartItems.map(item => item.interface_traffic_in_mbps), 10, 10),
+        50
+      )
+    ];
+
+    return this.applyPerformanceWorkloadTableData(view, data);
   }
 
   applyPerformanceWorkloadTableData(
@@ -538,6 +669,58 @@ export class NetworkDashboardService {
       )
     ];
     return view;
+  }
+
+  convertToInterfaceHealthMetricsViewDataFromTable(
+    data: NetworkInterfaceHealthMetricsTableResponse
+  ): InterfaceHealthMetricsWidgetViewData {
+    const view = new InterfaceHealthMetricsWidgetViewData();
+    const chartItems = this.convertInterfaceHealthTableItems(data?.data || []);
+
+    view.charts = [
+      this.buildInterfaceHealthMetricChart(
+        'errors-in',
+        'Interface Errors (Inbound)',
+        'errors',
+        'Errors (In)',
+        this.getInterfaceHealthTopItems(chartItems, item => Number(item.errors_in_per_sec || 0)),
+        item => Number(item.errors_in_per_sec || 0),
+        this.getRoundedAxisMax(chartItems.map(item => Number(item.errors_in_per_sec || 0)), 2, 2),
+        2
+      ),
+      this.buildInterfaceHealthMetricChart(
+        'errors-out',
+        'Interface Errors (Outbound)',
+        'errors',
+        'Errors (Out)',
+        this.getInterfaceHealthTopItems(chartItems, item => Number(item.errors_out_per_sec || 0)),
+        item => Number(item.errors_out_per_sec || 0),
+        this.getRoundedAxisMax(chartItems.map(item => Number(item.errors_out_per_sec || 0)), 2, 2),
+        2
+      ),
+      this.buildInterfaceHealthMetricChart(
+        'discards-in',
+        'Interface Discards (Inbound)',
+        'discards',
+        'Discards (In)',
+        this.getInterfaceHealthTopItems(chartItems, item => Number(item.discards_in_per_sec || 0)),
+        item => Number(item.discards_in_per_sec || 0),
+        this.getRoundedAxisMax(chartItems.map(item => Number(item.discards_in_per_sec || 0)), 2, 2),
+        2
+      ),
+      this.buildInterfaceHealthMetricChart(
+        'discards-out',
+        'Interface Discards (Outbound)',
+        'discards',
+        'Discards (Out)',
+        this.getInterfaceHealthTopItems(chartItems, item => Number(item.discards_out_per_sec || 0)),
+        item => Number(item.discards_out_per_sec || 0),
+        this.getRoundedAxisMax(chartItems.map(item => Number(item.discards_out_per_sec || 0)), 2, 2),
+        2
+      )
+    ];
+
+    return this.applyInterfaceHealthMetricsTableData(view, data);
   }
 
   applyInterfaceHealthMetricsTableData(
@@ -616,6 +799,70 @@ export class NetworkDashboardService {
       this.buildLowestAvailabilityCard(lowestAvailability?.data || [])
     ];
     return view;
+  }
+
+  convertToNetworkDeviceAvailabilityViewDataFromTable(
+    data: NetworkDeviceAvailabilityTableResponse
+  ): NetworkDeviceAvailabilityWidgetViewData {
+    const items = data?.data || [];
+    const view = new NetworkDeviceAvailabilityWidgetViewData();
+
+    const deviceHealthDistribution = this.aggregateDeviceHealthDistribution(items);
+    const deviceTypeDistribution = this.aggregateDeviceTypeDistribution(items);
+    const manufacturerModelBreakdown = this.aggregateManufacturerModelBreakdown(items);
+    const devicesByLocation = this.aggregateDevicesByLocation(items);
+    const averageUptimeByDeviceType = this.aggregateAverageUptimeByDeviceType(items);
+    const lowestAvailability = this.aggregateLowestAvailability(items);
+
+    view.cards = [
+      this.buildNetworkDeviceAvailabilityChartCard(
+        'device-health-distribution',
+        'Device Health Distribution',
+        this.convertToDeviceHealthDistributionChartData(deviceHealthDistribution),
+        236,
+        deviceHealthDistribution.length ? [
+          this.buildNetworkDeviceAvailabilityLegendItem('Down', '#d10000'),
+          this.buildNetworkDeviceAvailabilityLegendItem('Up', '#19bb73'),
+          this.buildNetworkDeviceAvailabilityLegendItem('Unknown', '#a5b1bd')
+        ] : [],
+        'Device split by health state.'
+      ),
+      this.buildNetworkDeviceAvailabilityChartCard(
+        'device-type-distribution',
+        'Device Type Distribution',
+        this.convertToDeviceTypeDistributionChartData(deviceTypeDistribution),
+        236,
+        this.buildWeightedLegendItems(deviceTypeDistribution.map(item => item.type).filter(Boolean), label => this.getDeviceTypeColor(label)),
+        'Distribution of devices by network device type.'
+      ),
+      this.buildNetworkDeviceAvailabilityChartCard(
+        'manufacturer-model-breakdown',
+        'Manufacturer & Model Breakdown',
+        this.convertToManufacturerModelBreakdownChartData(manufacturerModelBreakdown),
+        236,
+        this.buildWeightedLegendItems(this.getManufacturerModels(manufacturerModelBreakdown), label => this.getManufacturerModelColor(label)),
+        'Device counts grouped by manufacturer and stacked by model.'
+      ),
+      this.buildNetworkDeviceAvailabilityChartCard(
+        'devices-by-location',
+        'Devices by Location',
+        this.convertToDevicesByLocationChartData(devicesByLocation),
+        236,
+        this.buildWeightedLegendItems(devicesByLocation.map(item => item.datacenter || item.location).filter(Boolean), label => this.getDeviceLocationColor(label)),
+        'Distribution of monitored devices by location.'
+      ),
+      this.buildNetworkDeviceAvailabilityChartCard(
+        'average-uptime',
+        'Average Uptime by Category',
+        this.convertToAverageUptimeChartData(averageUptimeByDeviceType, 'days'),
+        236,
+        [],
+        'Average uptime in days grouped by device category.'
+      ),
+      this.buildLowestAvailabilityCard(lowestAvailability)
+    ];
+
+    return this.applyNetworkDeviceAvailabilityTableData(view, data);
   }
 
   applyNetworkDeviceAvailabilityTableData(
@@ -938,6 +1185,35 @@ export class NetworkDashboardService {
     });
   }
 
+  private convertTopBitsMetricItemsFromTable(
+    items: NetworkTopConversationTableApiItem[],
+    metric: 'received' | 'sent'
+  ): NetworkConversationMetricItem[] {
+    return (items || [])
+      .slice()
+      .sort((left, right) => {
+        const leftValue = metric === 'received' ? Number(left.bits_received_bps || 0) : Number(left.bits_sent_bps || 0);
+        const rightValue = metric === 'received' ? Number(right.bits_received_bps || 0) : Number(right.bits_sent_bps || 0);
+        return rightValue - leftValue;
+      })
+      .slice(0, 10)
+      .map(item => {
+        const value = metric === 'received'
+          ? Number(item.bits_received_bps || 0)
+          : Number(item.bits_sent_bps || 0);
+        const displayValue = this.formatValueWithUnit(metric === 'received' ? item.bits_received : item.bits_sent);
+        const category = this.getTopBitsCategory(value, metric);
+
+        return {
+          conversation_name: item.name,
+          value,
+          display_value: displayValue,
+          category,
+          color: this.getTopBitsColor(category, metric)
+        };
+      });
+  }
+
   private convertTopBandwidthUsageItems(items: NetworkTopBandwidthUsageApiItem[]): NetworkBandwidthUsageItem[] {
     return (items || []).map(item => {
       const value = this.normalizeBandwidthUsagePercent(item.bandwidth_usage);
@@ -950,6 +1226,24 @@ export class NetworkDashboardService {
         color: this.getBandwidthUsageColor(category)
       };
     });
+  }
+
+  private convertTopBandwidthUsageItemsFromTable(items: NetworkTopConversationTableApiItem[]): NetworkBandwidthUsageItem[] {
+    return (items || [])
+      .slice()
+      .sort((left, right) => this.normalizeBandwidthUsagePercent(right.bandwidth_usage) - this.normalizeBandwidthUsagePercent(left.bandwidth_usage))
+      .slice(0, 10)
+      .map(item => {
+        const value = this.normalizeBandwidthUsagePercent(item.bandwidth_usage);
+        const category = this.getBandwidthUsageTone(value);
+        return {
+          conversation_name: item.name,
+          value,
+          display_value: `${value}%`,
+          category,
+          color: this.getBandwidthUsageColor(category)
+        };
+      });
   }
 
   private buildTopBitsReceivedLegends(items: NetworkTopConversationMetricApiItem[]): NetworkMetricLegendItem[] {
@@ -970,7 +1264,34 @@ export class NetworkDashboardService {
     ];
   }
 
+  private buildTopBitsLegendsFromTable(
+    items: NetworkTopConversationTableApiItem[],
+    metric: 'received' | 'sent'
+  ): NetworkMetricLegendItem[] {
+    const values = (items || []).map(item => metric === 'received'
+      ? Number(item.bits_received_bps || 0)
+      : Number(item.bits_sent_bps || 0));
+    return this.buildTopBitsLegends(values, metric);
+  }
+
   private buildTopBandwidthUsageLegends(items: NetworkTopBandwidthUsageApiItem[]): NetworkMetricLegendItem[] {
+    const values = (items || []).map(item => this.normalizeBandwidthUsagePercent(item.bandwidth_usage));
+    const legends: NetworkMetricLegendItem[] = [];
+
+    if (values.some(value => value > 70)) {
+      legends.push({ label: 'Critical (>70%)', category: 'critical', color: this.getBandwidthUsageColor('critical') });
+    }
+    if (values.some(value => value > 40 && value <= 70)) {
+      legends.push({ label: 'Warning (40%-70%)', category: 'warning', color: this.getBandwidthUsageColor('warning') });
+    }
+    if (values.some(value => value <= 40)) {
+      legends.push({ label: 'Healthy (<40%)', category: 'healthy', color: this.getBandwidthUsageColor('healthy') });
+    }
+
+    return legends;
+  }
+
+  private buildTopBandwidthUsageLegendsFromTable(items: NetworkTopConversationTableApiItem[]): NetworkMetricLegendItem[] {
     const values = (items || []).map(item => this.normalizeBandwidthUsagePercent(item.bandwidth_usage));
     const legends: NetworkMetricLegendItem[] = [];
 
@@ -1066,12 +1387,14 @@ export class NetworkDashboardService {
         key: 'cpuDisplay',
         label: 'CPU Utilization (%)',
         sortKey: 'cpuPercent',
+        type: 'utilization',
         align: 'left'
       },
       {
         key: 'memoryDisplay',
         label: 'Memory Utilization (%)',
         sortKey: 'memoryPercent',
+        type: 'utilization',
         align: 'left'
       },
       {
@@ -1094,8 +1417,10 @@ export class NetworkDashboardService {
     row.deviceName = item.device_name;
     row.cpuPercent = this.getPerformanceCpuUtilization(item);
     row.cpuDisplay = `${row.cpuPercent}%`;
+    row.cpuTone = this.getPerformanceUtilizationTone(row.cpuPercent);
     row.memoryPercent = this.getPerformanceMemoryUtilization(item);
     row.memoryDisplay = `${row.memoryPercent}%`;
+    row.memoryTone = this.getPerformanceUtilizationTone(row.memoryPercent);
     row.interfaceTrafficInMbps = this.getPerformanceTrafficIn(item);
     row.interfaceTrafficInDisplay = this.formatValueWithUnit((item as NetworkPerformanceInsightsTableApiItem).traffic_in) || `${row.interfaceTrafficInMbps} Mbps`;
     row.interfaceTrafficOutMbps = this.getPerformanceTrafficOut(item);
@@ -1121,6 +1446,16 @@ export class NetworkDashboardService {
       memory_utilization_percent: 0,
       interface_traffic_in_mbps: Number(item.traffic_in || 0),
       interface_traffic_out_mbps: Number(item.traffic_out || 0)
+    }));
+  }
+
+  private convertPerformanceTableItems(items: NetworkPerformanceInsightsTableApiItem[]): NetworkPerformanceWorkloadInsightItem[] {
+    return (items || []).map(item => ({
+      device_name: item.device_name,
+      cpu_utilization_percent: Number(item.cpu_utilization || 0),
+      memory_utilization_percent: Number(item.memory_utilization || 0),
+      interface_traffic_in_mbps: Number(item.traffic_in?.value || 0),
+      interface_traffic_out_mbps: Number(item.traffic_out?.value || 0)
     }));
   }
 
@@ -1286,6 +1621,18 @@ export class NetworkDashboardService {
     return card;
   }
 
+  private aggregateLowestAvailability(items: NetworkDeviceAvailabilityTableApiItem[]): NetworkLowestAvailabilityApiItem[] {
+    return (items || []).map(item => ({
+      id: item.id,
+      device: item.name,
+      device_type: item.type,
+      availability: Number(item.availability || 0),
+      status: item.status,
+      location: item.location,
+      datacenter: item.datacenter
+    }));
+  }
+
   private buildLowestAvailabilityRow(item: NetworkLowestAvailabilityApiItem): NetworkDeviceAvailabilityLowestAvailabilityRowViewData {
     const row = new NetworkDeviceAvailabilityLowestAvailabilityRowViewData();
     row.name = item.device;
@@ -1366,6 +1713,7 @@ export class NetworkDashboardService {
 
   private buildNetworkDeviceAvailabilityTableRow(item: NetworkDeviceAvailabilityTableApiItem): NetworkDeviceAvailabilityTableRowViewData {
     const row = new NetworkDeviceAvailabilityTableRowViewData();
+    const healthState = this.getNetworkDeviceAvailabilityHealthState(item);
     row.name = item.name;
     row.type = item.type || '';
     row.manufacturer = item.manufacturer || '';
@@ -1375,12 +1723,129 @@ export class NetworkDashboardService {
     row.uptimeDisplay = item.uptime?.display || this.formatUptimeDays(row.uptimeValue, item.uptime?.unit || 'days');
     row.availabilityValue = Number(item.availability || 0);
     row.availabilityDisplay = this.formatAvailabilityPercent(row.availabilityValue);
-    row.statusLabel = this.getDeviceAvailabilityStatusLabel(item.status);
-    row.statusRank = this.getDeviceAvailabilityStatusRank(item.status);
-    row.statusTone = this.getDeviceAvailabilityStatusCode(item.status);
-    row.statusIconClass = this.getDeviceAvailabilityStatusIconClass(item.status);
+    row.statusLabel = this.getHealthStateLabel(healthState);
+    row.statusRank = this.getHealthStateRank(healthState);
+    row.statusTone = this.getHealthStateTone(healthState);
+    row.statusIconClass = this.getHealthStateIconClass(healthState);
     row.lastDiscovered = item.last_discovered || '';
     return row;
+  }
+
+  private aggregateDeviceHealthDistribution(items: NetworkDeviceAvailabilityTableApiItem[]): NetworkDeviceHealthDistributionApiItem[] {
+    const counts = { Down: 0, Up: 0, Unknown: 0 };
+
+    (items || []).forEach(item => {
+      const state = this.getNetworkDeviceAvailabilityHealthState(item);
+      if (state === 'down') {
+        counts.Down += 1;
+      } else if (state === 'up') {
+        counts.Up += 1;
+      } else {
+        counts.Unknown += 1;
+      }
+    });
+
+    return Object.keys(counts).map(status => ({
+      status,
+      count: counts[status]
+    }));
+  }
+
+  private aggregateDeviceTypeDistribution(items: NetworkDeviceAvailabilityTableApiItem[]): NetworkDeviceTypeDistributionApiItem[] {
+    const grouped = new Map<string, number>();
+
+    (items || []).forEach(item => {
+      const type = item.type || 'Unknown';
+      grouped.set(type, (grouped.get(type) || 0) + 1);
+    });
+
+    return Array.from(grouped.entries()).map(([type, count]) => ({
+      type,
+      count
+    }));
+  }
+
+  private aggregateManufacturerModelBreakdown(items: NetworkDeviceAvailabilityTableApiItem[]): NetworkManufacturerModelBreakdownApiItem[] {
+    const manufacturers = new Map<string, Map<string, number>>();
+
+    (items || []).forEach(item => {
+      const manufacturer = item.manufacturer || 'Unknown';
+      const model = item.model || 'Unknown';
+      if (!manufacturers.has(manufacturer)) {
+        manufacturers.set(manufacturer, new Map<string, number>());
+      }
+      const modelCounts = manufacturers.get(manufacturer);
+      modelCounts.set(model, (modelCounts.get(model) || 0) + 1);
+    });
+
+    return Array.from(manufacturers.entries()).map(([manufacturer, modelCounts]) => ({
+      manufacturer,
+      count: Array.from(modelCounts.values()).reduce((total, count) => total + count, 0),
+      models: Array.from(modelCounts.entries()).map(([model, count]) => ({
+        model,
+        count
+      }))
+    }));
+  }
+
+  private aggregateDevicesByLocation(items: NetworkDeviceAvailabilityTableApiItem[]): NetworkDevicesByLocationApiItem[] {
+    const grouped = new Map<string, NetworkDevicesByLocationApiItem>();
+
+    (items || []).forEach(item => {
+      const key = item.datacenter || item.location || 'Unknown';
+      const existing = grouped.get(key) || {
+        datacenter_id: item.datacenter_id,
+        datacenter: item.datacenter || item.location || 'Unknown',
+        location: item.location || item.datacenter || 'Unknown',
+        count: 0
+      };
+      existing.count = Number(existing.count || 0) + 1;
+      grouped.set(key, existing);
+    });
+
+    return Array.from(grouped.values());
+  }
+
+  private aggregateAverageUptimeByDeviceType(items: NetworkDeviceAvailabilityTableApiItem[]): NetworkAverageUptimeByDeviceTypeApiItem[] {
+    const grouped = new Map<string, { totalDays: number; count: number }>();
+
+    (items || []).forEach(item => {
+      const type = item.type || 'Unknown';
+      const uptimeDays = this.normalizeUptimeToDays(item.uptime);
+      const current = grouped.get(type) || { totalDays: 0, count: 0 };
+      current.totalDays += uptimeDays;
+      current.count += 1;
+      grouped.set(type, current);
+    });
+
+    return Array.from(grouped.entries()).map(([type, totals]) => ({
+      type,
+      average_uptime_days: totals.count ? Number((totals.totalDays / totals.count).toFixed(2)) : 0,
+      monitored_devices: totals.count
+    }));
+  }
+
+  private normalizeUptimeToDays(uptime?: NetworkDeviceAvailabilityUptime): number {
+    if (uptime?.seconds != null) {
+      return Number(uptime.seconds) / 86400;
+    }
+
+    const value = Number(uptime?.value || 0);
+    const unit = String(uptime?.unit || 'days').toLowerCase();
+
+    switch (unit) {
+      case 'hour':
+      case 'hours':
+        return value / 24;
+      case 'minute':
+      case 'minutes':
+        return value / 1440;
+      case 'second':
+      case 'seconds':
+        return value / 86400;
+      default:
+        return value;
+    }
   }
 
   private buildNetworkDeviceAvailabilityLegendItem(label: string, color: string): NetworkDeviceAvailabilityLegendItemViewData {
@@ -1454,8 +1919,13 @@ export class NetworkDashboardService {
         .filter(item => item.manufacturer === manufacturer)
         .reduce((total, item) => total + Number(item.count || 0), 0)
     );
-    const xMax = this.getRoundedAxisMax(totalsByManufacturer, 50, 50);
-    const xInterval = Math.max(50, Math.ceil(xMax / 4 / 10) * 10);
+    const highestTotal = Math.max(...totalsByManufacturer, 0);
+    const xMax = highestTotal <= 10
+      ? Math.max(2, Math.ceil(highestTotal / 2) * 2)
+      : this.getRoundedAxisMax(totalsByManufacturer, 10, 5);
+    const xInterval = highestTotal <= 10
+      ? Math.max(1, Math.ceil(xMax / 4))
+      : Math.max(5, Math.ceil(xMax / 4 / 5) * 5);
 
     chart.options = {
       animation: false,
@@ -1816,15 +2286,46 @@ export class NetworkDashboardService {
     return `${value.toFixed(2)}%`;
   }
 
-  private getDeviceAvailabilityStatusCode(status?: NetworkDeviceAvailabilityStatus | 'healthy' | 'warning' | 'critical'): 'healthy' | 'warning' | 'critical' {
+  private getNetworkDeviceAvailabilityHealthState(item: NetworkDeviceAvailabilityTableApiItem): string {
+    const rawStatus = typeof item?.status === 'string'
+      ? item.status
+      : item?.status?.label || item?.status?.code || item?.health_state || '';
+
+    const normalizedStatus = String(rawStatus || '').trim().toLowerCase();
+
+    if (normalizedStatus === 'up') {
+      return 'up';
+    }
+
+    if (normalizedStatus === 'down') {
+      return 'down';
+    }
+
+    return 'unknown';
+  }
+
+  private getDeviceAvailabilityStatusCode(
+    status?: NetworkDeviceAvailabilityStatus | 'healthy' | 'warning' | 'critical' | 'Up' | 'Down' | 'Unknown' | 'up' | 'down' | 'unknown'
+  ): 'healthy' | 'warning' | 'critical' {
     const code = typeof status === 'string' ? status : status?.code;
-    if (code === 'critical' || code === 'warning') {
+    if (code === 'critical' || code === 'warning' || code === 'down' || code === 'Down') {
+      return code === 'warning' ? 'warning' : 'critical';
+    }
+    if (code === 'unknown' || code === 'Unknown') {
+      return 'warning';
+    }
+    if (code === 'healthy' || code === 'up' || code === 'Up') {
+      return 'healthy';
+    }
+    if (code === 'critical') {
       return code;
     }
     return 'healthy';
   }
 
-  private getDeviceAvailabilityStatusRank(status?: NetworkDeviceAvailabilityStatus | 'healthy' | 'warning' | 'critical'): number {
+  private getDeviceAvailabilityStatusRank(
+    status?: NetworkDeviceAvailabilityStatus | 'healthy' | 'warning' | 'critical' | 'Up' | 'Down' | 'Unknown' | 'up' | 'down' | 'unknown'
+  ): number {
     switch (this.getDeviceAvailabilityStatusCode(status)) {
       case 'critical':
         return 3;
@@ -1835,9 +2336,21 @@ export class NetworkDashboardService {
     }
   }
 
-  private getDeviceAvailabilityStatusLabel(status?: NetworkDeviceAvailabilityStatus | 'healthy' | 'warning' | 'critical'): string {
+  private getDeviceAvailabilityStatusLabel(
+    status?: NetworkDeviceAvailabilityStatus | 'healthy' | 'warning' | 'critical' | 'Up' | 'Down' | 'Unknown' | 'up' | 'down' | 'unknown'
+  ): string {
     if (typeof status !== 'string' && status?.label) {
       return status.label;
+    }
+
+    if (status === 'Up' || status === 'up') {
+      return 'Up';
+    }
+    if (status === 'Down' || status === 'down') {
+      return 'Down';
+    }
+    if (status === 'Unknown' || status === 'unknown') {
+      return 'Unknown';
     }
 
     switch (this.getDeviceAvailabilityStatusCode(status)) {
@@ -1850,7 +2363,9 @@ export class NetworkDashboardService {
     }
   }
 
-  private getDeviceAvailabilityStatusIconClass(status?: NetworkDeviceAvailabilityStatus | 'healthy' | 'warning' | 'critical'): string {
+  private getDeviceAvailabilityStatusIconClass(
+    status?: NetworkDeviceAvailabilityStatus | 'healthy' | 'warning' | 'critical' | 'Up' | 'Down' | 'Unknown' | 'up' | 'down' | 'unknown'
+  ): string {
     switch (this.getDeviceAvailabilityStatusCode(status)) {
       case 'critical':
         return 'fas fa-times-circle';
@@ -1869,6 +2384,39 @@ export class NetworkDashboardService {
         return 'Up';
       default:
         return 'Unknown';
+    }
+  }
+
+  private getHealthStateTone(state: string): 'critical' | 'healthy' | 'warning' {
+    switch ((state || '').toLowerCase()) {
+      case 'down':
+        return 'critical';
+      case 'up':
+        return 'healthy';
+      default:
+        return 'warning';
+    }
+  }
+
+  private getHealthStateRank(state: string): number {
+    switch ((state || '').toLowerCase()) {
+      case 'down':
+        return 3;
+      case 'unknown':
+        return 2;
+      default:
+        return 1;
+    }
+  }
+
+  private getHealthStateIconClass(state: string): string {
+    switch ((state || '').toLowerCase()) {
+      case 'down':
+        return 'fas fa-times-circle';
+      case 'up':
+        return 'fas fa-check-circle';
+      default:
+        return 'fas fa-exclamation-circle';
     }
   }
 
@@ -3547,7 +4095,7 @@ export class NetworkDashboardService {
           label: {
             show: true,
             position: 'inside',
-            formatter: (params: any) => `${params.data.conversationName}: ${params.data.displayValue}`,
+            formatter: (params: any) => `${this.truncateChartLabel(params.data.conversationName, 22)}: ${params.data.displayValue}`,
             color: '#f7fbff',
             fontSize: 9,
             fontWeight: 600
@@ -3577,6 +4125,15 @@ export class NetworkDashboardService {
     };
 
     return view;
+  }
+
+  private truncateChartLabel(value: string, maxLength: number): string {
+    const normalizedValue = String(value || '');
+    if (normalizedValue.length <= maxLength) {
+      return normalizedValue;
+    }
+
+    return `${normalizedValue.slice(0, Math.max(maxLength - 3, 0))}...`;
   }
 
   private convertToBandwidthUsageChartData(items: NetworkBandwidthUsageItem[]): UnityChartDetails {
@@ -3925,11 +4482,15 @@ export class NetworkDashboardService {
   private getPerformanceWorkloadTone(item: NetworkPerformanceWorkloadInsightItem | NetworkPerformanceInsightsTableApiItem): string {
     const peakUtilization = Math.max(this.getPerformanceCpuUtilization(item), this.getPerformanceMemoryUtilization(item));
 
-    if (peakUtilization >= 90) {
+    return this.getPerformanceUtilizationTone(peakUtilization);
+  }
+
+  private getPerformanceUtilizationTone(value: number): string {
+    if (value >= 90) {
       return 'danger';
     }
 
-    if (peakUtilization >= 72) {
+    if (value >= 72) {
       return 'warning';
     }
 
@@ -3981,6 +4542,28 @@ export class NetworkDashboardService {
       discards_out_per_sec: 0,
       metric_value: Number(item.value || 0)
     }));
+  }
+
+  private convertInterfaceHealthTableItems(items: NetworkInterfaceHealthMetricsTableApiItem[]): NetworkInterfaceHealthMetricItem[] {
+    return (items || []).map(item => ({
+      interface_name: item.interface,
+      device_name: item.device,
+      errors_in_per_sec: Number(item.errors_inbound || 0),
+      errors_out_per_sec: Number(item.errors_outbound || 0),
+      discards_in_per_sec: Number(item.discards_inbound || 0),
+      discards_out_per_sec: Number(item.discards_outbound || 0)
+    }));
+  }
+
+  private getInterfaceHealthTopItems(
+    items: NetworkInterfaceHealthMetricItem[],
+    getValue: (item: NetworkInterfaceHealthMetricItem) => number
+  ): NetworkInterfaceHealthMetricItem[] {
+    return (items || [])
+      .filter(item => getValue(item) > 0)
+      .slice()
+      .sort((left, right) => getValue(right) - getValue(left))
+      .slice(0, 10);
   }
 
   private getInterfaceHealthErrorsInbound(item: NetworkInterfaceHealthMetricItem | NetworkInterfaceHealthMetricsTableApiItem): number {
@@ -4144,6 +4727,7 @@ export class PerformanceWorkloadTableColumnViewData {
   key: string;
   label: string;
   sortKey: string;
+  type?: 'text' | 'utilization';
   align: 'left' | 'center' | 'right';
 }
 

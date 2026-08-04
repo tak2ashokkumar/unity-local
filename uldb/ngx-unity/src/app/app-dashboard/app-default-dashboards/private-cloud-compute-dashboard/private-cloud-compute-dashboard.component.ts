@@ -171,8 +171,6 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
 
 
-
-
   loaderNames = {
     filters: 'privateCloudFiltersLoader',
     utilization: 'privateCloudUtilizationLoader',
@@ -258,6 +256,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   private buildFilterForm() {
     this.filterFormUnsubscribe.next();
     this.filterForm = this.svc.buildFilterForm();
+    this.onTimeRangeChange({ period: this.selectedTimeRange });
   }
 
   private initializeDefaultFilterSelections() {

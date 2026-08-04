@@ -10,6 +10,7 @@ export class ConditionInvestigationNewTerminalService {
   private pendingTabType: 'sameTab' | 'newTab' = 'sameTab';
   private backendTabId: string | null = null;
   private pendingCommandContext: CliCommandContext | null = null;
+  private hosts: string[] = [];
 
   private openModalSource = new Subject<CliCommandContext | null>();
   openModal$ = this.openModalSource.asObservable();
@@ -43,6 +44,14 @@ export class ConditionInvestigationNewTerminalService {
 
   getConversationId(): string {
     return this.conversationId;
+  }
+
+  setHosts(hosts: string[]) {
+    this.hosts = hosts || [];
+  }
+
+  getHosts(): string[] {
+    return this.hosts;
   }
 
   setPendingTabType(type: 'sameTab' | 'newTab') {

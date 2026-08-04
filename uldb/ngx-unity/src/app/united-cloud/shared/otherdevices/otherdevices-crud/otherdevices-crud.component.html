@@ -85,7 +85,7 @@
                 <div class="col-12">
                     <label class="d-inline-block">Monitoring Configuration :</label>
                     <div class="d-inline-block ml-2">
-                        <ul class="d-flex px-0 mb-0">
+                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                             <li>
                                 <label class="pointer-link"
                                     [class.active]="otherDevicesForm.controls.is_monitoring.value">
@@ -133,11 +133,11 @@
                                     <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.urls[i].url">
                                         {{otherDevicesFormErrors.urls[i].url}}</div>
                                 </div>
-                                <div class="col-2 pl-0 form-group">
+                                <div class="col-auto pl-0 form-group enable-disable-toggle-col">
                                     <label for="url_availabilty" class="form-col-form-label">URL
                                         Availability</label><br>
                                     <div class="d-inline-block">
-                                        <ul class="d-flex px-0 mb-0">
+                                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                                             <li>
                                                 <label class="pointer-link"
                                                     [class.active]="otherDevicesForm.controls.urls.controls[i].controls.url_availabilty.value">
@@ -157,11 +157,11 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="col-2 pl-0 form-group">
+                                <div class="col-auto pl-0 form-group enable-disable-toggle-col">
                                     <label for="response_availability" class="form-col-form-label">Response
                                         Code Availability</label>
                                     <div class="d-inline-block">
-                                        <ul class="d-flex px-0 mb-0">
+                                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                                             <li>
                                                 <label class="pointer-link"
                                                     [class.active]="otherDevicesForm.controls.urls.controls[i].controls.response_availability.value">
@@ -181,11 +181,11 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="col-2 form-group">
+                                <div class="col-auto form-group enable-disable-toggle-col">
                                     <label for="string_availabilty" class="form-col-form-label">String
                                         Pattern Availability</label>
                                     <div class="d-inline-block">
-                                        <ul class="d-flex px-0 mb-0">
+                                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                                             <li>
                                                 <label class="pointer-link"
                                                     [class.active]="otherDevicesForm.controls.urls.controls[i].controls.string_availabilty.value">
@@ -205,11 +205,11 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="col-2 form-group">
+                                <div class="col-auto form-group enable-disable-toggle-col">
                                     <label for="login_availability" class="form-col-form-label">Login
                                         Availability</label><br>
                                     <div class="d-inline-block">
-                                        <ul class="d-flex px-0 mb-0">
+                                        <ul class="d-flex px-0 mb-0 enable-disable-toggle">
                                             <li>
                                                 <label class="pointer-link"
                                                     [class.active]="otherDevicesForm.controls.urls.controls[i].controls.login_availability.value">

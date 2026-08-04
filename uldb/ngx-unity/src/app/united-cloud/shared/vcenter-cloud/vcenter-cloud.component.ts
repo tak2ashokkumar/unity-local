@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { VcenterCloudService, VcenterIconViewData, VcenterSummaryUsageViewData, VcenterSummaryViewData } from './vcenter-cloud.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppUtilityService, DeviceMapping, FaIconMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
@@ -19,6 +19,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppLevelService } from 'src/app/app-level.service';
 import { VcenterComponentSummary, VcenterSummaryAlerts } from './vcenter-cloud.type';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
+import { RemoteAccessService } from 'src/app/shared/remote-access/remote-access.service';
 
 @Component({
   selector: 'vcenter-cloud',
@@ -39,6 +40,7 @@ export class VcenterCloudComponent implements OnInit, OnDestroy {
   view: VcenterIconViewData;
   componentSummary: VcenterComponentSummary;
   alertSummary: VcenterSummaryAlerts;
+  remoteWebLaunching: boolean = false;
 
   showStastics: boolean = true;
   usageData: VcenterSummaryUsageViewData;
@@ -52,6 +54,7 @@ export class VcenterCloudComponent implements OnInit, OnDestroy {
     private storageSvc: StorageService,
     private notification: AppNotificationService,
     private appService: AppLevelService,
+    private remoteAccess: RemoteAccessService,
     private utilService: AppUtilityService,
     private ticketService: SharedCreateTicketService,
     private sharedSvc: UnitedCloudSharedService) {
@@ -157,11 +160,54 @@ export class VcenterCloudComponent implements OnInit, OnDestroy {
   }
 
   webAccessNewTab(view: VcenterIconViewData) {
-    if (!view.newTabWebAccessUrl) {
+    if (!view?.isNewTabEnabled || this.remoteWebLaunching) {
       return;
     }
-    this.appService.updateActivityLog(view.deviceType, view.vmId);
-    window.open(view.newTabWebAccessUrl);
+    const resourceId = view.remoteWebAccess?.resource_id || view.vmId;
+    if (!resourceId) {
+      this.notification.error(new Notification('Unable to open vCenter web console. Resource identifier is missing.'));
+      return;
+    }
+    const viewerWindow = this.openIsolatedViewerTab();
+    if (!viewerWindow) {
+      this.notification.error(new Notification('Popup blocked. Allow popups for UnityOne and try opening the web console again.'));
+      return;
+    }
+
+    this.remoteWebLaunching = true;
+    this.remoteAccess.createVCenterWebLaunch(resourceId)
+      .pipe(
+        takeUntil(this.ngUnsubscribe),
+        finalize(() => this.remoteWebLaunching = false)
+      )
+      .subscribe(launch => {
+        if (!launch.viewerUrl) {
+          viewerWindow.close();
+          this.notification.error(new Notification('Remote web viewer URL was not returned by UnityOne.'));
+          return;
+        }
+        this.appService.updateActivityLog(view.deviceType, view.vmId);
+        viewerWindow.location.replace(launch.viewerUrl);
+      }, err => {
+        viewerWindow.close();
+        this.notification.error(new Notification(this.remoteWebErrorMessage(err)));
+      });
+  }
+
+  private openIsolatedViewerTab(): Window | null {
+    const viewerWindow = window.open('about:blank', '_blank');
+    if (viewerWindow) {
+      viewerWindow.opener = null;
+      try {
+        viewerWindow.document.title = 'Opening UnityOne Remote Web Viewer';
+        viewerWindow.document.body.innerHTML = '<div style="font-family:Arial,sans-serif;padding:24px;">Opening UnityOne Remote Web Viewer...</div>';
+      } catch (e) { }
+    }
+    return viewerWindow;
+  }
+
+  private remoteWebErrorMessage(err: any): string {
+    return err?.error?.error || err?.error?.detail || err?.message || 'Unable to create remote web session. Please try again or contact support.';
   }
 
   createTicket() {

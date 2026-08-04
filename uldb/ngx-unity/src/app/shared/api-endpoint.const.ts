@@ -3156,7 +3156,7 @@ export const GET_AIOPS_ANALYTICS_SUMMARY = () => `/customer/aiops/conditions/ana
 
 export const AIOPS_TRENDS_BY_TIMELINE = () => `/customer/aiops/events/trends_graph/`;
 
-// AIML Analytics page (whole record set, no open/recently-resolved restriction) —
+// AIML Analytics page (whole record set, no open/recently-resolved restriction) 
 // dedicated endpoints so the AIML Summary page and Home dashboard widget (which
 // use the restricted constants above) are unaffected.
 export const GET_AIOPS_CONDITION_ANALYTICS_SUMMARY = () => `/customer/aiops/condition/analytics/analytics_summary/`;

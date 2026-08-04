@@ -61,7 +61,6 @@ export class StorageDevicesService {
 
       a.editBtnTooltipMsg = 'Edit';
       a.deleteBtnTooltipMsg = 'Delete';
-
       if (s.is_cluster) {
         // for for Ontap / Nimble storage devices.
         a.storageType = 'Ontap`';

@@ -16,6 +16,17 @@ import {
     NetworkTopConversationMetricResponse,
     NetworkTopConversationsTableResponse
 } from './network-dashboard.type';
+import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
+
+export const NETWORK_DASHBOARD_TIME_RANGE_DEFAULT = 'last_30_days';
+
+export const NETWORK_DASHBOARD_TIME_RANGE_OPTIONS: DateRangeOption[] = [
+    { label: 'Last 24 Hours', value: 'last_24_hours' },
+    { label: 'Last 7 Days', value: 'last_7_days' },
+    { label: 'Last 30 Days', value: 'last_30_days' },
+    { label: 'Last 60 Days', value: 'last_60_days' },
+    { label: 'Last 90 Days', value: 'last_90_days' }
+];
 
 
 export const NETWORK_DASHBOARD_FILTERS_RESPONSE: NetworkDashboardFiltersResponse = {
@@ -158,6 +169,231 @@ export const NETWORK_TOP_10_CONVERSATIONS_TABLE: NetworkTopConversationsTableRes
                 unit: 'Gbps'
             },
             bandwidth_usage: 0.03
+        },
+        {
+            id: '22311b0c-b72f-4894-a33e-9f3f2fb9c111',
+            name: 'beta-loadbalancer-11',
+            device_type: 'Load Balancer',
+            interface: 'Lo0 (Software Loopback)',
+            interface_index: '2',
+            bits_received_bps: 550000.0,
+            bits_sent_bps: 300000.0,
+            speed_bps: 3000000000.0,
+            bits_received: {
+                value: 550.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 300.0,
+                unit: 'K'
+            },
+            interface_type: 'Software Loopback',
+            operational_status: 'Down',
+            speed: {
+                value: 3.0,
+                unit: 'Gbps'
+            },
+            bandwidth_usage: 0.59
+        },
+        {
+            id: '32311b0c-b72f-4894-a33e-9f3f2fb9c222',
+            name: 'gamma-database-02',
+            device_type: 'Switch',
+            interface: 'Vlan200',
+            interface_index: '3',
+            bits_received_bps: 500000.0,
+            bits_sent_bps: 590000.0,
+            speed_bps: 1500000000.0,
+            bits_received: {
+                value: 500.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 590.0,
+                unit: 'K'
+            },
+            interface_type: 'Virtual Interface',
+            operational_status: 'Testing',
+            speed: {
+                value: 1.5,
+                unit: 'Gbps'
+            },
+            bandwidth_usage: 0.88
+        },
+        {
+            id: '42311b0c-b72f-4894-a33e-9f3f2fb9c333',
+            name: 'delta-application-03',
+            device_type: 'Firewall',
+            interface: 'Te0/1',
+            interface_index: '4',
+            bits_received_bps: 450000.0,
+            bits_sent_bps: 700000.0,
+            speed_bps: 800000000.0,
+            bits_received: {
+                value: 450.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 700.0,
+                unit: 'K'
+            },
+            interface_type: 'Gigabit Ethernet',
+            operational_status: 'Unknown',
+            speed: {
+                value: 800.0,
+                unit: 'Mbps'
+            },
+            bandwidth_usage: 0.21
+        },
+        {
+            id: '52311b0c-b72f-4894-a33e-9f3f2fb9c444',
+            name: 'epsilon-builder-04',
+            device_type: 'Load Balancer',
+            interface: 'Gi0/7',
+            interface_index: '5',
+            bits_received_bps: 400000.0,
+            bits_sent_bps: 150000.0,
+            speed_bps: 2500000000.0,
+            bits_received: {
+                value: 400.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 150.0,
+                unit: 'K'
+            },
+            interface_type: 'Ethernet (CSMA/CD)',
+            operational_status: 'Dormant',
+            speed: {
+                value: 2.5,
+                unit: 'Gbps'
+            },
+            bandwidth_usage: 0.59
+        },
+        {
+            id: '62311b0c-b72f-4894-a33e-9f3f2fb9c555',
+            name: 'eta-ci-14',
+            device_type: 'Switch',
+            interface: 'Vlan310',
+            interface_index: '6',
+            bits_received_bps: 320000.0,
+            bits_sent_bps: 390000.0,
+            speed_bps: 3200000000.0,
+            bits_received: {
+                value: 320.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 390.0,
+                unit: 'K'
+            },
+            interface_type: 'Virtual Interface',
+            operational_status: 'Lower Layer Down',
+            speed: {
+                value: 3.2,
+                unit: 'Gbps'
+            },
+            bandwidth_usage: 0.21
+        },
+        {
+            id: '72311b0c-b72f-4894-a33e-9f3f2fb9c666',
+            name: 'iota-tester-07',
+            device_type: 'Firewall',
+            interface: 'Vlan320',
+            interface_index: '7',
+            bits_received_bps: 210000.0,
+            bits_sent_bps: 480000.0,
+            speed_bps: 1700000000.0,
+            bits_received: {
+                value: 210.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 480.0,
+                unit: 'K'
+            },
+            interface_type: 'Virtual Interface',
+            operational_status: 'Testing',
+            speed: {
+                value: 1.7,
+                unit: 'Gbps'
+            },
+            bandwidth_usage: 0.88
+        },
+        {
+            id: '82311b0c-b72f-4894-a33e-9f3f2fb9c777',
+            name: 'kappa-service-08',
+            device_type: 'Load Balancer',
+            interface: 'Lo1',
+            interface_index: '8',
+            bits_received_bps: 120000.0,
+            bits_sent_bps: 650000.0,
+            speed_bps: 2000000000.0,
+            bits_received: {
+                value: 120.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 650.0,
+                unit: 'K'
+            },
+            interface_type: 'Software Loopback',
+            operational_status: 'Lower Layer Down',
+            speed: {
+                value: 2.0,
+                unit: 'Gbps'
+            },
+            bandwidth_usage: 0.21
+        },
+        {
+            id: '92311b0c-b72f-4894-a33e-9f3f2fb9c888',
+            name: 'lambda-edge-fw-09',
+            device_type: 'Firewall',
+            interface: 'Po12',
+            interface_index: '9',
+            bits_received_bps: 680000.0,
+            bits_sent_bps: 520000.0,
+            speed_bps: 4000000000.0,
+            bits_received: {
+                value: 680.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 520.0,
+                unit: 'K'
+            },
+            interface_type: 'Port Channel',
+            operational_status: 'Up',
+            speed: {
+                value: 4.0,
+                unit: 'Gbps'
+            },
+            bandwidth_usage: 0.46
+        },
+        {
+            id: 'a2311b0c-b72f-4894-a33e-9f3f2fb9c999',
+            name: 'mu-core-switch-10',
+            device_type: 'Switch',
+            interface: 'Gi1/0/48',
+            interface_index: '10',
+            bits_received_bps: 760000.0,
+            bits_sent_bps: 610000.0,
+            speed_bps: 5000000000.0,
+            bits_received: {
+                value: 760.0,
+                unit: 'K'
+            },
+            bits_sent: {
+                value: 610.0,
+                unit: 'K'
+            },
+            interface_type: 'Ethernet (CSMA/CD)',
+            operational_status: 'Up',
+            speed: {
+                value: 5.0,
+                unit: 'Gbps'
+            },
+            bandwidth_usage: 0.64
         }
     ]
 };

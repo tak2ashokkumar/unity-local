@@ -6,11 +6,12 @@
         </div>
         <form class="dashboard-filters d-flex align-items-end justify-content-md-end flex-wrap"
             *ngIf="filterForm" [formGroup]="filterForm">
-            <div class="filter-control duration-filter mr-2 mb-1">
+            <div class="duration-filter mr-2 mb-1">
                 <label class="font-sm text-muted mb-0">Duration</label>
                 <custom-date-dropdown [options]="timeRangeDropdownOptions" [enableCustomDateRange]="true"
                     [default]="durationDropdownDefault" [customClass]="'form-control-sm'" [emitOnInit]="false"
-                    [customSelectedLabel]="'Custom'" [viewportSafePopup]="true" [dateOnlyPicker]="true"
+                    [emitOnExternalChanges]="false"
+                    [viewportSafePopup]="true"
                     [popupPanelClass]="'database-dashboard-date-popup'" (onSubmit)="onDurationDropdownSubmit($event)">
                 </custom-date-dropdown>
             </div>

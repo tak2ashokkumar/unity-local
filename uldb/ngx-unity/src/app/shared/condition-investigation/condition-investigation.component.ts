@@ -111,6 +111,7 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   @ViewChild('executeCommand') executeCommand: ElementRef;
   confirmExecutionModalRef: BsModalRef;
   command: string = '';
+  commandDetails: any = null;
   hasDefaultDeviceForCommand = false;
   commandDefaultDevice: any = null;
 
@@ -325,8 +326,10 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   }
 
   getConditionDetails() {
+    this.newTerminalService.setHosts([]);
     this.svc.getConditionDetails(this.conditionUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.conditionDetailsViewData = this.svc.convertToConditionDetailsViewdata(res);
+      this.newTerminalService.setHosts(this.conditionDetailsViewData.hostIpAddresses);
       // this.spinner.stop('conditionDetailsSpinner');
     }, (err: HttpErrorResponse) => {
       // this.spinner.stop('conditionDetailsSpinner');
@@ -741,6 +744,16 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     const codeEl = target.closest('code');
     if (codeEl) {
       this.command = codeEl.textContent?.trim();
+      const classes = Array.from(codeEl.classList);
+      this.commandDetails = {
+        source: 'workspace_markdown',
+        commandType: classes.find(name => name.startsWith('commandType-'))
+          ?.replace('commandType-', '') || null,
+        shellType: classes.find(name => name.startsWith('shellType-'))
+          ?.replace('shellType-', '') || null,
+        dbEngine: classes.find(name => name.startsWith('dbEngine-'))
+          ?.replace('dbEngine-', '') || null
+      };
       if (this.command) {
         this.openCommandExecutionModal(this.command);
       }
@@ -823,7 +836,7 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
       tabType,
       application,
       title: this.conditionDetailsViewData?.description,
-      commandDetails: { source: 'workspace_markdown' },
+      commandDetails: this.commandDetails || { source: 'workspace_markdown' },
       device: forceDeviceChange ? this.commandDefaultDevice : undefined,
     }, forceDeviceChange).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { }, () => {
       this.notification.error(new Notification('Unable to start command execution.'));

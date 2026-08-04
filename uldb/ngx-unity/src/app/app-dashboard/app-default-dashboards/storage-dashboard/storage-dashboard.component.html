@@ -1,0 +1,94 @@
+<div class="storage-dashboard-shell">
+    <div class="storage-dashboard-filter-loading" *ngIf="!filterForm">
+        <app-spinner [name]="filterLoaderName" [width]="0"></app-spinner>
+    </div>
+
+    <form class="storage-dashboard-topbar" *ngIf="filterForm" [formGroup]="filterForm">
+        <div class="storage-dashboard-heading">
+            <div class="storage-dashboard-title-row">
+                <span class="storage-dashboard-title">Storage Dashboard -</span>
+                <select class="form-control form-control-sm storage-vendor-select" formControlName="vendor"
+                    aria-label="Storage vendor" (change)="onVendorChange()">
+                    <option *ngFor="let vendor of vendorOptions; trackBy: trackByOption" [value]="vendor.value">
+                        {{vendor.label}}
+                    </option>
+                </select>
+            </div>
+            <div class="storage-dashboard-subtitle">
+                Refreshed: {{refreshedText || 'Loading'}} | Scope:
+                <ng-container
+                    *ngTemplateOutlet="filterScopeSummaryTmpl; context: { summary: datacenterScopeSummary }">
+                </ng-container>
+                <span class="scope-separator">|</span>
+                <ng-container
+                    *ngTemplateOutlet="filterScopeSummaryTmpl; context: { summary: resourceScopeSummary }">
+                </ng-container>
+            </div>
+        </div>
+
+        <div class="storage-dashboard-filters">
+            <div class="storage-filter-control storage-multiselect-control">
+                <label>Datacenter</label>
+                <multiselect-dropdown [options]="datacenterOptions" [settings]="multiselectSettings"
+                    [texts]="datacenterMultiselectTexts" class="form-control p-0 storage-dashboard-multiselect"
+                    formControlName="datacenters" (dropdownClosed)="onDatacentersChange()">
+                </multiselect-dropdown>
+            </div>
+
+            <div class="storage-filter-control storage-multiselect-control">
+                <label>{{selectedVendor === 'netapp' ? 'Cluster Name' : 'Array Overview'}}</label>
+                <multiselect-dropdown [options]="resourceOptions" [settings]="multiselectSettings"
+                    [texts]="resourceMultiselectTexts" class="form-control p-0 storage-dashboard-multiselect"
+                    formControlName="resources" (dropdownClosed)="onResourcesChange()">
+                </multiselect-dropdown>
+            </div>
+
+            <div class="storage-filter-control storage-time-range-control">
+                <label>Time Range</label>
+                <custom-date-dropdown [options]="timeRangeOptions" [enableCustomDateRange]="true"
+                    [customClass]="'form-control-sm'" [default]="defaultTimeRange" [viewportSafePopup]="true"
+                    [emitOnInit]="false" (onSubmit)="onTimeRangeChange($event)">
+                </custom-date-dropdown>
+            </div>
+
+            <span class="storage-dashboard-action-separator"></span>
+
+            <div class="storage-dashboard-actions">
+                <button class="storage-round-action-btn" type="button" (click)="refreshData()" [tooltip]="'Refresh'"
+                    container="body" aria-label="Refresh storage dashboard">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="storage-round-action-btn" type="button" (click)="goBack()" [tooltip]="'Go Back'"
+                    container="body" aria-label="Go back">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <ng-template #filterScopeSummaryTmpl let-summary="summary">
+        <span class="scope-summary">
+            <span>{{summary.primaryLabel}}</span>
+            <span class="scope-more-count" *ngIf="summary.remainingLabels.length" [popover]="scopePopoverTmpl"
+                [popoverContext]="{ labels: summary.remainingLabels }" triggers="mouseenter:mouseleave"
+                placement="bottom" container="body">
+                +{{summary.remainingLabels.length}}
+            </span>
+        </span>
+    </ng-template>
+
+    <ng-template #scopePopoverTmpl let-labels="labels">
+        <div class="scope-popover-list">
+            <div class="scope-popover-item" *ngFor="let label of labels; trackBy: trackByIndex">{{label}}</div>
+        </div>
+    </ng-template>
+
+    <div class="storage-dashboard-content" *ngIf="filterForm && appliedFilters">
+        <ng-container [ngSwitch]="selectedVendor">
+            <netapp-storage-dashboard *ngSwitchCase="'netapp'" [filters]="appliedFilters">
+            </netapp-storage-dashboard>
+            <pure-storage-dashboard *ngSwitchCase="'pure'" [filters]="appliedFilters">
+            </pure-storage-dashboard>
+        </ng-container>
+    </div>
+</div>

@@ -8,6 +8,7 @@ import { SupportedLLMConfig, SupportedLLMConfigData } from '../shared/SharedEnti
 import { AssistedInsights, ChatDocuments, TokenUsage, UntiyChatBotExploreMenu, UrlData } from './unity-chatbot.type';
 import { UnityChartDetails } from '../shared/unity-chart-config.service';
 import { EChartsOption } from 'echarts';
+import { UNITY_ORG_SETTINGS } from '../shared/api-endpoint.const';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,8 @@ export class UnityChatbotService {
   onFilterChangeSource = new Subject<{ from: string, to: string }>();
   onFilterChangeAnnounced$ = this.onFilterChangeSource.asObservable();
   onChatTrigger$ = new BehaviorSubject<Boolean>(false);
+  private aiAgentProModeDefaultSource = new BehaviorSubject<boolean | null>(null);
+  aiAgentProModeDefault$ = this.aiAgentProModeDefaultSource.asObservable();
   private sidebarExpanded = new Subject<void>();
   sidebarExpanded$ = this.sidebarExpanded.asObservable();
 
@@ -44,6 +47,16 @@ export class UnityChatbotService {
         return res && res.supported_llms ? res.supported_llms : [];
       })
     )
+  }
+
+  getAiAgentProModeDefault(): Observable<boolean> {
+    return this.http.get<Array<{ is_pro_ai_enabled: boolean }>>(UNITY_ORG_SETTINGS()).pipe(
+      map(res => !!res[0]?.is_pro_ai_enabled)
+    );
+  }
+
+  setAiAgentProModeDefault(enabled: boolean) {
+    this.aiAgentProModeDefaultSource.next(enabled);
   }
 
   getResponse(data: any) {

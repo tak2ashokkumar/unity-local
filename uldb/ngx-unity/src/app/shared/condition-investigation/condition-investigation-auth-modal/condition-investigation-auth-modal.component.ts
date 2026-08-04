@@ -29,6 +29,7 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
 
   conversationId: string;
   collectors: any[] = [];
+  hosts: string[] = [];
   pendingCommandContext: CliCommandContext | null = null;
   showMakeDefaultCheckbox = false;
   readonly databaseConnectionType = DATABASE_CONNECTION_TYPE;
@@ -53,6 +54,7 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((context: CliCommandContext | null) => {
         this.pendingCommandContext = context || this.terminalService.getPendingCommandContext();
+        this.hosts = this.terminalService.getHosts();
         const savedDevice = this.pendingCommandContext?.device;
         this.showMakeDefaultCheckbox = !!(this.pendingCommandContext?.conditionId && this.pendingCommandContext?.command);
         this.prefillAuthForm(savedDevice);
@@ -85,19 +87,27 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
     return this.authForm.get('connection_type')?.value === DATABASE_CONNECTION_TYPE;
   }
 
+  addCustomValue(field: string) {
+    return (value: string) => {
+      return value;
+    };
+  }
+
   getCollectors(preferredCollectorUuid?: string) {
     const params = new HttpParams().set('page_size', '0');
     this.http.get<any[]>(GET_AGENT_CONFIGURATIONS(), { params })
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((res: any[]) => {
         this.collectors = res || [];
-        const collectorUuid = preferredCollectorUuid || this.collectors[0]?.uuid;
-        if (preferredCollectorUuid) {
-          this.authForm.patchValue({
-            collector: {
-              uuid: collectorUuid
-            }
-          }, { emitEvent: false });
+        const availableCollectors = Array.isArray(this.collectors) ? this.collectors : [];
+        const matchingCollector = preferredCollectorUuid
+          ? availableCollectors.find(collector => `${collector?.uuid}` === `${preferredCollectorUuid}`)
+          : null;
+
+        if (matchingCollector) {
+          setTimeout(() => {
+            this.authForm.get('collector.uuid')?.setValue(matchingCollector.uuid, { emitEvent: false });
+          }, 0);
         }
       });
   }
@@ -144,7 +154,6 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
       return;
     }
     const payload = this.authForm.getRawValue();
-    console.log(payload);
     const conversationId = this.terminalService.getConversationId();
     const pendingType = this.terminalService.getPendingTabType();
     const tabId = this.generateTabId();
@@ -234,7 +243,6 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
       engine: payload.connection_type === DATABASE_CONNECTION_TYPE ? payload.engine : undefined,
       database: payload.connection_type === DATABASE_CONNECTION_TYPE ? payload.database : undefined,
     }).subscribe((res: any) => {
-      console.log('getTab res', res);
       const backendTabId = res?.tab_id;
 
       if (backendTabId) {
@@ -269,8 +277,15 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
 
   prefillAuthForm(device?: any) {
     const host = device?.host || device?.device_ip_address || '';
-    const connectionType = device?.connection_type || (this.pendingCommandContext?.application === DATABASE_AGENT_APPLICATION ? DATABASE_CONNECTION_TYPE : 'ssh');
-    const engine = connectionType === DATABASE_CONNECTION_TYPE ? (device?.engine || 'postgres') : '';
+    const commandType = this.pendingCommandContext?.commandDetails?.commandType;
+    const shellType = this.pendingCommandContext?.commandDetails?.shellType;
+    const dbEngine = this.pendingCommandContext?.commandDetails?.dbEngine;
+    const connectionType =
+      commandType === 'windows' ? 'winrm' :
+        commandType === 'database' ? DATABASE_CONNECTION_TYPE :
+          (commandType === 'linux' || commandType === 'macos') ? 'ssh' :
+            device?.connection_type || (this.pendingCommandContext?.application === DATABASE_AGENT_APPLICATION ? DATABASE_CONNECTION_TYPE : 'ssh');
+    const engine = connectionType === DATABASE_CONNECTION_TYPE ? (dbEngine || device?.engine || 'postgres') : '';
     this.authForm.reset({
       connection_type: connectionType,
       engine,
@@ -280,7 +295,7 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
       username: device?.username || '',
       password: '',
       transport: device?.transport || 'ntlm',
-      shell: device?.shell || 'cmd',
+      shell: connectionType === 'winrm' ? (shellType || device?.shell || 'cmd') : 'cmd',
       collector: {
         uuid: device?.collector_uuid || ''
       },

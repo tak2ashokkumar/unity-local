@@ -585,7 +585,7 @@ th[sortable-column] {
 }
 
 .notification {
-  z-index: 2200;
+  z-index: 2220;
   position: absolute;
   width: -webkit-fill-available;
   width: -moz-available;
@@ -1135,16 +1135,12 @@ table.fold-table {
 }
 
 .popover.modalPopover {
-  z-index: 2000 !important;
-
   .popover-body {
     padding: 0px !important;
   }
 }
 
 .popover.box {
-  z-index: 2000 !important;
-
   .popover-arrow.arrow {
     display: none;
   }

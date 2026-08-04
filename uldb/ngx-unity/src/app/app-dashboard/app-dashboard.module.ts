@@ -45,6 +45,9 @@ import { BankOfAnthosApplicationDashboardComponent } from './app-default-dashboa
 import { DiscoveryDashboardComponent } from './app-default-dashboards/discovery-dashboard/discovery-dashboard.component';
 import { NetworkDashboardComponent } from './app-default-dashboards/network-dashboard/network-dashboard.component';
 import { UnityTopologyModule } from '../united-view/unity-topology/unity-topology.module';
+import { StorageDashboardComponent } from './app-default-dashboards/storage-dashboard/storage-dashboard.component';
+import { NetappStorageDashboardComponent } from './app-default-dashboards/storage-dashboard/netapp-storage-dashboard/netapp-storage-dashboard.component';
+import { PureStorageDashboardComponent } from './app-default-dashboards/storage-dashboard/pure-storage-dashboard/pure-storage-dashboard.component';
 // import { DashboardMapWidgetComponent } from '../app-home/dashboard-map-widget/dashboard-map-widget.component';
 
 export const MY_NATIVE_FORMATS = {
@@ -86,7 +89,10 @@ export const MY_NATIVE_FORMATS = {
     AppPersonaDashboardCrudComponent,
     AppPersonaDashboardViewComponent,
     DiscoveryDashboardComponent,
-    NetworkDashboardComponent
+    NetworkDashboardComponent,
+    StorageDashboardComponent,
+    NetappStorageDashboardComponent,
+    PureStorageDashboardComponent
   ],
   imports: [
     AppCoreModule,

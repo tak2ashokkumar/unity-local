@@ -16,7 +16,7 @@
                     <span class="ml-2 ">Loading</span>
                 </div>
             </ng-container>
-            <div *ngIf="commandExecutionStatusMessage || commandExecutionError"
+            <div *ngIf="(commandExecutionStatusMessage || commandExecutionError) && (!isProModeBannerMessage || shouldShowProModeBanner)"
                 class="mx-1 mb-1 px-2 py-2 d-flex align-items-center justify-content-between border rounded bg-white">
                 <div class="d-flex align-items-center font-sm"
                     [ngClass]="{'text-danger': commandExecutionError, 'text-muted': !commandExecutionError}">

@@ -10,6 +10,8 @@ import {
   CAPACITY_RESP,
   DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG,
   DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE,
+  DATABASE_DASHBOARD_DATABASES_RESP,
+  DATABASE_DASHBOARD_HEADER_INFO_RESP,
   DATABASE_DASHBOARD_TIME_RANGE_OPTIONS,
   DBDASHBOARDCOLORS,
   HEALTHGROWTH_RESP,
@@ -91,6 +93,7 @@ export class DatabaseDashboardService {
    * -----Start----- Sub header Related -------------------
    */
   getHeaderInfo(): Observable<DatabaseDashboardHeaderInfoResponse> {
+    // return of(DATABASE_DASHBOARD_HEADER_INFO_RESP);
     return this.http.get<DatabaseDashboardHeaderInfoResponse>('/customer/persona/database-dashboard/refresh-time/');
   }
   /*
@@ -104,7 +107,7 @@ export class DatabaseDashboardService {
     const customDurationRange = this.getDefaultCustomDurationRange();
     return this.builder.group({
       databases: [databases || []],
-      duration: [this.getDefaultOptionValue(DATABASE_DASHBOARD_TIME_RANGE_OPTIONS, 'last_month')],
+      duration: [this.getDefaultOptionValue(DATABASE_DASHBOARD_TIME_RANGE_OPTIONS, 'last_30_days')],
       durationFrom: [{ value: customDurationRange.from, disabled: true }, [Validators.required]],
       durationTo: [{ value: customDurationRange.to, disabled: true }, [Validators.required]]
     }, { validators: this.customDurationRangeValidator });
@@ -123,6 +126,7 @@ export class DatabaseDashboardService {
     //   map(databases => this.getDatabaseFilterOptions(databases))
     // );
     
+    // return of(DATABASE_DASHBOARD_DATABASES_RESP);
     return this.http.get<DatabaseDashboardFilterOption[]>('/customer/database_servers_fast/');
   }
 
@@ -155,8 +159,8 @@ export class DatabaseDashboardService {
     params = this.appendMultiValueParam(params, 'database', criteria?.databases);
     params = this.appendParam(params, 'duration', criteria?.duration);
     if (criteria?.duration === DATABASE_DASHBOARD_CUSTOM_TIMELINE_VALUE) {
-      params = this.appendDateParam(params, 'from', criteria?.durationFrom);
-      params = this.appendDateParam(params, 'to', criteria?.durationTo);
+      params = this.appendDateParam(params, 'start_datetime', criteria?.durationFrom);
+      params = this.appendDateParam(params, 'end_datetime', criteria?.durationTo);
     }
     if (sortColumn) {
       params = params.append('sort_by', sortColumn);
@@ -238,7 +242,7 @@ export class DatabaseDashboardService {
    * -----Start----- Database Estate / Inventory Overview Widget Related -------------------
    */
   getInventoryOverviewWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<InventoryWidgetType> {
-    // return of(INVENTORY_RESP)
+    // return of(INVENTORY_RESP);
     return this.http.get<InventoryWidgetType>('/customer/persona/database-dashboard/inventory-overview/', {
       params: this.convertFiltersToApiParams(criteria)
     });
@@ -536,7 +540,7 @@ export class DatabaseDashboardService {
    */
 
   getWorkloadInsightsTop10UtilizationViewData(criteria?: DatabaseDashboardFilterCriteria, sortColumn?: string, sortDirection?: string): Observable<DatabaseDashboardTop10Utilization[]> {
-    // return of(TOPUTIL_RESP)
+    // return of(TOPUTIL_RESP);
     return this.http.get<DatabaseDashboardTop10Utilization[]>('/customer/persona/database-dashboard/workload-insights/', {
       params: this.convertFiltersToApiParams(criteria, sortColumn, sortDirection)
     });
@@ -662,7 +666,7 @@ export class DatabaseDashboardService {
   }
 
   getWorkloadInsightsTop10QueryWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardTopQueryType> {
-    // return of(TOPQUERY_RESP)
+    // return of(TOPQUERY_RESP);
     return this.http.get<DatabaseDashboardTopQueryType>('/customer/persona/database-dashboard/top-query-performance/', {
       params: this.convertFiltersToApiParams(criteria)
     });
@@ -743,7 +747,7 @@ export class DatabaseDashboardService {
    */
 
   getCapacityGrowthInsightsWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<DBDashboardCapacityGrowthType> {
-    // return of(CAPACITY_RESP)
+    // return of(CAPACITY_RESP);
     return this.http.get<DBDashboardCapacityGrowthType>('/customer/persona/database-dashboard/growth-insights/', {
       params: this.convertFiltersToApiParams(criteria)
     });
@@ -1139,7 +1143,7 @@ export class DatabaseDashboardService {
    */
 
   getHealthOverviewWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<DbDashboardHealthGroupType> {
-    // return of(HEALTHGROWTH_RESP)
+    // return of(HEALTHGROWTH_RESP);
     return this.http.get<DbDashboardHealthGroupType>('/customer/persona/database-dashboard/health-overview/', {
       params: this.convertFiltersToApiParams(criteria)
     });
@@ -1183,7 +1187,7 @@ export class DatabaseDashboardService {
    */
 
   getAlertsOverviewWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardTopCriticalAlertsResponse> {
-    // return of(ALERTS_RESP)
+    // return of(ALERTS_RESP);
     return this.http.get<DatabaseDashboardTopCriticalAlertsResponse>('/customer/persona/database-dashboard/alerts-overview/', {
       params: this.convertFiltersToApiParams(criteria)
     });

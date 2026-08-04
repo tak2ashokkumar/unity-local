@@ -9,6 +9,7 @@ import { TableApiServiceService } from '../../table-functionality/table-api-serv
 import { SearchCriteria } from '../../table-functionality/search-criteria';
 import { UnityAssistantChatHistory } from 'src/app/unity-chatbot/uc-history/uc-history.type';
 import { PaginatedResult } from '../../SharedEntityTypes/paginated.type';
+import { UNITY_ORG_SETTINGS } from '../../api-endpoint.const';
 
 @Injectable()
 export class ConditionInvestigationChatbotService {
@@ -144,6 +145,12 @@ export class ConditionInvestigationChatbotService {
         return res && res.supported_llms ? res.supported_llms : [];
       })
     )
+  }
+
+  getAiAgentProModeDefault(): Observable<boolean> {
+    return this.http.get<Array<{ is_pro_ai_enabled: boolean }>>(UNITY_ORG_SETTINGS()).pipe(
+      map(res => !!res[0]?.is_pro_ai_enabled)
+    );
   }
 
   getChats(criteria: SearchCriteria): Observable<PaginatedResult<UnityAssistantChatHistory>> {

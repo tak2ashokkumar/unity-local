@@ -45,7 +45,7 @@ import { Location } from '@angular/common';
 import { FormGroup } from '@angular/forms';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import moment from 'moment';
-import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
+import { DateRangeOption, DateRangeSubmitPayload } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 
 @Component({
   selector: 'database-dashboard',
@@ -212,7 +212,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     this.loadFilterOptionsAndDashboard();
   }
 
-  onDurationDropdownSubmit(event: { period?: string; from?: Date | string; to?: Date | string }) {
+  onDurationDropdownSubmit(event: DateRangeSubmitPayload) {
     this.patchDurationRange(event);
     this.syncCustomDurationControls();
     if (this.isDurationReady()) {
@@ -396,7 +396,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       !isNaN(new Date(to).getTime());
   }
 
-  private patchDurationRange(event: { period?: string; from?: Date | string; to?: Date | string }) {
+  private patchDurationRange(event: DateRangeSubmitPayload) {
     if (!this.filterForm) {
       return;
     }

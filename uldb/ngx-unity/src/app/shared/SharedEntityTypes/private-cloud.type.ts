@@ -32,7 +32,21 @@ export interface PrivateCloudType {
     nutanix_details: PrivateCloudNutanixDetailsType;
     monitoring: DeviceMonitoringType;
     status: string;
+    remote_web_access?: PrivateCloudRemoteWebAccessType;
 
+}
+
+export interface PrivateCloudRemoteWebAccessType {
+    supported: boolean;
+    resource_type: string;
+    resource_id: string;
+    web_access_enabled: boolean;
+    has_permission: boolean;
+    collector_associated: boolean;
+    collector_state: string;
+    collector_state_allows_session: boolean;
+    can_create_session: boolean;
+    message: string;
 }
 
 export interface PrivateCloudTypeResource {
