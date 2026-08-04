@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_CRONJOBS, KUBERNETES_ACCOUNT_CRONJOBS, KUBERNETES_SYNC_CRONJOBS } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_CRONJOBS, KUBERNETES_SYNC_CRONJOBS } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesCronjobsService {
     private appService: AppLevelService) { }
 
   getCronjobs(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesCronjobType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_CRONJOBS(controllerId) : GET_KUBERNETES_CRONJOBS();
-    return this.tableService.getData<PaginatedResult<KubernetesCronjobType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesCronjobType>>(KUBERNETES_ACCOUNT_CRONJOBS(controllerId), criteria);
   }
 
   syncCronjobs(controllerId: string): Observable<TaskStatus> {

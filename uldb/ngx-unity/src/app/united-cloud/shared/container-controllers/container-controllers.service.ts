@@ -6,8 +6,8 @@ import { TableApiServiceService } from 'src/app/shared/table-functionality/table
 import { EMPTY, Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { ContainerControllerType, CONTROLLER_TYPE_MAPPING } from 'src/app/shared/SharedEntityTypes/container-contoller.type';
-import { GET_CONTAINER_CONTROLLERS, GET_KUBERNETES_CONTROLLERS, GET_DOCKER_CONTROLLERS, ADD_KUBERNETES_CONTROLLER, DELETE_KUBERNETES_CONTROLLER, UPDATE_KUBERNETES_CONTROLLER, CHANGE_CONTROLLER_PASSWORD, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
+import { ContainerAccountType, ContainerControllerType, CONTROLLER_TYPE_MAPPING } from 'src/app/shared/SharedEntityTypes/container-contoller.type';
+import { GET_CONTAINERS, ADD_KUBERNETES_CONTROLLER, DELETE_KUBERNETES_CONTROLLER, UPDATE_KUBERNETES_CONTROLLER, CHANGE_CONTROLLER_PASSWORD, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { Handle404Header } from 'src/app/app-http-interceptor';
@@ -21,29 +21,21 @@ export class ContainerControllersService {
     private utilService: AppUtilityService,
     private tableService: TableApiServiceService) { }
 
-  getControllers(criteria: SearchCriteria): Observable<ContainerControllerType[]> {
-    return this.tableService.getData<ContainerControllerType[]>(GET_CONTAINER_CONTROLLERS(), criteria);
+  getContainers(criteria: SearchCriteria): Observable<any> {
+    return this.tableService.getData<any>(GET_CONTAINERS(), criteria);
   }
 
-  getKubernetesControllers(criteria: SearchCriteria): Observable<any> {
-    return this.tableService.getData<any>(GET_KUBERNETES_CONTROLLERS(), criteria);
-  }
-
-  getDockerControllers(criteria: SearchCriteria): Observable<any> {
-    return this.tableService.getData<any>(GET_DOCKER_CONTROLLERS(), criteria);
-  }
-
-  convertToViewdata(controllers: ContainerControllerType[]): ContainerControllerViewdata[] {
+  convertToViewdata(accounts: ContainerAccountType[]): ContainerControllerViewdata[] {
     let viewData: ContainerControllerViewdata[] = [];
-    controllers.map(d => {
+    accounts.map(d => {
       let a: ContainerControllerViewdata = new ContainerControllerViewdata();
       a.controllerId = d.uuid;
-      a.controllerType = d.controller_type;
+      a.controllerType = d.type;
       a.name = d.name;
       a.hostname = d.hostname;
-      a.displayType = d.display_type;
+      a.displayType = d.type == CONTROLLER_TYPE_MAPPING.DOCKER ? 'Docker' : 'Kubernetes';
       a.statsTooltipMessage = 'Statistics';
-      a.monitoring = d.monitoring;
+      a.monitoring = d.zabbix;
       if (d.status) {
         a.deviceStatus = this.utilService.getDeviceStatus(d.status);
       }
@@ -53,7 +45,7 @@ export class ContainerControllersService {
   }
 
   getDeviceData(device: ContainerControllerViewdata) {
-    if (!device.monitoring.configured) {
+    if (!device.monitoring || !device.monitoring.configured) {
       if (!device.deviceStatus) {
         device.deviceStatus = 'Not Configured';
       }

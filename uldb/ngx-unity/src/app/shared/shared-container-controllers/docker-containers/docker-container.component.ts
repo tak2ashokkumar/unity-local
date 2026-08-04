@@ -7,7 +7,7 @@ import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
-import { tap, switchMap, takeWhile, takeUntil, mergeMap } from 'rxjs/operators';
+import { tap, switchMap, takeWhile, takeUntil, mergeMap, finalize } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
@@ -96,19 +96,18 @@ export class DockerContainerComponent implements OnInit, OnDestroy {
 
   syncContainers() {
     this.spinnerService.start('main');
-    this.containerService.syncContainers(this.controllerId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(status => {
-      if (status.result.data) {
-        this.spinnerService.stop('main');
+    this.containerService.syncContainers(this.controllerId).pipe(
+      takeUntil(this.ngUnsubscribe),
+      finalize(() => this.spinnerService.stop('main'))).subscribe(status => {
+        // A pending or timed out sync task comes back without a result payload.
+        if (!status || !status.result || !status.result.data) {
+          this.notification.error(new Notification('Docker connection failed. Please Contact administrator!'));
+          return;
+        }
         this.getContainers();
-      } else {
-        this.spinnerService.stop('main');
-        this.notification.error(new Notification('Docker connection failed. Please Contact administrator!'));
-      }
-      // this.getContainers();
-    }, (err: Error) => {
-      this.spinnerService.stop('main');
-      this.notification.error(new Notification('Error while fetching Containers.'));
-    });
+      }, (err: Error) => {
+        this.notification.error(new Notification('Error while fetching Containers.'));
+      });
   }
 
   getContainers() {

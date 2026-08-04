@@ -11,7 +11,7 @@ import { switchMap, take } from 'rxjs/operators';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { KubernetesNodeType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
-import { SYNC_KUBERNETES_NODES, GET_KUBERNETES_NODES, KUBERNETES_ACCOUNT_NODES } from 'src/app/shared/api-endpoint.const';
+import { SYNC_KUBERNETES_NODES, KUBERNETES_ACCOUNT_NODES } from 'src/app/shared/api-endpoint.const';
 import { VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_VIA_AGENT, WINDOWS_CONSOLE_CLIENT } from 'src/app/app-constants';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 
@@ -30,8 +30,7 @@ export class KubernetesNodesService {
   }
 
   getNodes(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesNodeType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_NODES(controllerId) : GET_KUBERNETES_NODES();
-    return this.tableService.getData<PaginatedResult<KubernetesNodeType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesNodeType>>(KUBERNETES_ACCOUNT_NODES(controllerId), criteria);
   }
 
   getStatusIcon(status: string): string {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { KubernetesContainerType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
 import { HttpClient } from '@angular/common/http';
-import { GET_KUBERNETES_CONTAINERS, KUBERNETES_ACCOUNT_CONTAINERS } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_CONTAINERS } from 'src/app/shared/api-endpoint.const';
 import { Observable } from 'rxjs';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
@@ -15,8 +15,7 @@ export class KubernetesContainersService {
     private tableService: TableApiServiceService) { }
 
   getContainers(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesContainerType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_CONTAINERS(controllerId) : GET_KUBERNETES_CONTAINERS();
-    return this.tableService.getData<PaginatedResult<KubernetesContainerType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesContainerType>>(KUBERNETES_ACCOUNT_CONTAINERS(controllerId), criteria);
   }
 
   getStatusIcon(status: string): string {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_REPLICASETS, KUBERNETES_ACCOUNT_REPLICASETS, KUBERNETES_SYNC_REPLICASETS } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_REPLICASETS, KUBERNETES_SYNC_REPLICASETS } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesReplicasetsService {
     private appService: AppLevelService) { }
 
   getReplicasets(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesReplicasetType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_REPLICASETS(controllerId) : GET_KUBERNETES_REPLICASETS();
-    return this.tableService.getData<PaginatedResult<KubernetesReplicasetType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesReplicasetType>>(KUBERNETES_ACCOUNT_REPLICASETS(controllerId), criteria);
   }
 
   syncReplicasets(controllerId: string): Observable<TaskStatus> {

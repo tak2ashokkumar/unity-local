@@ -1191,6 +1191,9 @@ export const CHECK_USER_IN_ZENDESK = () => `customer/ticketorganization/check_us
 
 export const GET_CONTAINER_CONTROLLERS = () => `/customer/container_clouds/`;
 
+// Unified container account list (Kubernetes + Docker in a single response).
+export const GET_CONTAINERS = () => `/customer/containers/`;
+
 
 // ==================== Kubernetes API ====================
 

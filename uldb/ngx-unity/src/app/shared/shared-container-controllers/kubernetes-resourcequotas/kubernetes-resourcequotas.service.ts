@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_RESOURCEQUOTAS, KUBERNETES_ACCOUNT_RESOURCE_QUOTAS, KUBERNETES_SYNC_RESOURCE_QUOTAS } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_RESOURCE_QUOTAS, KUBERNETES_SYNC_RESOURCE_QUOTAS } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesResourcequotasService {
     private appService: AppLevelService) { }
 
   getResourcequotas(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesResourcequotaType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_RESOURCE_QUOTAS(controllerId) : GET_KUBERNETES_RESOURCEQUOTAS();
-    return this.tableService.getData<PaginatedResult<KubernetesResourcequotaType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesResourcequotaType>>(KUBERNETES_ACCOUNT_RESOURCE_QUOTAS(controllerId), criteria);
   }
 
   syncResourcequotas(controllerId: string): Observable<TaskStatus> {

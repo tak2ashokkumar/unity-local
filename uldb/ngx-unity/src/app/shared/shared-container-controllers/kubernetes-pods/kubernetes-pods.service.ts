@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { switchMap, take } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
-import { SYNC_KUBERNETES_PODS, GET_KUBERNETES_PODS, DELETE_KUBERNETES_PODS, KUBERNETES_ACCOUNT_PODS } from 'src/app/shared/api-endpoint.const';
+import { SYNC_KUBERNETES_PODS, DELETE_KUBERNETES_PODS, KUBERNETES_ACCOUNT_PODS } from 'src/app/shared/api-endpoint.const';
 import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -29,8 +29,7 @@ export class KubernetesPodsService {
   }
 
   getPods(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesPodType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_PODS(controllerId) : GET_KUBERNETES_PODS();
-    return this.tableService.getData<PaginatedResult<KubernetesPodType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesPodType>>(KUBERNETES_ACCOUNT_PODS(controllerId), criteria);
   }
 
   getStatusIcon(status: string): string {

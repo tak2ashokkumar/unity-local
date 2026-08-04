@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_STATEFULSETS, KUBERNETES_ACCOUNT_STATEFULSETS, KUBERNETES_SYNC_STATEFULSETS } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_STATEFULSETS, KUBERNETES_SYNC_STATEFULSETS } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesStatefulsetsService {
     private appService: AppLevelService) { }
 
   getStatefulsets(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesStatefulsetType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_STATEFULSETS(controllerId) : GET_KUBERNETES_STATEFULSETS();
-    return this.tableService.getData<PaginatedResult<KubernetesStatefulsetType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesStatefulsetType>>(KUBERNETES_ACCOUNT_STATEFULSETS(controllerId), criteria);
   }
 
   syncStatefulsets(controllerId: string): Observable<TaskStatus> {

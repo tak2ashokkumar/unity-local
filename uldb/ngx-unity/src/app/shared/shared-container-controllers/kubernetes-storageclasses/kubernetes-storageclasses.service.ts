@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_STORAGECLASSES, KUBERNETES_ACCOUNT_STORAGE_CLASSES, KUBERNETES_SYNC_STORAGE_CLASSES } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_STORAGE_CLASSES, KUBERNETES_SYNC_STORAGE_CLASSES } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesStorageclassesService {
     private appService: AppLevelService) { }
 
   getStorageclasses(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesStorageclassType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_STORAGE_CLASSES(controllerId) : GET_KUBERNETES_STORAGECLASSES();
-    return this.tableService.getData<PaginatedResult<KubernetesStorageclassType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesStorageclassType>>(KUBERNETES_ACCOUNT_STORAGE_CLASSES(controllerId), criteria);
   }
 
   syncStorageclasses(controllerId: string): Observable<TaskStatus> {

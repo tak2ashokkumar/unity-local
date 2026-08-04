@@ -113,7 +113,7 @@ export const DEVICE_OPTIONS: labelAndValueType[] = [
     label: 'Virtual Machine'
   },
   {
-    value: '/unitycloud/devices/kubernetes/nodes',
+    value: '/unitycloud/devices/containers',
     label: 'Containers'
   },
   {

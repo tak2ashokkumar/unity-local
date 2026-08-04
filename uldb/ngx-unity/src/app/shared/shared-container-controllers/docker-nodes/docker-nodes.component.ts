@@ -7,7 +7,7 @@ import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
-import { tap, switchMap, takeWhile, takeUntil } from 'rxjs/operators';
+import { tap, switchMap, takeWhile, takeUntil, finalize } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -98,19 +98,17 @@ export class DockerNodesComponent implements OnInit, OnDestroy {
 
   syncNodes() {
     this.spinnerService.start('main');
-    this.nodesService.syncNodes(this.controllerId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(status => {
-      if (status.result.data) {
-        this.spinnerService.stop('main');
-
-      } else {
-        this.spinnerService.stop('main');
-        this.notification.error(new Notification('Docker connection failed. Please Contact administrator!'));
-      }
-      this.getNodes();
-    }, (err: Error) => {
-      this.spinnerService.stop('main');
-      this.notification.error(new Notification('Error while fetching Nodes.'));
-    });
+    this.nodesService.syncNodes(this.controllerId).pipe(
+      takeUntil(this.ngUnsubscribe),
+      finalize(() => this.spinnerService.stop('main'))).subscribe(status => {
+        // A pending or timed out sync task comes back without a result payload.
+        if (!status || !status.result || !status.result.data) {
+          this.notification.error(new Notification('Docker connection failed. Please Contact administrator!'));
+        }
+        this.getNodes();
+      }, (err: Error) => {
+        this.notification.error(new Notification('Error while fetching Nodes.'));
+      });
   }
 
   getNodes() {

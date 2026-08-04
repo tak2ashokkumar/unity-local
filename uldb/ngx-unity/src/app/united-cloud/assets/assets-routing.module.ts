@@ -2,10 +2,12 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { ConsoleAccessComponent } from 'src/app/shared/console-access/console-access.component';
-import { KubernetesNodesComponent } from 'src/app/shared/shared-container-controllers/kubernetes-nodes/kubernetes-nodes.component';
-import { KubernetesContainersComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
-import { KubernetesPodsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-pods.component';
 import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
+import { ContainerControllersComponent } from '../shared/container-controllers/container-controllers.component';
+import { ContainerControllersZabbixComponent } from '../shared/container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
+import { ZABBIX_CONTAINER_CONTROLLER_ROUTES } from '../shared/container-controllers/container-controllers-zabbix/container-controllers-zabbix-routing.const';
+import { DockerContainersZabbixComponent } from '../shared/container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
+import { ZABBIX_DOCKER_CONTAINER_ROUTES } from '../shared/container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix-routing.const';
 import { VmBackupHistoryComponent } from 'src/app/shared/vm-backup-history/vm-backup-history.component';
 import { SWITCH_ROUTES } from 'src/app/united-cloud/shared/switches/switches-routing.const';
 import { AwsDeviceTabComponent } from '../shared/aws-device-tab/aws-device-tab.component';
@@ -545,98 +547,53 @@ const tempRoutes: Routes = [
     component: AssetsCloudControllersComponent,
   },
   {
-    path: 'kubernetes',
+    path: 'containers',
+    component: ContainerControllersComponent,
+    data: {
+      breadcrumb: {
+        title: 'Containers',
+        stepbackCount: 0
+      }
+    }
+  },
+  {
+    path: 'containers/:deviceid/zbx',
+    component: ContainerControllersZabbixComponent,
+    data: {
+      breadcrumb: {
+        title: 'Containers',
+        stepbackCount: 2
+      }
+    },
+    children: ZABBIX_CONTAINER_CONTROLLER_ROUTES
+  },
+  {
+    path: 'containers/kubernetes/:controllerId',
     component: KubernetesTabsComponent,
     data: {
       breadcrumb: {
         title: 'Kubernetes',
-        stepbackCount: 0
+        stepbackCount: 1
       }
     },
     children: KUBERNETES_TABS_CHILDREN
-    // [
-    //   {
-    //     path: 'pods',
-    //     component: KubernetesPodsComponent,
-    //     data: {
-    //       breadcrumb: {
-    //         title: 'Pods',
-    //         stepbackCount: 1
-    //       }
-    //     },
-    //   },
-    //   {
-    //     path: 'pods/:podId',
-    //     data: {
-    //       breadcrumb: {
-    //         title: 'Pods',
-    //         stepbackCount: 1
-    //       }
-    //     },
-    //     children: [
-    //       {
-    //         path: 'containers',
-    //         component: KubernetesContainersComponent,
-    //         data: {
-    //           breadcrumb: {
-    //             title: 'Containers',
-    //             stepbackCount: 0
-    //           }
-    //         }
-    //       }
-    //     ]
-    //   },
-    //   {
-    //     path: 'nodes',
-    //     component: KubernetesNodesComponent,
-    //     data: {
-    //       breadcrumb: {
-    //         title: 'Nodes',
-    //         stepbackCount: 1
-    //       }
-    //     },
-    //   },
-    // ]
   },
   {
-    path: 'docker',
+    path: 'containers/docker/:controllerId',
     component: DockerTabsComponent,
     data: {
       breadcrumb: {
         title: 'Docker',
-        stepbackCount: 0
-      }
-    },
-    children: DOCKER_TABS_CHILDREN
-  },
-  {
-    path: 'pods',
-    component: KubernetesPodsComponent,
-    data: {
-      breadcrumb: {
-        title: 'Pods',
-        stepbackCount: 0
-      }
-    },
-  },
-  {
-    path: 'pods/:podId',
-    data: {
-      breadcrumb: {
-        title: 'Pods',
         stepbackCount: 1
       }
     },
     children: [
+      ...DOCKER_TABS_CHILDREN,
       {
-        path: 'containers',
-        component: KubernetesContainersComponent,
-        data: {
-          breadcrumb: {
-            title: 'Containers',
-            stepbackCount: 0
-          }
-        }
+        path: 'dockercontainers/:deviceid/zbx',
+        component: DockerContainersZabbixComponent,
+        data: { breadcrumb: { title: 'Docker Container', stepbackCount: 0 } },
+        children: ZABBIX_DOCKER_CONTAINER_ROUTES
       }
     ]
   },

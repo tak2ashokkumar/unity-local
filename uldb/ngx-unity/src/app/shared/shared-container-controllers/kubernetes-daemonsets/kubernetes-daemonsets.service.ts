@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_DAEMONSETS, KUBERNETES_ACCOUNT_DAEMONSETS, KUBERNETES_SYNC_DAEMONSETS } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_DAEMONSETS, KUBERNETES_SYNC_DAEMONSETS } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesDaemonsetsService {
     private appService: AppLevelService) { }
 
   getDaemonsets(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesDaemonsetType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_DAEMONSETS(controllerId) : GET_KUBERNETES_DAEMONSETS();
-    return this.tableService.getData<PaginatedResult<KubernetesDaemonsetType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesDaemonsetType>>(KUBERNETES_ACCOUNT_DAEMONSETS(controllerId), criteria);
   }
 
   syncDaemonsets(controllerId: string): Observable<TaskStatus> {

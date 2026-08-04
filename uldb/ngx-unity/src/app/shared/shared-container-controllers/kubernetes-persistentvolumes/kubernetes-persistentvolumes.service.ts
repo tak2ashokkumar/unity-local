@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_PERSISTENTVOLUMES, KUBERNETES_ACCOUNT_PVS, KUBERNETES_SYNC_PVS } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_PVS, KUBERNETES_SYNC_PVS } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesPersistentVolumesService {
     private appService: AppLevelService) { }
 
   getPersistentVolumes(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesPersistentVolumeType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_PVS(controllerId) : GET_KUBERNETES_PERSISTENTVOLUMES();
-    return this.tableService.getData<PaginatedResult<KubernetesPersistentVolumeType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesPersistentVolumeType>>(KUBERNETES_ACCOUNT_PVS(controllerId), criteria);
   }
 
   syncPersistentVolumes(controllerId: string): Observable<TaskStatus> {

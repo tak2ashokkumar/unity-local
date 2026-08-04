@@ -173,7 +173,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       oracle: ['/unitycloud/devices/vms/oracle']
     },
     hypervisors: ['/unitycloud/devices/hypervisors'],
-    kubernetes: ['/unitycloud/devices/kubernetes'],
+    kubernetes: ['/unitycloud/devices/containers'],
     bmservers: ['/unitycloud/devices/bmservers'],
     storage: ['/unitycloud/devices/storagedevices'],
     databases: ['/unitycloud/devices/databases'],

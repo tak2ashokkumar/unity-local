@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_NAMESPACES, KUBERNETES_ACCOUNT_NAMESPACES, KUBERNETES_SYNC_NAMESPACES } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_NAMESPACES, KUBERNETES_SYNC_NAMESPACES } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesNamespacesService {
     private appService: AppLevelService) { }
 
   getNamespaces(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesNamespaceType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_NAMESPACES(controllerId) : GET_KUBERNETES_NAMESPACES();
-    return this.tableService.getData<PaginatedResult<KubernetesNamespaceType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesNamespaceType>>(KUBERNETES_ACCOUNT_NAMESPACES(controllerId), criteria);
   }
 
   syncNamespaces(controllerId: string): Observable<TaskStatus> {

@@ -27,15 +27,9 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
   @Input() accountId: string;
   @Input() urlParam: string;
 
-  ControllerTypeMapping = CONTROLLER_TYPE_MAPPING;
-
-  kubernetesViewData: ContainerControllerViewdata[] = [];
-  kubernetesCriteria: SearchCriteria;
-  kubernetesCount: number = 0;
-
-  dockerViewData: ContainerControllerViewdata[] = [];
-  dockerCriteria: SearchCriteria;
-  dockerCount: number = 0;
+  viewData: ContainerControllerViewdata[] = [];
+  currentCriteria: SearchCriteria;
+  count: number = 0;
 
   private ngUnsubscribe = new Subject();
   poll: boolean = false;
@@ -52,13 +46,13 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
     private storageService: StorageService,) {
     this.termService.isOpenAnnounced$.pipe(tap(res => this.poll = res),
       switchMap(res => interval(environment.pollingInterval).pipe(takeWhile(() => this.poll), takeUntil(this.ngUnsubscribe))),
-      takeUntil(this.ngUnsubscribe)).subscribe(x => { this.getKubernetesControllers(); this.getDockerControllers(); });
+      takeUntil(this.ngUnsubscribe)).subscribe(x => { this.getContainers(); });
   }
 
   ngOnInit() {
     this.spinnerService.start('main');
-    if (!this.accountId) {
-      this.route.parent.paramMap.subscribe((params: ParamMap) => {
+    if (!this.accountId && this.route.parent) {
+      this.route.parent.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
         this.accountId = params.get('pcId');
       });
     }
@@ -66,10 +60,8 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
       this.urlParam = 'cloud_uuid';
     }
 
-    this.kubernetesCriteria = this.buildCriteria();
-    this.dockerCriteria = this.buildCriteria();
-    this.getKubernetesControllers();
-    this.getDockerControllers();
+    this.currentCriteria = this.buildCriteria();
+    this.getContainers();
   }
 
   ngOnDestroy() {
@@ -79,86 +71,60 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
   }
 
   private buildCriteria(): SearchCriteria {
-    let paramObj: { [k: string]: string } = {};
-    paramObj[this.urlParam] = this.accountId;
-    return { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [paramObj] };
-  }
-
-  private getCriteria(type: CONTROLLER_TYPE_MAPPING): SearchCriteria {
-    return type == CONTROLLER_TYPE_MAPPING.KUBERNETES ? this.kubernetesCriteria : this.dockerCriteria;
-  }
-
-  private load(type: CONTROLLER_TYPE_MAPPING) {
-    if (type == CONTROLLER_TYPE_MAPPING.KUBERNETES) {
-      this.getKubernetesControllers();
-    } else {
-      this.getDockerControllers();
+    let criteria: SearchCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
+    if (this.urlParam && this.accountId) {
+      let paramObj: { [k: string]: string } = {};
+      paramObj[this.urlParam] = this.accountId;
+      criteria.params = [paramObj];
     }
+    return criteria;
   }
 
-  onSorted(type: CONTROLLER_TYPE_MAPPING, $event: SearchCriteria) {
-    let criteria = this.getCriteria(type);
-    criteria.sortColumn = $event.sortColumn;
-    criteria.sortDirection = $event.sortDirection;
-    criteria.pageNo = 1;
-    this.load(type);
+  onSorted($event: SearchCriteria) {
+    this.currentCriteria.sortColumn = $event.sortColumn;
+    this.currentCriteria.sortDirection = $event.sortDirection;
+    this.currentCriteria.pageNo = 1;
+    this.getContainers();
   }
 
-  onSearched(type: CONTROLLER_TYPE_MAPPING, event: string) {
-    let criteria = this.getCriteria(type);
-    criteria.searchValue = event;
-    criteria.pageNo = 1;
-    this.load(type);
+  onSearched(event: string) {
+    this.currentCriteria.searchValue = event;
+    this.currentCriteria.pageNo = 1;
+    this.getContainers();
   }
 
-  pageChange(type: CONTROLLER_TYPE_MAPPING, pageNo: number) {
+  pageChange(pageNo: number) {
     this.spinnerService.start('main');
-    this.getCriteria(type).pageNo = pageNo;
-    this.load(type);
+    this.currentCriteria.pageNo = pageNo;
+    this.getContainers();
   }
 
-  pageSizeChange(type: CONTROLLER_TYPE_MAPPING, pageSize: number) {
+  pageSizeChange(pageSize: number) {
     this.spinnerService.start('main');
-    let criteria = this.getCriteria(type);
-    criteria.pageSize = pageSize;
-    criteria.pageNo = 1;
-    this.load(type);
+    this.currentCriteria.pageSize = pageSize;
+    this.currentCriteria.pageNo = 1;
+    this.getContainers();
   }
 
-  refreshData(type: CONTROLLER_TYPE_MAPPING, pageNo: number) {
+  refreshData(pageNo: number) {
     this.spinnerService.start('main');
-    this.getCriteria(type).pageNo = pageNo;
-    this.load(type);
+    this.currentCriteria.pageNo = pageNo;
+    this.getContainers();
   }
 
   trackByControllerId(index: number, item: ContainerControllerViewdata): string {
     return item.controllerId;
   }
 
-  getKubernetesControllers() {
-    this.svc.getKubernetesControllers(this.kubernetesCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: any) => {
+  getContainers() {
+    this.svc.getContainers(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: any) => {
       let list = Array.isArray(res) ? res : (res && res.results ? res.results : []);
-      this.kubernetesCount = Array.isArray(res) ? list.length : (res && res.count != null ? res.count : list.length);
-      this.kubernetesViewData = this.svc.convertToViewdata(list);
-      this.kubernetesViewData.forEach(v => v.controllerType = CONTROLLER_TYPE_MAPPING.KUBERNETES);
+      this.count = Array.isArray(res) ? list.length : (res && res.count != null ? res.count : list.length);
+      this.viewData = this.svc.convertToViewdata(list);
       this.spinnerService.stop('main');
-      this.getDeviceData(this.kubernetesViewData);
+      this.getDeviceData(this.viewData);
     }, (err: HttpErrorResponse) => {
-      this.notificationService.error(new Notification('Problem in getting Kubernetes controllers. Please try again later.'));
-      this.spinnerService.stop('main');
-    });
-  }
-
-  getDockerControllers() {
-    this.svc.getDockerControllers(this.dockerCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: any) => {
-      let list = Array.isArray(res) ? res : (res && res.results ? res.results : []);
-      this.dockerCount = Array.isArray(res) ? list.length : (res && res.count != null ? res.count : list.length);
-      this.dockerViewData = this.svc.convertToViewdata(list);
-      this.dockerViewData.forEach(v => v.controllerType = CONTROLLER_TYPE_MAPPING.DOCKER);
-      this.spinnerService.stop('main');
-      this.getDeviceData(this.dockerViewData);
-    }, (err: HttpErrorResponse) => {
-      this.notificationService.error(new Notification('Problem in getting Docker controllers. Please try again later.'));
+      this.notificationService.error(new Notification('Problem in getting container accounts. Please try again later.'));
       this.spinnerService.stop('main');
     });
   }
@@ -172,12 +138,9 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
       );
   }
 
-  goTo(view: ContainerControllerViewdata) {
-    if (view.controllerType == CONTROLLER_TYPE_MAPPING.DOCKER) {
-      this.router.navigate(['docker', view.controllerId, 'nodes'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['kubernetes', view.controllerId, 'nodes'], { relativeTo: this.route });
-    }
+  goToDetails(view: ContainerControllerViewdata) {
+    let type = view.controllerType == CONTROLLER_TYPE_MAPPING.DOCKER ? 'docker' : 'kubernetes';
+    this.router.navigate([type, view.controllerId, 'nodes'], { relativeTo: this.route });
   }
 
   goToStats(view: ContainerControllerViewdata) {
@@ -191,8 +154,7 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
 
   onCrud(uuid: string) {
     this.spinnerService.start('main');
-    this.getKubernetesControllers();
-    this.getDockerControllers();
+    this.getContainers();
   }
 
   deleteController(data: ContainerControllerViewdata) {

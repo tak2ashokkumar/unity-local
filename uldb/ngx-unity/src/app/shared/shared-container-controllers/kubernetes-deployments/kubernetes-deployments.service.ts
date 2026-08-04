@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_DEPLOYMENTS, KUBERNETES_ACCOUNT_DEPLOYMENTS, KUBERNETES_SYNC_DEPLOYMENTS } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_DEPLOYMENTS, KUBERNETES_SYNC_DEPLOYMENTS } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesDeploymentsService {
     private appService: AppLevelService) { }
 
   getDeployments(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesDeploymentType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_DEPLOYMENTS(controllerId) : GET_KUBERNETES_DEPLOYMENTS();
-    return this.tableService.getData<PaginatedResult<KubernetesDeploymentType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesDeploymentType>>(KUBERNETES_ACCOUNT_DEPLOYMENTS(controllerId), criteria);
   }
 
   syncDeployments(controllerId: string): Observable<TaskStatus> {

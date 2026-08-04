@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { GET_KUBERNETES_CONTROLPLANE_COMPONENTS, KUBERNETES_ACCOUNT_CONTROL_PLANE, KUBERNETES_SYNC_CONTROL_PLANE } from 'src/app/shared/api-endpoint.const';
+import { KUBERNETES_ACCOUNT_CONTROL_PLANE, KUBERNETES_SYNC_CONTROL_PLANE } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -19,8 +19,7 @@ export class KubernetesControlplaneComponentsService {
     private appService: AppLevelService) { }
 
   getControlplaneComponents(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesControlplaneComponentType>> {
-    let url = controllerId ? KUBERNETES_ACCOUNT_CONTROL_PLANE(controllerId) : GET_KUBERNETES_CONTROLPLANE_COMPONENTS();
-    return this.tableService.getData<PaginatedResult<KubernetesControlplaneComponentType>>(url, criteria);
+    return this.tableService.getData<PaginatedResult<KubernetesControlplaneComponentType>>(KUBERNETES_ACCOUNT_CONTROL_PLANE(controllerId), criteria);
   }
 
   syncControlplaneComponents(controllerId: string): Observable<TaskStatus> {

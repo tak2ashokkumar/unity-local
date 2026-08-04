@@ -1,0 +1,87 @@
+[
+  {
+    "uuid": "afdee4d4-5a27-4dd9-8508-3ece9c3528be",
+    "name": "docker-test",
+    "hostname": "http://10.192.18.22:2376",
+    "type": "docker",
+    "cloud": {
+      "platform_type": "Custom",
+      "uuid": "d408e6b1-85cc-4897-81c4-71f57bb8075c",
+      "id": 1016,
+      "name": "Custom DC3"
+    },
+    "status": "1",
+    "zabbix": {
+      "configured": true,
+      "observium": false,
+      "enabled": true,
+      "zabbix": true
+    },
+    "tags": []
+  },
+  {
+    "uuid": "aa246c89-55b9-421d-8026-eb7151a13a00",
+    "name": "Demo-Kub",
+    "hostname": "10.192.25.31",
+    "type": "kubernetes",
+    "cloud": null,
+    "status": "1",
+    "zabbix": {
+      "configured": true,
+      "observium": false,
+      "enabled": true,
+      "zabbix": true
+    },
+    "tags": []
+  },
+  {
+    "uuid": "393ff51f-adf0-4f59-9de0-cc54e251dcc3",
+    "name": "Demo-K8s",
+    "hostname": "10.192.25.31",
+    "type": "kubernetes",
+    "cloud": null,
+    "status": "1",
+    "zabbix": {
+      "configured": true,
+      "observium": false,
+      "enabled": true,
+      "zabbix": true
+    },
+    "tags": []
+  },
+  {
+    "uuid": "6b1c8f42-9d3e-4a17-b25c-0f8a4e7d1c93",
+    "name": "prod-cluster-01",
+    "hostname": "10.192.25.44",
+    "type": "kubernetes",
+    "cloud": {
+      "platform_type": "Custom",
+      "uuid": "d408e6b1-85cc-4897-81c4-71f57bb8075c",
+      "id": 1016,
+      "name": "Custom DC3"
+    },
+    "status": "0",
+    "zabbix": {
+      "configured": false,
+      "observium": false,
+      "enabled": false,
+      "zabbix": false
+    },
+    "tags": []
+  },
+  {
+    "uuid": "c47a2b90-5e61-4d38-8f7a-2b9c6e04d5f1",
+    "name": "docker-staging",
+    "hostname": "http://10.192.18.30:2376",
+    "type": "docker",
+    "cloud": null,
+    "status": "1",
+    "zabbix": {
+      "configured": true,
+      "observium": false,
+      "enabled": false,
+      "zabbix": true
+    },
+    "tags": []
+  }
+]
