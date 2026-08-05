@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { AI_APM_EXECUTIVE } from 'src/app/shared/api-endpoint.const';
 
 @Injectable()
 export class ExecutiveAiBusinessSummaryService {
@@ -15,7 +16,7 @@ export class ExecutiveAiBusinessSummaryService {
       message: 'Get me a Exective Summary of the app',
       session_id: this.generateSessionId(),
     }
-    return this.http.post<ExtendtedAIBusinessSummaryType>('http://10.192.11.64:9957/executive',payload);
+    return this.http.post<ExtendtedAIBusinessSummaryType>(AI_APM_EXECUTIVE(), payload);
   }
 
   generateSessionId(): string {

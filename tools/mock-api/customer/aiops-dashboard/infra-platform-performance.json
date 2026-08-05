@@ -1,13 +1,701 @@
 {
-  "top_network_bandwidth_usage": [],
-  "average_network_bandwidth_usage": [],
+  "top_network_bandwidth_usage": [
+    {
+      "host_id": 16457,
+      "id": "9d786d3d-255b-4cac-a653-19bf43dc9191",
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+      "device_type": "Server",
+      "device_id": 4409,
+      "interface_index": "2",
+      "value": 0.18,
+      "usage_percent": 0.18,
+      "bandwidth_usage_pct": 0.18,
+      "bits_received_bps": 0.0,
+      "bits_sent_bps": 0.0,
+      "speed_bps": 0.0,
+      "cpu_usage_pct": null,
+      "memory_usage_pct": null
+    },
+    {
+      "host_id": 16458,
+      "id": "dbb4c3f3-aa32-4204-b487-0eb48599c45e",
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+      "device_type": "Server",
+      "device_id": 4410,
+      "interface_index": "2",
+      "value": 0.15,
+      "usage_percent": 0.15,
+      "bandwidth_usage_pct": 0.15,
+      "bits_received_bps": 0.0,
+      "bits_sent_bps": 0.0,
+      "speed_bps": 0.0,
+      "cpu_usage_pct": null,
+      "memory_usage_pct": null
+    }
+  ],
+  "top_10_network_utilization": [
+    {
+      "host_id": 16457,
+      "id": "9d786d3d-255b-4cac-a653-19bf43dc9191",
+      "name": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+      "device_type": "Server",
+      "device_id": 4409,
+      "interface_index": "2",
+      "value": 0.18,
+      "usage_percent": 0.18,
+      "bandwidth_usage_pct": 0.18,
+      "bits_received_bps": 0.0,
+      "bits_sent_bps": 0.0,
+      "speed_bps": 0.0,
+      "cpu_usage_pct": null,
+      "memory_usage_pct": null
+    },
+    {
+      "host_id": 16458,
+      "id": "dbb4c3f3-aa32-4204-b487-0eb48599c45e",
+      "name": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+      "device_type": "Server",
+      "device_id": 4410,
+      "interface_index": "2",
+      "value": 0.15,
+      "usage_percent": 0.15,
+      "bandwidth_usage_pct": 0.15,
+      "bits_received_bps": 0.0,
+      "bits_sent_bps": 0.0,
+      "speed_bps": 0.0,
+      "cpu_usage_pct": null,
+      "memory_usage_pct": null
+    }
+  ],
+  "average_network_bandwidth_usage": [
+    {
+      "ts": 1785754800,
+      "time": "2026-08-03 11:00",
+      "value": 0.12,
+      "usage_percent": 0.12,
+      "bandwidth_usage_pct": 0.12
+    },
+    {
+      "ts": 1785758400,
+      "time": "2026-08-03 12:00",
+      "value": 0.12,
+      "usage_percent": 0.12,
+      "bandwidth_usage_pct": 0.12
+    },
+    {
+      "ts": 1785762000,
+      "time": "2026-08-03 13:00",
+      "value": 0.2,
+      "usage_percent": 0.2,
+      "bandwidth_usage_pct": 0.2
+    },
+    {
+      "ts": 1785765600,
+      "time": "2026-08-03 14:00",
+      "value": 0.3,
+      "usage_percent": 0.3,
+      "bandwidth_usage_pct": 0.3
+    },
+    {
+      "ts": 1785769200,
+      "time": "2026-08-03 15:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785772800,
+      "time": "2026-08-03 16:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785776400,
+      "time": "2026-08-03 17:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785780000,
+      "time": "2026-08-03 18:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785783600,
+      "time": "2026-08-03 19:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785787200,
+      "time": "2026-08-03 20:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785790800,
+      "time": "2026-08-03 21:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785794400,
+      "time": "2026-08-03 22:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785798000,
+      "time": "2026-08-03 23:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785801600,
+      "time": "2026-08-04 00:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785805200,
+      "time": "2026-08-04 01:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785808800,
+      "time": "2026-08-04 02:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785812400,
+      "time": "2026-08-04 03:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785816000,
+      "time": "2026-08-04 04:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785819600,
+      "time": "2026-08-04 05:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785823200,
+      "time": "2026-08-04 06:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785826800,
+      "time": "2026-08-04 07:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785830400,
+      "time": "2026-08-04 08:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785834000,
+      "time": "2026-08-04 09:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785837600,
+      "time": "2026-08-04 10:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785841200,
+      "time": "2026-08-04 11:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785844800,
+      "time": "2026-08-04 12:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785848400,
+      "time": "2026-08-04 13:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785852000,
+      "time": "2026-08-04 14:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785855600,
+      "time": "2026-08-04 15:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785859200,
+      "time": "2026-08-04 16:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785862800,
+      "time": "2026-08-04 17:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785866400,
+      "time": "2026-08-04 18:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785870000,
+      "time": "2026-08-04 19:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785873600,
+      "time": "2026-08-04 20:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785877200,
+      "time": "2026-08-04 21:00",
+      "value": 0.12,
+      "usage_percent": 0.12,
+      "bandwidth_usage_pct": 0.12
+    },
+    {
+      "ts": 1785880800,
+      "time": "2026-08-04 22:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785884400,
+      "time": "2026-08-04 23:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785888000,
+      "time": "2026-08-05 00:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785891600,
+      "time": "2026-08-05 01:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785895200,
+      "time": "2026-08-05 02:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785898800,
+      "time": "2026-08-05 03:00",
+      "value": 0.12,
+      "usage_percent": 0.12,
+      "bandwidth_usage_pct": 0.12
+    },
+    {
+      "ts": 1785902400,
+      "time": "2026-08-05 04:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    }
+  ],
+  "avg_network_bandwidth_usage": [
+    {
+      "ts": 1785754800,
+      "time": "2026-08-03 11:00",
+      "value": 0.12,
+      "usage_percent": 0.12,
+      "bandwidth_usage_pct": 0.12
+    },
+    {
+      "ts": 1785758400,
+      "time": "2026-08-03 12:00",
+      "value": 0.12,
+      "usage_percent": 0.12,
+      "bandwidth_usage_pct": 0.12
+    },
+    {
+      "ts": 1785762000,
+      "time": "2026-08-03 13:00",
+      "value": 0.2,
+      "usage_percent": 0.2,
+      "bandwidth_usage_pct": 0.2
+    },
+    {
+      "ts": 1785765600,
+      "time": "2026-08-03 14:00",
+      "value": 0.3,
+      "usage_percent": 0.3,
+      "bandwidth_usage_pct": 0.3
+    },
+    {
+      "ts": 1785769200,
+      "time": "2026-08-03 15:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785772800,
+      "time": "2026-08-03 16:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785776400,
+      "time": "2026-08-03 17:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785780000,
+      "time": "2026-08-03 18:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785783600,
+      "time": "2026-08-03 19:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785787200,
+      "time": "2026-08-03 20:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785790800,
+      "time": "2026-08-03 21:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785794400,
+      "time": "2026-08-03 22:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785798000,
+      "time": "2026-08-03 23:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785801600,
+      "time": "2026-08-04 00:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785805200,
+      "time": "2026-08-04 01:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785808800,
+      "time": "2026-08-04 02:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785812400,
+      "time": "2026-08-04 03:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785816000,
+      "time": "2026-08-04 04:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785819600,
+      "time": "2026-08-04 05:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785823200,
+      "time": "2026-08-04 06:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785826800,
+      "time": "2026-08-04 07:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785830400,
+      "time": "2026-08-04 08:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785834000,
+      "time": "2026-08-04 09:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785837600,
+      "time": "2026-08-04 10:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785841200,
+      "time": "2026-08-04 11:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785844800,
+      "time": "2026-08-04 12:00",
+      "value": 0.14,
+      "usage_percent": 0.14,
+      "bandwidth_usage_pct": 0.14
+    },
+    {
+      "ts": 1785848400,
+      "time": "2026-08-04 13:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785852000,
+      "time": "2026-08-04 14:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785855600,
+      "time": "2026-08-04 15:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785859200,
+      "time": "2026-08-04 16:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785862800,
+      "time": "2026-08-04 17:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785866400,
+      "time": "2026-08-04 18:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785870000,
+      "time": "2026-08-04 19:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785873600,
+      "time": "2026-08-04 20:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785877200,
+      "time": "2026-08-04 21:00",
+      "value": 0.12,
+      "usage_percent": 0.12,
+      "bandwidth_usage_pct": 0.12
+    },
+    {
+      "ts": 1785880800,
+      "time": "2026-08-04 22:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785884400,
+      "time": "2026-08-04 23:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785888000,
+      "time": "2026-08-05 00:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785891600,
+      "time": "2026-08-05 01:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785895200,
+      "time": "2026-08-05 02:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    },
+    {
+      "ts": 1785898800,
+      "time": "2026-08-05 03:00",
+      "value": 0.12,
+      "usage_percent": 0.12,
+      "bandwidth_usage_pct": 0.12
+    },
+    {
+      "ts": 1785902400,
+      "time": "2026-08-05 04:00",
+      "value": 0.13,
+      "usage_percent": 0.13,
+      "bandwidth_usage_pct": 0.13
+    }
+  ],
   "platform_performance": {
-    "VMware": 5,
+    "VMware": 3,
     "Nutanix": 1,
     "AWS": 2,
-    "Azure": 5,
+    "Azure": 7,
     "GCP": 4,
     "OCI": 1,
     "Others": 1
-  }
+  },
+  "cloud_platform_resources": {
+    "VMware": 3,
+    "Nutanix": 1,
+    "AWS": 2,
+    "Azure": 7,
+    "GCP": 4,
+    "OCI": 1,
+    "Others": 1
+  },
+  "summary": {
+    "avg_bandwidth_utilization": 0.16,
+    "total_storage_capacity": 3.8,
+    "monitored_devices": 2
+  },
+  "metrics": [
+    {
+      "suffix": "%",
+      "value": 0.16,
+      "label": "Avg Bandwidth Utilization"
+    },
+    {
+      "suffix": "TB",
+      "value": 3.8,
+      "label": "Total Storage Capacity"
+    },
+    {
+      "value": 2,
+      "label": "Monitored Devices"
+    }
+  ]
 }

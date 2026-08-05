@@ -4129,3 +4129,18 @@ export const DEVICE_OVERVIEW_BY_BATTERIES_DATA = (deviceType: DeviceMapping, uui
         default: console.error('Invalid device type : ', deviceType);
     }
 }
+
+// ==================== AI APM (aiapm service) ====================
+// AI-driven APM endpoints. In production the base is a relative `/aiapm/` so the
+// reverse proxy fronts https://unity.unitedlayer.com/aiapm/; in development the base
+// is the env-configured host (environment.aiApmHostUrl). This mirrors the networkai
+// pattern in condition-investigation-chatbot.service.ts. Never hardcode the host here.
+const AI_APM_BASE = () => environment.production ? '/aiapm/' : environment.aiApmHostUrl;
+
+export const AI_APM_REMEDIATION = () => `${AI_APM_BASE()}remediation`;
+
+export const AI_APM_IMPACT = () => `${AI_APM_BASE()}impact`;
+
+export const AI_APM_HEALTH = () => `${AI_APM_BASE()}health`;
+
+export const AI_APM_EXECUTIVE = () => `${AI_APM_BASE()}executive`;

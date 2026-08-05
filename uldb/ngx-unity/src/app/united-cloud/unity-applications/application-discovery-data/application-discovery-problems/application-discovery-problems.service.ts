@@ -6,7 +6,7 @@ import moment from 'moment';
 import { Observable, of } from 'rxjs';
 import { delay, map, switchMap, take } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
-import { GET_AIOPS_ALERT_BY_ID, GET_AIOPS_CONDITION_BY_ID, GET_AIOPS_EVENT_BY_ID } from 'src/app/shared/api-endpoint.const';
+import { AI_APM_REMEDIATION, GET_AIOPS_ALERT_BY_ID, GET_AIOPS_CONDITION_BY_ID, GET_AIOPS_EVENT_BY_ID } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { DeviceIconService } from 'src/app/shared/device-icon.service';
 import { ApplicationProblemConditionType, ApplicationProblemSummaryType } from 'src/app/shared/SharedEntityTypes/application.type';
@@ -146,7 +146,7 @@ export class ApplicationDiscoveryProblemsService {
     //   response: staticdataairemediation,
     // }
 
-    return this.http.post<AIRemediationType>('http://10.192.11.64:9957/remediation', payload);
+    return this.http.post<AIRemediationType>(AI_APM_REMEDIATION(), payload);
     // return of(obj).pipe(delay(100))
   }
 

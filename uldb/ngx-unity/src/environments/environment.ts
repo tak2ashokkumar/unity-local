@@ -20,6 +20,7 @@ export const environment = {
     availableThemes: ['light', 'dark'] as string[],
   },
   networkAgentHostUrl: 'http://10.192.11.64:8003/',
+  aiApmHostUrl: 'http://10.192.11.64:9957/',
   ChatbotDocumentUploadUrl: 'http://10.192.11.64:8000/',
   cliNetworkAgentUrl: '10.192.11.57:8006/ws/terminal'
 };
