@@ -248,6 +248,7 @@ export class TokenBillingTracingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.spinner.stop(this.loader);
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

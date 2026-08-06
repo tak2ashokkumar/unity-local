@@ -60,6 +60,9 @@ export class PublicCloudAzureCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.createAzureAccountModalRef?.hide();
+    this.editAzureAccountModalRef?.hide();
+    this.deleteAzureModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

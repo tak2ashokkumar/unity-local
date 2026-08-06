@@ -86,6 +86,12 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.taskModalRef?.hide();
+    this.taskDeleteModalRef?.hide();
+    this.cloneModalRef?.hide();
+    this.editModelRef?.hide();
+    this.editCatModalRef?.hide();
+    this.deleteCatModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()
   }

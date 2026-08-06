@@ -68,6 +68,8 @@ export class UnityconnectNetworkBillingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.billFormModalRef?.hide();
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

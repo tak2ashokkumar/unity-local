@@ -85,6 +85,7 @@ export class UsioSdwanComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.confirmSdwanDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

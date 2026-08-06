@@ -87,6 +87,8 @@ export class StorageCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmStorageDeleteModalRef?.hide();
+    this.storageModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

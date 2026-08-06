@@ -108,6 +108,7 @@ export class ApplicationDiscoveryCreateGraphsComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.graphModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

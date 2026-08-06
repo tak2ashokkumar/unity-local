@@ -78,6 +78,8 @@ export class DatacenterCabinetsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.panelModalRef?.hide();
+    this.modalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

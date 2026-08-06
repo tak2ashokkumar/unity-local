@@ -54,6 +54,7 @@ export class UsiImportDataComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.confirmDeleteModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

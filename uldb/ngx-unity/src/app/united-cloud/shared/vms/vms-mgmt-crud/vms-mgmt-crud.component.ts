@@ -47,6 +47,7 @@ export class VmsMgmtCrudComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.ipModelRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

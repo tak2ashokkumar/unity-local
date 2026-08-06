@@ -79,6 +79,8 @@ export class PduCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.pduModelRef?.hide();
+    this.confirmPduDeleteModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

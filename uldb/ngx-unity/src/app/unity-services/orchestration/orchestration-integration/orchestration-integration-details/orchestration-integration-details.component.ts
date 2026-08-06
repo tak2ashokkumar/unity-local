@@ -69,6 +69,9 @@ export class OrchestrationIntegrationDetailsComponent implements OnInit, OnDestr
   }
 
   ngOnDestroy() {
+    this.cloneModalRef?.hide();
+    this.playbookViewModalRef?.hide();
+    this.confirmDeleteModalRef?.hide();
     if (this.subscr) {
       this.subscr.unsubscribe();
     }

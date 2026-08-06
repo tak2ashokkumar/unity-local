@@ -86,6 +86,8 @@ export class PublicCloudOciCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.accountModelRef?.hide();
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

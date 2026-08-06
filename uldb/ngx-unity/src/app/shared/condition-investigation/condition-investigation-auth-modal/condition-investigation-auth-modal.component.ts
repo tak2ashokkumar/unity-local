@@ -402,6 +402,7 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next(null);
     this.ngUnsubscribe.complete();
   }

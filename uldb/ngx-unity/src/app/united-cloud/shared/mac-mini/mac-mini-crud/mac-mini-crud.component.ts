@@ -76,6 +76,8 @@ export class MacMiniCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmMacMiniDeleteModalRef?.hide();
+    this.macMiniModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

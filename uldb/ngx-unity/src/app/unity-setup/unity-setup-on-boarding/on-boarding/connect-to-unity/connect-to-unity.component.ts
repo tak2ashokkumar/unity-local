@@ -47,6 +47,8 @@ export class ConnectToUnityComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.createRequestModalRef?.hide();
+    this.requestedModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

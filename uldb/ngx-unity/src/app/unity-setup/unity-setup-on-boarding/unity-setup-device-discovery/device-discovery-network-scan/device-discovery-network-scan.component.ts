@@ -44,6 +44,7 @@ export class DeviceDiscoveryNetworkScanComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmModalRef?.hide();
     this.spinner.stop('main');
     this.destroyNetworkScan();
     this.ngUnsubscribe.next();

@@ -54,6 +54,7 @@ export class SourceEventTypesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.confirmEventDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

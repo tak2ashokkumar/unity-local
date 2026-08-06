@@ -89,6 +89,7 @@ export class MeshBackendComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.createModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

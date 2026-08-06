@@ -1,31 +1,38 @@
-
 # Project Coding Guidelines
 
 # High Priority
 - Never run any powershell / or any other scripts to capture screen shots.
 - This is my company laptop and as per the company rules, Codex / ChatGpt / Claude / Gemini Or any other AI Agent as external agents and the screen captures you do as potencially hacking type. So please don't take screen shots in any circumstances.
-- Also please don't run any scripts to change anything apart from the content inside unity-local folder.
-- Donot add corrupted/non-ASCII section-divider symbols in comments or in any places. Always Keep the comments readable using simple ASCII text. Do not change any component logic, imports, API calls, template, service, or mock files while handling ASCII Text...
+- Also please don't run any scripts to change anything apart from the content inside this repository.
+- Donot add corrupted/non-ASCII section-divider symbols in comments or in any places. Always Keep the comments readable using simple ASCII text. Do not change any component logic, imports, API calls, template, or service files while handling ASCII Text...
 
 # Command Execution Rules
 - NEVER use Bash, PowerShell, or any shell tool to run npm, ng, node, or any terminal commands.
-- The user runs ALL commands themselves ( except for updating mocks with .har files). Only tell the user what command to run — do not execute it.
+- The user runs ALL commands themselves. Only tell the user what command to run - do not execute it.
 - Never run builds. The user will run the build and report back if something goes wrong.
 
 # Project Scope
-- Primary work is inside uldb/ngx-unity/ only.
-- Do not touch anything outside the unity-local folder.
+- Primary work is inside <ADJUST: app source root, e.g. src/app/> only.
+- Do not touch anything outside the repository root.
 
 # Dev Environment
 - Angular 12.2.0, TypeScript 4.3.5, RxJS 6.6
-- Node 14.17.6 — auto-configured via .bashrc when inside the unity-local folder.
+- Node 14.17.6.
 - Plain npm install works. Do NOT suggest --legacy-peer-deps or any extra install flags.
-- Do not modify the portable node setup.
-- 3-tier local architecture:
-  - Browser -> localhost:8091 (Proxy)
-  - Proxy /customer/* -> localhost:3001 (Mock API -- Express + JSON files)
-  - Proxy /* -> localhost:8090 (Angular static server)
-- Proxy configs must remain in tools/proxy. Do not move or duplicate them.
+- The app talks to a REAL backend. The API base URL, auth, and any dev proxy come from the
+  Angular environment config (environment.ts / environment.*.ts) and/or proxy.conf.json.
+  <ADJUST: state the real API base URL source and how the dev server is served>.
+- Do NOT hardcode API base URLs, hostnames, tokens, or secrets anywhere in the app - they come
+  from the environment config only.
+
+# Real API Safety
+- Do NOT call real / production endpoints casually. No exploratory requests against live
+  services to "see what happens".
+- NEVER fire destructive or state-changing verbs (POST / PUT / PATCH / DELETE) against a real
+  backend to verify code. Reason about correctness or ask the user to test.
+- Treat the server response as the backend's contract: map it, do not mutate/reshape it in the
+  client. Do not assume a field exists - confirm against the API contract first.
+- Never commit secrets, tokens, or real credentials. Use placeholders and environment config.
 
 ## General
 - Use existing project patterns. Do NOT introduce new abstractions unless explicitly requested.
@@ -34,7 +41,7 @@
 - Avoid clever code when straightforward code is enough.
 
 ## API Endpoints
-- ALL API endpoint constants MUST be declared in `uldb/ngx-unity/src/app/shared/api-endpoint.const.ts`.
+- ALL API endpoint constants MUST be declared in `<ADJUST: src/app/shared/api-endpoint.const.ts>`.
   This is the ONLY file intended for endpoint URL structures.
 - Do NOT add API endpoint constants to `app-constants.ts` or any other file. `app-constants.ts`
   is for non-endpoint constants only (console/message/UI constants, mappings, etc.).
@@ -93,7 +100,7 @@ ngOnDestroy - full teardown, in this order:
    `this.modalService.show(...)` MUST be hidden here with safe navigation, e.g.
    `this.confirmModalRef?.hide();` (repeat for every modal-ref field). BsModalService
    attaches the modal to document.body, so a modal left open survives route changes
-   (browser Back) and floats over later pages. This was the DCIM-881 bug.
+   (browser Back) and floats over later pages.
 2. Stop any spinner this component started, e.g. `this.spinner.stop('main');`.
 3. Complete the unsubscribe subject:
    `this.ngUnsubscribe.next(); this.ngUnsubscribe.complete();`
@@ -256,10 +263,3 @@ reason - see the Listing "column-sizing directive" rule above) AND a trackBy on 
 - Do not redesign UI unless requested.
 - Use existing global classes as priority; if explicitly needed prefer scoped class changes.
 - Avoid global style changes unless necessary.
-
-## Mock Data
-- Do not move mock APIs inside Angular apps.
-- Keep mock file names aligned with endpoint names.
-- Do NOT modify the API response shape. Preserve it exactly as-is.
-- New mock endpoints go in tools/mock-api/customer/ matching the URL path structure.
-- ALWAYS extend the mock server for missing data. Never add Angular-side workarounds to compensate for missing mock endpoints.

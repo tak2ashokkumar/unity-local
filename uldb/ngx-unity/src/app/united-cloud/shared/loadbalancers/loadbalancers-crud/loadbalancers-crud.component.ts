@@ -107,6 +107,8 @@ export class LoadbalancersCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmLoadBalancerDeleteModalRef?.hide();
+    this.loadBalancerModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

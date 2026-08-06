@@ -193,6 +193,8 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.confirmSaveAsModalRef?.hide();
+    this.confirmExecutionModalRef?.hide();
     this.spinner.stop('main');
     clearTimeout(this.userScrollTimer);
     this.cleanupScrollPositionTracking();

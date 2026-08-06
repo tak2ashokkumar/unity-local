@@ -44,6 +44,8 @@ export class UsiUnityoneItsmComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.editModelRef?.hide();
+    this.deleteModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()
   }

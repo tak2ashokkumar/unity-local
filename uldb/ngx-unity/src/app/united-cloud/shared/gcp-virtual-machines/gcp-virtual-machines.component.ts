@@ -96,6 +96,9 @@ export class GcpVirtualMachinesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.addAccountModalRef?.hide();
+    this.confirmModalRef?.hide();
+    this.tagsModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

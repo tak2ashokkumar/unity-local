@@ -264,6 +264,7 @@ export class NaciAuthModalComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next(null);
     this.ngUnsubscribe.complete();
   }

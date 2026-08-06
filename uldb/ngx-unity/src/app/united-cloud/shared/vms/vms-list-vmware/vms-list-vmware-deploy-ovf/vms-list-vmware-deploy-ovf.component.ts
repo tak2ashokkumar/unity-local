@@ -86,6 +86,7 @@ export class VmsListVmwareDeployOvfComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.deployOvfModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

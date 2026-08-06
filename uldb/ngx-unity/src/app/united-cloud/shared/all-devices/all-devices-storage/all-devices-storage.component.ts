@@ -57,6 +57,7 @@ export class AllDevicesStorageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

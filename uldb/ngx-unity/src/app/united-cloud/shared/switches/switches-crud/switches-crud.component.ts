@@ -105,6 +105,8 @@ export class SwitchesCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmSwitchDeleteModalRef?.hide();
+    this.switchModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

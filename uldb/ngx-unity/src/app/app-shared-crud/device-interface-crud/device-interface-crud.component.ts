@@ -48,6 +48,7 @@ export class DeviceInterfaceCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.targetDeviceModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

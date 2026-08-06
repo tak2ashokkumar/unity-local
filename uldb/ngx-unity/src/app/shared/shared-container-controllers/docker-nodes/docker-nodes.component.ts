@@ -58,6 +58,7 @@ export class DockerNodesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.deleteModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

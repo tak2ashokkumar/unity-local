@@ -64,6 +64,9 @@ export class ForecastComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.confirmBulkDeleteModalRef?.hide();
+    this.confirmDeleteModalRef?.hide();
+    this.confirmDeviceDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

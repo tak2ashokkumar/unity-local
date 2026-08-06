@@ -46,6 +46,7 @@ export class UnitySetupPolicyPoliciesComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.policyDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

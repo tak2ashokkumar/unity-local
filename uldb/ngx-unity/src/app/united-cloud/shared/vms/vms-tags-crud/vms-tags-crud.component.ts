@@ -46,6 +46,7 @@ export class VmsTagsCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.tagsFormModelRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

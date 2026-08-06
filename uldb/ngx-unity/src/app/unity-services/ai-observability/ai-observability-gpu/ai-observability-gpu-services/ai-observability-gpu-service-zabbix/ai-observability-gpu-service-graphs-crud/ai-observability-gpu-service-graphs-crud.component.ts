@@ -102,6 +102,7 @@ export class AiObservabilityGpuServiceGraphsCrudComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.graphModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

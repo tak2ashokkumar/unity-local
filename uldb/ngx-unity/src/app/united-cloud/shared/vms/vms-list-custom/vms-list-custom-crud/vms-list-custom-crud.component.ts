@@ -67,6 +67,8 @@ export class VmsListCustomCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmDeviceDeleteModalRef?.hide();
+    this.deviceFormModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

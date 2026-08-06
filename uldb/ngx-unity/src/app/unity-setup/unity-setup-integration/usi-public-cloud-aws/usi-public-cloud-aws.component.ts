@@ -70,6 +70,9 @@ export class UsiPublicCloudAwsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.accessKeyModalRef?.hide();
+    this.deleteModalRef?.hide();
+    this.modalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

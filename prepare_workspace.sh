@@ -13,6 +13,19 @@ echo "----------------------------------------------------"
 # Create code backup directory if it doesn't exist
 mkdir -p "$PROJECT_ROOT/../code"
 
+if [ -f "uldb_export.tar.gz" ]; then
+    echo "📦 Extracting uldb_export.tar.gz directly to project root..."
+    if [ -d "$PROJECT_ROOT/uldb" ]; then
+        #Add commands to copy tmp_download_icons.sh, ngx-admin
+    	rm -rf "$PROJECT_ROOT/uldb"
+	  fi
+    tar -C "$PROJECT_ROOT/" -xvzf uldb_export.tar.gz
+    
+    echo "🚚 Moving uldb_export.tar.gz to backup..."
+    rm -f ../code/uldb_export.tar.gz
+    mv uldb_export.tar.gz ../code/
+fi
+
 if [ -f "uldb_static_export.tar.gz" ]; then
     echo "📦 Extracting uldb_static_export.tar.gz directly to uldb/..."
     if [ -d "$PROJECT_ROOT/uldb/static" ]; then

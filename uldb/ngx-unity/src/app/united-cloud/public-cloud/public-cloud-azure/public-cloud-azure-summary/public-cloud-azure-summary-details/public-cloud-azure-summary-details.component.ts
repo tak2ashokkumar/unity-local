@@ -180,6 +180,11 @@ export class PublicCloudAzureSummaryDetailsComponent implements OnInit, OnDestro
   }
 
   ngOnDestroy(): void {
+    this.createVmModalRef?.hide();
+    this.tagsModalRef?.hide();
+    this.switchAzureVmPowerModalRef?.hide();
+    this.deleteVmModalRef?.hide();
+    this.createNICModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

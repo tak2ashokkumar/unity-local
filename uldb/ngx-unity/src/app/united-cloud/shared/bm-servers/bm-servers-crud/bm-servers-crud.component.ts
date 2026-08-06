@@ -98,6 +98,8 @@ export class BmServersCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmBareMetalServerDeleteModalRef?.hide();
+    this.bareMetalServerModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

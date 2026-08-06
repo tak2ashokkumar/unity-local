@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { TabData } from '../../tabdata';
 import { TicketDetailsService, TicketDetailsViewData, UserMap, TicketCommentViewData } from './ticket-details.service';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
@@ -18,7 +18,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
   styleUrls: ['./ticket-details.component.scss'],
   providers: [TicketDetailsService]
 })
-export class TicketDetailsComponent implements OnInit {
+export class TicketDetailsComponent implements OnInit, OnDestroy {
   ticketId: string;
   PriorityEnum = Priority;
   userMap: UserMap;
@@ -51,6 +51,10 @@ export class TicketDetailsComponent implements OnInit {
     this.spinner.start('main');
     this.getTicketDetails();
     this.getComments();
+  }
+
+  ngOnDestroy() {
+    this.confirmModalRef?.hide();
   }
 
   getTicketDetails() {

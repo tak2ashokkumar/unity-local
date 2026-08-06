@@ -160,6 +160,8 @@ export class PublicCloudGcpSummaryDetailsComponent implements OnInit, OnDestroy 
   }
 
   ngOnDestroy(): void {
+    this.createInstanceModalRef?.hide();
+    this.confirmModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

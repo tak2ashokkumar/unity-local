@@ -96,6 +96,9 @@ export class HypervisorsCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmHypervisorDeleteModalRef?.hide();
+    this.hypervisorModelRef?.hide();
+    this.resetPasswordModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

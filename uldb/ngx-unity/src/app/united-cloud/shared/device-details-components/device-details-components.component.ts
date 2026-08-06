@@ -561,6 +561,7 @@ export class DeviceDetailsComponentsComponent implements OnInit, OnChanges, OnDe
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     // this.spinner.stop('main')

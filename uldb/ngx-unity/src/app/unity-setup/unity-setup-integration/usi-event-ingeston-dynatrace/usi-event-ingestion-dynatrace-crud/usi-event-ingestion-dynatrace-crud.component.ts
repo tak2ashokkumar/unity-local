@@ -55,6 +55,7 @@ export class UsiEventIngestionDynatraceCrudComponent implements OnInit, OnDestro
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

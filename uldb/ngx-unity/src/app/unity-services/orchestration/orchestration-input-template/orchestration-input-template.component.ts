@@ -48,6 +48,9 @@ export class OrchestrationInputTemplateComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.cloneModalRef?.hide();
+    this.deleteModalRef?.hide();
+    this.editModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()
   }

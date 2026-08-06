@@ -56,6 +56,7 @@ export class UsiEventIngestionLogicMonitorCrudComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

@@ -61,6 +61,7 @@ export class SourceEventCategoriesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.deleteCategoryModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

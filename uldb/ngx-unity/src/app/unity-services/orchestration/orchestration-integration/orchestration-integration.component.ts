@@ -56,6 +56,8 @@ export class OrchestrationIntegrationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.instanceModalRef?.hide();
+    this.confirmModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()
   }

@@ -62,6 +62,10 @@ export class OrchestrationIntegrationDetailsPlaybookComponent implements OnInit,
   }
 
   ngOnDestroy() {
+    this.playbookViewModalRef?.hide();
+    this.playbookModalRef?.hide();
+    this.playbookDeleteModalRef?.hide();
+    this.taskModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

@@ -125,6 +125,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmDeleteModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     this.spinnerService.stop('main');

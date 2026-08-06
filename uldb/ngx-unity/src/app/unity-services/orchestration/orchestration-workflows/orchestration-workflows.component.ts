@@ -120,6 +120,9 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.taskModalRef?.hide();
+    this.workflowDeleteModalRef?.hide();
+    this.processWorkflowModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

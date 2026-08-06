@@ -45,6 +45,8 @@ export class UsumUserGroupsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.toggleConfirmUserGroupModalRef?.hide();
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

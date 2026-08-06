@@ -46,6 +46,8 @@ export class DeviceDiscoveryConnectivityComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
+    this.confirmModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

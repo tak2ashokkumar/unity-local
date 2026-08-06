@@ -122,6 +122,7 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   }
 
   ngOnDestroy(): void {
+    this.confirmExecutionModalRef?.hide();
     this.resetChatInputModePayload();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

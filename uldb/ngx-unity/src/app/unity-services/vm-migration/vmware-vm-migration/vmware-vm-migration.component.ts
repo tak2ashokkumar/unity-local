@@ -74,6 +74,8 @@ export class VmwareVmMigrationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.authModalRef?.hide();
+    this.migrateModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

@@ -93,6 +93,7 @@ export class BmServersComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

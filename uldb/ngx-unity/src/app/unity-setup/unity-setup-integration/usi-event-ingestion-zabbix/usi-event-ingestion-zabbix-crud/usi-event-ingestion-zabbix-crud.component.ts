@@ -56,6 +56,7 @@ export class UsiEventIngestionZabbixCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

@@ -36,6 +36,7 @@ export class DeviceDiscoveryScanOpComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.confirmModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

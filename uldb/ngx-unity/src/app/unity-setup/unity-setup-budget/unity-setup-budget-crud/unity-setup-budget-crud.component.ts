@@ -125,6 +125,7 @@ export class UnitySetupBudgetCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.budgetEditModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

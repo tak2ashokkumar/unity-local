@@ -73,6 +73,8 @@ export class VcenterContentLibraryFilesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmDeleteModalRef?.hide();
+    this.uploadModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

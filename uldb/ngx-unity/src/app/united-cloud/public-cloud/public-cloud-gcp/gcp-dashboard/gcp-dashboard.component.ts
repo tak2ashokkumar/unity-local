@@ -80,6 +80,8 @@ export class GcpDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.billingFormModalRef?.hide();
+    this.sustainabilityFormModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

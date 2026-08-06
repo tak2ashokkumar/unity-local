@@ -68,6 +68,7 @@ export class OpenstackVmMigrationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.migrateModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

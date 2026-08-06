@@ -101,6 +101,8 @@ export class MacMiniComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.macRecycleAuthModelRef?.hide();
+    this.modalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

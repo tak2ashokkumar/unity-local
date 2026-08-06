@@ -139,6 +139,7 @@ export class ManageScheduleComponent implements OnInit, OnDestroy {
    * @returns Nothing.
    */
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

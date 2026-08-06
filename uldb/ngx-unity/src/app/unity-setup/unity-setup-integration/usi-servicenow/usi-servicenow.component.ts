@@ -57,6 +57,8 @@ export class UsiServicenowComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
+    this.historyModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

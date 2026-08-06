@@ -45,6 +45,7 @@ export class ExcelOnBoardingInventoryComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

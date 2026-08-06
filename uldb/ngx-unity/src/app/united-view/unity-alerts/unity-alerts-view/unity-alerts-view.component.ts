@@ -113,6 +113,10 @@ export class UnityAlertsViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.bulkActionModalRef?.hide();
+    this.acknowledgeModalRef?.hide();
+    this.changeSeverityModalRef?.hide();
+    this.closeProblemModalRef?.hide();
     this.spinner.stop('main');
     this.storageService.removeByKey('alert-device-type', StorageType.SESSIONSTORAGE);
     this.ngUnsubscribe.next();

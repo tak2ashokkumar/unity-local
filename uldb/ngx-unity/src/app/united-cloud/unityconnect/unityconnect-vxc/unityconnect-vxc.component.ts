@@ -65,6 +65,8 @@ export class UnityconnectVxcComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.createVxcTicketModalRef?.hide();
+    this.closeVxcTicketModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

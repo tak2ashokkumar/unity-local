@@ -93,6 +93,8 @@ export class PublicCloudGcpSummaryComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.deleteGcpModalRef?.hide();
+    this.historymodalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

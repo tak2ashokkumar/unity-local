@@ -101,6 +101,8 @@ export class ZabbixVmsGraphCrudComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.graphModelRef?.hide();
+    this.confirmGraphDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

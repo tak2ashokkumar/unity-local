@@ -305,6 +305,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.workflowReturnModalRef?.hide();
     this.maximizeLeftPanel();
     if (this.modalRef) {
       this.modalRef.hide();

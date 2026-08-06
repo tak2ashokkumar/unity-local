@@ -33,6 +33,7 @@ export class UnitySetupManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.templateModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

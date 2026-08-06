@@ -67,6 +67,8 @@ export class CabinetCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
+    this.confirmModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

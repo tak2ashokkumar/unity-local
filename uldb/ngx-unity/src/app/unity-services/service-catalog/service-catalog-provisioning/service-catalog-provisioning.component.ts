@@ -51,6 +51,7 @@ export class ServiceCatalogProvisioningComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.taskDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()

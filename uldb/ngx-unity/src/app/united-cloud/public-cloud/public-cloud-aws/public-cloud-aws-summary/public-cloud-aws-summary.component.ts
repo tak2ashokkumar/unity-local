@@ -93,6 +93,9 @@ export class PublicCloudAwsSummaryComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.deleteAwsModalRef?.hide();
+    this.accessKeyModalRef?.hide();
+    this.modalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

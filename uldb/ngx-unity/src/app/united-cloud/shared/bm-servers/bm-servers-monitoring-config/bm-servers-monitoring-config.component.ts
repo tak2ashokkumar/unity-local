@@ -95,6 +95,7 @@ export class BmServersMonitoringConfigComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.confirmDeleteModalRef?.hide();
     this.ngUnsubscribe.next();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.complete();

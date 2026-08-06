@@ -101,6 +101,9 @@ export class OciVirtualMachinesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.vmCreateModelRef?.hide();
+    this.confirmModalRef?.hide();
+    this.tagsModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

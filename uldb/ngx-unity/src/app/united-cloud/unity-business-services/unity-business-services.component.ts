@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UnityBusinessServicesService, BusinessViewData } from './unity-business-services.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -16,7 +16,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
   styleUrls: ['./unity-business-services.component.scss'],
   providers: [UnityBusinessServicesService]
 })
-export class UnityBusinessServicesComponent implements OnInit {
+export class UnityBusinessServicesComponent implements OnInit, OnDestroy {
 
   currentCriteria: SearchCriteria;
   viewData: BusinessViewData[] = [];
@@ -45,6 +45,10 @@ export class UnityBusinessServicesComponent implements OnInit {
   ngOnInit(): void {
     this.spinner.start('main');
     this.getBusinessServiceList();
+  }
+
+  ngOnDestroy() {
+    this.modalRef?.hide();
   }
 
   refreshData(pageNo: number) {

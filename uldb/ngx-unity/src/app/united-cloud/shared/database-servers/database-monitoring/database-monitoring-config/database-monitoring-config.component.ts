@@ -62,6 +62,7 @@ export class DatabaseMonitoringConfigComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmDeleteModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

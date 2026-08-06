@@ -47,6 +47,8 @@ export class UnitySetupConnectionsComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.editModelRef?.hide();
+    this.deleteConnectionModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

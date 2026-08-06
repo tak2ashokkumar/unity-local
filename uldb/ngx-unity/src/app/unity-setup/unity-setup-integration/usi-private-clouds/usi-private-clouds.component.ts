@@ -62,6 +62,9 @@ export class UsiPrivateCloudsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.deleteModalRef?.hide();
+    this.payloadModalRef?.hide();
+    this.scheduleHistoryRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

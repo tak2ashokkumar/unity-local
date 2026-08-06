@@ -46,6 +46,8 @@ export class UsiManageEngineComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
+    this.historyModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

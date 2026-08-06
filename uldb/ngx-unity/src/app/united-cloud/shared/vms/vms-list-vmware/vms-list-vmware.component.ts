@@ -143,6 +143,9 @@ export class VmsListVmwareComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
+    this.confirmDeleteModalRef?.hide();
+    this.authModalref?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

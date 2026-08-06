@@ -60,6 +60,8 @@ export class SdwansComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.tagsFormModelRef?.hide();
+    this.confirmSdwanDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

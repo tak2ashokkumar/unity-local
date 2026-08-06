@@ -37,6 +37,7 @@ export class OrchestrationIntegrationDetailsHistoryComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.playbookViewModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()
   }

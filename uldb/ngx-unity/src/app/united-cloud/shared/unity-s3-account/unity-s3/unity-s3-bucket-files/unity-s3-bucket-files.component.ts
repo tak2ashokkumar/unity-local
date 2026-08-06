@@ -83,6 +83,8 @@ export class UnityS3BucketFilesComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.uploadFileModalRef?.hide();
+    this.deleteFileModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

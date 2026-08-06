@@ -100,6 +100,8 @@ export class DatabaseMonitoringGraphCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.dbGraphModelRef?.hide();
+    this.confirmDBGraphDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

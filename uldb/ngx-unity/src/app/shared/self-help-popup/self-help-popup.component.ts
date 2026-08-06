@@ -28,6 +28,7 @@ export class SelfHelpPopupComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

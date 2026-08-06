@@ -137,6 +137,10 @@ export class AdvancedDiscoveryNetworkScanComponent implements OnInit, OnDestroy 
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
+    this.confirmModalRef?.hide();
+    this.confirmToggleModalRef?.hide();
+    this.cloneModalRef?.hide();
     // this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

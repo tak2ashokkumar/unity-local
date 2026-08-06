@@ -55,6 +55,7 @@ export class UsiEventIngestionAppDynamicsCrudComponent implements OnInit, OnDest
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

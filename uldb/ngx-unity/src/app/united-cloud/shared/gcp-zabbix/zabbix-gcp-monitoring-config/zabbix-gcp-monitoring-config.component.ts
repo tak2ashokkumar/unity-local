@@ -69,6 +69,7 @@ export class ZabbixGcpMonitoringConfigComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmDeleteModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     if (this.subscr && !this.subscr.closed) {

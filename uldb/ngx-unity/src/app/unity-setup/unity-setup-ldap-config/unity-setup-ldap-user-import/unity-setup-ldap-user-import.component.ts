@@ -56,6 +56,7 @@ export class UnitySetupLdapUserImportComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.importModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

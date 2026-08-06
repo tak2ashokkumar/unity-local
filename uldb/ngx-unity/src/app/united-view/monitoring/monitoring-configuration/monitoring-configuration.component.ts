@@ -92,6 +92,11 @@ export class MonitoringConfigurationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.editConfigModelRef?.hide();
+    this.confirmActivateModalRef?.hide();
+    this.confirmEnableModalRef?.hide();
+    this.confirmDisableModalRef?.hide();
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

@@ -75,6 +75,7 @@ export class VmsVmwareSnapshotsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     this.storageService.removeByKey('device', StorageType.SESSIONSTORAGE);

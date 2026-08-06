@@ -54,6 +54,8 @@ export class NcDeviceGroupsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.scheduleHistoryRef?.hide();
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

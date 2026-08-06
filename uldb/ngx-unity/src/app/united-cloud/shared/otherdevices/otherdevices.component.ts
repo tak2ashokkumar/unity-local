@@ -90,6 +90,8 @@ export class OtherdevicesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.tagsFormModelRef?.hide();
+    this.modalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

@@ -174,6 +174,12 @@ export class PublicCloudOciSummaryDetailsComponent implements OnInit, OnDestroy 
   }
 
   ngOnDestroy(): void {
+    this.confirmModalRef?.hide();
+    this.terminateModalRef?.hide();
+    this.vmCreateModelRef?.hide();
+    this.tagsModalRef?.hide();
+    this.uploadFileModalRef?.hide();
+    this.createModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

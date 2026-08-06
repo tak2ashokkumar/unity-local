@@ -57,6 +57,8 @@ export class UnityconnectNetworkConnectionComponent implements OnInit, OnDestroy
   }
 
   ngOnDestroy() {
+    this.portFormModalRef?.hide();
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

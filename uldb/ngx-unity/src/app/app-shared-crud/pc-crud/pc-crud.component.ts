@@ -144,6 +144,8 @@ export class PcCrudComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
   ngOnDestroy() {
+    this.confirmModalRef?.hide();
+    this.passwordChangeRef?.hide();
     this.cleanUp();
   }
 

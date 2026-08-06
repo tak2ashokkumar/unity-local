@@ -83,6 +83,8 @@ export class AssetsMobileDeviceCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmMobileDeleteModalRef?.hide();
+    this.mobileModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

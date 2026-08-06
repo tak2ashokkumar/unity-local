@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { UsiAccountViewData, UsiEventIngestionTableColumnsModel, UsiEventIngestionTablleActionsModel } from '../unity-setup-integration.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,7 +11,7 @@ import { FormGroup } from '@angular/forms';
   templateUrl: './usi-event-ingestion.component.html',
   styleUrls: ['./usi-event-ingestion.component.scss']
 })
-export class UsiEventIngestionComponent implements OnInit {
+export class UsiEventIngestionComponent implements OnInit, OnDestroy {
 
   @Input() count: number;
   @Input() currentCriteria: SearchCriteria;
@@ -43,6 +43,11 @@ export class UsiEventIngestionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.payloadModalRef?.hide();
+    this.deleteModalRef?.hide();
   }
 
   goBack() {

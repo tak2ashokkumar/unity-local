@@ -81,6 +81,7 @@ export class StorageDevicesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.storageService.removeByKey('urlState', StorageType.SESSIONSTORAGE);
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();

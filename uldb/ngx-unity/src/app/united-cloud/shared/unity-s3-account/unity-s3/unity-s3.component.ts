@@ -94,6 +94,10 @@ export class UnityS3Component implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.createModalRef?.hide();
+    this.uploadFileModalRef?.hide();
+    this.filesUploadedModalRef?.hide();
+    this.deleteBucketModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

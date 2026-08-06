@@ -100,6 +100,9 @@ export class MeshServicesCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmModalRef?.hide();
+    this.modalRef?.hide();
+    this.passwordChangeRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

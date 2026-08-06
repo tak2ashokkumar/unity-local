@@ -75,6 +75,7 @@ export class DatacenterCabinetViewDeviceInfoComponent implements OnInit, OnChang
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

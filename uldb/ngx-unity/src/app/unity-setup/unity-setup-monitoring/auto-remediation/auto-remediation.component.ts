@@ -84,6 +84,7 @@ export class AutoRemediationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.autoRemDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

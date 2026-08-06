@@ -49,6 +49,7 @@ export class DeviceGroupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.deviceAlertsModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

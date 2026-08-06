@@ -55,6 +55,7 @@ export class AppSearchComponent implements OnInit, OnDestroy {
   ngOnInit() { }
 
   ngOnDestroy() {
+    this.searchModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

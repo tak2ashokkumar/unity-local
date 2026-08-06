@@ -145,6 +145,8 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
   }
 
   ngOnDestroy(): void {
+    this.confirmSaveAsModalRef?.hide();
+    this.confirmExecutionModalRef?.hide();
     this.spinner.stop('main');
     this.maximizeLeftPanel();
     this.ngUnsubscribe.next();

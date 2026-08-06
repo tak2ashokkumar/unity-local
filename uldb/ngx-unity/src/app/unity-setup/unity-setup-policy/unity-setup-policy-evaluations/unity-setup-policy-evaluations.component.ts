@@ -56,6 +56,7 @@ export class UnitySetupPolicyEvaluationsComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.payloadModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()

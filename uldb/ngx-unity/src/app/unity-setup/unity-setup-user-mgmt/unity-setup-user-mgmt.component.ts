@@ -83,6 +83,11 @@ export class UnitySetupUserMgmtComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmModalRef?.hide();
+    this.confirmPasswordModalRef?.hide();
+    this.createModalRef?.hide();
+    this.confirmDeleteModalRef?.hide();
+    this.importUsersRefModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

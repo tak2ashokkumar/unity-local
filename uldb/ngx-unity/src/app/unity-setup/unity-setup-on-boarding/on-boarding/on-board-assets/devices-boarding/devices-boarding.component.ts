@@ -40,6 +40,7 @@ export class DevicesBoardingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.vcenterModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

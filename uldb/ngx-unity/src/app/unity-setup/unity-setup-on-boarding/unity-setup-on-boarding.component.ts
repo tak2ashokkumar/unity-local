@@ -66,6 +66,7 @@ export class UnitySetupOnBoardingComponent implements OnInit, OnDestroy {
   ngOnInit() { }
 
   ngOnDestroy() {
+    this.confirmAddModalRef?.hide();
     this.subscr.unsubscribe();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

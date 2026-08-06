@@ -86,6 +86,7 @@ export class VmsListVmwareDeployOvaComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.deployOvaModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

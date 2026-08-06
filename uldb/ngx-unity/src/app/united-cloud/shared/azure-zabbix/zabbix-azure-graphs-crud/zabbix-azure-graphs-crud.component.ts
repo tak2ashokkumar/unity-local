@@ -102,6 +102,8 @@ export class ZabbixAzureGraphsCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.graphModelRef?.hide();
+    this.confirmGraphDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

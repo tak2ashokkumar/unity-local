@@ -90,6 +90,10 @@ export class VmwareVmBackupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.authModalRef?.hide();
+    this.backupAWSModalRef?.hide();
+    this.backupAzureModalRef?.hide();
+    this.backupHistoryModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

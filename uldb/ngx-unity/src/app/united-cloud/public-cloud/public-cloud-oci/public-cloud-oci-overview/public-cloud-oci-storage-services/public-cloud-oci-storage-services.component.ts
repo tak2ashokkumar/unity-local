@@ -68,6 +68,9 @@ export class PublicCloudOciStorageServicesComponent implements OnInit, OnDestroy
   }
 
   ngOnDestroy() {
+    this.createModalRef?.hide();
+    this.confirmModalRef?.hide();
+    this.uploadFileModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

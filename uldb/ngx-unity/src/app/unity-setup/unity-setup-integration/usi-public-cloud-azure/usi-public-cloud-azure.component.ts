@@ -66,6 +66,7 @@ export class UsiPublicCloudAzureComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

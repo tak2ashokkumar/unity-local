@@ -87,6 +87,11 @@ export class UsiPublicCloudGcpComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.deleteModalRef?.hide();
+    this.accessKeyModalRef?.hide();
+    this.modalRef?.hide();
+    this.billingFormModalRef?.hide();
+    this.sustainabilityFormModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

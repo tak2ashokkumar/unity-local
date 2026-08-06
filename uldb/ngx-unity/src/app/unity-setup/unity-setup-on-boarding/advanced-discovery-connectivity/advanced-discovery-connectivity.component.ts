@@ -67,6 +67,8 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.testNetworkFormModalRef?.hide();
+    this.updateCollectorModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

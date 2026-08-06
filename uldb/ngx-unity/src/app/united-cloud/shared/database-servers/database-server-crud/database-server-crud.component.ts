@@ -76,6 +76,8 @@ export class DatabaseServerCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmDBDeleteModalRef?.hide();
+    this.dbModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

@@ -120,6 +120,8 @@ export class VmsListVmwareAddComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.addVmModelRef?.hide();
+    this.editVmModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

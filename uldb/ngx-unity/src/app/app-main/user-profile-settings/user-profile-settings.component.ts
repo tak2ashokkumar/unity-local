@@ -136,6 +136,10 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.changePasswordModalRef?.hide();
+    this.changeTZModalRef?.hide();
+    this.defaultDashboardModalRef?.hide();
+    this.modelDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

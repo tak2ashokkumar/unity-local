@@ -40,6 +40,8 @@ export class ServerPowerToggleComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmModalRef?.hide();
+    this.authModalref?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

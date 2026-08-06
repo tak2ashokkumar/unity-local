@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -22,7 +22,7 @@ import { UlS3AccountViewData, UnityS3AccountService } from './unity-s3-account.s
   styleUrls: ['./unity-s3-account.component.scss'],
   providers: [UnityS3AccountService]
 })
-export class UnityS3AccountComponent implements OnInit {
+export class UnityS3AccountComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
   count: number = 0;
@@ -78,6 +78,13 @@ export class UnityS3AccountComponent implements OnInit {
     this.spinner.start('main');
     this.getPrivateClouds();
     this.getAccounts();
+  }
+
+  ngOnDestroy() {
+    this.confirmModalRef?.hide();
+    this.accessKeyModalRef?.hide();
+    this.addAccountModalRef?.hide();
+    this.editAccountModalRef?.hide();
   }
 
   get isCrudEnabled() {

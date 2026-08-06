@@ -99,6 +99,7 @@ export class UsincCiscoMerakiComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

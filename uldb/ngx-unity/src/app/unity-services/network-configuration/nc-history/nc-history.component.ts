@@ -59,6 +59,9 @@ export class NcHistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.openConfigDetailsModalRef?.hide();
+    this.restoreConfigModalRef?.hide();
+    this.modalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()

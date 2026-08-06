@@ -56,6 +56,7 @@ export class UsiEventIngestionSolarwindsCrudComponent implements OnInit, OnDestr
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

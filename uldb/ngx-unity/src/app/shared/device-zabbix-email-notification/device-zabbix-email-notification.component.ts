@@ -55,6 +55,8 @@ export class DeviceZabbixEmailNotificationComponent implements OnInit, OnDestroy
   }
 
   ngOnDestroy() {
+    this.emailNotificationModelRef?.hide();
+    this.confirmNotificationModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

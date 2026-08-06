@@ -51,6 +51,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.spinnerservice.stop('dashboard_maintenance_widget');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

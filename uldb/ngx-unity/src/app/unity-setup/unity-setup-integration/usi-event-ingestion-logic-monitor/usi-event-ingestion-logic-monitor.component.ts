@@ -55,6 +55,7 @@ export class UsiEventIngestionLogicMonitorComponent implements OnInit, OnDestroy
   }
 
   ngOnDestroy() {
+    this.payloadModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

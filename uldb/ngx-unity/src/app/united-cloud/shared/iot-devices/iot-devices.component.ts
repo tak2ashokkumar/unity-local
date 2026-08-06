@@ -118,6 +118,7 @@ export class IotDevicesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.tagsFormModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

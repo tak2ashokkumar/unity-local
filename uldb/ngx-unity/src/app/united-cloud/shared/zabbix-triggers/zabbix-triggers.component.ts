@@ -76,6 +76,7 @@ export class ZabbixTriggersComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

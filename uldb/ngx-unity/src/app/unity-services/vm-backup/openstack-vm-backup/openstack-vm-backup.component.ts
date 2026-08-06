@@ -84,6 +84,9 @@ export class OpenstackVmBackupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.backupAWSModalRef?.hide();
+    this.backupAzureModalRef?.hide();
+    this.backupHistoryModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

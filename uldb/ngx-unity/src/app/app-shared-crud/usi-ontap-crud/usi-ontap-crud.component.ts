@@ -73,6 +73,7 @@ export class UsiOntapCrudComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

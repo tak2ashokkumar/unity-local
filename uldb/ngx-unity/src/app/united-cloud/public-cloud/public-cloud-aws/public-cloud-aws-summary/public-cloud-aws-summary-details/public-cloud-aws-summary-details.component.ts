@@ -211,6 +211,17 @@ export class PublicCloudAwsSummaryDetailsComponent implements OnInit, OnDestroy 
   }
 
   ngOnDestroy(): void {
+    this.createInstanceModalRef?.hide();
+    this.createS3ModelRef?.hide();
+    this.deleteS3ModalRef?.hide();
+    this.uploadS3FileModalRef?.hide();
+    this.filesUploadedS3ModalRef?.hide();
+    this.terminateModalRef?.hide();
+    this.confirmModalRef?.hide();
+    this.infoModalRef?.hide();
+    this.createImageModalRef?.hide();
+    this.autoScaleModalRef?.hide();
+    this.nwInterfaceModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

@@ -144,6 +144,14 @@ export class AwsVirtualMachinesComponent implements OnInit, OnDestroy, OnChanges
   }
 
   ngOnDestroy() {
+    this.confirmModalRef?.hide();
+    this.terminateModalRef?.hide();
+    this.createImageModalRef?.hide();
+    this.autoScaleModalRef?.hide();
+    this.nwInterfaceModalRef?.hide();
+    this.loadBalancerModalRef?.hide();
+    this.infoModalRef?.hide();
+    this.createInstanceModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

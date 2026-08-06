@@ -114,6 +114,12 @@ export class AdvancedDiscoveryScanOpComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.interfaceInfoModalRef?.hide();
+    this.ipAddressesInfoModalRef?.hide();
+    this.confirmModalRef?.hide();
+    this.confirmNetModalRef?.hide();
+    this.cloneNetModalRef?.hide();
+    this.modalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

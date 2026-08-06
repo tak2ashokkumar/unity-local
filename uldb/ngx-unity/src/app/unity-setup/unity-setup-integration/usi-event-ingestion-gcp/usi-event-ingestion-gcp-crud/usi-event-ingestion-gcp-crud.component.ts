@@ -55,6 +55,7 @@ export class UsiEventIngestionGcpCrudComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
