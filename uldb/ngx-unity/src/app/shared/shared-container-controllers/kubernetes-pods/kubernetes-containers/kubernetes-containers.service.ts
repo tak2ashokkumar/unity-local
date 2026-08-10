@@ -7,6 +7,8 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { DeviceStatusMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
+import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Injectable()
 export class KubernetesContainersService {
@@ -40,6 +42,8 @@ export class KubernetesContainersService {
       data.statusIcon = this.getStatusIcon(container.status);
       data.cpuRequest = container.cpu_request;
       data.memoryRequest = container.memory_request;
+      data.monitoring = container.monitoring;
+      data.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(container.monitoring);
       viewData.push(data);
     });
     return viewData;
@@ -55,4 +59,6 @@ export class KubernetesContainersViewdata {
   statusIcon: string;
   cpuRequest: string;
   memoryRequest: string;
+  monitoring: DeviceMonitoringType;
+  statsTooltipMessage: string;
 }

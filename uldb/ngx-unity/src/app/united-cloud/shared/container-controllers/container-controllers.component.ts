@@ -61,7 +61,13 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
     }
 
     this.currentCriteria = this.buildCriteria();
+    this.discoverResources();
     this.getContainers();
+  }
+
+  // Best-effort, non-blocking. The list still loads regardless of the outcome.
+  private discoverResources() {
+    this.svc.discoverResources().pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { }, () => { });
   }
 
   ngOnDestroy() {
@@ -130,7 +136,9 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
   }
 
   getDeviceData(viewData: ContainerControllerViewdata[]) {
-    from(viewData).pipe(
+    // Only Docker accounts refine their live status via the zabbix device_data call; Kubernetes
+    // accounts read monitoring straight off the list object (no extra monitoring API).
+    from(viewData.filter(v => v.controllerType === CONTROLLER_TYPE_MAPPING.DOCKER)).pipe(
       mergeMap((e) => this.svc.getDeviceData(e)),
       takeUntil(this.ngUnsubscribe))
       .subscribe(res => { },
@@ -144,7 +152,8 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
   }
 
   goToStats(view: ContainerControllerViewdata) {
-    this.storageService.put('device', { name: view.name, deviceType: DeviceMapping.CONTAINER_CONTROLLER, configured: view.monitoring.configured }, StorageType.SESSIONSTORAGE);
+    let deviceType = view.controllerType == CONTROLLER_TYPE_MAPPING.KUBERNETES ? DeviceMapping.KUBERNETES_ACCOUNT : DeviceMapping.CONTAINER_CONTROLLER;
+    this.storageService.put('device', { name: view.name, deviceType, configured: view.monitoring.configured }, StorageType.SESSIONSTORAGE);
     if (view.monitoring.configured && view.monitoring.enabled) {
       this.router.navigate([view.controllerId, 'zbx', 'monitoring-graphs'], { relativeTo: this.route });
     } else {

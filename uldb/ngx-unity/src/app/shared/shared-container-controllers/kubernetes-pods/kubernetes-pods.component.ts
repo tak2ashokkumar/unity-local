@@ -12,6 +12,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { environment } from 'src/environments/environment';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
+import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { KubernetesMonitoringService } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Component({
   selector: 'kubernetes-pods',
@@ -27,6 +29,7 @@ export class KubernetesPodsComponent implements OnInit, OnDestroy {
   currentCriteria: SearchCriteria;
   private ngUnsubscribe = new Subject();
   poll: boolean = false;
+  showMonitoring: boolean;
 
   @ViewChild('confirm') confirm: ElementRef;
   deleteModalRef: BsModalRef;
@@ -38,9 +41,11 @@ export class KubernetesPodsComponent implements OnInit, OnDestroy {
     private spinnerService: AppSpinnerService,
     private podsService: KubernetesPodsService,
     private refreshBtnService: DataRefreshBtnService,
-    private termService: FloatingTerminalService) {
+    private termService: FloatingTerminalService,
+    private k8sMon: KubernetesMonitoringService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.controllerId = params.get('controllerId');
+      this.showMonitoring = !!(this.route.parent && this.route.parent.snapshot && this.route.parent.snapshot.data && this.route.parent.snapshot.data.monitoringEnabled);
       this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{}] };
     });
 
@@ -125,6 +130,10 @@ export class KubernetesPodsComponent implements OnInit, OnDestroy {
 
   goToContainers(view: KubernetesPodsViewdata) {
     this.router.navigate([view.podId, 'containers'], { relativeTo: this.route });
+  }
+
+  goToStats(view: KubernetesPodsViewdata) {
+    this.k8sMon.goToStats(this.router, this.route, DeviceMapping.KUBERNETES_POD, view.podId, view.name, view.monitoring);
   }
 
   goBack() {

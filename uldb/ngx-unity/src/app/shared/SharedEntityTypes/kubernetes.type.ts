@@ -1,4 +1,5 @@
 // Consolidated Kubernetes resource types (merged from the former kubernetes-*.type.ts files).
+import { DeviceMonitoringType } from './devices-monitoring.type';
 
 // Shared cluster/cloud reference carried by the newer Kubernetes resource list items.
 export interface KubernetesResourceCloud {
@@ -55,6 +56,7 @@ export interface KubernetesNodeType {
     updated_at: string;
     os: string;
     os_type: string;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesPodType {
@@ -70,6 +72,7 @@ export interface KubernetesPodType {
     start_time: string;
     uuid: string;
     account: KubernetesAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesContainerType {
@@ -84,6 +87,7 @@ export interface KubernetesContainerType {
     cpu_request: string;
     memory_request: string;
     pod: number;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesNamespaceType {
@@ -94,6 +98,7 @@ export interface KubernetesNamespaceType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesCronjobType {
@@ -108,6 +113,7 @@ export interface KubernetesCronjobType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesResourcequotaType {
@@ -118,6 +124,7 @@ export interface KubernetesResourcequotaType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesStorageclassType {
@@ -130,6 +137,7 @@ export interface KubernetesStorageclassType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesServiceType {
@@ -144,6 +152,7 @@ export interface KubernetesServiceType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesPersistentVolumeType {
@@ -160,6 +169,7 @@ export interface KubernetesPersistentVolumeType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesPersistentVolumeClaimType {
@@ -174,6 +184,7 @@ export interface KubernetesPersistentVolumeClaimType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesDeploymentType {
@@ -188,6 +199,7 @@ export interface KubernetesDeploymentType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesEventType {
@@ -206,6 +218,7 @@ export interface KubernetesEventType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesReplicasetType {
@@ -219,6 +232,7 @@ export interface KubernetesReplicasetType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesDaemonsetType {
@@ -234,6 +248,7 @@ export interface KubernetesDaemonsetType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesStatefulsetType {
@@ -247,6 +262,7 @@ export interface KubernetesStatefulsetType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesControlplaneComponentType {
@@ -263,6 +279,7 @@ export interface KubernetesControlplaneComponentType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesJobType {
@@ -281,6 +298,7 @@ export interface KubernetesJobType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
 }
 
 export interface KubernetesHpaType {
@@ -300,4 +318,10 @@ export interface KubernetesHpaType {
     created_at: string;
     updated_at: string;
     account: KubernetesResourceAccount;
+    monitoring: DeviceMonitoringType;
+}
+
+// Response of the account-less discover_resources call. Synchronous, no task id.
+export interface KubernetesDiscoverResourcesResponse {
+    data: string;
 }

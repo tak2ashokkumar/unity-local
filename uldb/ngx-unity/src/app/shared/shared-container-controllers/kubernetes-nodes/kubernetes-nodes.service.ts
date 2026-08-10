@@ -14,6 +14,8 @@ import { KubernetesNodeType } from 'src/app/shared/SharedEntityTypes/kubernetes.
 import { SYNC_KUBERNETES_NODES, KUBERNETES_ACCOUNT_NODES } from 'src/app/shared/api-endpoint.const';
 import { VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_VIA_AGENT, WINDOWS_CONSOLE_CLIENT } from 'src/app/app-constants';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
+import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
+import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Injectable()
 export class KubernetesNodesService {
@@ -107,6 +109,9 @@ export class KubernetesNodesService {
         a.isNewTabEnabled = false;
       }
 
+      a.monitoring = node.monitoring;
+      a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(node.monitoring);
+
       viewData.push(a);
     });
     return viewData;
@@ -145,4 +150,7 @@ export class KubernetesNodesViewdata {
   isNewTabEnabled: boolean;
   newTabTootipMessage: string;
   newTabConsoleAccessUrl: string;
+
+  monitoring: DeviceMonitoringType;
+  statsTooltipMessage: string;
 }

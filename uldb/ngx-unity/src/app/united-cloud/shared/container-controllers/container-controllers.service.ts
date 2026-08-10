@@ -7,9 +7,10 @@ import { EMPTY, Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { ContainerAccountType, ContainerControllerType, CONTROLLER_TYPE_MAPPING } from 'src/app/shared/SharedEntityTypes/container-contoller.type';
-import { GET_CONTAINERS, ADD_KUBERNETES_CONTROLLER, DELETE_KUBERNETES_CONTROLLER, UPDATE_KUBERNETES_CONTROLLER, CHANGE_CONTROLLER_PASSWORD, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
+import { GET_CONTAINERS, ADD_KUBERNETES_CONTROLLER, DELETE_KUBERNETES_CONTROLLER, UPDATE_KUBERNETES_CONTROLLER, CHANGE_CONTROLLER_PASSWORD, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE, KUBERNETES_DISCOVER_RESOURCES } from 'src/app/shared/api-endpoint.const';
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
+import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 import { Handle404Header } from 'src/app/app-http-interceptor';
 import { map } from 'rxjs/operators';
 
@@ -25,6 +26,12 @@ export class ContainerControllersService {
     return this.tableService.getData<any>(GET_CONTAINERS(), criteria);
   }
 
+  // Account-less discovery. Fired best-effort when the list loads so Kubernetes resources are
+  // fresh before the user drills in. Not a celery task - answers synchronously.
+  discoverResources(): Observable<any> {
+    return this.http.get(KUBERNETES_DISCOVER_RESOURCES());
+  }
+
   convertToViewdata(accounts: ContainerAccountType[]): ContainerControllerViewdata[] {
     let viewData: ContainerControllerViewdata[] = [];
     accounts.map(d => {
@@ -34,8 +41,8 @@ export class ContainerControllersService {
       a.name = d.name;
       a.hostname = d.hostname;
       a.displayType = d.type == CONTROLLER_TYPE_MAPPING.DOCKER ? 'Docker' : 'Kubernetes';
-      a.statsTooltipMessage = 'Statistics';
       a.monitoring = d.zabbix;
+      a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(d.zabbix);
       if (d.status) {
         a.deviceStatus = this.utilService.getDeviceStatus(d.status);
       }

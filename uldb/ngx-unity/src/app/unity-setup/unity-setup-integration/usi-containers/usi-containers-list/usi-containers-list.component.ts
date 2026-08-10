@@ -56,7 +56,15 @@ export class UsiContainersListComponent implements OnInit, OnDestroy {
     this.typeLabel = this.controllerType == CONTROLLER_TYPE_MAPPING.DOCKER ? 'Docker' : 'Kubernetes';
     this.isKubernetes = this.controllerType == CONTROLLER_TYPE_MAPPING.KUBERNETES;
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{}] };
+    if (this.isKubernetes) {
+      this.discoverResources();
+    }
     this.getControllers();
+  }
+
+  // Best-effort, non-blocking. The list still loads regardless of the outcome.
+  private discoverResources() {
+    this.svc.discoverResources().pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { }, () => { });
   }
 
   ngOnDestroy() {

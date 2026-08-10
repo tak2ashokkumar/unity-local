@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -7,6 +7,8 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { KubernetesMonitoringService } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 import { KubernetesReplicasetsService, KubernetesReplicasetsViewdata } from './kubernetes-replicasets.service';
 
 @Component({
@@ -23,17 +25,21 @@ export class KubernetesReplicasetsComponent implements OnInit, OnDestroy {
   viewData: KubernetesReplicasetsViewdata[] = [];
   controllerId: string;
   currentCriteria: SearchCriteria;
+  showMonitoring: boolean;
 
   constructor(private route: ActivatedRoute,
     private svc: KubernetesReplicasetsService,
     private spinnerSvc: AppSpinnerService,
     private notificationSvc: AppNotificationService,
     private refreshSvc: DataRefreshBtnService,
-    private cdr: ChangeDetectorRef) { }
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private k8sMon: KubernetesMonitoringService) { }
 
   ngOnInit() {
     this.route.parent.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.controllerId = params.get('controllerId');
+      this.showMonitoring = !!(this.route.parent && this.route.parent.snapshot && this.route.parent.snapshot.data && this.route.parent.snapshot.data.monitoringEnabled);
       this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{}] };
       this.getReplicasets();
     });
@@ -80,6 +86,10 @@ export class KubernetesReplicasetsComponent implements OnInit, OnDestroy {
 
   trackByUuid(index: number, item: KubernetesReplicasetsViewdata): string {
     return item.uuid;
+  }
+
+  goToStats(view: KubernetesReplicasetsViewdata) {
+    this.k8sMon.goToStats(this.router, this.route, DeviceMapping.KUBERNETES_REPLICASET, view.uuid, view.name, view.monitoring);
   }
 
   private getReplicasets() {

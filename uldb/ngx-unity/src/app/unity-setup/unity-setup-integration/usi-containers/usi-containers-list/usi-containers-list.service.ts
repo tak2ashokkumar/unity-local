@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { DELETE_CONTAINER_CONTROLLER, EDIT_CONTAINER_CONTROLLER, GET_DOCKER_CONTROLLERS, KUBERNETES_ACCOUNTS, KUBERNETES_ACCOUNT_BY_ID, KUBERNETES_SYNC_RESOURCES } from 'src/app/shared/api-endpoint.const';
+import { DELETE_CONTAINER_CONTROLLER, EDIT_CONTAINER_CONTROLLER, GET_DOCKER_CONTROLLERS, KUBERNETES_ACCOUNTS, KUBERNETES_ACCOUNT_BY_ID, KUBERNETES_DISCOVER_RESOURCES, KUBERNETES_SYNC_RESOURCES } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
@@ -32,6 +32,12 @@ export class UsiContainersListService {
       return this.http.delete(KUBERNETES_ACCOUNT_BY_ID(controllerId));
     }
     return this.http.delete(DELETE_CONTAINER_CONTROLLER(controllerId, controllerType));
+  }
+
+  // Account-less discovery. Fired best-effort when the Kubernetes list loads so resources are
+  // fresh before the user drills in. Not a celery task - answers synchronously.
+  discoverResources(): Observable<any> {
+    return this.http.get(KUBERNETES_DISCOVER_RESOURCES());
   }
 
   syncResources(controllerId: string): Observable<TaskStatus> {

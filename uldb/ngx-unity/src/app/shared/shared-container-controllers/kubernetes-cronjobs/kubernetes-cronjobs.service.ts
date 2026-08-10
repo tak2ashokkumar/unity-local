@@ -10,6 +10,8 @@ import { KubernetesCronjobType } from 'src/app/shared/SharedEntityTypes/kubernet
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
+import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
+import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Injectable()
 export class KubernetesCronjobsService {
@@ -39,6 +41,8 @@ export class KubernetesCronjobsService {
       a.active = String(item.active != null ? item.active : 0);
       a.lastSchedule = item.last_schedule_time ? item.last_schedule_time : 'N/A';
       a.age = item.created_at ? item.created_at : 'N/A';
+      a.monitoring = item.monitoring;
+      a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);
     });
     return viewData;
@@ -54,4 +58,6 @@ export class KubernetesCronjobsViewdata {
   active: string;
   lastSchedule: string;
   age: string;
+  monitoring: DeviceMonitoringType;
+  statsTooltipMessage: string;
 }

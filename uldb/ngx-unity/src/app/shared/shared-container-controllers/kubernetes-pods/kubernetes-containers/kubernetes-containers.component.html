@@ -40,6 +40,7 @@
               <th>Image</th>
               <th>CPU Request</th>
               <th>Memory Request</th>
+              <th *ngIf="showMonitoring">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -60,6 +61,11 @@
               </td>
               <td>
                 <div [tooltip]="view.memoryRequest">{{view.memoryRequest}}</div>
+              </td>
+              <td class="action-icons-column" *ngIf="showMonitoring">
+                <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
+                  [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring" accessType="View Monitoring"
+                  elementType="actionbtn"></button>
               </td>
             </tr>
           </tbody>

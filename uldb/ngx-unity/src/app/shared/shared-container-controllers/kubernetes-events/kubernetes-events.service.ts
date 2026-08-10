@@ -10,6 +10,8 @@ import { KubernetesEventType } from 'src/app/shared/SharedEntityTypes/kubernetes
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
+import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
+import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Injectable()
 export class KubernetesEventsService {
@@ -32,6 +34,7 @@ export class KubernetesEventsService {
     items.map(item => {
       let a = new KubernetesEventsViewdata();
       a.uuid = item.uuid;
+      a.name = item.name ? item.name : 'N/A';
       a.type = item.event_type ? item.event_type : 'N/A';
       a.reason = item.reason ? item.reason : 'N/A';
       a.object = item.involved_object_name ? item.involved_object_name : 'N/A';
@@ -39,6 +42,8 @@ export class KubernetesEventsService {
       a.message = item.message ? item.message : 'N/A';
       a.count = String(item.count != null ? item.count : 0);
       a.lastSeen = item.last_time ? item.last_time : 'N/A';
+      a.monitoring = item.monitoring;
+      a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);
     });
     return viewData;
@@ -47,6 +52,7 @@ export class KubernetesEventsService {
 
 export class KubernetesEventsViewdata {
   uuid: string;
+  name: string;
   type: string;
   reason: string;
   object: string;
@@ -54,4 +60,6 @@ export class KubernetesEventsViewdata {
   message: string;
   count: string;
   lastSeen: string;
+  monitoring: DeviceMonitoringType;
+  statsTooltipMessage: string;
 }

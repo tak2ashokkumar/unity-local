@@ -3,6 +3,7 @@ import { UsiPcVmwareVcenterCrudComponent } from 'src/app/unity-setup/unity-setup
 import { AllDevicesComponent } from './all-devices/all-devices.component';
 import { ALL_DEVICES_BMS_ROUTES, BMS_ROUTES } from './bm-servers/bm-servers-routing.const';
 import { ZABBIX_CONTAINER_CONTROLLER_ROUTES } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix-routing.const';
+import { KUBERNETES_MONITORING_CHILDREN } from './container-controllers/kubernetes-monitoring-routing.const';
 import { ContainerControllersZabbixComponent } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
 import { ContainerControllersComponent } from './container-controllers/container-controllers.component';
 import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers/docker-tabs/docker-tabs.component';
@@ -270,12 +271,13 @@ const tempRoute: Routes = [
         path: 'containercontrollers/kubernetes/:controllerId',
         component: KubernetesTabsComponent,
         data: {
+            monitoringEnabled: true,
             breadcrumb: {
                 title: 'Controllers',
                 stepbackCount: 1
             }
         },
-        children: KUBERNETES_TABS_CHILDREN
+        children: [...KUBERNETES_TABS_CHILDREN, ...KUBERNETES_MONITORING_CHILDREN]
     },
     {
         path: 's3account',

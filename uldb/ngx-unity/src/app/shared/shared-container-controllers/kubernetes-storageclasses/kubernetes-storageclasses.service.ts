@@ -10,6 +10,8 @@ import { KubernetesStorageclassType } from 'src/app/shared/SharedEntityTypes/kub
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
+import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
+import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Injectable()
 export class KubernetesStorageclassesService {
@@ -37,6 +39,8 @@ export class KubernetesStorageclassesService {
       a.reclaimPolicy = item.reclaim_policy ? item.reclaim_policy : 'N/A';
       a.volumeBindingMode = item.volume_binding_mode ? item.volume_binding_mode : 'N/A';
       a.age = item.created_at ? item.created_at : 'N/A';
+      a.monitoring = item.monitoring;
+      a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);
     });
     return viewData;
@@ -50,4 +54,6 @@ export class KubernetesStorageclassesViewdata {
   reclaimPolicy: string;
   volumeBindingMode: string;
   age: string;
+  monitoring: DeviceMonitoringType;
+  statsTooltipMessage: string;
 }

@@ -14,6 +14,8 @@ import { DatePipe } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { AppUtilityService, DeviceStatusMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
+import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Injectable()
 export class KubernetesPodsService {
@@ -62,6 +64,8 @@ export class KubernetesPodsService {
       data.statusIcon = this.getStatusIcon(pod.phase);
       data.startTime = pod.start_time ? this.utilSvc.toUnityOneDateFormat(pod.start_time) : 'N/A';
       data.updatedAt = pod.updated_at ? this.utilSvc.toUnityOneDateFormat(pod.updated_at) : 'N/A';
+      data.monitoring = pod.monitoring;
+      data.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(pod.monitoring);
       viewData.push(data);
     });
     return viewData;
@@ -87,4 +91,6 @@ export class KubernetesPodsViewdata {
   updatedAt: string;
   cloud: string;
   clusterName: string;
+  monitoring: DeviceMonitoringType;
+  statsTooltipMessage: string;
 }

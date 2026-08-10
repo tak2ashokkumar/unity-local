@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -7,6 +7,8 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { KubernetesMonitoringService } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 import { KubernetesJobsService, KubernetesJobsViewdata } from './kubernetes-jobs.service';
 
 @Component({
@@ -22,18 +24,22 @@ export class KubernetesJobsComponent implements OnInit, OnDestroy {
   count: number = 0;
   viewData: KubernetesJobsViewdata[] = [];
   controllerId: string;
+  showMonitoring: boolean;
   currentCriteria: SearchCriteria;
 
   constructor(private route: ActivatedRoute,
+    private router: Router,
     private svc: KubernetesJobsService,
     private spinnerSvc: AppSpinnerService,
     private notificationSvc: AppNotificationService,
     private refreshSvc: DataRefreshBtnService,
+    private k8sMon: KubernetesMonitoringService,
     private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.route.parent.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.controllerId = params.get('controllerId');
+      this.showMonitoring = !!(this.route.parent && this.route.parent.snapshot && this.route.parent.snapshot.data && this.route.parent.snapshot.data.monitoringEnabled);
       this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{}] };
       this.getJobs();
     });
@@ -80,6 +86,10 @@ export class KubernetesJobsComponent implements OnInit, OnDestroy {
 
   trackByUuid(index: number, item: KubernetesJobsViewdata): string {
     return item.uuid;
+  }
+
+  goToStats(view: KubernetesJobsViewdata) {
+    this.k8sMon.goToStats(this.router, this.route, DeviceMapping.KUBERNETES_JOB, view.uuid, view.name, view.monitoring);
   }
 
   private getJobs() {

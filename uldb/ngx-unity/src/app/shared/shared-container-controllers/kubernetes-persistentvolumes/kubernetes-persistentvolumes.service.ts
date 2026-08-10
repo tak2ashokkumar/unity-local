@@ -7,6 +7,8 @@ import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { KubernetesPersistentVolumeType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
+import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
+import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
@@ -40,6 +42,8 @@ export class KubernetesPersistentVolumesService {
       a.claim = (item.claim_namespace && item.claim_name) ? item.claim_namespace + '/' + item.claim_name : 'N/A';
       a.storageClass = item.storage_class ? item.storage_class : 'N/A';
       a.age = item.created_at ? item.created_at : 'N/A';
+      a.monitoring = item.monitoring;
+      a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);
     });
     return viewData;
@@ -56,4 +60,6 @@ export class KubernetesPersistentVolumesViewdata {
   claim: string;
   storageClass: string;
   age: string;
+  monitoring: DeviceMonitoringType;
+  statsTooltipMessage: string;
 }

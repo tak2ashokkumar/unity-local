@@ -28,6 +28,7 @@
               <th sortable-column="namespace">Namespace</th>
               <th>Completions</th>
               <th>Age</th>
+              <th *ngIf="showMonitoring">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -43,6 +44,11 @@
               </td>
               <td class="tdw-20">
                 <div [tooltip]="view.age">{{view.age}}</div>
+              </td>
+              <td class="action-icons-column" *ngIf="showMonitoring">
+                <button *ngIf="showMonitoring" class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
+                  [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring" accessType="View Monitoring"
+                  elementType="actionbtn"></button>
               </td>
             </tr>
           </tbody>

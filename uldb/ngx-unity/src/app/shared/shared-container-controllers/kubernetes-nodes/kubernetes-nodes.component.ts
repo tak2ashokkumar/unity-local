@@ -14,6 +14,8 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
+import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { KubernetesMonitoringService } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Component({
   selector: 'kubernetes-nodes',
@@ -29,6 +31,7 @@ export class KubernetesNodesComponent implements OnInit, OnDestroy {
   currentCriteria: SearchCriteria;
   private ngUnsubscribe = new Subject();
   poll: boolean = false;
+  showMonitoring: boolean;
 
   @ViewChild('confirm') confirm: ElementRef;
   deleteModalRef: BsModalRef;
@@ -41,9 +44,11 @@ export class KubernetesNodesComponent implements OnInit, OnDestroy {
     private spinnerService: AppSpinnerService,
     private nodesService: KubernetesNodesService,
     private refreshBtnService: DataRefreshBtnService,
+    private k8sMon: KubernetesMonitoringService,
     private termService: FloatingTerminalService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.controllerId = params.get('controllerId');
+      this.showMonitoring = !!(this.route.parent && this.route.parent.snapshot && this.route.parent.snapshot.data && this.route.parent.snapshot.data.monitoringEnabled);
       this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{}] };
     });
 
@@ -144,6 +149,10 @@ export class KubernetesNodesComponent implements OnInit, OnDestroy {
     obj.newTab = true;
     this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
     window.open(view.newTabConsoleAccessUrl);
+  }
+
+  goToStats(view: KubernetesNodesViewdata) {
+    this.k8sMon.goToStats(this.router, this.route, DeviceMapping.KUBERNETES_NODE, view.nodeId, view.name, view.monitoring);
   }
 
 }

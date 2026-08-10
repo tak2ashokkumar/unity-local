@@ -17,7 +17,8 @@
       "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
       "name": "Prod Cluster",
       "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
-    }
+    },
+    "monitoring": { "configured": true, "observium": false, "enabled": true, "zabbix": true }
   },
   {
     "id": 2,
@@ -37,6 +38,7 @@
       "uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
       "name": "Prod Cluster",
       "cloud": { "name": "", "platform_type": "", "uuid": "", "id": "" }
-    }
+    },
+    "monitoring": { "configured": true, "observium": false, "enabled": false, "zabbix": true }
   }
 ]

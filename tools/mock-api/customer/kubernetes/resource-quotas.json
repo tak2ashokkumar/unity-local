@@ -4,6 +4,7 @@
     "uuid": "a7b8c9d0-0001-4a7b-8c10-700000000001",
     "name": "compute-quota",
     "namespace": "database",
+    "monitoring": { "configured": true, "observium": false, "enabled": true, "zabbix": true },
     "hard": {
       "requests.cpu": "4",
       "requests.memory": "8Gi",
@@ -38,6 +39,7 @@
     "uuid": "a7b8c9d0-0002-4a7b-8c10-700000000002",
     "name": "object-quota",
     "namespace": "monitoring",
+    "monitoring": { "configured": true, "observium": false, "enabled": false, "zabbix": false },
     "hard": {
       "configmaps": "30",
       "secrets": "30",

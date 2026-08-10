@@ -6,6 +6,7 @@ import { KubernetesTabsComponent } from 'src/app/shared/shared-container-control
 import { ContainerControllersComponent } from '../shared/container-controllers/container-controllers.component';
 import { ContainerControllersZabbixComponent } from '../shared/container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
 import { ZABBIX_CONTAINER_CONTROLLER_ROUTES } from '../shared/container-controllers/container-controllers-zabbix/container-controllers-zabbix-routing.const';
+import { KUBERNETES_MONITORING_CHILDREN } from '../shared/container-controllers/kubernetes-monitoring-routing.const';
 import { DockerContainersZabbixComponent } from '../shared/container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
 import { ZABBIX_DOCKER_CONTAINER_ROUTES } from '../shared/container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix-routing.const';
 import { VmBackupHistoryComponent } from 'src/app/shared/vm-backup-history/vm-backup-history.component';
@@ -571,12 +572,13 @@ const tempRoutes: Routes = [
     path: 'containers/kubernetes/:controllerId',
     component: KubernetesTabsComponent,
     data: {
+      monitoringEnabled: true,
       breadcrumb: {
         title: 'Kubernetes',
         stepbackCount: 1
       }
     },
-    children: KUBERNETES_TABS_CHILDREN
+    children: [...KUBERNETES_TABS_CHILDREN, ...KUBERNETES_MONITORING_CHILDREN]
   },
   {
     path: 'containers/docker/:controllerId',

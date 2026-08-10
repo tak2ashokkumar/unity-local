@@ -16,7 +16,8 @@
     "created_at": "2026-07-18T10:05:00Z",
     "updated_at": "2026-07-21T07:15:00Z",
     "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
-    "account": 1
+    "account": 1,
+    "monitoring": { "configured": true, "observium": false, "enabled": true, "zabbix": true }
   },
   {
     "id": 2,
@@ -35,6 +36,7 @@
     "created_at": "2026-07-12T14:40:00Z",
     "updated_at": "2026-07-21T07:16:00Z",
     "account_uuid": "b796f727-3f58-44f1-9c7a-8ef6165c429e",
-    "account": 1
+    "account": 1,
+    "monitoring": { "configured": true, "observium": false, "enabled": false, "zabbix": true }
   }
 ]

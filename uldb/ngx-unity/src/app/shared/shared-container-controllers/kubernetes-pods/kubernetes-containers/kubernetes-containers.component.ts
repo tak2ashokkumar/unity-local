@@ -9,6 +9,8 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { environment } from 'src/environments/environment';
+import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { KubernetesMonitoringService } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 
 @Component({
   selector: 'kubernetes-containers',
@@ -24,17 +26,20 @@ export class KubernetesContainersComponent implements OnInit, OnDestroy {
   currentCriteria: SearchCriteria;
   private ngUnsubscribe = new Subject();
   poll: boolean = false;
+  showMonitoring: boolean;
 
   constructor(private route: ActivatedRoute,
     private notification: AppNotificationService,
     private router: Router,
     private spinnerService: AppSpinnerService,
     private containerService: KubernetesContainersService,
-    private termService: FloatingTerminalService) {
+    private termService: FloatingTerminalService,
+    private k8sMon: KubernetesMonitoringService) {
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{}] };
     this.route.parent.parent.paramMap.subscribe((params: ParamMap) => {
       this.controllerId = params.get('controllerId');
     });
+    this.showMonitoring = !!(this.route.parent.parent && this.route.parent.parent.snapshot && this.route.parent.parent.snapshot.data && this.route.parent.parent.snapshot.data.monitoringEnabled);
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.podId = params.get('podId');
     });
@@ -95,6 +100,10 @@ export class KubernetesContainersComponent implements OnInit, OnDestroy {
       this.spinnerService.stop('main');
       this.notification.error(new Notification('Error while fetching Containers.'));
     });
+  }
+
+  goToStats(view: KubernetesContainersViewdata) {
+    this.k8sMon.goToStats(this.router, this.route, DeviceMapping.KUBERNETES_CONTAINER, view.uuid, view.name, view.monitoring);
   }
 
   goBack() {

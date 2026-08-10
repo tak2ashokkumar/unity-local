@@ -1201,6 +1201,10 @@ export const GET_CONTAINERS = () => `/customer/containers/`;
 export const KUBERNETES_ACCOUNTS = () => `customer/kubernetes/accounts/`;
 export const KUBERNETES_ACCOUNT_BY_ID = (uuid: string) => `customer/kubernetes/accounts/${uuid}/`;
 
+// Account-less resource discovery. GET, no uuid, no body. Answers synchronously with
+// { data: "Synced Successfully." } - this is NOT a celery task, so do not pollForTask.
+export const KUBERNETES_DISCOVER_RESOURCES = () => `customer/kubernetes/accounts/discover_resources/`;
+
 // --- Account-scoped resource data (support ?namespace=, ?pod_uuid=, ?event_type= query params) ---
 export const KUBERNETES_ACCOUNT_PODS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/pods/`;
 export const KUBERNETES_ACCOUNT_CONTAINERS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/containers/`;
@@ -2016,7 +2020,42 @@ export const DB_GRAPH_ITEMS = (instanceId: string) => `/customer/database_server
 
 export const BMS_IPMI_DRAC_RESET_PASSWORD = (id: string) => `/customer/bm_servers/${id}/reset_password/`;
 
+// Kubernetes monitoring shares one uniform URL shape: customer/kubernetes/{segment}/{uuid}/monitoring/...
+// This map picks the backend segment per Kubernetes monitoring device type (note the renamed ones:
+// pvs, pvcs, control-plane, storage-classes, resource-quotas). The BASE helper below lets each
+// device-type monitoring switch below short-circuit to the Kubernetes URL without a case per resource.
+export const KUBERNETES_MONITORING_SEGMENT: Partial<Record<DeviceMapping, string>> = {
+    [DeviceMapping.KUBERNETES_ACCOUNT]: 'accounts',
+    [DeviceMapping.KUBERNETES_NODE]: 'nodes',
+    [DeviceMapping.KUBERNETES_POD]: 'pods',
+    [DeviceMapping.KUBERNETES_CONTAINER]: 'containers',
+    [DeviceMapping.KUBERNETES_NAMESPACE]: 'namespaces',
+    [DeviceMapping.KUBERNETES_DEPLOYMENT]: 'deployments',
+    [DeviceMapping.KUBERNETES_REPLICASET]: 'replicasets',
+    [DeviceMapping.KUBERNETES_DAEMONSET]: 'daemonsets',
+    [DeviceMapping.KUBERNETES_STATEFULSET]: 'statefulsets',
+    [DeviceMapping.KUBERNETES_SERVICE]: 'services',
+    [DeviceMapping.KUBERNETES_PV]: 'pvs',
+    [DeviceMapping.KUBERNETES_PVC]: 'pvcs',
+    [DeviceMapping.KUBERNETES_EVENT]: 'events',
+    [DeviceMapping.KUBERNETES_CONTROLPLANE]: 'control-plane',
+    [DeviceMapping.KUBERNETES_STORAGECLASS]: 'storage-classes',
+    [DeviceMapping.KUBERNETES_JOB]: 'jobs',
+    [DeviceMapping.KUBERNETES_CRONJOB]: 'cronjobs',
+    [DeviceMapping.KUBERNETES_RESOURCEQUOTA]: 'resource-quotas',
+    [DeviceMapping.KUBERNETES_HPA]: 'hpas',
+};
+
+// Returns customer/kubernetes/{segment}/{deviceId}/ (trailing slash) for a Kubernetes monitoring
+// device type, else null so the caller falls through to its existing switch.
+export const KUBERNETES_MONITORING_BASE = (deviceType: DeviceMapping, deviceId: string): string | null => {
+    const seg = KUBERNETES_MONITORING_SEGMENT[deviceType];
+    return seg ? `customer/kubernetes/${seg}/${deviceId}/` : null;
+};
+
 export const MONITORING_CONFIGURATION_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/`;
@@ -2056,6 +2095,8 @@ export const DOWNLOAD_AGENT_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceI
 
 export const TOGGLE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string, enabled: boolean) => {
     const action: string = enabled ? 'stop' : 'start';
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/${action}/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/${action}/`;
@@ -2115,6 +2156,8 @@ export const TOGGLE_SNMP_TRAP_BY_DEVICE_TYPE = (deviceType: DeviceMapping, devic
 }
 
 export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return k8s;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return SWITCH_UPDATE(deviceId);
         case DeviceMapping.FIREWALL: return FIREWALL_UPDATE(deviceId);
@@ -2149,6 +2192,8 @@ export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, 
 }
 
 export const ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/device_data/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/device_data/`;
@@ -2184,6 +2229,8 @@ export const ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, dev
 }
 
 export const ZABBIX_DEVICE_ALERTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: DeviceMapping, deviceId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/alerts/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/alerts/`;
@@ -2217,6 +2264,8 @@ export const ZABBIX_DEVICE_ALERTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
 }
 
 export const ZABBIX_DEVICE_GRAPHS = (deviceType: DeviceMapping, deviceId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/graphs/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/graphs/`;
@@ -2263,6 +2312,8 @@ export const ZABBIX_DEVICE_GRAPHS = (deviceType: DeviceMapping, deviceId: string
 }
 
 export const MANAGE_ZABBIX_DEVICE_GRAPH = (deviceType: DeviceMapping, deviceId: string, graphId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/graphs/${graphId}/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/graphs/${graphId}/`;
@@ -2305,6 +2356,8 @@ export const MANAGE_ZABBIX_DEVICE_GRAPH = (deviceType: DeviceMapping, deviceId: 
 }
 
 export const ZABBIX_DEVICE_GRAPH_IMAGE = (deviceType: DeviceMapping, deviceId: string, graphId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/graph_image/${graphId}/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/graph_image/${graphId}/`;
@@ -2348,6 +2401,8 @@ export const ZABBIX_DEVICE_GRAPH_IMAGE = (deviceType: DeviceMapping, deviceId: s
 }
 
 export const ZABBIX_DEVICE_GRAPH_ITEMS = (deviceType: DeviceMapping, deviceId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/items/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/items/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/items/`;
@@ -2391,6 +2446,8 @@ export const ZABBIX_DEVICE_GRAPH_ITEMS = (deviceType: DeviceMapping, deviceId: s
 }
 
 export const ZABBIX_DEVICE_GRAPH_NUMBERIC_ITEMS = (deviceType: DeviceMapping, deviceId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/numeric_items/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/numeric_items/`;
@@ -2456,6 +2513,8 @@ export const ZABBIX_SENSOR_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, dev
 }
 
 export const TRIGGERS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string, triggerId?: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
@@ -3767,6 +3826,8 @@ export const BULK_DELETE_FOR_MAC_DEVICES = () => `/customer/macdevices/bulk_dele
 export const BULK_DELETE_FOR_STORAGE_DEVICES = () => `/customer/storagedevices/bulk_delete/`;
 
 export const ZABBIX_DEVICE_EVENTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: DeviceMapping, deviceId: string) => {
+    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
+    if (k8s) return `${k8s}monitoring/events/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/events/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/events/`;
