@@ -12,13 +12,15 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesStatefulsetsService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getStatefulsets(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesStatefulsetType>> {
     return this.tableService.getData<PaginatedResult<KubernetesStatefulsetType>>(KUBERNETES_ACCOUNT_STATEFULSETS(controllerId), criteria);
@@ -37,7 +39,7 @@ export class KubernetesStatefulsetsService {
       a.name = item.name ? item.name : 'N/A';
       a.namespace = item.namespace ? item.namespace : 'N/A';
       a.ready = (item.ready_replicas || 0) + '/' + (item.desired_replicas || 0);
-      a.age = item.created_at ? item.created_at : 'N/A';
+      a.age = item.created_at ? this.utilSvc.toUnityOneDateFormat(item.created_at) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);

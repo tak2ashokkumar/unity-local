@@ -12,13 +12,15 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesEventsService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getEvents(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesEventType>> {
     return this.tableService.getData<PaginatedResult<KubernetesEventType>>(KUBERNETES_ACCOUNT_EVENTS(controllerId), criteria);
@@ -41,7 +43,7 @@ export class KubernetesEventsService {
       a.namespace = item.namespace ? item.namespace : 'N/A';
       a.message = item.message ? item.message : 'N/A';
       a.count = String(item.count != null ? item.count : 0);
-      a.lastSeen = item.last_time ? item.last_time : 'N/A';
+      a.lastSeen = item.last_time ? this.utilSvc.toUnityOneDateFormat(item.last_time) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);

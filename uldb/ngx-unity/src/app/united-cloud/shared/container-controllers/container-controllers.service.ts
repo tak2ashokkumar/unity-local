@@ -7,7 +7,7 @@ import { EMPTY, Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { ContainerAccountType, ContainerControllerType, CONTROLLER_TYPE_MAPPING } from 'src/app/shared/SharedEntityTypes/container-contoller.type';
-import { GET_CONTAINERS, ADD_KUBERNETES_CONTROLLER, DELETE_KUBERNETES_CONTROLLER, UPDATE_KUBERNETES_CONTROLLER, CHANGE_CONTROLLER_PASSWORD, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE, KUBERNETES_DISCOVER_RESOURCES } from 'src/app/shared/api-endpoint.const';
+import { GET_CONTAINERS, ADD_KUBERNETES_CONTROLLER, DELETE_KUBERNETES_CONTROLLER, UPDATE_KUBERNETES_CONTROLLER, CHANGE_CONTROLLER_PASSWORD, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE, KUBERNETES_DISCOVER_RESOURCES, KUBERNETES_ACCOUNT_MONITORING_STATUS } from 'src/app/shared/api-endpoint.const';
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
@@ -77,6 +77,30 @@ export class ContainerControllersService {
             }
             device.statsTooltipMessage = 'Controller Statistics';
           }
+          return device;
+        })
+      );
+  }
+
+  // Kubernetes accounts refresh the list Status column from monitoring/status/ (not device_data).
+  // The object status is shown first; this overrides it once the call returns.
+  getKubernetesAccountStatus(device: ContainerControllerViewdata) {
+    if (!device.monitoring || !device.monitoring.configured) {
+      device.statsTooltipMessage = 'Configure Monitoring';
+      return EMPTY;
+    }
+    if (!device.monitoring.enabled) {
+      device.statsTooltipMessage = 'Enable monitoring';
+      return EMPTY;
+    }
+    return this.http.get(KUBERNETES_ACCOUNT_MONITORING_STATUS(device.controllerId), { headers: Handle404Header })
+      .pipe(
+        map((res: any) => {
+          const value = res && res.device_data ? res.device_data : res;
+          if (value && value.status != null) {
+            device.deviceStatus = this.utilService.getDeviceStatus(value.status);
+          }
+          device.statsTooltipMessage = 'Statistics';
           return device;
         })
       );

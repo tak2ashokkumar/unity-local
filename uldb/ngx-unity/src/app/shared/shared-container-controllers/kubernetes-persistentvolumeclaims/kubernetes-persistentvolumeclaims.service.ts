@@ -8,17 +8,19 @@ import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { KubernetesPersistentVolumeClaimType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
-import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { KUBERNETES_STATS_TOOLTIP, KUBERNETES_STATUS_ICON } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesPersistentVolumeClaimsService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getPersistentVolumeClaims(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesPersistentVolumeClaimType>> {
     return this.tableService.getData<PaginatedResult<KubernetesPersistentVolumeClaimType>>(KUBERNETES_ACCOUNT_PVCS(controllerId), criteria);
@@ -37,10 +39,11 @@ export class KubernetesPersistentVolumeClaimsService {
       a.name = item.name ? item.name : 'N/A';
       a.namespace = item.namespace ? item.namespace : 'N/A';
       a.status = item.status ? item.status : 'N/A';
+      a.statusIcon = KUBERNETES_STATUS_ICON(item.status);
       a.volume = item.volume_name ? item.volume_name : 'N/A';
       a.capacity = item.capacity ? item.capacity : 'N/A';
       a.storageClass = item.storage_class ? item.storage_class : 'N/A';
-      a.age = item.created_at ? item.created_at : 'N/A';
+      a.age = item.created_at ? this.utilSvc.toUnityOneDateFormat(item.created_at) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);
@@ -54,6 +57,7 @@ export class KubernetesPersistentVolumeClaimsViewdata {
   name: string;
   namespace: string;
   status: string;
+  statusIcon: string;
   volume: string;
   capacity: string;
   storageClass: string;

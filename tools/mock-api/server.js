@@ -343,11 +343,11 @@ app.use((req, res) => {
     return sendMockResponse(readMockFile(exactFilePath));
   }
 
-  // Kubernetes account/resource monitoring device_data stub so the zbx shell status arrow renders
-  // instead of erroring on an empty template. Covers customer/kubernetes/<segment>/<uuid>/monitoring/device_data.
-  const k8sMonitoringDeviceData = normalizedUrlPath.match(/^customer\/kubernetes\/[a-z-]+\/[^/]+\/monitoring\/device_data$/i);
-  if (k8sMonitoringDeviceData) {
-    return res.json({ device_data: { status: "1" } });
+  // Kubernetes monitoring status stub (e.g. the account list Status column refresh). Covers
+  // customer/kubernetes/<segment>/<uuid>/monitoring/status. status "1" = up.
+  const k8sMonitoringStatus = normalizedUrlPath.match(/^customer\/kubernetes\/[a-z-]+\/[^/]+\/monitoring\/status$/i);
+  if (k8sMonitoringStatus) {
+    return res.json({ status: "1" });
   }
 
   // Account-scoped Kubernetes resource lists reuse the standalone resource mocks when no

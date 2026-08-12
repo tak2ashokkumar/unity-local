@@ -12,13 +12,15 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesCronjobsService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getCronjobs(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesCronjobType>> {
     return this.tableService.getData<PaginatedResult<KubernetesCronjobType>>(KUBERNETES_ACCOUNT_CRONJOBS(controllerId), criteria);
@@ -39,8 +41,8 @@ export class KubernetesCronjobsService {
       a.schedule = item.schedule ? item.schedule : 'N/A';
       a.suspend = item.suspend != null ? String(item.suspend) : 'N/A';
       a.active = String(item.active != null ? item.active : 0);
-      a.lastSchedule = item.last_schedule_time ? item.last_schedule_time : 'N/A';
-      a.age = item.created_at ? item.created_at : 'N/A';
+      a.lastSchedule = item.last_schedule_time ? this.utilSvc.toUnityOneDateFormat(item.last_schedule_time) : 'N/A';
+      a.age = item.created_at ? this.utilSvc.toUnityOneDateFormat(item.created_at) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);

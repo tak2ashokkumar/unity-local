@@ -12,13 +12,15 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesServicesService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getServices(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesServiceType>> {
     return this.tableService.getData<PaginatedResult<KubernetesServiceType>>(KUBERNETES_ACCOUNT_SERVICES(controllerId), criteria);
@@ -40,7 +42,7 @@ export class KubernetesServicesService {
       a.clusterIp = item.cluster_ip ? item.cluster_ip : 'N/A';
       a.externalIp = (item.external_ips && item.external_ips.length) ? item.external_ips.join(', ') : 'N/A';
       a.ports = (item.ports && item.ports.length) ? item.ports.map((p) => p.port).join(', ') : 'N/A';
-      a.age = item.created_at ? item.created_at : 'N/A';
+      a.age = item.created_at ? this.utilSvc.toUnityOneDateFormat(item.created_at) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);

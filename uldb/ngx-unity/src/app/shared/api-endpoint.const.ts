@@ -2053,6 +2053,9 @@ export const KUBERNETES_MONITORING_BASE = (deviceType: DeviceMapping, deviceId: 
     return seg ? `customer/kubernetes/${seg}/${deviceId}/` : null;
 };
 
+// Live monitoring status for a Kubernetes account, used to refresh the account list Status column.
+export const KUBERNETES_ACCOUNT_MONITORING_STATUS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/monitoring/status/`;
+
 export const MONITORING_CONFIGURATION_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
     const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
     if (k8s) return `${k8s}monitoring/`;
@@ -2192,8 +2195,8 @@ export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, 
 }
 
 export const ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
-    const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
-    if (k8s) return `${k8s}monitoring/device_data/`;
+    // Kubernetes deliberately omitted: it has no device_data/status endpoint - its monitoring state
+    // comes from the /monitoring/ payload, and the zbx shell skips this call for Kubernetes devices.
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/device_data/`;

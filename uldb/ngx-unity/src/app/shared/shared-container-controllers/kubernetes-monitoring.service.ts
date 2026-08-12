@@ -17,6 +17,34 @@ export function KUBERNETES_STATS_TOOLTIP(monitoring: DeviceMonitoringType): stri
   return 'Statistics';
 }
 
+// Colored status dot for a Kubernetes resource status string, so resource lists show the same
+// icon + tooltip treatment as the account list. Unknown statuses fall back to a neutral dot.
+export function KUBERNETES_STATUS_ICON(status: string): string {
+  switch ((status || '').toLowerCase()) {
+    case 'active':
+    case 'bound':
+    case 'available':
+    case 'running':
+    case 'ready':
+    case 'succeeded':
+    case 'true':
+      return 'fa-circle text-success';
+    case 'pending':
+    case 'terminating':
+    case 'released':
+    case 'containercreating':
+    case 'unknown':
+      return 'fa-circle text-warning';
+    case 'failed':
+    case 'lost':
+    case 'error':
+    case 'false':
+      return 'fa-circle text-danger';
+    default:
+      return 'fa-circle text-secondary';
+  }
+}
+
 // Shared by every Kubernetes resource list page (18 of them) so the monitoring drill-down is
 // wired the same way everywhere. It stashes the device into session storage (the shared zbx
 // shell reads it back) and navigates to the resource's own sibling monitoring route, so Back

@@ -12,13 +12,15 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesStorageclassesService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getStorageclasses(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesStorageclassType>> {
     return this.tableService.getData<PaginatedResult<KubernetesStorageclassType>>(KUBERNETES_ACCOUNT_STORAGE_CLASSES(controllerId), criteria);
@@ -38,7 +40,7 @@ export class KubernetesStorageclassesService {
       a.provisioner = item.provisioner ? item.provisioner : 'N/A';
       a.reclaimPolicy = item.reclaim_policy ? item.reclaim_policy : 'N/A';
       a.volumeBindingMode = item.volume_binding_mode ? item.volume_binding_mode : 'N/A';
-      a.age = item.created_at ? item.created_at : 'N/A';
+      a.age = item.created_at ? this.utilSvc.toUnityOneDateFormat(item.created_at) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);

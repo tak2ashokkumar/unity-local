@@ -37,7 +37,9 @@
                 <div [tooltip]="view.name">{{view.name}}</div>
               </td>
               <td class="tdw-25">
-                <div [tooltip]="view.status" class="text-capitalize">{{view.status}}</div>
+                <div class="text-capitalize">
+                  <i class="fa status-icon" [ngClass]="view.statusIcon" [tooltip]="view.status" container="body"></i>
+                </div>
               </td>
               <td class="tdw-25">
                 <div [tooltip]="view.cluster">{{view.cluster}}</div>

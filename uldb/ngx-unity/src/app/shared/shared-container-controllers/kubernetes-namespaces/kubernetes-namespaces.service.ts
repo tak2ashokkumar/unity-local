@@ -11,14 +11,16 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
-import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { KUBERNETES_STATS_TOOLTIP, KUBERNETES_STATUS_ICON } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesNamespacesService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getNamespaces(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesNamespaceType>> {
     return this.tableService.getData<PaginatedResult<KubernetesNamespaceType>>(KUBERNETES_ACCOUNT_NAMESPACES(controllerId), criteria);
@@ -36,8 +38,9 @@ export class KubernetesNamespacesService {
       a.uuid = item.uuid;
       a.name = item.name ? item.name : 'N/A';
       a.status = item.status ? item.status : 'N/A';
+      a.statusIcon = KUBERNETES_STATUS_ICON(item.status);
       a.cluster = item.account ? item.account.name : 'N/A';
-      a.age = item.created_at ? item.created_at : 'N/A';
+      a.age = item.created_at ? this.utilSvc.toUnityOneDateFormat(item.created_at) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);
@@ -50,6 +53,7 @@ export class KubernetesNamespacesViewdata {
   uuid: string;
   name: string;
   status: string;
+  statusIcon: string;
   cluster: string;
   age: string;
   monitoring: DeviceMonitoringType;

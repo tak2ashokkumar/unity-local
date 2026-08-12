@@ -57,7 +57,7 @@ export class KubernetesPodsService {
       data.nodeName = pod.node_name;
       data.hostIp = pod.host_ip;
       data.podIp = pod.pod_ip;
-      data.cloud = pod.account.cloud ? pod.account.cloud.name + "(" +
+      data.cloud = (pod.account.cloud && pod.account.cloud.name) ? pod.account.cloud.name + "(" +
         this.utilSvc.getCloudTypeByPlatformType(pod.account.cloud.platform_type) + ")" : 'N/A';
       data.clusterName = pod.account.name;
       data.status = pod.phase;

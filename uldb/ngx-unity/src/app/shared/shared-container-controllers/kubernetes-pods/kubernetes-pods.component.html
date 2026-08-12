@@ -42,8 +42,8 @@
                 <div [tooltip]="view.name">{{view.name}}</div>
               </td>
               <td>
-                <div [tooltip]="view.status" class="text-capitalize">
-                  <i class="fa status-icon" [ngClass]="view.statusIcon"></i> {{view.status}}
+                <div class="text-capitalize">
+                  <i class="fa status-icon" [ngClass]="view.statusIcon" [tooltip]="view.status" container="body"></i>
                 </div>
               </td>
               <td>
@@ -65,12 +65,12 @@
                 <div [tooltip]="view.startTime">{{view.startTime}}</div>
               </td>
               <td class="action-icons-column">
-                <button *ngIf="showMonitoring" class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
-                  [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring" accessType="View Monitoring"
-                  elementType="actionbtn"></button>
                 <button class="action-icons mb-0 fa fa-list-ul font-sm ml-1" tooltip="Show Containers"
                   (click)="goToContainers(view)">
                 </button>
+                <button *ngIf="showMonitoring" class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
+                  [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring" accessType="View Monitoring"
+                  elementType="actionbtn"></button>
                 <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete Pod"
                   (click)="deletePod(view)" accessControl moduleName="Private Cloud" accessType="Manage Private Cloud"
                   elementType="actionbtn">

@@ -12,13 +12,15 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesDaemonsetsService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getDaemonsets(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesDaemonsetType>> {
     return this.tableService.getData<PaginatedResult<KubernetesDaemonsetType>>(KUBERNETES_ACCOUNT_DAEMONSETS(controllerId), criteria);
@@ -40,7 +42,7 @@ export class KubernetesDaemonsetsService {
       a.current = String(item.current != null ? item.current : 0);
       a.ready = String(item.ready != null ? item.ready : 0);
       a.available = String(item.available != null ? item.available : 0);
-      a.age = item.created_at ? item.created_at : 'N/A';
+      a.age = item.created_at ? this.utilSvc.toUnityOneDateFormat(item.created_at) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);

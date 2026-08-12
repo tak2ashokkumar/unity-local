@@ -50,7 +50,9 @@
                 <div [tooltip]="view.reclaimPolicy">{{view.reclaimPolicy}}</div>
               </td>
               <td class="tdw-11">
-                <div [tooltip]="view.status">{{view.status}}</div>
+                <div class="text-capitalize">
+                  <i class="fa status-icon" [ngClass]="view.statusIcon" [tooltip]="view.status" container="body"></i>
+                </div>
               </td>
               <td class="tdw-13">
                 <div [tooltip]="view.claim">{{view.claim}}</div>

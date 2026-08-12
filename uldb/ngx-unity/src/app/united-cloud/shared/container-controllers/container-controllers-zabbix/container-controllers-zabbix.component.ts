@@ -7,6 +7,7 @@ import { DevicesMonitoringConfigService } from '../../devices-monitoring-config/
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService, DeviceStatusMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { SharedMonitoringService } from 'src/app/shared/shared-monitoring.service';
+import { KUBERNETES_MONITORING_SEGMENT } from 'src/app/shared/api-endpoint.const';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -63,6 +64,11 @@ export class ContainerControllersZabbixComponent implements OnInit, OnDestroy {
   }
 
   getDeviceStatus() {
+    // Kubernetes has no separate status/device_data endpoint - its monitoring state comes from the
+    // /monitoring/ payload, so skip the shell status-arrow fetch entirely for Kubernetes device types.
+    if (KUBERNETES_MONITORING_SEGMENT[this.device.deviceType]) {
+      return;
+    }
     this.monitoringSvc.getZabbixDeviceData(this.device.deviceType, this.device.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       const deviceStatus = this.utilService.getDeviceStatus(res.device_data.status);
       switch (deviceStatus) {

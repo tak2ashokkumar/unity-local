@@ -58,7 +58,7 @@ export class KubernetesNodesService {
       a.memoryLimits = node.memory_limits ? node.memory_limits : 'N/A';
       a.cpuRequests = node.cpu_requests ? node.cpu_requests : 'N/A';
       a.cpuLimit = node.cpu_limit ? node.cpu_limit : 'N/A';
-      a.cloud = node.account.cloud ? node.account.cloud.name + "(" +
+      a.cloud = (node.account.cloud && node.account.cloud.name) ? node.account.cloud.name + "(" +
         this.utilService.getCloudTypeByPlatformType(node.account.cloud.platform_type) + ")" : 'N/A';
       a.clusterName = node.account ? node.account.name : 'N/A';
       a.status = node.status;

@@ -49,8 +49,8 @@
                 <div [tooltip]="view.name">{{view.name}}</div>
               </td>
               <td>
-                <div [tooltip]="view.status" class="text-capitalize">
-                  <i class="fa status-icon" [ngClass]="view.statusIcon"></i> {{view.status}}
+                <div class="text-capitalize">
+                  <i class="fa status-icon" [ngClass]="view.statusIcon" [tooltip]="view.status" container="body"></i>
                 </div>
               </td>
               <td>

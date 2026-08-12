@@ -12,13 +12,15 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class KubernetesHpasService {
 
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
-    private appService: AppLevelService) { }
+    private appService: AppLevelService,
+    private utilSvc: AppUtilityService) { }
 
   getHpas(controllerId: string, criteria: SearchCriteria): Observable<PaginatedResult<KubernetesHpaType>> {
     return this.tableService.getData<PaginatedResult<KubernetesHpaType>>(KUBERNETES_ACCOUNT_HPAS(controllerId), criteria);
@@ -41,7 +43,7 @@ export class KubernetesHpasService {
       a.minPods = String(item.min_replicas != null ? item.min_replicas : 0);
       a.maxPods = String(item.max_replicas != null ? item.max_replicas : 0);
       a.replicas = String(item.current_replicas != null ? item.current_replicas : 0);
-      a.age = item.created_at ? item.created_at : 'N/A';
+      a.age = item.created_at ? this.utilSvc.toUnityOneDateFormat(item.created_at) : 'N/A';
       a.monitoring = item.monitoring;
       a.statsTooltipMessage = KUBERNETES_STATS_TOOLTIP(item.monitoring);
       viewData.push(a);

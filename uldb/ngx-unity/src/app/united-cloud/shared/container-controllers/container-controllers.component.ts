@@ -136,10 +136,12 @@ export class ContainerControllersComponent implements OnInit, OnDestroy {
   }
 
   getDeviceData(viewData: ContainerControllerViewdata[]) {
-    // Only Docker accounts refine their live status via the zabbix device_data call; Kubernetes
-    // accounts read monitoring straight off the list object (no extra monitoring API).
-    from(viewData.filter(v => v.controllerType === CONTROLLER_TYPE_MAPPING.DOCKER)).pipe(
-      mergeMap((e) => this.svc.getDeviceData(e)),
+    // Status shown first from the list object, then refreshed per row: Docker accounts via the zabbix
+    // device_data call, Kubernetes accounts via their monitoring/status/ endpoint.
+    from(viewData).pipe(
+      mergeMap((e) => e.controllerType === CONTROLLER_TYPE_MAPPING.KUBERNETES
+        ? this.svc.getKubernetesAccountStatus(e)
+        : this.svc.getDeviceData(e)),
       takeUntil(this.ngUnsubscribe))
       .subscribe(res => { },
         err => console.log(err)

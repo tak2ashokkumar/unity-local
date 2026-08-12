@@ -43,7 +43,9 @@
                 <div [tooltip]="view.namespace">{{view.namespace}}</div>
               </td>
               <td class="tdw-12">
-                <div [tooltip]="view.status">{{view.status}}</div>
+                <div class="text-capitalize">
+                  <i class="fa status-icon" [ngClass]="view.statusIcon" [tooltip]="view.status" container="body"></i>
+                </div>
               </td>
               <td class="tdw-16">
                 <div [tooltip]="view.volume">{{view.volume}}</div>
