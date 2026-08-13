@@ -29,7 +29,7 @@ import { ExecutiveAiBusinessSummaryComponent } from "./application-overview-dash
 import { PrivateCloudComputeDashboardComponent } from "./private-cloud-compute-dashboard/private-cloud-compute-dashboard.component";
 import { PublicCloudComputeDashboardComponent } from "./public-cloud-compute-dashboard/public-cloud-compute-dashboard.component";
 import { DatabaseDashboardComponent } from "./database-dashboard/database-dashboard.component";
-import { UnifiedAiopsCommandCentreComponent } from "./unified-aiops-command-centre/unified-aiops-command-centre.component";
+import { NavigatorCentralComponent } from "./navigator-central/navigator-central.component";
 import { EventAnalyticsDashboardComponent } from "./event-analytics-dashboard/event-analytics-dashboard.component";
 import { DiscoveryDashboardComponent } from "./discovery-dashboard/discovery-dashboard.component";
 import { NetworkDashboardComponent } from "./network-dashboard/network-dashboard.component";
@@ -427,7 +427,7 @@ export const DEFAULT_DASHBOARD_ROUTES: Routes = [
     },
     {
         path: 'default/navigator-central',
-        component: UnifiedAiopsCommandCentreComponent,
+        component: NavigatorCentralComponent,
         data: {
             breadcrumb: {
                 title: 'Navigator Central',

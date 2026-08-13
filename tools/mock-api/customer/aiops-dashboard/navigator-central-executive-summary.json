@@ -1,0 +1,405 @@
+{
+  "summary": {
+    "total_discovered_resources": 8694,
+    "total_monitored_resources": {
+      "monitored": 1140,
+      "total": 1140,
+      "up": 980,
+      "down": 45,
+      "unknown": 115
+    },
+    "private_cloud_compute_resources": {
+      "discovered": 1599,
+      "monitored": 868,
+      "total": 1599,
+      "up": 790,
+      "down": 18,
+      "unknown": 60,
+      "orphaned": 34,
+      "idle": 57,
+      "by_type": [
+        {
+          "key": "vmware",
+          "label": "VMware VM",
+          "discovered": 1180,
+          "monitored": 780,
+          "total": 1180,
+          "up": 720,
+          "down": 15,
+          "unknown": 45
+        },
+        {
+          "key": "nutanix",
+          "label": "Nutanix VM",
+          "discovered": 419,
+          "monitored": 88,
+          "total": 419,
+          "up": 80,
+          "down": 2,
+          "unknown": 6
+        }
+      ]
+    },
+    "public_cloud_compute_resources": {
+      "discovered": 15,
+      "monitored": 12,
+      "total": 15,
+      "up": 5,
+      "down": 2,
+      "unknown": 5,
+      "orphaned": 2,
+      "idle": 3,
+      "by_provider": [
+        {
+          "key": "aws",
+          "label": "AWS Instance",
+          "discovered": 3,
+          "monitored": 3,
+          "total": 3,
+          "up": 3,
+          "down": 0,
+          "unknown": 0
+        },
+        {
+          "key": "azure",
+          "label": "Azure Virtual VM",
+          "discovered": 6,
+          "monitored": 5,
+          "total": 6,
+          "up": 4,
+          "down": 1,
+          "unknown": 0
+        },
+        {
+          "key": "gcp",
+          "label": "Google VM Instances",
+          "discovered": 4,
+          "monitored": 3,
+          "total": 4,
+          "up": 3,
+          "down": 0,
+          "unknown": 0
+        },
+        {
+          "key": "oci",
+          "label": "OCI",
+          "discovered": 2,
+          "monitored": 1,
+          "total": 2,
+          "up": 1,
+          "down": 0,
+          "unknown": 0
+        }
+      ]
+    },
+    "baremetal_servers": {
+      "discovered": 14,
+      "monitored": 11,
+      "total": 14,
+      "up": 11,
+      "down": 0,
+      "unknown": 0,
+      "by_vendor": [
+        {
+          "key": "dell",
+          "label": "Dell",
+          "discovered": 5,
+          "monitored": 5,
+          "total": 5,
+          "up": 5,
+          "down": 0,
+          "unknown": 0
+        },
+        {
+          "key": "hpe",
+          "label": "HPE",
+          "discovered": 4,
+          "monitored": 3,
+          "total": 4,
+          "up": 3,
+          "down": 0,
+          "unknown": 0
+        },
+        {
+          "key": "lenovo",
+          "label": "Lenovo",
+          "discovered": 3,
+          "monitored": 2,
+          "total": 3,
+          "up": 2,
+          "down": 0,
+          "unknown": 0
+        },
+        {
+          "key": "supermicro",
+          "label": "SuperMicro",
+          "discovered": 2,
+          "monitored": 1,
+          "total": 2,
+          "up": 1,
+          "down": 0,
+          "unknown": 0
+        }
+      ]
+    },
+    "datacenter_and_iot": {
+      "discovered": 22,
+      "monitored": 20,
+      "total": 22,
+      "up": 18,
+      "down": 0,
+      "unknown": 2,
+      "by_type": [
+        {
+          "key": "pdu",
+          "label": "PDU",
+          "discovered": 4,
+          "monitored": 4,
+          "total": 4,
+          "up": 3,
+          "down": 0,
+          "unknown": 1
+        },
+        {
+          "key": "temperature_sensors",
+          "label": "Temperature Sensors",
+          "discovered": 18,
+          "monitored": 16,
+          "total": 18,
+          "up": 15,
+          "down": 0,
+          "unknown": 1
+        }
+      ]
+    },
+    "idle_device_count": 60,
+    "total": 1140,
+    "up": 980,
+    "down": 45,
+    "unknown": 115,
+    "application_count": 2,
+    "database_count": 6,
+    "vm_count": 868,
+    "idle": 60,
+    "orphaned": 36
+  },
+  "data": {
+    "vm": 868,
+    "database": 14,
+    "switch": 44
+  },
+  "network_and_other": {
+    "routers": {
+      "discovered": 12,
+      "monitored": 10,
+      "total": 12,
+      "up": 9,
+      "down": 1,
+      "unknown": 0
+    },
+    "switches": {
+      "discovered": 44,
+      "monitored": 38,
+      "total": 44,
+      "up": 34,
+      "down": 2,
+      "unknown": 2
+    },
+    "firewalls": {
+      "discovered": 6,
+      "monitored": 6,
+      "total": 6,
+      "up": 6,
+      "down": 0,
+      "unknown": 0
+    },
+    "load_balancers": {
+      "discovered": 4,
+      "monitored": 3,
+      "total": 4,
+      "up": 3,
+      "down": 0,
+      "unknown": 0
+    },
+    "wireless_ap": {
+      "discovered": 120,
+      "monitored": 95,
+      "total": 120,
+      "up": 80,
+      "down": 5,
+      "unknown": 10
+    },
+    "pdus": {
+      "discovered": 4,
+      "monitored": 4,
+      "total": 4,
+      "up": 3,
+      "down": 0,
+      "unknown": 1
+    },
+    "applications": {
+      "discovered": 2,
+      "monitored": 2,
+      "total": 2,
+      "up": 2,
+      "down": 0,
+      "unknown": 0
+    },
+    "services": {
+      "discovered": 18,
+      "monitored": 14,
+      "total": 18,
+      "up": 12,
+      "down": 1,
+      "unknown": 1
+    },
+    "databases": {
+      "discovered": 14,
+      "monitored": 4,
+      "total": 14,
+      "up": 4,
+      "down": 0,
+      "unknown": 0,
+      "by_engine": [
+        {
+          "key": "mysql",
+          "label": "MySQL",
+          "discovered": 6,
+          "monitored": 2,
+          "total": 6,
+          "up": 2,
+          "down": 0,
+          "unknown": 0
+        },
+        {
+          "key": "sqlserver",
+          "label": "SQL Server",
+          "discovered": 3,
+          "monitored": 1,
+          "total": 3,
+          "up": 1,
+          "down": 0,
+          "unknown": 0
+        },
+        {
+          "key": "oracle",
+          "label": "Oracle",
+          "discovered": 2,
+          "monitored": 1,
+          "total": 2,
+          "up": 1,
+          "down": 0,
+          "unknown": 0
+        },
+        {
+          "key": "postgresql",
+          "label": "PostgreSQL",
+          "discovered": 3,
+          "monitored": 0,
+          "total": 3,
+          "up": 0,
+          "down": 0,
+          "unknown": 0
+        }
+      ]
+    },
+    "urls": {
+      "discovered": 3,
+      "monitored": 3,
+      "total": 3,
+      "up": 3,
+      "down": 0,
+      "unknown": 0
+    }
+  },
+  "containers": {
+    "k8cluster": {
+      "discovered": 0,
+      "monitored": 0,
+      "total": 0,
+      "up": 0,
+      "down": 0,
+      "unknown": 0
+    },
+    "nodes": {
+      "discovered": 0,
+      "monitored": 0,
+      "total": 0,
+      "up": 0,
+      "down": 0,
+      "unknown": 0
+    },
+    "docker_hosts": {
+      "discovered": 1,
+      "monitored": 1,
+      "total": 1,
+      "up": 1,
+      "down": 0,
+      "unknown": 0
+    },
+    "pods_running_count": 0,
+    "namespace_count": 0,
+    "pod_restarts_per_hour_count": 0
+  },
+  "gpu_llm_ai": {
+    "gpu_hosts": {
+      "discovered": 0,
+      "monitored": 0,
+      "total": 0,
+      "up": 0,
+      "down": 0,
+      "unknown": 0
+    },
+    "gpu_utilization_percent": 0,
+    "gpu_memory_percent": 0,
+    "avg_thermal_llm_temp": null,
+    "llm_workloads": 0,
+    "inference_latency": 0,
+    "vector_db_count": 0,
+    "vector_db_query_latency": 0
+  },
+  "sdwan": {
+    "cisco_meraki_resources": {
+      "discovered": 0,
+      "monitored": 0,
+      "total": 0,
+      "up": 0,
+      "down": 0,
+      "unknown": 0
+    },
+    "cisco_viptela_resources": {
+      "discovered": 0,
+      "monitored": 0,
+      "total": 0,
+      "up": 0,
+      "down": 0,
+      "unknown": 0
+    }
+  },
+  "storage": {
+    "total_storage_devices": {
+      "discovered": 8,
+      "monitored": 6,
+      "total": 8,
+      "up": 6,
+      "down": 0,
+      "unknown": 0
+    },
+    "pure_storage": {
+      "discovered": 5,
+      "monitored": 4,
+      "total": 5,
+      "up": 4,
+      "down": 0,
+      "unknown": 0
+    },
+    "netapp_storage": {
+      "discovered": 3,
+      "monitored": 2,
+      "total": 3,
+      "up": 2,
+      "down": 0,
+      "unknown": 0
+    }
+  }
+}

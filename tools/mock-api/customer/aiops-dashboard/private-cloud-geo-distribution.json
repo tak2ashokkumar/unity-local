@@ -1,0 +1,253 @@
+{
+  "total_private_clouds": 5,
+  "total_datacenters": 4,
+  "total_resources": 2582,
+  "total_alerts": 128,
+  "private_clouds": [
+    {
+      "id": 101,
+      "uuid": "6c9e6c3e-6b6b-4b0a-9b11-111111111111",
+      "name": "Private Cloud - VMware Pune",
+      "platform_type": "VMware",
+      "datacenter": {
+        "id": 11,
+        "uuid": "dc-pune-1111-2222-333333333333",
+        "name": "Pune DC",
+        "location": "Pune, MH",
+        "lat": "18.5204",
+        "long": "73.8567",
+        "city": "Pune",
+        "region": "Maharashtra",
+        "country": "India"
+      },
+      "datacenter_location": "Pune, MH",
+      "total_alerts": 30,
+      "alert_segregation": {
+        "critical": 8,
+        "warning": 14,
+        "info": 8
+      },
+      "resources": {
+        "summary": {
+          "vm": 420,
+          "clusters": 14,
+          "storage": 62,
+          "network": 120,
+          "hypervisor": 60,
+          "baremetal_server": 20,
+          "total": 620
+        },
+        "vm": [],
+        "network": {
+          "summary": {
+            "switch": 60,
+            "firewall": 30,
+            "load_balancer": 30,
+            "total": 120
+          },
+          "switch": [],
+          "firewall": [],
+          "load_balancer": []
+        },
+        "hypervisor": [],
+        "baremetal_server": []
+      }
+    },
+    {
+      "id": 102,
+      "uuid": "6c9e6c3e-6b6b-4b0a-9b11-222222222222",
+      "name": "Private Cloud - VMware Hyderabad",
+      "platform_type": "VMware",
+      "datacenter": {
+        "id": 12,
+        "uuid": "dc-hyd-1111-2222-333333333333",
+        "name": "Hyderabad DC",
+        "location": "Hyderabad, TG",
+        "lat": "17.3850",
+        "long": "78.4867",
+        "city": "Hyderabad",
+        "region": "Telangana",
+        "country": "India"
+      },
+      "datacenter_location": "Hyderabad, TG",
+      "total_alerts": 24,
+      "alert_segregation": {
+        "critical": 6,
+        "warning": 12,
+        "info": 6
+      },
+      "resources": {
+        "summary": {
+          "vm": 360,
+          "clusters": 12,
+          "storage": 55,
+          "network": 110,
+          "hypervisor": 50,
+          "baremetal_server": 20,
+          "total": 540
+        },
+        "vm": [],
+        "network": {
+          "summary": {
+            "switch": 55,
+            "firewall": 30,
+            "load_balancer": 25,
+            "total": 110
+          },
+          "switch": [],
+          "firewall": [],
+          "load_balancer": []
+        },
+        "hypervisor": [],
+        "baremetal_server": []
+      }
+    },
+    {
+      "id": 103,
+      "uuid": "6c9e6c3e-6b6b-4b0a-9b11-333333333333",
+      "name": "Private Cloud - Nutanix BLR A",
+      "platform_type": "Nutanix",
+      "datacenter": {
+        "id": 13,
+        "uuid": "dc-blr-1111-2222-333333333333",
+        "name": "SDX BLR DC",
+        "location": "Bengaluru, KA",
+        "lat": "12.9716",
+        "long": "77.5946",
+        "city": "Bengaluru",
+        "region": "Karnataka",
+        "country": "India"
+      },
+      "datacenter_location": "Bengaluru, KA",
+      "total_alerts": 28,
+      "alert_segregation": {
+        "critical": 9,
+        "warning": 12,
+        "info": 7
+      },
+      "resources": {
+        "summary": {
+          "vm": 340,
+          "clusters": 9,
+          "storage": 47,
+          "network": 90,
+          "hypervisor": 40,
+          "baremetal_server": 10,
+          "total": 480
+        },
+        "vm": [],
+        "network": {
+          "summary": {
+            "switch": 45,
+            "firewall": 25,
+            "load_balancer": 20,
+            "total": 90
+          },
+          "switch": [],
+          "firewall": [],
+          "load_balancer": []
+        },
+        "hypervisor": [],
+        "baremetal_server": []
+      }
+    },
+    {
+      "id": 104,
+      "uuid": "6c9e6c3e-6b6b-4b0a-9b11-444444444444",
+      "name": "Private Cloud - Nutanix BLR B",
+      "platform_type": "Nutanix",
+      "datacenter": {
+        "id": 13,
+        "uuid": "dc-blr-1111-2222-333333333333",
+        "name": "SDX BLR DC",
+        "location": "Bengaluru, KA",
+        "lat": "12.9716",
+        "long": "77.5946",
+        "city": "Bengaluru",
+        "region": "Karnataka",
+        "country": "India"
+      },
+      "datacenter_location": "Bengaluru, KA",
+      "total_alerts": 26,
+      "alert_segregation": {
+        "critical": 7,
+        "warning": 13,
+        "info": 6
+      },
+      "resources": {
+        "summary": {
+          "vm": 360,
+          "clusters": 10,
+          "storage": 50,
+          "network": 100,
+          "hypervisor": 42,
+          "baremetal_server": 10,
+          "total": 512
+        },
+        "vm": [],
+        "network": {
+          "summary": {
+            "switch": 50,
+            "firewall": 28,
+            "load_balancer": 22,
+            "total": 100
+          },
+          "switch": [],
+          "firewall": [],
+          "load_balancer": []
+        },
+        "hypervisor": [],
+        "baremetal_server": []
+      }
+    },
+    {
+      "id": 105,
+      "uuid": "6c9e6c3e-6b6b-4b0a-9b11-555555555555",
+      "name": "Private Cloud - Nutanix Chennai",
+      "platform_type": "Nutanix",
+      "datacenter": {
+        "id": 14,
+        "uuid": "dc-chennai-1111-2222-333333333333",
+        "name": "Chennai DC",
+        "location": "Chennai, TN",
+        "lat": "13.0827",
+        "long": "80.2707",
+        "city": "Chennai",
+        "region": "Tamil Nadu",
+        "country": "India"
+      },
+      "datacenter_location": "Chennai, TN",
+      "total_alerts": 20,
+      "alert_segregation": {
+        "critical": 5,
+        "warning": 10,
+        "info": 5
+      },
+      "resources": {
+        "summary": {
+          "vm": 300,
+          "clusters": 8,
+          "storage": 44,
+          "network": 80,
+          "hypervisor": 40,
+          "baremetal_server": 10,
+          "total": 430
+        },
+        "vm": [],
+        "network": {
+          "summary": {
+            "switch": 40,
+            "firewall": 22,
+            "load_balancer": 18,
+            "total": 80
+          },
+          "switch": [],
+          "firewall": [],
+          "load_balancer": []
+        },
+        "hypervisor": [],
+        "baremetal_server": []
+      }
+    }
+  ]
+}
