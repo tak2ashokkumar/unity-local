@@ -1,0 +1,74 @@
+[
+  {
+    "url": "http://localhost:3001/rest/ipv6_allocations/1/",
+    "id": 1,
+    "name": "UL-ARIN-PRIMARY",
+    "cidr": "2607:f4a0::/32",
+    "rir": "ARIN",
+    "description": "Primary ARIN direct allocation used for all US datacenter regions",
+    "assigned_date": "2011-06-08T09:00:00-07:00",
+    "status": "ACTIVE",
+    "prefix": "2607:f4a0::",
+    "prefixlen": 32
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_allocations/2/",
+    "id": 2,
+    "name": "UL-ARIN-SECONDARY",
+    "cidr": "2607:f2f8::/32",
+    "rir": "ARIN",
+    "description": "Second ARIN allocation carrying LA and LV customer blocks",
+    "assigned_date": "2013-02-19T11:15:00-08:00",
+    "status": "ACTIVE",
+    "prefix": "2607:f2f8::",
+    "prefixlen": 32
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_allocations/3/",
+    "id": 3,
+    "name": "UL-LEGACY-PEERING",
+    "cidr": "2001:504:13::/48",
+    "rir": "ARIN",
+    "description": "Legacy exchange point assignment retained for peering fabric",
+    "assigned_date": "2009-11-02T08:30:00-08:00",
+    "status": "RESERVED",
+    "prefix": "2001:504:13::",
+    "prefixlen": 48
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_allocations/4/",
+    "id": 4,
+    "name": "UL-RIPE-EU",
+    "cidr": "2a05:d018::/32",
+    "rir": "RIPE",
+    "description": "European allocation supporting the Amsterdam remote site",
+    "assigned_date": "2018-04-11T10:00:00-07:00",
+    "status": "ACTIVE",
+    "prefix": "2a05:d018::",
+    "prefixlen": 32
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_allocations/5/",
+    "id": 5,
+    "name": "UL-APNIC-APAC",
+    "cidr": "2401:3f00::/32",
+    "rir": "APNIC",
+    "description": "APAC allocation held for future Singapore expansion",
+    "assigned_date": "2019-09-23T14:45:00-07:00",
+    "status": "ACTIVE",
+    "prefix": "2401:3f00::",
+    "prefixlen": 32
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_allocations/6/",
+    "id": 6,
+    "name": "UL-ARIN-EXPANSION",
+    "cidr": "2607:f4a1::/32",
+    "rir": "ARIN",
+    "description": null,
+    "assigned_date": "2021-07-15T09:20:00-07:00",
+    "status": "PENDING",
+    "prefix": "2607:f4a1::",
+    "prefixlen": 32
+  }
+]

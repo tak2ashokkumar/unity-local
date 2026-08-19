@@ -1,0 +1,6 @@
+[
+  { "id": 1, "name": "tf-web-01", "cloud": "UL-VMware-Prod", "hostname": "tf-web-01.unitedlayer.com", "internal_ip": "10.20.30.11", "routable_ip": "208.185.44.51", "cpus": 4, "ram_size": 8192, "state": "running", "org_id": 1 },
+  { "id": 2, "name": "tf-web-02", "cloud": "UL-VMware-Prod", "hostname": "tf-web-02.unitedlayer.com", "internal_ip": "10.20.30.12", "routable_ip": "208.185.44.52", "cpus": 4, "ram_size": 8192, "state": "running", "org_id": 1 },
+  { "id": 3, "name": "tf-db-01", "cloud": "UL-VMware-DR", "hostname": "tf-db-01.unitedlayer.com", "internal_ip": "10.20.31.20", "routable_ip": null, "cpus": 8, "ram_size": 32768, "state": "stopped", "org_id": 1 },
+  { "id": 4, "name": "tf-bank-app", "cloud": "UL-OpenStack-East", "hostname": "tf-bank-app.1cbank.com", "internal_ip": "172.20.4.30", "routable_ip": "199.87.16.44", "cpus": 4, "ram_size": 16384, "state": "running", "org_id": 302 }
+]

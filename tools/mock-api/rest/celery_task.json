@@ -1,1 +1,68 @@
-[]
+[
+  {
+    "id": "8f14e45f-ceea-467a-9f4c-1b2d3e5a7c90",
+    "name": "uldb.tasks.sync_vmware_inventory",
+    "worker": "worker1@ul-sn-unity-celery",
+    "state": "SUCCESS",
+    "received": "2026-07-14T08:12:04.118000Z",
+    "started": "2026-07-14T08:12:04.902000Z",
+    "runtime": 42.317,
+    "args": "(11,)",
+    "result": "synced 148 vms"
+  },
+  {
+    "id": "9a27b63c-1de8-4a55-8c07-4f6b1e0d2a31",
+    "name": "uldb.tasks.poll_zabbix_alerts",
+    "worker": "worker2@ul-sn-unity-celery",
+    "state": "SUCCESS",
+    "received": "2026-07-14T08:15:00.004000Z",
+    "started": "2026-07-14T08:15:00.221000Z",
+    "runtime": 3.884,
+    "args": "()",
+    "result": "12 alerts"
+  },
+  {
+    "id": "b3c5d7e9-2fa0-4b66-9d18-5a7c2e4f8b12",
+    "name": "uldb.tasks.rebuild_ip_allocations",
+    "worker": "worker1@ul-sn-unity-celery",
+    "state": "STARTED",
+    "received": "2026-07-14T08:16:41.550000Z",
+    "started": "2026-07-14T08:16:41.933000Z",
+    "runtime": null,
+    "args": "(302,)",
+    "result": null
+  },
+  {
+    "id": "c4d6e8fa-30b1-4c77-ae29-6b8d3f5a9c23",
+    "name": "uldb.tasks.export_device_report",
+    "worker": "worker2@ul-sn-unity-celery",
+    "state": "FAILURE",
+    "received": "2026-07-14T07:58:12.700000Z",
+    "started": "2026-07-14T07:58:13.010000Z",
+    "runtime": 8.442,
+    "args": "(350, 'csv')",
+    "result": "TimeoutError: report backend timed out"
+  },
+  {
+    "id": "d5e7f90b-41c2-4d88-bf3a-7c9e4a6b0d34",
+    "name": "uldb.tasks.sync_openstack_tenants",
+    "worker": "worker1@ul-sn-unity-celery",
+    "state": "RETRY",
+    "received": "2026-07-14T08:10:22.310000Z",
+    "started": "2026-07-14T08:10:22.884000Z",
+    "runtime": 15.201,
+    "args": "(12,)",
+    "result": "retrying in 60s"
+  },
+  {
+    "id": "e6f80a1c-52d3-4e99-c04b-8d0f5b7c1e45",
+    "name": "uldb.tasks.refresh_salesforce_products",
+    "worker": "worker2@ul-sn-unity-celery",
+    "state": "PENDING",
+    "received": "2026-07-14T08:17:05.120000Z",
+    "started": null,
+    "runtime": null,
+    "args": "()",
+    "result": null
+  }
+]

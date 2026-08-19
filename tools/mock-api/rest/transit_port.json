@@ -1,1 +1,66 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/transit_port/1/",
+    "id": 1,
+    "name": "Transit - Cogent SF10",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/6043/",
+      "id": 6043,
+      "name": "sw2-edge.ash1"
+    },
+    "provider": "Cogent",
+    "port": "xe-0/0/12",
+    "speed_mbps": 10000,
+    "commit_mbps": 2000,
+    "datacenter": "SF10",
+    "status": "up"
+  },
+  {
+    "url": "http://localhost:3001/rest/transit_port/2/",
+    "id": 2,
+    "name": "Transit - Zayo ASH1",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/5270/",
+      "id": 5270,
+      "name": "sw1-core.lv1"
+    },
+    "provider": "Zayo",
+    "port": "xe-1/0/3",
+    "speed_mbps": 10000,
+    "commit_mbps": 5000,
+    "datacenter": "ASH1",
+    "status": "up"
+  },
+  {
+    "url": "http://localhost:3001/rest/transit_port/3/",
+    "id": 3,
+    "name": "Peering - SFMIX",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1715/",
+      "id": 1715,
+      "name": "sw4-agg.sf8"
+    },
+    "provider": "SFMIX",
+    "port": "et-0/0/1",
+    "speed_mbps": 100000,
+    "commit_mbps": 0,
+    "datacenter": "SF8",
+    "status": "up"
+  },
+  {
+    "url": "http://localhost:3001/rest/transit_port/4/",
+    "id": 4,
+    "name": "Transit - Lumen LV1",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/6043/",
+      "id": 6043,
+      "name": "sw2-edge.ash1"
+    },
+    "provider": "Lumen",
+    "port": "xe-0/0/44",
+    "speed_mbps": 10000,
+    "commit_mbps": 1000,
+    "datacenter": "LV1",
+    "status": "down"
+  }
+]

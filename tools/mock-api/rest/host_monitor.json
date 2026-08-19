@@ -1,1 +1,100 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/host_monitor/1/",
+    "id": 1,
+    "instance": "sw3.to1.unitedlayer.com",
+    "last_known_state": "UP",
+    "last_checked": "2026-07-14T20:52:11Z",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/215/",
+      "id": 215,
+      "name": "Granicus, Inc"
+    },
+    "datacenter": "SF10",
+    "check_type": "PING"
+  },
+  {
+    "url": "http://localhost:3001/rest/host_monitor/2/",
+    "id": 2,
+    "instance": "lb1-903.sf10.unitedlayer.com",
+    "last_known_state": "WARNING",
+    "last_checked": "2026-07-14T20:51:48Z",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/301/",
+      "id": 301,
+      "name": "ConsumerAffairs.com"
+    },
+    "datacenter": "SF10",
+    "check_type": "HTTP"
+  },
+  {
+    "url": "http://localhost:3001/rest/host_monitor/3/",
+    "id": 3,
+    "instance": "esx-ash1-02.unitedlayer.com",
+    "last_known_state": "CRITICAL",
+    "last_checked": "2026-07-14T20:50:03Z",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank"
+    },
+    "datacenter": "ASH1",
+    "check_type": "SNMP"
+  },
+  {
+    "url": "http://localhost:3001/rest/host_monitor/4/",
+    "id": 4,
+    "instance": "ul-db-01.sf10.unitedlayer.com",
+    "last_known_state": "UP",
+    "last_checked": "2026-07-14T20:52:30Z",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer"
+    },
+    "datacenter": "SF10",
+    "check_type": "PING"
+  },
+  {
+    "url": "http://localhost:3001/rest/host_monitor/5/",
+    "id": 5,
+    "instance": "px-sf8-01.unitedlayer.com",
+    "last_known_state": "DOWN",
+    "last_checked": "2026-07-14T20:44:19Z",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts"
+    },
+    "datacenter": "SF8",
+    "check_type": "PING"
+  },
+  {
+    "url": "http://localhost:3001/rest/host_monitor/6/",
+    "id": 6,
+    "instance": "hv-la1-01.unitedlayer.com",
+    "last_known_state": "UP",
+    "last_checked": "2026-07-14T20:52:05Z",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo"
+    },
+    "datacenter": "LA1",
+    "check_type": "SNMP"
+  },
+  {
+    "url": "http://localhost:3001/rest/host_monitor/7/",
+    "id": 7,
+    "instance": "sw1-core.lv1.unitedlayer.com",
+    "last_known_state": "WARNING",
+    "last_checked": "2026-07-14T20:49:57Z",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/223/",
+      "id": 223,
+      "name": "Allen Lund Company"
+    },
+    "datacenter": "LV1",
+    "check_type": "SNMP"
+  }
+]

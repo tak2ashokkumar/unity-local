@@ -32,11 +32,30 @@ startmock(){
     npm start
 }
 
-startproxy(){
-    proxy || return
-    node server.js
-}
+# =====================================================================
+#  HOW TO RUN
+# ---------------------------------------------------------------------
+#  Running an app = (1) its build/serve, plus (2) ONE proxy for the target
+#  environment. A single proxy process serves all three front ends at once:
+#
+#      http://localhost:8091          -> ngx-unity
+#      http://localhost:8091/admin    -> admin panel
+#      http://localhost:8061          -> ngx-mtp
+#
+#  So start only ONE proxy at a time and pick it from the environment
+#  groups below. Within a group the three commands are equivalent - they are
+#  named per app just so the intent is obvious.
+#
+#  /admin serves the React admin (ngx-admin) by default; use the matching
+#  *-admin-legacy command when you want the old AngularJS panel instead.
+# =====================================================================
 
+
+# =====================================================================
+#  APP SERVERS  (same for every environment)
+# =====================================================================
+
+# ---- ngx-unity ----
 buildunity() {
     unity || return
     node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --watch
@@ -47,6 +66,7 @@ serveunity() {
     npm run static-server
 }
 
+# ---- ngx-mtp ----
 buildmtp() {
     mtp || return
     node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --watch
@@ -57,14 +77,7 @@ servemtp() {
     npm run static-server
 }
 
-buildprod() {
-    # move to respective folder either ngx-mtp or ngx-unity and run
-    node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --configuration production
-}
-
-
-# --- ADMIN PORTAL (Angular 1.x) ---
-
+# ---- admin panel : legacy AngularJS (served from uldb/static) ----
 admin() {
     cd "$UNITY_HOME/tools/admin-server" || return
 }
@@ -74,35 +87,183 @@ serveadmin() {
     node server.js
 }
 
-# --- ADMIN PORTAL (React - ngx-admin) ---
-
+# ---- admin panel : React (uldb/ngx-admin) ----
 adminreact() {
     cd "$UNITY_HOME/uldb/ngx-admin" || return
 }
 
-# One-time / on-change production build of the React admin (outputs dist/).
-buildadmin() {
+buildadmin() {          # one-off production build -> dist/
     adminreact || return
     npm run build
 }
 
-# Watch-rebuild the React admin during development.
-buildadminwatch() {
+buildadminwatch() {     # rebuild on every change
     adminreact || return
     npm run build -- --watch
 }
 
-# Serve the built React admin on :8096 (mirrors serveunity's static-server).
-serveadminreact() {
+serveadminreact() {     # serve dist/ on :8096
     adminreact || return
     npm run static-server
 }
 
-# Run the proxy with the React admin active at http://localhost:8091/admin.
-startproxyreact() {
-    proxy || return
-    ADMIN_UI=react node server.js
+# ---- production build (run from inside ngx-unity or ngx-mtp) ----
+buildprod() {
+    node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --configuration production
 }
+
+
+# =====================================================================
+#  MOCK   ->  local mock API on :3001   (default, safe, offline)
+# ---------------------------------------------------------------------
+#  Writes only get echoed back, nothing is persisted.
+#  Needs the mock API running:  startmock
+# =====================================================================
+
+# to run the admin panel (React) against MOCK
+mock-admin() {
+    proxy || return
+    API_ENV=mock ADMIN_UI=react node server.js
+}
+
+# to run the admin panel (legacy AngularJS) against MOCK
+mock-admin-legacy() {
+    proxy || return
+    API_ENV=mock node server.js
+}
+
+# to run ngx-unity against MOCK          (browse http://localhost:8091)
+mock-unity() {
+    proxy || return
+    API_ENV=mock ADMIN_UI=react node server.js
+}
+
+# to run ngx-mtp against MOCK            (browse http://localhost:8061)
+mock-mtp() {
+    proxy || return
+    API_ENV=mock ADMIN_UI=react node server.js
+}
+
+
+# =====================================================================
+#  PROD   ->  https://unity.unitedlayer.com
+# ---------------------------------------------------------------------
+#  LIVE data. Reads AND writes hit the real system.
+#  Session required:  tools/proxy/.cookie-prod
+#  See the write-safety rule in CLAUDE.md before changing anything.
+# =====================================================================
+
+# to run the admin panel (React) against PROD
+prod-admin() {
+    proxy || return
+    API_ENV=prod ADMIN_UI=react node server.js
+}
+
+# to run the admin panel (legacy AngularJS) against PROD
+prod-admin-legacy() {
+    proxy || return
+    API_ENV=prod node server.js
+}
+
+# to run ngx-unity against PROD          (browse http://localhost:8091)
+prod-unity() {
+    proxy || return
+    API_ENV=prod ADMIN_UI=react node server.js
+}
+
+# to run ngx-mtp against PROD            (browse http://localhost:8061)
+prod-mtp() {
+    proxy || return
+    API_ENV=prod ADMIN_UI=react node server.js
+}
+
+
+# =====================================================================
+#  AMS    ->  http://unity-ams.unitedlayer.com
+#  Session required:  tools/proxy/.cookie-ams
+# =====================================================================
+
+ams-admin() {           # admin panel (React) against AMS
+    proxy || return
+    API_ENV=ams ADMIN_UI=react node server.js
+}
+
+ams-unity() {           # ngx-unity against AMS
+    proxy || return
+    API_ENV=ams ADMIN_UI=react node server.js
+}
+
+ams-mtp() {             # ngx-mtp against AMS
+    proxy || return
+    API_ENV=ams ADMIN_UI=react node server.js
+}
+
+ams-admin-legacy() {  # admin panel (legacy AngularJS) against AMS
+    proxy || return
+    API_ENV=ams node server.js
+}
+
+
+# =====================================================================
+#  PLAY   ->  https://play.unityone.ai
+#  Session required:  tools/proxy/.cookie-play
+# =====================================================================
+
+play-admin() {          # admin panel (React) against PLAY
+    proxy || return
+    API_ENV=play ADMIN_UI=react node server.js
+}
+
+play-unity() {          # ngx-unity against PLAY
+    proxy || return
+    API_ENV=play ADMIN_UI=react node server.js
+}
+
+play-mtp() {            # ngx-mtp against PLAY
+    proxy || return
+    API_ENV=play ADMIN_UI=react node server.js
+}
+
+play-admin-legacy() {  # admin panel (legacy AngularJS) against PLAY
+    proxy || return
+    API_ENV=play node server.js
+}
+
+
+# =====================================================================
+#  ALPHA  ->  https://alpha.unityone.ai
+#  Session required:  tools/proxy/.cookie-alpha
+# =====================================================================
+
+alpha-admin() {         # admin panel (React) against ALPHA
+    proxy || return
+    API_ENV=alpha ADMIN_UI=react node server.js
+}
+
+alpha-unity() {         # ngx-unity against ALPHA
+    proxy || return
+    API_ENV=alpha ADMIN_UI=react node server.js
+}
+
+alpha-mtp() {           # ngx-mtp against ALPHA
+    proxy || return
+    API_ENV=alpha ADMIN_UI=react node server.js
+}
+
+alpha-admin-legacy() {  # admin panel (legacy AngularJS) against ALPHA
+    proxy || return
+    API_ENV=alpha node server.js
+}
+
+
+# =====================================================================
+#  LEGACY ALIASES (kept so existing muscle memory still works)
+# =====================================================================
+startproxy()          { mock-unity; }          # mock, legacy admin
+startproxyreact()     { mock-admin; }          # mock, React admin
+startproxyprod()      { prod-unity; }          # prod, legacy admin
+startproxyreactprod() { prod-admin; }          # prod, React admin
+
 
 # --- Python (3.13.12) ---
 pythonlocal(){

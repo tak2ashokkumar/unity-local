@@ -1,0 +1,191 @@
+[
+  {
+    "url": "http://localhost:3001/rest/vlan/601/",
+    "id": 601,
+    "name": "1CB-DMZ",
+    "vlan_id": 412,
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "storage": null,
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/6/",
+      "id": 6,
+      "name": "SF10",
+      "uuid": "d02f2900-97e2-4350-ad2d-991331131205"
+    },
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1312/",
+      "id": 1312,
+      "name": "sw1a-505.sf10"
+    },
+    "description": "DMZ VLAN trunked to the customer edge firewall pair",
+    "uuid": "5b41c7de-2a90-4d18-9f63-71ac0e2b4d55",
+    "verified": true
+  },
+  {
+    "url": "http://localhost:3001/rest/vlan/602/",
+    "id": 602,
+    "name": "1CB-DB-TIER",
+    "vlan_id": 413,
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "storage": null,
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/6/",
+      "id": 6,
+      "name": "SF10",
+      "uuid": "d02f2900-97e2-4350-ad2d-991331131205"
+    },
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1313/",
+      "id": 1313,
+      "name": "sw1b-505.sf10"
+    },
+    "description": "Isolated database tier VLAN, no default gateway",
+    "uuid": "c9f0a1b7-6e34-4c52-8a0d-3d7e6bb91f42",
+    "verified": true
+  },
+  {
+    "url": "http://localhost:3001/rest/vlan/603/",
+    "id": 603,
+    "name": "UL-MGMT-OOB",
+    "vlan_id": 100,
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "storage": null,
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/6/",
+      "id": 6,
+      "name": "SF10",
+      "uuid": "d02f2900-97e2-4350-ad2d-991331131205"
+    },
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/2385/",
+      "id": 2385,
+      "name": "sw3-301.sf10-ULs-G3"
+    },
+    "description": "Out of band management VLAN carrying the 10.1.0.0/16 range",
+    "uuid": "7d2e4f88-b013-49a6-95cf-2c8a55e0d6b3",
+    "verified": true
+  },
+  {
+    "url": "http://localhost:3001/rest/vlan/604/",
+    "id": 604,
+    "name": "WIPRO-DEMO-LAN",
+    "vlan_id": 880,
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/372/",
+      "id": 372,
+      "name": "UnityDemo-Wipro",
+      "storage": null,
+      "uuid": "c1c15413-a1ef-4615-aeb0-9dc770de253c"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/6/",
+      "id": 6,
+      "name": "SF10",
+      "uuid": "d02f2900-97e2-4350-ad2d-991331131205"
+    },
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/4712/",
+      "id": 4712,
+      "name": "sw1-503.sf10-Wipro"
+    },
+    "description": "Demo LAN for the Wipro proof of concept cage",
+    "uuid": "a3806c15-4f7b-4e29-bb84-90d1f2c7a08e",
+    "verified": false
+  },
+  {
+    "url": "http://localhost:3001/rest/vlan/605/",
+    "id": 605,
+    "name": "TW-COLO-VOICE",
+    "vlan_id": 2044,
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/327/",
+      "id": 327,
+      "name": "Tire's Warehouse",
+      "storage": "48",
+      "uuid": "624d8a05-fff0-4477-bda5-48dbe955d049"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/3/",
+      "id": 3,
+      "name": "LV1",
+      "uuid": "03dbff4a-b52b-4726-be76-6a6678428c52"
+    },
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1131/",
+      "id": 1131,
+      "name": "sw3.4987-lv1"
+    },
+    "description": "Voice VLAN with QoS marking for the colo handsets",
+    "uuid": "e14b9d70-8c62-4a3f-9d15-6fb2c4e83a97",
+    "verified": true
+  },
+  {
+    "url": "http://localhost:3001/rest/vlan/606/",
+    "id": 606,
+    "name": "TW-COLO-DATA",
+    "vlan_id": 2045,
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/327/",
+      "id": 327,
+      "name": "Tire's Warehouse",
+      "storage": "48",
+      "uuid": "624d8a05-fff0-4477-bda5-48dbe955d049"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/3/",
+      "id": 3,
+      "name": "LV1",
+      "uuid": "03dbff4a-b52b-4726-be76-6a6678428c52"
+    },
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1132/",
+      "id": 1132,
+      "name": "sw3-4774.lv1"
+    },
+    "description": null,
+    "uuid": "2fa7c368-5d91-4b0e-8e77-45c93b1de620",
+    "verified": false
+  },
+  {
+    "url": "http://localhost:3001/rest/vlan/607/",
+    "id": 607,
+    "name": "YBCA-PROD",
+    "vlan_id": 3310,
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts",
+      "storage": "5",
+      "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/4/",
+      "id": 4,
+      "name": "LA1",
+      "uuid": "e992c74c-942f-45f3-b6dd-6d20a8066a1b"
+    },
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/2212/",
+      "id": 2212,
+      "name": "br1.la1.unitedlayer.com"
+    },
+    "description": "Production VLAN for the ticketing and CRM workloads",
+    "uuid": "8c05e2b4-91fd-4736-a6c8-0be74d3f9152",
+    "verified": true
+  }
+]

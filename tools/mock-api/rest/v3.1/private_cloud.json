@@ -1,1 +1,102 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/v3.1/private_cloud/3f2c91d4-7b16-4a58-9e03-c48d1f6a2b77/",
+    "id": 1,
+    "uuid": "3f2c91d4-7b16-4a58-9e03-c48d1f6a2b77",
+    "name": "1cbank-vmware-sf10",
+    "platform_type": "VMware",
+    "datacenter": "SF10",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "storage": null,
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "collector": "collector-sf10-01",
+    "vm_count": 86,
+    "host_count": 6,
+    "status": "ACTIVE",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3.1/private_cloud/a91e5c08-2d47-4f3b-8c61-70b9ad4e5312/",
+    "id": 2,
+    "uuid": "a91e5c08-2d47-4f3b-8c61-70b9ad4e5312",
+    "name": "ybca-openstack-sf8",
+    "platform_type": "OpenStack",
+    "datacenter": "SF8",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts",
+      "storage": "5",
+      "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+    },
+    "collector": "collector-sf8-02",
+    "vm_count": 34,
+    "host_count": 4,
+    "status": "SYNCING",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3.1/private_cloud/c65b78fa-90e1-4d22-b7a4-1e3f8c05d9aa/",
+    "id": 3,
+    "uuid": "c65b78fa-90e1-4d22-b7a4-1e3f8c05d9aa",
+    "name": "unityone-hyperv-la1",
+    "platform_type": "HyperV",
+    "datacenter": "LA1",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo",
+      "storage": null,
+      "uuid": "8596ccde-3e19-4d0b-8e5e-d8e67fba314f"
+    },
+    "collector": "collector-la1-01",
+    "vm_count": 19,
+    "host_count": 3,
+    "status": "ERROR",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3.1/private_cloud/7d04ab3e-51c9-4e86-a2f0-b83c6d17e405/",
+    "id": 4,
+    "uuid": "7d04ab3e-51c9-4e86-a2f0-b83c6d17e405",
+    "name": "ul-lab-proxmox-ash1",
+    "platform_type": "Proxmox",
+    "datacenter": "ASH1",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "storage": null,
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "collector": "collector-ash1-01",
+    "vm_count": 52,
+    "host_count": 5,
+    "status": "ACTIVE",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3.1/private_cloud/e28f6b19-c3a5-44d7-95be-2af07d1c8e63/",
+    "id": 5,
+    "uuid": "e28f6b19-c3a5-44d7-95be-2af07d1c8e63",
+    "name": "1cbank-vmware-dr-lv1",
+    "platform_type": "VMware",
+    "datacenter": "LV1",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "storage": null,
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "collector": "collector-lv1-01",
+    "vm_count": 41,
+    "host_count": 4,
+    "status": "ACTIVE",
+    "is_active": false
+  }
+]

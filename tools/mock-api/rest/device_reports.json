@@ -1,0 +1,128 @@
+[
+  {
+    "url": "http://localhost:3001/rest/device_reports/1/",
+    "id": 1,
+    "name": "SF10 Device Inventory - March 2025",
+    "report_type": "INVENTORY",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "storage": null,
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "generated_at": "2025-03-31T18:05:22Z",
+    "device_count": 148,
+    "format": "CSV",
+    "status": "COMPLETE",
+    "file_path": "/reports/device/2025/03/sf10-inventory-1cbank.csv"
+  },
+  {
+    "url": "http://localhost:3001/rest/device_reports/2/",
+    "id": 2,
+    "name": "Cabinet Utilization - SF8",
+    "report_type": "UTILIZATION",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts",
+      "storage": "5",
+      "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+    },
+    "generated_at": "2025-06-12T09:41:07Z",
+    "device_count": 36,
+    "format": "PDF",
+    "status": "COMPLETE",
+    "file_path": "/reports/device/2025/06/sf8-cabinet-utilization-ybca.pdf"
+  },
+  {
+    "url": "http://localhost:3001/rest/device_reports/3/",
+    "id": 3,
+    "name": "Warranty Expiry Forecast - ASH1",
+    "report_type": "WARRANTY",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "storage": null,
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "generated_at": "2025-09-02T14:18:55Z",
+    "device_count": 412,
+    "format": "XLSX",
+    "status": "COMPLETE",
+    "file_path": "/reports/device/2025/09/ash1-warranty-forecast.xlsx"
+  },
+  {
+    "url": "http://localhost:3001/rest/device_reports/4/",
+    "id": 4,
+    "name": "Power Draw Summary - LA1",
+    "report_type": "POWER",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo",
+      "storage": null,
+      "uuid": "8596ccde-3e19-4d0b-8e5e-d8e67fba314f"
+    },
+    "generated_at": "2025-11-20T02:30:11Z",
+    "device_count": 74,
+    "format": "CSV",
+    "status": "FAILED",
+    "file_path": null
+  },
+  {
+    "url": "http://localhost:3001/rest/device_reports/5/",
+    "id": 5,
+    "name": "Decommission Candidates - LV1",
+    "report_type": "LIFECYCLE",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "storage": null,
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "generated_at": "2026-01-08T11:12:44Z",
+    "device_count": 22,
+    "format": "PDF",
+    "status": "COMPLETE",
+    "file_path": "/reports/device/2026/01/lv1-decommission-candidates.pdf"
+  },
+  {
+    "url": "http://localhost:3001/rest/device_reports/6/",
+    "id": 6,
+    "name": "Full Asset Audit - LA4",
+    "report_type": "AUDIT",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts",
+      "storage": "5",
+      "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+    },
+    "generated_at": "2026-04-15T16:55:03Z",
+    "device_count": 58,
+    "format": "XLSX",
+    "status": "RUNNING",
+    "file_path": null
+  },
+  {
+    "url": "http://localhost:3001/rest/device_reports/7/",
+    "id": 7,
+    "name": "Monthly Device Inventory - All Sites",
+    "report_type": "INVENTORY",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "storage": null,
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "generated_at": "2026-06-01T05:00:00Z",
+    "device_count": 1264,
+    "format": "CSV",
+    "status": "COMPLETE",
+    "file_path": "/reports/device/2026/06/all-sites-inventory.csv"
+  }
+]

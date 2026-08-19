@@ -1,1 +1,82 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/memorytype/1/",
+    "id": 1,
+    "name": "Samsung 16GB DDR4-2400 ECC",
+    "capacity_mb": 16384,
+    "speed_mhz": 2400,
+    "memory_type": "DDR4",
+    "form_factor": "RDIMM",
+    "ecc": true,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/70/",
+      "id": 70,
+      "name": "Samsung"
+    },
+    "salesforce_id": null
+  },
+  {
+    "url": "http://localhost:3001/rest/memorytype/2/",
+    "id": 2,
+    "name": "Hynix 32GB DDR4-2666 ECC",
+    "capacity_mb": 32768,
+    "speed_mhz": 2666,
+    "memory_type": "DDR4",
+    "form_factor": "RDIMM",
+    "ecc": true,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/71/",
+      "id": 71,
+      "name": "SK Hynix"
+    },
+    "salesforce_id": null
+  },
+  {
+    "url": "http://localhost:3001/rest/memorytype/3/",
+    "id": 3,
+    "name": "Micron 64GB DDR4-3200 ECC",
+    "capacity_mb": 65536,
+    "speed_mhz": 3200,
+    "memory_type": "DDR4",
+    "form_factor": "LRDIMM",
+    "ecc": true,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/72/",
+      "id": 72,
+      "name": "Micron"
+    },
+    "salesforce_id": null
+  },
+  {
+    "url": "http://localhost:3001/rest/memorytype/4/",
+    "id": 4,
+    "name": "Kingston 8GB DDR3-1600",
+    "capacity_mb": 8192,
+    "speed_mhz": 1600,
+    "memory_type": "DDR3",
+    "form_factor": "UDIMM",
+    "ecc": false,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/73/",
+      "id": 73,
+      "name": "Kingston"
+    },
+    "salesforce_id": null
+  },
+  {
+    "url": "http://localhost:3001/rest/memorytype/5/",
+    "id": 5,
+    "name": "Samsung 128GB DDR5-4800 ECC",
+    "capacity_mb": 131072,
+    "speed_mhz": 4800,
+    "memory_type": "DDR5",
+    "form_factor": "RDIMM",
+    "ecc": true,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/70/",
+      "id": 70,
+      "name": "Samsung"
+    },
+    "salesforce_id": null
+  }
+]

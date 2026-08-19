@@ -1,0 +1,216 @@
+[
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_assignments/5201/",
+    "id": 5201,
+    "name": "1CB-INTERNAL-DB",
+    "cidr": "10.24.16.0/24",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "storage": null,
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/private_ipv4_allocations/21/",
+      "id": 21,
+      "name": "10.0.0.0/8",
+      "cidr": "10.0.0.0/8"
+    },
+    "assigned_to": {
+      "url": "http://localhost:3001/rest/server/724/",
+      "id": 724,
+      "name": "001 Dell Poweredge R430",
+      "object_class": "Server"
+    },
+    "description": "Back end database subnet, no external routing",
+    "status": "ASSIGNED",
+    "prefix": "10.24.16.0",
+    "prefixlen": 24,
+    "num_hosts": 256,
+    "splittable": true,
+    "aggregatable": false
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_assignments/5202/",
+    "id": 5202,
+    "name": "YBCA-VM-NET",
+    "cidr": "10.32.8.0/22",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts",
+      "storage": "5",
+      "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/private_ipv4_allocations/21/",
+      "id": 21,
+      "name": "10.0.0.0/8",
+      "cidr": "10.0.0.0/8"
+    },
+    "assigned_to": {
+      "url": "http://localhost:3001/rest/server/595/",
+      "id": 595,
+      "name": "Lehua",
+      "object_class": "Server"
+    },
+    "description": "Virtual machine network behind the Lehua ESXi host",
+    "status": "ASSIGNED",
+    "prefix": "10.32.8.0",
+    "prefixlen": 22,
+    "num_hosts": 1024,
+    "splittable": true,
+    "aggregatable": true
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_assignments/5203/",
+    "id": 5203,
+    "name": "UL-MGMT-OOB",
+    "cidr": "10.1.0.0/16",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "storage": null,
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/private_ipv4_allocations/21/",
+      "id": 21,
+      "name": "10.0.0.0/8",
+      "cidr": "10.0.0.0/8"
+    },
+    "assigned_to": {
+      "url": "http://localhost:3001/rest/switch/1312/",
+      "id": 1312,
+      "name": "sw1a-505.sf10",
+      "object_class": "Switch"
+    },
+    "description": "Out of band management range for all UnitedLayer network gear",
+    "status": "ASSIGNED",
+    "prefix": "10.1.0.0",
+    "prefixlen": 16,
+    "num_hosts": 65536,
+    "splittable": true,
+    "aggregatable": false
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_assignments/5204/",
+    "id": 5204,
+    "name": "WIPRO-DEMO-LAN",
+    "cidr": "172.16.48.0/24",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/372/",
+      "id": 372,
+      "name": "UnityDemo-Wipro",
+      "storage": null,
+      "uuid": "c1c15413-a1ef-4615-aeb0-9dc770de253c"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/private_ipv4_allocations/22/",
+      "id": 22,
+      "name": "172.16.0.0/12",
+      "cidr": "172.16.0.0/12"
+    },
+    "assigned_to": {
+      "url": "http://localhost:3001/rest/switch/4712/",
+      "id": 4712,
+      "name": "sw1-503.sf10-Wipro",
+      "object_class": "Switch"
+    },
+    "description": "Demo LAN trunked to the Wipro cage switch in SF10",
+    "status": "ASSIGNED",
+    "prefix": "172.16.48.0",
+    "prefixlen": 24,
+    "num_hosts": 256,
+    "splittable": true,
+    "aggregatable": false
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_assignments/5205/",
+    "id": 5205,
+    "name": "STP-DEMO-PRIV",
+    "cidr": "172.20.4.0/23",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo",
+      "storage": null,
+      "uuid": "8596ccde-3e19-4d0b-8e5e-d8e67fba314f"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/private_ipv4_allocations/22/",
+      "id": 22,
+      "name": "172.16.0.0/12",
+      "cidr": "172.16.0.0/12"
+    },
+    "assigned_to": null,
+    "description": "Staged for the UnityOne demo private cloud rollout",
+    "status": "RESERVED",
+    "prefix": "172.20.4.0",
+    "prefixlen": 23,
+    "num_hosts": 512,
+    "splittable": true,
+    "aggregatable": true
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_assignments/5206/",
+    "id": 5206,
+    "name": "LAMBDA-BUILD-NET",
+    "cidr": "192.168.24.0/24",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/351/",
+      "id": 351,
+      "name": "LambdaTest",
+      "storage": null,
+      "uuid": "bac9e0b2-8f91-4c14-960b-beb3adda1ce7"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/private_ipv4_allocations/23/",
+      "id": 23,
+      "name": "192.168.0.0/16",
+      "cidr": "192.168.0.0/16"
+    },
+    "assigned_to": null,
+    "description": null,
+    "status": "AVAILABLE",
+    "prefix": "192.168.24.0",
+    "prefixlen": 24,
+    "num_hosts": 256,
+    "splittable": true,
+    "aggregatable": true
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_assignments/5207/",
+    "id": 5207,
+    "name": "TW-VOICE-VLAN",
+    "cidr": "192.168.130.0/25",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/327/",
+      "id": 327,
+      "name": "Tire's Warehouse",
+      "storage": "48",
+      "uuid": "624d8a05-fff0-4477-bda5-48dbe955d049"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/private_ipv4_allocations/23/",
+      "id": 23,
+      "name": "192.168.0.0/16",
+      "cidr": "192.168.0.0/16"
+    },
+    "assigned_to": {
+      "url": "http://localhost:3001/rest/switch/1131/",
+      "id": 1131,
+      "name": "sw3.4987-lv1",
+      "object_class": "Switch"
+    },
+    "description": "Voice VLAN subnet for the LV1 colo handsets",
+    "status": "ASSIGNED",
+    "prefix": "192.168.130.0",
+    "prefixlen": 25,
+    "num_hosts": 128,
+    "splittable": false,
+    "aggregatable": false
+  }
+]

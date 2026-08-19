@@ -1,1 +1,66 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/collector_map/1/",
+    "id": 1,
+    "uuid": "7a1c4e80-3b52-4f19-9d06-2e5f8a0c3b71",
+    "org": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer"
+    },
+    "collector": "ul-collector-01",
+    "collector_url": "https://openaudit-sf10.unitedlayer.com",
+    "discovery_enabled": true,
+    "last_discovery": "2026-07-14T04:00:00Z",
+    "device_count": 412,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/collector_map/2/",
+    "id": 2,
+    "uuid": "8b2d5f91-4c63-4a20-ae17-3f6a9b1d4c82",
+    "org": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank"
+    },
+    "collector": "ul-collector-02",
+    "collector_url": "https://openaudit-ash1.unitedlayer.com",
+    "discovery_enabled": true,
+    "last_discovery": "2026-07-14T04:15:00Z",
+    "device_count": 87,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/collector_map/3/",
+    "id": 3,
+    "uuid": "9c3e60a2-5d74-4b31-bf28-4a7b0c2e5d93",
+    "org": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo"
+    },
+    "collector": "ul-collector-03",
+    "collector_url": "https://openaudit-la1.unitedlayer.com",
+    "discovery_enabled": false,
+    "last_discovery": "2026-06-30T04:00:00Z",
+    "device_count": 24,
+    "status": "DISABLED"
+  },
+  {
+    "url": "http://localhost:3001/rest/collector_map/4/",
+    "id": 4,
+    "uuid": "0d4f71b3-6e85-4c42-c039-5b8c1d3f6e04",
+    "org": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts"
+    },
+    "collector": "ul-collector-04",
+    "collector_url": "https://openaudit-sf8.unitedlayer.com",
+    "discovery_enabled": true,
+    "last_discovery": "2026-07-13T04:00:00Z",
+    "device_count": 51,
+    "status": "ERROR"
+  }
+]

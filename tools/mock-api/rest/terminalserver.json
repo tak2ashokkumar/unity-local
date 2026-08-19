@@ -1,0 +1,169 @@
+[
+  {
+    "url": "http://localhost:3001/rest/terminalserver/1/",
+    "id": 1,
+    "uuid": "6a90b247-13ce-4d85-90f2-58b4c7016ed3",
+    "name": "ts1.sf10",
+    "model": {
+      "url": "http://localhost:3001/rest/terminalservermodel/1/",
+      "id": 1,
+      "name": "2611XM"
+    },
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/1/",
+        "id": 1,
+        "name": "UnitedLayer",
+        "storage": null,
+        "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+      }
+    ],
+    "ip_address": "10.1.0.51",
+    "datacenter": "SF10",
+    "num_ports": 24,
+    "asset_tag": "4821"
+  },
+  {
+    "url": "http://localhost:3001/rest/terminalserver/2/",
+    "id": 2,
+    "uuid": "cf37a5e1-4b08-4d63-9271-8ae05c46137b",
+    "name": "ts2.sf10",
+    "model": {
+      "url": "http://localhost:3001/rest/terminalservermodel/1/",
+      "id": 1,
+      "name": "2611XM"
+    },
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/302/",
+        "id": 302,
+        "name": "1st Century Bank",
+        "storage": null,
+        "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+      }
+    ],
+    "ip_address": "10.1.0.52",
+    "datacenter": "SF10",
+    "num_ports": 24,
+    "asset_tag": "4822"
+  },
+  {
+    "url": "http://localhost:3001/rest/terminalserver/3/",
+    "id": 3,
+    "uuid": "2e480d61-a795-4c30-b8f1-04673ce9d825",
+    "name": "ts1.sf8",
+    "model": {
+      "url": "http://localhost:3001/rest/terminalservermodel/4/",
+      "id": 4,
+      "name": "2611"
+    },
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/255/",
+        "id": 255,
+        "name": "Yerba Buena Center for the Arts",
+        "storage": null,
+        "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+      }
+    ],
+    "ip_address": "10.3.0.14",
+    "datacenter": "SF8",
+    "num_ports": 16,
+    "asset_tag": null
+  },
+  {
+    "url": "http://localhost:3001/rest/terminalserver/4/",
+    "id": 4,
+    "uuid": "b1d5670e-8c42-49a3-95b0-3f7286ce014d",
+    "name": "ts1.ash1",
+    "model": {
+      "url": "http://localhost:3001/rest/terminalservermodel/1/",
+      "id": 1,
+      "name": "2611XM"
+    },
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/350/",
+        "id": 350,
+        "name": "STP-UnityOneDemo",
+        "storage": null,
+        "uuid": "8596ccde-3e19-4d0b-8e5e-d8e67fba314f"
+      }
+    ],
+    "ip_address": "10.5.12.9",
+    "datacenter": "ASH1",
+    "num_ports": 24,
+    "asset_tag": "5107"
+  },
+  {
+    "url": "http://localhost:3001/rest/terminalserver/5/",
+    "id": 5,
+    "uuid": "48f0a3d9-2b61-4750-8ec9-1760b47ea3c5",
+    "name": "ts2.la4",
+    "model": {
+      "url": "http://localhost:3001/rest/terminalservermodel/4/",
+      "id": 4,
+      "name": "2611"
+    },
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/1/",
+        "id": 1,
+        "name": "UnitedLayer",
+        "storage": null,
+        "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+      },
+      {
+        "url": "http://localhost:3001/rest/fast/org/302/",
+        "id": 302,
+        "name": "1st Century Bank",
+        "storage": null,
+        "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+      }
+    ],
+    "ip_address": "10.7.3.44",
+    "datacenter": "LA4",
+    "num_ports": 16,
+    "asset_tag": "3390"
+  },
+  {
+    "url": "http://localhost:3001/rest/terminalserver/6/",
+    "id": 6,
+    "uuid": "9d26ca1f-7e35-48b0-a629-051cd7be4382",
+    "name": "ts1.lv1",
+    "model": {
+      "url": "http://localhost:3001/rest/terminalservermodel/1/",
+      "id": 1,
+      "name": "2611XM"
+    },
+    "customers": [],
+    "ip_address": "10.9.1.72",
+    "datacenter": "LV1",
+    "num_ports": 24,
+    "asset_tag": null
+  },
+  {
+    "url": "http://localhost:3001/rest/terminalserver/7/",
+    "id": 7,
+    "uuid": "7c04e5b8-361d-4a92-80f7-e2b917d5064a",
+    "name": "ts1.la1",
+    "model": {
+      "url": "http://localhost:3001/rest/terminalservermodel/4/",
+      "id": 4,
+      "name": "2611"
+    },
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/255/",
+        "id": 255,
+        "name": "Yerba Buena Center for the Arts",
+        "storage": null,
+        "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+      }
+    ],
+    "ip_address": "10.6.8.31",
+    "datacenter": "LA1",
+    "num_ports": 8,
+    "asset_tag": "2874"
+  }
+]

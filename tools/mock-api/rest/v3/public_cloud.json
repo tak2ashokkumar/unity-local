@@ -1,1 +1,87 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/v3/public_cloud/191/",
+    "id": 191,
+    "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+    "name": "azure tenant1",
+    "account_name": "azure tenant1",
+    "cloud_type": "Azure",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer"
+    },
+    "vm_count": 6,
+    "region": "eastus",
+    "status": "ACTIVE",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3/public_cloud/247/",
+    "id": 247,
+    "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+    "name": "New Azure",
+    "account_name": "New Azure",
+    "cloud_type": "Azure",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo"
+    },
+    "vm_count": 11,
+    "region": "westus2",
+    "status": "ACTIVE",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3/public_cloud/258/",
+    "id": 258,
+    "uuid": "1516247d-bb14-430f-ad5d-507ffd9676e6",
+    "name": "AWS-tenant1",
+    "account_name": "AWS-tenant1",
+    "cloud_type": "AWS",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank"
+    },
+    "vm_count": 1,
+    "region": "us-west-1",
+    "status": "ACTIVE",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3/public_cloud/259/",
+    "id": 259,
+    "uuid": "8c3f61a9-4b2d-42e7-9f18-6d05c7a3e214",
+    "name": "AWS-Production",
+    "account_name": "AWS-Production",
+    "cloud_type": "AWS",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer"
+    },
+    "vm_count": 23,
+    "region": "us-east-1",
+    "status": "ACTIVE",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3/public_cloud/261/",
+    "id": 261,
+    "uuid": "5a7e2c04-9d81-4f36-a0b5-1e8f4c9d2b73",
+    "name": "GCP-Analytics",
+    "account_name": "GCP-Analytics",
+    "cloud_type": "GCP",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts"
+    },
+    "vm_count": 4,
+    "region": "us-central1",
+    "status": "SYNCING",
+    "is_active": true
+  }
+]

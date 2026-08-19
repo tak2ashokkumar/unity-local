@@ -1,1 +1,68 @@
-[]
+[
+  {
+    "id": 21,
+    "url": "http://localhost:3001/rest/juniper_switch/21/",
+    "name": "sw1-core.lv1",
+    "backend_url": "http://sw1-core.lv1.unitedlayer.com",
+    "proxy_url": "sw1corelv1",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/223/",
+        "id": 223,
+        "name": "Allen Lund Company",
+        "uuid": "7c1e9b40-2a58-4d63-9f07-8b3d5e1a6c92"
+      }
+    ],
+    "uuid": "4bff663d-e7cf-478a-bcae-0ee219558a01",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/5270/",
+      "id": 5270,
+      "name": "sw1-core.lv1"
+    },
+    "proxy_fqdn": "https://sw1corelv1.uproxy.unitedlayer.com"
+  },
+  {
+    "id": 22,
+    "url": "http://localhost:3001/rest/juniper_switch/22/",
+    "name": "sw2-edge.ash1",
+    "backend_url": "http://sw2-edge.ash1.unitedlayer.com",
+    "proxy_url": "sw2edgeash1",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/302/",
+        "id": 302,
+        "name": "1st Century Bank",
+        "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+      }
+    ],
+    "uuid": "5c00774e-f8d0-489b-cdbf-1ff32a669b12",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/6043/",
+      "id": 6043,
+      "name": "sw2-edge.ash1"
+    },
+    "proxy_fqdn": "https://sw2edgeash1.uproxy.unitedlayer.com"
+  },
+  {
+    "id": 23,
+    "url": "http://localhost:3001/rest/juniper_switch/23/",
+    "name": "sw4-agg.sf8",
+    "backend_url": "http://sw4-agg.sf8.unitedlayer.com",
+    "proxy_url": "sw4aggsf8",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/255/",
+        "id": 255,
+        "name": "Yerba Buena Center for the Arts",
+        "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+      }
+    ],
+    "uuid": "6d11885f-09e1-49ac-deca-20043b77ac23",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1715/",
+      "id": 1715,
+      "name": "sw4-agg.sf8"
+    },
+    "proxy_fqdn": "https://sw4aggsf8.uproxy.unitedlayer.com"
+  }
+]

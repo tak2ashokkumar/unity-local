@@ -1,0 +1,70 @@
+{
+  "data": [
+    {
+      "id": 201,
+      "partner": "AWS",
+      "name": "AWS Direct Connect - us-west-1",
+      "metro": "San Jose",
+      "country": "USA",
+      "connect_type": "AWS",
+      "speed_mbps": 10000,
+      "diversity_zone": "red",
+      "status": "Active"
+    },
+    {
+      "id": 202,
+      "partner": "AWS",
+      "name": "AWS Direct Connect - us-east-1",
+      "metro": "Ashburn",
+      "country": "USA",
+      "connect_type": "AWS",
+      "speed_mbps": 10000,
+      "diversity_zone": "blue",
+      "status": "Active"
+    },
+    {
+      "id": 203,
+      "partner": "Azure",
+      "name": "Azure ExpressRoute - West US 2",
+      "metro": "Seattle",
+      "country": "USA",
+      "connect_type": "AZURE",
+      "speed_mbps": 1000,
+      "diversity_zone": "red",
+      "status": "Active"
+    },
+    {
+      "id": 204,
+      "partner": "Azure",
+      "name": "Azure ExpressRoute - East US",
+      "metro": "Ashburn",
+      "country": "USA",
+      "connect_type": "AZURE",
+      "speed_mbps": 10000,
+      "diversity_zone": "blue",
+      "status": "Active"
+    },
+    {
+      "id": 205,
+      "partner": "Google",
+      "name": "Google Cloud Interconnect - us-central1",
+      "metro": "Council Bluffs",
+      "country": "USA",
+      "connect_type": "GOOGLE",
+      "speed_mbps": 10000,
+      "diversity_zone": "red",
+      "status": "Active"
+    },
+    {
+      "id": 206,
+      "partner": "Oracle",
+      "name": "Oracle FastConnect - us-ashburn-1",
+      "metro": "Ashburn",
+      "country": "USA",
+      "connect_type": "ORACLE",
+      "speed_mbps": 1000,
+      "diversity_zone": "blue",
+      "status": "Active"
+    }
+  ]
+}

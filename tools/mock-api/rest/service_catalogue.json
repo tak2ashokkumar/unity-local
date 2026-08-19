@@ -1,0 +1,90 @@
+[
+  {
+    "url": "http://localhost:3001/rest/service_catalogue/1/",
+    "id": 1,
+    "name": "Full Cabinet Colocation",
+    "category": "Colocation",
+    "description": "42U locking cabinet with A/B power feeds and 24x7 facility access.",
+    "sku": "CAT-COLO-CAB-FULL",
+    "unit_price": 1850.0,
+    "billing_cycle": "Monthly",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/service_catalogue/2/",
+    "id": 2,
+    "name": "Managed Dedicated Server",
+    "category": "Managed Hosting",
+    "description": "Fully managed bare metal server with OS patching and 24x7 monitoring.",
+    "sku": "CAT-DED-MGD",
+    "unit_price": 640.0,
+    "billing_cycle": "Monthly",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/service_catalogue/3/",
+    "id": 3,
+    "name": "Private Cloud vSphere Node",
+    "category": "Private Cloud",
+    "description": "Dedicated VMware node with vCenter, vSAN storage and daily snapshots.",
+    "sku": "CAT-PVC-VMW-NODE",
+    "unit_price": 1275.0,
+    "billing_cycle": "Monthly",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/service_catalogue/4/",
+    "id": 4,
+    "name": "IP Transit 100 Mbps Commit",
+    "category": "Network",
+    "description": "Blended transit over redundant upstreams, 95th percentile burst billing.",
+    "sku": "CAT-NET-TRANSIT-100",
+    "unit_price": 450.0,
+    "billing_cycle": "Monthly",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/service_catalogue/5/",
+    "id": 5,
+    "name": "Cross Connect Installation",
+    "category": "Network",
+    "description": "One time install of a single mode fiber cross connect within a facility.",
+    "sku": "CAT-NET-XC-INSTALL",
+    "unit_price": 350.0,
+    "billing_cycle": "One-time",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/service_catalogue/6/",
+    "id": 6,
+    "name": "Managed VM Backup",
+    "category": "Managed Services",
+    "description": "Agentless VM backup with 30 day retention, billed per usable TB.",
+    "sku": "CAT-MGD-BKP-TB",
+    "unit_price": 85.0,
+    "billing_cycle": "Monthly",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/service_catalogue/7/",
+    "id": 7,
+    "name": "Compliance Audit Support",
+    "category": "Professional Services",
+    "description": "Annual SOC 2 and PCI evidence collection support for hosted environments.",
+    "sku": "CAT-PS-AUDIT",
+    "unit_price": 7500.0,
+    "billing_cycle": "Annual",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/service_catalogue/8/",
+    "id": 8,
+    "name": "Legacy Tape Archive",
+    "category": "Managed Services",
+    "description": "Offsite tape archival service. Retired, retained for existing contracts only.",
+    "sku": "CAT-MGD-TAPE",
+    "unit_price": 220.0,
+    "billing_cycle": "Monthly",
+    "is_active": false
+  }
+]

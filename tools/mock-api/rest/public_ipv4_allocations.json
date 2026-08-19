@@ -1,1 +1,72 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/public_ipv4_allocations/1/",
+    "id": 1,
+    "uuid": "a1b2c3d4-e5f6-4708-9a1b-2c3d4e5f6071",
+    "cidr": "208.185.0.0/18",
+    "network": "208.185.0.0",
+    "prefix_length": 18,
+    "rir": "ARIN",
+    "description": "UnitedLayer primary ARIN allocation",
+    "assigned_date": "2012-04-17",
+    "total_ips": 16384,
+    "used_ips": 11208,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/public_ipv4_allocations/2/",
+    "id": 2,
+    "uuid": "b2c3d4e5-f607-4819-ab2c-3d4e5f607182",
+    "cidr": "64.62.128.0/19",
+    "network": "64.62.128.0",
+    "prefix_length": 19,
+    "rir": "ARIN",
+    "description": "SF10 / SF8 customer assignments",
+    "assigned_date": "2014-09-02",
+    "total_ips": 8192,
+    "used_ips": 6033,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/public_ipv4_allocations/3/",
+    "id": 3,
+    "uuid": "c3d4e5f6-0718-492a-bc3d-4e5f60718293",
+    "cidr": "199.87.16.0/20",
+    "network": "199.87.16.0",
+    "prefix_length": 20,
+    "rir": "ARIN",
+    "description": "ASH1 east coast allocation",
+    "assigned_date": "2016-01-25",
+    "total_ips": 4096,
+    "used_ips": 1877,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/public_ipv4_allocations/4/",
+    "id": 4,
+    "uuid": "d4e5f607-1829-4a3b-cd4e-5f6071829304",
+    "cidr": "204.145.64.0/21",
+    "network": "204.145.64.0",
+    "prefix_length": 21,
+    "rir": "ARIN",
+    "description": "LV1 allocation",
+    "assigned_date": "2018-07-11",
+    "total_ips": 2048,
+    "used_ips": 604,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/public_ipv4_allocations/5/",
+    "id": 5,
+    "uuid": "e5f60718-293a-4b4c-de5f-607182930415",
+    "cidr": "192.34.208.0/22",
+    "network": "192.34.208.0",
+    "prefix_length": 22,
+    "rir": "ARIN",
+    "description": "Legacy LA1 block - being reclaimed",
+    "assigned_date": "2010-11-30",
+    "total_ips": 1024,
+    "used_ips": 96,
+    "status": "RECLAIMING"
+  }
+]

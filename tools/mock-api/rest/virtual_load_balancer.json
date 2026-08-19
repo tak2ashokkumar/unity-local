@@ -1,1 +1,46 @@
-[]
+[
+  {
+    "id": 31,
+    "url": "http://localhost:3001/rest/virtual_load_balancer/31/",
+    "name": "vlb1-201.sf10",
+    "backend_url": "http://vlb1-201.sf10.unitedlayer.com",
+    "proxy_url": "vlb1201sf10",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/1/",
+        "id": 1,
+        "name": "UnitedLayer",
+        "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+      }
+    ],
+    "uuid": "8e229a71-1b03-4bce-f0ec-422651998e34",
+    "load_balancer": {
+      "url": "http://localhost:3001/rest/loadbalancer/2003/",
+      "id": 2003,
+      "name": "vlb1-201.sf10"
+    },
+    "proxy_fqdn": "https://vlb1201sf10.uproxy.unitedlayer.com"
+  },
+  {
+    "id": 32,
+    "url": "http://localhost:3001/rest/virtual_load_balancer/32/",
+    "name": "vlb2-118.ash1",
+    "backend_url": "http://vlb2-118.ash1.unitedlayer.com",
+    "proxy_url": "vlb2118ash1",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/302/",
+        "id": 302,
+        "name": "1st Century Bank",
+        "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+      }
+    ],
+    "uuid": "9f33ab82-2c14-4cdf-a1fd-533762aa9f45",
+    "load_balancer": {
+      "url": "http://localhost:3001/rest/loadbalancer/1582/",
+      "id": 1582,
+      "name": "vlb2-118.ash1"
+    },
+    "proxy_fqdn": "https://vlb2118ash1.uproxy.unitedlayer.com"
+  }
+]

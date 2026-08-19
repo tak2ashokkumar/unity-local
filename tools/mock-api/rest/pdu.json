@@ -1,1 +1,107 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/pdu/101/",
+    "id": 101,
+    "name": "SF10-01-EA-034-PDU-A",
+    "asset_tag": "UL-PDU-10041",
+    "serial_number": "5A1729T04512",
+    "model": {
+      "url": "http://localhost:3001/rest/pdumodel/53/",
+      "id": 53,
+      "name": "AP7800"
+    },
+    "cabinet": {
+      "url": "http://localhost:3001/rest/cabinet/950/",
+      "id": 950,
+      "name": "01.EA.034"
+    },
+    "ip_address": "10.20.14.11",
+    "num_outlets": 8,
+    "max_amps": 12,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/pdu/102/",
+    "id": 102,
+    "name": "SF10-01-EA-034-PDU-B",
+    "asset_tag": "UL-PDU-10042",
+    "serial_number": "5A1729T04513",
+    "model": {
+      "url": "http://localhost:3001/rest/pdumodel/53/",
+      "id": 53,
+      "name": "AP7800"
+    },
+    "cabinet": {
+      "url": "http://localhost:3001/rest/cabinet/950/",
+      "id": 950,
+      "name": "01.EA.034"
+    },
+    "ip_address": "10.20.14.12",
+    "num_outlets": 8,
+    "max_amps": 12,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/pdu/103/",
+    "id": 103,
+    "name": "ASH1-02-CB-011-PDU-A",
+    "asset_tag": "UL-PDU-10088",
+    "serial_number": "6B2830U11907",
+    "model": {
+      "url": "http://localhost:3001/rest/pdumodel/54/",
+      "id": 54,
+      "name": "AP8941"
+    },
+    "cabinet": {
+      "url": "http://localhost:3001/rest/cabinet/951/",
+      "id": 951,
+      "name": "02.CB.011"
+    },
+    "ip_address": "10.30.9.21",
+    "num_outlets": 24,
+    "max_amps": 30,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/pdu/104/",
+    "id": 104,
+    "name": "LA1-03-DA-007-PDU-A",
+    "asset_tag": "UL-PDU-10130",
+    "serial_number": "7C3941V22318",
+    "model": {
+      "url": "http://localhost:3001/rest/pdumodel/54/",
+      "id": 54,
+      "name": "AP8941"
+    },
+    "cabinet": {
+      "url": "http://localhost:3001/rest/cabinet/952/",
+      "id": 952,
+      "name": "03.DA.007"
+    },
+    "ip_address": "10.40.3.8",
+    "num_outlets": 24,
+    "max_amps": 30,
+    "status": "MAINTENANCE"
+  },
+  {
+    "url": "http://localhost:3001/rest/pdu/105/",
+    "id": 105,
+    "name": "LV1-01-AA-002-PDU-B",
+    "asset_tag": "UL-PDU-10175",
+    "serial_number": "8D4052W33429",
+    "model": {
+      "url": "http://localhost:3001/rest/pdumodel/55/",
+      "id": 55,
+      "name": "PX3-5497"
+    },
+    "cabinet": {
+      "url": "http://localhost:3001/rest/cabinet/953/",
+      "id": 953,
+      "name": "01.AA.002"
+    },
+    "ip_address": "10.50.7.4",
+    "num_outlets": 36,
+    "max_amps": 32,
+    "status": "ACTIVE"
+  }
+]

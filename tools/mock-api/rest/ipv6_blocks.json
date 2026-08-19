@@ -1,0 +1,205 @@
+[
+  {
+    "url": "http://localhost:3001/rest/ipv6_blocks/301/",
+    "id": 301,
+    "name": "1CB-SF10-BLOCK",
+    "cidr": "2607:f4a0:1::/48",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "storage": null,
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/6/",
+      "id": 6,
+      "name": "SF10",
+      "uuid": "d02f2900-97e2-4350-ad2d-991331131205"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/ipv6_allocations/1/",
+      "id": 1,
+      "name": "UL-ARIN-PRIMARY",
+      "cidr": "2607:f4a0::/32"
+    },
+    "description": "Customer /48 delegated for the 1st Century Bank SF10 cage",
+    "status": "ASSIGNED",
+    "prefix": "2607:f4a0:1::",
+    "prefixlen": 48
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_blocks/302/",
+    "id": 302,
+    "name": "YBCA-SF8-BLOCK",
+    "cidr": "2607:f4a0:2::/48",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts",
+      "storage": "5",
+      "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/5/",
+      "id": 5,
+      "name": "SF8",
+      "uuid": "cadb3e0d-46e9-4d4c-a24e-7849067c7211"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/ipv6_allocations/1/",
+      "id": 1,
+      "name": "UL-ARIN-PRIMARY",
+      "cidr": "2607:f4a0::/32"
+    },
+    "description": "Dual stack block for the Yerba Buena public web presence",
+    "status": "ASSIGNED",
+    "prefix": "2607:f4a0:2::",
+    "prefixlen": 48
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_blocks/303/",
+    "id": 303,
+    "name": "UL-ASH1-CORE",
+    "cidr": "2607:f4a0:10::/48",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "storage": null,
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/8/",
+      "id": 8,
+      "name": "ASH1",
+      "uuid": "b7cc6065-c39b-4a29-8601-c49cb0d5c8b8"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/ipv6_allocations/1/",
+      "id": 1,
+      "name": "UL-ARIN-PRIMARY",
+      "cidr": "2607:f4a0::/32"
+    },
+    "description": "Core and infrastructure addressing for the Ashburn region",
+    "status": "ASSIGNED",
+    "prefix": "2607:f4a0:10::",
+    "prefixlen": 48
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_blocks/304/",
+    "id": 304,
+    "name": "STP-LA1-BLOCK",
+    "cidr": "2607:f2f8:20::/48",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo",
+      "storage": null,
+      "uuid": "8596ccde-3e19-4d0b-8e5e-d8e67fba314f"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/4/",
+      "id": 4,
+      "name": "LA1",
+      "uuid": "e992c74c-942f-45f3-b6dd-6d20a8066a1b"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/ipv6_allocations/2/",
+      "id": 2,
+      "name": "UL-ARIN-SECONDARY",
+      "cidr": "2607:f2f8::/32"
+    },
+    "description": "Demo tenant block routed out of the LA1 border routers",
+    "status": "ASSIGNED",
+    "prefix": "2607:f2f8:20::",
+    "prefixlen": 48
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_blocks/305/",
+    "id": 305,
+    "name": "LAMBDA-LV1-BLOCK",
+    "cidr": "2607:f2f8:21::/48",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/351/",
+      "id": 351,
+      "name": "LambdaTest",
+      "storage": null,
+      "uuid": "bac9e0b2-8f91-4c14-960b-beb3adda1ce7"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/3/",
+      "id": 3,
+      "name": "LV1",
+      "uuid": "03dbff4a-b52b-4726-be76-6a6678428c52"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/ipv6_allocations/2/",
+      "id": 2,
+      "name": "UL-ARIN-SECONDARY",
+      "cidr": "2607:f2f8::/32"
+    },
+    "description": null,
+    "status": "RESERVED",
+    "prefix": "2607:f2f8:21::",
+    "prefixlen": 48
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_blocks/306/",
+    "id": 306,
+    "name": "WIPRO-LA4-BLOCK",
+    "cidr": "2a05:d018:5::/48",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/372/",
+      "id": 372,
+      "name": "UnityDemo-Wipro",
+      "storage": null,
+      "uuid": "c1c15413-a1ef-4615-aeb0-9dc770de253c"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/7/",
+      "id": 7,
+      "name": "LA4",
+      "uuid": "e112b305-3818-419a-840d-a0b14e140318"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/ipv6_allocations/4/",
+      "id": 4,
+      "name": "UL-RIPE-EU",
+      "cidr": "2a05:d018::/32"
+    },
+    "description": "Block carved from the RIPE allocation for cross region testing",
+    "status": "ASSIGNED",
+    "prefix": "2a05:d018:5::",
+    "prefixlen": 48
+  },
+  {
+    "url": "http://localhost:3001/rest/ipv6_blocks/307/",
+    "id": 307,
+    "name": "UL-SF10-ANYCAST",
+    "cidr": "2607:f4a0:ffff::/48",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "storage": null,
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "datacenter": {
+      "url": "http://localhost:3001/rest/datacenter/6/",
+      "id": 6,
+      "name": "SF10",
+      "uuid": "d02f2900-97e2-4350-ad2d-991331131205"
+    },
+    "allocation": {
+      "url": "http://localhost:3001/rest/ipv6_allocations/1/",
+      "id": 1,
+      "name": "UL-ARIN-PRIMARY",
+      "cidr": "2607:f4a0::/32"
+    },
+    "description": "Held back for anycast DNS and recursive resolver services",
+    "status": "AVAILABLE",
+    "prefix": "2607:f4a0:ffff::",
+    "prefixlen": 48
+  }
+]

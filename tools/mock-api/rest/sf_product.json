@@ -1,0 +1,90 @@
+[
+  {
+    "url": "http://localhost:3001/rest/sf_product/1/",
+    "id": 1,
+    "name": "Colocation - Full Cabinet",
+    "product_code": "COLO-CAB-FULL",
+    "family": "Colocation",
+    "description": "Full 42U cabinet with dual power feeds and 20A circuits.",
+    "list_price": 1850.0,
+    "is_active": true,
+    "salesforce_id": "01t60000003Kd91"
+  },
+  {
+    "url": "http://localhost:3001/rest/sf_product/2/",
+    "id": 2,
+    "name": "Colocation - Half Cabinet",
+    "product_code": "COLO-CAB-HALF",
+    "family": "Colocation",
+    "description": "Half cabinet (21U) with redundant power and shared cross connect panel.",
+    "list_price": 995.0,
+    "is_active": true,
+    "salesforce_id": "01t60000003Kd92"
+  },
+  {
+    "url": "http://localhost:3001/rest/sf_product/3/",
+    "id": 3,
+    "name": "Dedicated Server - Dell PowerEdge R430",
+    "product_code": "DED-R430",
+    "family": "Managed Hosting",
+    "description": "Dual Xeon E5-2620 v4, 128GB RAM, 2x480GB SSD, fully managed.",
+    "list_price": 640.0,
+    "is_active": true,
+    "salesforce_id": "01t60000003Kd93"
+  },
+  {
+    "url": "http://localhost:3001/rest/sf_product/4/",
+    "id": 4,
+    "name": "Private Cloud - VMware vSphere Node",
+    "product_code": "PVC-VMW-NODE",
+    "family": "Private Cloud",
+    "description": "Per-node VMware vSphere capacity including vCenter management.",
+    "list_price": 1275.0,
+    "is_active": true,
+    "salesforce_id": "01t60000003Kd94"
+  },
+  {
+    "url": "http://localhost:3001/rest/sf_product/5/",
+    "id": 5,
+    "name": "IP Transit - 100 Mbps Commit",
+    "product_code": "NET-TRANSIT-100",
+    "family": "Network",
+    "description": "Blended IP transit with 100 Mbps committed rate, 95th percentile billing.",
+    "list_price": 450.0,
+    "is_active": true,
+    "salesforce_id": "01t60000003Kd95"
+  },
+  {
+    "url": "http://localhost:3001/rest/sf_product/6/",
+    "id": 6,
+    "name": "Cross Connect - Single Mode Fiber",
+    "product_code": "NET-XC-SMF",
+    "family": "Network",
+    "description": "Single mode fiber cross connect within the same datacenter.",
+    "list_price": 275.0,
+    "is_active": true,
+    "salesforce_id": "01t60000003Kd96"
+  },
+  {
+    "url": "http://localhost:3001/rest/sf_product/7/",
+    "id": 7,
+    "name": "Managed Backup - Per TB",
+    "product_code": "MGD-BKP-TB",
+    "family": "Managed Services",
+    "description": "Managed VM backup with 30 day retention, billed per usable TB.",
+    "list_price": 85.0,
+    "is_active": true,
+    "salesforce_id": "01t60000003Kd97"
+  },
+  {
+    "url": "http://localhost:3001/rest/sf_product/8/",
+    "id": 8,
+    "name": "Legacy Remote Hands - Block Hours",
+    "product_code": "SVC-RH-BLOCK",
+    "family": "Professional Services",
+    "description": "Prepaid remote hands block. Retired in favor of on-demand billing.",
+    "list_price": 160.0,
+    "is_active": false,
+    "salesforce_id": "01t60000003Kd98"
+  }
+]

@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/org_storage/1/",
+    "id": 1,
+    "uuid": "1c2d3e4f-5061-4728-9a3b-4c5d6e7f8091",
+    "org": { "url": "http://localhost:3001/rest/fast/org/1/", "id": 1, "name": "UnitedLayer" },
+    "storage_model": { "url": "http://localhost:3001/rest/storage_model/1/", "id": 1, "name": "NetApp FAS8200" },
+    "allocated_gb": 51200,
+    "used_gb": 38140,
+    "tier": "SSD",
+    "datacenter": "SF10",
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/org_storage/2/",
+    "id": 2,
+    "uuid": "2d3e4f50-6172-4839-ab4c-5d6e7f8091a2",
+    "org": { "url": "http://localhost:3001/rest/fast/org/302/", "id": 302, "name": "1st Century Bank" },
+    "storage_model": { "url": "http://localhost:3001/rest/storage_model/2/", "id": 2, "name": "Pure FlashArray X20" },
+    "allocated_gb": 20480,
+    "used_gb": 11230,
+    "tier": "NVMe",
+    "datacenter": "ASH1",
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/org_storage/3/",
+    "id": 3,
+    "uuid": "3e4f5061-7283-494a-bc5d-6e7f8091a2b3",
+    "org": { "url": "http://localhost:3001/rest/fast/org/350/", "id": 350, "name": "STP-UnityOneDemo" },
+    "storage_model": { "url": "http://localhost:3001/rest/storage_model/3/", "id": 3, "name": "Dell EMC Unity 480" },
+    "allocated_gb": 10240,
+    "used_gb": 2870,
+    "tier": "HDD",
+    "datacenter": "LA1",
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/org_storage/4/",
+    "id": 4,
+    "uuid": "4f506172-8394-4a5b-cd6e-7f8091a2b3c4",
+    "org": { "url": "http://localhost:3001/rest/fast/org/255/", "id": 255, "name": "Yerba Buena Center for the Arts" },
+    "storage_model": { "url": "http://localhost:3001/rest/storage_model/4/", "id": 4, "name": "Synology RS4021xs+" },
+    "allocated_gb": 5120,
+    "used_gb": 4890,
+    "tier": "HDD",
+    "datacenter": "SF8",
+    "status": "NEAR_CAPACITY"
+  },
+  {
+    "url": "http://localhost:3001/rest/org_storage/5/",
+    "id": 5,
+    "uuid": "50617283-94a5-4b6c-de7f-8091a2b3c4d5",
+    "org": { "url": "http://localhost:3001/rest/fast/org/223/", "id": 223, "name": "Allen Lund Company" },
+    "storage_model": { "url": "http://localhost:3001/rest/storage_model/5/", "id": 5, "name": "HPE Nimble HF40" },
+    "allocated_gb": 15360,
+    "used_gb": 7420,
+    "tier": "Hybrid",
+    "datacenter": "LV1",
+    "status": "ACTIVE"
+  }
+]

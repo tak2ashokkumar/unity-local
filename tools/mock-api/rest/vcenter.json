@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/vcenter/3/",
+    "id": 3,
+    "uuid": "a4c81f92-6d70-4b18-9f21-73c5e0a8d114",
+    "name": "vcsa-sf10",
+    "proxy_url": "vcsa-sf10",
+    "proxy_fqdn": "https://vcsa-sf10.uproxy.unitedlayer.com",
+    "backend_url": "https://vcsa-sf10.internal.unitedlayer.com",
+    "username": "administrator@vsphere.local",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/1/",
+        "id": 1,
+        "name": "UnitedLayer",
+        "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+      }
+    ],
+    "version": "7.0.3",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/vcenter/4/",
+    "id": 4,
+    "uuid": "b57d20e6-91af-4c33-8e05-2f1a9b6c7d38",
+    "name": "vcsa-ash1",
+    "proxy_url": "vcsa-ash1",
+    "proxy_fqdn": "https://vcsa-ash1.uproxy.unitedlayer.com",
+    "backend_url": "https://vcsa-ash1.internal.unitedlayer.com",
+    "username": "administrator@vsphere.local",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/302/",
+        "id": 302,
+        "name": "1st Century Bank",
+        "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+      }
+    ],
+    "version": "8.0.1",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/vcenter/5/",
+    "id": 5,
+    "uuid": "c68e31f7-a2b0-4d44-9f16-3e2b8c7d0e49",
+    "name": "vcsa-la1",
+    "proxy_url": "vcsa-la1",
+    "proxy_fqdn": "https://vcsa-la1.uproxy.unitedlayer.com",
+    "backend_url": "https://vcsa-la1.internal.unitedlayer.com",
+    "username": "svc-unity@vsphere.local",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/350/",
+        "id": 350,
+        "name": "STP-UnityOneDemo",
+        "uuid": "9f4c1d55-72ab-4e30-b8d1-5c0e2a7f6b83"
+      }
+    ],
+    "version": "7.0.3",
+    "is_active": false
+  }
+]

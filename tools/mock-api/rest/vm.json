@@ -1,0 +1,212 @@
+[
+  {
+    "url": "http://localhost:3001/rest/vm/644/",
+    "id": 644,
+    "uuid": "34c19565-3072-464e-bb79-18f1dfe090a5",
+    "name": "ul-web-01",
+    "ip_address": "10.128.7.96",
+    "management_ip": "10.128.7.96",
+    "vcpus": 4,
+    "nics": 2,
+    "memory": 8192,
+    "os": {
+      "url": "http://localhost:3001/rest/os/310/",
+      "id": 310,
+      "name": "Ubuntu",
+      "version": "20.04",
+      "full_name": "Ubuntu 20.04",
+      "platform_type": "Linux"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "private_cloud": {
+      "id": 11,
+      "name": "UL-VMware-Prod",
+      "uuid": "0bd6781e-eb51-4f2c-affd-74bfac9f9097",
+      "platform_type": "VMware"
+    },
+    "datacenter": "SF10",
+    "status": "CONFIGURED",
+    "hypervisor": "esx-sf10-04",
+    "first_discovered": "2025-04-08T11:29:51.716198-07:00"
+  },
+  {
+    "url": "http://localhost:3001/rest/vm/645/",
+    "id": 645,
+    "uuid": "63bc2476-8299-4f87-9d5c-289b00377baa",
+    "name": "ul-db-01",
+    "ip_address": "10.128.7.97",
+    "management_ip": "10.128.7.97",
+    "vcpus": 8,
+    "nics": 2,
+    "memory": 32768,
+    "os": {
+      "url": "http://localhost:3001/rest/os/311/",
+      "id": 311,
+      "name": "CentOS",
+      "version": "7.9",
+      "full_name": "CentOS 7.9",
+      "platform_type": "Linux"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "private_cloud": {
+      "id": 11,
+      "name": "UL-VMware-Prod",
+      "uuid": "0bd6781e-eb51-4f2c-affd-74bfac9f9097",
+      "platform_type": "VMware"
+    },
+    "datacenter": "SF10",
+    "status": "CONFIGURED",
+    "hypervisor": "esx-sf10-04",
+    "first_discovered": "2025-04-08T11:31:02.118400-07:00"
+  },
+  {
+    "url": "http://localhost:3001/rest/vm/646/",
+    "id": 646,
+    "uuid": "8eea103c-6209-4d58-9e09-9a2c2633b620",
+    "name": "bank-app-prod",
+    "ip_address": "172.20.4.15",
+    "management_ip": "172.20.4.15",
+    "vcpus": 4,
+    "nics": 1,
+    "memory": 16384,
+    "os": {
+      "url": "http://localhost:3001/rest/os/312/",
+      "id": 312,
+      "name": "Windows Server",
+      "version": "2019",
+      "full_name": "Windows Server 2019",
+      "platform_type": "Windows"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank",
+      "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+    },
+    "private_cloud": {
+      "id": 12,
+      "name": "UL-OpenStack-East",
+      "uuid": "3c874681-c479-497d-9689-9c1c29a85efc",
+      "platform_type": "OpenStack"
+    },
+    "datacenter": "ASH1",
+    "status": "CONFIGURED",
+    "hypervisor": "kvm-ash1-02",
+    "first_discovered": "2025-06-19T09:14:33.550120-07:00"
+  },
+  {
+    "url": "http://localhost:3001/rest/vm/647/",
+    "id": 647,
+    "uuid": "a041aa69-2c4d-44a3-b171-81a6657908ef",
+    "name": "demo-jenkins",
+    "ip_address": "10.60.2.31",
+    "management_ip": "10.60.2.31",
+    "vcpus": 2,
+    "nics": 1,
+    "memory": 4096,
+    "os": {
+      "url": "http://localhost:3001/rest/os/310/",
+      "id": 310,
+      "name": "Ubuntu",
+      "version": "22.04",
+      "full_name": "Ubuntu 22.04",
+      "platform_type": "Linux"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo",
+      "uuid": "9f4c1d55-72ab-4e30-b8d1-5c0e2a7f6b83"
+    },
+    "private_cloud": {
+      "id": 13,
+      "name": "UL-HyperV-Lab",
+      "uuid": "7f2c9a55-1c8e-4c1a-9a3d-2b6f0d5e1a44",
+      "platform_type": "HyperV"
+    },
+    "datacenter": "LA1",
+    "status": "NOT_CONFIGURED",
+    "hypervisor": "hv-la1-01",
+    "first_discovered": "2025-09-02T15:47:10.004312-07:00"
+  },
+  {
+    "url": "http://localhost:3001/rest/vm/648/",
+    "id": 648,
+    "uuid": "c8b89158-1b6c-4dad-bac1-3dc9d5483274",
+    "name": "ybca-media-01",
+    "ip_address": "10.72.9.8",
+    "management_ip": "10.72.9.8",
+    "vcpus": 6,
+    "nics": 2,
+    "memory": 24576,
+    "os": {
+      "url": "http://localhost:3001/rest/os/313/",
+      "id": 313,
+      "name": "Big sur",
+      "version": "11.2.3",
+      "full_name": "Big sur 11.2.3",
+      "platform_type": "MacOS"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts",
+      "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+    },
+    "private_cloud": {
+      "id": 15,
+      "name": "UL-Proxmox-Edge",
+      "uuid": "c9e0f3b8-77a1-4d52-b6f4-3a8c5d2e7b91",
+      "platform_type": "Proxmox"
+    },
+    "datacenter": "SF8",
+    "status": "ERROR",
+    "hypervisor": "px-sf8-01",
+    "first_discovered": "2026-01-22T08:03:44.912770-08:00"
+  },
+  {
+    "url": "http://localhost:3001/rest/vm/649/",
+    "id": 649,
+    "uuid": "df250342-06d0-4892-9689-fb1c957bd623",
+    "name": "ul-cache-02",
+    "ip_address": "10.128.7.112",
+    "management_ip": "10.128.7.112",
+    "vcpus": 2,
+    "nics": 1,
+    "memory": 8192,
+    "os": {
+      "url": "http://localhost:3001/rest/os/311/",
+      "id": 311,
+      "name": "CentOS",
+      "version": "7.9",
+      "full_name": "CentOS 7.9",
+      "platform_type": "Linux"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "private_cloud": {
+      "id": 14,
+      "name": "UL-VMware-DR",
+      "uuid": "b1d4e6a2-55f7-4f0b-8c3e-9d7a1f2c8e60",
+      "platform_type": "VMware"
+    },
+    "datacenter": "LV1",
+    "status": "CONFIGURED",
+    "hypervisor": "esx-lv1-01",
+    "first_discovered": "2025-11-05T13:20:58.667001-08:00"
+  }
+]

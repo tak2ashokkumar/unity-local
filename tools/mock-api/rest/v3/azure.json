@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/v3/azure/191/",
+    "id": 191,
+    "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+    "name": "azure tenant1",
+    "account_name": "azure tenant1",
+    "subscription_id": "6f1a2b3c-4d5e-4f60-8a71-9b2c3d4e5f60",
+    "tenant_id": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+    "region": "eastus",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer"
+    },
+    "instance_count": 6,
+    "status": "ACTIVE",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3/azure/247/",
+    "id": 247,
+    "uuid": "42e91b2f-02dd-4cf3-8a37-7184c9344862",
+    "name": "New Azure",
+    "account_name": "New Azure",
+    "subscription_id": "7a2b3c4d-5e6f-4071-9b82-0c3d4e5f6071",
+    "tenant_id": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+    "region": "westus2",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/350/",
+      "id": 350,
+      "name": "STP-UnityOneDemo"
+    },
+    "instance_count": 11,
+    "status": "ACTIVE",
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/v3/azure/253/",
+    "id": 253,
+    "uuid": "564725e4-3281-4489-87c3-210c9cdd2cfd",
+    "name": "test",
+    "account_name": "test",
+    "subscription_id": "8b3c4d5e-6f70-4182-ac93-1d4e5f607182",
+    "tenant_id": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+    "region": "centralus",
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts"
+    },
+    "instance_count": 9,
+    "status": "ACTIVE",
+    "is_active": true
+  }
+]

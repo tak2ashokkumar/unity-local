@@ -6,11 +6,37 @@
 - This is my company laptop and as per the company rules, Codex / ChatGpt / Claude / Gemini Or any other AI Agent as external agents and the screen captures you do as potencially hacking type. So please don't take screen shots in any circumstances.
 - Also please don't run any scripts to change anything apart from the content inside unity-local folder.
 - Donot add corrupted/non-ASCII section-divider symbols in comments or in any places. Always Keep the comments readable using simple ASCII text. Do not change any component logic, imports, API calls, template, service, or mock files while handling ASCII Text...
+- PRODUCTION WRITE SAFETY: whenever the proxy is on a LIVE environment (any API_ENV other
+  than mock - prod, ams, play, alpha) the apps are pointed at a REAL system. In that mode you MUST NOT
+  trigger any write API - POST / PUT / PATCH / DELETE - without asking me first and getting
+  an explicit yes for that specific action. That includes clicking Save / Create / Delete in
+  the UI, running a scripted fetch, "just testing" a form, and anything that buys, imports,
+  impersonates or otherwise changes state. Read-only GETs are fine.
+  If you cannot tell whether something writes, assume it does and ask.
+  Before any such action, confirm which environment is active (GET /__admin_env -> "live").
+  In mock mode (default) writes are harmless - the mock only echoes them.
 
 # Command Execution Rules
 - NEVER use Bash, PowerShell, or any shell tool to run npm, ng, node, or any terminal commands.
 - The user runs ALL commands themselves ( except for updating mocks with .har files). Only tell the user what command to run — do not execute it.
 - Never run builds. The user will run the build and report back if something goes wrong.
+- ALWAYS give commands as the dev.sh aliases, never as raw npm/node/ng lines. dev.sh is
+  sourced in this shell, so the alias is what I actually type. If a task needs something
+  dev.sh does not cover yet, ADD an alias to dev.sh first, then tell me that alias name.
+  dev.sh is grouped by ENVIRONMENT. Pick the group, then the app:
+    navigate  : cdd, uldb, unity, mtp, mockapi, proxy, admin, adminreact
+    mock api  : startmock                      (Express mock on :3001, needed for MOCK)
+    MOCK      : mock-admin, mock-unity, mock-mtp        (+ mock-admin-legacy)
+    PROD      : prod-admin, prod-unity, prod-mtp        (+ prod-admin-legacy)
+    AMS       : ams-admin, ams-unity, ams-mtp           (+ ams-admin-legacy)
+    PLAY      : play-admin, play-unity, play-mtp        (+ play-admin-legacy)
+    ALPHA     : alpha-admin, alpha-unity, alpha-mtp     (+ alpha-admin-legacy)
+    app builds: buildunity/serveunity, buildmtp/servemtp,
+                buildadmin, buildadminwatch, serveadminreact, serveadmin (legacy), buildprod
+    python    : pythonlocal
+  Only ONE proxy runs at a time - it serves ngx-unity (:8091), the admin panel
+  (:8091/admin) and ngx-mtp (:8061) together, so within a group the three app
+  commands are equivalent and just state intent.
 
 # Project Scope
 - Primary work is inside uldb/ngx-unity/ only.
@@ -26,6 +52,38 @@
   - Proxy /customer/* -> localhost:3001 (Mock API -- Express + JSON files)
   - Proxy /* -> localhost:8090 (Angular static server)
 - Proxy configs must remain in tools/proxy. Do not move or duplicate them.
+
+# Data Source: environments (mock + several live systems)
+- ONE setting decides where ALL THREE front ends get their data - API_ENV in
+  tools/proxy/server.js. Do not set it by hand; use the dev.sh group for that
+  environment (see Command Execution Rules).
+      mock   local mock API on :3001   (tools/mock-api JSON files)   [default, safe]
+      prod   https://unity.unitedlayer.com
+      ams    http://unity-ams.unitedlayer.com
+      play   https://play.unityone.ai
+      alpha  https://alpha.unityone.ai
+- Add a new environment by adding one entry to API_ENVIRONMENTS in tools/proxy/server.js
+  and a matching group of aliases in dev.sh. Nothing in any app changes.
+- It covers every app, because they all reach data through that one file:
+    admin panel (legacy + ngx-admin) : http://localhost:8091/admin
+    ngx-unity                        : http://localhost:8091
+    ngx-mtp                          : http://localhost:8061
+- The mock JSON files always stay in place; switching environments never touches them.
+- Auth on a live environment: the API accepts ONLY Django SessionAuthentication - there is
+  no API token. Each environment is a separate login, so each needs its own session file:
+      tools/proxy/.cookie-<env>      e.g. .cookie-prod, .cookie-play, .cookie-alpha
+  (.prod-cookie still works for prod). Gitignored, re-read per request, so refreshing an
+  expired session needs no restart. Never commit, print, echo or log a cookie value.
+- For writes the proxy adds Origin, Referer and X-CSRFToken, which DRF SessionAuthentication
+  requires. An expired session comes back as a clean JSON 401, not login HTML.
+- Calling a live backend straight from the browser is impossible by design, so do not try:
+  django-cors-headers is disabled in settings.py (no Access-Control-Allow-Origin is ever
+  sent) and the Django session cookie is SameSite=Lax (not sent cross-site). The
+  server-side proxy is the only path that works.
+- GET /__admin_env on either proxy reports { env, label, apiTarget, live, authenticated }
+  so the active environment is always checkable. ngx-admin shows a red LIVE banner when
+  live. An unreachable host returns a JSON 502 naming the error code.
+- Ports are overridable via PROXY_PORT / MTP_PROXY_PORT (defaults 8091 / 8061).
 
 ## General
 - Use existing project patterns. Do NOT introduce new abstractions unless explicitly requested.

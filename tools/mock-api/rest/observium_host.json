@@ -1,1 +1,102 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/observium_host/1/",
+    "id": 1,
+    "uuid": "2a4f7b91-6c03-4d58-8e12-9f0b3d6a7c48",
+    "hostname": "sw3.to1.unitedlayer.com",
+    "device_id": 4412,
+    "observium_instance": {
+      "url": "http://localhost:3001/rest/observium/instance/2/",
+      "id": 2,
+      "account_name": "SF Granicus mon01"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/215/",
+      "id": 215,
+      "name": "Granicus, Inc"
+    },
+    "device_type": "Switch",
+    "status": "up",
+    "last_polled": "2026-07-14T20:50:12Z"
+  },
+  {
+    "url": "http://localhost:3001/rest/observium_host/2/",
+    "id": 2,
+    "uuid": "3b508ca2-7d14-4e69-9f23-0a1c4e7b8d59",
+    "hostname": "lb1-903.sf10.unitedlayer.com",
+    "device_id": 4487,
+    "observium_instance": {
+      "url": "http://localhost:3001/rest/observium/instance/2/",
+      "id": 2,
+      "account_name": "SF Granicus mon01"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/301/",
+      "id": 301,
+      "name": "ConsumerAffairs.com"
+    },
+    "device_type": "Load Balancer",
+    "status": "up",
+    "last_polled": "2026-07-14T20:49:55Z"
+  },
+  {
+    "url": "http://localhost:3001/rest/observium_host/3/",
+    "id": 3,
+    "uuid": "4c619db3-8e25-4f70-a034-1b2d5f8c9e60",
+    "hostname": "sw1-core.lv1.unitedlayer.com",
+    "device_id": 4520,
+    "observium_instance": {
+      "url": "http://localhost:3001/rest/observium/instance/6/",
+      "id": 6,
+      "account_name": "LV Core mon02"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/223/",
+      "id": 223,
+      "name": "Allen Lund Company"
+    },
+    "device_type": "Switch",
+    "status": "warning",
+    "last_polled": "2026-07-14T20:48:31Z"
+  },
+  {
+    "url": "http://localhost:3001/rest/observium_host/4/",
+    "id": 4,
+    "uuid": "5d72aec4-9f36-4a81-b145-2c3e6a9d0f71",
+    "hostname": "fw1-201.ash1.unitedlayer.com",
+    "device_id": 4566,
+    "observium_instance": {
+      "url": "http://localhost:3001/rest/observium/instance/6/",
+      "id": 6,
+      "account_name": "LV Core mon02"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/302/",
+      "id": 302,
+      "name": "1st Century Bank"
+    },
+    "device_type": "Firewall",
+    "status": "up",
+    "last_polled": "2026-07-14T20:51:07Z"
+  },
+  {
+    "url": "http://localhost:3001/rest/observium_host/5/",
+    "id": 5,
+    "uuid": "6e83bfd5-0a47-4b92-c256-3d4f7b0e1a82",
+    "hostname": "px-sf8-01.unitedlayer.com",
+    "device_id": 4601,
+    "observium_instance": {
+      "url": "http://localhost:3001/rest/observium/instance/2/",
+      "id": 2,
+      "account_name": "SF Granicus mon01"
+    },
+    "customer": {
+      "url": "http://localhost:3001/rest/fast/org/255/",
+      "id": 255,
+      "name": "Yerba Buena Center for the Arts"
+    },
+    "device_type": "Server",
+    "status": "down",
+    "last_polled": "2026-07-14T20:44:02Z"
+  }
+]

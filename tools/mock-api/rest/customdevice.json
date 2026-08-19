@@ -1,1 +1,77 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/customdevice/1/",
+    "id": 1,
+    "uuid": "5f1a2b3c-4d5e-4f60-8a71-9b2c3d4e5f61",
+    "name": "kvm-console-sf10-01",
+    "device_type": "KVM Console",
+    "manufacturer": { "url": "http://localhost:3001/rest/manufacturer/1/", "id": 1, "name": "APC" },
+    "customers": [ { "url": "http://localhost:3001/rest/fast/org/1/", "id": 1, "name": "UnitedLayer" } ],
+    "cabinet": { "url": "http://localhost:3001/rest/cabinet/950/", "id": 950, "name": "01.EA.034" },
+    "ip_address": "10.20.14.44",
+    "serial_number": "APC-KVM-88213",
+    "asset_tag": "UL-CD-2001",
+    "datacenter": "SF10",
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/customdevice/2/",
+    "id": 2,
+    "uuid": "6a2b3c4d-5e6f-4071-9b82-0c3d4e5f6072",
+    "name": "env-sensor-ash1-03",
+    "device_type": "Environmental Sensor",
+    "manufacturer": { "url": "http://localhost:3001/rest/manufacturer/1/", "id": 1, "name": "APC" },
+    "customers": [ { "url": "http://localhost:3001/rest/fast/org/302/", "id": 302, "name": "1st Century Bank" } ],
+    "cabinet": { "url": "http://localhost:3001/rest/cabinet/951/", "id": 951, "name": "02.CB.011" },
+    "ip_address": "10.30.9.77",
+    "serial_number": "APC-ENV-41902",
+    "asset_tag": "UL-CD-2002",
+    "datacenter": "ASH1",
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/customdevice/3/",
+    "id": 3,
+    "uuid": "7b3c4d5e-6f70-4182-ac93-1d4e5f607183",
+    "name": "tape-library-la1-01",
+    "device_type": "Tape Library",
+    "manufacturer": { "url": "http://localhost:3001/rest/manufacturer/2/", "id": 2, "name": "Intel" },
+    "customers": [ { "url": "http://localhost:3001/rest/fast/org/350/", "id": 350, "name": "STP-UnityOneDemo" } ],
+    "cabinet": { "url": "http://localhost:3001/rest/cabinet/952/", "id": 952, "name": "03.DA.007" },
+    "ip_address": "10.40.3.19",
+    "serial_number": "TL-LA1-77310",
+    "asset_tag": "UL-CD-2003",
+    "datacenter": "LA1",
+    "status": "MAINTENANCE"
+  },
+  {
+    "url": "http://localhost:3001/rest/customdevice/4/",
+    "id": 4,
+    "uuid": "8c4d5e6f-7081-4293-bda4-2e5f60718294",
+    "name": "rfid-reader-sf8-02",
+    "device_type": "RFID Reader",
+    "manufacturer": { "url": "http://localhost:3001/rest/manufacturer/3/", "id": 3, "name": "Generic" },
+    "customers": [ { "url": "http://localhost:3001/rest/fast/org/255/", "id": 255, "name": "Yerba Buena Center for the Arts" } ],
+    "cabinet": null,
+    "ip_address": "10.72.9.31",
+    "serial_number": "RFID-SF8-20114",
+    "asset_tag": "UL-CD-2004",
+    "datacenter": "SF8",
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/customdevice/5/",
+    "id": 5,
+    "uuid": "9d5e6f70-8192-43a4-cec5-3f6071829305",
+    "name": "console-server-lv1-01",
+    "device_type": "Console Server",
+    "manufacturer": { "url": "http://localhost:3001/rest/manufacturer/3/", "id": 3, "name": "Generic" },
+    "customers": [ { "url": "http://localhost:3001/rest/fast/org/223/", "id": 223, "name": "Allen Lund Company" } ],
+    "cabinet": { "url": "http://localhost:3001/rest/cabinet/953/", "id": 953, "name": "01.AA.002" },
+    "ip_address": "10.50.7.12",
+    "serial_number": "CS-LV1-55028",
+    "asset_tag": "UL-CD-2005",
+    "datacenter": "LV1",
+    "status": "ACTIVE"
+  }
+]

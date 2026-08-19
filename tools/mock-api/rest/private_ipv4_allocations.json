@@ -1,1 +1,72 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_allocations/1/",
+    "id": 1,
+    "uuid": "11223344-5566-4778-99aa-bbccddeeff01",
+    "cidr": "10.0.0.0/8",
+    "network": "10.0.0.0",
+    "prefix_length": 8,
+    "description": "Global RFC1918 supernet for managed infrastructure",
+    "customer": null,
+    "datacenter": null,
+    "total_ips": 16777216,
+    "used_ips": 42118,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_allocations/2/",
+    "id": 2,
+    "uuid": "22334455-6677-4889-aabb-ccddeeff0102",
+    "cidr": "10.20.0.0/16",
+    "network": "10.20.0.0",
+    "prefix_length": 16,
+    "description": "SF10 management network",
+    "customer": { "url": "http://localhost:3001/rest/fast/org/1/", "id": 1, "name": "UnitedLayer" },
+    "datacenter": "SF10",
+    "total_ips": 65536,
+    "used_ips": 9210,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_allocations/3/",
+    "id": 3,
+    "uuid": "33445566-7788-499a-bbcc-ddeeff010203",
+    "cidr": "10.30.0.0/16",
+    "network": "10.30.0.0",
+    "prefix_length": 16,
+    "description": "ASH1 management network",
+    "customer": { "url": "http://localhost:3001/rest/fast/org/302/", "id": 302, "name": "1st Century Bank" },
+    "datacenter": "ASH1",
+    "total_ips": 65536,
+    "used_ips": 3140,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_allocations/4/",
+    "id": 4,
+    "uuid": "44556677-8899-4aab-ccdd-eeff01020304",
+    "cidr": "172.20.0.0/14",
+    "network": "172.20.0.0",
+    "prefix_length": 14,
+    "description": "Private cloud tenant networks",
+    "customer": { "url": "http://localhost:3001/rest/fast/org/350/", "id": 350, "name": "STP-UnityOneDemo" },
+    "datacenter": "LA1",
+    "total_ips": 262144,
+    "used_ips": 1802,
+    "status": "ACTIVE"
+  },
+  {
+    "url": "http://localhost:3001/rest/private_ipv4_allocations/5/",
+    "id": 5,
+    "uuid": "55667788-99aa-4bbc-ddee-ff0102030405",
+    "cidr": "192.168.100.0/24",
+    "network": "192.168.100.0",
+    "prefix_length": 24,
+    "description": "Out-of-band IPMI network - SF8",
+    "customer": { "url": "http://localhost:3001/rest/fast/org/255/", "id": 255, "name": "Yerba Buena Center for the Arts" },
+    "datacenter": "SF8",
+    "total_ips": 256,
+    "used_ips": 118,
+    "status": "ACTIVE"
+  }
+]

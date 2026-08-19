@@ -1,1 +1,40 @@
-[]
+[
+  {
+    "url": "http://localhost:3001/rest/openstack_proxy/2/",
+    "id": 2,
+    "uuid": "d71f4a08-3c5b-4e91-a2d6-8b0f7c1e5942",
+    "name": "osp-ash1",
+    "proxy_url": "osp-ash1",
+    "proxy_fqdn": "https://osp-ash1.uproxy.unitedlayer.com",
+    "backend_url": "https://keystone-ash1.internal.unitedlayer.com:5000/v3",
+    "region": "RegionOne",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/302/",
+        "id": 302,
+        "name": "1st Century Bank",
+        "uuid": "1a7ba3c4-e3d0-4912-a0ca-30d797e76e76"
+      }
+    ],
+    "is_active": true
+  },
+  {
+    "url": "http://localhost:3001/rest/openstack_proxy/3/",
+    "id": 3,
+    "uuid": "e82a5b19-4d6c-4fa2-b3e7-9c1a8d2f6053",
+    "name": "osp-sf8",
+    "proxy_url": "osp-sf8",
+    "proxy_fqdn": "https://osp-sf8.uproxy.unitedlayer.com",
+    "backend_url": "https://keystone-sf8.internal.unitedlayer.com:5000/v3",
+    "region": "RegionTwo",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/255/",
+        "id": 255,
+        "name": "Yerba Buena Center for the Arts",
+        "uuid": "e07f993e-09b0-4654-a72b-2107dd76ec1b"
+      }
+    ],
+    "is_active": true
+  }
+]
