@@ -76,7 +76,7 @@ export class ZabbixAwsMonitoringConfigComponent implements OnInit, OnDestroy {
     }
   }
 
-  refreshData(){
+  refreshData() {
     this.getDeviceMonitoring();
     this.getCollectors();
   }

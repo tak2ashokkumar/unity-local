@@ -1,4 +1,5 @@
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
@@ -28,12 +29,13 @@ type RemoteWebViewerState =
 })
 export class RemoteWebViewerComponent implements OnInit, OnDestroy {
   @ViewChild('viewport', { static: false }) viewport: ElementRef<HTMLDivElement>;
+  @ViewChild('keyboardCapture', { static: false }) keyboardCapture: ElementRef<HTMLTextAreaElement>;
 
   sessionId = '';
   state: RemoteWebViewerState = 'authorizing';
   statusLabel = 'Authorizing';
   errorMessage = '';
-  frameUrl = '';
+  frameUrl: SafeUrl | string = '';
   textFrame = '';
   connectionStatus = 'Disconnected';
   durationLabel = '00:00';
@@ -65,7 +67,8 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private remoteAccess: RemoteAccessService
+    private remoteAccess: RemoteAccessService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -169,12 +172,17 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
         this.setState('terminated');
         this.connectionStatus = 'Terminated';
         this.closeSocket();
+        window.close();
       }, () => {
         this.setState('failed');
         this.errorMessage = 'Unable to terminate the remote web session. Please refresh status or contact support.';
         this.connectionStatus = 'Termination failed';
         this.closeSocket();
       });
+  }
+
+  openInNewTab(): void {
+    window.open(window.location.href, '_blank');
   }
 
   toggleFullscreen(): void {
@@ -198,6 +206,9 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
     if (!this.canSendInput) {
       return;
     }
+    if (event.ctrlKey && event.key === 'v' && eventType === 'keydown') {
+      return;
+    }
     this.markInputActivity();
     this.sendInput({
       type: 'keyboard',
@@ -211,6 +222,33 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
       repeat: event.repeat
     });
     event.preventDefault();
+  }
+
+  onPasteEvent(event: ClipboardEvent): void {
+    if (!this.canSendInput) {
+      return;
+    }
+    event.preventDefault();
+    if (this.keyboardCapture) { this.keyboardCapture.nativeElement.value = ''; }
+    const cd = event.clipboardData;
+    const text = cd.getData('text/plain');
+    if (text) {
+      this.sendInput({ type: 'clipboard_paste', text });
+    } else {
+    }
+  }
+
+  onClipboardButtonClick(): void {
+    if (!this.canSendInput) { return; }
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      navigator.clipboard.readText().then(text => {
+        if (text && this.canSendInput) {
+          this.sendInput({ type: 'clipboard_paste', text });
+        }
+      }).catch(() => {});
+    } else {
+      if (this.keyboardCapture) { this.keyboardCapture.nativeElement.focus(); }
+    }
   }
 
   onMouseEvent(event: MouseEvent, eventType: string): void {
@@ -391,6 +429,13 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (payload.type === 'vcenter_web_clipboard' && payload.text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(payload.text).catch(() => {});
+      }
+      return;
+    }
+
     if (payload.type === 'vcenter_web_close' || payload.type === 'ra_close' || payload.type === 'session_failed') {
       this.handleCloseMessage(payload);
       return;
@@ -447,6 +492,8 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
   private sendInput(payload: any): void {
     if (!this.canSendInput) {
       return;
+    }
+    if (payload.type === 'clipboard_paste') {
     }
     this.ws.send(JSON.stringify(payload));
   }
@@ -517,7 +564,7 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
   private setBlobFrame(blob: Blob): void {
     this.releaseObjectUrl();
     this.objectUrl = URL.createObjectURL(blob);
-    this.frameUrl = this.objectUrl;
+    this.frameUrl = this.sanitizer.bypassSecurityTrustUrl(this.objectUrl);
     this.textFrame = '';
     this.connectionStatus = 'Display active';
     this.reconnectDeadlineMs = 0;
@@ -526,7 +573,7 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
 
   private setBase64Frame(data: string, mimeType: string): void {
     this.releaseObjectUrl();
-    this.frameUrl = 'data:' + mimeType + ';base64,' + data;
+    this.frameUrl = this.sanitizer.bypassSecurityTrustUrl('data:' + mimeType + ';base64,' + data);
     this.textFrame = '';
     this.connectionStatus = 'Display active';
     this.reconnectDeadlineMs = 0;
@@ -534,8 +581,12 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
   }
 
   private setState(state: RemoteWebViewerState): void {
+    const prev = this.state;
     this.state = state;
     this.statusLabel = this.labelForState(state);
+    if (state === 'active' && prev !== 'active') {
+      setTimeout(() => this.sendViewportResize(), 0);
+    }
   }
 
   private fail(message: string): void {
@@ -591,7 +642,9 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
   }
 
   private focusViewport(): void {
-    if (this.viewport) {
+    if (this.keyboardCapture) {
+      this.keyboardCapture.nativeElement.focus();
+    } else if (this.viewport) {
       this.viewport.nativeElement.focus();
     }
   }

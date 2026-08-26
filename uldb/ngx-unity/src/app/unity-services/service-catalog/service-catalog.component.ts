@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { TabData } from 'src/app/shared/tabdata';
 import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
+import { UserInfoService } from 'src/app/shared/user-info.service';
 
 @Component({
   selector: 'service-catalog',
@@ -14,16 +15,19 @@ export class ServiceCatalogComponent implements OnInit, OnDestroy {
 
   tabItems: TabData[] = tabData;
   subscr: Subscription;
+  isServiceCatalogOnlyUser: boolean = false;
 
   constructor(private router: Router,
-    private permissionService: PermissionService) {
-    this.subscr = this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        if (event.url === '/services/service-catalog') {
-          this.router.navigate([this.tabItems[0].url]);
+    private permissionService: PermissionService,
+    private userInfoSvc: UserInfoService) {
+    this.isServiceCatalogOnlyUser = this.userInfoSvc.isServiceCatalogOnlyUser();
+      this.subscr = this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          if (event.url === '/services/service-catalog') {
+            this.router.navigate([this.tabItems[0].url]);
+          }
         }
-      }
-    });
+      });
   }
 
   ngOnInit() {
@@ -53,12 +57,12 @@ export class ServiceCatalogComponent implements OnInit, OnDestroy {
 
 const tabData: TabData[] = [
   {
-    name: 'Catalog',
-    url: '/services/service-catalog/catalog'
+    name: 'Catalogs',
+    url: '/services/service-catalog/redesign/catalog'
   },
   {
     name: 'Orders',
-    url: '/services/service-catalog/orders',
+    url: '/services/service-catalog/redesign/orders',
     task: 'Order Catalog',
     permission: 'Order Catalog'
   },

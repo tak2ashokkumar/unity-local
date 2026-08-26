@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Optional, Output } from '@angular/core';
 import { OrchestrationAgenticWorkflowVariablesService, paramNameValidator } from './orchestration-agentic-workflow-variables.service';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, debounceTime, takeUntil } from 'rxjs/operators';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { Observable, of, Subject } from 'rxjs';
 import { BsModalRef } from 'ngx-bootstrap/modal';
@@ -29,26 +29,49 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
   cloudAccount: any;
   credentials: any;
 
+  @Input() isDynamicWorkflow = false;
+  @Input() stackFields = true;
+  @Output() formDataChange = new EventEmitter<any>();
+  @Input() initialData: any;
+
+
   constructor(
     private svc: OrchestrationAgenticWorkflowVariablesService,
     private utilService: AppUtilityService,
     private fb: FormBuilder,
-    public bsModalRef: BsModalRef,
+    @Optional() public bsModalRef: BsModalRef,
     private paramsCompSvc: OrchestrationAgenticWorkflowParamsService,
     private notification: AppNotificationService,
   ) { }
 
   ngOnInit(): void {
-
     this.getCloudAccount();
     this.getCredentials();
     this.buildForm();
+
+    if (this.isDynamicWorkflow) {
+      this.workflowVarsForm.valueChanges
+        .pipe(
+          debounceTime(300),
+          takeUntil(this.ngUnsubscribe)
+        )
+        .subscribe(() => {
+          this.autoSaveProperties();
+          this.formDataChange.emit(this.updatedFormDatas);
+        });
+    }
+  }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   buildForm(): void {
     this.workflowVarsForm = this.svc.createWorkflowVarsForm();
     this.workflowVarsFormErrors = this.svc.workflowVarFormErrors();
     this.workflowVarsFormValidationMessages = this.svc.workflowVarFormValidationMessage;
+    const workflowVarData = this.getWorkflowVarData();
 
     const array = this.variables;
     array.clear();
@@ -56,7 +79,7 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
     // Clear error array as well
     this.workflowVarsFormErrors.variables = [];
 
-    (this.workflowVarData?.variables ?? []).forEach(v => {
+    (workflowVarData?.variables ?? []).forEach(v => {
       const group = this.svc.createWorkflowVarGroup(v);
 
       group.get('param_type')!
@@ -84,6 +107,10 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
     //     default_value: ''
     //   });
     // }
+  }
+
+  private getWorkflowVarData() {
+    return this.initialData?.workflowVarsForm ?? this.initialData ?? this.workflowVarData;
   }
 
 
@@ -193,38 +220,75 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
       .getAllCloud()
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((accounts) => {
-        this.cloudAccount = accounts;
+        this.cloudAccount = Array.isArray(accounts) ? accounts : accounts?.results ?? [];
       });
   }
 
   getAttributesForInput(input: any): string[] {
-    if (input.param_type === 'Cloud Account') {
+    const paramType = this.normalizeParamType(input?.param_type);
+
+    if (paramType === 'CLOUD_ACCOUNT') {
+      const defaultValue = input?.default_value;
+      const accountId = typeof defaultValue === 'object'
+        ? defaultValue?.uuid ?? defaultValue?.value
+        : defaultValue;
+      if (!accountId) {
+        return [];
+      }
+
       const account = this.cloudAccount?.find(
-        (acc) => acc.uuid === input.default_value.uuid
+        (acc) => String(acc?.uuid) === String(accountId)
       );
       if (!account) {
         return [];
       }
+
+      const cloudType = String(account.cloud_type ?? '').trim().toLowerCase();
+      const resolvedCloudType = cloudType === 'united private cloud vcenter'
+        ? 'vmware'
+        : cloudType;
       const attrConfig = cloudAttributes.find(
-        (c) => c.cloudType === account.cloud_type
+        (config) => config.cloudType.toLowerCase() === resolvedCloudType
       );
       return attrConfig ? attrConfig.attributes : [];
     }
 
-    if (input.param_type === 'Credential') {
-      return ['username', 'password'];
+    if (paramType === 'CREDENTIAL') {
+      const defaultValue = input?.default_value;
+      const credentialId = typeof defaultValue === 'object'
+        ? defaultValue?.uuid ?? defaultValue?.value
+        : defaultValue;
+      const credential = this.credentials?.find(
+        (item) => String(item?.uuid) === String(credentialId)
+      );
+      return credential ? ['username', 'password', 'sudo_password'] : [];
+    }
+
+    if (paramType === 'TARGET') {
+      const selectedTarget = Array.isArray(input?.default_value)
+        ? input.default_value[0]
+        : input?.default_value;
+      return selectedTarget && typeof selectedTarget === 'object'
+        ? ['uuid', 'name', 'ip_address', 'os']
+        : [];
     }
 
     return [];
   }
 
+  private normalizeParamType(paramType: any): string {
+    return String(paramType ?? '')
+      .trim()
+      .replace(/[\s-]+/g, '_')
+      .toUpperCase();
+  }
 
   getCredentials() {
     this.paramsCompSvc
       .getCredentials()
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((accounts) => {
-        this.credentials = accounts;
+        this.credentials = Array.isArray(accounts) ? accounts : (accounts as any)?.results ?? [];
       });
   }
 
@@ -290,11 +354,15 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
       if (this.onClose) {
         this.autoSaveProperties();
         this.onClose(this.updatedFormDatas);
-        this.bsModalRef.hide();
+        if (this.bsModalRef) {
+          this.bsModalRef.hide();
+        }
       }
 
     } else {
-      this.bsModalRef.hide();
+      if (this.bsModalRef) {
+        this.bsModalRef.hide();
+      }
     }
   }
 

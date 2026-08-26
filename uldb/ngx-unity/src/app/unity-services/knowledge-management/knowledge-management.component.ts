@@ -227,4 +227,3 @@ export class KnowledgeManagementComponent implements OnInit, OnDestroy {
   }
 
 }
-

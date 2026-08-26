@@ -28,6 +28,9 @@ export interface UnitySetupCredentials {
     devices: UnitySetupCredentialDevices[];
     database_type?: string;
     port?: number;
+    scope: string;
+    shared_groups: any[];
+    shared_users: any[];
 }
 export interface UnitySetupCredentialCustomer {
     url: string;

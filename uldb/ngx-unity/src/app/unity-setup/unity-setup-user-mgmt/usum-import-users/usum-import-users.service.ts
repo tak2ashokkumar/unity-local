@@ -10,32 +10,67 @@ export class UsumImportUsersService {
   constructor(private http: HttpClient) { }
 
   getAzureAccounts(): Observable<AzureManageAccountsType[]> {
-    let params: HttpParams = new HttpParams().set('page_size', 0);
+    const params: HttpParams = new HttpParams().set('page_size', '0');
     return this.http.get<AzureManageAccountsType[]>(GET_AZURE_ACCOUNTS(), { params: params });
   }
 
-  getAzureUsers(accountId: string): Observable<AzureUserType[]> {
-    return this.http.get<AzureUserType[]>(GET_AZURE_USERS(accountId));
+  getAzureUsers(accountId: string, criteria: AzureUsersQueryParams): Observable<AzureUsersResponse> {
+    let params: HttpParams = new HttpParams()
+      .set('page_size', criteria.pageSize.toString())
+      .set('page', criteria.page.toString());
+    const nextLink: string = criteria.nextLink ? criteria.nextLink.trim() : '';
+    const search: string = criteria.search ? criteria.search.trim() : '';
+    if (nextLink) {
+      params = params.set('next_link', nextLink);
+    }
+    if (search) {
+      params = params.set('search', search);
+    }
+    return this.http.get<AzureUsersResponse>(GET_AZURE_USERS(accountId), { params: params });
   }
 
   convertToViewData(data: AzureUserType[]): ImportUserViewData[] {
-    data = data.filter(d => d.mail);
-    let viewData: ImportUserViewData[] = [];
-    data.map(d => {
-      let a: ImportUserViewData = new ImportUserViewData();
-      a.firstName = d.givenName;
-      a.lastName = d.surname;
-      a.email = d.mail;
-      a.isSelected = false;
-      viewData.push(a);
+    return data.map(d => {
+      const email: string = d.mail ? d.mail.trim() : '';
+      const view: ImportUserViewData = new ImportUserViewData();
+      view.firstName = d.givenName || '';
+      view.lastName = d.surname || '';
+      view.email = email;
+      view.canSelect = !!email;
+      view.isSelected = false;
+      return view;
     });
-    return viewData;
   }
 
-  importUsersFromAzureAD(accountId: string, selectedUsers: AzureUserType[]) {
-    return this.http.post(IMPORT_USERS_FROM_AZURE(accountId), { users: selectedUsers });
+  importUsersFromAzureAD(accountId: string, payload: ImportUsersFromAzurePayload): Observable<string> {
+    return this.http.post<string>(IMPORT_USERS_FROM_AZURE(accountId), payload);
   }
 
+}
+
+export interface ImportUsersFromAzurePayload {
+  selected_users?: string[];
+  excluded_users?: string[];
+  is_all_selected: boolean;
+  search?: string;
+}
+
+export interface AzureUsersQueryParams {
+  nextLink?: string;
+  pageSize: number;
+  search?: string;
+  page: number;
+}
+
+export type AzureUsersResponse = AzureUsersPaginatedResponse | AzureUserType[];
+
+export interface AzureUsersPaginatedResponse {
+  count?: number;
+  results: AzureUserType[];
+  next?: string | null;
+  page?: number;
+  has_next?: boolean;
+  has_previous?: boolean;
 }
 
 export class ImportUserViewData {
@@ -43,19 +78,20 @@ export class ImportUserViewData {
   firstName: string;
   lastName: string;
   email: string;
+  canSelect: boolean = false;
   isSelected: boolean = false;
 }
 
 export interface AzureUserType {
-  displayName: string;
-  mobilePhone: string;
-  preferredLanguage: string;
-  jobTitle: string;
-  userPrincipalName: string;
-  officeLocation: string;
-  businessPhones: string[];
-  mail: string;
-  surname: string;
-  givenName: string;
-  id: string;
+  displayName?: string | null;
+  mobilePhone?: string | null;
+  preferredLanguage?: string | null;
+  jobTitle?: string | null;
+  userPrincipalName?: string | null;
+  officeLocation?: string | null;
+  businessPhones?: string[];
+  mail?: string | null;
+  surname?: string | null;
+  givenName?: string | null;
+  id?: string | null;
 }

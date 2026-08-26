@@ -62,7 +62,6 @@ export class DcCostAnalysisCostPlannerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.plannerDeleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

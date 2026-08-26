@@ -76,7 +76,6 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
   repoId: string;
   metaData: MetaData;
   showParams: boolean = false;
-  celeryTaskIds: string[] = [];
   categoryUuid: string;
 
   credentialList: DeviceDiscoveryCredentials[] = [];
@@ -1752,28 +1751,16 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
       }
       if (this.taskId) {
         this.svc.updateTask(this.taskId, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-          this.celeryTaskIds = this.storage.getByKey('celeryTaskId', StorageType.SESSIONSTORAGE);
-          if (!this.celeryTaskIds) {
-            this.celeryTaskIds = [];
-          }
-          this.celeryTaskIds.push(data.task_id);
-          this.storage.put('celeryTaskId', this.celeryTaskIds, StorageType.SESSIONSTORAGE);
           this.spinner.stop('main');
-          this.notification.success(new Notification('Task update In Progress...'));
+          this.notification.success(new Notification('Task updated successfully'));
           this.goBack();
         }, (err: HttpErrorResponse) => {
           this.handleError(err.error);
         });
       } else {
         this.svc.createTask(obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-          this.celeryTaskIds = this.storage.getByKey('celeryTaskId', StorageType.SESSIONSTORAGE);
-          if (!this.celeryTaskIds) {
-            this.celeryTaskIds = [];
-          }
-          this.celeryTaskIds.push(data.task_id);
-          this.storage.put('celeryTaskId', this.celeryTaskIds, StorageType.SESSIONSTORAGE);
           this.spinner.stop('main');
-          this.notification.success(new Notification('Task creation In Progress...'));
+          this.notification.success(new Notification('Task created successfully'));
           this.goBack();
         }, (err: HttpErrorResponse) => {
           this.spinner.stop('main');

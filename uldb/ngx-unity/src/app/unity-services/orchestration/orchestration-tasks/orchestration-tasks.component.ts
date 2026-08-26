@@ -47,7 +47,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   listSummaryViewData: ListSummaryViewModel;
   @ViewChild('edit') edit: ElementRef;
   editModelRef: BsModalRef;
-  celeryTaskIds: string[] = [];
   editCatModalRef: BsModalRef;
   @ViewChild('editcategory') editcategory: ElementRef;
   deleteCatModalRef: BsModalRef;
@@ -80,18 +79,17 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.spinner.start('main');
     this.globalReadOnlyUser = this.storage.getByKey('user', StorageType.SESSIONSTORAGE)?.active_rbac_roles?.some(r => r === 'Global Read-Only');
-    this.taskCrudCheck();
     this.getListSummary();
     this.getCategoryData();
   }
 
   ngOnDestroy() {
-    this.taskModalRef?.hide();
-    this.taskDeleteModalRef?.hide();
     this.cloneModalRef?.hide();
-    this.editModelRef?.hide();
+    this.taskModalRef?.hide();
     this.editCatModalRef?.hide();
     this.deleteCatModalRef?.hide();
+    this.editModelRef?.hide();
+    this.taskDeleteModalRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()
   }
@@ -170,31 +168,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
     });
   }
 
-  taskCrudCheck() {
-    this.celeryTaskIds = this.storage.getByKey('celeryTaskId', StorageType.SESSIONSTORAGE);
-    if (this.celeryTaskIds && this.celeryTaskIds.length > 0) {
-      // Loop through each task ID and call processNextTask
-      this.celeryTaskIds.forEach((taskId, index) => {
-        this.orchestraionTaskService.pollingResult(taskId)
-          .pipe(takeUntil(this.ngUnsubscribe))
-          .subscribe(
-            (data: TaskStatus) => {
-              if (data.state === 'SUCCESS') {
-                this.notification.success(new Notification(data.result.data));
-                this.celeryTaskIds.splice(index, 1);
-                this.storage.put('celeryTaskId', this.celeryTaskIds, StorageType.SESSIONSTORAGE);
-                this.getTaskData();
-              }
-            },
-            (err: HttpErrorResponse) => {
-              this.spinner.stop('main');
-              this.notification.error(new Notification('Failed to get Tasks'));
-            }
-          );
-      });
-    }
-  }
-
   getListSummary() {
     this.orchestraionTaskService.getListSummary().pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: ListSummaryResModel) => {
       this.listSummaryViewData = this.orchestraionTaskService.convertToListSummaryViewData(data);
@@ -204,10 +177,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
       this.notification.error(new Notification('Failed to get Tasks'));
     });
   }
-
-  // pollingResult(celeryTaskId: string) {
-  //   return this.http.get<CeleryTask>(`/task/celeryTaskId/`).pipe(switchMap(res => this.appService.pollForTask(res.task_id, 3, 1000).pipe(take(1))), take(1));
-  // }
 
   getCategoryData() {
     this.spinner.start('main');

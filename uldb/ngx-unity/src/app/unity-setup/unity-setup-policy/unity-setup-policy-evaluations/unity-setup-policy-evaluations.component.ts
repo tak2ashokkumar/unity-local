@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { PolicyEvaluationsItemViewData, UnitySetupPolicyEvaluationsService } from './unity-setup-policy-evaluations.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
@@ -17,7 +17,7 @@ import { takeUntil } from 'rxjs/operators';
   styleUrls: ['./unity-setup-policy-evaluations.component.scss'],
   providers: [UnitySetupPolicyEvaluationsService]
 })
-export class UnitySetupPolicyEvaluationsComponent implements OnInit {
+export class UnitySetupPolicyEvaluationsComponent implements OnInit, OnDestroy {
 
   private ngUnsubscribe = new Subject();
   viewData: PolicyEvaluationsItemViewData[] = [];

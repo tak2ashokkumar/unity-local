@@ -279,14 +279,14 @@ export class VmsListVmwareComponent implements OnInit, OnDestroy {
     }
   }
 
-  getVMlistData(){
+  getVMlistData() {
     if (this.router.url.includes('vmware')) {
-        this.getPrivateClouds();
-      } else {
-        this.getVms();
-        this.getVmsSummary();
-        this.syncVcenterVms();
-      }
+      this.getPrivateClouds();
+    } else {
+      this.getVms();
+      this.getVmsSummary();
+      this.syncVcenterVms();
+    }
   }
 
   getVms() {
@@ -362,11 +362,15 @@ export class VmsListVmwareComponent implements OnInit, OnDestroy {
     if (!view.isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.vmwareService.getConsoleAccessInput(view);
-    obj.managementIp = view.managementIp;
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(view.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.vmwareService.getConsoleAccessInput(view);
+      obj.managementIp = view.managementIp;
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(view.newTabConsoleAccessUrl);
+    }
   }
 
   newWebConsole(view: VMwareViewData) {

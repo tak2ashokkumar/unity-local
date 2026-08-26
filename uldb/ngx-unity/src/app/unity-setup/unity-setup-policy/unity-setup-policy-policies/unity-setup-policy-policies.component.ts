@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { PolicyDataItemViewData, UnitySetupPolicyService } from '../unity-setup-policy.service';
@@ -17,7 +17,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
   styleUrls: ['./unity-setup-policy-policies.component.scss'],
   providers: [UnitySetupPolicyPoliciesService]
 })
-export class UnitySetupPolicyPoliciesComponent implements OnInit {
+export class UnitySetupPolicyPoliciesComponent implements OnInit, OnDestroy {
 
   currentCriteria: SearchCriteria;
   private ngUnsubscribe = new Subject();

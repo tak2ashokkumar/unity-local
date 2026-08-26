@@ -1,6 +1,6 @@
 export interface AIMLConditionsSummary {
   total: AIMLConditionsSummaryData;
-  last_7_days: AIMLConditionsSummaryData;
+  last_7_days?: AIMLConditionsSummaryData;
 }
 
 export interface AIMLConditionsSummaryData {

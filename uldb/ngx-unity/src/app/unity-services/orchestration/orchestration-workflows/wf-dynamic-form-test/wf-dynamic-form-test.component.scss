@@ -1,0 +1,50 @@
+.dynamic-form-test {
+  min-height: 650px;
+}
+
+.nav-link {
+  cursor: pointer;
+}
+
+::ng-deep app-auto-complete-multi .dropdown {
+  width: 100% !important;
+}
+
+.nested-group {
+  background: #faf5ff !important;
+  border-color: #e9d5ff !important;
+}
+
+.remove-icon,
+.remove-group-icon {
+  right: 0.5rem;
+  font-size: 1.125rem;
+}
+
+.remove-icon {
+  top: -0.75rem;
+}
+
+.remove-group-icon {
+  top: -1.25rem;
+}
+
+.rule-divider {
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid #dbe4f0;
+  }
+
+  span {
+    margin: 0 0.625rem;
+    padding: 0.125rem 0.75rem;
+    border: 1px solid #bfdbfe;
+    border-radius: 1.25rem;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 0.6875rem;
+    font-weight: 600;
+  }
+}

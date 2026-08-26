@@ -16,7 +16,7 @@ import { UsiEventIngestionLogicMonitorCrudService } from './usi-event-ingestion-
   templateUrl: './usi-event-ingestion-logic-monitor-crud.component.html',
   styleUrls: ['./usi-event-ingestion-logic-monitor-crud.component.scss']
 })
-export class UsiEventIngestionLogicMonitorCrudComponent implements OnInit {
+export class UsiEventIngestionLogicMonitorCrudComponent implements OnInit, OnDestroy {
 
   @Output('onCrud') onCrud = new EventEmitter<CRUDActionTypes>();
 

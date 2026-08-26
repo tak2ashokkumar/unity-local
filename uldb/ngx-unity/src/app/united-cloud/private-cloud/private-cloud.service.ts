@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { PRIVATE_CLOUDS, PRIVATE_CLOUD_BY_ID } from 'src/app/shared/api-endpoint.const';
 import { PrivateCloudType, PrivateClouds } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { PCTabs } from './tabs';
+import { UserInfoService } from 'src/app/shared/user-info.service';
 
 
 @Injectable()
@@ -13,7 +14,7 @@ export class PrivateCloudService {
   private hideSubTabAnnouncedSource = new Subject<boolean>();
   hideSubTabAnnounced$ = this.hideSubTabAnnouncedSource.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private userInfoSvc: UserInfoService) { }
   getPrivateClouds(): Observable<PCTabs[]> {
     const params = new HttpParams().set('page_size', '0');
     return this.http.get<PrivateClouds[]>(PRIVATE_CLOUDS(), { params: params })
@@ -24,6 +25,9 @@ export class PrivateCloudService {
           pcTab.url = '/unitycloud/pccloud/' + pc.uuid;
           pcTabs.push(pcTab);
         });
+        if (this.userInfoSvc.isPlayground) {
+          return pcTabs.filter(pc => pc.platform_type != 'vCloud Director' && pc.platform_type != 'ESXi');
+        }
         return pcTabs;
       }));
   }

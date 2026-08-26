@@ -48,6 +48,9 @@ export class WSSHClient {
     private messageEvent = new Subject<any>();
     onMessage: Observable<any> = this.messageEvent.asObservable();
 
+    private inputEvent = new Subject<any>();
+    onInput: Observable<any> = this.inputEvent.asObservable();
+
     private pendingMessages: string[] = [];
     private pendingResize: string | null = null;
 
@@ -182,6 +185,7 @@ export class WSSHClient {
     // }
 
     sendClientData(data: any) {
+        this.inputEvent.next(data);
         const payload = JSON.stringify({
             type: 'input',
             data: data,

@@ -182,6 +182,20 @@ import { NaciAuthModalComponent } from './ai-agents/ai-agents-network-agent/ai-a
 import { NaciNewTerminalComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-new-terminal/naci-new-terminal.component';
 import { NaciFloatingTerminalItemComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-floating-terminal/naci-floating-terminal-item/naci-floating-terminal-item.component';
 import { NaciTerminalNewTabComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-terminal-new-tab/naci-terminal-new-tab.component';
+import { ServiceCatalogRedesignComponent } from './service-catalog-redesign/service-catalog-redesign.component';
+import { CatalogComponent } from './service-catalog-redesign/catalog/catalog.component';
+import { OrdersComponent } from './service-catalog-redesign/orders/orders.component';
+import { ServiceCatalogHomeComponent } from './service-catalog-redesign/service-catalog-home/service-catalog-home.component';
+import { ServiceCatalogDashboardComponent } from './service-catalog-redesign/service-catalog-dashboard/service-catalog-dashboard.component';
+import { CatalogCrudComponent } from './service-catalog-redesign/catalog/catalog-crud/catalog-crud.component';
+import { CatalogCheckoutComponent } from './service-catalog-redesign/catalog/catalog-checkout/catalog-checkout.component';
+import { WfDynamicContainerComponent } from './orchestration/orchestration-workflows/wf-dynamic-container/wf-dynamic-container.component';
+import { WfDynamicLeftComponent } from './orchestration/orchestration-workflows/wf-dynamic-left/wf-dynamic-left.component';
+import { WfDynamicParamsComponent } from './orchestration/orchestration-workflows/wf-dynamic-params/wf-dynamic-params.component';
+import { WfDynamicRightExecuteComponent } from './orchestration/orchestration-workflows/wf-dynamic-right-execute/wf-dynamic-right-execute.component';
+import { WfDynamicHelpPanelComponent } from './orchestration/orchestration-workflows/wf-dynamic-help-panel/wf-dynamic-help-panel.component';
+import { WfDynamicFormTestComponent } from './orchestration/orchestration-workflows/wf-dynamic-form-test/wf-dynamic-form-test.component';
+import { WfDynamicListExecuteComponent } from './orchestration/orchestration-workflows/wf-dynamic-list-execute/wf-dynamic-list-execute.component';
 /**
  * Change format according to need
  */
@@ -362,7 +376,21 @@ export const MY_NATIVE_FORMATS = {
     NtValidateFixStepComponent,
     NaciZabbixGraphsComponent,
     NaciFloatingTerminalItemComponent,
-    NaciTerminalNewTabComponent
+    NaciTerminalNewTabComponent,
+    ServiceCatalogRedesignComponent,
+    CatalogComponent,
+    OrdersComponent,
+    ServiceCatalogHomeComponent,
+    ServiceCatalogDashboardComponent,
+    CatalogCrudComponent,
+    CatalogCheckoutComponent,
+    WfDynamicContainerComponent,
+    WfDynamicLeftComponent,
+    WfDynamicParamsComponent,
+    WfDynamicRightExecuteComponent,
+    WfDynamicHelpPanelComponent,
+    WfDynamicFormTestComponent,
+    WfDynamicListExecuteComponent
   ],
   imports: [
     AppCoreModule,

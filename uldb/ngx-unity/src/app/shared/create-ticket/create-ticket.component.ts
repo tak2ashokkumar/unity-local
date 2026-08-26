@@ -112,7 +112,7 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
       } else if (this.selectedTcktMgmt.type == 'ServiceNow') {
         this.ticketTypeList = SERVICE_NOW_TICKET_TYPES;
         this.ticketForm.setControl('type', new FormControl(SERVICE_NOW_TICKET_TYPES[0], [Validators.required, NoWhitespaceValidator]));
-      } else{
+      } else {
         this.ticketTypeList = ZENDESK_TICKET_TYPES;
         this.ticketForm.setControl('type', new FormControl(ZENDESK_TICKET_TYPES[0], [Validators.required, NoWhitespaceValidator]));
       }

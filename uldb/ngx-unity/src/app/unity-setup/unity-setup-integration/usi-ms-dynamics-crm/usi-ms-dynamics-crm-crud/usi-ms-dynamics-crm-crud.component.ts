@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
@@ -18,7 +18,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
   templateUrl: './usi-ms-dynamics-crm-crud.component.html',
   styleUrls: ['./usi-ms-dynamics-crm-crud.component.scss']
 })
-export class UsiMsDynamicsCrmCrudComponent implements OnInit {
+export class UsiMsDynamicsCrmCrudComponent implements OnInit, OnDestroy {
   @Output('onCrud') onCrud = new EventEmitter<CRUDActionTypes>();
 
   @ViewChild('confirm') confirm: ElementRef;

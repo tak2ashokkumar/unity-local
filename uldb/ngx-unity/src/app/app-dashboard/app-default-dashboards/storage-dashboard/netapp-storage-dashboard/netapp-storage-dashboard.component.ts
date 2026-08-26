@@ -1,15 +1,108 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { StorageDashboardFilterCriteria } from '../storage-dashboard.type';
-import { NetappStorageDashboardService } from './netapp-storage-dashboard.service';
-import { NETAPP_STORAGE_CLUSTER_METRICS, NETAPP_STORAGE_TONE_CLASS } from './netapp-storage-dashboard.const';
 import {
-  NetappStorageChartCard,
-  NetappStorageDashboardViewData,
-  NetappStorageMetric,
-  NetappStorageSection,
-  NetappStorageTone,
-  NetappStorageViewMode
-} from './netapp-storage-dashboard.type';
+  AggregateOverviewChartViewData,
+  AggregateOverviewTableViewData,
+  AggregateOverviewViewData,
+  AutoRemediationViewData,
+  CapacityPlanningChartViewData,
+  CapacityPlanningTableViewData,
+  CapacityPlanningViewData,
+  ClusterOverviewWidgetViewData,
+  LUNOverviewChartViewData,
+  LUNOverviewTableViewData,
+  LUNOverviewViewData,
+  NetappStorageDashboardService,
+  NetappStorageSectionViewData,
+  NodeInfoAndMetricsChartViewData,
+  NodeInfoAndMetricsTableViewData,
+  NodeInfoAndMetricsViewData,
+  PerformanceMetricsChartViewData,
+  PerformanceMetricsTableViewData,
+  PerformanceMetricsViewData,
+  PortOverviewChartViewData,
+  PortOverviewTableViewData,
+  PortOverviewViewData,
+  RecentAlertsChartViewData,
+  RecentAlertsTableViewData,
+  RecentAlertsViewData,
+  SVMOverviewChartViewData,
+  SVMOverviewTableViewData,
+  SVMOverviewViewData,
+  VolumeOverviewChartViewData,
+  VolumeOverviewTableViewData,
+  VolumeOverviewViewData,
+} from './netapp-storage-dashboard.service';
+import { Observable, Subject } from 'rxjs';
+import { finalize, takeUntil } from 'rxjs/operators';
+import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
+import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { ColumnSortedEvent } from 'src/app/shared/table-functionality/sortable-column/sort.service';
+
+interface NetappStorageWidgetLoadingState {
+  clusterOverviewSummary: boolean;
+  nodeInfoAndMetricsSummary: boolean;
+  nodeInfoAndMetricsTable: boolean;
+  cpuUsageNodeDistribution: boolean;
+  memUsageNodeDistribution: boolean;
+  networkThroughput: boolean;
+  iopsTopNodes: boolean;
+  devWriteThroughput: boolean;
+  aggregateOverviewSummary: boolean;
+  aggregateOverviewTable: boolean;
+  aggregateCapacityDistribution: boolean;
+  aggregateUtilization: boolean;
+  aggregateNearlyFull: boolean;
+  aggregateTop10Largest: boolean;
+  aggregateGrowthTrend: boolean;
+  svmOverviewSummary: boolean;
+  svmOverviewTable: boolean;
+  capacityBySvm: boolean;
+  volumeCountBySvm: boolean;
+  lunCountBySvm: boolean;
+  throughputBySvm: boolean;
+  top10CapacityConsumers: boolean;
+  topPerformingSvms: boolean;
+  volumeOverviewSummary: boolean;
+  volumeOverviewTable: boolean;
+  volumeUtilizationDistribution: boolean;
+  volumeTop10Largest: boolean;
+  volumeTop10MostUsed: boolean;
+  volumeIopsTrend: boolean;
+  volumeRwRatio: boolean;
+  volumeLatencyTrend: boolean;
+  volumeSnapshotUsage: boolean;
+  lunOverviewSummary: boolean;
+  lunOverviewTable: boolean;
+  lunHealthDistribution: boolean;
+  lunTop10ByUsage: boolean;
+  lunGrowthTrend: boolean;
+  lunAvailability: boolean;
+  performanceMetricsSummary: boolean;
+  performanceMetricsTable: boolean;
+  performanceIopsRealTimeTrend: boolean;
+  performanceThroughputRealTimeTrend: boolean;
+  performanceLatencyTrend: boolean;
+  performanceIopsActivityBreakdown: boolean;
+  capacityPlanningSummary: boolean;
+  capacityPlanningTable: boolean;
+  capacityForecast: boolean;
+  capacityVolUtilDistribution: boolean;
+  capacityAggUtilDistribution: boolean;
+  capacityTop5Consumers: boolean;
+  capacityPlanningBySvm: boolean;
+  capacityMonthlyGrowth: boolean;
+  portOverviewSummary: boolean;
+  portOverviewTable: boolean;
+  portLinkStatusDistribution: boolean;
+  portTypeAndProtocol: boolean;
+  portCabledByNode: boolean;
+  recentAlertsSummary: boolean;
+  recentAlertsTable: boolean;
+  recentAlertsSeverityDistribution: boolean;
+  recentAlertsAlertTimeline: boolean;
+  autoRemediationSummary: boolean;
+}
 
 @Component({
   selector: 'netapp-storage-dashboard',
@@ -17,226 +110,1248 @@ import {
   styleUrls: ['./netapp-storage-dashboard.component.scss'],
   providers: [NetappStorageDashboardService]
 })
-export class NetappStorageDashboardComponent implements OnInit, OnChanges {
+export class NetappStorageDashboardComponent implements OnInit, OnChanges, OnDestroy {
+  private reloadCancel = new Subject<void>();
+  private ngUnsubscribe = new Subject<void>();
+  private initialized = false;
+  dashboardReady = false;
+  dashboardLoading = false;
+  dashboardNoData = false;
+  private pendingDashboardLoads = 0;
+
   @Input() filters: StorageDashboardFilterCriteria;
   @Input() refreshToken = 0;
+  @Input() filtersUnavailable = false;
 
-  viewModes: Record<string, NetappStorageViewMode> = {};
-  readonly data: NetappStorageDashboardViewData = {
-    clusterOverview: {
-      title: 'Cluster Overview',
-      metrics: NETAPP_STORAGE_CLUSTER_METRICS
-    }
+  widgetLoading: NetappStorageWidgetLoadingState = {
+    clusterOverviewSummary: false,
+    nodeInfoAndMetricsSummary: false,
+    nodeInfoAndMetricsTable: false,
+    cpuUsageNodeDistribution: false,
+    memUsageNodeDistribution: false,
+    networkThroughput: false,
+    iopsTopNodes: false,
+    devWriteThroughput: false,
+    aggregateOverviewSummary: false,
+    aggregateOverviewTable: false,
+    aggregateCapacityDistribution: false,
+    aggregateUtilization: false,
+    aggregateNearlyFull: false,
+    aggregateTop10Largest: false,
+    aggregateGrowthTrend: false,
+    svmOverviewSummary: false,
+    svmOverviewTable: false,
+    capacityBySvm: false,
+    volumeCountBySvm: false,
+    lunCountBySvm: false,
+    throughputBySvm: false,
+    top10CapacityConsumers: false,
+    topPerformingSvms: false,
+    volumeOverviewSummary: false,
+    volumeOverviewTable: false,
+    volumeUtilizationDistribution: false,
+    volumeTop10Largest: false,
+    volumeTop10MostUsed: false,
+    volumeIopsTrend: false,
+    volumeRwRatio: false,
+    volumeLatencyTrend: false,
+    volumeSnapshotUsage: false,
+    lunOverviewSummary: false,
+    lunOverviewTable: false,
+    lunHealthDistribution: false,
+    lunTop10ByUsage: false,
+    lunGrowthTrend: false,
+    lunAvailability: false,
+    performanceMetricsSummary: false,
+    performanceMetricsTable: false,
+    performanceIopsRealTimeTrend: false,
+    performanceThroughputRealTimeTrend: false,
+    performanceLatencyTrend: false,
+    performanceIopsActivityBreakdown: false,
+    capacityPlanningSummary: false,
+    capacityPlanningTable: false,
+    capacityForecast: false,
+    capacityVolUtilDistribution: false,
+    capacityAggUtilDistribution: false,
+    capacityTop5Consumers: false,
+    capacityPlanningBySvm: false,
+    capacityMonthlyGrowth: false,
+    portOverviewSummary: false,
+    portOverviewTable: false,
+    portLinkStatusDistribution: false,
+    portTypeAndProtocol: false,
+    portCabledByNode: false,
+    recentAlertsSummary: false,
+    recentAlertsTable: false,
+    recentAlertsSeverityDistribution: false,
+    recentAlertsAlertTimeline: false,
+    autoRemediationSummary: false,
   };
 
-  clusterOverviewNote = 'Scope: All Clusters | Time Range: 30 Days';
-  sections: NetappStorageSection[] = [];
-  private allSections: NetappStorageSection[] = [];
+  loaderNames: { [key in keyof NetappStorageWidgetLoadingState]: string } = {
+    clusterOverviewSummary: 'clusterOverviewSummaryLoader',
+    nodeInfoAndMetricsSummary: 'nodeInfoAndMetricsSummaryLoader',
+    nodeInfoAndMetricsTable: 'nodeInfoAndMetricsTableLoader',
+    cpuUsageNodeDistribution: 'cpuUsageNodeDistributionLoader',
+    memUsageNodeDistribution: 'memUsageNodeDistributionLoader',
+    networkThroughput: 'networkThroughputLoader',
+    iopsTopNodes: 'iopsTopNodesLoader',
+    devWriteThroughput: 'devWriteThroughputLoader',
+    aggregateOverviewSummary: 'aggregateOverviewSummaryLoader',
+    aggregateOverviewTable: 'aggregateOverviewTableLoader',
+    aggregateCapacityDistribution: 'aggregateCapacityDistributionLoader',
+    aggregateUtilization: 'aggregateUtilizationLoader',
+    aggregateNearlyFull: 'aggregateNearlyFullLoader',
+    aggregateTop10Largest: 'aggregateTop10LargestLoader',
+    aggregateGrowthTrend: 'aggregateGrowthTrendLoader',
+    svmOverviewSummary: 'svmOverviewSummaryLoader',
+    svmOverviewTable: 'svmOverviewTableLoader',
+    capacityBySvm: 'capacityBySvmLoader',
+    volumeCountBySvm: 'volumeCountBySvmLoader',
+    lunCountBySvm: 'lunCountBySvmLoader',
+    throughputBySvm: 'throughputBySvmLoader',
+    top10CapacityConsumers: 'top10CapacityConsumersLoader',
+    topPerformingSvms: 'topPerformingSvmsLoader',
+    volumeOverviewSummary: 'volumeOverviewSummaryLoader',
+    volumeOverviewTable: 'volumeOverviewTableLoader',
+    volumeUtilizationDistribution: 'volumeUtilizationDistributionLoader',
+    volumeTop10Largest: 'volumeTop10LargestLoader',
+    volumeTop10MostUsed: 'volumeTop10MostUsedLoader',
+    volumeIopsTrend: 'volumeIopsTrendLoader',
+    volumeRwRatio: 'volumeRwRatioLoader',
+    volumeLatencyTrend: 'volumeLatencyTrendLoader',
+    volumeSnapshotUsage: 'volumeSnapshotUsageLoader',
+    lunOverviewSummary: 'lunOverviewSummaryLoader',
+    lunOverviewTable: 'lunOverviewTableLoader',
+    lunHealthDistribution: 'lunHealthDistributionLoader',
+    lunTop10ByUsage: 'lunTop10ByUsageLoader',
+    lunGrowthTrend: 'lunGrowthTrendLoader',
+    lunAvailability: 'lunAvailabilityLoader',
+    performanceMetricsSummary: 'performanceMetricsSummaryLoader',
+    performanceMetricsTable: 'performanceMetricsTableLoader',
+    performanceIopsRealTimeTrend: 'performanceIopsRealTimeTrendLoader',
+    performanceThroughputRealTimeTrend: 'performanceThroughputRealTimeTrendLoader',
+    performanceLatencyTrend: 'performanceLatencyTrendLoader',
+    performanceIopsActivityBreakdown: 'performanceIopsActivityBreakdownLoader',
+    capacityPlanningSummary: 'capacityPlanningSummaryLoader',
+    capacityPlanningTable: 'capacityPlanningTableLoader',
+    capacityForecast: 'capacityForecastLoader',
+    capacityVolUtilDistribution: 'capacityVolUtilDistributionLoader',
+    capacityAggUtilDistribution: 'capacityAggUtilDistributionLoader',
+    capacityTop5Consumers: 'capacityTop5ConsumersLoader',
+    capacityPlanningBySvm: 'capacityPlanningBySvmLoader',
+    capacityMonthlyGrowth: 'capacityMonthlyGrowthLoader',
+    portOverviewSummary: 'portOverviewSummaryLoader',
+    portOverviewTable: 'portOverviewTableLoader',
+    portLinkStatusDistribution: 'portLinkStatusDistributionLoader',
+    portTypeAndProtocol: 'portTypeAndProtocolLoader',
+    portCabledByNode: 'portCabledByNodeLoader',
+    recentAlertsSummary: 'recentAlertsSummaryLoader',
+    recentAlertsTable: 'recentAlertsTableLoader',
+    recentAlertsSeverityDistribution: 'recentAlertsSeverityDistributionLoader',
+    recentAlertsAlertTimeline: 'recentAlertsAlertTimelineLoader',
+    autoRemediationSummary: 'autoRemediationSummaryLoader'
+  };
 
-  constructor(private svc: NetappStorageDashboardService) {}
+  nodeInfoAndMetricsTableCriteria: SearchCriteria;
+  aggregateOverviewTableCriteria: SearchCriteria;
+  svmOverviewTableCriteria: SearchCriteria;
+  volumeOverviewTableCriteria: SearchCriteria;
+  lunOverviewTableCriteria: SearchCriteria;
+  performanceMetricsTableCriteria: SearchCriteria;
+  capacityPlanningTableCriteria: SearchCriteria;
+  portOverviewTableCriteria: SearchCriteria;
+  recentAlertsTableCriteria: SearchCriteria;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if ((changes.filters || changes.refreshToken) && this.allSections.length) {
-      this.applyFilterCriteria();
-    }
+  constructor(private svc: NetappStorageDashboardService,
+    private spinner: AppSpinnerService) {
+    this.nodeInfoAndMetricsTableCriteria = this.createSortedTableCriteria('model', 'asc');
+    this.aggregateOverviewTableCriteria = this.createSortedTableCriteria('total', 'desc');
+    this.svmOverviewTableCriteria = this.createSortedTableCriteria('state', 'asc');
+    this.volumeOverviewTableCriteria = this.createSortedTableCriteria('name', 'asc');
+    this.lunOverviewTableCriteria = this.createSortedTableCriteria('path', 'asc');
+    this.performanceMetricsTableCriteria = this.createSortedTableCriteria('rx', 'asc');
+    this.capacityPlanningTableCriteria = this.createSortedTableCriteria('total', 'desc');
+    this.portOverviewTableCriteria = this.createSortedTableCriteria('name', 'asc');
+    this.recentAlertsTableCriteria = this.createSortedTableCriteria('device', 'desc');
   }
 
   ngOnInit(): void {
-    this.allSections = [
-      {
-        key: 'node',
-        title: 'Node Info & Metrics',
-        metrics: [
-          { label: 'Total Nodes', value: '5' }, { label: 'CPU Utilization(Avg)', value: '18%' },
-          { label: 'Memory Utilization(Avg)', value: '32%', tone: 'primary' }, { label: 'Network Utilization(Avg)', value: '12%' },
-          { label: 'Uptime', value: '45 Days' }
-        ],
-        columns: ['Cluster', 'Node Name', 'Model', 'OS Version', 'CPU Usage', 'Memory Usage', 'Net Throughput', 'IOPS (Read/Write)', 'Latency (Read/Write)', 'Uptime', 'Status'],
-        rows: [['cluster-prod-01', 'node-01', 'AFF A400', 'ONTAP 9.14', '18%', '32%', '2.1 Gbps', '18K / 8K', '1.2 / 2.4 ms', '45 Days', 'Healthy'],
-          ['cluster-prod-01', 'node-02', 'AFF A400', 'ONTAP 9.14', '21%', '35%', '2.4 Gbps', '20K / 9K', '1.4 / 2.7 ms', '44 Days', 'Healthy'],
-          ['cluster-dr-01', 'node-03', 'AFF C800', 'ONTAP 9.13', '82%', '71%', '1.2 Gbps', '11K / 7K', '4.2 / 6.1 ms', '12 Days', 'Warning']],
-        charts: [
-          { title: 'CPU Usage Node Distribution', option: this.svc.makeBarOption(['node-01', 'node-02', 'node-03', 'node-04', 'node-05'], [18, 21, 82, 14, 25]) },
-          { title: 'Memory Usage Node Distribution', option: this.svc.makeBarOption(['node-01', 'node-02', 'node-03', 'node-04', 'node-05'], [32, 35, 71, 28, 41], '#00b050') },
-          { title: 'Top 10 Network Throughput (Gbps)', option: this.svc.makeBarOption(['node-03', 'node-02', 'node-01', 'node-05', 'node-04'], [9.1, 8.5, 7.8, 6.2, 5.7], '#fd7e14', true) },
-          { title: 'Top 10 Read/Write IOPS by Node (K)', option: this.svc.makeBarOption(['node-03', 'node-02', 'node-01', 'node-05', 'node-04'], [26, 24, 22, 14, 12], '#378AD8', true) },
-          { title: 'Top 10 Dev/Write Throughput', option: this.svc.makeLineOption(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [2.4, 2.7, 2.5, 3.1, 3.4], '#00b050') }
-        ]
-      },
-      {
-        key: 'agg',
-        title: 'Aggregate Overview',
-        metrics: [
-          { label: 'Total Aggregates', value: '18' }, { label: 'Used Capacity(Avg)', value: '1.21 PB', tone: 'primary' },
-          { label: 'Free Capacity(Avg)', value: '0.61 PB', tone: 'primary' }, { label: 'Overall Utilization', value: '66.5%' }
-        ],
-        columns: ['Cluster', 'Aggregate Name', 'Total Capacity', 'Used Capacity', 'Free Capacity', 'Utilization', 'Nodes', 'RAID Type', 'Aggregate State', 'Snapshot Used', 'Nearly Full', 'Status'],
-        rows: [['cluster-prod-01', 'aggr0', '200 TB', '160 TB', '40 TB', '80%', '2', 'RAID-DP', 'Online', '12 TB', 'Yes', 'Healthy'],
-          ['cluster-prod-01', 'aggr1', '180 TB', '118 TB', '62 TB', '66%', '2', 'RAID-DP', 'Online', '10 TB', 'No', 'Healthy'],
-          ['cluster-dr-01', 'aggr2', '160 TB', '145 TB', '15 TB', '91%', '1', 'RAID-TEC', 'Online', '18 TB', 'Yes', 'Warning']],
-        charts: [
-          { title: 'Aggregate Capacity Distribution', option: this.svc.makePieOption(['Used', 'Free'], [1210, 610]) },
-          { title: 'Aggregate Utilization (%)', option: this.svc.makeBarOption(['aggr0', 'aggr1', 'aggr2', 'aggr3', 'aggr4'], [80, 66, 91, 54, 71]) },
-          { title: 'Top 10 Largest Aggregates (TB)', option: this.svc.makeBarOption(['aggr0', 'aggr1', 'aggr2'], [200, 180, 160], '#fd7e14', true) },
-          { title: 'Aggregate Growth Trend (PB)', option: this.svc.makeLineOption(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], [1.01, 1.06, 1.11, 1.15, 1.19, 1.21], '#378AD8') }
-        ]
-      },
-      {
-        key: 'svm',
-        title: 'Storage Virtual Machine (SVM)',
-        metrics: [{ label: 'Total SVMs', value: '12' }, { label: 'Capacity Used(Avg)', value: '1.21 PB', tone: 'primary' }, { label: 'Avg IOPS', value: '14.2K' }, { label: 'Avg Latency', value: '1.8 ms' }, { label: 'Throughput (Avg)', value: '4.8 GB/s' }],
-        columns: ['Cluster', 'SVM Name', 'State', 'Volume Count', 'LUN Count', 'Capacity Used', 'IOPS (Read/Write)', 'Latency (Read/Write)', 'Throughput', 'Status'],
-        rows: [['cluster-prod-01', 'svm-prod-01', 'Running', '24', '58', '220 TB', '9.8K / 4.4K', '1.2 / 2.4 ms', '4.8 GB/s', 'Healthy'], ['cluster-dr-01', 'svm-dev-01', 'Running', '18', '46', '140 TB', '7.1K / 3.0K', '1.5 / 2.8 ms', '3.9 GB/s', 'Healthy']],
-        charts: [
-          { title: 'Capacity by SVM (TB)', option: this.svc.makeBarOption(['svm-prod-01', 'svm-dev-01', 'svm-qa-01'], [220, 140, 94], '#378AD8', true) },
-          { title: 'Volume Count by SVM', option: this.svc.makeBarOption(['svm-prod-01', 'svm-dev-01', 'svm-qa-01'], [24, 18, 12], '#00b050', true) },
-          { title: 'LUN Count by SVM', option: this.svc.makeBarOption(['svm-prod-01', 'svm-dev-01', 'svm-qa-01'], [58, 46, 32], '#fd7e14', true) },
-          { title: 'Throughput by SVM (GB/s)', option: this.svc.makeLineOption(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [3.8, 4.1, 4.2, 4.5, 4.8], '#00b050') },
-          { title: 'Top 10 Capacity Consumers', option: this.svc.makeBarOption(['svm-prod-01', 'svm-dev-01', 'svm-qa-01'], [220, 140, 94], '#dc3545', true) },
-          { title: 'Top Performing SVMs (IOPS)', option: this.svc.makeBarOption(['svm-prod-01', 'svm-dev-01', 'svm-qa-01'], [14.9, 12.7, 9.4], '#378AD8', true) }
-        ]
-      },
-      {
-        key: 'vol',
-        title: 'Volume Overview',
-        metrics: [{ label: 'Total Volumes', value: '128' }, { label: 'Used Capacity', value: '1.21 PB', tone: 'primary' }, { label: 'Avg Latency', value: '1.9 ms', tone: 'success' }, { label: 'Total IOPS', value: '58.4K' }, { label: 'Snapshot Reserve', value: '384 TB' }],
-        columns: ['Cluster', 'Volume Name', 'SVM', 'Aggregate', 'State', 'Type', 'Total Space (TB)', 'Available Space (TB)'],
-        rows: [['cluster-prod-01', 'vol_finance_01', 'svm-prod-01', 'aggr0', 'Online', 'RW', '26', '4'], ['cluster-prod-01', 'vol_backup_01', 'svm-prod-01', 'aggr1', 'Online', 'DP', '40', '12']],
-        charts: [
-          { title: 'Volume Utilization Distribution', option: this.svc.makePieOption(['0-50%', '51-80%', '81-100%'], [42, 51, 35]) },
-          { title: 'Top 10 Largest Volumes (TB)', option: this.svc.makeBarOption(['vol_finance_01', 'vol_backup_01'], [26, 40], '#378AD8', true) },
-          { title: 'Top 10 Used Volumes (%)', option: this.svc.makeBarOption(['vol_backup_01', 'vol_finance_01'], [87, 76], '#fd7e14', true) },
-          { title: 'Volume IOPS Trend', option: this.svc.makeLineOption(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [48, 51, 53, 56, 58], '#00b050') },
-          { title: 'Volume Read/Write Ratio', option: this.svc.makeBarOption(['vol_finance_01', 'vol_backup_01'], [1.8, 2.4]) },
-          { title: 'Volume Read/Write Latency', option: this.svc.makeBarOption(['vol_finance_01', 'vol_backup_01'], [1.3, 2.1], '#dc3545', true) },
-          { title: 'Snapshot Usage (TB)', option: this.svc.makeBarOption(['vol_finance_01', 'vol_backup_01'], [8, 12], '#fd7e14') }
-        ]
-      },
-      {
-        key: 'lun',
-        title: 'LUN Overview',
-        metrics: [{ label: 'Total LUNs', value: '324' }, { label: 'Avg Latency', value: '2.8 ms', tone: 'success' }, { label: 'Total IOPS', value: '58.4K' }],
-        columns: ['Cluster', 'LUN Name', 'Volume Path', 'State', 'Space'],
-        rows: [['cluster-prod-01', 'lun_fin_01', '/vol/finance/lun_fin_01', 'Online', '3.2 TB'], ['cluster-dr-01', 'lun_db_01', '/vol/db/lun_db_01', 'Online', '4.1 TB']],
-        charts: [
-          { title: 'LUN Health & Status', option: this.svc.makePieOption(['Healthy', 'Warning', 'Critical'], [318, 4, 2]) },
-          { title: 'Top 10 LUNs by Usage (%)', option: this.svc.makeBarOption(['lun_db_01', 'lun_fin_01'], [91, 84], '#378AD8', true) },
-          { title: 'LUN Growth (TB)', option: this.svc.makeLineOption(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], [2.8, 2.9, 3.0, 3.1, 3.3, 3.4], '#fd7e14') },
-          { title: 'Availability', option: this.svc.makeLineOption(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], [99.96, 99.97, 99.96, 99.98, 99.97, 99.97], '#00b050') }
-        ]
-      },
-      {
-        key: 'perf',
-        title: 'Performance Metrics',
-        metrics: [{ label: 'Total IOPS', value: '58.4K' }, { label: 'Read IOPS', value: '35.6K', tone: 'primary' }, { label: 'Write IOPS', value: '22.8K', tone: 'success' }, { label: 'Throughput', value: '21.4 GB/s', tone: 'primary' }, { label: 'Read Latency', value: '1.8 ms', tone: 'success' }, { label: 'Write Latency', value: '2.3 ms', tone: 'warning' }],
-        columns: ['Timestamp', 'IOPS (Read/Write)', 'Latency (Read/Write)', 'Throughput'],
-        rows: [['10:00', '58K / 23K', '1.8 / 2.3 ms', '21.4 GB/s'], ['09:45', '56K / 22K', '1.7 / 2.2 ms', '20.8 GB/s']],
-        charts: [
-          { title: 'IOPS Real-time Trend (K)', option: this.svc.makeLineOption(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [52, 54, 55, 57, 58], '#378AD8') },
-          { title: 'Throughput Real-time Trend (GB/s)', option: this.svc.makeLineOption(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [18.1, 19.5, 20.2, 20.9, 21.4], '#00b050') },
-          { title: 'Latency Trend (ms)', option: this.svc.makeLineOption(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [2.2, 2.1, 2.0, 1.9, 1.8], '#fd7e14') },
-          { title: 'IOPS Activity Breakdown', option: this.svc.makePieOption(['Read', 'Write'], [35600, 22800], ['#00b050', '#378AD8']) }
-        ]
-      },
-      {
-        key: 'capacity',
-        title: 'Capacity Planning',
-        metrics: [{ label: 'Used Capacity', value: '1.21 PB', tone: 'primary' }, { label: 'Free Capacity', value: '0.61 PB', tone: 'primary' }, { label: 'Usable Capacity', value: '1.82 PB' }, { label: 'Growth Rate', value: '6.2% / Mo', tone: 'warning' }, { label: 'Days Until Full', value: '182 Days', tone: 'danger' }, { label: 'Thin Provisioning', value: '72%' }],
-        columns: ['Cluster', 'Total Capacity', 'Space Utilization', 'Growth Rate', 'Days Until Full', 'Data Reduction Ratio', 'Status'],
-        rows: [['cluster-prod-01', '1.2 PB', '66%', '6.1%', '184', '4.4:1', 'Healthy'], ['cluster-dr-01', '620 TB', '71%', '6.4%', '177', '4.1:1', 'Warning']],
-        charts: [
-          { title: 'Capacity Growth Forecast (Jan - Dec)', option: this.svc.makeLineOption(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], [1.01, 1.05, 1.09, 1.13, 1.17, 1.21], '#378AD8') },
-          { title: 'Volume Utilization Distribution', option: this.svc.makePieOption(['0-50%', '51-80%', '81-100%'], [34, 58, 36]) },
-          { title: 'Aggregate Utilization Distribution', option: this.svc.makePieOption(['0-50%', '51-80%', '81-100%'], [7, 8, 3]) },
-          { title: 'Top 5 Capacity Consumers', option: this.svc.makeBarOption(['vol_backup_01', 'vol_finance_01'], [40, 26], '#dc3545', true) },
-          { title: 'Capacity by SVM (TB)', option: this.svc.makeBarOption(['svm-prod-01', 'svm-dev-01'], [220, 140], '#00b050', true) },
-          { title: 'Monthly Growth Increments (TB)', option: this.svc.makeLineOption(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], [12, 15, 16, 18, 20, 21], '#fd7e14') }
-        ]
-      },
-      {
-        key: 'ports',
-        title: 'Port Overview',
-        metrics: [{ label: 'Total Ports', value: '50' }, { label: 'Ethernet Ports', value: '38' }, { label: 'FC Ports', value: '12' }],
-        columns: ['Cluster', 'Node', 'Port Name', 'Port Type', 'Protocol', 'Admin Status', 'Link Status', 'Connected Device', 'Connected Port'],
-        rows: [['cluster-prod-01', 'node-01', 'e0a', 'Ethernet', 'NFS', 'Up', 'Up', 'switch-1', 'eth1'], ['cluster-dr-01', 'node-03', 'fc1', 'FC', 'FCP', 'Up', 'Down', 'switch-4', 'fc7']],
-        charts: [
-          { title: 'Link Status Distribution', option: this.svc.makePieOption(['Up', 'Down'], [48, 2], ['#00b050', '#dc3545']) },
-          { title: 'Port Type & Protocol', option: this.svc.makePieOption(['Ethernet', 'FC'], [38, 12], ['#378AD8', '#fd7e14']) },
-          { title: 'Ports cabled by Node (Top 10)', option: this.svc.makeBarOption(['node-01', 'node-02', 'node-03'], [18, 16, 12], '#00b050', true) }
-        ]
-      },
-      {
-        key: 'alerts',
-        title: 'Recent Alerts',
-        metrics: [{ label: 'Total Alerts', value: '12' }, { label: 'Critical', value: '3', tone: 'danger' }, { label: 'Warning', value: '2', tone: 'warning' }, { label: 'Information', value: '2', tone: 'primary' }],
-        columns: ['ID', 'Device Name', 'Count', 'Event Metric', 'Alert Time', 'Severity', 'Description', 'Status', 'Source'],
-        rows: [['A-101', 'node-03', '4', 'Latency', '10:10', 'Critical', 'Latency spike on node-03', 'Open', 'ONTAP'], ['A-102', 'vol_backup_01', '2', 'Capacity', '09:40', 'Warning', 'Volume nearing threshold', 'Acknowledged', 'ONTAP']],
-        charts: [
-          { title: 'Alert Severity Distribution', option: this.svc.makePieOption(['Critical', 'Warning', 'Information'], [3, 2, 2], ['#dc3545', '#fd7e14', '#378AD8']) },
-          { title: 'Alert Timeline (Count)', option: this.svc.makeLineOption(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [1, 2, 2, 3, 4], '#dc3545') }
-        ]
+    this.dashboardReady = true;
+    if (this.isNetappSelected()) {
+      if (this.filtersUnavailable) {
+        this.showDashboardNoData();
+        return;
       }
-    ];
-
-    this.allSections.forEach(section => this.viewModes[section.key] = 'chart');
-    this.applyFilterCriteria();
-  }
-
-  toggleView(sectionKey: string, mode: NetappStorageViewMode): void {
-    this.viewModes[sectionKey] = mode;
-  }
-
-  toneClass(tone?: NetappStorageTone): string | null {
-    return tone ? NETAPP_STORAGE_TONE_CLASS[tone] : null;
-  }
-
-  trackByKey(_: number, item: NetappStorageSection): string {
-    return item.key;
-  }
-
-  trackByMetric(_: number, metric: NetappStorageMetric): string {
-    return metric.label;
-  }
-
-  trackByChart(_: number, chart: NetappStorageChartCard): string {
-    return chart.title;
-  }
-
-  trackByIndex(index: number): number {
-    return index;
-  }
-
-  private applyFilterCriteria(): void {
-    const selectedClusters = new Set(this.filters?.resourceIds || []);
-    this.sections = this.allSections.map(section => {
-      const clusterColumnIndex = section.columns.indexOf('Cluster');
-      const rows = clusterColumnIndex < 0 || !this.filters
-        ? section.rows
-        : section.rows.filter(row => selectedClusters.has(row[clusterColumnIndex]));
-      return { ...section, rows: [...rows] };
-    });
-    this.clusterOverviewNote = this.getClusterOverviewNote();
-  }
-
-  private getClusterOverviewNote(): string {
-    if (!this.filters) {
-      return 'Scope: All Clusters | Time Range: 30 Days';
+      this.loadDashboard();
     }
-    const clusters = this.filters.resourceIds.length === 1
-      ? this.filters.resourceIds[0]
-      : `${this.filters.resourceIds.length} Clusters`;
-    return `Scope: ${clusters} | Time Range: ${this.getTimeRangeLabel(this.filters.period)}`;
   }
 
-  private getTimeRangeLabel(period: string): string {
-    const labels: Record<string, string> = {
-      last_24_hours: '24 Hours',
-      last_7_days: '7 Days',
-      last_30_days: '30 Days',
-      last_60_days: '60 Days',
-      last_90_days: '90 Days',
-      custom: 'Custom Range'
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.filtersUnavailable && this.dashboardReady && this.filtersUnavailable) {
+      this.showDashboardNoData();
+      return;
+    }
+    if ((changes.filters || changes.refreshToken || changes.filtersUnavailable)
+      && this.dashboardReady && this.isNetappSelected() && !this.filtersUnavailable) {
+      this.loadDashboard();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.reloadCancel.next();
+    this.reloadCancel.complete();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
+  getTableSortDirection(criteria: SearchCriteria, columnName: string): string {
+    return criteria.sortColumn === columnName ? criteria.sortDirection : '';
+  }
+
+  isTableSortedColumn(criteria: SearchCriteria, columnName: string): boolean {
+    return !!this.getTableSortDirection(criteria, columnName);
+  }
+
+  isWidgetDataAvailable(widgetData: unknown): boolean {
+    if (Array.isArray(widgetData)) {
+      return widgetData.length > 0;
+    }
+    return !!widgetData;
+  }
+
+  getChartBodyClass(widgetData: unknown): string {
+    return this.isWidgetDataAvailable(widgetData) ? '' : 'd-flex align-items-center justify-content-center';
+  }
+
+  private updateDashboardNoData(): void {
+    if (!this.dashboardReady || this.dashboardLoading) {
+      return;
+    }
+
+    const hasSummaryData = this.clusterOverviewWidgetViewData.hasSummaryData
+      || this.autoRemediationViewData.hasSummaryData;
+
+    const hasSectionData = [
+      this.nodeInfoAndMetricsViewData,
+      this.aggregateOverviewViewData,
+      this.svmOverviewViewData,
+      this.volumeOverviewViewData,
+      this.lunOvervieViewData,
+      this.performanceMetricsViewData,
+      this.capacityPlanningViewData,
+      this.portOverviewViewData,
+      this.recentAlertsViewData
+    ].some(section => !section.hidden);
+
+    this.dashboardNoData = !hasSummaryData && !hasSectionData;
+  }
+
+  private startDashboardLoader(): void {
+    this.dashboardLoading = true;
+    this.dashboardNoData = false;
+    this.pendingDashboardLoads = 0;
+  }
+
+  private stopDashboardLoader(): void {
+    this.dashboardLoading = false;
+    if (this.pendingDashboardLoads === 0) {
+      this.updateDashboardNoData();
+    }
+  }
+
+  private stopAllLoaders(): void {
+    Object.values(this.loaderNames).forEach(loaderName => this.spinner.stop(loaderName));
+  }
+
+  private registerDashboardLoad(): void {
+    this.pendingDashboardLoads += 1;
+  }
+
+  private completeDashboardLoad(): void {
+    if (this.pendingDashboardLoads > 0) {
+      this.pendingDashboardLoads -= 1;
+    }
+    if (this.pendingDashboardLoads === 0) {
+      this.updateDashboardNoData();
+    }
+  }
+
+  private hasMeaningfulData(value: unknown): boolean {
+    if (value === null || value === undefined) {
+      return false;
+    }
+    if (typeof value === 'string') {
+      const normalizedValue = value.trim().toLowerCase();
+      return !!normalizedValue && !['n/a', 'N/A', 'na', '-', '--', null, undefined].includes(normalizedValue);
+    }
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return true;
+    }
+    if (Array.isArray(value)) {
+      return value.some(item => this.hasMeaningfulData(item));
+    }
+    if (typeof value === 'object') {
+      return Object.keys(value as object).some(key => {
+        const fieldValue = (value as { [key: string]: unknown })[key];
+        return this.hasMeaningfulData(fieldValue);
+      });
+    }
+    return false;
+  }
+
+  private updateSectionDataAvailability(
+    section: NetappStorageSectionViewData & {
+      summaryViewData?: unknown;
+      chartViewData?: { hasData?: boolean };
+      tableViewData?: unknown[];
+    }
+  ): void {
+    section.hasSummaryData = this.hasMeaningfulData(section.summaryViewData);
+    section.hasChartData = section.chartViewData?.hasData ?? false;
+    section.chartLoaded = true;
+    this.updateSectionVisibility(section);
+  }
+
+  private updateSectionVisibility(
+    section: NetappStorageSectionViewData & { tableViewData?: unknown[] }
+  ): void {
+    const hasTableData = !!section.tableViewData?.length;
+    section.hidden = section.chartLoaded
+      && !section.hasSummaryData
+      && !section.hasChartData
+      && !hasTableData;
+  }
+
+  private updateSummaryOnlySectionDataAvailability(
+    section: {
+      hidden: boolean;
+      hasSummaryData: boolean;
+      summaryViewData?: unknown;
+    }
+  ): void {
+    section.hasSummaryData = this.hasMeaningfulData(section.summaryViewData);
+    section.hidden = !section.hasSummaryData;
+  }
+
+  private resetSectionVisibility(
+    section: NetappStorageSectionViewData & { tableCount?: number, tableViewData?: unknown[] }
+  ): void {
+    section.hidden = false;
+    section.chartLoaded = false;
+    section.hasSummaryData = false;
+    section.hasChartData = false;
+    if (section.tableViewData?.length) {
+      section.tableCount = 0;
+      section.tableViewData = [];
+    }
+  }
+
+  private resetSummaryOnlySectionVisibility(
+    section: {
+      hidden: boolean;
+      hasSummaryData: boolean;
+      summaryViewData?: unknown;
+    }
+  ): void {
+    section.hidden = false;
+    section.hasSummaryData = false;
+    section.summaryViewData = null;
+  }
+
+  private createSortedTableCriteria(sortColumn: string, sortDirection: 'asc' | 'desc'): SearchCriteria {
+    return {
+      pageNo: 1,
+      pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE,
+      searchValue: '',
+      sortColumn,
+      sortDirection
     };
-    return labels[period] || period;
+  }
+
+  private loadDashboard(): void {
+    this.reloadCancel.next();
+    if (this.filtersUnavailable) {
+      this.showDashboardNoData();
+      return;
+    }
+    this.startDashboardLoader();
+    this.resetAllTablePages();
+    this.deferViewLoad(() => this.getClusterOverviewData());
+    this.deferViewLoad(() => this.getNodeInfoAndMetricsChartData());
+    this.deferViewLoad(() => this.getAggregateOverviewChartData());
+    this.deferViewLoad(() => this.getSvmOverviewChartData());
+    this.deferViewLoad(() => this.getVolumeOverviewChartData());
+    this.deferViewLoad(() => this.getLunOverviewChartData());
+    this.deferViewLoad(() => this.getPerformanceMetricsChartData());
+    this.deferViewLoad(() => this.getCapacityPlanningChartData());
+    this.deferViewLoad(() => this.getPortOverviewChartData());
+    this.deferViewLoad(() => this.getRecentAlertsChartData());
+    this.deferViewLoad(() => this.getAutoRemediationSummaryData());
+
+    if (this.nodeInfoAndMetricsViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getNodeInfoAndMetricsTableData());
+    }
+    if (this.aggregateOverviewViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getAggregateOverviewTableData());
+    }
+    if (this.svmOverviewViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getSvmOverviewTableData());
+    }
+    if (this.volumeOverviewViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getVolumeOverviewTableData());
+    }
+    if (this.lunOvervieViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getLunOverviewTableData());
+    }
+    if (this.performanceMetricsViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getPerformanceMetricsTableData());
+    }
+    if (this.capacityPlanningViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getCapacityPlanningTableData());
+    }
+    if (this.portOverviewViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getPortOverviewTableData());
+    }
+    if (this.recentAlertsViewData.viewType === 'table') {
+      this.deferViewLoad(() => this.getRecentAlertsTableData());
+    }
+    this.deferViewLoad(() => this.stopDashboardLoader());
+  }
+
+  private isNetappSelected(): boolean {
+    return this.filters?.storageType === 'netapp';
+  }
+
+  private getAllChartTableSections(): NetappStorageSectionViewData[] {
+    return [
+      this.nodeInfoAndMetricsViewData,
+      this.aggregateOverviewViewData,
+      this.svmOverviewViewData,
+      this.volumeOverviewViewData,
+      this.lunOvervieViewData,
+      this.performanceMetricsViewData,
+      this.capacityPlanningViewData,
+      this.portOverviewViewData,
+      this.recentAlertsViewData
+    ];
+  }
+
+  private showDashboardNoData(): void {
+    this.reloadCancel.next();
+    this.stopAllLoaders();
+    this.startDashboardLoader();
+    this.resetSummaryOnlySectionVisibility(this.clusterOverviewWidgetViewData);
+    this.clusterOverviewWidgetViewData.hidden = true;
+    this.resetSummaryOnlySectionVisibility(this.autoRemediationViewData);
+    this.autoRemediationViewData.hidden = true;
+    this.getAllChartTableSections().forEach(section => {
+      this.resetSectionVisibility(section);
+      section.hidden = true;
+    });
+    this.pendingDashboardLoads = 0;
+    this.dashboardLoading = false;
+    this.dashboardNoData = true;
+  }
+
+  private resetAllTablePages(): void {
+    const tableCriteriaList: SearchCriteria[] = [
+      this.nodeInfoAndMetricsTableCriteria,
+      this.aggregateOverviewTableCriteria,
+      this.svmOverviewTableCriteria,
+      this.volumeOverviewTableCriteria,
+      this.lunOverviewTableCriteria,
+      this.performanceMetricsTableCriteria,
+      this.capacityPlanningTableCriteria,
+      this.portOverviewTableCriteria,
+      this.recentAlertsTableCriteria
+    ];
+    tableCriteriaList.forEach(criteria => {
+      criteria.pageNo = 1;
+      criteria.searchValue = ''
+    });
+  }
+
+  private updateTableSearch(criteria: SearchCriteria, searchValue: string): void {
+    criteria.searchValue = searchValue;
+    criteria.pageNo = 1;
+  }
+
+  private updateTableSort(criteria: SearchCriteria, event: ColumnSortedEvent): void {
+    criteria.sortColumn = event.sortColumn;
+    criteria.sortDirection = event.sortDirection === 'desc' ? 'desc' : 'asc';
+    criteria.pageNo = 1;
+  }
+
+  clusterOverviewWidgetViewData: ClusterOverviewWidgetViewData = new ClusterOverviewWidgetViewData();
+  getClusterOverviewData() {
+    this.loadWidget(
+      'clusterOverviewSummary',
+      this.svc.getClusterOverviewData(this.filters),
+      res => {
+        this.clusterOverviewWidgetViewData.summaryViewData = this.svc.convertToClusterOverviewViewData(res.summary);
+        this.updateSummaryOnlySectionDataAvailability(this.clusterOverviewWidgetViewData);
+      },
+      () => {
+        this.clusterOverviewWidgetViewData.summaryViewData = null;
+        this.updateSummaryOnlySectionDataAvailability(this.clusterOverviewWidgetViewData);
+      },
+      () => {
+        this.resetSummaryOnlySectionVisibility(this.clusterOverviewWidgetViewData);
+      }
+    );
+  }
+
+  nodeInfoAndMetricsViewData: NodeInfoAndMetricsViewData = new NodeInfoAndMetricsViewData();
+
+  private deferViewLoad(loadFn: () => void): void {
+    setTimeout(() => loadFn(), 0);
+  }
+
+  setNodeInfoAndMetricsViewType(viewType: 'table' | 'chart'): void {
+    this.nodeInfoAndMetricsViewData.viewType = viewType;
+    if (viewType == 'table') {
+      this.deferViewLoad(() => this.getNodeInfoAndMetricsTableData());
+    } else if (viewType == 'chart' && !this.nodeInfoAndMetricsViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getNodeInfoAndMetricsChartData());
+    }
+  }
+
+  getNodeInfoAndMetricsTableData(): void {
+    this.loadWidget(
+      'nodeInfoAndMetricsTable',
+      this.svc.getNodeInfoAndMetricsTableData(this.nodeInfoAndMetricsTableCriteria, this.filters),
+      res => {
+        this.nodeInfoAndMetricsViewData.tableCount = res?.count || 0;
+        this.nodeInfoAndMetricsViewData.tableViewData =
+          this.svc.convertToNodeInfoAndMetricsTableViewData(res?.results || []);
+        this.updateSectionVisibility(this.nodeInfoAndMetricsViewData);
+      },
+      () => {
+        this.nodeInfoAndMetricsViewData.tableCount = 0;
+        this.nodeInfoAndMetricsViewData.tableViewData = [];
+        this.updateSectionVisibility(this.nodeInfoAndMetricsViewData);
+      },
+      () => {
+        this.nodeInfoAndMetricsViewData.hidden = false;
+        this.nodeInfoAndMetricsViewData.tableCount = 0;
+        this.nodeInfoAndMetricsViewData.tableViewData = [];
+      }
+    );
+  }
+
+  onNodeInfoAndMetricsSearched(value: string): void {
+    this.updateTableSearch(this.nodeInfoAndMetricsTableCriteria, value);
+    this.getNodeInfoAndMetricsTableData();
+  }
+
+  onNodeInfoAndMetricsPageChange(pageNo: number): void {
+    if (this.nodeInfoAndMetricsTableCriteria.pageNo !== pageNo) {
+      this.nodeInfoAndMetricsTableCriteria.pageNo = pageNo;
+      this.getNodeInfoAndMetricsTableData();
+    }
+  }
+
+  onNodeInfoAndMetricsSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.nodeInfoAndMetricsTableCriteria, event);
+    this.getNodeInfoAndMetricsTableData();
+  }
+
+  trackByNodeInfoAndMetricsRow(_index: number, row: NodeInfoAndMetricsTableViewData): string {
+    return `${row.cluster}-${row.name}`;
+  }
+
+
+  getNodeInfoAndMetricsChartData(): void {
+    this.loadWidget(
+      ['nodeInfoAndMetricsSummary', 'cpuUsageNodeDistribution', 'memUsageNodeDistribution', 'networkThroughput', 'iopsTopNodes', 'devWriteThroughput'],
+      this.svc.getNodeInfoAndMetricsChartViewData(this.filters),
+      res => {
+        this.nodeInfoAndMetricsViewData.summaryViewData = this.svc.convertToNodeInfoAndMetricsSummaryViewData(res?.summary);
+        this.nodeInfoAndMetricsViewData.chartViewData = this.svc.convertToNodeInfoAndMetricsChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.nodeInfoAndMetricsViewData);
+      },
+      () => {
+        this.nodeInfoAndMetricsViewData.summaryViewData = null;
+        this.nodeInfoAndMetricsViewData.chartViewData = new NodeInfoAndMetricsChartViewData();
+        this.updateSectionDataAvailability(this.nodeInfoAndMetricsViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.nodeInfoAndMetricsViewData);
+        this.nodeInfoAndMetricsViewData.summaryViewData = null;
+        this.nodeInfoAndMetricsViewData.chartViewData = new NodeInfoAndMetricsChartViewData();
+      }
+    );
+  }
+
+  aggregateOverviewViewData: AggregateOverviewViewData = new AggregateOverviewViewData();
+
+  setAggregateOverviewViewType(viewType: 'table' | 'chart'): void {
+    this.aggregateOverviewViewData.viewType = viewType;
+    if (viewType === 'table') {
+      this.deferViewLoad(() => this.getAggregateOverviewTableData());
+    } else if (viewType === 'chart' && !this.aggregateOverviewViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getAggregateOverviewChartData());
+    }
+  }
+
+  getAggregateOverviewTableData(): void {
+    this.loadWidget(
+      'aggregateOverviewTable',
+      this.svc.getAggregateOverviewTableData(this.aggregateOverviewTableCriteria, this.filters),
+      response => {
+        this.aggregateOverviewViewData.tableViewData =
+          this.svc.convertToAggregateOverviewTableViewData(response?.results || []);
+        this.aggregateOverviewViewData.tableCount = response?.count || 0;
+        this.updateSectionVisibility(this.aggregateOverviewViewData);
+      },
+      () => {
+        this.aggregateOverviewViewData.tableViewData = [];
+        this.aggregateOverviewViewData.tableCount = 0;
+        this.updateSectionVisibility(this.aggregateOverviewViewData);
+      },
+      () => {
+        this.aggregateOverviewViewData.hidden = false;
+        this.aggregateOverviewViewData.tableViewData = [];
+        this.aggregateOverviewViewData.tableCount = 0;
+      }
+    );
+  }
+
+  onAggregateOverviewSearched(value: string): void {
+    this.updateTableSearch(this.aggregateOverviewTableCriteria, value);
+    this.getAggregateOverviewTableData();
+  }
+
+  onAggregateOverviewPageChange(pageNo: number): void {
+    if (this.aggregateOverviewTableCriteria.pageNo !== pageNo) {
+      this.aggregateOverviewTableCriteria.pageNo = pageNo;
+      this.getAggregateOverviewTableData();
+    }
+  }
+
+  onAggregateOverviewSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.aggregateOverviewTableCriteria, event);
+    this.getAggregateOverviewTableData();
+  }
+
+  trackByAggregateOverviewRow(_index: number, row: AggregateOverviewTableViewData): string {
+    return `${row.cluster}-${row.name}`;
+  }
+
+  getAggregateOverviewChartData() {
+    this.loadWidget(
+      ['aggregateOverviewSummary', 'aggregateCapacityDistribution', 'aggregateUtilization', 'aggregateNearlyFull', 'aggregateTop10Largest', 'aggregateGrowthTrend'],
+      this.svc.getAggregateOverviewChartData(this.filters),
+      res => {
+        this.aggregateOverviewViewData.summaryViewData = this.svc.convertToAggregateOverviewViewData(res.summary);
+        this.aggregateOverviewViewData.chartViewData = this.svc.convertToAggregateOverviewChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.aggregateOverviewViewData);
+      },
+      () => {
+        this.aggregateOverviewViewData.summaryViewData = null;
+        this.aggregateOverviewViewData.chartViewData = new AggregateOverviewChartViewData();
+        this.updateSectionDataAvailability(this.aggregateOverviewViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.aggregateOverviewViewData);
+        this.aggregateOverviewViewData.summaryViewData = null;
+        this.aggregateOverviewViewData.chartViewData = new AggregateOverviewChartViewData();
+      }
+    );
+  }
+
+  svmOverviewViewData: SVMOverviewViewData = new SVMOverviewViewData();
+
+  setSvmOverviewViewType(viewType: 'table' | 'chart'): void {
+    this.svmOverviewViewData.viewType = viewType;
+    if (viewType === 'table') {
+      this.deferViewLoad(() => this.getSvmOverviewTableData());
+    } else if (viewType === 'chart' && !this.svmOverviewViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getSvmOverviewChartData());
+    }
+  }
+
+  getSvmOverviewTableData(): void {
+    this.loadWidget(
+      'svmOverviewTable',
+      this.svc.getSvmOverviewTableData(this.svmOverviewTableCriteria, this.filters),
+      response => {
+        this.svmOverviewViewData.tableViewData =
+          this.svc.convertToSvmOverviewTableViewData(response?.results || []);
+        this.svmOverviewViewData.tableCount = response?.count || 0;
+        this.updateSectionVisibility(this.svmOverviewViewData);
+      },
+      () => {
+        this.svmOverviewViewData.tableViewData = [];
+        this.svmOverviewViewData.tableCount = 0;
+        this.updateSectionVisibility(this.svmOverviewViewData);
+      },
+      () => {
+        this.svmOverviewViewData.hidden = false;
+        this.svmOverviewViewData.tableViewData = [];
+        this.svmOverviewViewData.tableCount = 0;
+      }
+    );
+  }
+
+  onSvmOverviewSearched(value: string): void {
+    this.updateTableSearch(this.svmOverviewTableCriteria, value);
+    this.getSvmOverviewTableData();
+  }
+
+  onSvmOverviewPageChange(pageNo: number): void {
+    if (this.svmOverviewTableCriteria.pageNo !== pageNo) {
+      this.svmOverviewTableCriteria.pageNo = pageNo;
+      this.getSvmOverviewTableData();
+    }
+  }
+
+  onSvmOverviewSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.svmOverviewTableCriteria, event);
+    this.getSvmOverviewTableData();
+  }
+
+  trackBySvmOverviewRow(_index: number, row: SVMOverviewTableViewData): string {
+    return `${row.cluster}-${row.name}`;
+  }
+
+  getSvmOverviewChartData() {
+    this.loadWidget(
+      ['svmOverviewSummary', 'capacityBySvm', 'volumeCountBySvm', 'lunCountBySvm', 'throughputBySvm', 'top10CapacityConsumers', 'topPerformingSvms'],
+      this.svc.getSvmOverviewChartData(this.filters),
+      res => {
+        this.svmOverviewViewData.summaryViewData = this.svc.convertToSvmOverviewSummaryViewData(res?.summary);
+        this.svmOverviewViewData.chartViewData = this.svc.convertToSvmOverviewChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.svmOverviewViewData);
+      },
+      () => {
+        this.svmOverviewViewData.summaryViewData = null;
+        this.svmOverviewViewData.chartViewData = new SVMOverviewChartViewData();
+        this.updateSectionDataAvailability(this.svmOverviewViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.svmOverviewViewData);
+        this.svmOverviewViewData.summaryViewData = null;
+        this.svmOverviewViewData.chartViewData = new SVMOverviewChartViewData();
+      }
+    );
+  }
+
+  volumeOverviewViewData: VolumeOverviewViewData = new VolumeOverviewViewData();
+
+  setVolumeOverviewViewType(viewType: 'table' | 'chart'): void {
+    this.volumeOverviewViewData.viewType = viewType;
+    if (viewType === 'table') {
+      this.deferViewLoad(() => this.getVolumeOverviewTableData());
+    } else if (viewType === 'chart' && !this.volumeOverviewViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getVolumeOverviewChartData());
+    }
+  }
+
+  getVolumeOverviewTableData(): void {
+    this.loadWidget(
+      'volumeOverviewTable',
+      this.svc.getVolumeOverviewTableData(this.volumeOverviewTableCriteria, this.filters),
+      response => {
+        this.volumeOverviewViewData.tableViewData =
+          this.svc.convertToVolumeOverviewTableViewData(response?.results || []);
+        this.volumeOverviewViewData.tableCount = response?.count || 0;
+        this.updateSectionVisibility(this.volumeOverviewViewData);
+      },
+      () => {
+        this.volumeOverviewViewData.tableViewData = [];
+        this.volumeOverviewViewData.tableCount = 0;
+        this.updateSectionVisibility(this.volumeOverviewViewData);
+      },
+      () => {
+        this.volumeOverviewViewData.hidden = false;
+        this.volumeOverviewViewData.tableViewData = [];
+        this.volumeOverviewViewData.tableCount = 0;
+      }
+    );
+  }
+
+  onVolumeOverviewSearched(value: string): void {
+    this.updateTableSearch(this.volumeOverviewTableCriteria, value);
+    this.getVolumeOverviewTableData();
+  }
+
+  onVolumeOverviewPageChange(pageNo: number): void {
+    if (this.volumeOverviewTableCriteria.pageNo !== pageNo) {
+      this.volumeOverviewTableCriteria.pageNo = pageNo;
+      this.getVolumeOverviewTableData();
+    }
+  }
+
+  onVolumeOverviewSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.volumeOverviewTableCriteria, event);
+    this.getVolumeOverviewTableData();
+  }
+
+  trackByVolumeOverviewRow(_index: number, row: VolumeOverviewTableViewData): string {
+    return `${row.cluster}-${row.name}`;
+  }
+
+  getVolumeOverviewChartData() {
+    this.loadWidget(
+      ['volumeOverviewSummary', 'volumeUtilizationDistribution', 'volumeTop10Largest', 'volumeTop10MostUsed', 'volumeIopsTrend', 'volumeRwRatio', 'volumeLatencyTrend', 'volumeSnapshotUsage'],
+      this.svc.getVolumeOverviewChartData(this.filters),
+      res => {
+        this.volumeOverviewViewData.summaryViewData = this.svc.convertToVolumeOverviewSummaryViewData(res.summary);
+        this.volumeOverviewViewData.chartViewData = this.svc.convertToVolumeOverviewChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.volumeOverviewViewData);
+      },
+      () => {
+        this.volumeOverviewViewData.summaryViewData = null;
+        this.volumeOverviewViewData.chartViewData = new VolumeOverviewChartViewData();
+        this.updateSectionDataAvailability(this.volumeOverviewViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.volumeOverviewViewData);
+        this.volumeOverviewViewData.summaryViewData = null;
+        this.volumeOverviewViewData.chartViewData = new VolumeOverviewChartViewData();
+      }
+    );
+  }
+
+  lunOvervieViewData: LUNOverviewViewData = new LUNOverviewViewData();
+
+  setLunOverviewViewType(viewType: 'table' | 'chart'): void {
+    this.lunOvervieViewData.viewType = viewType;
+    if (viewType === 'table') {
+      this.deferViewLoad(() => this.getLunOverviewTableData());
+    } else if (viewType === 'chart' && !this.lunOvervieViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getLunOverviewChartData());
+    }
+  }
+
+  getLunOverviewTableData(): void {
+    this.loadWidget(
+      'lunOverviewTable',
+      this.svc.getLunOverviewTableData(this.lunOverviewTableCriteria, this.filters),
+      response => {
+        this.lunOvervieViewData.tableViewData =
+          this.svc.convertToLunOverviewTableViewData(response?.results || []);
+        this.lunOvervieViewData.tableCount = response?.count || 0;
+        this.updateSectionVisibility(this.lunOvervieViewData);
+      },
+      () => {
+        this.lunOvervieViewData.tableViewData = [];
+        this.lunOvervieViewData.tableCount = 0;
+        this.updateSectionVisibility(this.lunOvervieViewData);
+      },
+      () => {
+        this.lunOvervieViewData.hidden = false;
+        this.lunOvervieViewData.tableViewData = [];
+        this.lunOvervieViewData.tableCount = 0;
+      }
+    );
+  }
+
+  onLunOverviewSearched(value: string): void {
+    this.updateTableSearch(this.lunOverviewTableCriteria, value);
+    this.getLunOverviewTableData();
+  }
+
+  onLunOverviewPageChange(pageNo: number): void {
+    if (this.lunOverviewTableCriteria.pageNo !== pageNo) {
+      this.lunOverviewTableCriteria.pageNo = pageNo;
+      this.getLunOverviewTableData();
+    }
+  }
+
+  onLunOverviewSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.lunOverviewTableCriteria, event);
+    this.getLunOverviewTableData();
+  }
+
+  trackByLunOverviewRow(_index: number, row: LUNOverviewTableViewData): string {
+    return `${row.cluster}-${row.name}`;
+  }
+
+  getLunOverviewChartData() {
+    this.loadWidget(
+      ['lunOverviewSummary', 'lunHealthDistribution', 'lunTop10ByUsage', 'lunGrowthTrend', 'lunAvailability'],
+      this.svc.getLunOverviewChartData(this.filters),
+      res => {
+        this.lunOvervieViewData.summaryViewData = this.svc.convertToLunOverviewViewData(res.summary);
+        this.lunOvervieViewData.chartViewData = this.svc.convertToLunOverviewChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.lunOvervieViewData);
+      },
+      () => {
+        this.lunOvervieViewData.summaryViewData = null;
+        this.lunOvervieViewData.chartViewData = new LUNOverviewChartViewData();
+        this.updateSectionDataAvailability(this.lunOvervieViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.lunOvervieViewData);
+        this.lunOvervieViewData.summaryViewData = null;
+        this.lunOvervieViewData.chartViewData = new LUNOverviewChartViewData();
+      }
+    );
+  }
+
+  performanceMetricsViewData: PerformanceMetricsViewData = new PerformanceMetricsViewData();
+
+  setPerformanceMetricsViewType(viewType: 'table' | 'chart'): void {
+    this.performanceMetricsViewData.viewType = viewType;
+    if (viewType === 'table') {
+      this.deferViewLoad(() => this.getPerformanceMetricsTableData());
+    } else if (viewType === 'chart' && !this.performanceMetricsViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getPerformanceMetricsChartData());
+    }
+  }
+
+  getPerformanceMetricsTableData(): void {
+    this.loadWidget(
+      'performanceMetricsTable',
+      this.svc.getPerformanceMetricsTableData(this.performanceMetricsTableCriteria, this.filters),
+      response => {
+        this.performanceMetricsViewData.tableViewData =
+          this.svc.convertToPerformanceMetricsTableViewData(response?.results || []);
+        this.performanceMetricsViewData.tableCount = response?.count || 0;
+        this.updateSectionVisibility(this.performanceMetricsViewData);
+      },
+      () => {
+        this.performanceMetricsViewData.tableViewData = [];
+        this.performanceMetricsViewData.tableCount = 0;
+        this.updateSectionVisibility(this.performanceMetricsViewData);
+      },
+      () => {
+        this.performanceMetricsViewData.hidden = false;
+        this.performanceMetricsViewData.tableViewData = [];
+        this.performanceMetricsViewData.tableCount = 0;
+      }
+    );
+  }
+
+  onPerformanceMetricsSearched(value: string): void {
+    this.updateTableSearch(this.performanceMetricsTableCriteria, value);
+    this.getPerformanceMetricsTableData();
+  }
+
+  onPerformanceMetricsPageChange(pageNo: number): void {
+    if (this.performanceMetricsTableCriteria.pageNo !== pageNo) {
+      this.performanceMetricsTableCriteria.pageNo = pageNo;
+      this.getPerformanceMetricsTableData();
+    }
+  }
+
+  onPerformanceMetricsSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.performanceMetricsTableCriteria, event);
+    this.getPerformanceMetricsTableData();
+  }
+
+  trackByPerformanceMetricsRow(_index: number, row: PerformanceMetricsTableViewData): string {
+    return row.time;
+  }
+
+  getPerformanceMetricsChartData() {
+    this.loadWidget(
+      ['performanceMetricsSummary', 'performanceIopsRealTimeTrend', 'performanceThroughputRealTimeTrend', 'performanceLatencyTrend', 'performanceIopsActivityBreakdown'],
+      this.svc.getPerformanceMetricsChartData(this.filters),
+      res => {
+        this.performanceMetricsViewData.summaryViewData = this.svc.convertToPerformanceMetricsSummaryViewData(res.summary);
+        this.performanceMetricsViewData.chartViewData = this.svc.convertToPerformanceMetricsChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.performanceMetricsViewData);
+      },
+      () => {
+        this.performanceMetricsViewData.summaryViewData = null;
+        this.performanceMetricsViewData.chartViewData = new PerformanceMetricsChartViewData();
+        this.updateSectionDataAvailability(this.performanceMetricsViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.performanceMetricsViewData);
+        this.performanceMetricsViewData.summaryViewData = null;
+        this.performanceMetricsViewData.chartViewData = new PerformanceMetricsChartViewData();
+      }
+    );
+  }
+
+  capacityPlanningViewData: CapacityPlanningViewData = new CapacityPlanningViewData();
+
+  setCapacityPlanningViewType(viewType: 'table' | 'chart'): void {
+    this.capacityPlanningViewData.viewType = viewType;
+    if (viewType === 'table') {
+      this.deferViewLoad(() => this.getCapacityPlanningTableData());
+    } else if (viewType === 'chart' && !this.capacityPlanningViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getCapacityPlanningChartData());
+    }
+  }
+
+  getCapacityPlanningTableData(): void {
+    this.loadWidget(
+      'capacityPlanningTable',
+      this.svc.getCapacityPlanningTableData(this.capacityPlanningTableCriteria, this.filters),
+      response => {
+        this.capacityPlanningViewData.tableViewData =
+          this.svc.convertToCapacityPlanningTableViewData(response?.results || []);
+        this.capacityPlanningViewData.tableCount = response?.count || 0;
+        this.updateSectionVisibility(this.capacityPlanningViewData);
+      },
+      () => {
+        this.capacityPlanningViewData.tableViewData = [];
+        this.capacityPlanningViewData.tableCount = 0;
+        this.updateSectionVisibility(this.capacityPlanningViewData);
+      },
+      () => {
+        this.capacityPlanningViewData.hidden = false;
+        this.capacityPlanningViewData.tableViewData = [];
+        this.capacityPlanningViewData.tableCount = 0;
+      }
+    );
+  }
+
+  onCapacityPlanningSearched(value: string): void {
+    this.updateTableSearch(this.capacityPlanningTableCriteria, value);
+    this.getCapacityPlanningTableData();
+  }
+
+  onCapacityPlanningPageChange(pageNo: number): void {
+    if (this.capacityPlanningTableCriteria.pageNo !== pageNo) {
+      this.capacityPlanningTableCriteria.pageNo = pageNo;
+      this.getCapacityPlanningTableData();
+    }
+  }
+
+  onCapacityPlanningSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.capacityPlanningTableCriteria, event);
+    this.getCapacityPlanningTableData();
+  }
+
+  trackByCapacityPlanningRow(_index: number, row: CapacityPlanningTableViewData): string {
+    return row.cluster;
+  }
+
+  getCapacityPlanningChartData() {
+    this.loadWidget(
+      ['capacityPlanningSummary', 'capacityForecast', 'capacityVolUtilDistribution', 'capacityAggUtilDistribution', 'capacityTop5Consumers', 'capacityPlanningBySvm', 'capacityMonthlyGrowth'],
+      this.svc.getCapacityPlanningChartData(this.filters),
+      res => {
+        this.capacityPlanningViewData.summaryViewData = this.svc.convertToCapacityPlanningSummaryViewData(res.summary);
+        this.capacityPlanningViewData.chartViewData = this.svc.convertToCapacityPlanningChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.capacityPlanningViewData);
+      },
+      () => {
+        this.capacityPlanningViewData.summaryViewData = null;
+        this.capacityPlanningViewData.chartViewData = new CapacityPlanningChartViewData();
+        this.updateSectionDataAvailability(this.capacityPlanningViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.capacityPlanningViewData);
+        this.capacityPlanningViewData.summaryViewData = null;
+        this.capacityPlanningViewData.chartViewData = new CapacityPlanningChartViewData();
+      }
+    );
+  }
+
+  portOverviewViewData: PortOverviewViewData = new PortOverviewViewData();
+
+  setPortOverviewViewType(viewType: 'table' | 'chart'): void {
+    this.portOverviewViewData.viewType = viewType;
+    if (viewType === 'table') {
+      this.deferViewLoad(() => this.getPortOverviewTableData());
+    } else if (viewType === 'chart' && !this.portOverviewViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getPortOverviewChartData());
+    }
+  }
+
+  getPortOverviewTableData(): void {
+    this.loadWidget(
+      'portOverviewTable',
+      this.svc.getPortOverviewTableData(this.portOverviewTableCriteria, this.filters),
+      response => {
+        this.portOverviewViewData.tableViewData =
+          this.svc.convertToPortOverviewTableViewData(response?.results || []);
+        this.portOverviewViewData.tableCount = response?.count || 0;
+        this.updateSectionVisibility(this.portOverviewViewData);
+      },
+      () => {
+        this.portOverviewViewData.tableViewData = [];
+        this.portOverviewViewData.tableCount = 0;
+        this.updateSectionVisibility(this.portOverviewViewData);
+      },
+      () => {
+        this.portOverviewViewData.hidden = false;
+        this.portOverviewViewData.tableViewData = [];
+        this.portOverviewViewData.tableCount = 0;
+      }
+    );
+  }
+
+  onPortOverviewSearched(value: string): void {
+    this.updateTableSearch(this.portOverviewTableCriteria, value);
+    this.getPortOverviewTableData();
+  }
+
+  onPortOverviewPageChange(pageNo: number): void {
+    if (this.portOverviewTableCriteria.pageNo !== pageNo) {
+      this.portOverviewTableCriteria.pageNo = pageNo;
+      this.getPortOverviewTableData();
+    }
+  }
+
+  onPortOverviewSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.portOverviewTableCriteria, event);
+    this.getPortOverviewTableData();
+  }
+
+  trackByPortOverviewRow(_index: number, row: PortOverviewTableViewData): string {
+    return `${row.cluster}-${row.node}-${row.name}`;
+  }
+
+  getPortOverviewChartData() {
+    this.loadWidget(
+      ['portOverviewSummary', 'portLinkStatusDistribution', 'portTypeAndProtocol', 'portCabledByNode'],
+      this.svc.getPortOverviewChartData(this.filters),
+      res => {
+        this.portOverviewViewData.summaryViewData = this.svc.convertToPortOverviewSummaryViewData(res?.summary);
+        this.portOverviewViewData.chartViewData = this.svc.convertToPortOverviewChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.portOverviewViewData);
+      },
+      () => {
+        this.portOverviewViewData.summaryViewData = null;
+        this.portOverviewViewData.chartViewData = new PortOverviewChartViewData();
+        this.updateSectionDataAvailability(this.portOverviewViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.portOverviewViewData);
+        this.portOverviewViewData.summaryViewData = null;
+        this.portOverviewViewData.chartViewData = new PortOverviewChartViewData();
+      }
+    );
+  }
+
+  recentAlertsViewData: RecentAlertsViewData = new RecentAlertsViewData();
+
+  setRecentAlertsViewType(viewType: 'table' | 'chart'): void {
+    this.recentAlertsViewData.viewType = viewType;
+    if (viewType === 'table') {
+      this.deferViewLoad(() => this.getRecentAlertsTableData());
+    } else if (viewType === 'chart' && !this.recentAlertsViewData.chartLoaded) {
+      this.deferViewLoad(() => this.getRecentAlertsChartData());
+    }
+  }
+
+  getRecentAlertsTableData(): void {
+    this.loadWidget(
+      'recentAlertsTable',
+      this.svc.getRecentAlertsTableData(this.recentAlertsTableCriteria, this.filters),
+      response => {
+        this.recentAlertsViewData.tableViewData =
+          this.svc.convertToRecentAlertsTableViewData(response?.results || []);
+        this.recentAlertsViewData.tableCount = response?.count || 0;
+        this.updateSectionVisibility(this.recentAlertsViewData);
+      },
+      () => {
+        this.recentAlertsViewData.tableViewData = [];
+        this.recentAlertsViewData.tableCount = 0;
+        this.updateSectionVisibility(this.recentAlertsViewData);
+      },
+      () => {
+        this.recentAlertsViewData.hidden = false;
+        this.recentAlertsViewData.tableViewData = [];
+        this.recentAlertsViewData.tableCount = 0;
+      }
+    );
+  }
+
+  onRecentAlertsSearched(value: string): void {
+    this.updateTableSearch(this.recentAlertsTableCriteria, value);
+    this.getRecentAlertsTableData();
+  }
+
+  onRecentAlertsPageChange(pageNo: number): void {
+    if (this.recentAlertsTableCriteria.pageNo !== pageNo) {
+      this.recentAlertsTableCriteria.pageNo = pageNo;
+      this.getRecentAlertsTableData();
+    }
+  }
+
+  onRecentAlertsSorted(event: ColumnSortedEvent): void {
+    this.updateTableSort(this.recentAlertsTableCriteria, event);
+    this.getRecentAlertsTableData();
+  }
+
+  trackByRecentAlertsRow(_index: number, row: RecentAlertsTableViewData): number {
+    return row.id;
+  }
+
+  getRecentAlertsChartData() {
+    this.loadWidget(
+      ['recentAlertsSummary', 'recentAlertsSeverityDistribution', 'recentAlertsAlertTimeline'],
+      this.svc.getRecentAlertsChartData(this.filters),
+      res => {
+        this.recentAlertsViewData.summaryViewData = this.svc.convertToRecentAlertsSummaryViewData(res?.summary);
+        this.recentAlertsViewData.chartViewData = this.svc.convertToRecentAlertsChartViewData(res?.charts);
+        this.updateSectionDataAvailability(this.recentAlertsViewData);
+      },
+      () => {
+        this.recentAlertsViewData.summaryViewData = null;
+        this.recentAlertsViewData.chartViewData = new RecentAlertsChartViewData();
+        this.updateSectionDataAvailability(this.recentAlertsViewData);
+      },
+      () => {
+        this.resetSectionVisibility(this.recentAlertsViewData);
+        this.recentAlertsViewData.summaryViewData = null;
+        this.recentAlertsViewData.chartViewData = new RecentAlertsChartViewData();
+      }
+    );
+  }
+
+  autoRemediationViewData: AutoRemediationViewData = new AutoRemediationViewData();
+  getAutoRemediationSummaryData() {
+    this.loadWidget(
+      'autoRemediationSummary',
+      this.svc.getAutoRemediationSummaryData(this.filters),
+      res => {
+        this.autoRemediationViewData.summaryViewData =
+          this.svc.convertToAutoRemediationSummaryViewData(res?.summary);
+        this.updateSummaryOnlySectionDataAvailability(this.autoRemediationViewData);
+      },
+      () => {
+        this.autoRemediationViewData.summaryViewData = null;
+        this.updateSummaryOnlySectionDataAvailability(this.autoRemediationViewData);
+      },
+      () => {
+        this.resetSummaryOnlySectionVisibility(this.autoRemediationViewData);
+      }
+    );
+  }
+
+  private loadWidget<T>(
+    loadingKeys: keyof NetappStorageWidgetLoadingState | Array<keyof NetappStorageWidgetLoadingState>,
+    request: Observable<T>,
+    onSuccess: (res: T) => void,
+    onError: () => void,
+    onBeforeLoad?: () => void
+  ) {
+    this.registerDashboardLoad();
+    const keys = Array.isArray(loadingKeys) ? loadingKeys : [loadingKeys];
+    keys.forEach(key => {
+      this.widgetLoading[key] = true;
+      setTimeout(() => {
+        this.spinner.start(this.loaderNames[key]);
+      }, 0);
+    });
+    if (onBeforeLoad) {
+      onBeforeLoad();
+    }
+    request.pipe(
+      takeUntil(this.reloadCancel),
+      takeUntil(this.ngUnsubscribe),
+      finalize(() => {
+        keys.forEach(key => {
+          this.widgetLoading[key] = false;
+          setTimeout(() => this.spinner.stop(this.loaderNames[key]), 0);
+        });
+        this.completeDashboardLoad();
+      })
+    ).subscribe(res => {
+      onSuccess(res);
+    }, () => {
+      onError();
+    });
   }
 }

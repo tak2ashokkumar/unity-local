@@ -85,6 +85,7 @@ export class OrchestrationExecutionsWorkflowLogsService {
       viewItem.endDate = task.end_time ? task.end_time.split('T')[0] : '';
       viewItem.duration = task.duration ? this.formatDuration(task.duration) : 'NA';
       viewItem.inputs = task.execution_inputs;
+      viewItem.nodeId = Number(task.name_id.replace('task_', ''));
       // viewItem.statusColor = task.execution_status == 'Success' ? 'text-success' : 'text-danger';
       if (task.execution_status === 'Success') {
         viewItem.statusColor = 'text-success';
@@ -177,24 +178,52 @@ export class OrchestrationExecutionsWorkflowLogsService {
 
   covertToOutputViewData(data: WorkflowOutputResponse[]): WorkflowOutputViewData[] {
     let viewData: WorkflowOutputViewData[] = [];
-    data.forEach(d => {
+    (data || []).forEach(d => {
       let view: WorkflowOutputViewData = new WorkflowOutputViewData()
-      view.executionStatus = d?.execution_status;
-      // if (d.type === 'Chart Task') {
-      //   view.output = JSON.parse(d.output.replaceAll("'", "\""));
-      // } else {
-      view.output = d.output;
-      // }
-      view.taskName = d.task_name;
-      view.type = d.type;
-      view.id = d.id;
+      view.executionStatus = d?.status;
+      view.taskName = d.name;
+      view.type = d.node_type;
+      view.id = d.node_id;
+
+      if (this.isChartNode(view.type)) {
+        view.output = this.getChartOutput(d.output);
+        view.chartType = String(view.output?.chart_type || '').toUpperCase();
+      } else {
+        view.output = d.output;
+      }
+
       viewData.push(view);
     });
     return viewData;
   }
 
+  private isChartNode(nodeType: string): boolean {
+    const normalizedType = String(nodeType || '').toLowerCase();
+    return normalizedType === 'chart' || normalizedType === 'chart task';
+  }
+
+  private getChartOutput(output: any): any {
+    // Agentic output wraps the chart payload in { status, output, error }.
+    // Legacy chart tasks can return the chart payload directly as a string.
+    const chartOutput = output?.output ?? output;
+
+    if (typeof chartOutput !== 'string') {
+      return chartOutput;
+    }
+
+    try {
+      return JSON.parse(chartOutput);
+    } catch {
+      try {
+        return JSON.parse(chartOutput.replace(/'/g, '"'));
+      } catch {
+        return null;
+      }
+    }
+  }
+
   convertToBarChartData(data) {
-    if (!data.execution_by_type || !data.execution_by_type.data || !data.execution_by_type.data.length) {
+    if (!Array.isArray(data?.x_values) || !Array.isArray(data?.y_values)) {
       return;
     }
     let view: UnityChartDetails = new UnityChartDetails();
@@ -496,6 +525,7 @@ export class WorkflowOutputViewData {
   taskName: string;
   type: string;
   id: number;
+  chartType?: string;
 }
 
 export class WorkflowTaskViewData {

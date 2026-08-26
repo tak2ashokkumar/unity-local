@@ -105,6 +105,8 @@ export class FirewallsCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.confirmFirewallDeleteModalRef?.hide();
+    this.firewallModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

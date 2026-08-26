@@ -15,6 +15,7 @@ import { AIMLEventsViewData, AimlEventsService, EventsFilterFormData, aimlEvents
 import { AIMLEventsSummary } from './aiml-events.type';
 import { TableColumnMapping } from '../../green-it/green-it-usage/green-it-usage.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AIMLEventMgmtDateRangeParams, AimlEventMgmtService } from '../aiml-event-mgmt.service';
 
 @Component({
   selector: 'aiml-events',
@@ -25,6 +26,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class AimlEventsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
+  private dateRangeParams: AIMLEventMgmtDateRangeParams = {};
 
   summaryViewData: AIMLEventsSummary;
   count: number;
@@ -81,6 +83,7 @@ export class AimlEventsComponent implements OnInit, OnDestroy {
   };
 
   constructor(private eventSvc: AimlEventsService,
+    private aimlMgmtSvc: AimlEventMgmtService,
     private eventDetailService: AimlEventDetailsService,
     private utilService: AppUtilityService,
     private spinner: AppSpinnerService,
@@ -93,6 +96,8 @@ export class AimlEventsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.dateRangeParams = this.aimlMgmtSvc.getDateRangeParams();
+    this.handleDateRangeChanges();
     this.spinner.start('main');
     this.columnsSelected = this.tableColumns.filter(col => col.default);
     this.getEventSummary();
@@ -153,7 +158,7 @@ export class AimlEventsComponent implements OnInit, OnDestroy {
   }
 
   getEventSummary() {
-    this.eventSvc.getEventSummary().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.eventSvc.getEventSummary(this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.summaryViewData = res;
     }, err => {
       this.notification.error(new Notification('Error whlie fetching event summary'))
@@ -176,13 +181,25 @@ export class AimlEventsComponent implements OnInit, OnDestroy {
   }
 
   getEvents() {
-    this.eventSvc.getEvents(this.currentCriteria, this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.eventSvc.getEvents(this.currentCriteria, this.filterForm.getRawValue(), this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.spinner.stop('main');
       this.count = res.count;
       this.viewData = this.eventSvc.convertDetailsToViewdata(res.results);
     }, err => {
       this.spinner.stop('main');
       this.notification.error(new Notification('Error while fetching events'))
+    });
+  }
+
+  private handleDateRangeChanges(): void {
+    this.aimlMgmtSvc.dateRangeParams$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((dateRangeParams: AIMLEventMgmtDateRangeParams) => {
+      this.dateRangeParams = dateRangeParams;
+      this.currentCriteria.pageNo = 1;
+      this.getEventSummary();
+      if (this.filterForm) {
+        this.spinner.start('main');
+        this.getEvents();
+      }
     });
   }
 

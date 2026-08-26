@@ -894,25 +894,63 @@ const HOME_NAV_DATA = (svc: PermissionService) => {
 
 
 export const GET_UNITY_NAV_DATA = (svc: PermissionService, userSvc: UserInfoService,) => {
-    let selfBrandedOrgName = userSvc.selfBrandedOrgName;
-    let isTenantOrg = userSvc.isTenantOrg;
-    let nav = [
-        HOME_NAV_DATA(svc),
-        DASHBOARD_NAV_DATA(svc),
-        UNITED_VIEW_NAV_DATA(svc, selfBrandedOrgName),
-        UNITED_CLOUD_NAV_DATA(svc, selfBrandedOrgName),
-        UNITY_SERVICES_NAV_DATA(svc, selfBrandedOrgName, isTenantOrg),
-        UNITY_AI_NAV_DATA(svc, selfBrandedOrgName),
-        UNITY_COST_ANALYSIS_NAV_DATA(svc, userSvc),
-        UNITY_REPORT_NAV_DATA(svc, selfBrandedOrgName),
-        UNITY_SUPPORT_NAV_DATA(svc, selfBrandedOrgName),
-        UNITY_SETUP_NAV_DATA(svc, selfBrandedOrgName),
-    ];
-    if (canAccessAiInfraManagement(userSvc)) {
-        nav.splice(5, 0, UNITY_AI_INFRA_MGMT_NAV_DATA());
+    if (userSvc.isServiceCatalogOnlyUser()) {
+        const catalogNavItems: UnityNavData[] = [
+            {
+                name: 'Home',
+                url: '/services/service-catalog/home',
+                icon: 'fas fa-home',
+                attributes: {
+                    module: UnityModules.SERVICE_CATALOGUE,
+                }
+            },
+            {
+                name: 'Dashboard',
+                url: '/services/service-catalog/dashboard',
+                icon: 'fas fa-tachometer-alt',
+                attributes: {
+                    module: UnityModules.SERVICE_CATALOGUE,
+                }
+            },
+            {
+                name: 'Quick Catalog',
+                url: '/services/service-catalog/redesign/catalog',
+                icon: 'fas fa-list',
+                attributes: {
+                    module: UnityModules.SERVICE_CATALOGUE,
+                }
+            },
+            {
+                name: 'Orders',
+                url: '/services/service-catalog/redesign/orders',
+                icon: 'fas fa-list',
+                attributes: {
+                    module: UnityModules.SERVICE_CATALOGUE,
+                }
+            }
+        ];
+        return catalogNavItems;
+    } else {
+        let selfBrandedOrgName = userSvc.selfBrandedOrgName;
+        let isTenantOrg = userSvc.isTenantOrg;
+        let nav = [
+            HOME_NAV_DATA(svc),
+            DASHBOARD_NAV_DATA(svc),
+            UNITED_VIEW_NAV_DATA(svc, selfBrandedOrgName),
+            UNITED_CLOUD_NAV_DATA(svc, selfBrandedOrgName),
+            UNITY_SERVICES_NAV_DATA(svc, selfBrandedOrgName, isTenantOrg),
+            UNITY_AI_NAV_DATA(svc, selfBrandedOrgName),
+            UNITY_COST_ANALYSIS_NAV_DATA(svc, userSvc),
+            UNITY_REPORT_NAV_DATA(svc, selfBrandedOrgName),
+            UNITY_SUPPORT_NAV_DATA(svc, selfBrandedOrgName),
+            UNITY_SETUP_NAV_DATA(svc, selfBrandedOrgName),
+        ];
+        if (canAccessAiInfraManagement(userSvc)) {
+            nav.splice(5, 0, UNITY_AI_INFRA_MGMT_NAV_DATA());
+        }
+        if (canAccessAiAgents(userSvc)) {
+            nav.splice(selfBrandedOrgName ? 6 : 5, 0, UNITY_AI_AGENTS_NAV_DATA(svc, selfBrandedOrgName));
+        }
+        return nav.filter(n => n);
     }
-    if (canAccessAiAgents(userSvc)) {
-        nav.splice(selfBrandedOrgName ? 6 : 5, 0, UNITY_AI_AGENTS_NAV_DATA(svc, selfBrandedOrgName));
-    }
-    return nav.filter(n => n);
 }

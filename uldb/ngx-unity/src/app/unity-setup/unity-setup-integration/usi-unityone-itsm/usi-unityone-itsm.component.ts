@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UnityOneITSMView, UsiUnityoneItsmService } from './usi-unityone-itsm.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { Subject } from 'rxjs';
@@ -16,7 +16,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
   styleUrls: ['./usi-unityone-itsm.component.scss'],
   providers: [UsiUnityoneItsmService]
 })
-export class UsiUnityoneItsmComponent implements OnInit {
+export class UsiUnityoneItsmComponent implements OnInit, OnDestroy {
 
   currentCriteria: SearchCriteria;
   private ngUnsubscribe = new Subject();
@@ -44,8 +44,8 @@ export class UsiUnityoneItsmComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.editModelRef?.hide();
     this.deleteModalRef?.hide();
+    this.editModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete()
   }

@@ -9,7 +9,7 @@ import { forkJoin, Subject } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
-import { CiDistributionByDeviceSortColumn, CiDistributionByDeviceTableRowViewData, CiDistributionByDiscoverySortColumn, CiDistributionByDiscoveryTableRowViewData, CiDistributionSortColumn, CiDistributionTableRowViewData, CmdbSyncInsightsViewData, CmdbSyncTrendSortColumn, CmdbSyncTrendTableRowViewData, DiscoveryDashboardFilterCriteria, DiscoveryDashboardFilterFormValue, DiscoveryDashboardFilterOption, DiscoverySuccessFailureSortColumn, DiscoverySuccessFailureTableRowViewData, DiscoveryTrendAnalyticsSortColumn, DiscoveryTrendAnalyticsTableRowViewData, ExecutiveKpiViewData, NewlyDiscoveredDeviceItemViewData, NewlyDiscoveredDevicesSortColumn, OperatingSystemsItemViewData, OperatingSystemsSortColumn, OrphanedDeviceByTypeItemViewData, OrphanedDeviceByTypeSortColumn, OrphanedDevicesBreakdownItem, TopDiscoveryFailuresItemViewData, TopDiscoveryFailuresSortColumn } from './discovery-dashboard.type';
+import { CiDistributionByDeviceSortColumn, CiDistributionByDeviceTableRowViewData, CiDistributionByDiscoverySortColumn, CiDistributionByDiscoveryTableRowViewData, CiDistributionSortColumn, CiDistributionTableRowViewData, CmdbSyncInsightsViewData, CmdbSyncTrendSortColumn, CmdbSyncTrendTableRowViewData, DiscoveryDashboardDeploymentEnvironmentApiOption, DiscoveryDashboardFilterCriteria, DiscoveryDashboardFilterFormValue, DiscoveryDashboardFilterOption, DiscoverySuccessFailureSortColumn, DiscoverySuccessFailureTableRowViewData, DiscoveryTrendAnalyticsSortColumn, DiscoveryTrendAnalyticsTableRowViewData, ExecutiveKpiViewData, NewlyDiscoveredDeviceItemViewData, NewlyDiscoveredDevicesSortColumn, OperatingSystemsItemViewData, OperatingSystemsSortColumn, OrphanedDeviceByTypeItemViewData, OrphanedDeviceByTypeSortColumn, OrphanedDevicesBreakdownItem, TopDiscoveryFailuresItemViewData, TopDiscoveryFailuresSortColumn } from './discovery-dashboard.type';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -32,21 +32,31 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   readonly timeRangeOptions: DateRangeOption[] = DISCOVERY_DASHBOARD_TIME_RANGE_OPTIONS;
   selectedTimeRange: string = DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT;
   private selectedTimeRangeDates: { from: string; to: string } | null = null;
+  deploymentEnvironmentOptions: DiscoveryDashboardFilterOption[] = [];
   regionOptions: DiscoveryDashboardFilterOption[] = [];
   executiveKpiViewData: ExecutiveKpiViewData = new ExecutiveKpiViewData();
   cmdbSyncInsights: CmdbSyncInsightsViewData = new CmdbSyncInsightsViewData();
   ciDistributionByDeviceChartData: EChartsOption = null;
   ciDistributionByDeviceViewMode: 'table' | 'chart' = 'chart';
   ciDistributionByDeviceTableRows: CiDistributionByDeviceTableRowViewData[] = [];
+  ciDistributionByDeviceCount = 0;
+  ciDistributionByDevicePageNo = 1;
+  ciDistributionByDevicePageSize = 8;
   ciDistributionByDeviceSortState: { sortColumn: CiDistributionByDeviceSortColumn | ''; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   ciDistributionChartData: EChartsOption = null;
   ciDistributionViewMode: 'table' | 'chart' = 'chart';
   ciDistributionTableRows: CiDistributionTableRowViewData[] = [];
+  ciDistributionCount = 0;
+  ciDistributionPageNo = 1;
+  ciDistributionPageSize = 8;
   ciDistributionSortState: { sortColumn: CiDistributionSortColumn | ''; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   ciDistributionLegendItems: Array<{ label: string; color: string; redirectUrl: string }> = [];
   ciDistributionByDiscoveryChartData: EChartsOption = null;
   ciDistributionByDiscoveryViewMode: 'table' | 'chart' = 'chart';
   ciDistributionByDiscoveryTableRows: CiDistributionByDiscoveryTableRowViewData[] = [];
+  ciDistributionByDiscoveryCount = 0;
+  ciDistributionByDiscoveryPageNo = 1;
+  ciDistributionByDiscoveryPageSize = 8;
   ciDistributionByDiscoverySortState: { sortColumn: CiDistributionByDiscoverySortColumn | ''; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   newlyDiscoveredDevices: NewlyDiscoveredDeviceItemViewData[] = [];
   newlyDiscoveredDevicesViewMode: 'table' | 'chart' = 'chart';
@@ -66,6 +76,9 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   topDiscoveryFailuresChartData: EChartsOption = null;
   topDiscoveryFailuresViewMode: 'table' | 'chart' = 'chart';
   topDiscoveryFailures: TopDiscoveryFailuresItemViewData[] = [];
+  topDiscoveryFailuresCount = 0;
+  topDiscoveryFailuresPageNo = 1;
+  topDiscoveryFailuresPageSize = 8;
   topDiscoveryFailuresSortState: { sortColumn: TopDiscoveryFailuresSortColumn | ''; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   operatingSystemsChartData: EChartsOption = null;
   operatingSystemsViewMode: 'table' | 'chart' = 'chart';
@@ -89,6 +102,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   sucessAndFailureChartOptions: EChartsOption = null;
 
   appliedFilters: DiscoveryDashboardFilterCriteria = {
+    deploymentEnvironment: [],
     region: [],
     timeRange: DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT,
     startDate: '',
@@ -133,6 +147,15 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     defaultTitle: 'Select regions',
     allSelected: 'All Selected'
   };
+  deploymentEnvironmentMultiselectTexts: IMultiSelectTexts = {
+    checkAll: 'Select all',
+    uncheckAll: 'Unselect all',
+    checked: 'item selected',
+    checkedPlural: 'items selected',
+    searchPlaceholder: 'Find',
+    defaultTitle: 'Select deployment environment',
+    allSelected: 'All Selected'
+  };
 
   constructor(private svc: DiscoveryDashboardService,
     private router: Router,
@@ -155,7 +178,9 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.resetFilterState();
     this.spinner.start(this.loaderNames.filters);
     this.svc.getFilterOptions().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.deploymentEnvironmentOptions = this.convertDeploymentEnvironmentOptions(res?.deployment_environment || []);
       this.regionOptions = this.convertRegionOptions(res?.regions || []);
+      this.appliedFilters.deploymentEnvironment = this.getDefaultDeploymentEnvironmentSelectionValues();
       this.appliedFilters.region = this.getDefaultRegionSelectionValues();
       this.appliedFilters.timeRange = this.getDefaultTimeRangeSelection();
       this.selectedTimeRange = this.appliedFilters.timeRange;
@@ -258,17 +283,22 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   getCiDistributionByDevice() {
     this.ciDistributionByDeviceChartData = null;
     this.ciDistributionByDeviceTableRows = [];
+    this.ciDistributionByDeviceCount = 0;
     this.spinner.start(this.loaderNames.ciDistributionByDevice);
-    this.svc.getCiDistributionByDevice(this.appliedFilters)
+    this.svc.getCiDistributionByDeviceTable(
+      this.ciDistributionByDevicePageNo,
+      this.ciDistributionByDevicePageSize,
+      this.appliedFilters
+    )
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
           this.ciDistributionByDeviceChartData = this.svc.convertToCiDistributionByDeviceChartView(res);
+          this.ciDistributionByDeviceCount = res.count || res.total || 0;
           this.ciDistributionByDeviceTableRows = this.svc.convertToCiDistributionByDeviceTableView(res);
           this.initializeCiDistributionByDeviceSortState();
-          this.spinner.stop(this.loaderNames.ciDistributionByDevice);
-
         }
+        this.spinner.stop(this.loaderNames.ciDistributionByDevice);
       }, (_err: HttpErrorResponse) => {
         this.notification.error(new Notification('Failed to load CI Distribution by Device Type widget data. Try again later.'));
       });
@@ -277,17 +307,22 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   getCiDistributionByDiscovery() {
     this.ciDistributionByDiscoveryChartData = null;
     this.ciDistributionByDiscoveryTableRows = [];
+    this.ciDistributionByDiscoveryCount = 0;
     this.spinner.start(this.loaderNames.ciDistributionByDiscovery);
-    this.svc.getCiDistributionByDicovery(this.appliedFilters)
+    this.svc.getCiDistributionByDicoveryTable(
+      this.ciDistributionByDiscoveryPageNo,
+      this.ciDistributionByDiscoveryPageSize,
+      this.appliedFilters
+    )
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
           this.ciDistributionByDiscoveryChartData = this.svc.convertToCiDistributionByDiscoveryChartView(res);
+          this.ciDistributionByDiscoveryCount = res.count || res.total || 0;
           this.ciDistributionByDiscoveryTableRows = this.svc.convertToCiDistributionByDiscoveryTableView(res);
           this.initializeCiDistributionByDiscoverySortState();
-          this.spinner.stop(this.loaderNames.ciDistributionByDiscovery);
-
         }
+        this.spinner.stop(this.loaderNames.ciDistributionByDiscovery);
       }, (_err: HttpErrorResponse) => {
         this.notification.error(new Notification('Failed to load CI Distribution by Discovery Method widget data. Try again later.'));
       });
@@ -301,7 +336,6 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   orphanedDeviceByTypePageNo = 1;
   orphanedDeviceByTypePageSize = 10;
   orphanedDevicesBreakdownTotal = 0;
-  topDiscoveryFailuresCount: number;
   operatingSystemsCount: number;
 
   getNewlyDiscoveredDevices() {
@@ -423,7 +457,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getNewlyDiscoveredDevicesHeaderClass(sortColumn: NewlyDiscoveredDevicesSortColumn): string {
     return this.newlyDiscoveredDevicesSortState.sortColumn === sortColumn
-      ? 'discovery-new-ci-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -524,7 +558,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getOrphanedDeviceByTypeHeaderClass(sortColumn: OrphanedDeviceByTypeSortColumn): string {
     return this.orphanedDeviceByTypeSortState.sortColumn === sortColumn
-      ? 'discovery-orphan-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -618,18 +652,22 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   getTopDiscoveryFailures() {
     this.topDiscoveryFailuresChartData = null;
     this.topDiscoveryFailures = [];
+    this.topDiscoveryFailuresCount = 0;
     this.spinner.start(this.loaderNames.topDiscoveryFailures);
-    this.svc.getTopDiscoveryFailures(this.appliedFilters)
+    this.svc.getTopDiscoveryFailuresTable(
+      this.topDiscoveryFailuresPageNo,
+      this.topDiscoveryFailuresPageSize,
+      this.appliedFilters
+    )
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          this.topDiscoveryFailuresCount = res.length;
           this.topDiscoveryFailuresChartData = this.svc.convertToTopDiscoveryFailuresChartView(res);
+          this.topDiscoveryFailuresCount = res.count || res.total || 0;
           this.topDiscoveryFailures = this.svc.convertToTopDiscoveryFailuresViewData(res);
           this.initializeTopDiscoveryFailuresSortState();
-          this.spinner.stop(this.loaderNames.topDiscoveryFailures);
-
         }
+        this.spinner.stop(this.loaderNames.topDiscoveryFailures);
       }, (_err: HttpErrorResponse) => {
         this.notification.error(new Notification('Failed to load Top Discovery Failures widget data. Try again later.'));
       });
@@ -637,6 +675,24 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   setTopDiscoveryFailuresViewMode(mode: 'table' | 'chart') {
     this.topDiscoveryFailuresViewMode = mode;
+  }
+
+  topDiscoveryFailuresPageChange(pageNo: number) {
+    if (this.topDiscoveryFailuresPageNo === pageNo) {
+      return;
+    }
+
+    this.topDiscoveryFailuresPageNo = pageNo;
+    this.getTopDiscoveryFailures();
+  }
+
+  getTopDiscoveryFailuresPageSummary(): string {
+    return this.buildCompactPageSummary(
+      this.topDiscoveryFailuresCount,
+      this.topDiscoveryFailuresPageNo,
+      this.topDiscoveryFailuresPageSize,
+      this.topDiscoveryFailures.length
+    );
   }
 
   onTopDiscoveryFailuresTableSorted(event: ColumnSortedEvent) {
@@ -667,7 +723,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getTopDiscoveryFailuresHeaderClass(sortColumn: TopDiscoveryFailuresSortColumn): string {
     return this.topDiscoveryFailuresSortState.sortColumn === sortColumn
-      ? 'discovery-failures-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -758,7 +814,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getOperatingSystemsHeaderClass(sortColumn: OperatingSystemsSortColumn): string {
     return this.operatingSystemsSortState.sortColumn === sortColumn
-      ? 'discovery-os-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -788,14 +844,20 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   getCiDistribution() {
     this.ciDistributionChartData = null;
     this.ciDistributionTableRows = [];
+    this.ciDistributionCount = 0;
     this.ciDistributionLegendItems = [];
     this.spinner.start(this.loaderNames.ciDistribution);
-    this.svc.getCiDistribution(this.appliedFilters)
+    this.svc.getCiDistribution(
+      this.ciDistributionPageNo,
+      this.ciDistributionPageSize,
+      this.appliedFilters
+    )
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
           this.ciDistributionChartData = this.svc.convertToCiDistributionChartView(res);
           this.ciDistributionTableRows = this.svc.convertToCiDistributionTableView(res);
+          this.ciDistributionCount = res.count || res.total || 0;
           this.initializeCiDistributionSortState();
           this.ciDistributionLegendItems = this.buildCiDistributionLegendItems(this.ciDistributionChartData);
           this.spinner.stop(this.loaderNames.ciDistribution);
@@ -807,6 +869,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   applyFilters() {
     this.appliedFilters = this.getFilterFormOutput();
+    this.resetPagedTablePageNumbers();
   }
 
   refreshFilters() {
@@ -829,12 +892,66 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.ciDistributionByDeviceViewMode = mode;
   }
 
+  ciDistributionByDevicePageChange(pageNo: number) {
+    if (this.ciDistributionByDevicePageNo === pageNo) {
+      return;
+    }
+
+    this.ciDistributionByDevicePageNo = pageNo;
+    this.getCiDistributionByDevice();
+  }
+
+  getCiDistributionByDevicePageSummary(): string {
+    return this.buildCompactPageSummary(
+      this.ciDistributionByDeviceCount,
+      this.ciDistributionByDevicePageNo,
+      this.ciDistributionByDevicePageSize,
+      this.ciDistributionByDeviceTableRows.length
+    );
+  }
+
   setCiDistributionByDiscoveryViewMode(mode: 'table' | 'chart') {
     this.ciDistributionByDiscoveryViewMode = mode;
   }
 
+  ciDistributionByDiscoveryPageChange(pageNo: number) {
+    if (this.ciDistributionByDiscoveryPageNo === pageNo) {
+      return;
+    }
+
+    this.ciDistributionByDiscoveryPageNo = pageNo;
+    this.getCiDistributionByDiscovery();
+  }
+
+  getCiDistributionByDiscoveryPageSummary(): string {
+    return this.buildCompactPageSummary(
+      this.ciDistributionByDiscoveryCount,
+      this.ciDistributionByDiscoveryPageNo,
+      this.ciDistributionByDiscoveryPageSize,
+      this.ciDistributionByDiscoveryTableRows.length
+    );
+  }
+
   setCiDistributionViewMode(mode: 'table' | 'chart') {
     this.ciDistributionViewMode = mode;
+  }
+
+  ciDistributionPageChange(pageNo: number) {
+    if (this.ciDistributionPageNo === pageNo) {
+      return;
+    }
+
+    this.ciDistributionPageNo = pageNo;
+    this.getCiDistribution();
+  }
+
+  getCiDistributionPageSummary(): string {
+    return this.buildCompactPageSummary(
+      this.ciDistributionCount,
+      this.ciDistributionPageNo,
+      this.ciDistributionPageSize,
+      this.ciDistributionTableRows.length
+    );
   }
 
   setCmdbSyncTrendViewMode(mode: 'table' | 'chart') {
@@ -869,7 +986,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getCiDistributionByDeviceHeaderClass(sortColumn: CiDistributionByDeviceSortColumn): string {
     return this.ciDistributionByDeviceSortState.sortColumn === sortColumn
-      ? 'discovery-device-distribution-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -916,7 +1033,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getTrendAnalyticsHeaderClass(sortColumn: DiscoveryTrendAnalyticsSortColumn): string {
     return this.trendAnalyticsSortState.sortColumn === sortColumn
-      ? 'discovery-trend-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -952,7 +1069,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getSuccessAndFailureHeaderClass(sortColumn: DiscoverySuccessFailureSortColumn): string {
     return this.successAndFailureSortState.sortColumn === sortColumn
-      ? 'discovery-success-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -988,7 +1105,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getCiDistributionByDiscoveryHeaderClass(sortColumn: CiDistributionByDiscoverySortColumn): string {
     return this.ciDistributionByDiscoverySortState.sortColumn === sortColumn
-      ? 'discovery-distribution-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -1024,7 +1141,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getCiDistributionHeaderClass(sortColumn: CiDistributionSortColumn): string {
     return this.ciDistributionSortState.sortColumn === sortColumn
-      ? 'discovery-distribution-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -1060,7 +1177,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
   getCmdbSyncTrendHeaderClass(sortColumn: CmdbSyncTrendSortColumn): string {
     return this.cmdbSyncTrendSortState.sortColumn === sortColumn
-      ? 'discovery-trend-table-head-cell--active'
+      ? 'discovery-dashboard-table-head-cell--active'
       : '';
   }
 
@@ -1085,15 +1202,21 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.ciDistributionChartData = null;
     this.ciDistributionViewMode = 'chart';
     this.ciDistributionTableRows = [];
+    this.ciDistributionCount = 0;
+    this.ciDistributionPageNo = 1;
     this.ciDistributionSortState = { sortColumn: '', sortDirection: '' };
     this.ciDistributionLegendItems = [];
     this.ciDistributionByDeviceChartData = null;
     this.ciDistributionByDeviceViewMode = 'chart';
     this.ciDistributionByDeviceTableRows = [];
+    this.ciDistributionByDeviceCount = 0;
+    this.ciDistributionByDevicePageNo = 1;
     this.ciDistributionByDeviceSortState = { sortColumn: '', sortDirection: '' };
     this.ciDistributionByDiscoveryChartData = null;
     this.ciDistributionByDiscoveryViewMode = 'chart';
     this.ciDistributionByDiscoveryTableRows = [];
+    this.ciDistributionByDiscoveryCount = 0;
+    this.ciDistributionByDiscoveryPageNo = 1;
     this.ciDistributionByDiscoverySortState = { sortColumn: '', sortDirection: '' };
     this.newlyDiscoveredDevices = [];
     this.newlyDiscoveredDevicesViewMode = 'chart';
@@ -1111,6 +1234,8 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.topDiscoveryFailuresChartData = null;
     this.topDiscoveryFailuresViewMode = 'chart';
     this.topDiscoveryFailures = [];
+    this.topDiscoveryFailuresCount = 0;
+    this.topDiscoveryFailuresPageNo = 1;
     this.topDiscoveryFailuresSortState = { sortColumn: '', sortDirection: '' };
     this.operatingSystemsChartData = null;
     this.operatingSystemsViewMode = 'chart';
@@ -1123,7 +1248,6 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.orphanedDeviceByTypeCount = 0;
     this.orphanedDeviceByTypePageNo = 1;
     this.orphanedDevicesBreakdownTotal = 0;
-    this.topDiscoveryFailuresCount = 0;
     this.operatingSystemsCount = 0;
     this.cmdbSyncTrend = null;
     this.cmdbSyncTrendViewMode = 'chart';
@@ -1138,6 +1262,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     this.successAndFailureSortState = { sortColumn: '', sortDirection: '' };
     this.sucessAndFailureChartOptions = null;
     this.appliedFilters = {
+      deploymentEnvironment: [],
       region: [],
       timeRange: DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT,
       startDate: '',
@@ -1152,6 +1277,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   private getFilterFormOutput(): DiscoveryDashboardFilterCriteria {
     const rawValue = this.filterForm?.getRawValue() || {};
     return {
+      deploymentEnvironment: this.getSelectedDeploymentEnvironmentValues(rawValue.deploymentEnvironment),
       region: this.getSelectedRegionValues(rawValue.region),
       timeRange: rawValue.timeRange || this.getDefaultTimeRangeSelection(),
       startDate: rawValue.timeRange === 'custom' ? (rawValue.startDate || '') : '',
@@ -1159,9 +1285,18 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     };
   }
 
+  private convertDeploymentEnvironmentOptions(options: DiscoveryDashboardDeploymentEnvironmentApiOption[]): DiscoveryDashboardFilterOption[] {
+    return (options || [])
+      .filter((option, index, list) => !!option?.key && !!option?.value && list.findIndex(item => item?.key === option.key) === index)
+      .map(option => ({
+        label: option.value,
+        value: option.key
+      }));
+  }
+
   private convertRegionOptions(regions: string[]): DiscoveryDashboardFilterOption[] {
     return (regions || [])
-      .filter((region, index, list) => !!region && list.indexOf(region) === index)
+      .filter((region, index, list) => !!region && String(region).toLowerCase() !== 'all' && list.indexOf(region) === index)
       .map(region => ({
         label: this.formatRegionLabel(region),
         value: region
@@ -1209,13 +1344,37 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
   }
 
   private watchFilterChanges() {
+    this.filterForm.get('deploymentEnvironment').valueChanges
+      .pipe(takeUntil(this.ngUnsubscribe), takeUntil(this.filterFormUnsubscribe))
+      .subscribe(() => this.applyFilters());
+
     this.filterForm.get('region').valueChanges
       .pipe(takeUntil(this.ngUnsubscribe), takeUntil(this.filterFormUnsubscribe))
       .subscribe(() => this.applyFilters());
   }
 
+  private resetPagedTablePageNumbers() {
+    this.ciDistributionPageNo = 1;
+    this.ciDistributionByDevicePageNo = 1;
+    this.ciDistributionByDiscoveryPageNo = 1;
+    this.newlyDiscoveredDevicesPageNo = 1;
+    this.orphanedDeviceByTypePageNo = 1;
+    this.topDiscoveryFailuresPageNo = 1;
+  }
+
+  private buildCompactPageSummary(totalCount: number, pageNo: number, pageSize: number, currentLength: number): string {
+    if (!totalCount || !currentLength) {
+      return 'Showing 0-0 of 0';
+    }
+
+    const start = ((pageNo - 1) * pageSize) + 1;
+    const end = start + currentLength - 1;
+    return `Showing ${start}-${end} of ${totalCount}`;
+  }
+
   private getFilterFormDefaults(): DiscoveryDashboardFilterFormValue {
     return {
+      deploymentEnvironment: this.getSelectedDeploymentEnvironmentOptions(this.appliedFilters.deploymentEnvironment),
       region: this.getSelectedRegionOptions(this.appliedFilters.region),
       timeRange: this.appliedFilters.timeRange,
       startDate: this.appliedFilters.startDate || '',
@@ -1223,12 +1382,29 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
     };
   }
 
+  private getDefaultDeploymentEnvironmentSelection(): DiscoveryDashboardFilterOption[] {
+    return [...this.deploymentEnvironmentOptions];
+  }
+
+  private getDefaultDeploymentEnvironmentSelectionValues(): string[] {
+    return ['all'];
+  }
+
   private getDefaultRegionSelection(): DiscoveryDashboardFilterOption[] {
-    return this.regionOptions;
+    return [...this.regionOptions];
   }
 
   private getDefaultRegionSelectionValues(): string[] {
     return ['all'];
+  }
+
+  private getSelectedDeploymentEnvironmentOptions(selectedValues: string[]): DiscoveryDashboardFilterOption[] {
+    if (this.isAllSelection(selectedValues)) {
+      return this.getDefaultDeploymentEnvironmentSelection();
+    }
+
+    const nextOptions = this.deploymentEnvironmentOptions.filter(option => (selectedValues || []).includes(option.value));
+    return nextOptions.length ? nextOptions : this.getDefaultDeploymentEnvironmentSelection();
   }
 
   private getSelectedRegionOptions(selectedValues: string[]): DiscoveryDashboardFilterOption[] {
@@ -1238,6 +1414,18 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
 
     const nextOptions = this.regionOptions.filter(option => (selectedValues || []).includes(option.value));
     return nextOptions.length ? nextOptions : this.getDefaultRegionSelection();
+  }
+
+  private getSelectedDeploymentEnvironmentValues(selectedOptions: DiscoveryDashboardFilterOption[]): string[] {
+    const selectedValues = (selectedOptions || [])
+      .map(option => option?.value)
+      .filter(value => !!value);
+
+    if (!selectedValues.length || selectedValues.length === this.deploymentEnvironmentOptions.length) {
+      return this.getDefaultDeploymentEnvironmentSelectionValues();
+    }
+
+    return selectedValues;
   }
 
   private getSelectedRegionValues(selectedOptions: DiscoveryDashboardFilterOption[]): string[] {
@@ -1489,7 +1677,7 @@ export class DiscoveryDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const sortColumn: CiDistributionByDiscoverySortColumn = 'resourcesDiscovered';
+    const sortColumn: CiDistributionByDiscoverySortColumn = 'resourceCount';
     const sortDirection = 'desc';
     this.ciDistributionByDiscoverySortState = {
       sortColumn,

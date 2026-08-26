@@ -14,6 +14,7 @@ import { AIMLAlertsSummary } from './aiml-alerts.type';
 import { cloneDeep as _clone } from 'lodash-es';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AimlEventDetailsService } from 'src/app/shared/aiml-event-details/aiml-event-details.service';
+import { AIMLEventMgmtDateRangeParams, AimlEventMgmtService } from '../aiml-event-mgmt.service';
 
 @Component({
   selector: 'aiml-alerts',
@@ -24,6 +25,7 @@ import { AimlEventDetailsService } from 'src/app/shared/aiml-event-details/aiml-
 export class AimlAlertsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
+  private dateRangeParams: AIMLEventMgmtDateRangeParams = {};
 
   summaryViewData: AIMLAlertsSummary;
   count: number;
@@ -41,6 +43,7 @@ export class AimlAlertsComponent implements OnInit, OnDestroy {
   @ViewChild('tooltipRef', { static: false }) tooltipElementRef: ElementRef;
 
   constructor(private alertSvc: AimlAlertsService,
+    private aimlMgmtSvc: AimlEventMgmtService,
     private alertDetailSvc: AimlAlertDetailsService,
     private utilService: AppUtilityService,
     private notification: AppNotificationService,
@@ -54,6 +57,8 @@ export class AimlAlertsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.dateRangeParams = this.aimlMgmtSvc.getDateRangeParams();
+    this.handleDateRangeChanges();
     this.getAlertSummary();
     this.buildFilterForm();
     if (this.isSuppressed) {
@@ -112,7 +117,7 @@ export class AimlAlertsComponent implements OnInit, OnDestroy {
   }
 
   getAlertSummary() {
-    this.alertSvc.getAlertsSummary().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.alertSvc.getAlertsSummary(this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.summaryViewData = res;
     }, err => {
       this.notification.error(new Notification('Error whlie getting alert summary'))
@@ -126,7 +131,7 @@ export class AimlAlertsComponent implements OnInit, OnDestroy {
   getAlerts() {
     this.viewData = [];
     this.spinner.start('main');
-    this.alertSvc.getAlerts(this.currentCriteria, this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.alertSvc.getAlerts(this.currentCriteria, this.filterForm.getRawValue(), this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.count = res.count;
       this.viewData = this.alertSvc.convertToViewdata(res.results);
       this.spinner.stop('main');
@@ -152,13 +157,28 @@ export class AimlAlertsComponent implements OnInit, OnDestroy {
     if (!isStartSpinnerNotRequired) {
       this.spinner.start('main');
     }
-    this.alertSvc.getSuppressedEvents(this.currentCriteria, this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.alertSvc.getSuppressedEvents(this.currentCriteria, this.filterForm.getRawValue(), this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.count = res.count;
       this.viewData = this.alertSvc.convertToSuppressedEventsViewdata(res.results);
       this.spinner.stop('main');
     }, err => {
       this.notification.error(new Notification('Error whlie getting Suppressed Events'));
       this.spinner.stop('main');
+    });
+  }
+
+  private handleDateRangeChanges(): void {
+    this.aimlMgmtSvc.dateRangeParams$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((dateRangeParams: AIMLEventMgmtDateRangeParams) => {
+      this.dateRangeParams = dateRangeParams;
+      this.currentCriteria.pageNo = 1;
+      this.getAlertSummary();
+      if (this.filterForm) {
+        if (this.isSuppressed) {
+          this.getSuppressedEvents();
+        } else {
+          this.getAlerts();
+        }
+      }
     });
   }
 

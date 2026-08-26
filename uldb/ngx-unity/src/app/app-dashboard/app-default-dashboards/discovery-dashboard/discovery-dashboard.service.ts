@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import * as echarts from 'echarts';
 import { EChartsOption } from 'echarts';
-import { Observable, of } from 'rxjs';
-import { CiDistributionByDevice, CiDistributionByDeviceData, CiDistributionByDeviceSortColumn, CiDistributionByDeviceTableRowViewData, CiDistributionByDiscovery, CiDistributionByDiscoverySortColumn, CiDistributionByDiscoveryTableRowViewData, CiDistributionSortColumn, CiDistributionTableRowViewData, CmdbSyncInsights, CmdbSyncInsightsMetric, CmdbSyncInsightsMetricViewData, CmdbSyncInsightsViewData, CmdbSyncTrend, CmdbSyncTrendSortColumn, CmdbSyncTrendTableRowViewData, DiscoveryDashboardFilterCriteria, DiscoveryDashboardFilterFormValue, DiscoveryDashboardFilterOptions, DiscoverySuccessFailureData, DiscoverySuccessFailureSortColumn, DiscoverySuccessFailureTableRowViewData, DiscoveryTrendAnalyticsData, DiscoveryTrendAnalyticsSortColumn, DiscoveryTrendAnalyticsTableRowViewData, ExecutiveKpiData, ExecutiveKpiViewData, NewlyDiscoveredDatacenterDistribution, NewlyDiscoveredDatacenterDistributionItem, NewlyDiscoveredDevice, NewlyDiscoveredDeviceItem, NewlyDiscoveredDeviceItemViewData, NewlyDiscoveredDevicesSortColumn, NewlyDiscoveredManufacturerDistributionItem, NewlyDiscoveredManufacturerModelDistribution, NewlyDiscoveredStatusByDatacenterDistribution, NewlyDiscoveredStatusByDatacenterItem, OperatingSystems, OperatingSystemsItem, OperatingSystemsItemViewData, OperatingSystemsSortColumn, OrphanedDeviceByTypeItem, OrphanedDeviceByTypeItemViewData, OrphanedDeviceByTypeResponse, OrphanedDeviceByTypeSortColumn, OrphanedDevicesBreakdownItem, OrphanedDevicesBreakdownResponse, ResourceDiscoveryData, ResourceDiscoveryViewData, TopDiscoveryFailures, TopDiscoveryFailuresItem, TopDiscoveryFailuresItemViewData, TopDiscoveryFailuresSortColumn } from './discovery-dashboard.type';
-import { DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT, NEWLY_DISCOVERED_DEVICE } from './discovery-dashboard.const';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { CiDistributionByDevice, CiDistributionByDeviceData, CiDistributionByDeviceDataItem, CiDistributionByDeviceSortColumn, CiDistributionByDeviceTableRowViewData, CiDistributionByDiscoveryItem, CiDistributionByDiscoveryResponse, CiDistributionByDiscoverySortColumn, CiDistributionByDiscoveryTableRowViewData, CiDistributionItem, CiDistributionSortColumn, CiDistributionTableRowViewData, CmdbSyncInsights, CmdbSyncInsightsMetric, CmdbSyncInsightsMetricViewData, CmdbSyncInsightsViewData, CmdbSyncTrend, CmdbSyncTrendSortColumn, CmdbSyncTrendTableRowViewData, DiscoveryDashboardFilterCriteria, DiscoveryDashboardFilterFormValue, DiscoveryDashboardFilterOptions, DiscoveryDashboardPaginatedResponse, DiscoverySuccessFailureData, DiscoverySuccessFailureSortColumn, DiscoverySuccessFailureTableRowViewData, DiscoveryTrendAnalyticsData, DiscoveryTrendAnalyticsSortColumn, DiscoveryTrendAnalyticsTableRowViewData, ExecutiveKpiData, ExecutiveKpiViewData, NewlyDiscoveredDatacenterDistribution, NewlyDiscoveredDatacenterDistributionItem, NewlyDiscoveredDevice, NewlyDiscoveredDeviceItem, NewlyDiscoveredDeviceItemViewData, NewlyDiscoveredDevicesSortColumn, NewlyDiscoveredManufacturerDistributionItem, NewlyDiscoveredManufacturerModelDistribution, NewlyDiscoveredStatusByDatacenterDistribution, NewlyDiscoveredStatusByDatacenterItem, OperatingSystems, OperatingSystemsItem, OperatingSystemsItemViewData, OperatingSystemsSortColumn, OrphanedDeviceByTypeItem, OrphanedDeviceByTypeItemViewData, OrphanedDeviceByTypeResponse, OrphanedDeviceByTypeSortColumn, OrphanedDevicesBreakdownItem, OrphanedDevicesBreakdownResponse, ResourceDiscoveryData, ResourceDiscoveryViewData, TopDiscoveryFailuresItem, TopDiscoveryFailuresItemViewData, TopDiscoveryFailuresResponse, TopDiscoveryFailuresSortColumn } from './discovery-dashboard.type';
+import { DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT } from './discovery-dashboard.const';
 
 
 @Injectable()
@@ -23,12 +24,14 @@ export class DiscoveryDashboardService {
 
 
   buildFilterForm(defaults: DiscoveryDashboardFilterFormValue = {
+    deploymentEnvironment: [],
     region: [],
     timeRange: DISCOVERY_DASHBOARD_TIME_RANGE_DEFAULT,
     startDate: '',
     endDate: ''
   }): FormGroup {
     return this.builder.group({
+      deploymentEnvironment: [defaults.deploymentEnvironment],
       region: [defaults.region],
       timeRange: [defaults.timeRange],
       startDate: [defaults.startDate || ''],
@@ -301,8 +304,8 @@ export class DiscoveryDashboardService {
     view.trendText = this.formatCmdbInsightTrend(metric);
     view.valueClass = valueClass;
     view.trendClass = metric?.trend === 'down'
-      ? 'discovery-insight-trend--danger'
-      : 'discovery-insight-trend--success';
+      ? 'text-danger'
+      : 'text-success';
     return view;
   }
 
@@ -544,20 +547,29 @@ export class DiscoveryDashboardService {
       return view;
     }
 
-    view.cmdbSyncRate = this.buildCmdbInsightMetricViewData('CMDB sync rate', data.cmdb_sync_rate, 'discovery-insight-value--success');
-    view.ciUpdateFailures = this.buildCmdbInsightMetricViewData('CI update failures', data.ci_update_failures, 'discovery-insight-value--danger');
+    view.cmdbSyncRate = this.buildCmdbInsightMetricViewData('CMDB sync rate', data.cmdb_sync_rate, 'text-success');
+    view.ciUpdateFailures = this.buildCmdbInsightMetricViewData('CI update failures', data.ci_update_failures, 'text-danger');
     view.orphanedCis = this.buildCmdbInsightMetricViewData('Orphaned CIs', data.orphaned_cis, '');
-    view.unmappedCis = this.buildCmdbInsightMetricViewData('Unmapped', data.unmapped_cis, 'discovery-insight-value--primary');
-    view.duplicateCis = this.buildCmdbInsightMetricViewData('Duplicate CIs', data.duplicate_cis, 'discovery-insight-value--primary');
+    view.unmappedCis = this.buildCmdbInsightMetricViewData('Unmapped', data.unmapped_cis, 'text-primary');
+    view.duplicateCis = this.buildCmdbInsightMetricViewData('Duplicate CIs', data.duplicate_cis, 'text-primary');
     return view;
   }
 
-  getCiDistributionByDevice(filters?: DiscoveryDashboardFilterCriteria): Observable<CiDistributionByDeviceData> {
-    // return of(CI_DISTRIBUTION_BY_DEVICE);
-    return this.http.get<CiDistributionByDeviceData>(`/customer/discovery-dashboard/device_type_distribution/`, {
-      params: this.buildFilterParams(filters)
-    });
+  getCiDistributionByDeviceTable(
+    page = 1,
+    pageSize = 8,
+    filters?: DiscoveryDashboardFilterCriteria
+  ): Observable<DiscoveryDashboardPaginatedResponse<CiDistributionByDeviceDataItem>> {
+    let params = this.buildFilterParams(filters);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
 
+    return this.http.get<CiDistributionByDeviceData>(`/customer/discovery-dashboard/device_type_distribution/`, {
+      params
+    }).pipe(
+      map(res => this.normalizePaginatedResponse<CiDistributionByDeviceDataItem>(res, page, pageSize))
+    );
   }
 
   convertToCiDistributionByDeviceChartView(data: CiDistributionByDeviceData): EChartsOption {
@@ -664,6 +676,8 @@ export class DiscoveryDashboardService {
   convertToCiDistributionByDeviceTableView(data: CiDistributionByDeviceData): CiDistributionByDeviceTableRowViewData[] {
     return (data?.results || []).map(item => {
       const row = new CiDistributionByDeviceTableRowViewData();
+      row.deploymentEnvironment = this.formatDeploymentEnvironmentLabel(item?.deployment_environment);
+      row.deploymentEnvironmentTone = this.getDeploymentEnvironmentTone(item?.deployment_environment);
       row.deviceType = item?.device_type || item?.category || '';
       row.deviceTypeKey = item?.device_type_key || item?.category_key || '';
       row.redirectUrl = item?.redirect_url || '';
@@ -709,60 +723,151 @@ export class DiscoveryDashboardService {
     });
   }
 
-  getCiDistributionByDicovery(filters?: DiscoveryDashboardFilterCriteria): Observable<CiDistributionByDiscovery> {
+  getCiDistributionByDicoveryTable(
+    page = 1,
+    pageSize = 8,
+    filters?: DiscoveryDashboardFilterCriteria
+  ): Observable<DiscoveryDashboardPaginatedResponse<CiDistributionByDiscoveryItem>> {
+    let params = this.buildFilterParams(filters);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
 
-    return this.http.get<CiDistributionByDiscovery>(`customer/discovery-dashboard/discovery_distribution/`, {
-      params: this.buildFilterParams(filters)
-    });
-
+    return this.http.get<CiDistributionByDiscoveryResponse>(`customer/discovery-dashboard/discovery_distribution/`, {
+      params
+    }).pipe(
+      map(res => this.normalizePaginatedResponse<CiDistributionByDiscoveryItem>(res, page, pageSize))
+    );
   }
 
-  convertToCiDistributionByDiscoveryChartView(data: CiDistributionByDiscovery): EChartsOption {
-    const rows = this.sortCiDistributionByDiscoveryRows(
-      this.convertToCiDistributionByDiscoveryTableView(data),
-      'resourcesDiscovered',
-      'desc'
-    );
+  convertToCiDistributionByDiscoveryChartView(data: CiDistributionByDiscoveryResponse): EChartsOption {
+    const rows = this.convertToCiDistributionByDiscoveryTableView(data);
     if (!rows.length) {
       return null;
     }
 
-    const chartRows = rows.slice(0, 10);
-    const values = chartRows.map(item => item.resourcesDiscovered);
-    const yAxisScale = this.getTrendAnalyticsAxisScale(values);
+    const discoveryMethodMap = new Map<string, {
+      discoveryMethod: string;
+      total: number;
+      vendorCounts: Record<string, number>;
+    }>();
+    rows.forEach((row: CiDistributionByDiscoveryTableRowViewData) => {
+      const discoveryMethod = row.discoveryMethod || 'N/A';
+      const vendorPlatform = row.vendorPlatform || 'N/A';
+      const resourceCount = this.getSafeNumberValue(row.resourceCount);
+      const existingMethod = discoveryMethodMap.get(discoveryMethod) || {
+        discoveryMethod,
+        total: 0,
+        vendorCounts: {}
+      };
+
+      existingMethod.total += resourceCount;
+      existingMethod.vendorCounts[vendorPlatform] = (existingMethod.vendorCounts[vendorPlatform] || 0) + resourceCount;
+      discoveryMethodMap.set(discoveryMethod, existingMethod);
+    });
+
+    const chartRows = Array.from(discoveryMethodMap.values())
+      .sort((left, right) => {
+        if (right.total === left.total) {
+          return left.discoveryMethod.localeCompare(right.discoveryMethod);
+        }
+
+        return right.total - left.total;
+      })
+      .slice(0, 10);
+
+    const visibleVendorTotals = new Map<string, number>();
+    chartRows.forEach(item => {
+      Object.entries(item.vendorCounts).forEach(([vendorPlatform, count]) => {
+        visibleVendorTotals.set(vendorPlatform, (visibleVendorTotals.get(vendorPlatform) || 0) + Number(count || 0));
+      });
+    });
+
+    const vendorPlatforms = Array.from(visibleVendorTotals.entries())
+      .sort((left, right) => {
+        if (right[1] === left[1]) {
+          return left[0].localeCompare(right[0]);
+        }
+
+        return right[1] - left[1];
+      })
+      .map(([vendorPlatform]) => vendorPlatform);
+
+    const discoveryMethods = chartRows.map(item => item.discoveryMethod);
+    const totals = chartRows.map(item => item.total);
+    const yAxisScale = this.getTrendAnalyticsAxisScale(totals);
+    const barWidth = chartRows.length <= 3 ? 44 : chartRows.length <= 5 ? 32 : 22;
+    const barCategoryGap = chartRows.length <= 3 ? '18%' : chartRows.length <= 5 ? '28%' : '40%';
 
     return {
       animation: false,
+      color: vendorPlatforms.map((_, index) =>
+        DISCOVERY_DISTRIBUTION_CHART_COLORS[index % DISCOVERY_DISTRIBUTION_CHART_COLORS.length]
+      ),
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          type: 'shadow'
+          type: 'shadow',
+          shadowStyle: {
+            color: 'rgba(59, 105, 240, 0.08)'
+          }
         },
-        backgroundColor: 'rgba(33, 41, 52, 0.94)',
-        borderWidth: 0,
+        backgroundColor: '#ffffff',
+        borderColor: '#dde6ee',
+        borderWidth: 1,
+        padding: [10, 12],
+        extraCssText: 'box-shadow: 0 8px 20px rgba(31, 41, 55, 0.12); border-radius: 6px;',
         textStyle: {
-          color: '#ffffff'
+          color: '#445063'
         },
-        formatter: (params: any) => {
-          const item = Array.isArray(params) ? params[0] : params;
-          return `${item?.axisValueLabel || ''}: ${item?.value || 0}`;
+        formatter: (params: any[]) => {
+          const axisItems = Array.isArray(params) ? params : [params];
+          const fallbackTitleItem = axisItems.length ? axisItems[0] : null;
+          const tooltipItems = axisItems
+            .filter(item => Number(item?.value || 0) > 0)
+            .sort((left, right) => Number(right?.value || 0) - Number(left?.value || 0));
+          const title = echarts.format.encodeHTML(
+            String(tooltipItems[0]?.axisValueLabel || tooltipItems[0]?.name || fallbackTitleItem?.axisValueLabel || '')
+          );
+
+          if (!tooltipItems.length) {
+            return `<div style="min-width: 140px;">
+              <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px;">${title}</div>
+              <div style="font-size: 12px;">Total <span style="float: right; font-weight: 600;">0</span></div>
+            </div>`;
+          }
+
+          const lines = tooltipItems.map(item => {
+            const name = echarts.format.encodeHTML(String(item?.seriesName || 'N/A'));
+            const value = Number(item?.value || 0).toLocaleString();
+            return `${item?.marker || ''}${name}<span style="float: right; margin-left: 18px; font-weight: 600;">${value}</span>`;
+          });
+          const total = tooltipItems.reduce((sum, item) => sum + Number(item?.value || 0), 0).toLocaleString();
+
+          return `<div style="min-width: 180px;">
+            <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px;">${title}</div>
+            <div style="font-size: 12px; line-height: 1.6;">${lines.join('<br/>')}</div>
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e6edf3; font-size: 12px; font-weight: 600;">
+              Total <span style="float: right;">${total}</span>
+            </div>
+          </div>`;
         }
       },
       legend: {
         show: false
       },
       grid: {
-        left: 26,
+        left: 34,
         right: 18,
-        top: 18,
-        bottom: 52,
+        top: 20,
+        bottom: 44,
         containLabel: true
       },
       xAxis: {
         type: 'category',
-        data: chartRows.map(item => item.discoveryMethod),
+        data: discoveryMethods,
         axisTick: {
-          alignWithLabel: true
+          show: false
         },
         axisLine: {
           lineStyle: {
@@ -773,11 +878,10 @@ export class DiscoveryDashboardService {
           color: '#6a7480',
           fontSize: 11,
           interval: 0,
-          rotate: 28,
-          margin: 10,
+          margin: 8,
           formatter: (value: string) => {
             const label = String(value || '').trim();
-            return label.length > 10 ? `${label.slice(0, 10)}...` : label;
+            return label.length > 12 ? `${label.slice(0, 12)}...` : label;
           }
         }
       },
@@ -800,42 +904,70 @@ export class DiscoveryDashboardService {
           }
         }
       },
-      series: [
-        {
-          name: 'Discovery Distribution',
-          type: 'bar',
-          barWidth: 16,
-          barCategoryGap: '48%',
-          data: values,
-          itemStyle: {
-            color: '#4b74eb',
-            borderRadius: [5, 5, 0, 0]
-          },
-          label: {
-            show: true,
-            position: 'top',
-            color: '#333b44',
-            fontSize: 11,
-            formatter: (params: any) => Number(params?.value || 0).toLocaleString()
-          }
-        }
-      ]
+      series: vendorPlatforms.map((vendorPlatform: string) => ({
+        name: vendorPlatform,
+        type: 'bar',
+        stack: 'total',
+        barWidth,
+        barCategoryGap,
+        itemStyle: {
+          borderWidth: 0
+        },
+        data: chartRows.map(item => item.vendorCounts[vendorPlatform] || 0)
+      }))
     };
   }
 
-  convertToCiDistributionByDiscoveryTableView(data: CiDistributionByDiscovery): CiDistributionByDiscoveryTableRowViewData[] {
-    return (data || []).map(item => {
+  convertToCiDistributionByDiscoveryTableView(data: CiDistributionByDiscoveryResponse): CiDistributionByDiscoveryTableRowViewData[] {
+    return this.getResponseResults(data).map(item => {
       const row = new CiDistributionByDiscoveryTableRowViewData();
-      row.discoveryMethod = item?.discovery_method || '';
-      row.targetResources = item?.target_resources || '';
+      const resourcesDiscovered = typeof item?.resources_discovered === 'string'
+        ? item.resources_discovered
+        : String(item?.resources_discovered ?? '');
+      const resourceCount = this.getSafeNumberValue(
+        item?.resource_count != null ? item.resource_count : item?.resources_discovered
+      );
+
+      row.deploymentEnvironment = this.formatDeploymentEnvironmentLabel(item?.deployment_environment);
+      row.deploymentEnvironmentTone = this.getDeploymentEnvironmentTone(item?.deployment_environment);
       row.protocol = item?.protocol || '';
-      row.resourcesDiscovered = item?.resources_discovered ?? 0;
-      row.up = item?.up ?? 0;
-      row.down = item?.down ?? 0;
-      row.unknown = item?.unknown ?? 0;
+      row.discoveryMethod = item?.discovery_method || '';
+      row.infrastructureType = item?.infrastructure_type || '';
+      row.vendorPlatform = item?.vendor_platform || '';
+      row.resourceCount = resourceCount;
+      row.down = this.getSafeNumberValue(item?.down);
+      row.resourcesDiscovered = resourcesDiscovered || 'N/A';
+      row.unknown = this.getSafeNumberValue(item?.unknown);
+      row.up = this.getSafeNumberValue(item?.up);
       row.lastRun = item?.last_run || '';
       return row;
     });
+  }
+
+  private formatDeploymentEnvironmentLabel(value?: string): string {
+    switch (value) {
+      case 'public_cloud':
+        return 'Public Cloud';
+      case 'private_cloud':
+        return 'Private Cloud';
+      case 'datacenter':
+        return 'Datacenter';
+      default:
+        return value ? value.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : '';
+    }
+  }
+
+  private getDeploymentEnvironmentTone(value?: string): 'public-cloud' | 'private-cloud' | 'datacenter' | 'default' {
+    switch (value) {
+      case 'public_cloud':
+        return 'public-cloud';
+      case 'private_cloud':
+        return 'private-cloud';
+      case 'datacenter':
+        return 'datacenter';
+      default:
+        return 'default';
+    }
   }
 
   sortCiDistributionByDiscoveryRows(
@@ -873,13 +1005,15 @@ export class DiscoveryDashboardService {
   }
 
   getNewlyDiscoveredDevices(page = 1, pageSize = 10, searchValue = '', filters?: DiscoveryDashboardFilterCriteria): Observable<NewlyDiscoveredDevice> {
-    let params: HttpParams = this.buildFilterParams(filters);
-    params = params.set('search', String(searchValue));
+    let params = this.buildFilterParams(filters);
     params = params.set('page', String(page));
     params = params.set('page_size', String(pageSize));
     params = params.set('offset', String((page - 1) * pageSize));
+    params = params.set('search', searchValue || '');
 
-    return this.http.get<NewlyDiscoveredDevice>(`/customer/discovery-dashboard/newly_discovered_device/`, { params });
+    return this.http.get<NewlyDiscoveredDevice>('customer/discovery-dashboard/newly_discovered_device/', {
+      params
+    });
   }
 
   getNewlyDiscoveredManufacturerModelDistribution(filters?: DiscoveryDashboardFilterCriteria): Observable<NewlyDiscoveredManufacturerModelDistribution> {
@@ -906,14 +1040,16 @@ export class DiscoveryDashboardService {
     return (data || []).map((item: NewlyDiscoveredDeviceItem) => {
       const viewItem = new NewlyDiscoveredDeviceItemViewData();
       const normalizedStatus = this.normalizeAvailabilityStatus(item?.availability_status);
+      viewItem.deploymentEnvironment = this.formatDeploymentEnvironmentLabel(item?.deployment_environment);
+      viewItem.deploymentEnvironmentTone = this.getDeploymentEnvironmentTone(item?.deployment_environment);
       viewItem.availabilityStatus = normalizedStatus;
       viewItem.availabilityStatusClass = this.getAvailabilityStatusClass(normalizedStatus);
       viewItem.ciName = item?.ci_name || 'N/A';
       viewItem.ciType = item?.ci_type || 'N/A';
       viewItem.datacenter = item?.datacenter || 'N/A';
-      viewItem.datacenterClass = 'discovery-new-ci-datacenter-badge';
+      viewItem.datacenterClass = 'badge badge-pill badge-light text-primary px-2 py-1';
       viewItem.discoveryMethod = item?.discovery_method || 'N/A';
-      viewItem.discoveryMethodClass = 'discovery-new-ci-method-pill';
+      viewItem.discoveryMethodClass = 'badge badge-pill badge-light text-secondary px-2 py-1';
       viewItem.lastDiscovered = item?.last_discovered || 'N/A';
       viewItem.lastDiscoveredTimestamp = this.getTimestampValue(item?.last_discovered_at);
       viewItem.manufacturer = item?.manufacturer || 'N/A';
@@ -1399,16 +1535,16 @@ export class DiscoveryDashboardService {
   private getAvailabilityStatusClass(status: string): string {
     switch (status) {
       case 'Up':
-        return 'discovery-availability-pill discovery-availability-pill--up';
+        return 'd-inline-flex align-items-center justify-content-center discovery-availability-pill discovery-availability-pill--up';
 
       case 'Degraded':
-        return 'discovery-availability-pill discovery-availability-pill--degraded';
+        return 'd-inline-flex align-items-center justify-content-center discovery-availability-pill discovery-availability-pill--degraded';
 
       case 'Down':
-        return 'discovery-availability-pill discovery-availability-pill--down';
+        return 'd-inline-flex align-items-center justify-content-center discovery-availability-pill discovery-availability-pill--down';
 
       default:
-        return 'discovery-availability-pill discovery-availability-pill--unknown';
+        return 'd-inline-flex align-items-center justify-content-center discovery-availability-pill discovery-availability-pill--unknown';
     }
   }
 
@@ -1431,6 +1567,22 @@ export class DiscoveryDashboardService {
   private getTimestampValue(value: string): number {
     const timestamp = value ? new Date(value).getTime() : NaN;
     return Number.isFinite(timestamp) ? timestamp : 0;
+  }
+
+  private getSafeNumberValue(value: any): number {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : 0;
+    }
+
+    if (value == null || value === '') {
+      return 0;
+    }
+
+    const normalizedValue = typeof value === 'string'
+      ? value.replace(/,/g, '').trim()
+      : value;
+    const numericValue = Number(normalizedValue);
+    return Number.isFinite(numericValue) ? numericValue : 0;
   }
 
   private getUptimeDays(value: string): number {
@@ -1503,6 +1655,8 @@ export class DiscoveryDashboardService {
       const viewItem = new OrphanedDeviceByTypeItemViewData();
       const normalizedStatus = this.normalizeAvailabilityStatus(item?.status);
       viewItem.uuid = item?.uuid || '';
+      viewItem.deploymentEnvironment = this.formatDeploymentEnvironmentLabel(item?.deployment_environment);
+      viewItem.deploymentEnvironmentTone = this.getDeploymentEnvironmentTone(item?.deployment_environment);
       viewItem.deviceName = item?.device_name || item?.name || 'N/A';
       viewItem.device = item?.device || '';
       viewItem.deviceTypeKey = item?.deviceType || '';
@@ -1630,19 +1784,30 @@ export class DiscoveryDashboardService {
     };
   }
 
-  getTopDiscoveryFailures(filters?: DiscoveryDashboardFilterCriteria): Observable<TopDiscoveryFailures> {
-    // return of(TOP_DISCOVERY_FAILURES);
-    return this.http.get<TopDiscoveryFailures>(`customer/discovery-dashboard/top_discovery_policy/`, {
-      params: this.buildFilterParams(filters)
-    });
+  getTopDiscoveryFailuresTable(
+    page = 1,
+    pageSize = 8,
+    filters?: DiscoveryDashboardFilterCriteria
+  ): Observable<DiscoveryDashboardPaginatedResponse<TopDiscoveryFailuresItem>> {
+    let params = this.buildFilterParams(filters);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
 
+    return this.http.get<TopDiscoveryFailuresResponse>(`customer/discovery-dashboard/top_discovery_policy/`, {
+      params
+    }).pipe(
+      map(res => this.normalizePaginatedResponse<TopDiscoveryFailuresItem>(res, page, pageSize))
+    );
   }
 
-  convertToTopDiscoveryFailuresViewData(data: TopDiscoveryFailuresItem[]): TopDiscoveryFailuresItemViewData[] {
+  convertToTopDiscoveryFailuresViewData(data: TopDiscoveryFailuresResponse): TopDiscoveryFailuresItemViewData[] {
     const viewData: TopDiscoveryFailuresItemViewData[] = [];
 
-    (data || []).forEach((item: TopDiscoveryFailuresItem) => {
+    this.getResponseResults(data).forEach((item: TopDiscoveryFailuresItem) => {
       const viewItem = new TopDiscoveryFailuresItemViewData();
+      viewItem.deploymentEnvironment = this.formatDeploymentEnvironmentLabel(item?.deployment_environment);
+      viewItem.deploymentEnvironmentTone = this.getDeploymentEnvironmentTone(item?.deployment_environment);
       viewItem.policyName = item?.policy_name;
       viewItem.failureCount = item?.failure_count;
       viewItem.lastFailure = item?.last_failure;
@@ -1652,7 +1817,7 @@ export class DiscoveryDashboardService {
     return viewData;
   }
 
-  convertToTopDiscoveryFailuresChartView(data: TopDiscoveryFailuresItem[]): EChartsOption {
+  convertToTopDiscoveryFailuresChartView(data: TopDiscoveryFailuresResponse): EChartsOption {
     const rows = this.sortTopDiscoveryFailuresRows(
       this.convertToTopDiscoveryFailuresViewData(data),
       'failureCount',
@@ -1790,6 +1955,8 @@ export class DiscoveryDashboardService {
 
     (data || []).forEach((item: OperatingSystemsItem) => {
       const viewItem = new OperatingSystemsItemViewData();
+      viewItem.deploymentEnvironment = this.formatDeploymentEnvironmentLabel(item?.deployment_environment);
+      viewItem.deploymentEnvironmentTone = this.getDeploymentEnvironmentTone(item?.deployment_environment);
       viewItem.count = item?.count;
       viewItem.eolData = item?.eol_data || '-';
       viewItem.osType = item?.os_type;
@@ -2103,6 +2270,8 @@ export class DiscoveryDashboardService {
   convertToCmdbSyncTrendTableView(data: CmdbSyncTrend): CmdbSyncTrendTableRowViewData[] {
     return (data || []).map((item, index) => {
       const row = new CmdbSyncTrendTableRowViewData();
+      row.deploymentEnvironment = this.formatDeploymentEnvironmentLabel(item?.deployment_environment);
+      row.deploymentEnvironmentTone = this.getDeploymentEnvironmentTone(item?.deployment_environment);
       row.week = item?.week;
       row.weekOrder = index;
       row.discoveredCis = item?.discovered_cis ?? 0;
@@ -2147,11 +2316,21 @@ export class DiscoveryDashboardService {
     });
   }
 
-  getCiDistribution(filters?: DiscoveryDashboardFilterCriteria): Observable<CiDistributionByDevice> {
-    // return of(CI_DISTRIBUTION);
+  getCiDistribution(
+    page = 1,
+    pageSize = 8,
+    filters?: DiscoveryDashboardFilterCriteria
+  ): Observable<CiDistributionByDevice> {
+    let params = this.buildFilterParams(filters);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
+
     return this.http.get<CiDistributionByDevice>(`/customer/discovery-dashboard/ci_distribution_by_device/`, {
-      params: this.buildFilterParams(filters)
-    });
+      params
+    }).pipe(
+      map(res => this.normalizePaginatedResponse<CiDistributionItem>(res, page, pageSize))
+    );
 
   }
 
@@ -2224,6 +2403,8 @@ export class DiscoveryDashboardService {
   convertToCiDistributionTableView(data: CiDistributionByDevice): CiDistributionTableRowViewData[] {
     return (data?.results || []).map(item => {
       const row = new CiDistributionTableRowViewData();
+      row.deploymentEnvironment = this.formatDeploymentEnvironmentLabel(item?.deployment_environment);
+      row.deploymentEnvironmentTone = this.getDeploymentEnvironmentTone(item?.deployment_environment);
       row.category = item?.category || '';
       row.categoryKey = item?.category_key || '';
       row.count = item?.count ?? 0;
@@ -2294,8 +2475,64 @@ export class DiscoveryDashboardService {
       .replace(/\b\w/g, letter => letter.toUpperCase());
   }
 
+  private getResponseResults<T>(data: DiscoveryDashboardPaginatedResponse<T> | T[]): T[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    return data?.results || data?.data || [];
+  }
+
+  private getResponseCount<T>(data: DiscoveryDashboardPaginatedResponse<T> | T[]): number {
+    if (Array.isArray(data)) {
+      return data.length;
+    }
+
+    const total = Number(data?.count ?? data?.total ?? 0);
+    return total > 0 ? total : (data?.results || data?.data || []).length;
+  }
+
+  private normalizePaginatedResponse<T>(
+    data: DiscoveryDashboardPaginatedResponse<T> | T[],
+    page = 1,
+    pageSize = 8
+  ): DiscoveryDashboardPaginatedResponse<T> {
+    const results = this.getResponseResults(data);
+    const count = this.getResponseCount(data);
+    const paginatedData = Array.isArray(data) ? null : data;
+    const isApiPaginated = !!paginatedData && (
+      !!paginatedData.next ||
+      !!paginatedData.previous ||
+      (Number(paginatedData.count || 0) > results.length) ||
+      (Number(paginatedData.total || 0) > results.length)
+    );
+
+    if (isApiPaginated) {
+      return {
+        count,
+        total: count,
+        next: paginatedData.next ?? null,
+        previous: paginatedData.previous ?? null,
+        results
+      };
+    }
+
+    const start = Math.max(0, (page - 1) * pageSize);
+    return {
+      count,
+      total: count,
+      next: null,
+      previous: null,
+      results: results.slice(start, start + pageSize)
+    };
+  }
+
   private buildFilterParams(filters?: DiscoveryDashboardFilterCriteria): HttpParams {
     let params = new HttpParams();
+
+    (filters?.deploymentEnvironment?.length ? filters.deploymentEnvironment : ['all']).forEach(environment => {
+      params = params.append('deployment_environment', environment);
+    });
 
     (filters?.region?.length ? filters.region : ['all']).forEach(region => {
       params = params.append('region', region);
@@ -2348,7 +2585,18 @@ const CI_DISTRIBUTION_CHART_COLORS = [
 
 const DISCOVERY_DISTRIBUTION_CHART_COLORS = [
   '#3b69f0',
-  '#56b99a'
+  '#16b364',
+  '#f79009',
+  '#9e77ed',
+  '#39c7e7',
+  '#f04483',
+  '#f6c34e',
+  '#2c3da3',
+  '#ef4e5e',
+  '#0cb04d',
+  '#a855f7',
+  '#20a4f3',
+  '#f97316'
 ];
 
 const CI_DISTRIBUTION_WIDGET_COLORS = [

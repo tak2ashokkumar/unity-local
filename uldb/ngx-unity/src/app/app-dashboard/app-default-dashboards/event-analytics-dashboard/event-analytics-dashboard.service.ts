@@ -2,9 +2,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { EChartsOption } from 'echarts';
-import * as moment from 'moment';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import moment from 'moment';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { DataCenterTabs } from 'src/app/united-cloud/datacenter/tabs';
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
 import {
@@ -12,12 +12,8 @@ import {
   DASHBOARD_FILTERS_DUMMY,
   DASHBOARD_TOP_FILTERS_API_DUMMY,
   DASHBOARD_HEADER_API_DUMMY,
-  EVENT_ANALYTICS_ALL_DATACENTER_OPTION,
-  EVENT_ANALYTICS_ALL_DATACENTER_VALUE,
-  EVENT_ANALYTICS_ALL_SEVERITY_VALUE,
-  EVENT_ANALYTICS_ALL_SOURCE_OPTION,
-  EVENT_ANALYTICS_ALL_SOURCE_VALUE,
   EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE,
+  EVENT_ANALYTICS_EVENT_ALERT_TIME_RANGE_OPTIONS,
   EVENT_ANALYTICS_CATEGORY_OPTIONS,
   EVENT_ANALYTICS_DONUT_COLORS,
   EVENT_ANALYTICS_CATEGORY_COLOR_MAP,
@@ -39,11 +35,14 @@ import {
   EVENT_ANALYTICS_NOISY_HOSTS_ENDPOINT,
   EVENT_ANALYTICS_OPEN_INCIDENTS_ENDPOINT,
   EVENT_ANALYTICS_PIPELINE_ENDPOINT,
+  EVENT_ANALYTICS_PRIVATE_CLOUD_FAST_ENDPOINT,
+  EVENT_ANALYTICS_PUBLIC_CLOUD_FAST_ENDPOINT,
   EVENT_ANALYTICS_RESOLVED_INCIDENTS_ENDPOINT,
   EVENT_ANALYTICS_STATUS_COLORS,
   EVENT_ANALYTICS_SUMMARY_ENDPOINT,
   EVENT_ANALYTICS_TOP_TIME_RANGE_OPTIONS,
   EVENT_ANALYTICS_TIME_RANGE_OPTIONS,
+  EVENT_ANALYTICS_TIME_RANGE_PARAM_MAP,
   EVENT_ANALYTICS_TOP_HEADER_ENDPOINT,
   EVENT_ANALYTICS_TREND_ALERT_TYPE_OPTIONS,
   EVENT_ANALYTICS_TREND_BY_TIMELINE_ENDPOINT,
@@ -68,12 +67,14 @@ import {
   DashboardFiltersApiResponse,
   DashboardHeaderApiResponse,
   DashboardFilterCriteria,
+  DashboardFilterOptionValue,
   DashboardFilters,
   DashboardHeader,
   EventAlertAnalyticsApiResponse,
   EventAlertAnalyticsGraphApiResponse,
   EventAlertAnalyticsGraphLinkApiResponse,
   EventAlertAnalyticsGraphNodeApiResponse,
+  EventAlertAnalyticsSourceRowApiResponse,
   EventAlertAnalyticsFlowSourceApiResponse,
   EventAnalyticsTone,
   EventByDeviceTypeApiItem,
@@ -128,12 +129,12 @@ export class EventAnalyticsDashboardService {
       trendTimelineTo: [{ value: customTimelineRange.to, disabled: true }, [Validators.required]],
       alertSegregationCategory: [this.getDefaultOptionValue(dashboardFilters.alertSegregationCategory, 'all')],
       analyticsViewBy: [this.getDefaultOptionValue(dashboardFilters.analyticsViewBy, 'source')],
-      analyticsSourceType: [this.getDefaultOptionValue(dashboardFilters.analyticsSourceType, EVENT_ANALYTICS_ALL_SOURCE_VALUE)],
-      analyticsSeverityType: [this.getDefaultOptionValue(dashboardFilters.analyticsSeverityType, EVENT_ANALYTICS_ALL_SEVERITY_VALUE)],
-      analyticsDatacenter: [this.getDefaultOptionValue(dashboardFilters.analyticsDatacenter, EVENT_ANALYTICS_ALL_DATACENTER_VALUE)],
-      analyticsCloud: [this.getDefaultOptionValue(dashboardFilters.analyticsCloud, 'all_cloud')],
-      analyticsCategory: [this.getDefaultOptionValue(dashboardFilters.analyticsCategory, 'all')],
-      eventAndAlertTimeline: [this.getDefaultOptionValue(dashboardFilters.eventAndAlertTimeline, 'last_week')],
+      analyticsSourceTypes: [this.getDefaultAnalyticsOptionSelection(dashboardFilters.analyticsSourceType)],
+      analyticsSeverityTypes: [this.getDefaultAnalyticsOptionSelection(dashboardFilters.analyticsSeverityType)],
+      analyticsDatacenters: [this.getDefaultAnalyticsOptionSelection(dashboardFilters.analyticsDatacenter)],
+      analyticsClouds: [this.getDefaultAnalyticsOptionSelection(dashboardFilters.analyticsCloud)],
+      analyticsDeviceTypes: [this.getDefaultAnalyticsOptionSelection(dashboardFilters.analyticsDeviceTypes)],
+      eventAndAlertTimeline: [this.getDefaultOptionValue(dashboardFilters.eventAndAlertTimeline, 'last_30_days')],
       eventAndAlertTimelineFrom: [{ value: customTimelineRange.from, disabled: true }, [Validators.required]],
       eventAndAlertTimelineTo: [{ value: customTimelineRange.to, disabled: true }, [Validators.required]],
       noisyEventsCategory: [this.getDefaultOptionValue(dashboardFilters.noisyEventsCategory, 'all')],
@@ -173,27 +174,52 @@ export class EventAnalyticsDashboardService {
   }
 
   getFallbackAnalyticsDatacenters(): SelectOption[] {
-    return [{ ...EVENT_ANALYTICS_ALL_DATACENTER_OPTION }];
+    return [];
+  }
+
+  getAnalyticsClouds(): Observable<SelectOption[]> {
+    return forkJoin([
+      this.getPrivateClouds().pipe(catchError(() => of([]))),
+      this.getPublicClouds().pipe(catchError(() => of([])))
+    ]).pipe(
+      map(([privateClouds, publicClouds]) => [
+        ...this.getPrivateCloudFilterOptions(privateClouds),
+        ...this.getPublicCloudFilterOptions(publicClouds)
+      ])
+    );
   }
 
   getAnalyticsSeverityTypeOptions(): SelectOption[] {
-    return DASHBOARD_FILTERS_DUMMY.analyticsSeverityType.map(option => ({ ...option }));
+    return this.getSelectableAnalyticsOptions(DASHBOARD_FILTERS_DUMMY.analyticsSeverityType);
+  }
+
+  getAnalyticsCloudOptions(options?: SelectOption[]): SelectOption[] {
+    return this.getSelectableAnalyticsOptions(options);
+  }
+
+  getAnalyticsDeviceCategoryOptions(options?: SelectOption[]): SelectOption[] {
+    const normalizedOptions = (options || [])
+      .map(option => this.normalizeCategoryOption(option))
+      .filter(option => !!option.value && !this.isAnalyticsAllValue(option.value));
+    return this.getSelectableAnalyticsOptions(normalizedOptions);
   }
 
   getAnalyticsSourceTypeOptions(rows?: EventAlertAnalyticsApiResponse['rows']): SelectOption[] {
     const sourceOptions = (rows || []).reduce((options: SelectOption[], row) => {
-      if (row?.key && row?.label) {
+      if (this.getNumber((row as EventAlertAnalyticsSourceRowApiResponse)?.total) <= 0) {
+        return options;
+      }
+      const value = String(row?.label || row?.key || '').trim();
+      const label = String(row?.label || row?.key || '').trim();
+      if (value && label && !options.some(option => option.value === value)) {
         options.push({
-          value: row.key,
-          label: row.label
+          value,
+          label
         });
       }
       return options;
     }, []);
-    return [
-      { ...EVENT_ANALYTICS_ALL_SOURCE_OPTION },
-      ...sourceOptions
-    ];
+    return this.getSelectableAnalyticsOptions(sourceOptions);
   }
 
   getHeaderTextData(): Observable<DashboardHeaderApiResponse> {
@@ -235,6 +261,7 @@ export class EventAnalyticsDashboardService {
 
   getTrendByTimeline(criteria: DashboardFilterCriteria): Observable<TrendByTimelineApiResponse> {
     // return of(TREND_BY_TIMELINE_API_DUMMY);
+    const selectedAlertTypes = this.getSelectedTrendAlertTypes(criteria?.trendAlertTypes);
     const trendTimelineParams: Record<string, string | undefined> = {
       trend_timeline: criteria?.trendTimeline
     };
@@ -243,7 +270,7 @@ export class EventAnalyticsDashboardService {
       trendTimelineParams.trend_timeline_to = this.formatApiDate(criteria?.trendTimelineTo);
     }
     return this.http.get<TrendByTimelineApiResponse>(EVENT_ANALYTICS_TREND_BY_TIMELINE_ENDPOINT, this.getRequestOptions(criteria, trendTimelineParams, {
-      alert_type: criteria?.trendAlertTypes
+      alert_type: selectedAlertTypes
     }));
   }
 
@@ -256,25 +283,16 @@ export class EventAnalyticsDashboardService {
 
   getEventAlertAnalytics(criteria: DashboardFilterCriteria): Observable<EventAlertAnalyticsApiResponse> {
     // return of(EVENT_ALERT_ANALYTICS_API_DUMMY);
-    const viewBy = criteria?.analyticsViewBy || 'source';
-    const analyticsParams: Record<string, string | undefined> = {
-      view_by: viewBy,
-      datacenter: criteria?.analyticsDatacenter,
-      cloud: criteria?.analyticsCloud,
-      analytics_category: criteria?.analyticsCategory,
-      event_and_alert_timeline: criteria?.eventAndAlertTimeline
-    };
-    if (viewBy === 'source') {
-      analyticsParams.source_type = criteria?.analyticsSourceType;
-    }
-    if (viewBy === 'severity') {
-      analyticsParams.severity_type = criteria?.analyticsSeverityType;
-    }
-    if (criteria?.eventAndAlertTimeline === EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE) {
-      analyticsParams.event_and_alert_timeline_from = this.formatApiDate(criteria?.eventAndAlertTimelineFrom);
-      analyticsParams.event_and_alert_timeline_to = this.formatApiDate(criteria?.eventAndAlertTimelineTo);
-    }
-    return this.http.get<EventAlertAnalyticsApiResponse>(EVENT_ANALYTICS_EVENT_ALERT_ANALYTICS_ENDPOINT, this.getRequestOptions(criteria, analyticsParams));
+    return this.http.get<EventAlertAnalyticsApiResponse>(EVENT_ANALYTICS_EVENT_ALERT_ANALYTICS_ENDPOINT, this.getEventAlertAnalyticsRequestOptions(criteria));
+  }
+
+  getEventAlertAnalyticsFilterOptions(criteria: DashboardFilterCriteria): Observable<{ sourceTypeOptions: SelectOption[]; deviceTypeOptions: SelectOption[] }> {
+    return this.getEventAlertAnalytics(criteria).pipe(
+      map(res => ({
+        sourceTypeOptions: this.getAnalyticsSourceTypeOptions(res.rows),
+        deviceTypeOptions: this.getAnalyticsDeviceCategoryOptions(res.categoryOptions)
+      }))
+    );
   }
 
   getNoisyEvents(criteria: DashboardFilterCriteria, sortColumn?: NoisyTableSortColumn | '', sortDirection?: string): Observable<NoisyEventsApiResponse> {
@@ -1129,7 +1147,7 @@ export class EventAnalyticsDashboardService {
   private mapDashboardFiltersResponse(res?: DashboardFiltersApiResponse): DashboardFilters {
     const timeRange = EVENT_ANALYTICS_TOP_TIME_RANGE_OPTIONS.map(option => ({ ...option }));
     const trendTimeline = this.buildTimeRangeOptions(EVENT_ANALYTICS_TIME_RANGE_OPTIONS);
-    const eventAndAlertTimeline = this.buildTimeRangeOptions(EVENT_ANALYTICS_TIME_RANGE_OPTIONS);
+    const eventAndAlertTimeline = this.buildEventAlertTimeRangeOptions(EVENT_ANALYTICS_EVENT_ALERT_TIME_RANGE_OPTIONS);
     const category = this.getCategoryOptions();
     return {
       timeRange,
@@ -1139,10 +1157,10 @@ export class EventAnalyticsDashboardService {
       alertSegregationCategory: category,
       analyticsViewBy: DASHBOARD_FILTERS_DUMMY.analyticsViewBy,
       analyticsSourceType: DASHBOARD_FILTERS_DUMMY.analyticsSourceType,
-      analyticsSeverityType: DASHBOARD_FILTERS_DUMMY.analyticsSeverityType,
+      analyticsSeverityType: this.getAnalyticsSeverityTypeOptions(),
       analyticsDatacenter: DASHBOARD_FILTERS_DUMMY.analyticsDatacenter,
       analyticsCloud: DASHBOARD_FILTERS_DUMMY.analyticsCloud,
-      analyticsCategory: category,
+      analyticsDeviceTypes: DASHBOARD_FILTERS_DUMMY.analyticsDeviceTypes,
       eventAndAlertTimeline,
       noisyEventsCategory: category,
       noisyHostsCategory: category,
@@ -1153,28 +1171,75 @@ export class EventAnalyticsDashboardService {
   private getAnalyticsDatacenterOptions(datacenters: DataCenterTabs[]): SelectOption[] {
     const options = (datacenters || [])
       .map(datacenter => ({
-        // value: this.getDatacenterOptionValue(datacenter),
-        // label: this.getDatacenterOptionLabel(datacenter)
-        value: datacenter.name,
-        label: datacenter.name
+        value: this.getDatacenterOptionValue(datacenter),
+        label: this.getDatacenterOptionLabel(datacenter)
       }))
       .filter(option => !!option.value && !!option.label);
 
-    return [
-      { ...EVENT_ANALYTICS_ALL_DATACENTER_OPTION },
-      ...options
-    ];
+    return options;
   }
 
-  // private getDatacenterOptionValue(datacenter: DataCenterTabs): string {
-  //   const dc = datacenter as DataCenterTabs & { key?: string; dc_uuid?: string };
-  //   return String(dc?.key || dc?.uuid || dc?.dc_uuid || '').trim();
-  // }
+  private getDatacenterOptionValue(datacenter: DataCenterTabs): string {
+    const dc = datacenter as DataCenterTabs & { key?: string; dc_uuid?: string };
+    return String(dc?.uuid || dc?.key || dc?.dc_uuid || '').trim();
+  }
 
-  // private getDatacenterOptionLabel(datacenter: DataCenterTabs): string {
-  //   const dc = datacenter as DataCenterTabs & { dc_name?: string; datacenter_name?: string };
-  //   return String(dc?.dc_name || dc?.name || dc?.datacenter_name || '').trim();
-  // }
+  private getDatacenterOptionLabel(datacenter: DataCenterTabs): string {
+    const dc = datacenter as DataCenterTabs & { dc_name?: string; datacenter_name?: string };
+    return String(dc?.name || dc?.dc_name || dc?.datacenter_name || '').trim();
+  }
+
+  private getPrivateClouds(): Observable<any[]> {
+    return this.http.get<any[]>(EVENT_ANALYTICS_PRIVATE_CLOUD_FAST_ENDPOINT, {
+      params: new HttpParams().set('page_size', '0')
+    }).pipe(map(res => this.getArrayPayload<any>(res)));
+  }
+
+  private getPublicClouds(): Observable<any[]> {
+    return this.http.get<any[]>(EVENT_ANALYTICS_PUBLIC_CLOUD_FAST_ENDPOINT, {
+      params: new HttpParams().set('page_size', '0')
+    }).pipe(map(res => this.getArrayPayload<any>(res)));
+  }
+
+  private getPrivateCloudFilterOptions(clouds: any[]): SelectOption[] {
+    return (clouds || []).reduce((options: SelectOption[], cloud: any) => {
+      if (cloud?.uuid) {
+        options.push({
+          value: cloud.uuid,
+          label: cloud.name || cloud.instance_name || cloud.display_name || cloud.uuid
+        });
+      }
+      return options;
+    }, []);
+  }
+
+  private getPublicCloudFilterOptions(clouds: any[]): SelectOption[] {
+    return (clouds || []).reduce((options: SelectOption[], cloud: any) => {
+      if (cloud?.uuid) {
+        options.push({
+          value: cloud.uuid,
+          label: cloud.account_name || cloud.name || cloud.instance_name || cloud.uuid
+        });
+      }
+      return options;
+    }, []);
+  }
+
+  private getArrayPayload<T>(payload: any): T[] {
+    if (Array.isArray(payload)) {
+      return payload;
+    }
+    if (!payload || typeof payload !== 'object') {
+      return [];
+    }
+    const arrayKeys = ['results', 'data', 'items', 'rows'];
+    for (const key of arrayKeys) {
+      if (Array.isArray(payload[key])) {
+        return payload[key];
+      }
+    }
+    return [];
+  }
 
   private mapEventAlertAnalyticsMetrics(payload: any): MetricViewData[] {
     if (Array.isArray(payload?.metrics)) {
@@ -1495,6 +1560,10 @@ export class EventAnalyticsDashboardService {
     return this.buildTimeRangeOptions(options);
   }
 
+  getEventAlertTimeRangeOptions(options?: SelectOption[]): SelectOption[] {
+    return this.buildEventAlertTimeRangeOptions(options);
+  }
+
   getTrendAlertTypeOptions(options?: SelectOption[], fallback: SelectOption[] = EVENT_ANALYTICS_TREND_ALERT_TYPE_OPTIONS): SelectOption[] {
     const normalizedOptions = (options || [])
       .map(option => this.normalizeTrendAlertTypeOption(option))
@@ -1558,16 +1627,70 @@ export class EventAnalyticsDashboardService {
     return normalizedOptions;
   }
 
+  private buildEventAlertTimeRangeOptions(options?: SelectOption[]): SelectOption[] {
+    const fallback = EVENT_ANALYTICS_EVENT_ALERT_TIME_RANGE_OPTIONS.map(option => ({ ...option }));
+    const normalizedOptions = (options || []).map(option => ({
+      value: this.normalizeEventAlertTimeRangeValue(option?.value),
+      label: this.normalizeEventAlertTimeRangeLabel(option?.value, option?.label)
+    })).filter(option => !!option.value);
+
+    return normalizedOptions.length ? normalizedOptions : fallback;
+  }
+
   private getDefaultOptionValue(options: SelectOption[], preferredValue?: string): string {
     const availableOptions = options || [];
     const preferredOption = availableOptions.find(option => option.value === preferredValue);
     return preferredOption?.value || availableOptions[0]?.value || '';
   }
 
+  private getDefaultAnalyticsOptionSelection(options?: SelectOption[]): SelectOption[] {
+    return this.getSelectableAnalyticsOptions(options);
+  }
+
   private getRequestOptions(criteria?: DashboardFilterCriteria, extraParams?: Record<string, string | undefined>, extraMultiParams?: Record<string, string[] | undefined>): { params: HttpParams } {
     return {
       params: this.convertFiltersToApiParams(criteria, extraParams, extraMultiParams)
     };
+  }
+
+  private getEventAlertAnalyticsRequestOptions(criteria?: DashboardFilterCriteria): { params: HttpParams } {
+    const viewBy = criteria?.analyticsViewBy || 'source';
+    let params = new HttpParams();
+    params = params.set('dc_uuids', this.getCsvValue(this.getSelectedAnalyticsValues(criteria?.analyticsDatacenters)));
+    params = params.set('cloud_uuids', this.getCsvValue(this.getSelectedAnalyticsValues(criteria?.analyticsClouds)));
+    const deviceCategories = this.getSelectedAnalyticsValues(criteria?.analyticsDeviceTypes).map(value => this.normalizeCategoryValue(value));
+    const sourceTypes = this.getSelectedAnalyticsValues(criteria?.analyticsSourceTypes);
+    const severityTypes = this.getSelectedAnalyticsValues(criteria?.analyticsSeverityTypes);
+
+    if (deviceCategories.length) {
+      params = params.set('device_category', this.getCsvValue(deviceCategories));
+    }
+    if (viewBy === 'source' && sourceTypes.length) {
+      params = params.set('source_types', this.getCsvValue(sourceTypes));
+    }
+    if (viewBy === 'severity' && severityTypes.length) {
+      params = params.set('severity_types', this.getCsvValue(severityTypes));
+    }
+    if (viewBy) {
+      params = params.set('view_by', viewBy);
+    }
+
+    const timeRange = this.getEventAlertTimeRangeParam(criteria?.eventAndAlertTimeline);
+    if (timeRange) {
+      params = params.set('time_range', timeRange);
+    }
+    if (criteria?.eventAndAlertTimeline === EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE) {
+      const startDate = this.formatEventAlertAnalyticsDate(criteria?.eventAndAlertTimelineFrom, false);
+      const endDate = this.formatEventAlertAnalyticsDate(criteria?.eventAndAlertTimelineTo, true);
+      if (startDate) {
+        params = params.set('start_datetime', startDate);
+      }
+      if (endDate) {
+        params = params.set('end_datetime', endDate);
+      }
+    }
+
+    return { params };
   }
 
   private convertFiltersToApiParams(criteria?: DashboardFilterCriteria, extraParams?: Record<string, string | undefined>, extraMultiParams?: Record<string, string[] | undefined>): HttpParams {
@@ -1603,9 +1726,34 @@ export class EventAnalyticsDashboardService {
     return params.append(key, formattedDate);
   }
 
+  private getSelectableAnalyticsOptions(options?: SelectOption[]): SelectOption[] {
+    return (options || [])
+      .filter(option => !!option?.value && !this.isAnalyticsAllValue(option.value))
+      .map(option => ({ ...option }));
+  }
+
+  private getSelectedAnalyticsValues(values?: DashboardFilterOptionValue[]): string[] {
+    return (values || [])
+      .map(value => typeof value === 'string' ? value : value?.value)
+      .filter((value: string | undefined) => !!value && !this.isAnalyticsAllValue(value)) as string[];
+  }
+
+  private getCsvValue(values?: string[]): string {
+    return (values || []).filter(value => !!value).join(',');
+  }
+
+  private isAnalyticsAllValue(value?: string): boolean {
+    return ['all', 'all_source', 'all_severity', 'all_datacenter', 'all_cloud'].indexOf(this.normalizeKey(value || '')) > -1;
+  }
+
   private formatApiDate(value?: Date | string): string | undefined {
     const date = moment(value);
     return date.isValid() ? date.format('YYYY-MM-DD HH:mm:ss') : undefined;
+  }
+
+  private formatEventAlertAnalyticsDate(value?: Date | string, isEnd: boolean = false): string | undefined {
+    const date = moment(value);
+    return date.isValid() ? `${date.format('YYYY-MM-DD')}T${isEnd ? '23:59:59' : '00:00:00'}Z` : undefined;
   }
 
   private formatApiDay(value?: Date | string): string | undefined {
@@ -2225,6 +2373,24 @@ export class EventAnalyticsDashboardService {
     }
   }
 
+  private normalizeEventAlertTimeRangeValue(value?: string): string {
+    switch (value) {
+      case 'last_week':
+        return 'last_7_days';
+      case 'last_month':
+        return 'last_30_days';
+      case 'last_quarter':
+        return 'last_90_days';
+      default:
+        return value || '';
+    }
+  }
+
+  private getEventAlertTimeRangeParam(value?: string): string {
+    const normalizedValue = this.normalizeEventAlertTimeRangeValue(value);
+    return EVENT_ANALYTICS_TIME_RANGE_PARAM_MAP[normalizedValue] || normalizedValue;
+  }
+
   private normalizeTimeRangeLabel(value?: string, label?: string): string {
     switch (value) {
       case 'last_hour':
@@ -2242,6 +2408,25 @@ export class EventAnalyticsDashboardService {
       case 'last_quarter':
       case 'last_90_days':
         return '90 Days';
+      case EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE:
+        return 'Custom';
+      default:
+        return label || '';
+    }
+  }
+
+  private normalizeEventAlertTimeRangeLabel(value?: string, label?: string): string {
+    switch (this.normalizeEventAlertTimeRangeValue(value)) {
+      case 'last_24_hours':
+        return 'Last 24 Hours';
+      case 'last_7_days':
+        return 'Last 7 Days';
+      case 'last_30_days':
+        return 'Last 30 Days';
+      case 'last_60_days':
+        return 'Last 60 Days';
+      case 'last_90_days':
+        return 'Last 90 Days';
       case EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE:
         return 'Custom';
       default:

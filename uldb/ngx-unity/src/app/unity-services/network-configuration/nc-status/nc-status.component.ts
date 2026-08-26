@@ -138,9 +138,9 @@ export class NcStatusComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.openStartupConfigDetailsModalRef?.hide();
     this.credentialFormModalRef?.hide();
     this.openRunningConfigDetailsModalRef?.hide();
-    this.openStartupConfigDetailsModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

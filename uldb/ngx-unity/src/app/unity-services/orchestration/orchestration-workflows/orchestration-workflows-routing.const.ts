@@ -12,6 +12,9 @@ import { OrchestrationWorkflowsOnChatComponent } from "./orchestration-workflows
 import { OrchestrationAgenticWorkflowWebhookTriggerComponent } from "./orchestration-agentic-workflow-webhook-trigger/orchestration-agentic-workflow-webhook-trigger.component";
 import { OrchestrationAgenticWorkflowItsmTriggerComponent } from "./orchestration-agentic-workflow-itsm-trigger/orchestration-agentic-workflow-itsm-trigger.component";
 import { OrchestrationAgenticWorkflowAimlTriggerComponent } from "./orchestration-agentic-workflow-aiml-trigger/orchestration-agentic-workflow-aiml-trigger.component";
+import { WfDynamicContainerComponent } from "./wf-dynamic-container/wf-dynamic-container.component";
+import { WfDynamicFormTestComponent } from "./wf-dynamic-form-test/wf-dynamic-form-test.component";
+import { WfDynamicListExecuteComponent } from "./wf-dynamic-list-execute/wf-dynamic-list-execute.component";
 
 export const ORCHESTRATION_WORKFLOW_ROUTES: Routes = [
     {
@@ -100,6 +103,17 @@ export const ORCHESTRATION_WORKFLOW_ROUTES: Routes = [
             },
         },
     },
+    {
+        path: 'workflows/:id/trigger-execute/:nodeType',
+        component: WfDynamicListExecuteComponent,
+        data: {
+            breadcrumb: {
+                title: 'Execute',
+                stepbackCount: 0
+            }
+        }
+    },
+
 ]
 
 export const ORCHESTRATION_WORKFLOW_CRUD_ROUTES: Routes = [
@@ -185,7 +199,34 @@ export const ORCHESTRATION_WORKFLOW_CRUD_ROUTES: Routes = [
                 title: 'Workflow',
             },
         },
-    }
+    },
+    {
+        path: 'orchestration/workflows/dynamic-workflow',
+        component: WfDynamicContainerComponent,
+        data: {
+            breadcrumb: {
+                title: 'Workflow',
+            },
+        },
+    },
+    {
+        path: 'orchestration/workflows/dynamic-workflow/:id/edit',
+        component: WfDynamicContainerComponent,
+        data: {
+            breadcrumb: {
+                title: 'Workflow',
+            },
+        },
+    },
+    {
+        path: 'orchestration/workflows/dynamic-workflow/form-test',
+        component: WfDynamicFormTestComponent,
+        data: {
+            breadcrumb: {
+                title: 'Workflow',
+            },
+        },
+    },
 ]
 
 // export const ORCHESTRATION_WORKFLOW_ON_CHAT: Routes = [

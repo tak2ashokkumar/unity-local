@@ -99,8 +99,6 @@ export class DatacenterBillCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.confirmBillDeleteModalRef?.hide();
-    this.billModelRef?.hide();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }

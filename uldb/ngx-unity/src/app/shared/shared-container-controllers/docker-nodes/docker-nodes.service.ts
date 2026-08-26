@@ -12,7 +12,7 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { DockerNodeType } from 'src/app/shared/SharedEntityTypes/docker.type';
 import { SYNC_DOCKER_NODES, GET_DOCKER_NODES, DELETE_DOCKER_NODE } from 'src/app/shared/api-endpoint.const';
-import { WINDOWS_CONSOLE_VIA_AGENT, WINDOWS_CONSOLE_CLIENT, VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE } from 'src/app/app-constants';
+import { WINDOWS_CONSOLE_VIA_AGENT, WINDOWS_CONSOLE_CLIENT, VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR } from 'src/app/app-constants';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 
 @Injectable()
@@ -61,7 +61,8 @@ export class DockerNodesService {
       a.memory = node.memory;
       a.cloud = node.account.cloud ? node.account.cloud.name + "(" +
         this.utilService.getCloudTypeByPlatformType(node.account.cloud.platform_type) + ")" : 'N/A';
-
+      a.collectorUuid = node.collector?.uuid;
+      a.isCollectorZtc = node.collector?.is_ztc;
       a.os = node.os ? node.os : 'N/A';
       if (node.os) {
         a.hasOS = true;
@@ -86,8 +87,13 @@ export class DockerNodesService {
         a.isNewTabEnabled = (!a.ipAddress.match('N/A') && a.hasOS && (a.platformType.match('windows') || a.platformType.match('linux'))) ? true : false;
         if (a.isNewTabEnabled && a.hasOS) {
           switch (a.platformType) {
-            case 'windows': a.newTabTootipMessage = 'Open In New Tab';
-              a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.ipAddress) : WINDOWS_CONSOLE_CLIENT(a.ipAddress);
+            case 'windows':
+              a.newTabTootipMessage = 'Open In New Tab';
+              if (node.collector?.is_ztc) {
+                a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(a.collectorUuid, a.ipAddress)}`;
+              } else {
+                a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.ipAddress) : WINDOWS_CONSOLE_CLIENT(a.ipAddress);
+              }
               break;
             case 'linux': a.newTabTootipMessage = 'Open In New Tab';
               a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -133,6 +139,8 @@ export class DockerNodesViewdata {
   cloud: string;
   clusterName: string;
   statusIcon: string
+  collectorUuid: string;
+  isCollectorZtc: boolean;
 
   hasOS: boolean;
   os: string;

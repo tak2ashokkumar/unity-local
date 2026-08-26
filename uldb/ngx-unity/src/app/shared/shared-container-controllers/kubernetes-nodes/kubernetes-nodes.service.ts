@@ -12,7 +12,7 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { KubernetesNodeType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
 import { SYNC_KUBERNETES_NODES, KUBERNETES_ACCOUNT_NODES } from 'src/app/shared/api-endpoint.const';
-import { VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_VIA_AGENT, WINDOWS_CONSOLE_CLIENT } from 'src/app/app-constants';
+import { VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_VIA_AGENT, WINDOWS_CONSOLE_CLIENT, GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR } from 'src/app/app-constants';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { KUBERNETES_STATS_TOOLTIP } from 'src/app/shared/shared-container-controllers/kubernetes-monitoring.service';
@@ -65,7 +65,8 @@ export class KubernetesNodesService {
       a.statusIcon = this.getStatusIcon(node.status);
       a.internalIp = node.internal_ip ? node.internal_ip : 'N/A';
       a.externalIp = node.external_ip ? node.external_ip : 'N/A';
-
+      a.collectorUuid = node.collector?.uuid;
+      a.isCollectorZtc = node.collector?.is_ztc;
       a.os = node.os ? node.os : 'N/A';
       if (node.os) {
         a.hasOS = true;
@@ -90,8 +91,13 @@ export class KubernetesNodesService {
         a.isNewTabEnabled = (!a.internalIp.match('N/A') && a.hasOS && (a.platformType.match('windows') || a.platformType.match('linux'))) ? true : false;
         if (a.isNewTabEnabled && a.hasOS) {
           switch (a.platformType) {
-            case 'windows': a.newTabTootipMessage = 'Open In New Tab';
-              a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.internalIp) : WINDOWS_CONSOLE_CLIENT(a.internalIp);
+            case 'windows':
+              a.newTabTootipMessage = 'Open In New Tab';
+              if (node.collector?.is_ztc) {
+                a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(a.collectorUuid, a.internalIp)}`;
+              } else {
+                a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.internalIp) : WINDOWS_CONSOLE_CLIENT(a.internalIp);
+              }
               break;
             case 'linux': a.newTabTootipMessage = 'Open In New Tab';
               a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -140,6 +146,8 @@ export class KubernetesNodesViewdata {
   cpuLimit: string
   cloud: string;
   clusterName: string;
+  collectorUuid: string;
+  isCollectorZtc: boolean;
 
   hasOS: boolean;
   os: string;

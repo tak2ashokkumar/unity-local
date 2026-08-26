@@ -562,10 +562,14 @@ export class PublicCloudAzureSummaryDetailsComponent implements OnInit, OnDestro
     if (!view.isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.svc.getConsoleAccessInput(view);
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(view.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.svc.getConsoleAccessInput(view);
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(view.newTabConsoleAccessUrl);
+    }
   }
 
   goToStats(view: AzureResourcesViewData) {

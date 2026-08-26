@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, take } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { Terminal } from 'xterm';
 // import { fit } from 'xterm/lib/addons/fit/fit';
 import { FitAddon } from 'xterm-addon-fit';
 import { FloatingTerminalInput, FloatingTerminalService } from '../floating-terminal.service';
-import { AuthType, ConsoleAccessInput } from '../../check-auth/check-auth.service';
+import { AuthType, CheckAuthService, ConsoleAccessInput } from '../../check-auth/check-auth.service';
 import { WSSHClient } from '../../app-xterm/WSSHClient';
 
 @Component({
@@ -29,7 +29,8 @@ export class TeminalItemComponent implements OnInit, OnDestroy {
   fitAddon = new FitAddon();
   private currentCommand = '';
   private exitCommandSent = false;
-  constructor(private termService: FloatingTerminalService) {
+  private reconnecting = false;
+  constructor(private termService: FloatingTerminalService, private authService: CheckAuthService) {
     this.termService.resizeAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       setTimeout(() => {
         if (document.getElementById('term-' + this.index)) {
@@ -106,10 +107,32 @@ export class TeminalItemComponent implements OnInit, OnDestroy {
     if (!this.wsClient.isConnectionClosed() && !this.wsClient.isConnecting()) {
       this.trackExitCommand(data);
       this.wsClient.sendClientData(data);
-    } else if (data == 'y' || data == 'Y') {
-      this.term.dispose();
-      this.initTerminal();
+    } else if ((data == 'y' || data == 'Y') && !this.reconnecting) {
+      this.reconnect();
     }
+  }
+
+  // Re-establishing an SSH session after a disconnect must go back through the
+  // credential prompt rather than silently replaying the cached password/pkey
+  // from the original connection.
+  reconnect() {
+    this.reconnecting = true;
+    this.auth = null;
+    this.authService.checkAuth({
+      label: this.input.deviceName, deviceType: this.input.deviceType,
+      deviceId: this.input.deviceId, managementIp: this.input.managementIp, port: this.input.port,
+      newTab: false, deviceName: this.input.deviceName, userName: this.input.userName,
+      osType: this.input.osType, ipType: this.input.ipType
+    }).pipe(take(1)).subscribe(res => {
+      this.reconnecting = false;
+      if (res != null) {
+        this.auth = res;
+        this.term.dispose();
+        this.initTerminal();
+      } else {
+        this.term.write("\rReconnect cancelled.\r\nEnter Y to reconnect...\r\n");
+      }
+    });
   }
 
   trackExitCommand(data: any) {

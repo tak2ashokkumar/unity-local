@@ -91,7 +91,7 @@ export class UsfBasicService {
     this.customNgSelectValues = fields;
   }
 
-  getCustomDropdownValues(){
+  getCustomDropdownValues() {
     return this.customNgSelectValues;
   }
 
@@ -178,8 +178,8 @@ export class UsfBasicService {
 // export const LicenseModels = ['BYOL', 'PAYG', 'Subscription'];
 export const Currencies: CurrencyObjType[] = [
   { 'name': 'USD', 'disabled': false },
-  { 'name': 'EURO', 'disabled': true },
-  { 'name': 'RIYADH',  'disabled': true }
+  { 'name': 'EUR', 'disabled': false },
+  // { 'name': 'RIYADH', 'disabled': true }
 ];
 // export const BudgetPeriods = ['Hourly', 'Monthly'];
 // export const AllocationTypes = ['Shared', 'Dedicated'];

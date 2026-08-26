@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ApplicationDiscoveryCreateGraphsService, ApplicationMonitoringGraphCRUDViewdata } from './application-discovery-create-graphs.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
@@ -30,7 +30,7 @@ import { MonitoringGraphCRUDItems } from './application-discovery-create-graphs.
   styleUrls: ['./application-discovery-create-graphs.component.scss'],
   providers: [ApplicationDiscoveryCreateGraphsService]
 })
-export class ApplicationDiscoveryCreateGraphsComponent implements OnInit {
+export class ApplicationDiscoveryCreateGraphsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   pcId: string;
   deviceId: string;

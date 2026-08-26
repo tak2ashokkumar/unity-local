@@ -1,0 +1,267 @@
+// catalog-item.component.scss
+:host {
+    --ci-accent: #0e7c6b;
+    --ci-accent-soft: #e1f2ef;
+    --ci-ink: #10141b;
+    --ci-ink-2: #5a6472;
+    --ci-ink-3: #8a93a1;
+    --ci-rule: #d6dbe2;
+    --ci-rule-2: #e7eaef;
+    --ci-surface: #ffffff;
+    --ci-surface-2: #f5f7f9;
+    --ci-warn: #8a5a00;
+}
+
+.catalog-item-page {
+    padding: 20px 4px 60px;
+
+    .page-header {
+        margin-bottom: 16px;
+
+        h4 {
+            font-weight: 600;
+        }
+
+        .spacer {
+            flex: 1;
+        }
+    }
+}
+
+// ---------- accordion shell ----------
+.accordion-card {
+    background: var(--ci-surface);
+    border: 1px solid var(--ci-rule);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.accordion-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--ci-rule-2);
+    cursor: pointer;
+    user-select: none;
+
+    .chevron {
+        display: inline-block;
+        color: var(--ci-ink-3);
+        transition: transform 0.15s ease;
+
+        &.open {
+            transform: rotate(90deg);
+        }
+    }
+
+    .title {
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+}
+
+.accordion-body {
+    padding: 18px;
+}
+
+// ---------- repeatable rows (use_cases, key_features, requirements, etc.) ----------
+.repeat-block {
+    border: 1px solid var(--ci-rule-2);
+    border-radius: 6px;
+    padding: 10px;
+    background: var(--ci-surface-2);
+}
+
+.repeat-row {
+    display: grid;
+    grid-template-columns: 1fr 32px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+
+    &.cols-2 {
+        grid-template-columns: 1fr 1fr 32px;
+    }
+
+    &.cols-3 {
+        grid-template-columns: 1fr 1.6fr 0.8fr 32px;
+    }
+
+    &.cols-4 {
+        grid-template-columns: 1.2fr 1.2fr 0.8fr 1fr 32px;
+    }
+}
+
+.kill {
+    border: 1px solid var(--ci-rule);
+    background: var(--ci-surface);
+    color: var(--ci-ink-2);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover {
+        border-color: var(--ci-warn);
+        color: var(--ci-warn);
+    }
+}
+
+.help-text {
+    color: var(--ci-ink-3);
+    margin-bottom: 8px;
+}
+
+.input-group-append .sla-unit-suffix:disabled {
+    border-color: #8f99a3 !important;
+    background-color: #8f99a3 !important;
+    color: #fff !important;
+    opacity: 1;
+    cursor: default;
+}
+
+// ---------- configuration field cards ----------
+.cfg-card {
+    border: 1px solid var(--ci-rule-2);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 14px;
+    background: var(--ci-surface-2);
+}
+
+.cfg-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+
+    .tag {
+        background: var(--ci-accent-soft);
+        color: var(--ci-accent);
+        padding: 3px 7px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        flex: 1;
+    }
+}
+
+.check-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+    margin: 0;
+}
+
+// ---------- automation type segmented toggle ----------
+.automation-type-toggle {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+
+    li {
+        border: 1px solid #c8ced3;
+        background: #f0f3f5;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        label {
+            display: inherit;
+            width: 100%;
+            margin-bottom: 0 !important;
+            min-width: 88px;
+            padding: 0.25rem 0.7rem;
+            border-radius: 25px;
+            color: #73818f;
+            font-size: 0.765625rem;
+            line-height: 1.5;
+            text-align: center;
+
+            input {
+                visibility: hidden;
+                max-width: 0;
+            }
+
+            &.active {
+                background-color: #378ad8;
+                color: #fff;
+            }
+        }
+
+        &:first-child {
+            border-right: 0;
+            border-radius: 25px 0 0 25px;
+        }
+
+        &:last-child {
+            border-radius: 0 25px 25px 0;
+        }
+    }
+}
+
+.automation-mapping-row {
+    grid-template-columns: 3fr 3fr 6fr;
+
+    .automation-param-name {
+        width: 100%;
+        max-width: none; // let it fill its 3fr track instead of capping at 160px
+    }
+}
+
+.automation-select-wrap {
+    max-width: 280px;
+}
+
+// ---------- requirements two-column layout ----------
+.req-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.req-column {
+    .lbl {
+        display: block;
+        text-transform: uppercase;
+        color: var(--ci-ink-2);
+        margin-bottom: 6px;
+    }
+
+    .repeat-row {
+        grid-template-columns: 1fr 28px;
+    }
+}
+
+.logo-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    border: 1px solid #dcdcdc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #fafafa;
+    flex-shrink: 0;
+}
+
+.logo-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.logo-preview-placeholder {
+    color: #b0b0b0;
+    font-size: 22px;
+}
+
+.logo-upload-wrap .btn.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}

@@ -19,6 +19,7 @@ import { AimlConditionDetailsService } from '../aiml-condition-details/aiml-cond
 import { AIMLConditionAlertEventViewData, AIMLConditionAlertsViewData, AIMLConditionsViewData, AimlConditionsService } from './aiml-conditions.service';
 import { AIMLConditionDetails, AIMLConditionsSummary } from './aiml-conditions.type';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AIMLEventMgmtDateRangeParams, AimlEventMgmtService } from '../aiml-event-mgmt.service';
 
 
 @Component({
@@ -30,6 +31,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class AimlConditionsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
+  private dateRangeParams: AIMLEventMgmtDateRangeParams = {};
   tabdetails: string = 'Alerts';
   activityVerticalWizardViewData: any;
   analysisViewData: any;
@@ -74,6 +76,7 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private conditionSvc: AimlConditionsService,
+    private aimlMgmtSvc: AimlEventMgmtService,
     private conditionDetailSvc: AimlConditionDetailsService,
     private alertDetailSvc: AimlAlertDetailsService,
     private spinner: AppSpinnerService,
@@ -102,6 +105,8 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.dateRangeParams = this.aimlMgmtSvc.getDateRangeParams();
+    this.handleDateRangeChanges();
     this.spinner.start('main');
     if (this.selectedConditionId) {
       this.onSearched(this.selectedConditionId)
@@ -178,7 +183,7 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
   }
 
   getConditionsSummary() {
-    this.conditionSvc.getConditionsSummary().pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getConditionsSummary(this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.summaryViewData = res;
     }, (err) => {
       this.notification.error(new Notification('Error whlie getting alert summary'));
@@ -186,7 +191,7 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
   }
 
   getConditions() {
-    this.conditionSvc.getConditions(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getConditions(this.currentCriteria, this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.spinner.stop('main');
       this.conditionCount = res.count;
       this.viewData = this.conditionSvc.convertToViewdata(res.results);
@@ -207,8 +212,8 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
 
     this.analysisViewData = null;
-    this.conditionSvc.getAnalysisDetails(this.conditionUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
-      this.downloadUrl = `customer/aiops/rca_analysis/download/?condition_uuid=${this.conditionUuid}`
+    this.conditionSvc.getAnalysisDetails(this.conditionUuid, this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.downloadUrl = this.getAnalysisDownloadUrl(this.conditionUuid);
       this.analysisViewData = this.conditionSvc.convertToAnalysisData(res);
       this.spinner.stop('main');
     }, (err) => {
@@ -219,7 +224,7 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
 
   getAlerts(conditionId: string) {
     this.alerts = [];
-    this.conditionSvc.getAlerts(conditionId, this.alertsCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getAlerts(conditionId, this.alertsCurrentCriteria, this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.alertsCount = res.count;
       this.alerts = this.conditionSvc.convertToAlertsViewdata(res.results);
     }, (err) => {
@@ -228,7 +233,7 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
   }
 
   getAlertsStack(conditionId: string, cIndex: number) {
-    this.conditionSvc.getAlertsStack(conditionId).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getAlertsStack(conditionId, this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.viewData[cIndex].hostBasedAlerts = this.conditionSvc.convertToHostBasedAlerts(this.selectedCondition, res);
     }, (err) => {
       this.notification.error(new Notification('Error whlie fetching Alerts Stack.'));
@@ -237,7 +242,7 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
 
   getActivities() {
     this.activityVerticalWizardViewData = [];
-    this.conditionSvc.getOverviewDetails(this.conditionUuid, this.activityCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getOverviewDetails(this.conditionUuid, this.activityCurrentCriteria, this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.activitiesCount = res.count;
       this.activityVerticalWizardViewData = this.conditionSvc.convertToActivityWizardViewData(res.results);
     }, (err) => {
@@ -265,7 +270,7 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.selectedCondition = null;
     // this.router.navigate([ this.viewData[i].uuid, 'condition-alerts'], { relativeTo: this.route });
-    this.conditionSvc.getConditionDetails(this.viewData[i].uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getConditionDetails(this.viewData[i].uuid, this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       // this.viewData[i].loaded = true;
       // this.spinner.stop('main');
       this.selectedCondition = res;
@@ -393,7 +398,7 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
   }
 
   updateCondtionDetailsAfterCelerySuccess(i: number) {
-    this.conditionSvc.getConditionDetails(this.viewData[i].uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+    this.conditionSvc.getConditionDetails(this.viewData[i].uuid, this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.viewData[i].conditionStatus = res.condition_status;
       if (res.condition_status == 'Resolved') {
         this.viewData[i].statusTextColor = 'text-success';
@@ -404,6 +409,31 @@ export class AimlConditionsComponent implements OnInit, OnDestroy {
       this.spinner.stop('main');
       this.notification.error(new Notification(`Error whlie getting Condition ID: ${this.viewData[i].id} details`));
     });
+  }
+
+  private handleDateRangeChanges(): void {
+    this.aimlMgmtSvc.dateRangeParams$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((dateRangeParams: AIMLEventMgmtDateRangeParams) => {
+      this.dateRangeParams = dateRangeParams;
+      this.currentCriteria.pageNo = 1;
+      this.alertsCurrentCriteria.pageNo = 1;
+      this.activityCurrentCriteria.pageNo = 1;
+      this.selectedConditionIndex = 0;
+      this.selectedCondition = null;
+      this.alerts = [];
+      this.activityVerticalWizardViewData = [];
+      this.analysisViewData = null;
+      this.getConditionsSummary();
+      this.getConditions();
+    });
+  }
+
+  private getAnalysisDownloadUrl(conditionUuid: string): string {
+    let url = `customer/aiops/rca_analysis/download/?condition_uuid=${conditionUuid}`;
+    const dateRangeParams = this.dateRangeParams;
+    if (this.aimlMgmtSvc.hasValidDateRangeParams(dateRangeParams)) {
+      url += `&start_date=${encodeURIComponent(dateRangeParams.startDate)}&end_date=${encodeURIComponent(dateRangeParams.endDate)}`;
+    }
+    return url;
   }
 
   viewConditionDetails() {

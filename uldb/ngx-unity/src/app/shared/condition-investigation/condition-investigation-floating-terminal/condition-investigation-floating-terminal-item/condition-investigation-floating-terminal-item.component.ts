@@ -15,7 +15,7 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
   private ngUnsubscribe = new Subject();
 
   @Input()
-  termInput: { input: any, auth: AuthType };
+  termInput: { input: any, auth: AuthType, terminalSnapshot?: string };
   @Input()
   index: number;
   isRunning: boolean = false;
@@ -30,6 +30,10 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
   private currentCommand = '';
   private exitCommandSent = false;
   private lifecycleCompleted = false;
+  private suppressInitialConnectionOutput = false;
+  private initialConnectionReady = false;
+  private initialInputSent = false;
+  private terminalHistory = '';
 
   constructor(private termService: ConditionInvestigationFloatingTerminalService) {
     this.termService.resizeAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
@@ -70,19 +74,32 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
     this.currentCommand = '';
     this.exitCommandSent = false;
     this.lifecycleCompleted = false;
+    this.suppressInitialConnectionOutput = Boolean(this.termInput.terminalSnapshot);
+    this.initialConnectionReady = false;
+    this.initialInputSent = false;
+    this.terminalHistory = this.termInput.terminalSnapshot || '';
     document.getElementById('term-' + this.index).setAttribute('style', 'height:' + Math.round(window.innerHeight - document.getElementsByClassName('terminal-container')[0].getBoundingClientRect().top) + 'px;');
     this.term = new Terminal({ cursorBlink: true });
     this.term.loadAddon(this.fitAddon);
     this.term.open(document.getElementById('term-' + this.index));
     this.fitAddon.fit();
+    if (this.termInput.terminalSnapshot) {
+      this.term.write(this.termInput.terminalSnapshot);
+    }
     let obj = Object.assign({ hostname: this.auth.host, port: this.auth.port, collector_uuid: this.auth.collector_uuid, password: this.auth.password, username: this.auth.username, conversation_id: this.auth.conversation_id, uuid: this.input.tabId, tab_type: this.auth.tab_type, org_id: this.auth.org_id, user_id: this.auth.user_id, agent_id: this.auth.agent_id, connection_type: this.auth.connection_type, engine: this.auth.engine, database: this.auth.database, transport: this.auth.transport, shell: this.auth.shell, pkey: this.auth.pkey }, this.getRowsCols());
     this.wsClient = new WSSHClient(obj);
     this.termService.registerTerminal(this.input.tabId, this.wsClient, this.tabType);
     this.termService.setTabRunning(this.input.tabId, false);
-    this.term.write(`Connecting to ${this.input.deviceName}...`);
+    if (!this.suppressInitialConnectionOutput) {
+      this.writeTerminal(`Connecting to ${this.input.deviceName}...`);
+    }
     this.wsClient.connect();
     this.subscribeToEvent();
 
+  }
+
+  getTerminalSnapshot(): string {
+    return this.terminalHistory;
   }
 
   subscribeToEvent() {
@@ -94,6 +111,13 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
       });
     });
 
+    this.wsClient.onInput.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+      this.initialInputSent = true;
+      if (this.initialConnectionReady) {
+        this.suppressInitialConnectionOutput = false;
+      }
+    });
+
     this.wsClient.onMessage.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       const lifecycleEvent = this.parseLifecycleEvent(res);
       if (lifecycleEvent) {
@@ -101,7 +125,17 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
         return;
       }
 
-      this.term.write(res);
+      if (this.suppressInitialConnectionOutput) {
+        if (this.wsClient.isShellReady(res)) {
+          this.initialConnectionReady = true;
+          if (this.initialInputSent) {
+            this.suppressInitialConnectionOutput = false;
+          }
+        }
+        return;
+      }
+
+      this.writeTerminal(res);
 
       // VERY IMPORTANT: detect command start
       if (!this.isRunning && this.wsClient['_commandSent']) {
@@ -117,16 +151,21 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
     });
 
     this.wsClient.onClose.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.term.write(`\rconnection closed\r\n`);
+      this.writeTerminal(`\rconnection closed\r\n`);
       this.emitTerminalClosedIfNeeded('Terminal connection closed before command completed.');
       if (!this.exitCommandSent) {
-        this.term.write("Enter Y to reconnect...\r\n");
+        this.writeTerminal("Enter Y to reconnect...\r\n");
       }
     });
 
     this.wsClient.onError.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.term.write('Error: ' + res + '\r\n');
+      this.writeTerminal('Error: ' + res + '\r\n');
     });
+  }
+
+  private writeTerminal(data: string) {
+    this.terminalHistory += data;
+    this.term.write(data);
   }
 
   private parseLifecycleEvent(raw: any): any | null {
@@ -140,6 +179,14 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
     try {
       const parsed = JSON.parse(trimmed);
       const type = parsed.type || parsed.event;
+      if (type === 'error') {
+        return {
+          ...parsed,
+          type: 'command_failed',
+          reason: 'terminal_error',
+          error: parsed.message || 'Terminal connection failed.'
+        };
+      }
       if (['command_started', 'command_completed', 'command_failed'].includes(type)) {
         return { ...parsed, type };
       }

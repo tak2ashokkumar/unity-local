@@ -81,10 +81,12 @@ export class UnityS3AccountComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.confirmModalRef?.hide();
-    this.accessKeyModalRef?.hide();
     this.addAccountModalRef?.hide();
+    this.accessKeyModalRef?.hide();
     this.editAccountModalRef?.hide();
+    this.confirmModalRef?.hide();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   get isCrudEnabled() {

@@ -238,11 +238,15 @@ export class VmsListHypervComponent implements OnInit {
     if (!view.isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.hyperVService.getConsoleAccessInput(this.deviceMapping, view);
-    obj.managementIp = view.managementIp;
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(view.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.hyperVService.getConsoleAccessInput(this.deviceMapping, view);
+      obj.managementIp = view.managementIp;
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(view.newTabConsoleAccessUrl);
+    }
   }
 
   createTicket(data: HypervVMViewData) {

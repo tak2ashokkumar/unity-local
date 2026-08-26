@@ -550,9 +550,9 @@ export const CHECK_TASK_STATUS_BY_TASK_ID = (taskId: string) => `task/${taskId}/
 
 export const CHECK_TASK_STATUS_BY_TASK_ID_AS_PARAMS = (url: string, taskId: string) => `${url}?task_id=${taskId}`;
 
-export const GET_EXECUTION_STATUS_FOR_ON_CHAT = (taskId: string) => `/rest/orchestration/agentic_workflow_executions/${taskId}/chat_response/`;
+export const GET_EXECUTION_STATUS_FOR_ON_CHAT = (taskId: string) => `/api/orchestration/v1/workflow_execution/${taskId}/output/`;
 
-export const GET_EXECUTION_STATUS_FOR_AGENTIC_WF_EXECUTE = (taskId: string) => `/rest/orchestration/agentic_workflow_preview/${taskId}/`;
+export const GET_EXECUTION_STATUS_FOR_AGENTIC_WF_EXECUTE = (taskId: string) => `/api/orchestration/v1/dynamic_workflow_preview/${taskId}/`;
 
 export const GET_VM_LIST_BY_PLATFORM = (platform: PlatFormMapping) => {
     switch (platform) {
@@ -1193,7 +1193,6 @@ export const GET_CONTAINER_CONTROLLERS = () => `/customer/container_clouds/`;
 
 // Unified container account list (Kubernetes + Docker in a single response).
 export const GET_CONTAINERS = () => `/customer/containers/`;
-
 
 // ==================== Kubernetes API ====================
 
@@ -2020,6 +2019,7 @@ export const DB_GRAPH_ITEMS = (instanceId: string) => `/customer/database_server
 
 export const BMS_IPMI_DRAC_RESET_PASSWORD = (id: string) => `/customer/bm_servers/${id}/reset_password/`;
 
+
 // Kubernetes monitoring shares one uniform URL shape: customer/kubernetes/{segment}/{uuid}/monitoring/...
 // This map picks the backend segment per Kubernetes monitoring device type (note the renamed ones:
 // pvs, pvcs, control-plane, storage-classes, resource-quotas). The BASE helper below lets each
@@ -2055,6 +2055,7 @@ export const KUBERNETES_MONITORING_BASE = (deviceType: DeviceMapping, deviceId: 
 
 // Live monitoring status for a Kubernetes account, used to refresh the account list Status column.
 export const KUBERNETES_ACCOUNT_MONITORING_STATUS = (uuid: string) => `customer/kubernetes/accounts/${uuid}/monitoring/status/`;
+
 
 export const MONITORING_CONFIGURATION_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
     const k8s = KUBERNETES_MONITORING_BASE(deviceType, deviceId);
@@ -2195,8 +2196,6 @@ export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, 
 }
 
 export const ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
-    // Kubernetes deliberately omitted: it has no device_data/status endpoint - its monitoring state
-    // comes from the /monitoring/ payload, and the zbx shell skips this call for Kubernetes devices.
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/device_data/`;
@@ -3378,15 +3377,15 @@ export const ORCHESTRATION_EXECUTION_TASK_OUTPUT = (uuid: string) => `/orchestra
 
 export const ORCHESTRATION_EXECUTION_WORKFLOWS = (workflowId: string) => `orchestration/workflow/execution/${workflowId}/`;
 
-export const ORCHESTRATION_AGENTIC_EXECUTION_WORKFLOWS = (workflowId: string) => `rest/orchestration/agentic_workflow_executions/${workflowId}/`;
+export const ORCHESTRATION_AGENTIC_EXECUTION_WORKFLOWS = (workflowId: string) => `/api/orchestration/v1/workflow_execution/${workflowId}/`;
 
 export const ORCHESTRATION_EXECUTION_WORKFLOW_LOGS = (workflowId: string) => `orchestration/workflow/execution/${workflowId}/execution_log/`;
 
-export const ORCHESTRATION_AGENTIC_EXECUTION_WORKFLOW_LOGS = (workflowId: string) => `rest/orchestration/agentic_workflow_executions/${workflowId}/execution_log/`;
+export const ORCHESTRATION_AGENTIC_EXECUTION_WORKFLOW_LOGS = (workflowId: string) => `/api/orchestration/v1/workflow_execution/${workflowId}/execution_log/`;
 
 export const ORCHESTRATION_EXECUTION_WORKFLOW_OUTPUT = (workflowId: string) => `orchestration/workflow/execution/${workflowId}/output/`;
 
-export const ORCHESTRATION_EXECUTION_AGENTIC_WORKFLOW_OUTPUT = (workflowId: string) => `rest/orchestration/agentic_workflow_executions/${workflowId}/output/`;
+export const ORCHESTRATION_EXECUTION_AGENTIC_WORKFLOW_OUTPUT = (workflowId: string) => `/api/orchestration/v1/workflow_execution/${workflowId}/output/`;
 
 export const ORCHESTRATION_INPUT_TEMPLATE = () => `orchestration/input_template/`;
 
@@ -3589,10 +3588,13 @@ export const GET_NETWORK_DASHBOARD_DEVICES_BY_LOCATION = () => `customer/network
 export const GET_NETWORK_DASHBOARD_AVERAGE_UPTIME_BY_DEVICE_TYPE = () => `customer/network-dashboard/average_uptime_by_device_type`;
 export const GET_NETWORK_DASHBOARD_LOWEST_AVAILIBILITY = () => `customer/network-dashboard/lowest_availibility`;
 export const GET_NETWORK_DASHBOARD_ENVIRONMENTAL_HEALTH_SUMMARY = () => `customer/network-dashboard/environmental_health_summary`;
+export const GET_NETWORK_DASHBOARD_ENVIRONMENTAL_HEALTH_TABLE = () => `customer/network-dashboard/environmental-health-table/`;
 export const GET_NETWORK_DASHBOARD_TOP_DEVICES_BY_HOTSPOT_TEMPERATURE = () => `customer/network-dashboard/top_devices_by_hotspot_temperature`;
 export const GET_NETWORK_DASHBOARD_AVERAGE_TEMPERATURE_BY_SENSOR_TYPE = () => `customer/network-dashboard/average_temperature_by_sensor_type`;
 export const GET_NETWORK_DASHBOARD_POWER_SUPPLY_STATUS_DISTRIBUTION = () => `customer/network-dashboard/power_supply_status_distribution`;
 export const GET_NETWORK_DASHBOARD_FAN_HEALTH_BY_DEVICE = () => `customer/network-dashboard/fan_health_by_device`;
+export const GET_NETWORK_DASHBOARD_LOADBALANCER_HEALTH = () => `customer/network-dashboard/loadbalancer-health/`;
+export const GET_NETWORK_DASHBOARD_PDU_HEALTH = () => `customer/network-dashboard/pdu-health/`;
 export const GET_NETWORK_DASHBOARD_ALERT_EVENTS_SUMMARY = () => `customer/network-dashboard/alert_events_summary`;
 export const GET_NETWORK_DASHBOARD_ALERTS_BY_SEVERITY = () => `customer/network-dashboard/alerts_by_severity`;
 export const GET_NETWORK_DASHBOARD_ALERTS_BY_DEVICE_TYPE = () => `customer/network-dashboard/alerts_by_device_type`;
@@ -4194,11 +4196,10 @@ export const DEVICE_OVERVIEW_BY_BATTERIES_DATA = (deviceType: DeviceMapping, uui
     }
 }
 
-// ==================== AI APM (aiapm service) ====================
-// AI-driven APM endpoints. In production the base is a relative `/aiapm/` so the
-// reverse proxy fronts https://unity.unitedlayer.com/aiapm/; in development the base
-// is the env-configured host (environment.aiApmHostUrl). This mirrors the networkai
-// pattern in condition-investigation-chatbot.service.ts. Never hardcode the host here.
+// ==================== APM (aiapm service) ====================
+// In production the base is a relative `/aiapm/` so the reverse proxy fronts /aiapm/; 
+// In development the base is the env-configured host (environment.aiApmHostUrl). 
+// Never hardcode the host here.
 const AI_APM_BASE = () => environment.production ? '/aiapm/' : environment.aiApmHostUrl;
 
 export const AI_APM_REMEDIATION = () => `${AI_APM_BASE()}remediation`;

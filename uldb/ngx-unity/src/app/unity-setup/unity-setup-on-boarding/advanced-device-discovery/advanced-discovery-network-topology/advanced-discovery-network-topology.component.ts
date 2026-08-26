@@ -97,6 +97,7 @@ export class AdvancedDiscoveryNetworkTopologyComponent implements OnInit, OnDest
   }
 
   ngOnDestroy() {
+    this.deviceInfoModalRef?.hide();
     this.spinner.stop('topology');
     this.destroyNetwork();
     this.ngUnsubscribe.next();

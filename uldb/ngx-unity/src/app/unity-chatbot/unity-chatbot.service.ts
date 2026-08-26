@@ -273,7 +273,8 @@ export enum ModuleIcons {
   "Unity Services" = "fa cfa-unity-services",
   "Cost Analysis" = "fa-money-check-alt fas",
   "Support" = "fa-life-ring far",
-  "Unity Setup" = "fa fa-cogs"
+  "Unity Setup" = "fa fa-cogs",
+  "Catalog Management" = "fas fa-layer-group"
 }
 
 export const moduleMapping: { [key: string]: string } = {

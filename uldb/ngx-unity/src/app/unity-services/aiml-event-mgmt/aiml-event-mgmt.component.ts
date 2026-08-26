@@ -2,8 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AimlEventMgmtService, AIMLEventMgmtViewData } from './aiml-event-mgmt.service';
+import { AIMLEventMgmtDateRangeParams, AimlEventMgmtService, AIMLEventMgmtViewData } from './aiml-event-mgmt.service';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
+import { CustomDateFilterChange, CustomDateFilterOption, CustomDateFilterPeriod } from 'src/app/shared/custom-date-filter/custom-date-filter.type';
 
 @Component({
   selector: 'aiml-event-mgmt',
@@ -17,6 +18,14 @@ export class AimlEventMgmtComponent implements OnInit, OnDestroy {
   currentPath: string;
 
   viewData: AIMLEventMgmtViewData = new AIMLEventMgmtViewData();
+  readonly dateRangeDefault: CustomDateFilterPeriod = CustomDateFilterPeriod.THIRTY_DAYS;
+  readonly dateRangeOptions: CustomDateFilterOption[] = [
+    { label: '24H', value: CustomDateFilterPeriod.LAST_24_HR },
+    { label: '7D', value: CustomDateFilterPeriod.SEVEN_DAYS },
+    { label: '30D', value: CustomDateFilterPeriod.THIRTY_DAYS },
+    { label: 'ALL', value: CustomDateFilterPeriod.ALL },
+    { label: 'CUSTOM', value: CustomDateFilterPeriod.CUSTOM }
+  ];
 
   constructor(private aimlMgmtSvc: AimlEventMgmtService,
     private router: Router,
@@ -46,12 +55,23 @@ export class AimlEventMgmtComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscr.unsubscribe();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   getConditionsSummary() {
     this.aimlMgmtSvc.getConditionsSummary().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.viewData = this.aimlMgmtSvc.convertToViewData(res);
     });
+  }
+
+  onDateRangeChange(event: CustomDateFilterChange): void {
+    const dateRangeParams: AIMLEventMgmtDateRangeParams = {
+      startDate: event?.from || null,
+      endDate: event?.to || null
+    };
+    this.aimlMgmtSvc.setDateRangeParams(dateRangeParams);
+    this.refreshData();
   }
 
   goTo(target: string) {

@@ -73,7 +73,8 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     document.addEventListener('click', (event) => this.closeDropdown(event));
     this.workflowsInProgress = this.storage.getByKey('workflowsInProgress', StorageType.SESSIONSTORAGE);
-    this.globalReadOnlyUser = this.storage.getByKey('user', StorageType.SESSIONSTORAGE)?.active_rbac_roles?.some(r => r === 'Global Read-Only');
+    const roles = this.storage.getByKey('user', StorageType.SESSIONSTORAGE)?.active_rbac_roles;
+    this.globalReadOnlyUser = !!roles?.length && roles.every(r => r === 'Global Read-Only');
     console.log(this.workflowsInProgress, "workflow In progress")
     this.jsonValue = {
       "workflow_name": "",
@@ -120,9 +121,9 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.processWorkflowModalRef?.hide();
     this.taskModalRef?.hide();
     this.workflowDeleteModalRef?.hide();
-    this.processWorkflowModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -277,6 +278,10 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     }
   }
 
+  openDynamicAgentic() {
+    this.router.navigate(['dynamic-workflow'], { relativeTo: this.route })
+  }
+
   toggleStatus(index: number, status: boolean) {
     // this.spinner.start('main');
     if (status === true) {
@@ -301,21 +306,25 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   executeWorkflow(view: WorkflowViewData) {
     // use view.is_agentic flag and view.trigger_type = "Manual Trigger" / "Schedule Trigger" / "Chat Trigger"
     // to route to different components else below execute route.
-    if (view.is_agentic && view.trigger_type === "Manual Trigger") {
-      this.router.navigate([view.uuid, 'manual-trigger'], { relativeTo: this.route });
-    } else if (view.is_agentic && view.trigger_type === "Schedule Trigger") {
-      this.router.navigate([view.uuid, 'schedule-trigger'], { relativeTo: this.route });
-    } else if (view.is_agentic && view.trigger_type === "Chat Trigger") {
+
+    // else if (view.is_agentic && view.trigger_type === "Schedule Trigger") {
+    //   this.router.navigate([view.uuid, 'schedule-trigger'], { relativeTo: this.route });
+    // } 
+    if (view.is_agentic && view.trigger_type === "Chat Trigger") {
       this.chatbotSvc.onChatTrigger$.next(true);
-      this.appService.$assistantData.next({ sourceName: 'workflow', apiUrl: `/rest/orchestration/agentic_workflow/${view.uuid}/chat/`, entityId: view.uuid, entity: view.name });
+      this.appService.$assistantData.next({ sourceName: 'workflow', apiUrl: `/api/orchestration/v1/dynamic_workflows/${view.uuid}/execute/`, entityId: view.uuid, entity: view.name });
       // this.router.navigate([view.uuid, 'on-chat'], { relativeTo: this.route });
-    } else if (view.is_agentic && view.trigger_type === "Webhook Trigger") {
-      this.router.navigate([view.uuid, 'webhook-trigger'], { relativeTo: this.route });
-    } else if (view.is_agentic && view.trigger_type === "ITSM Event Trigger") {
-      this.router.navigate([view.uuid, 'itsm-trigger'], { relativeTo: this.route });
-    } else if (view.is_agentic && view.trigger_type === "AIML Event Trigger") {
-      this.router.navigate([view.uuid, 'aiml-trigger'], { relativeTo: this.route });
-    } else {
+    } else if (view.is_agentic) {
+      this.router.navigate([view.uuid, 'trigger-execute', view.trigger_type], { relativeTo: this.route });
+    }
+    // else if (view.is_agentic && view.trigger_type === "Webhook Trigger") {
+    //   this.router.navigate([view.uuid, 'webhook-trigger'], { relativeTo: this.route });
+    // } else if (view.is_agentic && view.trigger_type === "ITSM Event Trigger") {
+    //   this.router.navigate([view.uuid, 'itsm-trigger'], { relativeTo: this.route });
+    // } else if (view.is_agentic && view.trigger_type === "AIML Event Trigger") {
+    //   this.router.navigate([view.uuid, 'aiml-trigger'], { relativeTo: this.route });
+    // } 
+    else {
       this.router.navigate([view.uuid, 'execute'], { relativeTo: this.route });
     }
   }
@@ -330,7 +339,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     } else if (task.isAdvanced) {
       this.router.navigate(['new-workflow', task.uuid, 'edit'], { relativeTo: this.route });
     } else if (task.is_agentic) {
-      this.router.navigate(['agentic-workflow', task.uuid, 'edit'], { relativeTo: this.route });
+      this.router.navigate(['dynamic-workflow', task.uuid, 'edit'], { relativeTo: this.route });
     } else {
       this.router.navigate([task.uuid, 'edit'], { relativeTo: this.route });
     }

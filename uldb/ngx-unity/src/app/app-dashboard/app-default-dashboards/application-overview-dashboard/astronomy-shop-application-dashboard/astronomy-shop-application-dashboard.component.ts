@@ -202,13 +202,13 @@ export class AstronomyShopApplicationDashboardComponent implements OnInit, OnCha
   }
 
   pageChange(pageNo: number) {
-    this.spinner.start('main');
+    // this.spinner.start('main');
     this.currentCriteria.pageNo = pageNo;
     this.getCriticalAlertsData();
   }
 
   pageSizeChange(pageSize: number) {
-    this.spinner.start('main');
+    // this.spinner.start('main');
     this.currentCriteria.pageSize = pageSize;
     this.currentCriteria.pageNo = 1;
     this.getCriticalAlertsData();
@@ -230,13 +230,13 @@ export class AstronomyShopApplicationDashboardComponent implements OnInit, OnCha
   }
 
   pageChangeForServicesOverview(pageNo: number) {
-    this.spinner.start('main');
+    // this.spinner.start('main');
     this.currentCriteriaForServicesOverview.pageNo = pageNo;
     this.getServiceOverviewData();
   }
 
   pageSizeChangeForServicesOverview(pageSize: number) {
-    this.spinner.start('main');
+    // this.spinner.start('main');
     this.currentCriteriaForServicesOverview.pageSize = pageSize;
     this.currentCriteriaForServicesOverview.pageNo = 1;
     this.getServiceOverviewData();

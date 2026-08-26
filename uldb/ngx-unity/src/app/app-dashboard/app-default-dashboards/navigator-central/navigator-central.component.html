@@ -86,16 +86,21 @@
                 <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
                 <ng-container *ngIf="executiveView as view">
                     <div class="exec-hero-row">
-                        <div class="exec-hero-card exec-totals-card">
+                        <div class="exec-hero-card exec-totals-card"
+                            [ngClass]="getExecHeroTotalsGridClass(view)">
                             <div class="exec-total-block"
                                 [ngClass]="{'linked-widget': canOpenExecLink(view.totals.link)}"
                                 (click)="openExecLink(view.totals.link)"
-                                [tooltip]="canOpenExecLink(view.totals.link) ? 'Open linked page' : ''" placement="top"
-                                container="body">
+                                [popover]="execTotalDiscoveredPopover"
+                                [popoverContext]="{ totals: view.totals }" triggers="mouseenter:mouseleave"
+                                placement="auto" container="body" containerClass="exec-summary-popover">
                                 <div class="exec-total-label">Total Discovered Resources</div>
                                 <div class="exec-total-value">{{view.totals.discovered}}</div>
                             </div>
-                            <div class="exec-total-block">
+                            <div class="exec-total-block"
+                                [popover]="execTotalsStatusPopover"
+                                [popoverContext]="{ totals: view.totals }" triggers="mouseenter:mouseleave"
+                                placement="auto" container="body" containerClass="exec-summary-popover">
                                 <div class="exec-total-label">Total Monitored Resources</div>
                                 <div class="exec-card-count"><span class="exec-count-value">{{view.totals.monitored}}</span>
                                     <span class="exec-count-total">/ {{view.totals.monitoredOf}} Discovered</span></div>
@@ -105,8 +110,9 @@
                                     *ngTemplateOutlet="execStatusLine; context: { card: view.totals }"></ng-container>
                             </div>
                         </div>
-                        <ng-container *ngFor="let card of view.heroCards; trackBy: trackByIndex">
-                            <ng-container *ngTemplateOutlet="execHeroCard; context: { card: card }"></ng-container>
+                        <ng-container *ngFor="let card of view.heroCards; let i = index; trackBy: trackByIndex">
+                            <ng-container
+                                *ngTemplateOutlet="execHeroCard; context: { card: card, gridClass: getExecHeroCardGridClass(view, i) }"></ng-container>
                         </ng-container>
                     </div>
 
@@ -122,8 +128,9 @@
                             <div class="exec-tile" *ngFor="let tile of group.tiles; trackBy: trackByIndex"
                                 [ngClass]="{'linked-widget': canOpenExecLink(tile.link)}"
                                 (click)="openExecLink(tile.link)"
-                                [tooltip]="canOpenExecLink(tile.link) ? 'Open linked page' : ''" placement="top"
-                                container="body">
+                                [popover]="execTilePopover" [popoverContext]="{ tile: tile }"
+                                triggers="mouseenter:mouseleave" placement="auto" container="body"
+                                containerClass="exec-summary-popover exec-summary-tile-popover">
                                 <div class="exec-tile-label">{{tile.label}}</div>
                                 <div class="exec-tile-value" [ngClass]="tile.tone ? getToneClass(tile.tone) : ''">
                                     {{tile.value}}</div>
@@ -141,18 +148,20 @@
                 </div>
             </ng-template>
 
-            <ng-template #execStatusLine let-card="card">
-                <div class="exec-status-line">
-                    <span class="up"><span class="exec-dot up"></span>Up {{card.up}}</span>
-                    <span class="down"><span class="exec-dot down"></span>Down {{card.down}}</span>
-                    <span class="unknown"><span class="exec-dot unknown"></span>Unknown {{card.unknown}}</span>
+            <ng-template #execStatusLine let-card="card" let-compactStatus="compactStatus">
+                <div class="exec-status-line" [ngClass]="{'compact': compactStatus}">
+                    <span class="up"><span class="exec-dot up"></span><ng-container *ngIf="!compactStatus">Up </ng-container>{{card.up}}</span>
+                    <span class="down"><span class="exec-dot down"></span><ng-container *ngIf="!compactStatus">Down </ng-container>{{card.down}}</span>
+                    <span class="unknown"><span class="exec-dot unknown"></span><ng-container *ngIf="!compactStatus">Unknown </ng-container>{{card.unknown}}</span>
                 </div>
             </ng-template>
 
-            <ng-template #execCard let-card="card">
+            <ng-template #execCard let-card="card" let-compactStatus="compactStatus">
                 <div class="exec-card" [ngClass]="{'linked-widget': canOpenExecLink(card.link)}"
                     (click)="openExecLink(card.link)"
-                    [tooltip]="canOpenExecLink(card.link) ? 'Open linked page' : ''" placement="top" container="body">
+                    [popover]="execStatusPopover" [popoverContext]="{ card: card }"
+                    triggers="mouseenter:mouseleave" placement="auto" container="body"
+                    containerClass="exec-summary-popover">
                     <div class="exec-card-head">
                         <span class="exec-badge" *ngIf="card.badgeText" [ngClass]="card.badgeClass">{{card.badgeText}}</span>
                         <span class="exec-card-label">{{card.label}}</span>
@@ -160,30 +169,132 @@
                     <div class="exec-card-count"><span class="exec-count-value">{{card.monitored}}</span>
                         <span class="exec-count-total">/ {{card.discovered}} {{card.unit}}</span></div>
                     <ng-container *ngTemplateOutlet="execStatusBar; context: { card: card }"></ng-container>
-                    <ng-container *ngTemplateOutlet="execStatusLine; context: { card: card }"></ng-container>
+                    <ng-container *ngTemplateOutlet="execStatusLine; context: { card: card, compactStatus: compactStatus }"></ng-container>
                 </div>
             </ng-template>
 
-            <ng-template #execHeroCard let-card="card">
-                <div class="exec-hero-card">
-                    <div class="exec-hero-head" [ngClass]="{'linked-widget': canOpenExecLink(card.link)}"
-                        (click)="openExecLink(card.link)"
-                        [tooltip]="canOpenExecLink(card.link) ? 'Open linked page' : ''" placement="top" container="body">
-                        <i class="exec-hero-icon" [ngClass]="card.iconClass" [style.color]="card.iconColor"></i>
-                        <span class="exec-hero-title">{{card.label}}</span>
-                    </div>
-                    <div class="exec-card-count exec-hero-count"><span class="exec-count-value">{{card.monitored}}</span>
-                        <span class="exec-count-total">/ {{card.discovered}} {{card.unit}}</span></div>
-                    <ng-container *ngTemplateOutlet="execStatusBar; context: { card: card }"></ng-container>
-                    <ng-container *ngTemplateOutlet="execStatusLine; context: { card: card }"></ng-container>
-                    <div class="exec-chip-row" *ngIf="card.chips.length">
-                        <span class="exec-chip" *ngFor="let chip of card.chips; trackBy: trackByIndex">{{chip.label}}
-                            {{chip.value}}</span>
+            <ng-template #execHeroCard let-card="card" let-gridClass="gridClass">
+                <div class="exec-hero-card" [ngClass]="[getExecHeroCardClass(card), gridClass]">
+                    <div class="exec-hero-main" [popover]="execStatusPopover"
+                        [popoverContext]="{ card: card }" triggers="mouseenter:mouseleave"
+                        placement="auto" container="body" containerClass="exec-summary-popover">
+                        <div class="exec-hero-head" [ngClass]="{'linked-widget': canOpenExecLink(card.link)}"
+                            (click)="openExecLink(card.link)">
+                            <i class="exec-hero-icon" [ngClass]="card.iconClass" [style.color]="card.iconColor"></i>
+                            <span class="exec-hero-title">{{card.label}}</span>
+                        </div>
+                        <div class="exec-card-count exec-hero-count"><span class="exec-count-value">{{card.monitored}}</span>
+                            <span class="exec-count-total">/ {{card.discovered}} {{card.unit}}</span></div>
+                        <ng-container *ngTemplateOutlet="execStatusBar; context: { card: card }"></ng-container>
+                        <ng-container *ngTemplateOutlet="execStatusLine; context: { card: card }"></ng-container>
+                        <div class="exec-chip-row" *ngIf="card.chips.length">
+                            <span class="exec-chip" *ngFor="let chip of card.chips; trackBy: trackByIndex">{{chip.label}}
+                                {{chip.value}}</span>
+                        </div>
                     </div>
                     <div class="exec-subcard-grid" *ngIf="card.subCards.length">
                         <ng-container *ngFor="let sub of card.subCards; trackBy: trackByIndex">
-                            <ng-container *ngTemplateOutlet="execCard; context: { card: sub }"></ng-container>
+                            <ng-container *ngTemplateOutlet="execCard; context: { card: sub, compactStatus: true }"></ng-container>
                         </ng-container>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #execStatusPopover let-card="card">
+                <div class="exec-popover-card">
+                    <div class="exec-popover-title">
+                        <span class="exec-popover-dot" [ngClass]="card.badgeClass"
+                            [style.background]="card.iconColor ? card.iconColor : null"></span>
+                        <span>{{card.label}}</span>
+                    </div>
+                    <div class="exec-popover-row">
+                        <i class="fa fa-list-alt exec-popover-icon"></i>
+                        <span>Discovered</span>
+                        <strong>{{card.discovered}}</strong>
+                    </div>
+                    <div class="exec-popover-row">
+                        <i class="fa fa-check-square exec-popover-icon monitored"></i>
+                        <span>Monitored</span>
+                        <strong>{{card.monitored}}</strong>
+                    </div>
+                    <div class="exec-popover-divider"></div>
+                    <div class="exec-popover-row">
+                        <span class="exec-popover-status up"></span>
+                        <span>Up</span>
+                        <strong class="up">{{card.up}}</strong>
+                    </div>
+                    <div class="exec-popover-row">
+                        <span class="exec-popover-status down"></span>
+                        <span>Down</span>
+                        <strong class="down">{{card.down}}</strong>
+                    </div>
+                    <div class="exec-popover-row">
+                        <span class="exec-popover-status unknown"></span>
+                        <span>Unknown</span>
+                        <strong class="unknown">{{card.unknown}}</strong>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #execTotalsStatusPopover let-totals="totals">
+                <div class="exec-popover-card">
+                    <div class="exec-popover-title">
+                        <span class="exec-popover-dot"></span>
+                        <span>Total Monitored Resources</span>
+                    </div>
+                    <div class="exec-popover-row">
+                        <i class="fa fa-list-alt exec-popover-icon"></i>
+                        <span>Discovered</span>
+                        <strong>{{totals.monitoredOf}}</strong>
+                    </div>
+                    <div class="exec-popover-row">
+                        <i class="fa fa-check-square exec-popover-icon monitored"></i>
+                        <span>Monitored</span>
+                        <strong>{{totals.monitored}}</strong>
+                    </div>
+                    <div class="exec-popover-divider"></div>
+                    <div class="exec-popover-row">
+                        <span class="exec-popover-status up"></span>
+                        <span>Up</span>
+                        <strong class="up">{{totals.up}}</strong>
+                    </div>
+                    <div class="exec-popover-row">
+                        <span class="exec-popover-status down"></span>
+                        <span>Down</span>
+                        <strong class="down">{{totals.down}}</strong>
+                    </div>
+                    <div class="exec-popover-row">
+                        <span class="exec-popover-status unknown"></span>
+                        <span>Unknown</span>
+                        <strong class="unknown">{{totals.unknown}}</strong>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #execTotalDiscoveredPopover let-totals="totals">
+                <div class="exec-popover-card exec-popover-card-compact">
+                    <div class="exec-popover-title">
+                        <span class="exec-popover-dot"></span>
+                        <span>Total Discovered Resources</span>
+                    </div>
+                    <div class="exec-popover-row">
+                        <i class="fa fa-list-alt exec-popover-icon"></i>
+                        <span>Discovered</span>
+                        <strong>{{totals.discovered}}</strong>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #execTilePopover let-tile="tile">
+                <div class="exec-popover-card exec-popover-card-compact">
+                    <div class="exec-popover-title">
+                        <span class="exec-popover-dot"></span>
+                        <span>{{tile.label}}</span>
+                    </div>
+                    <div class="exec-popover-row">
+                        <i class="fa fa-info-circle exec-popover-icon"></i>
+                        <span>Value</span>
+                        <strong>{{tile.value}}</strong>
                     </div>
                 </div>
             </ng-template>
@@ -202,7 +313,7 @@
                 </div>
             </ng-container>
 
-            <ng-container *ngIf="mapSvc.shouldShowMapWidgets() && hasPrivateCloudGeo">
+            <ng-container *ngIf="hasPrivateCloudGeo">
                 <div class="section-title mt-3">
                     <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
                         (click)="openPrivateCloudGeoDistribution()" [tooltip]="'Open linked page'" placement="top"
@@ -215,8 +326,8 @@
                     <div class="pcgeo-header" *ngIf="privateCloudGeoView as pcView">
                         <div class="pcgeo-kpis">
                             <div class="pcgeo-kpi">
-                                <div class="pcgeo-kpi-label">Data Center Sites</div>
-                                <div class="pcgeo-kpi-value">{{pcView.totalDatacenters | number}}</div>
+                                <div class="pcgeo-kpi-label">Private Clouds</div>
+                                <div class="pcgeo-kpi-value">{{pcView.totalPrivateClouds | number}}</div>
                             </div>
                             <div class="pcgeo-kpi">
                                 <div class="pcgeo-kpi-label">Total Resources</div>
@@ -236,48 +347,72 @@
                             </select>
                         </div>
                     </div>
-                    <div #privateCloudGeoMap class="private-cloud-geo-map"
-                        *ngIf="privateCloudGeoMapAvailable && privateCloudGeoSites.length"></div>
-                    <div class="pcgeo-legend" *ngIf="privateCloudGeoView as pcView">
-                        <span class="pcgeo-legend-item"><span class="pcgeo-legend-dot vmware"></span>VMware Sites
-                            ({{pcView.vmwareCount}})</span>
-                        <span class="pcgeo-legend-item"><span class="pcgeo-legend-dot nutanix"></span>Nutanix Sites
-                            ({{pcView.nutanixCount}})</span>
-                        <span class="pcgeo-legend-note">Marker size is proportional to total resources at site</span>
+                    <div echarts [options]="privateCloudGeoOptions" (chartInit)="onPrivateCloudGeoChartInit($event)"
+                        class="private-cloud-geo-chart linked-chart" *ngIf="hasChartData(privateCloudGeoOptions)"></div>
+                    <div class="dashboard-empty-state"
+                        *ngIf="!widgetLoading.privateCloudGeo && privateCloudGeoView && !hasChartData(privateCloudGeoOptions)">
+                        No related data available
+                    </div>
+                    <div class="pcgeo-legend" *ngIf="privateCloudGeoLegends.length">
+                        <span class="pcgeo-legend-item"
+                            *ngFor="let legend of privateCloudGeoLegends; trackBy: trackByIndex">
+                            <span class="pcgeo-legend-dot" [style.background]="legend.color"></span>{{legend.label}}
+                            ({{legend.count}})
+                        </span>
                     </div>
                 </div>
             </ng-container>
 
-            <div class="two-column-grid mt-3" *ngIf="hasEmployeeExperience || hasGeoDistribution"
-                [ngClass]="{'single-widget-grid': !(hasEmployeeExperience && hasGeoDistribution)}">
-                <div *ngIf="hasEmployeeExperience">
-                    <div class="employee-widget-header">
-                        <div class="section-title mb-0">Employee / Digital Experience</div>
-                        <button type="button" class="btn btn-sm employee-view-btn" (click)="openEmployeeExperience()"
-                            [tooltip]="'Open Digital Experience'" placement="top" container="body">View</button>
+            <ng-container *ngIf="hasGeoDistribution">
+                <div class="section-title mt-3">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openPublicCloudGeoDistribution()" [tooltip]="'Open linked page'" placement="top"
+                        container="body">
+                        Public Cloud Geo Distribution <i class="fa fa-link"></i>
+                    </button>
+                </div>
+                <div class="dashboard-card geo-card">
+                    <app-spinner [name]="loaderNames.geoDistribution" [width]="0"></app-spinner>
+                    <div class="pcgeo-header" *ngIf="geoDistributionCells.length">
+                        <div class="pcgeo-kpis">
+                            <div class="pcgeo-kpi">
+                                <div class="pcgeo-kpi-label">Cloud Regions</div>
+                                <div class="pcgeo-kpi-value">{{geoDistributionSummary.totalLocations | number}}</div>
+                            </div>
+                            <div class="pcgeo-kpi">
+                                <div class="pcgeo-kpi-label">Total Resources</div>
+                                <div class="pcgeo-kpi-value">{{geoDistributionSummary.totalResources | number}}</div>
+                            </div>
+                            <div class="pcgeo-kpi">
+                                <div class="pcgeo-kpi-label">Total Alerts</div>
+                                <div class="pcgeo-kpi-value">{{geoDistributionSummary.totalAlerts | number}}</div>
+                            </div>
+                        </div>
+                        <div class="pcgeo-platform-filter">
+                            <label>Cloud Type</label>
+                            <select class="form-control" [value]="selectedGeoDistributionCloudType"
+                                (change)="onGeoDistributionCloudTypeChange($event)">
+                                <option *ngFor="let option of geoDistributionCloudOptions; trackBy: trackByValue"
+                                    [value]="option.value"
+                                    [selected]="option.value === selectedGeoDistributionCloudType">{{option.label}}</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="dashboard-card employee-card linked-widget" (click)="openEmployeeExperience()"
-                        [tooltip]="'Open Digital Experience'" placement="top" container="body">
-                        <img class="employee-experience-image"
-                            src="static/assets/images/external-brand/Nexthink_Cloud_Wipro.png"
-                            alt="Employee Digital Experience" />
+                    <div echarts [options]="geoHeatmapOptions" (chartInit)="onGeoDistributionChartInit($event)"
+                        class="geo-distribution-chart linked-chart" *ngIf="hasChartData(geoHeatmapOptions)"></div>
+                    <div class="dashboard-empty-state"
+                        *ngIf="!widgetLoading.geoDistribution && geoDistributionCells.length && !hasChartData(geoHeatmapOptions)">
+                        No related data available
+                    </div>
+                    <div class="pcgeo-legend" *ngIf="geoDistributionLegends.length">
+                        <span class="pcgeo-legend-item"
+                            *ngFor="let legend of geoDistributionLegends; trackBy: trackByIndex">
+                            <span class="pcgeo-legend-dot" [style.background]="legend.color"></span>{{legend.label}}
+                            ({{legend.count}})
+                        </span>
                     </div>
                 </div>
-                <div *ngIf="hasGeoDistribution">
-                    <div class="section-title">
-                        <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
-                            (click)="openPublicCloudGeoDistribution()" [tooltip]="'Open linked page'" placement="top"
-                            container="body">
-                            Public Cloud Geo Distribution <i class="fa fa-link"></i>
-                        </button>
-                    </div>
-                    <div class="dashboard-card geo-card">
-                        <app-spinner [name]="loaderNames.geoDistribution" [width]="0"></app-spinner>
-                        <div echarts [options]="geoHeatmapOptions" (chartInit)="onGeoDistributionChartInit($event)"
-                            class="geo-chart linked-chart" *ngIf="hasChartData(geoHeatmapOptions)"></div>
-                    </div>
-                </div>
-            </div>
+            </ng-container>
 
             <ng-container *ngIf="hasDiscovery">
                 <div class="discovery-header mt-3">
@@ -389,8 +524,18 @@
                 </table>
             </div>
 
-            <div class="section-title mt-3" *ngIf="hasPrivateCloudCoverage">Private Cloud Infrastructure Coverage -
-                {{privateCloudCoverageTotal}} Resources
+            <div class="d-flex align-items-center justify-content-between section-title mt-3" *ngIf="hasPrivateCloudCoverage">
+                <div class="mb-0">Private Cloud Infrastructure Coverage -
+                    {{privateCloudCoverageTotal}} Resources
+                </div>
+                <div class="btn-group" role="group" aria-label="Sort private cloud resources">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="privateCloudCoverageSortOrder === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onPrivateCloudCoverageSortChange('asc')">A-Z</button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="privateCloudCoverageSortOrder === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onPrivateCloudCoverageSortChange('desc')">Z-A</button>
+                </div>
             </div>
             <div class="coverage-grid private-grid" *ngIf="hasPrivateCloudCoverage">
                 <app-spinner [name]="loaderNames.privateCloudCoverage" [width]="0"></app-spinner>
@@ -429,13 +574,23 @@
                 </div>
             </div>
 
-            <div class="section-title mt-3" *ngIf="hasPublicCloudCoverage">Public Cloud Infrastructure Coverage -
-                {{publicCloudCoverageTotal}} Resources
+            <div class="d-flex align-items-center justify-content-between section-title mt-3" *ngIf="hasPublicCloudCoverage">
+                <div class="section-title mb-0">Public Cloud Infrastructure Coverage -
+                    {{publicCloudCoverageTotal}} Resources
+                </div>
+                <div class="btn-group" role="group" aria-label="Sort public cloud resources">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="publicCloudCoverageSortOrder === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onPublicCloudCoverageSortChange('asc')">A-Z</button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="publicCloudCoverageSortOrder === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onPublicCloudCoverageSortChange('desc')">Z-A</button>
+                </div>
             </div>
             <div class="dashboard-card public-coverage-card" *ngIf="hasPublicCloudCoverage">
                 <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
-                <div class="coverage-group" *ngFor="let group of publicCloudCoverageGroups; trackBy: trackByIndex">
-                    <div class="coverage-group-header">
+                <div class="coverage-group" *ngFor="let group of publicCloudCoverageGroups; let i = index; trackBy: trackByIndex">
+                    <div class="coverage-group-header" [ngClass]="{'pt-3': i > 0}">
                         <span class="coverage-group-badge">{{group.totalLabel}}</span>
                         <span class="coverage-group-title">{{group.title}}</span>
                     </div>
@@ -491,120 +646,152 @@
             </div>
 
             <ng-container *ngIf="hasNewVms">
-                <div class="subsection-title new-vms-title mt-3">
-                    <span class="new-vms-count-badge">{{newVmsTotal}}</span>
-                    <span class="new-vms-title-divider"></span>
-                    Newly Provisioned VMs
-                </div>
-                <div class="dashboard-card new-vms-card">
-                    <app-spinner [name]="loaderNames.newVms" [width]="0"></app-spinner>
-                    <div class="new-vms-toolbar">
-                        <div class="new-vms-filters">
-                            <div class="new-vms-filter">
-                                <label>Search by Name</label>
-                                <input type="text" class="form-control" placeholder="e.g. web-aws-01"
-                                    [value]="newVmsSearch" (input)="onNewVmSearch($event)" />
-                            </div>
-                            <div class="new-vms-filter">
-                                <label>Cloud / Platform</label>
-                                <select class="form-control" (change)="onNewVmSelectChange('cloud', $event)">
-                                    <option *ngFor="let option of newVmCloudOptions; trackBy: trackByValue"
-                                        [value]="option.value"
-                                        [selected]="option.value === selectedNewVmCloud">{{option.label}}</option>
-                                </select>
-                            </div>
-                            <div class="new-vms-filter">
-                                <label>Status</label>
-                                <select class="form-control" (change)="onNewVmSelectChange('status', $event)">
-                                    <option *ngFor="let option of newVmStatusOptions; trackBy: trackByValue"
-                                        [value]="option.value"
-                                        [selected]="option.value === selectedNewVmStatus">{{option.label}}</option>
-                                </select>
-                            </div>
-                            <div class="new-vms-filter">
-                                <label>VM State</label>
-                                <select class="form-control" (change)="onNewVmSelectChange('state', $event)">
-                                    <option *ngFor="let option of newVmStateOptions; trackBy: trackByValue"
-                                        [value]="option.value"
-                                        [selected]="option.value === selectedNewVmState">{{option.label}}</option>
-                                </select>
-                            </div>
-                            <div class="new-vms-filter">
-                                <label>Lifecycle Stage</label>
-                                <select class="form-control" (change)="onNewVmSelectChange('stage', $event)">
-                                    <option *ngFor="let option of newVmLifecycleStageOptions; trackBy: trackByValue"
-                                        [value]="option.value"
-                                        [selected]="option.value === selectedNewVmStage">{{option.label}}</option>
-                                </select>
-                            </div>
-                            <div class="new-vms-filter">
-                                <label>Lifecycle Stage Status</label>
-                                <select class="form-control" (change)="onNewVmSelectChange('stageStatus', $event)">
-                                    <option *ngFor="let option of newVmLifecycleStatusOptions; trackBy: trackByValue"
-                                        [value]="option.value"
-                                        [selected]="option.value === selectedNewVmStageStatus">{{option.label}}</option>
-                                </select>
-                            </div>
+                <div class="new-vms-header mt-3">
+                    <div class="d-flex align-items-center">
+                        <span class="new-vms-count-badge">{{newVmsTotal | number}}</span>
+                        <span class="new-vms-title-divider"></span>
+                        <div class="section-title mb-0">Newly Provisioned VMs</div>
+                    </div>
+                    <div class="new-vms-filter-row">
+                        <div class="mini-filter">
+                            <label>Search by Name</label>
+                            <input type="text" class="form-control" placeholder="e.g. web-aws-01"
+                                [value]="newVmsSearch" (input)="onNewVmSearch($event)" />
+                        </div>
+                        <div class="mini-filter">
+                            <label>Cloud / Platform</label>
+                            <select class="form-control" (change)="onNewVmSelectChange('cloud', $event)">
+                                <option *ngFor="let option of newVmCloudOptions; trackBy: trackByValue"
+                                    [value]="option.value"
+                                    [selected]="option.value === selectedNewVmCloud">{{option.label}}</option>
+                            </select>
+                        </div>
+                        <div class="mini-filter">
+                            <label>VM State</label>
+                            <select class="form-control" (change)="onNewVmSelectChange('state', $event)">
+                                <option *ngFor="let option of newVmStateOptions; trackBy: trackByValue"
+                                    [value]="option.value"
+                                    [selected]="option.value === selectedNewVmState">{{option.label}}</option>
+                            </select>
+                        </div>
+                        <div class="mini-filter">
+                            <label>Lifecycle Stage</label>
+                            <select class="form-control" (change)="onNewVmSelectChange('stage', $event)">
+                                <option *ngFor="let option of newVmLifecycleStageOptions; trackBy: trackByValue"
+                                    [value]="option.value"
+                                    [selected]="option.value === selectedNewVmStage">{{option.label}}</option>
+                            </select>
+                        </div>
+                        <div class="mini-filter">
+                            <label>Lifecycle Stage Status</label>
+                            <select class="form-control" (change)="onNewVmSelectChange('stageStatus', $event)">
+                                <option *ngFor="let option of newVmLifecycleStatusOptions; trackBy: trackByValue"
+                                    [value]="option.value"
+                                    [selected]="option.value === selectedNewVmStageStatus">{{option.label}}</option>
+                            </select>
                         </div>
                     </div>
+                </div>
+                <div class="dashboard-card new-vms-card pb-0">
+                    <app-spinner [name]="loaderNames.newVms" [width]="0"></app-spinner>
 
                     <ng-container>
                         <div class="new-vms-table-wrap">
+                            <div class="new-vm-state-legend" *ngIf="newVms.length">
+                                <span class="new-vm-state-legend-item">
+                                    <i class="fa fa-check-circle tone-success"></i>
+                                    Up
+                                </span>
+                                <span class="new-vm-state-legend-item">
+                                    <i class="fa fa-exclamation-triangle tone-danger"></i>
+                                    Down
+                                </span>
+                                <span class="new-vm-state-legend-item">
+                                    <i class="fa fa-minus-circle tone-muted"></i>
+                                    Unknown / NA
+                                </span>
+                            </div>
                             <table class="table table-sm new-vms-table mb-0" *ngIf="newVms.length">
                                 <colgroup>
-                                    <col style="width:11%"><col style="width:9%"><col style="width:8%">
-                                    <col style="width:12%"><col style="width:7%"><col style="width:12%">
-                                    <col style="width:12%"><col style="width:12%"><col style="width:9%">
-                                    <col style="width:8%">
+                                    <col style="width:12%"><col style="width:6%"><col style="width:12%">
+                                    <col style="width:8%"><col style="width:14%"><col style="width:13%">
+                                    <col style="width:13%"><col style="width:10%"><col style="width:12%">
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>NAME</th>
-                                        <th>STATUS</th>
-                                        <th>VM STATE</th>
-                                        <th>OS NAME</th>
-                                        <th>CLOUD TYPE</th>
-                                        <th>CLOUD ACCOUNT NAME</th>
-                                        <th>PROVISIONED DATE</th>
-                                        <th>LAST DISCOVERED DATE</th>
-                                        <th>LIFECYCLE STAGE</th>
-                                        <th>LIFECYCLE STAGE STATUS</th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('name')"
+                                            (click)="sortNewVms('name')">
+                                            Name <i [ngClass]="getNewVmSortIcon('name')" *ngIf="isNewVmSortActive('name')"></i>
+                                        </th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('vm_state')"
+                                            (click)="sortNewVms('vm_state')">
+                                            VM State <i [ngClass]="getNewVmSortIcon('vm_state')" *ngIf="isNewVmSortActive('vm_state')"></i>
+                                        </th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('os_name')"
+                                            (click)="sortNewVms('os_name')">
+                                            OS Name <i [ngClass]="getNewVmSortIcon('os_name')" *ngIf="isNewVmSortActive('os_name')"></i>
+                                        </th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('cloud_type')"
+                                            (click)="sortNewVms('cloud_type')">
+                                            Cloud Type <i [ngClass]="getNewVmSortIcon('cloud_type')" *ngIf="isNewVmSortActive('cloud_type')"></i>
+                                        </th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('cloud_account_name')"
+                                            (click)="sortNewVms('cloud_account_name')">
+                                            Cloud Account Name <i [ngClass]="getNewVmSortIcon('cloud_account_name')" *ngIf="isNewVmSortActive('cloud_account_name')"></i>
+                                        </th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('provisioned_date')"
+                                            (click)="sortNewVms('provisioned_date')">
+                                            Provisioned Date <i [ngClass]="getNewVmSortIcon('provisioned_date')" *ngIf="isNewVmSortActive('provisioned_date')"></i>
+                                        </th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('last_discovered_date')"
+                                            (click)="sortNewVms('last_discovered_date')">
+                                            Last Discovered Date <i [ngClass]="getNewVmSortIcon('last_discovered_date')" *ngIf="isNewVmSortActive('last_discovered_date')"></i>
+                                        </th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('life_cycle_stage')"
+                                            (click)="sortNewVms('life_cycle_stage')">
+                                            Lifecycle Stage <i [ngClass]="getNewVmSortIcon('life_cycle_stage')" *ngIf="isNewVmSortActive('life_cycle_stage')"></i>
+                                        </th>
+                                        <th class="sortable-col" [class.sort-active]="isNewVmSortActive('life_cycle_stage_status')"
+                                            (click)="sortNewVms('life_cycle_stage_status')">
+                                            Lifecycle Stage Status <i [ngClass]="getNewVmSortIcon('life_cycle_stage_status')" *ngIf="isNewVmSortActive('life_cycle_stage_status')"></i>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let vm of newVms; trackBy: trackByIndex" truncateText>
-                                        <td class="tdw-11">
-                                            <div class="new-vm-name" [tooltip]="vm.name">{{vm.name}}</div>
+                                        <td class="tdw-12">
+                                            <div class="new-vm-name text-primary pointer-link" [tooltip]="vm.name"
+                                                (click)="openNewVmList(vm)">{{vm.name}}</div>
                                         </td>
-                                        <td class="tdw-9">
-                                            <span class="new-vm-badge"
-                                                [ngClass]="getToneClass(vm.statusTone)">{{vm.status}}</span>
-                                        </td>
-                                        <td class="tdw-8">
-                                            <span class="new-vm-badge"
-                                                [ngClass]="getToneClass(vm.vmStateTone)">{{vm.vmState}}</span>
+                                        <td class="tdw-6">
+                                            <i class="fa status-icon new-vm-state-icon"
+                                                [ngClass]="[getStatusIcon(vm.vmStateTone), getToneClass(vm.vmStateTone)]"
+                                                [tooltip]="getNewVmStateTooltip(vm.vmState)" container="body"></i>
                                         </td>
                                         <td class="tdw-12">
                                             <div [tooltip]="vm.osName">{{vm.osName}}</div>
                                         </td>
-                                        <td class="tdw-7">
+                                        <td class="tdw-8">
                                             <div [tooltip]="vm.cloudType">{{vm.cloudType}}</div>
                                         </td>
-                                        <td class="tdw-12">
+                                        <td class="tdw-14">
                                             <div [tooltip]="vm.cloudAccountName">{{vm.cloudAccountName}}</div>
                                         </td>
-                                        <td class="tdw-12">
+                                        <td class="tdw-13">
                                             <div [tooltip]="vm.provisionedDate">{{vm.provisionedDate}}</div>
                                         </td>
-                                        <td class="tdw-12">
+                                        <td class="tdw-13">
                                             <div [tooltip]="vm.lastDiscoveredDate">{{vm.lastDiscoveredDate}}</div>
                                         </td>
-                                        <td class="tdw-9">
+                                        <td class="tdw-10">
                                             <div [tooltip]="vm.lifecycleStage">{{vm.lifecycleStage}}</div>
                                         </td>
-                                        <td class="tdw-8">
-                                            <span class="new-vm-badge"
+                                        <td class="tdw-12">
+                                            <span class="new-vm-badge" *ngIf="vm.lifecycleStageStatus !== 'NA'; else newVmLifecycleStatusNa"
                                                 [ngClass]="getToneClass(vm.lifecycleStageStatusTone)">{{vm.lifecycleStageStatus}}</span>
+                                            <ng-template #newVmLifecycleStatusNa>
+                                                <div [tooltip]="vm.lifecycleStageStatus">{{vm.lifecycleStageStatus}}</div>
+                                            </ng-template>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -875,7 +1062,7 @@
                         <div class="chart-title">
                             <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
                                 (click)="openAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
-                                Alert Trend - 7 Days <i class="fa fa-link"></i>
+                                Alert Trend - {{alertTrendTimeRangeLabel}} <i class="fa fa-link"></i>
                             </button>
                         </div>
                         <div echarts [options]="alertTrendOptions" (chartInit)="onAlertTrendChartInit($event)"

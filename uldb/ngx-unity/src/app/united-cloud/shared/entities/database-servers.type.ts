@@ -24,6 +24,7 @@ export interface DatabaseServer {
     databases: DatabaseType[];
     life_cycle_stage: string;
     life_cycle_stage_status: string;
+    collector: CollectorType;
 }
 
 export interface DatabaseServerDBType {

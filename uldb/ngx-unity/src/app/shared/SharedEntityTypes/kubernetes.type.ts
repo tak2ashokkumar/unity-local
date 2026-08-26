@@ -56,6 +56,7 @@ export interface KubernetesNodeType {
     updated_at: string;
     os: string;
     os_type: string;
+    collector: CollectorType;
     monitoring: DeviceMonitoringType;
 }
 

@@ -40,14 +40,14 @@ export class DockerNodesComponent implements OnInit, OnDestroy {
     private spinnerService: AppSpinnerService,
     private nodesService: DockerNodesService,
     private termService: FloatingTerminalService) {
-      this.route.parent.paramMap.subscribe((params: ParamMap) => {
-        this.controllerId = params.get('controllerId');
-        this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ 'account_uuid': this.controllerId }] };
-      });
+    this.route.parent.paramMap.subscribe((params: ParamMap) => {
+      this.controllerId = params.get('controllerId');
+      this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ 'account_uuid': this.controllerId }] };
+    });
 
-      this.termService.isOpenAnnounced$.pipe(tap(res => this.poll = res),
-        switchMap(res => interval(this.controllerId ? environment.pollingInterval * 6 : environment.pollingInterval).pipe(takeWhile(() => this.poll), takeUntil(this.ngUnsubscribe))),
-        takeUntil(this.ngUnsubscribe)).subscribe(x => this.controllerId ? this.syncNodes() : this.getNodes());
+    this.termService.isOpenAnnounced$.pipe(tap(res => this.poll = res),
+      switchMap(res => interval(this.controllerId ? environment.pollingInterval * 6 : environment.pollingInterval).pipe(takeWhile(() => this.poll), takeUntil(this.ngUnsubscribe))),
+      takeUntil(this.ngUnsubscribe)).subscribe(x => this.controllerId ? this.syncNodes() : this.getNodes());
   }
   ngOnInit() {
     if (this.controllerId) {
@@ -158,10 +158,14 @@ export class DockerNodesComponent implements OnInit, OnDestroy {
     if (!view.isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.nodesService.getConsoleAccessInput(view);
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(view.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.nodesService.getConsoleAccessInput(view);
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(view.newTabConsoleAccessUrl);
+    }
   }
 
 }

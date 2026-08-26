@@ -73,7 +73,7 @@ export class UcAgenticComponent implements OnInit {
       this.chatHistoryData = [];
       this.newMessage = '';
       this.isTyping = false;
-      this.sessionId = '';
+      this.sessionId = this.generateUUID();
       this.workflowName = '';
       this.welcomeMessage = '';
       this.getStartingChat();
@@ -104,9 +104,8 @@ export class UcAgenticComponent implements OnInit {
     this.showHotKeys = false;
     this.svc.getStartingChat(this.chatbotData?.apiUrl).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       res => {
-        this.welcomeMessage = res?.welcome_message ?? 'Hello! How can I assist you today?';
+        this.welcomeMessage = res?.config?.welcome_message ?? 'Hello! How can I assist you today?';
         this.workflowName = res?.name ?? this.workflowName;
-        this.sessionId = res?.session_id ?? this.sessionId;
         this.chatHistoryData.push({ sender: 'bot', message: this.welcomeMessage });
       },
       (err: HttpErrorResponse) => {
@@ -138,7 +137,7 @@ export class UcAgenticComponent implements OnInit {
 
     setTimeout(() => this.scrollToBottom('smooth'), 60);
 
-    const req = { query: text, session_id: this.sessionId };
+    const req = { inputs: { query: text, session_id: this.sessionId } };
     let runningMessageIndex: number | null = null;
 
     this.svc.getExecutionId(req, this.chatbotData?.entityId).pipe(
@@ -150,22 +149,22 @@ export class UcAgenticComponent implements OnInit {
           if (runningMessageIndex === null) {
             runningMessageIndex = this.chatHistoryData.push({
               sender: 'bot',
-              message: status.output,
+              message: status?.chat_response,
               status: 'Running'
             }) - 1;
           } else {
-            this.chatHistoryData[runningMessageIndex].message = status.output;
+            this.chatHistoryData[runningMessageIndex].message = status?.chat_response;
             this.chatHistoryData[runningMessageIndex].status = 'Running';
           }
         } else {
           // terminal status: Success or Failed
           if (runningMessageIndex !== null) {
-            this.chatHistoryData[runningMessageIndex].message = status.output;
+            this.chatHistoryData[runningMessageIndex].message = status?.chat_response;
             this.chatHistoryData[runningMessageIndex].status = status.status;
           } else {
             this.chatHistoryData.push({
               sender: 'bot',
-              message: status.output,
+              message: status?.chat_response,
               status: status.status
             });
           }
@@ -247,7 +246,7 @@ export class UcAgenticComponent implements OnInit {
     this.chatHistoryData = [];
     this.newMessage = '';
     this.isTyping = false;
-    this.sessionId = '';
+    this.sessionId = this.generateUUID();
     this.workflowName = '';
     this.welcomeMessage = '';
 
@@ -263,5 +262,17 @@ export class UcAgenticComponent implements OnInit {
     this.welcomeMessage = '';
     this.showHotKeys = true;
     this.getWorkflowList();
+  }
+
+  generateUUID(): string {
+    if (crypto && 'randomUUID' in crypto) {
+      return (crypto as any).randomUUID();
+    }
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = crypto.getRandomValues(new Uint8Array(1))[0] & 15;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
   }
 }

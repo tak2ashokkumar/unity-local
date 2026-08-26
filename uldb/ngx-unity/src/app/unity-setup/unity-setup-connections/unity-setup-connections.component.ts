@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ConnectionConfigViewData, UnitySetupConnectionsService } from './unity-setup-connections.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,7 +19,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./unity-setup-connections.component.scss'],
   providers: [UnitySetupConnectionsService]
 })
-export class UnitySetupConnectionsComponent implements OnInit {
+export class UnitySetupConnectionsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
   count: number;
@@ -47,8 +47,8 @@ export class UnitySetupConnectionsComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.editModelRef?.hide();
     this.deleteConnectionModalRef?.hide();
+    this.editModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

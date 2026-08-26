@@ -28,7 +28,10 @@ export class StoragePureService {
     view.options = this.chartConfigSvc.getDefaultDonutChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
     view.options.legend = { show: false };
-    view.options.tooltip = Object.assign(view.options.tooltip, { formatter: '{b} : {c} ({d}%)' })
+    view.options.tooltip = Object.assign(view.options.tooltip, {
+      formatter: (params: { name: string; percent: number; data?: { displayValue?: string } }): string =>
+        `${params.name} : ${params.data?.displayValue || '0'} (${params.percent.toFixed(2)}%)`
+    });
 
     let volumes = Number(this.fileSize.transform(data.volumes, 'TB').split(' ')[0]);
     let snapshots = Number(this.fileSize.transform(data.snapshots, 'TB').split(' ')[0]);
@@ -37,11 +40,11 @@ export class StoragePureService {
     let empty = Number(this.fileSize.transform(data.empty, 'TB').split(' ')[0]);
 
     let seriesData = [];
-    seriesData.push({ name: 'Volumes', value: volumes ? volumes : 0, itemStyle: { color: ComponentColor.VOLUMES } });
-    seriesData.push({ name: 'Snapshots', value: snapshots ? snapshots : 0, itemStyle: { color: ComponentColor.SNAPSHOTS } });
-    seriesData.push({ name: 'Shared', value: shared ? shared : 0, itemStyle: { color: ComponentColor.SHARED } });
-    seriesData.push({ name: 'System', value: system ? system : 0, itemStyle: { color: ComponentColor.SYSTEM } });
-    seriesData.push({ name: 'Empty', value: empty ? empty : 0, itemStyle: { color: ComponentColor.EMPTY } });
+    seriesData.push({ name: 'Volumes', value: volumes ? volumes : 0, itemStyle: { color: ComponentColor.VOLUMES }, displayValue: data.volumes });
+    seriesData.push({ name: 'Snapshots', value: snapshots ? snapshots : 0, itemStyle: { color: ComponentColor.SNAPSHOTS }, displayValue: data.snapshots });
+    seriesData.push({ name: 'Shared', value: shared ? shared : 0, itemStyle: { color: ComponentColor.SHARED }, displayValue: data.shared });
+    seriesData.push({ name: 'System', value: system ? system : 0, itemStyle: { color: ComponentColor.SYSTEM }, displayValue: data.system });
+    seriesData.push({ name: 'Empty', value: empty ? empty : 0, itemStyle: { color: ComponentColor.EMPTY }, displayValue: data.empty });
     seriesData.sort((a, b) => a.value - b.value);
     view.options.series = this.chartConfigSvc.setSeriesByChartType(UnityChartTypes.NIGHTINGALE);
     view.options.series = Object.assign(view.options.series, { radius: ['50%', '80%'] }, { label: { show: false } }, { data: seriesData });
@@ -113,5 +116,6 @@ export enum ComponentColor {
   SNAPSHOTS = '#004581',
   SHARED = '#0CBB70',
   SYSTEM = '#EDCE3E',
-  EMPTY = '#CC0000'
+  // EMPTY = '#CC0000'
+  EMPTY = '#73818F'
 }

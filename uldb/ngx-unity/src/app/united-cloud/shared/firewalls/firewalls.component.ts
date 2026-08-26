@@ -78,6 +78,7 @@ export class FirewallsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.modalRef?.hide();
     this.spinnerSvc.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

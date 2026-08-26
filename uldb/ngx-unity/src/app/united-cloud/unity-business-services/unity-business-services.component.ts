@@ -47,10 +47,6 @@ export class UnityBusinessServicesComponent implements OnInit, OnDestroy {
     this.getBusinessServiceList();
   }
 
-  ngOnDestroy() {
-    this.modalRef?.hide();
-  }
-
   refreshData(pageNo: number) {
     this.spinner.start('main');
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ is_active: '' }] };
@@ -83,6 +79,13 @@ export class UnityBusinessServicesComponent implements OnInit, OnDestroy {
     this.getBusinessServiceList();
   }
 
+
+  ngOnDestroy(): void {
+    this.modalRef?.hide();
+    this.spinner.stop('main');
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
 
   getBusinessServiceList() {
     this.svc.getBusinessServiceList(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {

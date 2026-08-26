@@ -82,6 +82,7 @@ export class AdvancedDiscoverySummaryNetworkViewComponent implements OnInit, OnD
   }
 
   ngOnDestroy() {
+    this.deviceInfoModalRef?.hide();
     this.spinner.stop('summary-network');
     this.destroyNetwork();
     this.ngUnsubscribe.next();

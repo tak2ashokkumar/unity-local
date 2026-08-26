@@ -1,0 +1,53 @@
+.custom-date-filter-period-btn {
+  min-width: 48px;
+  height: 29px;
+  padding: 2px;
+  background-color: #fff;
+  border-radius: 0;
+
+  &.active {
+    background-color: #0cbb70;
+    color: #fff !important;
+  }
+
+  &:last-child {
+    border-right: 0;
+  }
+
+  &:focus {
+    outline: 0;
+    box-shadow: none;
+  }
+
+}
+
+.custom-date-filter-date-input {
+  width: 134px;
+}
+
+.custom-date-filter-input {
+  height: 29px !important;
+
+  &:disabled {
+    opacity: 1;
+  }
+
+  &::placeholder {
+    opacity: 1;
+  }
+}
+
+.custom-date-filter-calendar {
+  height: 29px;
+  padding: 2px;
+}
+
+.custom-date-filter-separator {
+  font-weight: 500;
+}
+
+::ng-deep .custom-date-dropdown-panel--safe .owl-dt-container,
+::ng-deep .custom-date-dropdown-panel--safe .owl-dt-container-inner {
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+}

@@ -2,10 +2,6 @@
   display: block;
 }
 
-.network-dashboard-shell {
-  background: transparent;
-}
-
 :host ::ng-deep .network-dashboard-shell app-spinner {
   position: absolute;
   inset: 0;
@@ -48,55 +44,16 @@
   background-color: #ff8900 !important;
 }
 
-.network-dashboard-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 10px 22px 8px;
-  border-bottom: 1px solid #d7dfe6;
-}
-
-.network-dashboard-header-info {
-  min-width: 0;
-  padding-top: 2px;
-}
-
 .network-dashboard-title {
-  color: #00b16a;
   font-size: 14px;
   font-weight: 600;
   line-height: 18px;
 }
 
 .network-dashboard-meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0;
   margin-top: 2px;
-  color: #748191;
   font-size: 11px;
   line-height: 16px;
-}
-
-.network-dashboard-meta-item {
-  white-space: nowrap;
-}
-
-.network-dashboard-meta-item--divider {
-  margin-right: 8px;
-  padding-right: 8px;
-  border-right: 1px solid #ccd4dc;
-}
-
-.network-dashboard-filter-form {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  gap: 8px;
-  margin: 0;
-  min-width: 0;
 }
 
 .network-dashboard-filter-group {
@@ -105,15 +62,6 @@
 
 .network-dashboard-filter-group--small {
   width: 116px;
-}
-
-.network-dashboard-filter-group label {
-  display: block;
-  margin-bottom: 2px !important;
-  color: #303841;
-  font-size: 11px;
-  line-height: 14px;
-  font-weight: 400;
 }
 
 .network-dashboard-filter-group .form-control {
@@ -212,22 +160,8 @@
   height: 27px;
   min-width: 27px;
   padding: 0;
-  border: 0;
-  border-radius: 50%;
-  color: #ffffff;
-  background: #ff8900;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   font-size: 12px;
   line-height: 1;
-}
-
-.network-dashboard-action-separator {
-  width: 1px;
-  height: 26px;
-  margin: 0 2px;
-  background: #b8c2cc;
 }
 
 .network-dashboard-section-title {
@@ -240,166 +174,27 @@
 .network-dashboard-section-note {
   flex: 1 1 auto;
   max-width: 760px;
-  color: #6f7f8d;
   font-size: 11px;
   line-height: 14px;
-  text-align: right;
   font-style: italic;
 }
 
-.network-dashboard-overview-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-
-.network-dashboard-overview-card {
-  background: #ffffff;
-  border: 1px solid #cfd6dc;
-  border-radius: 8px;
-  box-shadow: none;
-}
-
-.network-dashboard-overview-list {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: stretch;
-  min-height: 88px;
-}
-
-.network-dashboard-overview-item {
+.network-dashboard-overview-cell {
   position: relative;
-  flex: 1 1 0;
   min-width: 0;
-  padding: 12px 24px 10px;
-  text-align: left;
 }
 
-.network-dashboard-overview-item--summary {
-  flex: 1.02 1 0;
-}
-
-.network-dashboard-overview-item--availability {
-  flex: 1.28 1 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.network-dashboard-overview-item--device-type {
-  flex: 0.78 1 0;
-}
-
-.network-dashboard-overview-item:not(:last-child)::after {
+.network-dashboard-overview-cell--divider::after {
   content: '';
   position: absolute;
-  top: 16px;
+  top: 14px;
   right: 0;
   width: 1px;
-  height: calc(100% - 32px);
+  height: calc(100% - 28px);
   background: #d3dae2;
 }
 
-.network-dashboard-overview-label {
-  color: #728090;
-  font-size: 13px;
-  line-height: 18px;
-  white-space: nowrap;
-}
-
-.network-dashboard-overview-label--availability {
-  display: inline-block;
-  text-align: left;
-}
-
-.network-dashboard-overview-value {
-  margin-top: 5px;
-  color: #202a33;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 20px;
-}
-
-.network-dashboard-overview-value--success {
-  color: #00ad73;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 24px;
-}
-
-.network-dashboard-overview-value--primary {
-  color: #2f86de;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.network-dashboard-overview-subtext {
-  margin-top: 2px;
-  color: #728090;
-  font-size: 11px;
-  line-height: 15px;
-}
-
-.network-dashboard-overview-status-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: 12px;
-  margin-top: 5px;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-.network-dashboard-overview-summary {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-top: 5px;
-}
-
-.network-dashboard-overview-status-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.network-dashboard-overview-status-item--normal {
-  color: #00ad73;
-}
-
-.network-dashboard-overview-status-item--critical {
-  color: #f04444;
-}
-
-.network-dashboard-overview-status-item--unknown {
-  color: #6f7f8d;
-}
-
-.network-dashboard-overview-status-item i {
-  font-size: 12px;
-}
-
-.network-dashboard-conversations-head,
-.network-dashboard-performance-head,
-.network-dashboard-interface-health-head,
-.network-dashboard-device-availability-head,
-.network-dashboard-environmental-health-head,
-.network-dashboard-alert-events-head,
-.network-dashboard-auto-remediation-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 18px 0 10px;
-}
-
 .network-dashboard-view-toggle {
-  display: inline-flex;
-  align-items: center;
   padding: 2px;
   border: 1px solid #c7d2dd;
   border-radius: 999px;
@@ -423,12 +218,7 @@
 }
 
 .network-dashboard-top-conversations-shell,
-.network-dashboard-performance-shell,
-.network-dashboard-interface-health-shell,
-.network-dashboard-device-availability-shell,
-.network-dashboard-environmental-health-shell,
-.network-dashboard-alert-events-shell,
-.network-dashboard-auto-remediation-shell {
+.network-dashboard-device-availability-shell {
   background: #ffffff;
   border: 1px solid #cfd6dc;
   border-radius: 10px;
@@ -436,11 +226,7 @@
 }
 
 .network-dashboard-top-conversations-shell > .card-body,
-.network-dashboard-performance-shell > .card-body,
-.network-dashboard-interface-health-shell > .card-body,
-.network-dashboard-device-availability-shell > .card-body,
-.network-dashboard-alert-events-shell > .card-body,
-.network-dashboard-auto-remediation-shell > .card-body {
+.network-dashboard-device-availability-shell > .card-body {
   position: relative;
 }
 
@@ -448,8 +234,7 @@
   min-height: 346px;
 }
 
-.network-dashboard-performance-shell > .card-body,
-.network-dashboard-interface-health-shell > .card-body {
+.network-dashboard-performance-shell > .card-body {
   min-height: 282px;
 }
 
@@ -457,23 +242,8 @@
   min-height: 612px;
 }
 
-.network-dashboard-conversation-card {
-  border: 1px solid #dbe4ed;
-  border-radius: 8px;
-  box-shadow: none;
-}
-
-.network-dashboard-conversation-card-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e8eef5;
-  background: #ffffff;
-}
-
-.network-dashboard-conversation-card-title {
-  color: #27313b;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
+.network-dashboard-device-availability-shell--table > .card-body {
+  min-height: 0;
 }
 
 .network-dashboard-conversation-chart-wrap {
@@ -488,23 +258,12 @@
   padding: 16px 12px 2px 8px;
 }
 
-.network-dashboard-conversation-chart {
-  width: 100%;
-}
-
 .network-dashboard-conversation-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
   padding: 10px 14px 14px;
   border-top: 1px solid #eef3f7;
 }
 
 .network-dashboard-conversation-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   color: #647486;
   font-size: 11px;
   line-height: 14px;
@@ -518,389 +277,28 @@
   flex-shrink: 0;
 }
 
-.network-dashboard-conversation-table-wrap {
-  min-height: 250px;
-  max-height: 420px;
-  overflow: auto;
-  padding: 0 16px 16px;
-}
-
-.network-dashboard-performance-table-wrap,
-.network-dashboard-interface-table-wrap,
-.network-dashboard-device-availability-table-wrap,
-.network-dashboard-environmental-table-wrap,
-.network-dashboard-alert-events-table-wrap {
-  min-height: 250px;
-}
-
-.network-dashboard-conversation-table-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 16px 16px 10px;
-}
-
-.network-dashboard-performance-table-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 16px 16px 10px;
-}
-
-.network-dashboard-interface-table-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 16px 16px 10px;
-}
-
-.network-dashboard-conversation-search {
-  width: 220px;
-  max-width: 100%;
-}
-
-.network-dashboard-performance-search {
-  width: 220px;
-  max-width: 100%;
-}
-
-.network-dashboard-interface-search {
-  width: 220px;
-  max-width: 100%;
-}
-
-:host ::ng-deep .network-dashboard-conversation-search search-box .input-group,
-:host ::ng-deep .network-dashboard-conversation-search search-box .form-group,
-:host ::ng-deep .network-dashboard-conversation-search search-box .search-box {
+:host ::ng-deep .network-dashboard-search-box .input-group,
+:host ::ng-deep .network-dashboard-search-box .form-group,
+:host ::ng-deep .network-dashboard-search-box .search-box {
   width: 100%;
   margin-bottom: 0;
 }
 
-:host ::ng-deep .network-dashboard-performance-search search-box .input-group,
-:host ::ng-deep .network-dashboard-performance-search search-box .form-group,
-:host ::ng-deep .network-dashboard-performance-search search-box .search-box {
-  width: 100%;
-  margin-bottom: 0;
-}
-
-:host ::ng-deep .network-dashboard-interface-search search-box .input-group,
-:host ::ng-deep .network-dashboard-interface-search search-box .form-group,
-:host ::ng-deep .network-dashboard-interface-search search-box .search-box {
-  width: 100%;
-  margin-bottom: 0;
-}
-
-:host ::ng-deep .network-dashboard-conversation-search .form-control {
+:host ::ng-deep .network-dashboard-search-box .form-control {
   height: 32px;
   border-color: #cfd6dc;
   border-radius: 6px;
   background: #ffffff;
 }
 
-:host ::ng-deep .network-dashboard-performance-search .form-control {
-  height: 32px;
-  border-color: #cfd6dc;
-  border-radius: 6px;
-  background: #ffffff;
-}
-
-:host ::ng-deep .network-dashboard-interface-search .form-control {
-  height: 32px;
-  border-color: #cfd6dc;
-  border-radius: 6px;
-  background: #ffffff;
-}
-
-.network-dashboard-conversation-table {
-  min-width: 1180px;
-  margin-bottom: 0;
-  table-layout: fixed;
-}
-
-.network-dashboard-performance-table,
-.network-dashboard-interface-table,
-.network-dashboard-device-availability-table,
-.network-dashboard-environmental-table,
-.network-dashboard-alert-events-table {
-  min-width: 1040px;
-  margin-bottom: 0;
-}
-
-.network-dashboard-performance-table-wrap {
+.network-dashboard-table-wrap {
   min-height: 250px;
   max-height: 420px;
   overflow: auto;
-  padding: 0 16px 16px;
-}
-
-.network-dashboard-interface-table-wrap {
-  min-height: 250px;
-  max-height: 420px;
-  overflow: auto;
-  padding: 0 16px 16px;
-}
-
-.network-dashboard-performance-table {
-  table-layout: fixed;
-}
-
-.network-dashboard-interface-table {
-  table-layout: fixed;
-}
-
-.network-dashboard-device-availability-table {
-  min-width: 1180px;
-}
-
-.network-dashboard-environmental-table {
-  min-width: 1180px;
-}
-
-.network-dashboard-alert-events-table {
-  min-width: 1180px;
-}
-
-.network-dashboard-conversation-table thead th {
-  border: 0;
-  background: #eef1f3;
-  color: #27313b;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  padding: 11px 12px;
-  white-space: nowrap;
-  cursor: pointer;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.network-dashboard-conversation-table thead th:first-child {
-  width: 210px;
-}
-
-.network-dashboard-conversation-table thead th:first-child,
-.network-dashboard-conversation-table tbody td:first-child {
-  text-align: left;
-}
-
-.network-dashboard-conversation-table thead th.network-dashboard-conversation-table-head-cell--active {
-  background: #cfe4fb;
-  color: #0b66c3;
-}
-
-.network-dashboard-performance-table thead th {
-  border: 0;
-  background: #eef1f3;
-  color: #445063;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  padding: 11px 14px;
-  white-space: nowrap;
-  cursor: pointer;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.network-dashboard-performance-table thead th.network-dashboard-conversation-table-head-cell--active {
-  background: #cfe4fb;
-  color: #0b66c3;
-}
-
-.network-dashboard-performance-table thead th:first-child {
-  width: 180px;
-}
-
-.network-dashboard-interface-table thead th {
-  border: 0;
-  background: #eef1f3;
-  color: #445063;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  padding: 11px 14px;
-  white-space: nowrap;
-  cursor: pointer;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.network-dashboard-interface-table thead th.network-dashboard-conversation-table-head-cell--active {
-  background: #cfe4fb;
-  color: #0b66c3;
-}
-
-.network-dashboard-interface-table thead th:first-child {
-  width: 180px;
-}
-
-.network-dashboard-device-availability-table thead th {
-  border: 0;
-  background: #eef1f3;
-  color: #445063;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  padding: 11px 14px;
-  white-space: nowrap;
-  cursor: pointer;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.network-dashboard-device-availability-table thead th.network-dashboard-conversation-table-head-cell--active {
-  background: #cfe4fb;
-  color: #0b66c3;
-}
-
-.network-dashboard-environmental-table thead th {
-  border: 0;
-  background: #eef1f3;
-  color: #445063;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  padding: 11px 14px;
-  white-space: nowrap;
-  cursor: pointer;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.network-dashboard-environmental-table thead th.network-dashboard-conversation-table-head-cell--active {
-  background: #cfe4fb;
-  color: #0b66c3;
-}
-
-.network-dashboard-alert-events-table thead th {
-  border: 0;
-  background: #eef1f3;
-  color: #445063;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  padding: 11px 14px;
-  white-space: nowrap;
-  cursor: pointer;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.network-dashboard-alert-events-table thead th.network-dashboard-conversation-table-head-cell--active {
-  background: #cfe4fb;
-  color: #0b66c3;
-}
-
-.network-dashboard-conversation-table tbody td {
-  padding: 10px 12px;
-  border-color: #dce2e6;
-  color: #27313b;
-  font-size: 12px;
-  line-height: 18px;
-  vertical-align: middle;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.network-dashboard-conversation-table tbody td.network-dashboard-conversation-table-empty {
-  padding: 48px 12px;
-  color: #6f7f8d;
-  font-size: 14px;
-  font-weight: 400;
-  text-align: center;
-  white-space: normal;
-}
-
-.network-dashboard-conversation-table tbody td:nth-child(2),
-.network-dashboard-conversation-table tbody td:nth-child(3),
-.network-dashboard-conversation-table tbody td:nth-child(4),
-.network-dashboard-conversation-table tbody td:nth-child(5),
-.network-dashboard-conversation-table tbody td:nth-child(6),
-.network-dashboard-conversation-table tbody td:nth-child(7) {
-  text-align: left;
-}
-
-.network-dashboard-performance-table tbody td {
-  padding: 10px 14px;
-  border-color: #dce2e6;
-  color: #27313b;
-  font-size: 12px;
-  line-height: 18px;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.network-dashboard-performance-table tbody td.network-dashboard-performance-table-empty {
-  padding: 48px 12px;
-  color: #6f7f8d;
-  font-size: 14px;
-  font-weight: 400;
-  text-align: center;
-  white-space: normal;
 }
 
 .network-dashboard-utilization-cell {
   min-width: 180px;
-}
-
-.network-dashboard-interface-table tbody td {
-  padding: 10px 14px;
-  border-color: #dce2e6;
-  color: #27313b;
-  font-size: 12px;
-  line-height: 18px;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.network-dashboard-interface-table tbody td.network-dashboard-interface-table-empty {
-  padding: 48px 12px;
-  color: #6f7f8d;
-  font-size: 14px;
-  font-weight: 400;
-  text-align: center;
-  white-space: normal;
-}
-
-.network-dashboard-device-availability-table tbody td {
-  padding: 10px 14px;
-  border-color: #dce2e6;
-  color: #27313b;
-  font-size: 12px;
-  line-height: 18px;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.network-dashboard-environmental-table tbody td {
-  padding: 10px 14px;
-  border-color: #dce2e6;
-  color: #27313b;
-  font-size: 12px;
-  line-height: 18px;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.network-dashboard-alert-events-table tbody td {
-  padding: 10px 14px;
-  border-color: #dce2e6;
-  color: #27313b;
-  font-size: 12px;
-  line-height: 18px;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.network-dashboard-conversation-table-col--bandwidth {
-  width: 240px;
-}
-
-.network-dashboard-table-link {
-  color: #2f86de;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 18px;
 }
 
 .network-dashboard-bandwidth-cell {
@@ -908,10 +306,6 @@
 }
 
 .network-dashboard-bandwidth-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
   margin-top: 4px;
   color: #6f7f8d;
   font-size: 11px;
@@ -931,62 +325,6 @@
   border-radius: 3px;
 }
 
-.progress-fill.tone-success {
-  background: #13bd77;
-}
-
-.progress-fill.tone-warning {
-  background: #ff8a00;
-}
-
-.progress-fill.tone-danger {
-  background: #d90000;
-}
-
-:host ::ng-deep .network-dashboard-conversation-table thead th .fa {
-  color: #8391a0;
-  font-size: 11px;
-}
-
-:host ::ng-deep .network-dashboard-conversation-table thead th.network-dashboard-conversation-table-head-cell--active .fa {
-  color: #0b66c3;
-}
-
-:host ::ng-deep .network-dashboard-performance-table thead th .fa {
-  color: #8391a0;
-  font-size: 11px;
-}
-
-:host ::ng-deep .network-dashboard-performance-table thead th.network-dashboard-conversation-table-head-cell--active .fa {
-  color: #0b66c3;
-}
-
-.network-dashboard-interface-chart-grid {
-  padding: 18px 16px 14px;
-}
-
-.network-dashboard-interface-chart-panel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-width: 0;
-  padding: 0 8px 8px;
-}
-
-.network-dashboard-interface-chart-head {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.network-dashboard-interface-chart-title {
-  color: #526278;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 18px;
-}
-
 .network-dashboard-chart-info-btn {
   color: #7f8a97;
   font-size: 12px;
@@ -998,113 +336,6 @@
   color: #5c6978;
   text-decoration: none;
   box-shadow: none;
-}
-
-.network-dashboard-interface-chart {
-  width: 100%;
-}
-
-.network-dashboard-interface-empty-state {
-  flex: 1 1 auto;
-  min-height: 220px;
-  width: 100%;
-  text-align: center;
-}
-
-.network-dashboard-interface-legend {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 12px;
-  padding: 2px 0 0 2px;
-}
-
-.network-dashboard-interface-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #667585;
-  font-size: 10px;
-  line-height: 13px;
-  white-space: nowrap;
-}
-
-.network-dashboard-interface-legend-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-:host ::ng-deep .network-dashboard-interface-table thead th .fa {
-  color: #8391a0;
-  font-size: 11px;
-}
-
-:host ::ng-deep .network-dashboard-interface-table thead th.network-dashboard-conversation-table-head-cell--active .fa {
-  color: #0b66c3;
-}
-
-:host ::ng-deep .network-dashboard-device-availability-table thead th .fa {
-  color: #8391a0;
-  font-size: 11px;
-}
-
-:host ::ng-deep .network-dashboard-device-availability-table thead th.network-dashboard-conversation-table-head-cell--active .fa {
-  color: #0b66c3;
-}
-
-:host ::ng-deep .network-dashboard-environmental-table thead th .fa {
-  color: #8391a0;
-  font-size: 11px;
-}
-
-:host ::ng-deep .network-dashboard-environmental-table thead th.network-dashboard-conversation-table-head-cell--active .fa {
-  color: #0b66c3;
-}
-
-:host ::ng-deep .network-dashboard-alert-events-table thead th .fa {
-  color: #8391a0;
-  font-size: 11px;
-}
-
-:host ::ng-deep .network-dashboard-alert-events-table thead th.network-dashboard-conversation-table-head-cell--active .fa {
-  color: #0b66c3;
-}
-
-.network-dashboard-performance-chart-grid {
-  padding: 18px 18px 14px;
-}
-
-.network-dashboard-performance-chart-panel {
-  min-width: 0;
-  padding: 0 10px;
-}
-
-.network-dashboard-performance-chart-head {
-  display: grid;
-  grid-template-columns: 72px 1fr 72px;
-  align-items: end;
-  margin-bottom: 6px;
-}
-
-.network-dashboard-performance-chart-y-title {
-  color: #6f7f8d;
-  font-size: 12px;
-  line-height: 16px;
-  text-align: left;
-}
-
-.network-dashboard-performance-chart-title {
-  color: #27313b;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 20px;
-  text-align: center;
-}
-
-.network-dashboard-performance-chart {
-  width: 100%;
 }
 
 .network-dashboard-performance-empty-state {
@@ -1126,9 +357,6 @@
 }
 
 .network-dashboard-device-availability-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 10px;
   padding: 12px 14px;
   border-bottom: 1px solid #e8eef5;
@@ -1155,18 +383,10 @@
 }
 
 .network-dashboard-device-availability-legend {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 10px 12px;
   padding: 0 8px 6px;
 }
 
 .network-dashboard-device-availability-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   color: #667585;
   font-size: 10px;
   line-height: 14px;
@@ -1174,7 +394,6 @@
 }
 
 .network-dashboard-device-availability-legend--manufacturer {
-  display: block;
   padding: 4px 8px 8px;
 }
 
@@ -1192,18 +411,12 @@
 }
 
 .network-dashboard-device-availability-legend-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
   min-height: 28px;
 }
 
 .network-dashboard-device-availability-legend-track {
-  display: flex;
   flex: 1 1 auto;
   flex-wrap: nowrap;
-  gap: 8px 14px;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
@@ -1214,9 +427,6 @@
 }
 
 .network-dashboard-device-availability-legend-pager {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   color: #45515d;
   font-size: 12px;
   line-height: 18px;
@@ -1224,15 +434,9 @@
 }
 
 .network-dashboard-device-availability-legend-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 18px;
   height: 18px;
-  padding: 0;
-  border: 0;
   color: #334e68;
-  background: transparent;
   line-height: 1;
 }
 
@@ -1243,33 +447,6 @@
 .network-dashboard-device-availability-legend-page {
   min-width: 24px;
   text-align: center;
-}
-
-.network-dashboard-device-availability-lowest-wrap {
-  padding: 0 0 8px;
-}
-
-.network-dashboard-device-availability-lowest-table {
-  margin-bottom: 0;
-}
-
-.network-dashboard-device-availability-lowest-table thead th {
-  border-top: 0;
-  background: #f5f8fb;
-  color: #506073;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  padding: 9px 14px;
-}
-
-.network-dashboard-device-availability-lowest-table tbody td {
-  padding: 10px 14px;
-  border-color: #e3e9ef;
-  color: #27313b;
-  font-size: 12px;
-  line-height: 18px;
-  vertical-align: middle;
 }
 
 .network-dashboard-device-availability-badge {
@@ -1290,67 +467,22 @@
 }
 
 .network-dashboard-device-availability-badge--critical {
-  color: #ef4757;
   background: #ffe8eb;
 }
 
 .network-dashboard-device-availability-badge--warning {
-  color: #f0a300;
   background: #fff5dc;
 }
 
 .network-dashboard-device-availability-badge--healthy {
-  color: #159e61;
   background: #def6e9;
-}
-
-.network-dashboard-device-availability-text--critical {
-  color: #ef4757;
-  font-weight: 600;
-}
-
-.network-dashboard-device-availability-text--warning {
-  color: #f0a300;
-  font-weight: 600;
-}
-
-.network-dashboard-device-availability-text--healthy {
-  color: #27313b;
-  font-weight: 600;
-}
-
-.network-dashboard-device-availability-status-cell {
-  display: inline-flex;
-  align-items: center;
-}
-
-.network-dashboard-device-status-icon--critical {
-  color: #ef4757;
-}
-
-.network-dashboard-device-status-icon--warning {
-  color: #f0a300;
-}
-
-.network-dashboard-device-status-icon--healthy {
-  color: #10b45f;
-}
-
-.network-dashboard-topology-head {
-  margin-top: 14px;
-  margin-bottom: 8px;
-}
-
-.network-dashboard-geo-map-head {
-  margin-top: 14px;
-  margin-bottom: 8px;
 }
 
 .network-dashboard-topology-shell {
   border: 1px solid #cfd6dc;
   border-radius: 12px;
   box-shadow: none;
-  overflow: hidden;
+  overflow: visible;
   background: #ffffff;
 }
 
@@ -1363,14 +495,10 @@
 
 .network-dashboard-geo-map-empty {
   min-height: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 24px;
   color: #728090;
   font-size: 16px;
   line-height: 22px;
-  text-align: center;
 }
 
 :host ::ng-deep .network-dashboard-topology-shell .container-fluid {
@@ -1403,7 +531,7 @@
 }
 
 :host ::ng-deep .network-dashboard-topology-shell .topology-card {
-  min-height: 420px;
+  min-height: 520px;
   margin-top: 0 !important;
   background: transparent;
 }
@@ -1472,274 +600,13 @@
 }
 
 :host ::ng-deep .network-dashboard-topology-shell .discovery-network-container {
-  min-height: 380px;
+  height: 460px !important;
+  min-height: 460px;
+  max-height: 460px;
 }
 
-.network-dashboard-environmental-grid {
-  padding: 10px 10px 12px;
-  row-gap: 18px;
-}
-
-.network-dashboard-environmental-card {
-  height: 100%;
-  margin: 8px;
-  border: 1px solid #dbe4ed;
-  border-radius: 8px;
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.network-dashboard-environmental-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid #e8eef5;
-}
-
-.network-dashboard-environmental-card-title {
-  color: #27313b;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-}
-
-.network-dashboard-environmental-chart-wrap {
-  min-height: 274px;
-  padding: 8px 10px 12px;
-}
-
-.network-dashboard-environmental-chart {
-  width: 100%;
-}
-
-.network-dashboard-environmental-empty-state {
-  min-height: 248px;
-}
-
-.network-dashboard-environmental-legend {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 0 12px 12px;
-}
-
-.network-dashboard-environmental-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #647486;
-  font-size: 11px;
-  line-height: 14px;
-}
-
-.network-dashboard-environmental-legend-swatch {
-  width: 22px;
-  height: 12px;
-  border-radius: 3px;
-  flex-shrink: 0;
-}
-
-.network-dashboard-environmental-status-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 56px;
-  padding: 1px 9px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  font-size: 12px;
-  line-height: 18px;
-}
-
-.network-dashboard-environmental-status-pill--normal,
-.network-dashboard-environmental-status-pill--healthy {
-  color: #0b8b58;
-  background: #dff7ea;
-  border-color: #79dba7;
-}
-
-.network-dashboard-environmental-status-pill--warning {
-  color: #f0a300;
-  background: transparent;
-  border-color: transparent;
-  padding-left: 0;
-  padding-right: 0;
-  min-width: auto;
-}
-
-.network-dashboard-environmental-status-pill--failed,
-.network-dashboard-environmental-status-pill--critical {
-  color: #d83e4e;
-  background: #ffe7ea;
-  border-color: #f2a4ad;
-}
-
-.network-dashboard-environmental-fan-cell {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.network-dashboard-environmental-fan-text {
-  font-size: 12px;
-  line-height: 18px;
-  font-weight: 500;
-}
-
-.network-dashboard-environmental-fan-text--warning {
-  color: #f0a300;
-}
-
-.network-dashboard-environmental-fan-text--critical {
-  color: #d83e4e;
-}
-
-.network-dashboard-environmental-fan-meta {
-  color: #7b8793;
-  font-size: 11px;
-  line-height: 16px;
-}
-
-.network-dashboard-environmental-temp-cell {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.network-dashboard-environmental-temp-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.network-dashboard-environmental-temp-dot--healthy {
-  background: #0db14b;
-}
-
-.network-dashboard-environmental-temp-dot--warning {
-  background: #ffba08;
-}
-
-.network-dashboard-environmental-temp-dot--critical {
-  background: #df3b4a;
-}
-
-.network-dashboard-environmental-temp-text--healthy {
-  color: #27313b;
-  font-weight: 600;
-}
-
-.network-dashboard-environmental-temp-text--warning {
-  color: #27313b;
-  font-weight: 600;
-}
-
-.network-dashboard-environmental-temp-text--critical {
-  color: #27313b;
-  font-weight: 600;
-}
-
-.network-dashboard-alert-events-summary {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  padding: 12px 0 10px;
-  border-bottom: 1px solid #e5ebf2;
-}
-
-.network-dashboard-alert-events-summary-item {
-  min-width: 168px;
-  padding: 0 36px;
-  text-align: center;
-  position: relative;
-}
-
-.network-dashboard-alert-events-summary-item:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  right: 0;
-  width: 1px;
-  height: calc(100% - 12px);
-  background: #d8e0e8;
-}
-
-.network-dashboard-alert-events-summary-label {
-  color: #6b7886;
-  font-size: 13px;
-  line-height: 18px;
-}
-
-.network-dashboard-alert-events-summary-value {
-  margin-top: 4px;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 24px;
-}
-
-.network-dashboard-alert-events-summary-value--critical {
-  color: #d10000;
-}
-
-.network-dashboard-alert-events-summary-value--warning {
-  color: #ff8d0a;
-}
-
-.network-dashboard-alert-events-summary-value--info {
-  color: #3f8ad8;
-}
-
-.network-dashboard-alert-events-visuals {
-  padding: 12px 10px 4px;
-}
-
-.network-dashboard-alert-events-panel {
-  min-height: 100%;
-  padding: 0 14px 12px;
-  border-right: 1px solid #e5ebf2;
-}
-
-.network-dashboard-alert-events-panel--stats {
-  border-right: 0;
-}
-
-.network-dashboard-alert-events-panel-title {
-  color: #27313b;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  text-align: center;
-}
-
-.network-dashboard-alert-events-chart-wrap {
-  min-height: 228px;
-  padding-top: 8px;
-}
-
-.network-dashboard-alert-events-chart {
-  width: 100%;
-}
-
-.network-dashboard-alert-events-legend {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 2px 0 0;
-}
-
-.network-dashboard-alert-events-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #647486;
-  font-size: 11px;
-  line-height: 14px;
-  white-space: nowrap;
+:host ::ng-deep .network-dashboard-topology-shell .vis-network {
+  height: 100% !important;
 }
 
 .network-dashboard-alert-events-legend-dot {
@@ -1749,275 +616,31 @@
   flex-shrink: 0;
 }
 
-.network-dashboard-alert-events-stats-card {
-  padding: 10px 12px;
-  border: 1px solid #ced7df;
-  border-radius: 4px;
-  background: #ffffff;
-}
-
-.network-dashboard-alert-events-stats-card+.network-dashboard-alert-events-stats-card {
-  margin-top: 10px;
-}
-
-.network-dashboard-alert-events-stats-head,
-.network-dashboard-alert-events-stats-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.network-dashboard-alert-events-stats-head {
-  color: #27313b;
-  font-size: 13px;
-  line-height: 18px;
-  margin-bottom: 4px;
-}
-
-.network-dashboard-alert-events-stats-highlight,
-.network-dashboard-alert-events-stats-value {
-  color: #3f8ad8;
-}
-
-.network-dashboard-alert-events-stats-highlight {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.network-dashboard-alert-events-stats-row {
-  color: #364250;
-  font-size: 12px;
-  line-height: 18px;
-}
-
-.network-dashboard-alert-events-stats-value {
-  font-weight: 500;
-}
-
-.network-dashboard-alert-events-table-section {
-  padding: 8px 14px 14px;
-}
-
-.network-dashboard-alert-events-table-title {
-  color: #27313b;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-  margin-bottom: 8px;
-}
-
-.network-dashboard-alert-events-severity-cell {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.network-dashboard-alert-events-severity-icon--critical {
-  color: #d10000;
-}
-
-.network-dashboard-alert-events-severity-icon--warning {
-  color: #ff8d0a;
-}
-
-.network-dashboard-auto-remediation-grid {
-  padding: 0;
-}
-
-.network-dashboard-auto-remediation-panel {
-  min-height: 158px;
-  padding: 14px 18px 12px;
-  border-right: 1px solid #dfe6ee;
-}
-
-.network-dashboard-auto-remediation-panel--last {
-  border-right: 0;
-}
-
-.network-dashboard-auto-remediation-donut-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.network-dashboard-alert-events-empty-state {
+  min-height: 216px;
 }
 
 .network-dashboard-auto-remediation-donut {
-  width: 120px;
-  flex: 0 0 120px;
-}
-
-.network-dashboard-auto-remediation-summary-block {
-  display: flex;
-  flex: 1 1 auto;
-  min-width: 0;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.network-dashboard-auto-remediation-legend {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 12px;
-}
-
-.network-dashboard-auto-remediation-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #27313b;
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 600;
-  white-space: nowrap;
+  width: 168px;
+  max-width: 100%;
 }
 
 .network-dashboard-auto-remediation-legend-swatch {
   width: 10px;
   height: 10px;
-  border-radius: 2px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
-.network-dashboard-auto-remediation-summary-line {
-  margin-top: 8px;
-  color: #27313b;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 600;
-}
-
-.network-dashboard-auto-remediation-summary-separator {
-  margin: 0 8px;
-  color: #68798a;
-}
-
-.network-dashboard-auto-remediation-title {
-  color: #27313b;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  text-align: center;
-}
-
-.network-dashboard-auto-remediation-actions-wrap {
-  min-height: 176px;
-  padding-top: 6px;
-}
-
-.network-dashboard-auto-remediation-actions-chart {
-  width: 100%;
-}
-
-.network-dashboard-auto-remediation-metrics-card {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border: 1px solid #ced7df;
-  border-radius: 10px;
-  background: #ffffff;
-  overflow: hidden;
-  min-height: 154px;
-  align-content: center;
+.network-dashboard-auto-remediation-empty-state {
+  min-height: 148px;
 }
 
 .network-dashboard-auto-remediation-metric {
-  padding: 14px 18px;
   min-width: 0;
 }
 
-.network-dashboard-auto-remediation-metric--right {
-  border-left: 1px solid #dfe6ee;
-}
-
-.network-dashboard-auto-remediation-metric--bottom {
-  border-top: 1px solid #dfe6ee;
-}
-
-.network-dashboard-auto-remediation-metric-label {
-  color: #728090;
-  font-size: 14px;
-  line-height: 18px;
-}
-
-.network-dashboard-auto-remediation-metric-value {
-  margin-top: 6px;
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 26px;
-}
-
-.network-dashboard-auto-remediation-metric-value--success {
-  color: #00ad73;
-}
-
-.network-dashboard-auto-remediation-metric-value--danger {
-  color: #d10000;
-}
-
-@media (max-width: 1199px) {
-  .network-dashboard-overview-list {
-    flex-wrap: wrap;
-  }
-
-  .network-dashboard-overview-item,
-  .network-dashboard-overview-item--availability,
-  .network-dashboard-overview-item--summary,
-  .network-dashboard-overview-item--device-type {
-    flex: 1 0 25%;
-  }
-
-  .network-dashboard-conversations-head,
-  .network-dashboard-performance-head,
-  .network-dashboard-interface-health-head,
-  .network-dashboard-device-availability-head,
-  .network-dashboard-environmental-health-head,
-  .network-dashboard-alert-events-head,
-  .network-dashboard-auto-remediation-head {
-    flex-wrap: wrap;
-  }
-
-  .network-dashboard-alert-events-panel {
-    border-right: 0;
-  }
-
-  .network-dashboard-auto-remediation-panel {
-    border-right: 0;
-  }
-}
-
 @media (max-width: 767px) {
-  .network-dashboard-overview-head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .network-dashboard-section-note {
-    text-align: left;
-  }
-
-  .network-dashboard-overview-item,
-  .network-dashboard-overview-item--availability,
-  .network-dashboard-overview-item--summary,
-  .network-dashboard-overview-item--device-type {
-    flex: 1 0 50%;
-  }
-
-  .network-dashboard-conversations-head,
-  .network-dashboard-performance-head,
-  .network-dashboard-interface-health-head,
-  .network-dashboard-device-availability-head,
-  .network-dashboard-environmental-health-head,
-  .network-dashboard-alert-events-head,
-  .network-dashboard-auto-remediation-head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .network-dashboard-conversation-legend {
-    justify-content: flex-start;
-  }
-
   .network-dashboard-view-toggle {
     width: 100%;
     justify-content: space-between;
@@ -2027,122 +650,17 @@
     flex: 1 1 50%;
   }
 
-  .network-dashboard-performance-chart-grid {
-    padding: 14px 10px 12px;
-  }
-
-  .network-dashboard-performance-chart-panel {
-    padding: 0;
-  }
-
-  .network-dashboard-performance-chart-panel+.network-dashboard-performance-chart-panel {
-    margin-top: 18px;
-  }
-
-  .network-dashboard-performance-chart-head {
-    grid-template-columns: 56px 1fr 56px;
-  }
-
-  .network-dashboard-interface-chart-grid {
-    padding: 14px 10px 12px;
-  }
-
-  .network-dashboard-interface-chart-panel {
-    padding: 0 0 14px;
-  }
-
-  .network-dashboard-device-availability-grid {
-    padding: 8px 6px 10px;
-  }
-
-  .network-dashboard-device-availability-card {
-    margin: 6px;
-  }
-
-  .network-dashboard-device-availability-legend {
-    justify-content: flex-start;
-  }
-
-  .network-dashboard-environmental-grid {
-    padding: 8px 6px 10px;
-  }
-
-  .network-dashboard-environmental-card {
-    margin: 6px;
-  }
-
-  .network-dashboard-environmental-legend {
-    justify-content: flex-start;
-  }
-
-  .network-dashboard-alert-events-summary {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .network-dashboard-alert-events-summary-item {
-    min-width: 0;
-    width: 50%;
-    padding: 0 12px 10px;
-    text-align: left;
-  }
-
-  .network-dashboard-alert-events-summary-item:nth-child(2)::after,
-  .network-dashboard-alert-events-summary-item:last-child::after {
-    display: none;
-  }
-
-  .network-dashboard-alert-events-panel {
-    padding: 0 8px 14px;
-    border-right: 0;
-  }
-
-  .network-dashboard-alert-events-legend {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .network-dashboard-alert-events-table-section {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .network-dashboard-auto-remediation-panel {
-    padding: 12px 10px 14px;
-  }
-
-  .network-dashboard-auto-remediation-donut-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .network-dashboard-auto-remediation-summary-block {
-    width: 100%;
-  }
-
-  .network-dashboard-auto-remediation-summary-line {
-    font-size: 13px;
-  }
-
-  .network-dashboard-auto-remediation-metrics-card {
-    grid-template-columns: 1fr;
-  }
-
-  .network-dashboard-auto-remediation-metric {
-    width: auto;
-  }
-
-  .network-dashboard-auto-remediation-metric--right {
-    border-left: 0;
-  }
-
-  .network-dashboard-auto-remediation-metric--bottom {
-    border-top: 0;
-  }
-
-  .network-dashboard-auto-remediation-metric+.network-dashboard-auto-remediation-metric {
+  .network-dashboard-auto-remediation-metric + .network-dashboard-auto-remediation-metric {
     border-top: 1px solid #dfe6ee;
+  }
+
+  .network-dashboard-auto-remediation-metric.border-left {
+    border-left: 0 !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .network-dashboard-overview-cell--divider::after {
+    display: none;
   }
 }

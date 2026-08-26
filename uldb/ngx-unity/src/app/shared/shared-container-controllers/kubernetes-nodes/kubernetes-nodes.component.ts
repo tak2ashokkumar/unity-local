@@ -145,10 +145,14 @@ export class KubernetesNodesComponent implements OnInit, OnDestroy {
     if (!view.isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.nodesService.getConsoleAccessInput(view);
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(view.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.nodesService.getConsoleAccessInput(view);
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(view.newTabConsoleAccessUrl);
+    }
   }
 
   goToStats(view: KubernetesNodesViewdata) {

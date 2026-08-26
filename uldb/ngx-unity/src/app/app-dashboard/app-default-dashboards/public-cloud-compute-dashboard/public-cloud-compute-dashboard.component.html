@@ -151,7 +151,17 @@
             </div>
         </div>
 
-        <div class="section-title" *ngIf="hasPublicCloudCoverage">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources</div>
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasPublicCloudCoverage">
+            <div class="mb-0">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources</div>
+            <div class="btn-group" role="group" aria-label="Sort public cloud resources">
+                <button type="button" class="btn btn-sm"
+                    [ngClass]="publicCloudCoverageSortOrder === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
+                    (click)="onPublicCloudCoverageSortChange('asc')">A-Z</button>
+                <button type="button" class="btn btn-sm"
+                    [ngClass]="publicCloudCoverageSortOrder === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
+                    (click)="onPublicCloudCoverageSortChange('desc')">Z-A</button>
+            </div>
+        </div>
         <div class="dashboard-card public-coverage-card" *ngIf="hasPublicCloudCoverage">
             <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
             <div class="coverage-group" *ngFor="let group of publicCloudCoverageGroups; trackBy: trackByIndex">
@@ -238,21 +248,21 @@
                             <th>Cloud</th>
                             <th class="sortable-col" [class.sort-active]="isHotspotSortActive('cpu_utilization')"
                                 (click)="sortPerformanceHotspots('cpu_utilization')">
-                                CPU Utilization <i class="fas fa-caret-down" *ngIf="isHotspotSortActive('cpu_utilization')"></i>
+                                CPU Utilization <i [ngClass]="getHotspotSortIcon('cpu_utilization')" *ngIf="isHotspotSortActive('cpu_utilization')"></i>
                             </th>
                             <th class="sortable-col" [class.sort-active]="isHotspotSortActive('available_memory')"
                                 (click)="sortPerformanceHotspots('available_memory')">
-                                Available Memory <i class="fas fa-caret-down" *ngIf="isHotspotSortActive('available_memory')"></i>
+                                Available Memory <i [ngClass]="getHotspotSortIcon('available_memory')" *ngIf="isHotspotSortActive('available_memory')"></i>
                             </th>
                             <th class="sortable-col" [class.sort-active]="isHotspotSortActive('disk_size')"
                                 (click)="sortPerformanceHotspots('disk_size')">
-                                Disk Size <i class="fas fa-caret-down" *ngIf="isHotspotSortActive('disk_size')"></i>
+                                Disk Size <i [ngClass]="getHotspotSortIcon('disk_size')" *ngIf="isHotspotSortActive('disk_size')"></i>
                             </th>
                             <th>Data Disk Read/Write Bytes</th>
                             <th>Data Disk Read/Write Rates</th>
                             <th class="sortable-col" [class.sort-active]="isHotspotSortActive('network_traffic')"
                                 (click)="sortPerformanceHotspots('network_traffic')">
-                                Network Traffic <i class="fas fa-caret-down" *ngIf="isHotspotSortActive('network_traffic')"></i>
+                                Network Traffic <i [ngClass]="getHotspotSortIcon('network_traffic')" *ngIf="isHotspotSortActive('network_traffic')"></i>
                             </th>
                         </tr>
                     </thead>

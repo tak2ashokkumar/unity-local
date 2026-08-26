@@ -198,12 +198,28 @@ export interface NetworkPerformanceWorkloadInsightItem {
 }
 
 export interface NetworkInterfaceHealthMetricItem {
+  device_id?: string;
   interface_name: string;
+  interface_type?: string;
+  interface_type_display?: string;
   device_name: string;
+  device_type?: string;
+  duplex_status?: string;
+  operational_status?: string;
+  inbound_bandwidth_mbps?: number;
+  outbound_bandwidth_mbps?: number;
+  bits_received_bps?: number;
+  bits_sent_bps?: number;
+  speed_gbps?: number;
   errors_in_per_sec: number;
   errors_out_per_sec: number;
   discards_in_per_sec: number;
   discards_out_per_sec: number;
+  total_bandwidth_mbps?: number;
+  total_discards_value?: number;
+  total_issue_value?: number;
+  health_tone?: 'healthy' | 'warning' | 'critical' | 'unknown';
+  health_label?: string;
   metric_value?: number;
 }
 
@@ -226,6 +242,15 @@ export interface NetworkInterfaceHealthMetricsTableApiItem {
     device_type?: string;
     interface: string;
     interface_index?: string;
+    interface_type?: string;
+    operational_status?: string;
+    duplex_type?: string;
+    health?: string;
+    inbound_bandwidth?: number;
+    outbound_bandwidth?: number;
+    bits_received?: number;
+    bits_sent?: number;
+    speed?: number;
     errors_inbound?: number;
     errors_outbound?: number;
     discards_inbound?: number;
@@ -370,6 +395,76 @@ export interface NetworkLowestAvailabilityApiItem {
     datacenter?: string;
 }
 
+export interface NetworkLoadBalancerStatusCodeLabel {
+    code?: string;
+    label?: string;
+}
+
+export interface NetworkLoadBalancerHealthValue {
+    value?: number | string;
+    unit?: string;
+}
+
+export interface NetworkLoadBalancerSslCertStatus extends NetworkLoadBalancerStatusCodeLabel {
+    expires_at?: string;
+    days_remaining?: number | string;
+}
+
+export interface NetworkLoadBalancerHealthTableResponse {
+    count?: number;
+    next?: string;
+    previous?: string;
+    time_range?: string;
+    data?: NetworkLoadBalancerHealthTableApiItem[];
+}
+
+export interface NetworkLoadBalancerHealthTableApiItem {
+    device_id?: string;
+    load_balancer_name?: string;
+    vendor?: string;
+    virtual_server?: string[];
+    backend_pool?: string[];
+    vip_status?: NetworkLoadBalancerStatusCodeLabel;
+    pool_member_health?: NetworkLoadBalancerStatusCodeLabel;
+    active_connections?: number | string;
+    new_connections?: number | string;
+    throughput?: NetworkLoadBalancerHealthValue;
+    requests?: number | string;
+    avg_response_time?: NetworkLoadBalancerHealthValue;
+    ssl_cert_status?: NetworkLoadBalancerSslCertStatus;
+    health?: NetworkLoadBalancerStatusCodeLabel;
+}
+
+export interface NetworkPduHealthValue {
+    value?: number | string;
+    unit?: string;
+}
+
+export interface NetworkPduHealthTableResponse {
+    count?: number;
+    next?: string;
+    previous?: string;
+    time_range?: string;
+    data?: NetworkPduHealthTableApiItem[];
+}
+
+export interface NetworkPduHealthTableApiItem {
+    device_id?: string;
+    pdu_name?: string;
+    vendor?: string;
+    location?: string;
+    rack?: string;
+    power_status?: NetworkStatusCodeLabel;
+    load?: NetworkPduHealthValue;
+    input_voltage?: NetworkPduHealthValue;
+    current?: NetworkPduHealthValue;
+    power?: NetworkPduHealthValue;
+    temperature?: NetworkPduHealthValue;
+    humidity?: NetworkPduHealthValue;
+    outlet_status?: string;
+    health?: NetworkStatusCodeLabel;
+}
+
 export interface NetworkEnvironmentalHealthSummaryItem {
   device_name: string;
   device_type: string;
@@ -390,7 +485,7 @@ export interface NetworkStatusCodeLabel {
 }
 
 export interface NetworkTemperatureValue {
-    value?: number;
+    value?: number | string;
     unit?: string;
     status?: NetworkStatusCodeLabel;
 }
@@ -408,6 +503,8 @@ export interface NetworkEnvironmentalFanStatus {
 
 export interface NetworkEnvironmentalHealthSummaryTableResponse {
     count?: number;
+    previous?: string;
+    next?: string;
     time_range?: string;
     data?: NetworkEnvironmentalHealthSummaryTableApiItem[];
 }

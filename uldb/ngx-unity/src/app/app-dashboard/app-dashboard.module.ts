@@ -38,7 +38,6 @@ import { OrchestrationOverviewDashboardComponent } from './app-default-dashboard
 import { PrivateCloudComputeDashboardComponent } from './app-default-dashboards/private-cloud-compute-dashboard/private-cloud-compute-dashboard.component';
 import { PublicCloudComputeDashboardComponent } from './app-default-dashboards/public-cloud-compute-dashboard/public-cloud-compute-dashboard.component';
 import { UnifiedAiopsCommandCentreComponent } from './app-default-dashboards/unified-aiops-command-centre/unified-aiops-command-centre.component';
-import { NavigatorCentralComponent } from './app-default-dashboards/navigator-central/navigator-central.component';
 import { AppPersonaDashboardCrudComponent } from './app-persona-dashboards/app-persona-dashboard-crud/app-persona-dashboard-crud.component';
 import { AppPersonaDashboardViewComponent } from './app-persona-dashboards/app-persona-dashboard-view/app-persona-dashboard-view.component';
 import { AppPersonaDashboardsComponent } from './app-persona-dashboards/app-persona-dashboards.component';
@@ -49,6 +48,7 @@ import { UnityTopologyModule } from '../united-view/unity-topology/unity-topolog
 import { StorageDashboardComponent } from './app-default-dashboards/storage-dashboard/storage-dashboard.component';
 import { NetappStorageDashboardComponent } from './app-default-dashboards/storage-dashboard/netapp-storage-dashboard/netapp-storage-dashboard.component';
 import { PureStorageDashboardComponent } from './app-default-dashboards/storage-dashboard/pure-storage-dashboard/pure-storage-dashboard.component';
+import { NavigatorCentralComponent } from './app-default-dashboards/navigator-central/navigator-central.component';
 // import { DashboardMapWidgetComponent } from '../app-home/dashboard-map-widget/dashboard-map-widget.component';
 
 export const MY_NATIVE_FORMATS = {

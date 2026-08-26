@@ -138,14 +138,14 @@
 
 <ng-template #databaseAgentSummaryWidget>
     <div class="col-6" *ngIf="conditionsSummaryViewdata?.databaseSummaryCards?.length">
-        <div class="card mb-2">
+        <div class="card mb-2 overflow-hidden">
             <div class="card-body py-2">
-                <div class="d-flex justify-content-center align-items-center">
-                    <div class="d-flex flex-column flex-fill px-3"
+                <div class="d-flex flex-nowrap justify-content-center align-items-center">
+                    <div class="d-flex flex-column flex-fill px-1"
                         *ngFor="let database of conditionsSummaryViewdata?.databaseSummaryCards; let first = first; trackBy: trackByDatabaseSummaryCard"
                         [class.border-left]="!first">
-                        <span class="text-truncate" [tooltip]="database?.name" container="body">{{database?.name}}</span>
-                        <div>
+                        <span class="px-1" [tooltip]="database?.name" container="body">{{database?.name}}</span>
+                        <div class="px-1">
                             <span class="font-xl text-primary">{{database?.count}}</span>
                             <span class="text-muted font-sm-xs pl-1">Conditions</span>
                         </div>
@@ -1025,18 +1025,29 @@
 <ng-template #confirmLoadChatRef>
     <div class="card round-edge mb-0">
         <div class="card-body text-center pb-2">
-            <div>Would you like to load previous chat history for <strong>{{selectedCondition?.description}}</strong>?
+            <div *ngIf="selectedCondition?.conversation_detail?.conversation_id">Would you like to load previous chat
+                history for <strong>{{selectedCondition?.description}}</strong>?
             </div>
-            <div class="text-muted font-sm-xs mt-2">
+            <div *ngIf="selectedCondition?.conversation_detail?.conversation_id"
+                class="text-muted font-sm-xs mt-2">
                 <i class="fas fa-info-circle mr-1"></i>
                 If you choose No, the previous chat history will be lost.
             </div>
+            <div *ngIf="isUnityChatbotOpen" class="text-muted font-sm-xs mt-2">
+                <i class="fas fa-info-circle mr-1"></i>
+                The current chatbot will be closed. You can access it again when you return to this page.
+            </div>
         </div>
         <div class="card-footer bg-white d-flex justify-content-center border-top-0">
-            <button class="btn btn-sm btn-pill btn-success mr-2 px-4" type="button"
+            <button *ngIf="selectedCondition?.conversation_detail?.conversation_id"
+                class="btn btn-sm btn-pill btn-success mr-2 px-3" type="button"
                 (click)="onLoadChat(true)">Yes</button>
-            <button class="btn btn-sm btn-pill btn-outline-secondary mr-2" type="button"
+            <button *ngIf="selectedCondition?.conversation_detail?.conversation_id"
+                class="btn btn-sm btn-pill btn-outline-secondary mr-2" type="button"
                 (click)="onLoadChat(false)">No</button>
+            <button *ngIf="!selectedCondition?.conversation_detail?.conversation_id"
+                class="btn btn-sm btn-pill btn-success mr-2 px-3" type="button"
+                (click)="onLoadChat(false)">Continue</button>
             <button class="btn btn-sm btn-pill btn-outline-danger" type="button"
                 (click)="modalRef.hide()">Cancel</button>
         </div>

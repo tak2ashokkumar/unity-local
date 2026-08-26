@@ -1,0 +1,146 @@
+<div class="left-sidebar position-relative w-100 bg-white">
+    <!-- SEARCH -->
+    <div class="p-2 mb-1">
+        <table-search-box [searchValue]="searchQuery" (searched)="onSearched($event)">
+        </table-search-box>
+    </div>
+    <app-spinner [name]="'left-panel'"></app-spinner>
+
+    <div [ngSwitch]="menuType">
+        <!-- =========================================
+             MAIN MENU
+        ========================================== -->
+        <ng-container *ngSwitchCase="'main'">
+            <div *ngFor="let menu of mainMenu"
+                class="menu-card d-flex align-items-center p-2 px-3 mb-2 mx-2 pointer-link"
+                (click)="goToSubMenu(menu)">
+                <!-- ICON -->
+                <div class="item-icon d-flex align-items-center justify-content-center flex-shrink-0">
+                    <img [src]="getIconPath(menu.icon_path)" height="24" width="24" loading="eager">
+                </div>
+                <!-- CONTENT -->
+                <div class="item-content flex-grow-1 mx-3">
+                    <h5 class="m-0 menu-title">
+                        {{ menu.name }}
+                    </h5>
+                    <span class="text-muted description">
+                        {{ menu.description }}
+                    </span>
+                </div>
+                <!-- ARROW -->
+                <div class="d-flex align-items-center justify-content-center flex-shrink-0">
+                    <i class="fas fa-arrow-right fa-sm text-muted"></i>
+                </div>
+            </div>
+        </ng-container>
+
+
+        <!-- =========================================
+             DYNAMIC SUBMENU
+        ========================================== -->
+        <ng-container *ngSwitchCase="'dynamic-submenu'">
+            <!-- HEADER -->
+            <div (click)="backToMainMenu()" class="submenu-header p-2 mb-1 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0 menu-title">
+                        {{ selectedGroup?.name }}
+                    </h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    {{ selectedGroup?.description }}
+                </span>
+            </div>
+
+            <!-- =========================================
+                 STATIC GROUP ITEMS
+            ========================================== -->
+            <ng-container *ngIf="!selectedGroup?.isCategorized">
+                <div *ngFor="let item of selectedGroup?.items"
+                    class="drag-card d-flex align-items-center p-2 px-3 mx-2 mb-1 drag-item">
+                    <!-- ICON -->
+                    <div class="item-icon d-flex align-items-center justify-content-center flex-shrink-0 mr-3">
+                        <img loading="eager" [src]="getIconPath(item.icon_path)" height="20" width="20">
+                    </div>
+                    <!-- CONTENT -->
+                    <div class="item-content flex-grow-1" draggable="true"
+                        (dragstart)="onDynamicDragStart($event, item)">
+                        <h5 class="m-0 sub-headers">
+                            {{ item.name }}
+                        </h5>
+                        <span class="text-muted description">
+                            {{ item.description }}
+                        </span>
+                    </div>
+                </div>
+            </ng-container>
+
+            <!-- =========================================
+                 DYNAMIC CATEGORY GROUPS
+                 (TASKS)
+            ========================================== -->
+            <ng-container *ngIf="selectedGroup?.isCategorized">
+                <div *ngFor="let category of selectedGroup?.categories" class="accordion w-100 mb-1">
+                    <!-- CATEGORY HEADER -->
+                    <div class="accordion-headers d-flex justify-content-between align-items-center py-2 px-3 ml-2 mr-1 pointer-link"
+                        (click)="toggleTaskAccordion(category.category)">
+                        <span class="sub-headers">
+                            {{ category.category }}
+                        </span>
+                        <i
+                            [ngClass]=" isOpenTasks[category.category]? 'fas fa-chevron-up fa-sm': 'fas fa-chevron-down fa-sm'"></i>
+                    </div>
+
+                    <!-- CATEGORY BODY -->
+                    <div class="accordion-body" [ngClass]="{'active': isOpenTasks[category.category]}">
+                        <div *ngFor="let item of category.items"
+                            class="drag-item d-flex align-items-center rounded p-1 px-3 mb-1 mx-1"
+                            draggable="true" (dragstart)="onDynamicDragStart($event, item)">
+                            <!-- ICON -->
+                            <div class="item-icon d-flex align-items-center justify-content-center flex-shrink-0 mr-3">
+                                <img [src]="getIconPath(item.icon_path)" height="16" width="16">
+                            </div>
+                            <!-- NAME -->
+                            <span class="text-truncate sub-headers task-name" [title]="item.name">
+                                {{ item.name }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+
+        <!-- =========================================
+             SEARCH RESULTS
+        ========================================== -->
+
+        <ng-container *ngSwitchCase="'Search'">
+            <div *ngIf="globalSearchResults.length > 0; else noResults">
+                <div *ngFor="let item of globalSearchResults"
+                    class="drag-card d-flex align-items-center p-2 px-3 mx-2 mb-1 pointer-link"
+                    draggable="true" (dragstart)="onDynamicDragStart($event, item)">
+                    <!-- ICON -->
+                    <div class="item-icon d-flex align-items-center justify-content-center flex-shrink-0 mr-3">
+                        <img [src]="getIconPath(item.icon_path)" height="20" width="20">
+                    </div>
+                    <!-- CONTENT -->
+                    <div class="item-content flex-grow-1">
+                        <span [innerHTML]="highlightMatch(item.name)"
+                            class="d-inline-block text-truncate w-100 sub-headers">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMPTY -->
+            <ng-template #noResults>
+                <div class="text-center py-4">
+                    <i class="fas fa-search-minus mb-2 d-block" style="font-size:1.4rem; opacity:0.3;"></i>
+                    <span class="text-muted small">
+                        No results found.
+                    </span>
+                </div>
+            </ng-template>
+        </ng-container>
+    </div>
+</div>

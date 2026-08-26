@@ -5,6 +5,8 @@ import { ZABBIX_FIREWALLS_ROUTES } from "src/app/united-cloud/shared/firewalls/f
 import { FirewallsZabbixComponent } from "src/app/united-cloud/shared/firewalls/firewalls-zabbix/firewalls-zabbix.component";
 import { ZABBIX_HYPERVISOR_ROUTES } from "src/app/united-cloud/shared/hypervisors/hypervisors-zabbix/hypervisors-zabbix-routing.const";
 import { HypervisorsZabbixComponent } from "src/app/united-cloud/shared/hypervisors/hypervisors-zabbix/hypervisors-zabbix.component";
+import { ZABBIX_IOT_DEVICE_ROUTES } from "src/app/united-cloud/shared/iot-devices/iot-devices-zabbix/iot-devices-zabbix-routing.const";
+import { IotDevicesZabbixComponent } from "src/app/united-cloud/shared/iot-devices/iot-devices-zabbix/iot-devices-zabbix.component";
 import { ZABBIX_LOADBALANCERS_ROUTES } from "src/app/united-cloud/shared/loadbalancers/loadbalancers-zabbix/loadbalancers-zabbix-routing.const";
 import { LoadbalancersZabbixComponent } from "src/app/united-cloud/shared/loadbalancers/loadbalancers-zabbix/loadbalancers-zabbix.component";
 import { ZABBIX_MACMINI_ROUTES } from "src/app/united-cloud/shared/mac-mini/macmini-zabbix/macmini-zabbix-routing.const";
@@ -15,24 +17,22 @@ import { ZABBIX_SWITCH_ROUTES } from "src/app/united-cloud/shared/switches/switc
 import { SwitchesZabbixComponent } from "src/app/united-cloud/shared/switches/switches-zabbix/switches-zabbix.component";
 import { ZABBIX_VMS_ROUTES } from "src/app/united-cloud/shared/vms/vms-zabbix/vms-zabbix-routing.const";
 import { VmsZabbixComponent } from "src/app/united-cloud/shared/vms/vms-zabbix/vms-zabbix.component";
-import { CloudCostOverviewDashboardComponent } from "./cloud-cost-overview-dashboard/cloud-cost-overview-dashboard.component";
-import { ResourceLevelDashboardComponent } from "./cloud-cost-overview-dashboard/resource-level-dashboard/resource-level-dashboard.component";
-import { OrchestrationOverviewDashboardComponent } from "./orchestration-overview-dashboard/orchestration-overview-dashboard.component";
-import { InfrastructureOverviewDashboardComponent } from "./infrastructure-overview-dashboard/infrastructure-overview-dashboard.component";
-import { IotDevicesSummaryDashboardComponent } from "./iot-devices-summary-dashboard/iot-devices-summary-dashboard.component";
-import { NetworkDevicesOverviewDashboardComponent } from "./network-devices-overview-dashboard/network-devices-overview-dashboard.component";
-import { InterfaceDetailsDashboardComponent } from "./interface-details-dashboard/interface-details-dashboard.component";
-import { IotDevicesZabbixComponent } from "src/app/united-cloud/shared/iot-devices/iot-devices-zabbix/iot-devices-zabbix.component";
-import { ZABBIX_IOT_DEVICE_ROUTES } from "src/app/united-cloud/shared/iot-devices/iot-devices-zabbix/iot-devices-zabbix-routing.const";
 import { ApplicationOverviewDashboardComponent } from "./application-overview-dashboard/application-overview-dashboard.component";
 import { ExecutiveAiBusinessSummaryComponent } from "./application-overview-dashboard/executive-ai-business-summary/executive-ai-business-summary.component";
+import { CloudCostOverviewDashboardComponent } from "./cloud-cost-overview-dashboard/cloud-cost-overview-dashboard.component";
+import { ResourceLevelDashboardComponent } from "./cloud-cost-overview-dashboard/resource-level-dashboard/resource-level-dashboard.component";
+import { DatabaseDashboardComponent } from "./database-dashboard/database-dashboard.component";
+import { DiscoveryDashboardComponent } from "./discovery-dashboard/discovery-dashboard.component";
+import { EventAnalyticsDashboardComponent } from "./event-analytics-dashboard/event-analytics-dashboard.component";
+import { InfrastructureOverviewDashboardComponent } from "./infrastructure-overview-dashboard/infrastructure-overview-dashboard.component";
+import { InterfaceDetailsDashboardComponent } from "./interface-details-dashboard/interface-details-dashboard.component";
+import { IotDevicesSummaryDashboardComponent } from "./iot-devices-summary-dashboard/iot-devices-summary-dashboard.component";
+import { NavigatorCentralComponent } from "./navigator-central/navigator-central.component";
+import { NetworkDashboardComponent } from "./network-dashboard/network-dashboard.component";
+import { NetworkDevicesOverviewDashboardComponent } from "./network-devices-overview-dashboard/network-devices-overview-dashboard.component";
+import { OrchestrationOverviewDashboardComponent } from "./orchestration-overview-dashboard/orchestration-overview-dashboard.component";
 import { PrivateCloudComputeDashboardComponent } from "./private-cloud-compute-dashboard/private-cloud-compute-dashboard.component";
 import { PublicCloudComputeDashboardComponent } from "./public-cloud-compute-dashboard/public-cloud-compute-dashboard.component";
-import { DatabaseDashboardComponent } from "./database-dashboard/database-dashboard.component";
-import { NavigatorCentralComponent } from "./navigator-central/navigator-central.component";
-import { EventAnalyticsDashboardComponent } from "./event-analytics-dashboard/event-analytics-dashboard.component";
-import { DiscoveryDashboardComponent } from "./discovery-dashboard/discovery-dashboard.component";
-import { NetworkDashboardComponent } from "./network-dashboard/network-dashboard.component";
 import { StorageDashboardComponent } from "./storage-dashboard/storage-dashboard.component";
 // import { MockStorageDashboardComponent } from "./mock-storage-dashboard/mock-storage-dashboard.component";
 
@@ -395,16 +395,16 @@ export const DEFAULT_DASHBOARD_ROUTES: Routes = [
     //         }
     //     },
     // },
-    // {
-    //     path: 'default/storage',
-    //     component: StorageDashboardComponent,
-    //     data: {
-    //         breadcrumb: {
-    //             title: 'Storage Dashboard',
-    //             stepbackCount: 1
-    //         }
-    //     },
-    // },
+    {
+        path: 'default/storage',
+        component: StorageDashboardComponent,
+        data: {
+            breadcrumb: {
+                title: 'Storage Dashboard',
+                stepbackCount: 1
+            }
+        },
+    },
     {
         path: 'default/database',
         component: DatabaseDashboardComponent,

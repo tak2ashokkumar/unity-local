@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { TabData } from '../../tabdata';
 import { TicketDetailsService, TicketDetailsViewData, UserMap, TicketCommentViewData } from './ticket-details.service';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';

@@ -898,6 +898,14 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
             this.clearCommandExecutionState();
             return;
           }
+          if (event.payload?.reason === 'terminal_error') {
+            this.commandExecutionState = 'failed';
+            this.commandExecutionStatusMessage = '';
+            this.commandExecutionError = event.error || event.payload?.message || 'Terminal connection failed.';
+            this.activeCommandContext = null;
+            this.cliCommandService.setActiveCommandContext(null);
+            return;
+          }
           this.commandExecutionState = 'analyzing';
           this.commandExecutionStatusMessage = 'Analyzing command output...';
           this.commandExecutionError = '';

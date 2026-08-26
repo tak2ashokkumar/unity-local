@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -20,7 +20,7 @@ import { GCP_ACCOUNT_TICKET_METADATA, OCI_ACCOUNT_TICKET_METADATA, TICKET_SUBJEC
   templateUrl: './usi-public-clouds.component.html',
   styleUrls: ['./usi-public-clouds.component.scss'],
 })
-export class UsiPublicCloudsComponent implements OnInit {
+export class UsiPublicCloudsComponent implements OnInit, OnDestroy {
 
   private ngUnsubscribe = new Subject();
 

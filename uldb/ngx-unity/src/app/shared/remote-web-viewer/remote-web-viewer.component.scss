@@ -150,6 +150,7 @@
   outline: none;
   overflow: hidden;
   position: relative;
+  user-select: none;
 }
 
 .viewer-viewport-disabled {
@@ -161,7 +162,9 @@
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;
+  pointer-events: none;
   width: 100%;
+  -webkit-user-drag: none;
 }
 
 .viewer-text {
@@ -209,4 +212,21 @@
   .viewer-capabilities {
     overflow-x: auto;
   }
+}
+
+.viewer-keyboard-capture {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  resize: none;
+  overflow: hidden;
+  pointer-events: none;
+  font-size: 1px;
+  border: none;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
 }

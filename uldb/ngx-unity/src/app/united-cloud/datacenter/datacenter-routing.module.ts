@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DevicesRoutes } from 'src/app/united-cloud/shared/shared-route';
+import { PcCrudComponent } from 'src/app/app-shared-crud/pc-crud/pc-crud.component';
 import { OBSERVIUM_BMS_ROUTES } from '../shared/bm-servers/bm-servers-observium/bm-servers-obs-routing.const';
 import { ZABBIX_BMS_ROUTES } from '../shared/bm-servers/bm-servers-zabbix/bm-servers-zabbix-routing.const';
 import { BmServersZabbixComponent } from '../shared/bm-servers/bm-servers-zabbix/bm-servers-zabbix.component';
@@ -68,6 +69,10 @@ const routes: Routes = [
         }
       },
       ...DC_PDU_ROUTES,
+      {
+        path: 'pccloud/summary/add',
+        component: PcCrudComponent
+      },
       {
         path: 'pccloud',
         component: DatacenterPrivateCloudsComponent,

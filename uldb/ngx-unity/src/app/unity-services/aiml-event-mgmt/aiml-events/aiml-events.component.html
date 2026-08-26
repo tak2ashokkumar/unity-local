@@ -25,7 +25,7 @@
             <div class="card-body py-2">
                 <div class="card-title mb-0">Total Events</div>
                 <span class="text-primary text-value">{{summaryViewData.total.event_count}}</span>
-                <span class="font-xs text-muted font-500 ml-1">{{summaryViewData.last_7_days.event_count}} Since last
+                <span *ngIf="summaryViewData.last_7_days as lastSevenDays" class="font-xs text-muted font-500 ml-1">{{lastSevenDays.event_count}} Since last
                     week</span>
             </div>
         </div>
@@ -35,7 +35,7 @@
             <div class="card-body py-2">
                 <div class="card-title mb-0">Critical</div>
                 <span class="text-primary text-value">{{summaryViewData.total.critical}}</span>
-                <span class="font-xs text-muted font-500 ml-1">{{summaryViewData.last_7_days.critical}} Since last
+                <span *ngIf="summaryViewData.last_7_days as lastSevenDays" class="font-xs text-muted font-500 ml-1">{{lastSevenDays.critical}} Since last
                     week</span>
             </div>
         </div>
@@ -45,7 +45,7 @@
             <div class="card-body py-2">
                 <div class="card-title mb-0">Warning</div>
                 <span class="text-primary text-value">{{summaryViewData.total.warning}}</span>
-                <span class="font-xs text-muted font-500 ml-1">{{summaryViewData.last_7_days.warning}} Since last
+                <span *ngIf="summaryViewData.last_7_days as lastSevenDays" class="font-xs text-muted font-500 ml-1">{{lastSevenDays.warning}} Since last
                     week</span>
             </div>
         </div>
@@ -55,7 +55,7 @@
             <div class="card-body py-2">
                 <div class="card-title mb-0">Information</div>
                 <span class="text-primary text-value">{{summaryViewData.total.information}}</span>
-                <span class="font-xs text-muted font-500 ml-1">{{summaryViewData.last_7_days.information}} Since last
+                <span *ngIf="summaryViewData.last_7_days as lastSevenDays" class="font-xs text-muted font-500 ml-1">{{lastSevenDays.information}} Since last
                     week</span>
             </div>
         </div>

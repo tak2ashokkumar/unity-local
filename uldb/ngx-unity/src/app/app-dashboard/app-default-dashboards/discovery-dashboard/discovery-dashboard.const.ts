@@ -449,25 +449,92 @@ export const CMDB_SYNC_TREND: CmdbSyncTrend = [
 ]
 
 export const CI_DISTRIBUTION: CiDistributionByDevice = {
-  "total": 249,
+  "count": 12,
+  "total": 12,
   "results": [
     {
+      "deployment_environment": "public_cloud",
+      "category": "Public Cloud Compute",
+      "category_key": "public_cloud_compute",
+      "count": 128,
+      "share": 24.0
+    },
+    {
+      "deployment_environment": "private_cloud",
       "category": "Private Cloud Compute",
       "category_key": "private_cloud_compute",
-      "count": 239,
-      "share": 96.0
+      "count": 96,
+      "share": 18.0
     },
     {
+      "deployment_environment": "private_cloud",
+      "category": "Databases",
+      "category_key": "databases",
+      "count": 72,
+      "share": 13.5
+    },
+    {
+      "deployment_environment": "public_cloud",
+      "category": "Containers",
+      "category_key": "containers",
+      "count": 64,
+      "share": 12.0
+    },
+    {
+      "deployment_environment": "datacenter",
       "category": "Firewalls",
       "category_key": "firewalls",
-      "count": 7,
-      "share": 2.8
+      "count": 48,
+      "share": 9.0
     },
     {
-      "category": "Database",
-      "category_key": "database",
-      "count": 3,
-      "share": 1.2
+      "deployment_environment": "datacenter",
+      "category": "Storage",
+      "category_key": "storage",
+      "count": 40,
+      "share": 7.5
+    },
+    {
+      "deployment_environment": "datacenter",
+      "category": "SD-WAN",
+      "category_key": "sd_wan",
+      "count": 28,
+      "share": 5.2
+    },
+    {
+      "deployment_environment": "public_cloud",
+      "category": "Kubernetes Nodes",
+      "category_key": "kubernetes_nodes",
+      "count": 22,
+      "share": 4.1
+    },
+    {
+      "deployment_environment": "datacenter",
+      "category": "Network Switches",
+      "category_key": "network_switches",
+      "count": 16,
+      "share": 3.0
+    },
+    {
+      "deployment_environment": "private_cloud",
+      "category": "Linux Servers",
+      "category_key": "linux_servers",
+      "count": 10,
+      "share": 1.9
+    },
+    {
+      "deployment_environment": "private_cloud",
+      "category": "Windows Servers",
+      "category_key": "windows_servers",
+      "count": 6,
+      "share": 1.1
+    },
+    {
+      "deployment_environment": "datacenter",
+      "category": "Sensors",
+      "category_key": "sensors",
+      "count": 4,
+      "share": 0.7
     }
   ]
 }

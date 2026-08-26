@@ -373,10 +373,8 @@ export class OrchestrationWorkflowPocComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.maximizeLeftPanel();
-    if (this.modalRef) {
-      this.modalRef.hide();
-    }
   }
 
 

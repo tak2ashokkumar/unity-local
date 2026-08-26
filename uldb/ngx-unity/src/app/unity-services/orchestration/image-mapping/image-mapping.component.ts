@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { ImageMappingModel, ImageMappingService, ImageMappingViewModel, nodesColumnMapping } from './image-mapping.service';
 import { Subject } from 'rxjs';
@@ -20,7 +20,7 @@ import { cloneDeep as _clone } from 'lodash-es';
   templateUrl: './image-mapping.component.html',
   styleUrls: ['./image-mapping.component.scss']
 })
-export class ImageMappingComponent implements OnInit {
+export class ImageMappingComponent implements OnInit, OnDestroy {
 
   currentCriteria: SearchCriteria;
   private ngUnsubscribe = new Subject();
@@ -173,5 +173,4 @@ export class ImageMappingComponent implements OnInit {
   }
 
 }
-
 

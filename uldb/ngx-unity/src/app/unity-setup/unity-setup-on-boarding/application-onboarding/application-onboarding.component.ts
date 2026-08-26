@@ -49,6 +49,7 @@ export class ApplicationOnboardingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.confirmDeleteModalRef?.hide();
     this.spinnerSvc.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

@@ -62,6 +62,10 @@ export class DatabaseMonitoringConfigService {
       } else if (dbType == 'MySQL') {
         agentForm.addControl('username', new FormControl(details.username, [Validators.required, NoWhitespaceValidator]));
         agentForm.addControl('password', new FormControl(details.password, [Validators.required, NoWhitespaceValidator]));
+      } else if (dbType == 'PostgreSQL') {
+        agentForm.addControl('service_name', new FormControl('', [Validators.required, NoWhitespaceValidator]));
+        agentForm.addControl('username', new FormControl('', [Validators.required, NoWhitespaceValidator]));
+        agentForm.addControl('password', new FormControl('', [Validators.required, NoWhitespaceValidator]));
       }
     } else {
       if (dbType == 'Oracle') {
@@ -70,6 +74,10 @@ export class DatabaseMonitoringConfigService {
         agentForm.addControl('username', new FormControl('', [Validators.required, NoWhitespaceValidator]));
         agentForm.addControl('password', new FormControl('', [Validators.required, NoWhitespaceValidator]));
       } else if (dbType == 'MySQL') {
+        agentForm.addControl('username', new FormControl('', [Validators.required, NoWhitespaceValidator]));
+        agentForm.addControl('password', new FormControl('', [Validators.required, NoWhitespaceValidator]));
+      } else if (dbType == 'PostgreSQL') {
+        agentForm.addControl('service_name', new FormControl('', [Validators.required, NoWhitespaceValidator]));
         agentForm.addControl('username', new FormControl('', [Validators.required, NoWhitespaceValidator]));
         agentForm.addControl('password', new FormControl('', [Validators.required, NoWhitespaceValidator]));
       }

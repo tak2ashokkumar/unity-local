@@ -6,7 +6,6 @@ import { switchMap, take } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { ORCHESTRATION_CATEGORY, ORCHESTRATION_CLONE_TASK, ORCHESTRATION_DELETE_TASK, ORCHESTRATION_GET_TASK, ORCHESTRATION_LIST_SUMMARY, ORCHESTRATION_STATUS_TOGGLE, ORCHESTRATION_VIEW_HISTORY } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
-import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
@@ -172,10 +171,6 @@ export class OrchestrationTasksService {
 
   toggleStatus(uuid: string) {
     return this.http.get(ORCHESTRATION_STATUS_TOGGLE(uuid));
-  }
-
-  pollingResult(celeryTaskId: string): Observable<TaskStatus> {
-    return this.http.get<CeleryTask>(`/task/${celeryTaskId}/`).pipe(switchMap(res => this.appService.pollForTask(celeryTaskId, 3, 1000).pipe(take(1))), take(1));
   }
 }
 

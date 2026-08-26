@@ -124,9 +124,9 @@ export class OrchestrationExecutionsWorkflowLogsComponent implements OnInit, OnD
       } else {
         this.workflowDetailsViewData = this.workflowLogsService.converToWorkflowDetailsViewData(data);
         this.workflowTaskListViewData = this.workflowLogsService.convertToWorkflowTaskViewList(data);
-        this.selectedTask = this.workflowTaskListViewData[2];
+        this.selectedTask = this.workflowTaskListViewData[0];
       }
-
+      this.selectTaskWithOutput();
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('main');
       this.notification.error(new Notification('Failed to get workflow details'));
@@ -146,29 +146,25 @@ export class OrchestrationExecutionsWorkflowLogsComponent implements OnInit, OnD
   getOutputDetails() {
     this.workflowLogsService.getOutputDetails(this.workflowId, this.isAgentic).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: any) => {
       console.log(data);
-      this.workflowOutputViewData = this.workflowLogsService.covertToOutputViewData(data);
+      const outputNodes = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.nodes)
+          ? data.nodes
+          : data?.node_type
+            ? [data]
+            : [];
+      this.workflowOutputViewData = this.workflowLogsService.covertToOutputViewData(outputNodes);
       console.log(this.workflowOutputViewData, this.workflowTaskListViewData);
-
-      // this.selectedTask = this.workflowTaskListViewData[0];
-      if (this.workflowTaskListViewData?.length && this.workflowOutputViewData?.length) {
-        console.log(this.workflowTaskListViewData, "wf task list")
-        console.log(this.workflowOutputViewData, "wf output list")
-        const taskWithOutput = this.workflowTaskListViewData.find(task =>
-          this.workflowOutputViewData.some(output => output.id === task.nodeId)
-        );
-        this.selectedTask = taskWithOutput || this.workflowTaskListViewData[0];
-        console.log(this.selectedTask, "selected Task")
-      }
+      this.selectTaskWithOutput();
       this.workflowOutputViewData.forEach(val => {
-        if (val.type === 'Chart Task') {
-          val.output = JSON.parse(val.output.replaceAll("'", "\""));
-          if (val.output.chart_type === 'Pie') {
+        if (val.chartType) {
+          if (val.chartType === 'PIE') {
             this.pieChartData = this.workflowLogsService.convertToPieChartData(val.output);
-          } else if (val.output.chart_type === 'Bar') {
+          } else if (val.chartType === 'BAR') {
             this.barChartData = this.workflowLogsService.convertToBarChartData(val.output);
-          } else if (val.output.chart_type === 'Line') {
+          } else if (val.chartType === 'LINE') {
             this.lineChartData = this.workflowLogsService.convertToLineChartData(val.output);
-          } else if (val.output.chart_type === 'Area') {
+          } else if (val.chartType === 'AREA') {
             this.AreaChartData = this.workflowLogsService.convertToAreaChartData(val.output);
           }
         }
@@ -178,6 +174,21 @@ export class OrchestrationExecutionsWorkflowLogsComponent implements OnInit, OnD
       this.notification.error(new Notification('Failed to get output details'));
     });
   }
+
+  private selectTaskWithOutput(): void {
+    if (!this.workflowTaskListViewData?.length || !this.workflowOutputViewData?.length) {
+      return;
+    }
+
+    const taskWithOutput = this.workflowTaskListViewData.find(task =>
+      this.workflowOutputViewData.some(output => output.id === task.nodeId)
+    );
+
+    if (taskWithOutput) {
+      this.selectedTask = taskWithOutput;
+    }
+  }
+
   showTaskDetails(task) {
     this.selectedTask = { ...task };
   }

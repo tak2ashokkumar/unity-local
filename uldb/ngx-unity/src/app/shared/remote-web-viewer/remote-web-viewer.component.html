@@ -21,6 +21,9 @@
       <button class="viewer-icon-button" type="button" (click)="retry()" [disabled]="isClosing || state === 'authorizing'" title="Reconnect">
         <i class="fas fa-sync-alt"></i>
       </button>
+      <button class="viewer-icon-button" type="button" (click)="openInNewTab()" *ngIf="!terminalState" title="Open in new tab">
+        <i class="fas fa-external-link-alt"></i>
+      </button>
       <button class="viewer-end-button" type="button" (click)="endSession()" [disabled]="isClosing || state === 'terminated'">
         End Session
       </button>
@@ -56,13 +59,23 @@
 
   <div #viewport class="viewer-viewport" tabindex="0"
     [class.viewer-viewport-disabled]="!canSendInput"
-    (keydown)="onKeyboardEvent($event, 'keydown')"
-    (keyup)="onKeyboardEvent($event, 'keyup')"
     (mousedown)="onMouseEvent($event, 'mousedown')"
     (mouseup)="onMouseEvent($event, 'mouseup')"
     (mousemove)="onMouseEvent($event, 'mousemove')"
-    (wheel)="onWheel($event)">
-    <img *ngIf="frameUrl" class="viewer-frame" [src]="frameUrl" alt="Remote browser display">
+    (wheel)="onWheel($event)"
+    (contextmenu)="$event.preventDefault()">
+    <textarea #keyboardCapture
+      class="viewer-keyboard-capture"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      tabindex="0"
+      aria-hidden="true"
+      (keydown)="onKeyboardEvent($event, 'keydown')"
+      (keyup)="onKeyboardEvent($event, 'keyup')"
+      (paste)="onPasteEvent($event)"></textarea>
+    <img *ngIf="frameUrl" class="viewer-frame" [src]="frameUrl" alt="Remote browser display" draggable="false">
     <pre *ngIf="!frameUrl && textFrame" class="viewer-text">{{textFrame}}</pre>
     <div *ngIf="!frameUrl && !textFrame" class="viewer-empty">
       <div class="viewer-empty-status">{{statusLabel}}</div>

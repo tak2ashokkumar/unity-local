@@ -87,11 +87,11 @@ export interface WorkflowLogs {
 }
 
 export interface WorkflowOutputResponse {
-  execution_status: string;
-  output: string;
-  task_name: string;
-  type: string;
-  id: number;
+  status: string;
+  output: any;
+  name: string;
+  node_type: string;
+  node_id: number;
 }
 
 

@@ -5,12 +5,11 @@ import {
     NetworkDashboardFiltersResponse,
     NetworkDeviceAvailabilityItem,
     NetworkEnvironmentalHealthSummaryItem,
-    NetworkEnvironmentalHealthSummaryTableResponse,
     NetworkFanHealthByDeviceResponse,
-    NetworkInterfaceHealthMetricItem,
+    NetworkInterfaceHealthMetricsTableResponse,
     NetworkOverview,
+    NetworkPerformanceInsightsTableResponse,
     NetworkPowerSupplyStatusDistributionResponse,
-    NetworkPerformanceWorkloadInsightItem,
     NetworkTopDevicesByHotspotTemperatureResponse,
     NetworkTopBandwidthUsageResponse,
     NetworkTopConversationMetricResponse,
@@ -398,161 +397,399 @@ export const NETWORK_TOP_10_CONVERSATIONS_TABLE: NetworkTopConversationsTableRes
     ]
 };
 
-export const NETWORK_PERFORMANCE_WORKLOAD_INSIGHTS: NetworkPerformanceWorkloadInsightItem[] = [
-    {
-        device_name: 'Dev 1',
-        cpu_utilization_percent: 96,
-        memory_utilization_percent: 88,
-        interface_traffic_in_mbps: 250,
-        interface_traffic_out_mbps: 230
-    },
-    {
-        device_name: 'Dev 2',
-        cpu_utilization_percent: 92,
-        memory_utilization_percent: 85,
-        interface_traffic_in_mbps: 220,
-        interface_traffic_out_mbps: 210
-    },
-    {
-        device_name: 'Dev 3',
-        cpu_utilization_percent: 85,
-        memory_utilization_percent: 80,
-        interface_traffic_in_mbps: 180,
-        interface_traffic_out_mbps: 170
-    },
-    {
-        device_name: 'Dev 4',
-        cpu_utilization_percent: 78,
-        memory_utilization_percent: 74,
-        interface_traffic_in_mbps: 160,
-        interface_traffic_out_mbps: 150
-    },
-    {
-        device_name: 'Dev 5',
-        cpu_utilization_percent: 72,
-        memory_utilization_percent: 68,
-        interface_traffic_in_mbps: 140,
-        interface_traffic_out_mbps: 120
-    },
-    {
-        device_name: 'Dev 6',
-        cpu_utilization_percent: 70,
-        memory_utilization_percent: 61,
-        interface_traffic_in_mbps: 110,
-        interface_traffic_out_mbps: 95
-    },
-    {
-        device_name: 'Dev 7',
-        cpu_utilization_percent: 65,
-        memory_utilization_percent: 53,
-        interface_traffic_in_mbps: 120,
-        interface_traffic_out_mbps: 130
-    },
-    {
-        device_name: 'Dev 8',
-        cpu_utilization_percent: 58,
-        memory_utilization_percent: 49,
-        interface_traffic_in_mbps: 95,
-        interface_traffic_out_mbps: 110
-    },
-    {
-        device_name: 'Dev 9',
-        cpu_utilization_percent: 52,
-        memory_utilization_percent: 42,
-        interface_traffic_in_mbps: 75,
-        interface_traffic_out_mbps: 60
-    },
-    {
-        device_name: 'Dev 10',
-        cpu_utilization_percent: 45,
-        memory_utilization_percent: 38,
-        interface_traffic_in_mbps: 50,
-        interface_traffic_out_mbps: 45
-    }
-];
+export const NETWORK_PERFORMANCE_INSIGHTS_TABLE_RESPONSE: NetworkPerformanceInsightsTableResponse = {
+    count: 10,
+    time_range: 'custom',
+    data: [
+        {
+            device_name: 'Core-Switch-01',
+            device_type: 'Switch',
+            cpu_utilization: 96,
+            memory_utilization: 88,
+            traffic_in: {
+                value: 250,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 230,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'Edge-FW-01',
+            device_type: 'Firewall',
+            cpu_utilization: 92,
+            memory_utilization: 85,
+            traffic_in: {
+                value: 220,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 210,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'LoadBalancer-01',
+            device_type: 'Load Balancer',
+            cpu_utilization: 85,
+            memory_utilization: 80,
+            traffic_in: {
+                value: 180,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 170,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'Access-Switch-04',
+            device_type: 'Switch',
+            cpu_utilization: 78,
+            memory_utilization: 74,
+            traffic_in: {
+                value: 160,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 150,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'WAN-Router-02',
+            device_type: 'Router',
+            cpu_utilization: 72,
+            memory_utilization: 68,
+            traffic_in: {
+                value: 140,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 120,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'Aggregation-Switch-02',
+            device_type: 'Switch',
+            cpu_utilization: 70,
+            memory_utilization: 61,
+            traffic_in: {
+                value: 110,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 95,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'Branch-FW-03',
+            device_type: 'Firewall',
+            cpu_utilization: 65,
+            memory_utilization: 53,
+            traffic_in: {
+                value: 120,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 130,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'PDU-Monitor-01',
+            device_type: 'PDU',
+            cpu_utilization: 58,
+            memory_utilization: 49,
+            traffic_in: {
+                value: 95,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 110,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'Edge-Router-09',
+            device_type: 'Router',
+            cpu_utilization: 52,
+            memory_utilization: 42,
+            traffic_in: {
+                value: 75,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 60,
+                unit: 'Mbps'
+            }
+        },
+        {
+            device_name: 'Access-Switch-10',
+            device_type: 'Switch',
+            cpu_utilization: 45,
+            memory_utilization: 38,
+            traffic_in: {
+                value: 50,
+                unit: 'Mbps'
+            },
+            traffic_out: {
+                value: 45,
+                unit: 'Mbps'
+            }
+        }
+    ]
+};
 
-export const NETWORK_INTERFACE_HEALTH_METRICS: NetworkInterfaceHealthMetricItem[] = [
-    {
-        interface_name: 'Ge0/0/1',
-        device_name: 'Edge-RT-01',
-        errors_in_per_sec: 12.4,
-        errors_out_per_sec: 10.1,
-        discards_in_per_sec: 15.2,
-        discards_out_per_sec: 14.1
-    },
-    {
-        interface_name: 'Ge0/0/2',
-        device_name: 'DC-SW-02',
-        errors_in_per_sec: 8.5,
-        errors_out_per_sec: 9.4,
-        discards_in_per_sec: 11.1,
-        discards_out_per_sec: 7.8
-    },
-    {
-        interface_name: 'Ge0/0/3',
-        device_name: '2nd-SW-02',
-        errors_in_per_sec: 4.6,
-        errors_out_per_sec: 3.2,
-        discards_in_per_sec: 2.1,
-        discards_out_per_sec: 1.9
-    },
-    {
-        interface_name: 'Ge0/0/4',
-        device_name: 'Edge-RT-02',
-        errors_in_per_sec: 3.8,
-        errors_out_per_sec: 2.9,
-        discards_in_per_sec: 1.8,
-        discards_out_per_sec: 1.5
-    },
-    {
-        interface_name: 'Ge0/0/5',
-        device_name: 'DC-SW-01',
-        errors_in_per_sec: 3.1,
-        errors_out_per_sec: 2.4,
-        discards_in_per_sec: 1.5,
-        discards_out_per_sec: 1.2
-    },
-    {
-        interface_name: 'Ge0/0/6',
-        device_name: 'Core-RT-01',
-        errors_in_per_sec: 2.5,
-        errors_out_per_sec: 1.8,
-        discards_in_per_sec: 1.2,
-        discards_out_per_sec: 0.9
-    },
-    {
-        interface_name: 'Ge0/0/7',
-        device_name: 'Core-RT-02',
-        errors_in_per_sec: 2.0,
-        errors_out_per_sec: 1.5,
-        discards_in_per_sec: 0.9,
-        discards_out_per_sec: 0.7
-    },
-    {
-        interface_name: 'Ge0/0/8',
-        device_name: 'WAN-RT-01',
-        errors_in_per_sec: 1.8,
-        errors_out_per_sec: 1.2,
-        discards_in_per_sec: 0.7,
-        discards_out_per_sec: 0.5
-    },
-    {
-        interface_name: 'Ge0/0/9',
-        device_name: 'WAN-RT-02',
-        errors_in_per_sec: 1.5,
-        errors_out_per_sec: 0.9,
-        discards_in_per_sec: 0.5,
-        discards_out_per_sec: 0.3
-    },
-    {
-        interface_name: 'Ge0/0/10',
-        device_name: 'Access-SW-01',
-        errors_in_per_sec: 1.0,
-        errors_out_per_sec: 0.5,
-        discards_in_per_sec: 0.2,
-        discards_out_per_sec: 0.1
-    }
-];
+export const NETWORK_INTERFACE_HEALTH_METRICS_TABLE_RESPONSE: NetworkInterfaceHealthMetricsTableResponse = {
+    count: 12,
+    time_range: 'custom',
+    data: [
+        {
+            device_id: 'if-01',
+            device: 'Border-SDX-S-JP2',
+            device_type: 'Switch',
+            interface: 'Gi1/0/180',
+            interface_index: '10180',
+            interface_type: 'Ethernet (CSMA/CD)',
+            operational_status: 'Up',
+            duplex_type: 'Full Duplex',
+            health: 'Healthy',
+            inbound_bandwidth: 3100,
+            outbound_bandwidth: 10400,
+            bits_received: 3100,
+            bits_sent: 10400,
+            speed: 10,
+            errors_inbound: 0,
+            errors_outbound: 0,
+            discards_inbound: 0,
+            discards_outbound: 0
+        },
+        {
+            device_id: 'if-02',
+            device: 'Border-SDX-S-JP2',
+            device_type: 'Switch',
+            interface: 'Gi1/0/60',
+            interface_index: '10060',
+            interface_type: 'Ethernet (CSMA/CD)',
+            operational_status: 'Up',
+            duplex_type: 'Full Duplex',
+            health: 'Healthy',
+            inbound_bandwidth: 2550,
+            outbound_bandwidth: 9100,
+            bits_received: 2550,
+            bits_sent: 9100,
+            speed: 10,
+            errors_inbound: 0,
+            errors_outbound: 0,
+            discards_inbound: 0,
+            discards_outbound: 0
+        },
+        {
+            device_id: 'if-03',
+            device: 'DC-Core-01',
+            device_type: 'Load Balancer',
+            interface: 'mgmt0',
+            interface_index: '900',
+            interface_type: 'Management',
+            operational_status: 'Up',
+            duplex_type: 'Full Duplex',
+            health: 'Warning',
+            inbound_bandwidth: 1850,
+            outbound_bandwidth: 7600,
+            bits_received: 1850,
+            bits_sent: 7600,
+            speed: 1,
+            errors_inbound: 2,
+            errors_outbound: 1,
+            discards_inbound: 4,
+            discards_outbound: 2
+        },
+        {
+            device_id: 'if-04',
+            device: 'Border-SDX-S-JP2',
+            device_type: 'Switch',
+            interface: 'Gi1/0/40',
+            interface_index: '10040',
+            interface_type: 'Ethernet (CSMA/CD)',
+            operational_status: 'Up',
+            duplex_type: 'Full Duplex',
+            health: 'Healthy',
+            inbound_bandwidth: 1250,
+            outbound_bandwidth: 6900,
+            bits_received: 1250,
+            bits_sent: 6900,
+            speed: 1,
+            errors_inbound: 0,
+            errors_outbound: 0,
+            discards_inbound: 0,
+            discards_outbound: 0
+        },
+        {
+            device_id: 'if-05',
+            device: 'Edge-FW-01',
+            device_type: 'Firewall',
+            interface: 'Loopback0',
+            interface_index: '1001',
+            interface_type: 'Loopback',
+            operational_status: 'Up',
+            duplex_type: 'Unknown',
+            health: 'Warning',
+            inbound_bandwidth: 980,
+            outbound_bandwidth: 5800,
+            bits_received: 980,
+            bits_sent: 5800,
+            speed: 1,
+            errors_inbound: 1,
+            errors_outbound: 0,
+            discards_inbound: 3,
+            discards_outbound: 1
+        },
+        {
+            device_id: 'if-06',
+            device: 'Access-SW-01',
+            device_type: 'Switch',
+            interface: 'Vlan100',
+            interface_index: '1100',
+            interface_type: 'VLAN',
+            operational_status: 'Up',
+            duplex_type: 'Full Duplex',
+            health: 'Warning',
+            inbound_bandwidth: 840,
+            outbound_bandwidth: 5300,
+            bits_received: 840,
+            bits_sent: 5300,
+            speed: 1,
+            errors_inbound: 0,
+            errors_outbound: 0,
+            discards_inbound: 2,
+            discards_outbound: 2
+        },
+        {
+            device_id: 'if-07',
+            device: 'Border-SDX-S-JP2',
+            device_type: 'Switch',
+            interface: 'Gi1/0/120',
+            interface_index: '10120',
+            interface_type: 'Ethernet (CSMA/CD)',
+            operational_status: 'Up',
+            duplex_type: 'Full Duplex',
+            health: 'Healthy',
+            inbound_bandwidth: 760,
+            outbound_bandwidth: 4200,
+            bits_received: 760,
+            bits_sent: 4200,
+            speed: 1,
+            errors_inbound: 0,
+            errors_outbound: 0,
+            discards_inbound: 0,
+            discards_outbound: 0
+        },
+        {
+            device_id: 'if-08',
+            device: 'Branch-RT-03',
+            device_type: 'Router',
+            interface: 'Gi1/0/30',
+            interface_index: '10030',
+            interface_type: 'Ethernet (CSMA/CD)',
+            operational_status: 'Up',
+            duplex_type: 'Half Duplex',
+            health: 'Warning',
+            inbound_bandwidth: 620,
+            outbound_bandwidth: 3800,
+            bits_received: 620,
+            bits_sent: 3800,
+            speed: 1,
+            errors_inbound: 3,
+            errors_outbound: 1,
+            discards_inbound: 1,
+            discards_outbound: 1
+        },
+        {
+            device_id: 'if-09',
+            device: 'Core-SW-01',
+            device_type: 'Switch',
+            interface: 'Vlan200',
+            interface_index: '1200',
+            interface_type: 'VLAN',
+            operational_status: 'Up',
+            duplex_type: 'Full Duplex',
+            health: 'Critical',
+            inbound_bandwidth: 610,
+            outbound_bandwidth: 4100,
+            bits_received: 610,
+            bits_sent: 4100,
+            speed: 1,
+            errors_inbound: 6,
+            errors_outbound: 4,
+            discards_inbound: 10,
+            discards_outbound: 6
+        },
+        {
+            device_id: 'if-10',
+            device: 'Border-SDX-S-JP2',
+            device_type: 'Switch',
+            interface: 'Gi1/0/50',
+            interface_index: '10050',
+            interface_type: 'Ethernet (CSMA/CD)',
+            operational_status: 'Up',
+            duplex_type: 'Half Duplex',
+            health: 'Critical',
+            inbound_bandwidth: 590,
+            outbound_bandwidth: 4000,
+            bits_received: 590,
+            bits_sent: 4000,
+            speed: 1,
+            errors_inbound: 8,
+            errors_outbound: 6,
+            discards_inbound: 7,
+            discards_outbound: 4
+        },
+        {
+            device_id: 'if-11',
+            device: 'VPN-GW-01',
+            device_type: 'Firewall',
+            interface: 'Tunnel1',
+            interface_index: '2001',
+            interface_type: 'Tunnel',
+            operational_status: 'Up',
+            duplex_type: 'Unknown',
+            health: 'Warning',
+            inbound_bandwidth: 510,
+            outbound_bandwidth: 2900,
+            bits_received: 510,
+            bits_sent: 2900,
+            speed: 1,
+            errors_inbound: 4,
+            errors_outbound: 2,
+            discards_inbound: 3,
+            discards_outbound: 1
+        },
+        {
+            device_id: 'if-12',
+            device: 'VPN-GW-02',
+            device_type: 'Firewall',
+            interface: 'Tunnel2',
+            interface_index: '2002',
+            interface_type: 'Tunnel',
+            operational_status: 'Up',
+            duplex_type: 'Unknown',
+            health: 'Critical',
+            inbound_bandwidth: 430,
+            outbound_bandwidth: 2500,
+            bits_received: 430,
+            bits_sent: 2500,
+            speed: 1,
+            errors_inbound: 11,
+            errors_outbound: 9,
+            discards_inbound: 15,
+            discards_outbound: 7
+        }
+    ]
+};
 
 export const NETWORK_DEVICE_AVAILABILITY: NetworkDeviceAvailabilityItem[] = [
     {
@@ -846,62 +1083,6 @@ export const NETWORK_ENVIRONMENTAL_HEALTH_SUMMARY: NetworkEnvironmentalHealthSum
     }
 ];
 
-export const NETWORK_ENVIRONMENTAL_HEALTH_SUMMARY_TABLE_RESPONSE: NetworkEnvironmentalHealthSummaryTableResponse = {
-    count: 10,
-    time_range: '30_days',
-    data: [
-        {
-            device_id: '91460024-eeb8-475e-962f-b600a1543275',
-            device_name: 'CORE-SW-01',
-            device_type: 'Core Switch',
-            power_supply_a: {
-                code: 'normal',
-                label: 'Normal'
-            },
-            power_supply_b: {
-                code: 'normal',
-                label: 'Normal'
-            },
-            fan_status: {
-                total: 3,
-                healthy: 3,
-                warning: 0,
-                failed: 0,
-                unknown: 0,
-                status: {
-                    code: 'healthy',
-                    label: 'Healthy'
-                },
-                warning_fans: [],
-                failed_fans: []
-            },
-            inlet_temperature: {
-                value: 24,
-                unit: 'C',
-                status: {
-                    code: 'normal',
-                    label: 'Normal'
-                }
-            },
-            outlet_temperature: {
-                value: 33,
-                unit: 'C',
-                status: {
-                    code: 'normal',
-                    label: 'Normal'
-                }
-            },
-            hotspot_temperature: {
-                value: 39,
-                unit: 'C',
-                status: {
-                    code: 'normal',
-                    label: 'Normal'
-                }
-            }
-        }
-    ]
-};
 
 export const NETWORK_TOP_DEVICES_BY_HOTSPOT_TEMPERATURE_RESPONSE: NetworkTopDevicesByHotspotTemperatureResponse = {
     count: 10,

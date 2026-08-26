@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ForecastMetricViewData, ForecastService, ForecastViewData } from './forecast.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -22,7 +22,7 @@ import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
   styleUrls: ['./forecast.component.scss'],
   providers: [ForecastService]
 })
-export class ForecastComponent implements OnInit {
+export class ForecastComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
   count: number = 0;

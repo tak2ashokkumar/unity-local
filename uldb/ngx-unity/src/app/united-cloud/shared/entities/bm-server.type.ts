@@ -43,7 +43,8 @@ export interface BMServer {
     available_storage: string;
     custom_attribute_data?: { [key: string]: any };
     life_cycle_stage: string;
-    life_cycle_stage_status: string
+    life_cycle_stage_status: string;
+    collector: CollectorType;
 }
 
 export interface BMServerOS {
@@ -86,4 +87,5 @@ export interface Private_cloud {
 export interface CollectorType {
     name: string;
     uuid: string;
+    is_ztc: boolean;
 }

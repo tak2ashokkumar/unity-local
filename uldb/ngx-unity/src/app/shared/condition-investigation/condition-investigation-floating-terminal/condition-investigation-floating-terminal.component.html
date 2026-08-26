@@ -17,6 +17,18 @@
                 <a class="nav-link bg-secondary border-bottom-0"><i class="fa fa-angle-right"></i></a>
             </div>
             <div class="nav-item floating-tabs nav-actions p-0">
+                <a class="nav-link h-100 border-bottom-0 px-2" title="Open in new window"
+                    (click)="openActiveTerminalInNewTab()">
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+            </div>
+            <div class="nav-item floating-tabs nav-actions p-0">
+                <a class="nav-link h-100 border-bottom-0 px-2" title="Open new terminal"
+                    (click)="openAddTerminalConfirmation()">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </div>
+            <div class="nav-item floating-tabs nav-actions p-0">
                 <a class="nav-link h-100 border-bottom-0 px-2" (click)="minimize()"><i
                         class="fa fa-window-minimize"></i></a>
             </div>
@@ -41,6 +53,30 @@
         </div>
     </div>
 </div>
+
+<ng-template #addTerminalConfirmation>
+    <div class="card mb-0">
+        <div class="card-header font-500">
+            Open New Terminal
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="addTerminalModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Select where you want to open the new terminal.
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
+                (click)="confirmAddTerminal('newTab')">Manage in New tab</button>
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button"
+                (click)="confirmAddTerminal('sameTab')">Manage in Same tab</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="addTerminalModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
 
 <!-- <div class="floating-terminal-card" *ngIf="show">
 

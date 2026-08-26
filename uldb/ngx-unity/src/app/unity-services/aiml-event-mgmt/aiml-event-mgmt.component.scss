@@ -26,3 +26,24 @@
     color: $white;
   }
 }
+
+:host ::ng-deep .aiml-event-mgmt-date-popup,
+:host ::ng-deep .cdk-overlay-pane.aiml-event-mgmt-date-popup {
+  max-width: calc(100vw - 16px) !important;
+}
+
+:host ::ng-deep .aiml-event-mgmt-date-popup .owl-dt-container,
+:host ::ng-deep .aiml-event-mgmt-date-popup .owl-dt-container-inner,
+:host ::ng-deep .cdk-overlay-pane.aiml-event-mgmt-date-popup .owl-dt-container,
+:host ::ng-deep .cdk-overlay-pane.aiml-event-mgmt-date-popup .owl-dt-container-inner {
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: none;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .aiml-event-mgmt-date-popup .owl-dt-container,
+:host ::ng-deep .aiml-event-mgmt-date-popup .owl-dt-container-inner,
+:host ::ng-deep .cdk-overlay-pane.aiml-event-mgmt-date-popup .owl-dt-container,
+:host ::ng-deep .cdk-overlay-pane.aiml-event-mgmt-date-popup .owl-dt-container-inner {
+  overflow: visible;
+}

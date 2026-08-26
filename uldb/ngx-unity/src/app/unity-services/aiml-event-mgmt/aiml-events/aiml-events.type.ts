@@ -22,7 +22,7 @@ export interface AIMLEvents {
 
 export interface AIMLEventsSummary {
     total: AIMLEventsSummaryData;
-    last_7_days: AIMLEventsSummaryData;
+    last_7_days?: AIMLEventsSummaryData;
 }
 
 export interface AIMLEventsSummaryData {

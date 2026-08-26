@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -58,6 +58,8 @@ export class VmsListProxmoxService {
     a.powerOnInProgress = vm.actions_in_progress.power_on;
     a.powerOffInProgress = vm.actions_in_progress.power_off;
     a.tags = vm.tags.filter(tg => tg);
+    a.collectorUuid = vm.collector?.uuid;
+    a.isCollectorZtc = vm.collector?.is_ztc;
 
     if (this.user.isManagementEnabled && !vm.is_template) {
 
@@ -80,7 +82,11 @@ export class VmsListProxmoxService {
         a.newTabToolipMessage = 'VM is Down';
       } else if (isWindows) {
         a.newTabToolipMessage = 'Open In New Tab';
-        a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+        if (vm.collector?.is_ztc) {
+          a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(a.collectorUuid, a.managementIp)}`;
+        } else {
+          a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+        }
       } else {
         a.newTabToolipMessage = 'Open In New Tab';
         a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -239,6 +245,8 @@ export class ProxmoxVMViewData {
   storage: string;
   isTemplate: boolean;
   type: string;
+  collectorUuid: string;
+  isCollectorZtc: boolean;
   isSameTabEnabled: boolean;
   sameTabTootipMessage: string;
   isNewTabEnabled: boolean;
@@ -440,6 +448,7 @@ export interface ProxmoxVM {
   management_ip: string;
   last_reboot_time: string;
   tags: string[];
+  collector: CollectorType;
 }
 
 interface ProxmoxVMActionsInProgress {

@@ -256,11 +256,15 @@ export class VmsListVcloudComponent implements OnInit, OnDestroy {
     if (!view.isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.vCloudService.getConsoleAccessInput(view);
-    obj.managementIp = view.managementIp;
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(view.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.vCloudService.getConsoleAccessInput(view);
+      obj.managementIp = view.managementIp;
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(view.newTabConsoleAccessUrl);
+    }
   }
 
   goToStats(view: VCloudVMViewData) {

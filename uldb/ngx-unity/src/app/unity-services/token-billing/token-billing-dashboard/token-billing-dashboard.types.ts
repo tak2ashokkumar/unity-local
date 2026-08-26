@@ -235,6 +235,7 @@ export class UserConsumptionWidgetData {
   loader = 'tbUserConsumptionLoader';
   chartData: UnityChartDetails;
   totalCostUsd = 0;
+  totalTokens = 0;
   allUsers: string[] = [];
   selectedUsers: string[] = [];
 }

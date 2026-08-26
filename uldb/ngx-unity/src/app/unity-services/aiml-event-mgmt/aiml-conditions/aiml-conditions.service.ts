@@ -13,6 +13,7 @@ import { TableApiServiceService } from 'src/app/shared/table-functionality/table
 import { AIMLAnalysisData, AIMLConditionActivityDetail, AIMLConditionAlertDetail, AIMLConditionAlertEventDetail, AIMLConditionAlerts, AIMLConditionDetails, AIMLConditionDeviceEventTimeline, AIMLConditions, AIMLConditionsSummary } from './aiml-conditions.type';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
+import { AIMLEventMgmtDateRangeParams, AimlEventMgmtService } from '../aiml-event-mgmt.service';
 
 @Injectable()
 export class AimlConditionsService {
@@ -21,11 +22,11 @@ export class AimlConditionsService {
     private utilSvc: AppUtilityService,
     private iconService: DeviceIconService,
     private appService: AppLevelService,
+    private aimlMgmtSvc: AimlEventMgmtService,
     private tableService: TableApiServiceService) { }
 
-  getConditionsSummary() {
-    let params: HttpParams = new HttpParams();
-    params = params.append('last_n_days', 7);
+  getConditionsSummary(dateRangeParams?: AIMLEventMgmtDateRangeParams) {
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(new HttpParams(), dateRangeParams);
     return this.http.get<AIMLConditionsSummary>(GET_AIOPS_CONDITIONS_SUMMARY(), { params: params });
   }
 
@@ -38,13 +39,14 @@ export class AimlConditionsService {
   //   return this.http.get<AIMLConditions[]>(GET_AIOPS_CONDITIONS(), { params: params });
   // }
 
-  getConditions(criteria: SearchCriteria): Observable<PaginatedResult<AIMLConditions>> {
+  getConditions(criteria: SearchCriteria, dateRangeParams?: AIMLEventMgmtDateRangeParams): Observable<PaginatedResult<AIMLConditions>> {
     // let params = new HttpParams();
     // if (criteria.searchValue) {
     //   params = params.set('search_key', criteria.searchValue);
     // }
     // params = params.set('page_size', criteria.pageSize);
-    return this.tableService.getData<PaginatedResult<AIMLConditions>>(GET_AIOPS_CONDITIONS(), criteria);
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(this.tableService.getWithParam(criteria), dateRangeParams);
+    return this.http.get<PaginatedResult<AIMLConditions>>(GET_AIOPS_CONDITIONS(), { params: params });
   }
 
 
@@ -116,25 +118,30 @@ export class AimlConditionsService {
     return viewdata;
   }
 
-  getConditionDetails(conditionId: string) {
-    return this.http.get<AIMLConditionDetails>(GET_AIOPS_CONDITION_BY_ID(conditionId));
+  getConditionDetails(conditionId: string, dateRangeParams?: AIMLEventMgmtDateRangeParams) {
+    const params = this.aimlMgmtSvc.appendDateRangeParams(new HttpParams(), dateRangeParams);
+    return this.http.get<AIMLConditionDetails>(GET_AIOPS_CONDITION_BY_ID(conditionId), { params: params });
   }
 
-  getAlerts(conditionId: string, criteria: SearchCriteria): Observable<PaginatedResult<AIMLConditionAlerts>> {
-    return this.tableService.getData<PaginatedResult<AIMLConditionAlerts>>(`customer/aiops/conditions/${conditionId}/alerts/`, criteria);
+  getAlerts(conditionId: string, criteria: SearchCriteria, dateRangeParams?: AIMLEventMgmtDateRangeParams): Observable<PaginatedResult<AIMLConditionAlerts>> {
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(this.tableService.getWithParam(criteria), dateRangeParams);
+    return this.http.get<PaginatedResult<AIMLConditionAlerts>>(`customer/aiops/conditions/${conditionId}/alerts/`, { params: params });
   }
 
-  getAlertsStack(conditionId: string): Observable<AIMLConditionDeviceEventTimeline> {
-    return this.http.get<AIMLConditionDeviceEventTimeline>(`customer/aiops/conditions/${conditionId}/alerts_timeline/`);
+  getAlertsStack(conditionId: string, dateRangeParams?: AIMLEventMgmtDateRangeParams): Observable<AIMLConditionDeviceEventTimeline> {
+    const params = this.aimlMgmtSvc.appendDateRangeParams(new HttpParams(), dateRangeParams);
+    return this.http.get<AIMLConditionDeviceEventTimeline>(`customer/aiops/conditions/${conditionId}/alerts_timeline/`, { params: params });
   }
 
-  getOverviewDetails(conditionId: string, criteria: SearchCriteria): Observable<PaginatedResult<AIMLConditionActivityDetail>> {
-    return this.tableService.getData<PaginatedResult<AIMLConditionActivityDetail>>(`customer/aiops/conditions/${conditionId}/activities/`, criteria);
+  getOverviewDetails(conditionId: string, criteria: SearchCriteria, dateRangeParams?: AIMLEventMgmtDateRangeParams): Observable<PaginatedResult<AIMLConditionActivityDetail>> {
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(this.tableService.getWithParam(criteria), dateRangeParams);
+    return this.http.get<PaginatedResult<AIMLConditionActivityDetail>>(`customer/aiops/conditions/${conditionId}/activities/`, { params: params });
   }
 
-  getAnalysisDetails(conditionId: string) {
+  getAnalysisDetails(conditionId: string, dateRangeParams?: AIMLEventMgmtDateRangeParams) {
     let params: HttpParams = new HttpParams();
     params = params.append('condition_uuid', conditionId);
+    params = this.aimlMgmtSvc.appendDateRangeParams(params, dateRangeParams);
     return this.http.get<AIMLAnalysisData>(`/chatbot/generate_condition_rca/`, { params: params });
   }
 

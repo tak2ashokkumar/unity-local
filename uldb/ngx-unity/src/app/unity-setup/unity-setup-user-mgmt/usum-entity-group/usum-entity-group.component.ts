@@ -44,8 +44,8 @@ export class UsumEntityGroupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.toggleConfirmEntityGroupModalRef?.hide();
     this.confirmDeleteModalRef?.hide();
+    this.toggleConfirmEntityGroupModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

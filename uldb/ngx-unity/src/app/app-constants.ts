@@ -12,6 +12,8 @@ export const WINDOWS_CONSOLE_VIA_AGENT = (rdpURL: string, managementIP: string) 
 
 export const MANAGEMENT_NOT_ENABLED_MESSAGE = () => `This feature is not enabled`;
 
+export const GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR = (colletorUuid: string, ip: string) => `/rdp/terminal/?collector_uuid=${colletorUuid}&ip=${ip}&domain=unityonecloud.com&port=3389`;
+
 export const AUTH_ALGOS = [
     { label: 'MD5', value: 'MD5' },
     { label: 'SHA1', value: 'SHA1' },

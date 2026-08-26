@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
@@ -16,7 +16,7 @@ import { UsiEventIngestionGcpCrudService } from './usi-event-ingestion-gcp-crud.
   templateUrl: './usi-event-ingestion-gcp-crud.component.html',
   styleUrls: ['./usi-event-ingestion-gcp-crud.component.scss']
 })
-export class UsiEventIngestionGcpCrudComponent implements OnInit {
+export class UsiEventIngestionGcpCrudComponent implements OnInit, OnDestroy {
 
   @Output('onCrud') onCrud = new EventEmitter<CRUDActionTypes>();
 

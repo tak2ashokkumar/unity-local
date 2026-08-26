@@ -26,8 +26,8 @@
                 <div class="text-truncate">Total Alerts</div>
                 <div class="d-flex align-items-baseline">
                     <span class="text-primary text-value">{{summaryViewData.total.alert_count}}</span>
-                    <span
-                        class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.alert_count}}
+                    <span *ngIf="summaryViewData.last_7_days as lastSevenDays"
+                        class="font-xs text-muted font-500 ml-1 text-truncate">{{lastSevenDays.alert_count}}
                         Since last week</span>
                 </div>
             </div>
@@ -61,8 +61,8 @@
                 <div class="text-truncate">Critical</div>
                 <div class="d-flex align-items-baseline">
                     <span class="text-primary text-value">{{summaryViewData.total.critical}}</span>
-                    <span
-                        class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.critical}}
+                    <span *ngIf="summaryViewData.last_7_days as lastSevenDays"
+                        class="font-xs text-muted font-500 ml-1 text-truncate">{{lastSevenDays.critical}}
                         Since last week</span>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                 <div class="text-truncate">Warning</div>
                 <div class="d-flex align-items-baseline">
                     <span class="text-primary text-value">{{summaryViewData.total.warning}}</span>
-                    <span class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.warning}}
+                    <span *ngIf="summaryViewData.last_7_days as lastSevenDays" class="font-xs text-muted font-500 ml-1 text-truncate">{{lastSevenDays.warning}}
                         Since last week</span>
                 </div>
             </div>
@@ -86,8 +86,8 @@
                 <div class="text-truncate">Information</div>
                 <div class="d-flex align-items-baseline">
                     <span class="text-primary text-value">{{summaryViewData.total.information}}</span>
-                    <span
-                        class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.information}}
+                    <span *ngIf="summaryViewData.last_7_days as lastSevenDays"
+                        class="font-xs text-muted font-500 ml-1 text-truncate">{{lastSevenDays.information}}
                         Since last week</span>
                 </div>
             </div>

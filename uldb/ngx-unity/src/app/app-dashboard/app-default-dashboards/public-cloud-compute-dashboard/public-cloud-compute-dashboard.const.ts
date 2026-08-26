@@ -327,13 +327,13 @@ export const PUBLIC_CLOUD_STORAGE_HIGH_LATENCY_DEVICES_ENDPOINT = '/customer/pub
 
 // Storage Performance card definitions (render order + colour + card kind). 'trend' cards
 // render an area chart from the metric points; 'highLatency' renders a bar chart of per-device P95.
-export const PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS: Array<{ key: string, endpoint: string, color: string, kind: 'trend' | 'highLatency' }> = [
-  { key: 'e2e_latency', endpoint: PUBLIC_CLOUD_STORAGE_E2E_LATENCY_TREND_ENDPOINT, color: '#3f8cff', kind: 'trend' },
-  { key: 'success_server_latency', endpoint: PUBLIC_CLOUD_STORAGE_SUCCESS_SERVER_LATENCY_TREND_ENDPOINT, color: '#8b5cf6', kind: 'trend' },
-  { key: 'network_query_delay', endpoint: PUBLIC_CLOUD_STORAGE_NETWORK_QUERY_DELAY_TREND_ENDPOINT, color: '#ff8a3d', kind: 'trend' },
-  { key: 'avg_queue_depth', endpoint: PUBLIC_CLOUD_STORAGE_AVG_QUEUE_DEPTH_TREND_ENDPOINT, color: '#ff8a3d', kind: 'trend' },
-  { key: 'utilization', endpoint: PUBLIC_CLOUD_STORAGE_UTILIZATION_TREND_ENDPOINT, color: '#3fb950', kind: 'trend' },
-  { key: 'high_latency_devices', endpoint: PUBLIC_CLOUD_STORAGE_HIGH_LATENCY_DEVICES_ENDPOINT, color: '#ec4b3f', kind: 'highLatency' }
+export const PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS: Array<{ key: string, title: string, endpoint: string, color: string, kind: 'trend' | 'highLatency' }> = [
+  { key: 'e2e_latency', title: 'E2E Latency Trends', endpoint: PUBLIC_CLOUD_STORAGE_E2E_LATENCY_TREND_ENDPOINT, color: '#3f8cff', kind: 'trend' },
+  { key: 'success_server_latency', title: 'Success Server Latency(P95)Trend', endpoint: PUBLIC_CLOUD_STORAGE_SUCCESS_SERVER_LATENCY_TREND_ENDPOINT, color: '#8b5cf6', kind: 'trend' },
+  { key: 'network_query_delay', title: 'Network/Query Delay(P95)Trend', endpoint: PUBLIC_CLOUD_STORAGE_NETWORK_QUERY_DELAY_TREND_ENDPOINT, color: '#ff8a3d', kind: 'trend' },
+  { key: 'avg_queue_depth', title: 'Average Queue Depth', endpoint: PUBLIC_CLOUD_STORAGE_AVG_QUEUE_DEPTH_TREND_ENDPOINT, color: '#ff8a3d', kind: 'trend' },
+  { key: 'utilization', title: 'Utilization', endpoint: PUBLIC_CLOUD_STORAGE_UTILIZATION_TREND_ENDPOINT, color: '#3fb950', kind: 'trend' },
+  { key: 'high_latency_devices', title: 'High Latency Devices', endpoint: PUBLIC_CLOUD_STORAGE_HIGH_LATENCY_DEVICES_ENDPOINT, color: '#ec4b3f', kind: 'highLatency' }
 ];
 
 export const PUBLIC_CLOUD_STORAGE_RESOURCES_ENDPOINT = '/customer/public-cloud-widgets/top_storage_resource/';

@@ -33,13 +33,12 @@ export const EVENT_ANALYTICS_RESOLVED_INCIDENTS_ENDPOINT = '/customer/persona/ev
 export const EVENT_ANALYTICS_NOISY_EVENTS_ENDPOINT = '/customer/persona/event-analytics-dashboard/noisy-events/';
 export const EVENT_ANALYTICS_NOISY_HOSTS_ENDPOINT = '/customer/persona/event-analytics-dashboard/noisy-hosts/';
 export const EVENT_ANALYTICS_ITSM_TICKET_VIEW_ENDPOINT = '/customer/persona/event-analytics-dashboard/itsm-ticket-view/';
+export const EVENT_ANALYTICS_PRIVATE_CLOUD_FAST_ENDPOINT = '/customer/private_cloud_fast/';
+export const EVENT_ANALYTICS_PUBLIC_CLOUD_FAST_ENDPOINT = '/customer/public_cloud_fast/';
 
-export const EVENT_ANALYTICS_ALL_SOURCE_VALUE = 'all_source';
-export const EVENT_ANALYTICS_ALL_SOURCE_OPTION: SelectOption = { value: EVENT_ANALYTICS_ALL_SOURCE_VALUE, label: 'All Sources' };
-export const EVENT_ANALYTICS_ALL_SEVERITY_VALUE = 'all_severity';
-export const EVENT_ANALYTICS_ALL_SEVERITY_OPTION: SelectOption = { value: EVENT_ANALYTICS_ALL_SEVERITY_VALUE, label: 'All Severity' };
-export const EVENT_ANALYTICS_ALL_DATACENTER_VALUE = 'all_datacenter';
-export const EVENT_ANALYTICS_ALL_DATACENTER_OPTION: SelectOption = { value: EVENT_ANALYTICS_ALL_DATACENTER_VALUE, label: 'All Datacenter' };
+export const EVENT_ANALYTICS_TIME_RANGE_PARAM_MAP: { [period: string]: string } = {
+  last_24_hours: 'last_24_hrs'
+};
 
 export const EVENT_ANALYTICS_STATUS_COLORS: Record<string, string> = {
   critical: '#d90000',
@@ -133,6 +132,15 @@ export const EVENT_ANALYTICS_TOP_TIME_RANGE_OPTIONS: SelectOption[] = [
   // { value: EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE, label: 'Custom' }
 ];
 
+export const EVENT_ANALYTICS_EVENT_ALERT_TIME_RANGE_OPTIONS: SelectOption[] = [
+  { value: 'last_24_hours', label: 'Last 24 Hours' },
+  { value: 'last_7_days', label: 'Last 7 Days' },
+  { value: 'last_30_days', label: 'Last 30 Days' },
+  { value: 'last_60_days', label: 'Last 60 Days' },
+  { value: 'last_90_days', label: 'Last 90 Days' },
+  { value: EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE, label: 'Custom' }
+];
+
 export const EVENT_ANALYTICS_TIME_RANGE_OPTIONS: SelectOption[] = [
   // { value: 'last_hour', label: '1 Hour' },
   { value: 'last_24_hours', label: '24 Hour' },
@@ -153,33 +161,16 @@ export const DASHBOARD_FILTERS_DUMMY: DashboardFilters = {
     { value: 'source', label: 'Source' },
     { value: 'severity', label: 'Severity' }
   ],
-  analyticsSourceType: [
-    EVENT_ANALYTICS_ALL_SOURCE_OPTION,
-    // { value: 'unity', label: 'Unity' },
-    // { value: 'azure', label: 'Azure' },
-    // { value: 'nagios', label: 'Nagios' },
-    // { value: 'zabbix', label: 'Zabbix' },
-    // { value: 'aws_cloudwatch', label: 'AWS CloudWatch' },
-    // { value: 'logicmonitor', label: 'LogicMonitor' },
-    // { value: 'opsramp', label: 'OpsRamp' },
-    // { value: 'appdynamics', label: 'AppDynamics' }
-  ],
+  analyticsSourceType: [],
   analyticsSeverityType: [
-    EVENT_ANALYTICS_ALL_SEVERITY_OPTION,
     { value: 'critical', label: 'Critical' },
     { value: 'warning', label: 'Warning' },
     { value: 'information', label: 'Information' }
   ],
-  analyticsDatacenter: [
-    EVENT_ANALYTICS_ALL_DATACENTER_OPTION
-  ],
-  analyticsCloud: [
-    { value: 'all_cloud', label: 'All Cloud' },
-    { value: 'private_cloud', label: 'Private Cloud' },
-    { value: 'public_cloud', label: 'Public Cloud' }
-  ],
-  analyticsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS,
-  eventAndAlertTimeline: EVENT_ANALYTICS_TIME_RANGE_OPTIONS,
+  analyticsDatacenter: [],
+  analyticsCloud: [],
+  analyticsDeviceTypes: [],
+  eventAndAlertTimeline: EVENT_ANALYTICS_EVENT_ALERT_TIME_RANGE_OPTIONS,
   noisyEventsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS,
   noisyHostsCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS,
   incidentCategory: EVENT_ANALYTICS_CATEGORY_OPTIONS

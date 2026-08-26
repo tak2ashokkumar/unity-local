@@ -1,16 +1,17 @@
-export type StorageVendor = 'netapp' | 'pure';
+export type StorageType = 'netapp' | 'pure';
 
 export interface StorageFilterOption {
   value: string;
   label: string;
 }
 
-export interface StorageVendorOption extends StorageFilterOption {
-  value: StorageVendor;
+export interface StorageClusterOption extends StorageFilterOption {
+  uuid?: string;
+  name?: string;
 }
 
-export interface StorageResourceOption extends StorageFilterOption {
-  datacenter: string;
+export interface StorageArrayOption extends StorageFilterOption {
+  uuid?: string;
 }
 
 export interface StorageDateRangeValue {
@@ -20,10 +21,12 @@ export interface StorageDateRangeValue {
 }
 
 export interface StorageDashboardFilterCriteria {
-  vendor: StorageVendor;
+  storageType: StorageType;
   datacenters: string[];
-  resourceIds: string[];
+  clusters: string[];
+  arrays: string[];
   period: string;
+  timeRangeApiValue?: string;
   from: string | Date;
   to: string | Date;
 }
@@ -31,4 +34,49 @@ export interface StorageDashboardFilterCriteria {
 export interface StorageFilterScopeSummary {
   primaryLabel: string;
   remainingLabels: string[];
+}
+
+export interface StorageTimeRangeOptionApi {
+  label: string;
+  value: string;
+}
+
+export interface StorageTimeRangeOption extends StorageTimeRangeOptionApi {
+  apiValue?: string;
+}
+
+export interface StorageNetappClusterApi {
+  name: string;
+  uuid: string;
+}
+
+export interface StorageNetappDatacenterApi {
+  label: string;
+  value: string;
+}
+
+export interface StorageNetappDashboardFiltersResponse {
+  datacenters?: StorageNetappDatacenterApi[];
+  clusters?: StorageNetappClusterApi[];
+  timeRangeOptions?: StorageTimeRangeOptionApi[];
+}
+
+export type StorageNetappClusterFiltersResponse = StorageNetappClusterApi[];
+
+export interface StoragePureFilterOptionApi {
+  name: string;
+  uuid: string;
+}
+
+export interface StoragePureDashboardFiltersResponse {
+  arrays: StoragePureFilterOptionApi[];
+  datacenters: StoragePureFilterOptionApi[];
+  time_range: StorageTimeRangeOptionApi[];
+}
+
+export interface StorageDashboardFilterOptionsViewData {
+  datacenters: StorageFilterOption[];
+  clusters: StorageClusterOption[];
+  arrays: StorageArrayOption[];
+  timeRangeOptions: StorageTimeRangeOption[];
 }

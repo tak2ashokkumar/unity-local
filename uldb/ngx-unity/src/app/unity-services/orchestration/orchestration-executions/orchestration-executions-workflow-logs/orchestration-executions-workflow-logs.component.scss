@@ -7,6 +7,19 @@
 .output-bgr {
     background-color: #F0F3F5;
     border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.workflow-output-scroll {
+    overflow-x: auto;
+}
+
+.workflow-output-json {
+    width: max-content;
+    min-width: 100%;
+    white-space: pre;
+    color: #1f2937;
+    font-size: 12px;
 }
 
 .vertical-line {

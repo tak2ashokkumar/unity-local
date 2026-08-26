@@ -2,13 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { ConsoleAccessComponent } from 'src/app/shared/console-access/console-access.component';
+import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
+import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers/docker-tabs/docker-tabs.component';
 import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
-import { ContainerControllersComponent } from '../shared/container-controllers/container-controllers.component';
-import { ContainerControllersZabbixComponent } from '../shared/container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
-import { ZABBIX_CONTAINER_CONTROLLER_ROUTES } from '../shared/container-controllers/container-controllers-zabbix/container-controllers-zabbix-routing.const';
-import { KUBERNETES_MONITORING_CHILDREN } from '../shared/container-controllers/kubernetes-monitoring-routing.const';
-import { DockerContainersZabbixComponent } from '../shared/container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
-import { ZABBIX_DOCKER_CONTAINER_ROUTES } from '../shared/container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix-routing.const';
 import { VmBackupHistoryComponent } from 'src/app/shared/vm-backup-history/vm-backup-history.component';
 import { SWITCH_ROUTES } from 'src/app/united-cloud/shared/switches/switches-routing.const';
 import { AwsDeviceTabComponent } from '../shared/aws-device-tab/aws-device-tab.component';
@@ -17,6 +13,12 @@ import { AwsZabbixComponent } from '../shared/aws-zabbix/aws-zabbix.component';
 import { ZABBIX_AZURE_ACCOUNT_ROUTES } from '../shared/azure-zabbix/azure-zabbix-routing.const';
 import { AzureZabbixComponent } from '../shared/azure-zabbix/azure-zabbix.component';
 import { BMS_ROUTES } from '../shared/bm-servers/bm-servers-routing.const';
+import { ZABBIX_CONTAINER_CONTROLLER_ROUTES } from '../shared/container-controllers/container-controllers-zabbix/container-controllers-zabbix-routing.const';
+import { ContainerControllersZabbixComponent } from '../shared/container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
+import { ContainerControllersComponent } from '../shared/container-controllers/container-controllers.component';
+import { ZABBIX_DOCKER_CONTAINER_ROUTES } from '../shared/container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix-routing.const';
+import { DockerContainersZabbixComponent } from '../shared/container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
+import { KUBERNETES_MONITORING_CHILDREN } from '../shared/container-controllers/kubernetes-monitoring-routing.const';
 import { ZABBIX_DBS_ROUTES } from '../shared/database-servers/database-zabbix-routing.const';
 import { DeviceTabComponent } from '../shared/device-tab/device-tab.component';
 import { FIREWALL_ROUTES } from '../shared/firewalls/firewalls-routing.const';
@@ -60,8 +62,6 @@ import { AssetsVmsGcpComponent } from './assets-vms/assets-vms-gcp/assets-vms-gc
 import { AssetsVmsOracleComponent } from './assets-vms/assets-vms-oracle/assets-vms-oracle.component';
 import { AssetsVmsComponent } from './assets-vms/assets-vms.component';
 import { AssetsComponent } from './assets.component';
-import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
-import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers/docker-tabs/docker-tabs.component';
 
 
 

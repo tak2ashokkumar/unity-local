@@ -125,6 +125,7 @@ interface StorageItem {
 interface CollectorType {
     name: string;
     uuid: string;
+    is_ztc?:boolean;
 }
 
 interface Nutanix {

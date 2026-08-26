@@ -1,0 +1,796 @@
+//  Design Tokens (mirror from main) 
+$background-color: #ffffff;
+$surface-alt: #f7f8f9;
+$color: #5c6873;
+$color-dark: #3d4a52;
+$color-light: #8a9aa4;
+$accent: #4a90a4;
+$accent-glow: rgba(74, 144, 164, 0.18);
+$border-color: #dce1e5;
+$node-border: #5c6873;
+$shadow-node: 0 2px 10px rgba(60, 72, 82, 0.13);
+$shadow-node-hover: 0 6px 20px rgba(60, 72, 82, 0.20);
+$transition-snap: cubic-bezier(0.4, 0, 0.2, 1);
+
+.wf-page-container {
+
+    //  Canvas 
+    .drawflow-canvas {
+        flex: 1 !important;
+        min-height: 0 !important;
+        overflow: auto !important;
+        background: $surface-alt;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .drawflow-canvas,
+    #dynamic-drawflow {
+        pointer-events: auto;
+        min-height: 0 !important;
+    }
+
+    #dynamic-drawflow {
+        flex: 1;
+        min-height: 0 !important;
+        border: none;
+        background-color: $surface-alt;
+        position: relative;
+        overflow: hidden;
+        min-width: 0;
+        // Refined dot grid  lighter, tighter
+        background-image: radial-gradient(circle, #c8d0d6 1px, transparent 1px);
+        background-size: 22px 22px;
+    }
+
+    //  Drawflow node shell 
+    .drawflow-node.agentic-default-node {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: auto !important;
+    }
+
+    //  Custom node wrapper 
+    .agentic-custom-node {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        background: transparent !important;
+        min-width: 60px;
+        cursor: grab;
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    //  Node Box 
+    .node-box {
+        width: 60px !important;
+        height: 60px !important;
+        border: 1.5px solid $node-border !important;
+        border-radius: 10px !important;
+        background: $background-color !important;
+        position: relative;
+        box-shadow: $shadow-node;
+        transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.15s $transition-snap;
+
+        &:hover {
+            box-shadow: $shadow-node-hover;
+            border-color: $accent !important;
+            // transform: translateY(-1px);
+        }
+    }
+
+    //  Node Label 
+    .node-label {
+        margin-top: 7px;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: $color;
+        text-align: center;
+        width: 170px;
+        max-width: 170px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        letter-spacing: 0.01em;
+
+        .node-name-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: calc(100% - 14px);
+        }
+    }
+
+    //  Variant: Switch / LLM / Loop 
+    .node-box.switch-case {
+        height: 100px !important;
+    }
+
+    .node-box.loop {
+        height: 90px !important;
+    }
+
+    .node-box.llm {
+        height: 110px !important;
+        width: 150px !important;
+    }
+
+    //  Node wrapper 
+    .agentic-custom-node .node-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    //  Ports  Input 
+    .drawflow .drawflow-node.agentic-default-node .input {
+        visibility: visible !important;
+        width: 7px !important;
+        height: 14px !important;
+        left: 52px !important;
+        top: -10px !important;
+        border-radius: 2px !important;
+        background-color: $color !important;
+        cursor: pointer !important;
+        border: transparent;
+        transition: background-color 0.15s ease;
+
+        &:hover {
+            background-color: $accent !important;
+        }
+    }
+
+    .drawflow .drawflow-node.agentic-default-node:has(.type-trigger) .input {
+        display: none !important;
+    }
+
+    .drawflow .drawflow-node.agentic-default-node .drawflow-delete {
+        display: none !important;
+    }
+
+    //  Ports  Output 
+    .drawflow .drawflow-node.agentic-default-node .output {
+        position: absolute !important;
+        right: 50px !important;
+        top: 35%;
+        transform: translateY(-50%);
+        width: 12px !important;
+        height: 12px !important;
+        border-radius: 50% !important;
+        border: 1.5px solid $node-border;
+        background-color: $background-color !important;
+        cursor: pointer !important;
+        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+
+        &:hover {
+            background-color: $accent !important;
+            border-color: $accent;
+            transform: translateY(-50%) scale(1.25);
+        }
+    }
+
+    //  LLM port overrides 
+    .drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .input {
+        left: -3px !important;
+        top: 50% !important;
+        transform: translateY(-50%);
+    }
+
+    .drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .output {
+        right: -5px !important;
+        top: 50% !important;
+    }
+
+    //  Connections 
+    .drawflow .connection path {
+        stroke: $color !important;
+        stroke-width: 1.5px !important;
+        fill: none;
+        stroke-linecap: round;
+        marker-end: url(#arrow);
+        cursor: pointer;
+        transition: stroke 0.15s ease;
+
+        &:hover {
+            stroke: $accent !important;
+            stroke-width: 2px !important;
+        }
+    }
+
+    .drawflow .connection .main-path.selected {
+        stroke: $accent !important;
+        stroke-width: 2.5px !important;
+    }
+
+    // The connection editor replaces Drawflow's right-click cross control.
+    .drawflow>.drawflow-delete {
+        display: none !important;
+    }
+
+    .connection-editor {
+        position: absolute;
+        z-index: 30;
+        width: 304px;
+        padding: 10px;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        background: $background-color;
+        box-shadow: 0 8px 24px rgba(60, 72, 82, 0.2);
+        color: $color-dark;
+    }
+
+    .connection-editor-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .connection-delete {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 25px;
+        height: 25px;
+        padding: 0;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+        background: $background-color;
+        color: $color;
+        cursor: pointer;
+        transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease, transform 0.12s ease;
+
+        &:hover,
+        &:focus {
+            border-color: #d9534f;
+            background: #fdecea;
+            color: #d9534f;
+            outline: none;
+            transform: scale(1.08);
+        }
+    }
+
+    .connection-shape-options {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .connection-shape-option {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 3px 5px;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        background: $surface-alt;
+        color: $color;
+        font-size: 9px;
+        line-height: 1.1;
+        cursor: pointer;
+        transition: border-color 0.14s ease, background 0.14s ease, color 0.14s ease;
+
+        svg {
+            width: 40px;
+            height: 18px;
+            overflow: visible;
+        }
+
+        path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        &:hover,
+        &:focus,
+        &.active {
+            border-color: $accent;
+            background: $accent-glow;
+            color: $accent;
+            outline: none;
+        }
+
+        &.active {
+            box-shadow: inset 0 0 0 1px $accent;
+        }
+    }
+
+    .connection-bulk-apply {
+        width: 100%;
+        margin-top: 8px;
+        padding: 6px 8px;
+        border: 1px solid $accent;
+        border-radius: 5px;
+        background: $accent;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            background: $color-dark;
+            border-color: $color-dark;
+            outline: none;
+        }
+    }
+
+    //  Icons 
+    .node-left-icon {
+        position: absolute !important;
+        left: -8px !important;
+        top: 45% !important;
+        transform: translateY(-50%) !important;
+        width: 15px !important;
+        height: 15px !important;
+
+        img {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    }
+
+    .node-center-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 22px;
+        height: 22px;
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    //  Icon+Title row 
+    .icon-and-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding-top: 5%;
+    }
+
+    .node-center-icon-ai {
+        position: relative;
+        width: 25px;
+        height: 25px;
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .node-center-icon-llm {
+        position: relative;
+        width: 20px;
+        height: 20px;
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .node-title {
+        display: block;
+        min-width: 0;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: $color-dark;
+        letter-spacing: 0.01em;
+    }
+
+    //  Node Actions 
+    %node-actions-base {
+        position: absolute;
+        top: -32px;
+        height: 28px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+        padding: 0 4px;
+        z-index: 10;
+        visibility: hidden;
+        background: transparent;
+        color: $color;
+        cursor: pointer !important;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+
+        // Keep the node hovered while the pointer crosses the gap to the actions.
+        &::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            right: 0;
+            left: 0;
+            height: 4px;
+        }
+    }
+
+    .agentic-custom-node .node-actions {
+        @extend %node-actions-base;
+        left: 0;
+        right: 40px;
+    }
+
+    .agentic-custom-node .node-actions-agentic {
+        @extend %node-actions-base;
+        left: 0;
+        right: 40px;
+    }
+
+    .agentic-custom-node .node-actions-llm {
+        @extend %node-actions-base;
+        left: 0;
+        right: 40px;
+    }
+
+    // Show on hover with smooth reveal
+    .agentic-custom-node:hover .node-actions,
+    .agentic-custom-node:hover .node-actions-agentic,
+    .agentic-custom-node:hover .node-actions-llm,
+    .agentic-custom-node .node-actions:hover {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    // Action icon buttons
+    .node-actions,
+    .node-actions-agentic,
+    .node-actions-llm {
+        .action {
+            width: 24px;
+            height: 24px;
+            border-radius: 5px;
+            background: $background-color;
+            border: 1px solid $border-color;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: $color;
+            box-shadow: 0 1px 4px rgba(60, 72, 82, 0.12);
+            transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease, transform 0.12s ease;
+            cursor: pointer;
+            padding: 0 5px;
+
+            &:hover {
+                transform: scale(1.12);
+            }
+
+            &.test:hover {
+                background: #eaf6f0;
+                color: #2d8f62;
+                border-color: #2d8f62;
+            }
+
+            &.edit:hover {
+                background: #eaf2fb;
+                color: $accent;
+                border-color: $accent;
+            }
+
+            &.delete:hover {
+                background: #fdecea;
+                color: #d9534f;
+                border-color: #d9534f;
+            }
+        }
+    }
+
+    //  Node Status 
+    .node-status {
+        position: relative;
+    }
+
+    .node-status[data-tip]:hover::after {
+        content: attr(data-tip);
+        position: absolute;
+        left: 50%;
+        bottom: 125%;
+        transform: translateX(-50%);
+        max-width: 240px;
+        white-space: pre-wrap;
+        padding: 7px 10px;
+        border-radius: 6px;
+        background: $color-dark;
+        color: #fff;
+        font-size: 11.5px;
+        line-height: 1.4;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+        z-index: 1000;
+    }
+
+    .node-status[data-tip]:hover::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 115%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: $color-dark;
+        z-index: 1001;
+    }
+
+    .node-status[data-tip]::after,
+    .node-status[data-tip]::before {
+        opacity: 0;
+        transition: opacity 120ms ease, transform 120ms ease;
+        pointer-events: none;
+    }
+
+    .node-status[data-tip]:hover::after,
+    .node-status[data-tip]:hover::before {
+        opacity: 1;
+    }
+
+    .node-status-right {
+        position: absolute;
+        top: 2px;
+        right: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    //  AI Agent Node 
+    .node-box.ainode {
+        width: fit-content !important;
+        min-width: 180px !important;
+        max-width: calc(5 * 34px + 5 * 10px + 16px);
+        height: auto !important;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        padding: 10px;
+        background: $background-color !important;
+        border-radius: 10px !important;
+        border: 1.5px solid $node-border !important;
+        box-shadow: $shadow-node;
+        transition: box-shadow 0.18s ease, border-color 0.18s ease;
+
+        &:hover {
+            box-shadow: $shadow-node-hover;
+            border-color: $accent !important;
+        }
+    }
+
+    .node-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .node-center-icon-ai img {
+            width: 18px;
+        }
+    }
+
+    .status-icon {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+    }
+
+    //  Config Row 
+    .config-row {
+        display: flex;
+        gap: 10px;
+    }
+
+    .config-col {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .config-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: $color-light;
+        margin-bottom: 3px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .model-select {
+        height: 32px;
+        font-size: 12px;
+        border: 1px solid $border-color;
+        border-radius: 16px !important;
+        color: $color-dark;
+        background: $surface-alt;
+        padding: 0 10px;
+        cursor: pointer;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        appearance: none;
+        -webkit-appearance: none;
+
+        &:focus {
+            border-color: $accent;
+            box-shadow: 0 0 0 3px $accent-glow;
+            outline: none;
+        }
+    }
+
+    .memory-col {
+        align-items: center;
+    }
+
+    .memory-icon {
+        width: 35px;
+        cursor: pointer !important;
+        transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+
+        &:hover {
+            transform: scale(1.08);
+            filter: brightness(1.1);
+        }
+    }
+
+    .memory-brain-icon[data-enabled="false"] {
+        filter: grayscale(1);
+        opacity: 0.45;
+
+        &:hover {
+            filter: grayscale(1) brightness(1.1);
+        }
+    }
+
+    //  Tools Container 
+    .tools-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 34px);
+        gap: 10px;
+        justify-content: start;
+        padding: 4px 2px;
+        max-width: calc(5 * 34px + 5 * 10px);
+        width: fit-content;
+
+        &:empty {
+            display: none;
+        }
+    }
+
+    .tool-chip {
+        position: relative;
+        width: 34px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tool-icon {
+        width: 34px;
+        height: 34px;
+        border: 1.5px solid $node-border;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: $background-color;
+        cursor: pointer;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+
+        img {
+            width: 18px;
+        }
+
+        &:hover {
+            border-color: $accent;
+            box-shadow: 0 0 0 3px $accent-glow;
+            transform: scale(1.08);
+        }
+    }
+
+    .tool-name {
+        font-size: 9px;
+        text-align: center;
+        max-width: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $color-light;
+        margin-top: 2px;
+    }
+
+    //  Drop Zone 
+    .drop-zone {
+        border: 1.5px dashed $border-color;
+        border-radius: 7px;
+        min-height: 48px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10.5px;
+        color: $color-light;
+        cursor: pointer;
+        margin-top: auto;
+        letter-spacing: 0.03em;
+        transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+
+        &:hover,
+        &.dragover {
+            border-color: $accent;
+            background: $accent-glow;
+            color: $accent;
+        }
+    }
+
+    //  AI Agent Port Overrides 
+    .drawflow .drawflow-node.agentic-default-node:has(.node-box.ainode) .input {
+        top: 50% !important;
+        left: -3px !important;
+    }
+
+    .drawflow .drawflow-node.agentic-default-node:has(.node-box.ainode) .output {
+        right: -5px !important;
+        top: 50% !important;
+    }
+
+    //  Tool Delete Icon 
+    .tool-delete-icon {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 15px;
+        height: 15px;
+        background: #e55353;
+        color: #fff;
+        font-size: 9px;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(229, 83, 83, 0.35);
+        transition: background 0.12s ease, transform 0.12s ease;
+
+        &:hover {
+            background: #c0392b;
+            transform: scale(1.15);
+        }
+    }
+
+    .tool-chip.show-delete .tool-delete-icon {
+        display: flex;
+    }
+
+    // Human in Loop
+    .human-in-loop-icon {
+        position: absolute;
+        top: -15px;
+        left: -5px;
+        color: $color !important;
+        transition: color 0.15s ease;
+
+        &:hover {
+            color: $accent !important;
+        }
+    }
+}

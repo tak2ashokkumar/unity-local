@@ -1,0 +1,516 @@
+@import "../../../../unity-chatbot/unity-chatbot.component.scss";
+
+// ─── Design Tokens ───────────────────────────────────────────────────────────
+$background-color: #ffffff;
+$surface-alt: #f7f8f9;
+$color: #5c6873;
+$color-dark: #3d4a52;
+$color-light: #8a9aA4;
+$accent: #4a90a4;
+$accent-glow: rgba(74, 144, 164, 0.18);
+$border-color: #dce1e5;
+$shadow-soft: 0 2px 12px rgba(60, 72, 82, 0.10);
+$shadow-panel: 0 4px 24px rgba(60, 72, 82, 0.13);
+$shadow-lifted: 0 8px 32px rgba(60, 72, 82, 0.17);
+$transition-snap: cubic-bezier(0.4, 0, 0.2, 1);
+$transition-panel: 0.22s $transition-snap;
+
+$tab-active-color: #378ad8; // matches your existing custom-tabs active colour
+$tab-active-bg: rgba(55, 138, 216, 0.08);
+$tab-hover-bg: rgba(92, 104, 115, 0.07);
+$snap: cubic-bezier(0.4, 0, 0.2, 1);
+
+// ─── Page Shell ──────────────────────────────────────────────────────────────
+.wf-page-container {
+    background: $surface-alt;
+}
+
+.workflow-save-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 200;
+    background: rgba(247, 248, 249, 0.78);
+    backdrop-filter: blur(2px);
+}
+
+.workflow-save-status {
+    min-width: 280px;
+    padding: 24px 32px;
+    color: $color-dark;
+    background: $background-color;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    box-shadow: $shadow-lifted;
+}
+
+.workflow-save-spinner {
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 14px;
+    border: 4px solid $accent-glow;
+    border-top-color: $accent;
+    animation: workflow-save-spin 0.8s linear infinite;
+}
+
+.workflow-save-title {
+    margin-bottom: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.workflow-save-message {
+    color: $color-light;
+    font-size: 0.8rem;
+}
+
+@keyframes workflow-save-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.wf-card {
+    min-height: 0;
+    background: $surface-alt;
+}
+
+.wf-body {
+    min-height: 0;
+}
+
+:host {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 3.5rem);
+    overflow: hidden;
+}
+
+// ─── Card Header ─────────────────────────────────────────────────────────────
+.card-header.wf-header {
+    border-bottom-color: $border-color !important;
+    padding: 0.25rem 0.75rem !important;
+    box-shadow: 0 1px 4px rgba(60, 72, 82, 0.07);
+    z-index: 50;
+
+    .workflow-name-field {
+        flex: 0 1 18rem;
+        min-width: 0;
+    }
+
+    .workflow-name-display {
+        min-width: 0;
+        max-width: 100%;
+        gap: 0.5rem;
+        padding: 0.3rem 0.45rem;
+        color: $color-dark;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            color: $accent;
+            outline: none;
+        }
+
+        .workflow-name-text {
+            min-width: 0;
+        }
+
+        i {
+            font-size: 0.75rem;
+        }
+    }
+}
+
+// ─── Main Layout ─────────────────────────────────────────────────────────────
+.main-layout {
+    min-height: 0;
+}
+
+.main-layout .row {
+    flex: 1;
+    min-height: 0;
+}
+
+// ─── Workspace Shell ──────────────────────────────────────────────────────────
+.workspace-shell {
+    background: $surface-alt;
+}
+
+.drawflow-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+// ─── Shared Overlay Styles ────────────────────────────────────────────────────
+.left-overlay,
+.right-overlay,
+.bottom-overlay {
+    position: absolute;
+    background: $background-color;
+    box-shadow: $shadow-panel;
+    z-index: 10;
+    overflow: hidden;
+    border: 1px solid $border-color;
+    transition: transform $transition-panel, box-shadow 0.2s ease;
+}
+
+// ─── Left Panel ───────────────────────────────────────────────────────────────
+.left-overlay {
+    top: 0;
+    left: 0;
+    height: 100%;
+    min-width: 340px;
+    max-width: 650px;
+    border-top: none;
+    border-left: none;
+    border-bottom: none;
+
+    &:hover {
+        box-shadow: $shadow-lifted;
+    }
+}
+
+// ─── Right Panel ──────────────────────────────────────────────────────────────
+.right-overlay {
+    top: 0;
+    right: 0;
+    height: 100%;
+    min-width: 340px;
+    max-width: 650px;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+
+    &:hover {
+        box-shadow: $shadow-lifted;
+    }
+}
+
+// ─── Bottom Panel ─────────────────────────────────────────────────────────────
+.bottom-overlay {
+    bottom: 0;
+    min-height: 180px;
+    max-height: 100%;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+}
+
+// ─── Panel Content ────────────────────────────────────────────────────────────
+.left-panel-content,
+.right-panel-content,
+.bottom-panel-content {
+    height: 100%;
+    overflow: auto;
+    background: $background-color;
+}
+
+// Slim scrollbar
+.left-panel-content {
+    &::-webkit-scrollbar {
+        width: 3px !important;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent !important;
+        margin: 3px 0 !important;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $color-light !important;
+        border-radius: 10px !important;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: $color !important;
+    }
+
+    &::-webkit-scrollbar-button {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    &::-webkit-scrollbar-corner {
+        background: transparent !important;
+    }
+}
+
+// ─── Resizers ─────────────────────────────────────────────────────────────────
+.left-resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    cursor: ew-resize;
+    transition: background 0.15s ease;
+
+    &:hover {
+        background: $accent;
+    }
+}
+
+.right-resizer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    cursor: ew-resize;
+    transition: background 0.15s ease;
+
+    &:hover {
+        background: $accent;
+    }
+}
+
+.bottom-resizer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    cursor: ns-resize;
+    z-index: 9999;
+    transition: background 0.15s ease;
+
+    &:hover {
+        background: $accent;
+    }
+}
+
+// ─── Panel Header ─────────────────────────────────────────────────────────────
+.panel-header {
+    height: 46px;
+    gap: 10px;
+    padding: 0 14px;
+    background: $background-color;
+    color: $color;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+    z-index: 5;
+    border-bottom: 1px solid $border-color;
+    user-select: none;
+}
+
+.panel-toggle {
+    background: transparent;
+    border: none;
+    color: $color;
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.15s ease;
+    padding: 0;
+
+    &:hover {
+        color: $accent;
+    }
+
+    i {
+        transition: transform 0.2s $transition-snap;
+    }
+}
+
+.left-panel-content,
+.right-panel-content,
+.bottom-panel-content {
+    height: calc(100% - 46px);
+    overflow: auto;
+}
+
+.left-panel-content {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+// ─── Outside Launcher Buttons ─────────────────────────────────────────────────
+.panel-launcher {
+    position: absolute;
+    z-index: 30;
+    background: $background-color;
+    color: $color;
+    border: 1px solid $border-color;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: $shadow-soft;
+    transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+
+}
+
+.left-launcher {
+    top: 20px;
+    left: 0;
+    width: 210px;
+    height: 56px;
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+    padding: 0 14px;
+
+    &:hover {
+        transform: translateX(2px);
+    }
+}
+
+// ─── Bottom Collapsed Bar ─────────────────────────────────────────────────────
+.bottom-collapsed-bar {
+    position: absolute;
+    bottom: 0;
+    height: 40px;
+    background: $background-color;
+    color: $color;
+    z-index: 30;
+    padding: 0 10px;
+    box-shadow: 0 -2px 8px rgba(60, 72, 82, 0.10);
+    cursor: pointer;
+    border-top: 1px solid $border-color;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: background 0.15s ease;
+    user-select: none;
+
+    &:hover {
+        background: $surface-alt;
+        color: $accent;
+    }
+
+}
+
+// ─── Center Canvas Text ───────────────────────────────────────────────────────
+.center-text-container {
+    position: absolute;
+    width: 240px;
+    top: 200px;
+    right: 630px;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 10;
+    color: $color-light;
+    border: 1.5px dashed $border-color;
+    padding: 18px 15px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(4px);
+    line-height: 1.5;
+    pointer-events: none;
+}
+
+.toolbar-container {
+    z-index: 90;
+}
+
+.toolbar-actions {
+    gap: 6px;
+}
+
+// ── Collapsed pill tabs (visible when panel is shut) ──────────────────────────
+.bottom-collapsed-tabs {
+    gap: 4px;
+}
+
+.bottom-panel-actions {
+    gap: 8px;
+}
+
+.bottom-tab-pill {
+    gap: 4px;
+    height: 26px;
+    padding: 0 10px;
+    border: 1px solid $border-color;
+    border-radius: 13px;
+    background: transparent;
+    color: $color;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s $snap, border-color 0.15s $snap, color 0.15s $snap;
+
+    &:hover {
+        background: $tab-hover-bg;
+        border-color: $tab-active-color;
+        color: $tab-active-color;
+    }
+
+    &.active {
+        background: $tab-active-bg;
+        border-color: $tab-active-color;
+        color: $tab-active-color;
+        font-weight: 600;
+    }
+
+    .fx-icon {
+        font-size: 11px;
+        font-style: normal;
+
+        i {
+            font-style: italic;
+            font-weight: 700;
+        }
+    }
+}
+
+// ── Expanded panel header ─────────────────────────────────────────────────────
+.bottom-panel-header {
+    height: 32px;
+    background: $background-color;
+    border-bottom: 1px solid $border-color;
+
+    >.d-flex {
+        height: 32px;
+    }
+
+    .tb {
+        width: 26px;
+        height: 26px;
+        padding: 0;
+    }
+}
+
+.bottom-panel-title {
+    color: $color-dark;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+}
+
+// ── Panel content area ────────────────────────────────────────────────────────
+.bottom-panel-content {
+    min-height: 0;
+    height: auto;
+}
+
+.bottom-expanded-bar {
+    height: 40px;
+    flex: 0 0 40px;
+    padding: 0 10px;
+    background: $background-color;
+    border-top: 1px solid $border-color;
+    box-shadow: 0 -2px 8px rgba(60, 72, 82, 0.08);
+    user-select: none;
+}
+
+.bottom-collapse-toggle {
+    margin-left: 8px;
+    flex: 0 0 auto;
+}
+
+.wf-launcher-btns {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    z-index: 30;
+    gap: 8px;
+    padding: 0 14px;
+}

@@ -1,86 +1,101 @@
-<div class="modal-body m-0 p-0">
-  <!-- Round Close Button -->
-  <button type="button" class="btn-close-round mr-1" (click)="closeModal()">
-    <i class="fas fa-times"></i>
-  </button>
+<div class="workflow-variables-container" [class.dynamic-workflow-variables]="isDynamicWorkflow"
+  [ngClass]="!isDynamicWorkflow ? 'modal-body m-0 p-0' : 'm-0 p-0'">
 
-  <button type="button" class="btn-tick-round" (click)="closeModal('save')">
-    <i class="fas fa-check"></i>
-  </button>
+  <div *ngIf="!isDynamicWorkflow">
+    <!-- Round Close Button -->
+    <button type="button" class="btn-close-round mr-1" (click)="closeModal()">
+      <i class="fas fa-times"></i>
+    </button>
 
-  <div class="card-header d-flex justify-content-between align-items-center rounded">
+    <button type="button" class="btn-tick-round" (click)="closeModal('save')">
+      <i class="fas fa-check"></i>
+    </button>
+  </div>
+
+  <div *ngIf="!isDynamicWorkflow" class="card-header d-flex justify-content-between align-items-center rounded">
     <h6 class="mb-0 text-dark">Workflow Variables</h6>
   </div>
   <div class="row m-1 p-2 properties">
     <form [formGroup]="workflowVarsForm" *ngIf="workflowVarsForm" class="col-12">
       <ng-container formArrayName="variables">
-        <div class="mb-4" *ngFor="let workflowVar of variables.controls; let i = index" [formGroupName]="i">
-          <div class="d-flex justify-content-between mb-1">
-            <div class="d-flex align-items-end">
-              <label class="text-muted text-sm align-self-end mb-0">Variable Name<em>*</em> :</label>
+        <div class="variable-row mb-4" *ngFor="let workflowVar of variables.controls; let i = index"
+          [class.variable-row--stacked]="stackFields" [formGroupName]="i">
+          <div class="variable-field variable-name-field">
+            <div class="variable-field-header">
+              <label class="text-muted text-sm mb-1">Variable Name<em>*</em> :</label>
             </div>
-            <button type="button" class="action-icons fas fa-minus btn-sm" (click)="removeVariable(i)"></button>
+            <input type="text" class="text-dark form-control mb-2" formControlName="param_name"
+              placeholder="Enter Param Name" [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.param_name">
+            <div class="invalid-feedback" *ngIf="workflowVarsFormErrors?.variables[i]?.param_name">
+              {{ workflowVarsFormErrors?.variables[i].param_name }}
+            </div>
           </div>
-          <input type="text" class="text-dark form-control mb-2" formControlName="param_name"
-            placeholder="Enter Param Name" [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.param_name">
-          <div class="invalid-feedback" *ngIf="workflowVarsFormErrors?.variables[i]?.param_name">
-            {{ workflowVarsFormErrors?.variables[i].param_name }}
-          </div>
-          <label class="text-muted text-sm mb-1">Variable Type<em>*</em> :</label>
-          <select class="form-control mb-2 text-dark" formControlName="param_type"
-            [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.param_type">
-            <option value="">Select Variable Type</option>
-            <option value="Text">Text</option>
-            <option value="Password">Password</option>
-            <option value="Number">Number</option>
-            <option value="Cloud Account">Cloud Account</option>
-            <option value="Target">Target</option>
-            <option value="Credential">Credential</option>
-          </select>
-          <div class="invalid-feedback" *ngIf="workflowVarsFormErrors?.variables[i]?.param_type">
-            {{ workflowVarsFormErrors?.variables[i].param_type }}
-          </div>
-          <label class="text-muted text-sm mb-1">Default Value<em>*</em> :</label>
-          <ng-container [ngSwitch]="workflowVar.get('param_type')?.value">
-            <input *ngSwitchCase="'Text'" type="text" class="text-dark form-control mb-2"
-              formControlName="default_value" placeholder="Enter Default Value"
-              [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
 
-            <custom-password-field *ngSwitchCase="'Password'" formControlName="default_value"
-              [options]="{id:'default_value', errors:workflowVarsFormErrors?.variables[i]?.default_value, placeholder:'Enter Default Value'}"
-              class="mb-3">
-            </custom-password-field>
-
-            <input *ngSwitchCase="'Number'" type="number" class="text-dark form-control mb-2"
-              formControlName="default_value" [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
-
-            <select *ngSwitchCase="'Cloud Account'" class="text-dark form-control mb-2" [compareWith]="compareAccounts"
-              formControlName="default_value" [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
-              <option value="">Select Cloud Account</option>
-              <option *ngFor="let account of cloudAccount" [ngValue]="account">{{ account.account_name }}
-              </option>
+          <div class="variable-field">
+            <label class="text-muted text-sm mb-1">Variable Type<em>*</em> :</label>
+            <select class="form-control mb-2 text-dark" formControlName="param_type"
+              [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.param_type">
+              <option value="">Select Variable Type</option>
+              <option value="TEXT">Text</option>
+              <option value="PASSWORD">Password</option>
+              <option value="NUMBER">Number</option>
+              <option value="CLOUD_ACCOUNT">Cloud Account</option>
+              <option value="TARGET">Target</option>
+              <option value="CREDENTIAL">Credential</option>
             </select>
-
-            <select *ngSwitchCase="'Credential'" class="text-dark form-control mb-2" formControlName="default_value"
-              [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
-              <option value="">Select Credential</option>
-              <option *ngFor="let account of credentials" [value]="account.uuid">{{ account.name }}</option>
-            </select>
-
-            <app-auto-complete-multi *ngSwitchCase="'Target'" formControlName="default_value" [apiFn]="searchTargets"
-              placeholder="Search Targets" class="mb-2"></app-auto-complete-multi>
-
-            <input *ngSwitchDefault type="text" class="text-dark form-control mb-2" formControlName="default_value"
-              placeholder="Enter Default Value"
-              [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
-          </ng-container>
-          <div class="invalid-feedback" *ngIf="workflowVarsFormErrors?.variables[i]?.default_value">
-            {{ workflowVarsFormErrors?.variables[i].default_value }}
+            <div class="invalid-feedback" *ngIf="workflowVarsFormErrors?.variables[i]?.param_type">
+              {{ workflowVarsFormErrors?.variables[i].param_type }}
+            </div>
           </div>
 
+          <div class="variable-field">
+            <label class="text-muted text-sm mb-1">Default Value<em>*</em> :</label>
+            <ng-container [ngSwitch]="workflowVar.get('param_type')?.value">
+              <input *ngSwitchCase="'TEXT'" type="text" class="text-dark form-control mb-2"
+                formControlName="default_value" placeholder="Enter Default Value"
+                [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
+
+              <custom-password-field *ngSwitchCase="'PASSWORD'" formControlName="default_value"
+                [options]="{id:'default_value', errors:workflowVarsFormErrors?.variables[i]?.default_value, placeholder:'Enter Default Value'}"
+                class="mb-3">
+              </custom-password-field>
+
+              <input *ngSwitchCase="'NUMBER'" type="number" class="text-dark form-control mb-2"
+                formControlName="default_value"
+                [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
+
+              <select *ngSwitchCase="'CLOUD_ACCOUNT'" class="text-dark form-control mb-2"
+                [compareWith]="compareAccounts" formControlName="default_value"
+                [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
+                <option value="">Select Cloud Account</option>
+                <option *ngFor="let account of cloudAccount" [ngValue]="account">{{ account.account_name }}
+                </option>
+              </select>
+
+              <select *ngSwitchCase="'CREDENTIAL'" class="text-dark form-control mb-2"
+                formControlName="default_value"
+                [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
+                <option value="">Select Credential</option>
+                <option *ngFor="let account of credentials" [value]="account.uuid">{{ account.name }}</option>
+              </select>
+
+              <app-auto-complete-multi *ngSwitchCase="'TARGET'" formControlName="default_value"
+                [apiFn]="searchTargets" placeholder="Search Targets" class="mb-2"></app-auto-complete-multi>
+
+              <input *ngSwitchDefault type="text" class="text-dark form-control mb-2"
+                formControlName="default_value" placeholder="Enter Default Value"
+                [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.default_value">
+            </ng-container>
+            <div class="invalid-feedback" *ngIf="workflowVarsFormErrors?.variables[i]?.default_value">
+              {{ workflowVarsFormErrors?.variables[i].default_value }}
+            </div>
+          </div>
+
+          <button type="button" class="variable-remove action-icons fas fa-minus"
+            (click)="removeVariable(i)" [attr.aria-label]="'Remove variable ' + (i + 1)"></button>
         </div>
       </ng-container>
-      <div class="d-flex justify-content-between align-items-center">
+      <div class="variables-actions d-flex justify-content-between align-items-center">
         <div>
           <ng-container *ngIf="!variables.length">
             <span class="text-muted fst-italic mb-3">Variables will appear here once you add.</span>

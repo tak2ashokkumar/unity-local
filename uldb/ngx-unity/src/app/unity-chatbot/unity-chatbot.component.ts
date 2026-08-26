@@ -90,6 +90,40 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   @ViewChild('fileInput') fileInput: ElementRef;
   fileUploadLoader: boolean = false;
   attachedFiles: ChatDocument[] = [];
+  readonly exploreVisibleCount: number = 6;
+  readonly catalogManagementModule: UntiyChatBotExploreMenu = {
+    module_name: 'Catalog Management',
+    queries: [],
+    isActive: false,
+    module_display_name: 'Catalog Management',
+    icon: ModuleIcons['Catalog Management']
+  };
+  exploreStartIndex: number = 0;
+  exploreScrollDirection: 'left' | 'right' = null;
+  private exploreScrollAnimationTimeout: any;
+
+  get compactExploreModules(): UntiyChatBotExploreMenu[] {
+    if (!this.modules.length) {
+      return this.modules;
+    }
+    if (this.modules.some(module => module.module_name == this.catalogManagementModule.module_name)) {
+      return this.modules;
+    }
+    return [...this.modules, this.catalogManagementModule];
+  }
+
+  get visibleExploreModules(): UntiyChatBotExploreMenu[] {
+    return this.compactExploreModules.slice(this.exploreStartIndex, this.exploreStartIndex + this.exploreVisibleCount);
+  }
+
+  get canScrollExploreLeft(): boolean {
+    return this.exploreStartIndex > 0;
+  }
+
+  get canScrollExploreRight(): boolean {
+    return this.exploreStartIndex + this.exploreVisibleCount < this.compactExploreModules.length;
+  }
+
   get chatbotZIndex(): string {
     if (this.isExpanded) {
       return '3001';
@@ -196,6 +230,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.ngUnsubscribe.complete();
     this.annoucedNgUnsubscribe.next();
     this.annoucedNgUnsubscribe.complete();
+    clearTimeout(this.exploreScrollAnimationTimeout);
   }
 
   ngAfterViewChecked(): void {
@@ -339,6 +374,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
         module_display_name: this.getModuleDisplayName(module.module_name),
         icon: ModuleIcons[module.module_name] || ""
       }));
+      this.exploreStartIndex = 0;
     }, (err: HttpErrorResponse) => {
     });
   }
@@ -390,7 +426,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
 
   disableChatbot() {
     if (this.router.url.includes('services/orchestration/workflows/new-workflow') ||
-      this.router.url.includes('/investigate')) {
+      this.router.url.includes('/investigate') ||  this.router.url.includes('/services/orchestration/workflows/dynamic-workflow')) {
       const buttonElement = document.getElementById('chatbotButton');
       this.isOpen && this.togglePopUp();
       buttonElement && buttonElement.classList.add("hidden");
@@ -545,7 +581,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   onExploreMenuLeave() {
-    this.modules.forEach(m => m.isActive = false);
+    this.compactExploreModules.forEach(m => m.isActive = false);
     const q = document.getElementById('queries');
     if (q) {
       q.classList.remove("show");
@@ -558,32 +594,58 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   onIconHover(module: UntiyChatBotExploreMenu) {
-    this.modules.forEach(m => m.isActive = false);
+    this.compactExploreModules.forEach(m => m.isActive = false);
     module.isActive = !module.isActive;
     const q = document.getElementById('queries');
     if (q) {
       if (this.queries.length) {
-        this.queries = this.modules.find(m => m.isActive)?.queries || [];
+        this.queries = this.compactExploreModules.find(m => m.isActive)?.queries || [];
       } else {
         q.classList.add("show");
-        this.queries = this.modules.find(m => m.isActive)?.queries || [];
+        this.queries = this.compactExploreModules.find(m => m.isActive)?.queries || [];
       }
     }
     this.queries.length && (setTimeout(() => { this.scrollToBottom() }, 0));
+  }
+
+  scrollExploreLeft() {
+    if (!this.canScrollExploreLeft) {
+      return;
+    }
+    this.exploreStartIndex = Math.max(this.exploreStartIndex - 1, 0);
+    this.animateExploreScroll('left');
+  }
+
+  scrollExploreRight() {
+    if (!this.canScrollExploreRight) {
+      return;
+    }
+    const lastStartIndex = Math.max(this.compactExploreModules.length - this.exploreVisibleCount, 0);
+    this.exploreStartIndex = Math.min(this.exploreStartIndex + 1, lastStartIndex);
+    this.animateExploreScroll('right');
+  }
+
+  animateExploreScroll(direction: 'left' | 'right') {
+    this.exploreScrollDirection = direction;
+    clearTimeout(this.exploreScrollAnimationTimeout);
+    this.exploreScrollAnimationTimeout = setTimeout(() => {
+      this.exploreScrollDirection = null;
+    }, 220);
   }
 
   manageActiveModule(module: UntiyChatBotExploreMenu, unCheck?: boolean) {
     if (this.onHistory) {
       return //test
     }
-    if (module.isActive && module.isActive == this.modules.find(m => m.module_name == module.module_name).isActive) {
+    const activeModule = this.modules.find(m => m.module_name == module.module_name) || module;
+    if (module.isActive && module.isActive == activeModule.isActive) {
       if (unCheck) {
         this.queries = [];
         module.isActive = !module.isActive;
       }
       return;
     }
-    this.modules.forEach(m => m.isActive = false);
+    this.compactExploreModules.forEach(m => m.isActive = false);
     module.isActive = !module.isActive;
     if (!this.chatHistoryData.length) {
       const defQ = document.getElementById('defaultQueries');

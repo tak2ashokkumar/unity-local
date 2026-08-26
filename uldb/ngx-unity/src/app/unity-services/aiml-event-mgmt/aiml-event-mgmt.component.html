@@ -65,9 +65,17 @@
                 </div>
             </div>
 
-            <div class="col-4 offset-1 mt-3">
+            <div class="col-4 offset-1 d-flex justify-content-end align-items-center">
+                <div class="aiml-duration-filter d-flex justify-content-between align-items-center">
+                    <!-- <label class="d-block font-sm-xs text-muted mb-0 mr-1">Duration</label> -->
+                    <custom-date-filter [options]="dateRangeOptions" [default]="dateRangeDefault" [emitOnInit]="false"
+                        [viewportSafePopup]="true"
+                        [popupPanelClass]="'aiml-event-mgmt-date-popup'"
+                        (rangeChange)="onDateRangeChange($event)">
+                    </custom-date-filter>
+                </div>
                 <data-refresh-btn></data-refresh-btn>
-                <button class="btn btn-pill btn-warning pull-right btn-sm" [tooltip]="'Rules'" container="body"
+                <button class="btn btn-pill btn-warning ml-1 pull-right btn-sm" type="button" [tooltip]="'Rules'" container="body"
                     (click)="goTo('rules')" accessControl moduleName="AIML Event Management"
                     accessType="Manage AIML Event Management" elementType="btn">
                     <i class="fas fa-cog"></i>

@@ -1,5 +1,4 @@
 @import '../../orchestration-workflows/orchestration-workflow-poc/orchestration-workflow-poc.component.scss';
-@import '../../orchestration-workflows//orchestration-agentic-workflow-container/orchestration-agentic-workflow-container.component.scss';
 
 .task-details-card {
   position: fixed !important;
@@ -15,4 +14,54 @@
 
 .right-card-body {
   flex: 0 1 auto !important;
+}
+
+.readonly-execution-node {
+  .node-header,
+  .icon-and-title {
+    position: relative;
+    width: 100%;
+    justify-content: center !important;
+  }
+
+  .node-header > .status-icon,
+  .icon-and-title > .status-icon {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    margin: 0 !important;
+    transform: translateY(-50%);
+  }
+
+  .memory-icon {
+    cursor: default !important;
+  }
+
+  .tool-icon {
+    cursor: default !important;
+  }
+
+  .model-select:disabled {
+    cursor: default;
+  }
+}
+
+#drawflow {
+  .readonly-execution-node,
+  .readonly-execution-node:active {
+    cursor: default !important;
+  }
+
+  .drawflow-node.agentic-default-node {
+    .input,
+    .output {
+      cursor: default !important;
+    }
+  }
+
+  // The LLM's 150px box is centered inside its 170px label wrapper. Keep the
+  // input on the box edge instead of the wrapper edge (which leaves a 10px gap).
+  .drawflow-node.agentic-default-node:has(.readonly-execution-node .node-box.llm) .input {
+    left: 7px !important;
+  }
 }

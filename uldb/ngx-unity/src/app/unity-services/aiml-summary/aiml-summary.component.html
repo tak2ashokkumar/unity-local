@@ -49,7 +49,14 @@
         </div>
     </div>
     <div class="d-flex align-items-center">
-        <button class="btn btn-pill btn-warning pull-right btn-sm" [tooltip]="'Rules'" container="body"
+        <div class="aiml-summary-duration-filter mr-2">
+            <!-- <label class="d-block font-sm-xs text-muted mb-0">Duration</label> -->
+            <custom-date-filter [options]="dateRangeOptions" [default]="dateRangeDefault" [emitOnInit]="false"
+                [viewportSafePopup]="true" [popupPanelClass]="'aiml-summary-date-popup'"
+                (rangeChange)="onDateRangeChange($event)">
+            </custom-date-filter>
+        </div>
+        <button class="btn btn-pill btn-warning pull-right btn-sm" type="button" [tooltip]="'Rules'" container="body"
             (click)="goTo('rules')" accessControl moduleName="AIML Event Management"
             accessType="Manage AIML Event Management" elementType="btn">
             <i class="fas fa-cog"></i>

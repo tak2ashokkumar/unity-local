@@ -23,11 +23,13 @@ import {
   GET_NETWORK_DASHBOARD_DEVICES_BY_LOCATION,
   GET_NETWORK_DASHBOARD_AVERAGE_UPTIME_BY_DEVICE_TYPE,
   GET_NETWORK_DASHBOARD_LOWEST_AVAILIBILITY,
-  GET_NETWORK_DASHBOARD_ENVIRONMENTAL_HEALTH_SUMMARY,
   GET_NETWORK_DASHBOARD_TOP_DEVICES_BY_HOTSPOT_TEMPERATURE,
   GET_NETWORK_DASHBOARD_AVERAGE_TEMPERATURE_BY_SENSOR_TYPE,
   GET_NETWORK_DASHBOARD_POWER_SUPPLY_STATUS_DISTRIBUTION,
   GET_NETWORK_DASHBOARD_FAN_HEALTH_BY_DEVICE,
+  GET_NETWORK_DASHBOARD_ENVIRONMENTAL_HEALTH_TABLE,
+  GET_NETWORK_DASHBOARD_LOADBALANCER_HEALTH,
+  GET_NETWORK_DASHBOARD_PDU_HEALTH,
   GET_NETWORK_DASHBOARD_ALERT_EVENTS_SUMMARY,
   GET_NETWORK_DASHBOARD_ALERTS_BY_SEVERITY,
   GET_NETWORK_DASHBOARD_ALERTS_BY_DEVICE_TYPE,
@@ -38,12 +40,7 @@ import {
 } from 'src/app/shared/api-endpoint.const';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import {
-  NETWORK_DASHBOARD_TIME_RANGE_DEFAULT,
-  NETWORK_AVERAGE_TEMPERATURE_BY_SENSOR_TYPE_RESPONSE,
-  NETWORK_ENVIRONMENTAL_HEALTH_SUMMARY_TABLE_RESPONSE,
-  NETWORK_FAN_HEALTH_BY_DEVICE_RESPONSE,
-  NETWORK_POWER_SUPPLY_STATUS_DISTRIBUTION_RESPONSE,
-  NETWORK_TOP_DEVICES_BY_HOTSPOT_TEMPERATURE_RESPONSE
+  NETWORK_DASHBOARD_TIME_RANGE_DEFAULT
 } from './network-dashboard.const';
 import {
   NetworkAlertsByDeviceTypeApiItem,
@@ -83,12 +80,21 @@ import {
   NetworkEnvironmentalHealthSummaryItem,
   NetworkEnvironmentalHealthSummaryTableApiItem,
   NetworkEnvironmentalHealthSummaryTableResponse,
+  NetworkEnvironmentalThresholds,
   NetworkTopDevicesByHotspotTemperatureApiItem,
   NetworkTopDevicesByHotspotTemperatureResponse,
   NetworkAverageTemperatureBySensorTypeApiItem,
   NetworkAverageTemperatureBySensorTypeResponse,
   NetworkPowerSupplyStatusDistributionApiItem,
   NetworkPowerSupplyStatusDistributionResponse,
+  NetworkLoadBalancerHealthTableApiItem,
+  NetworkLoadBalancerHealthTableResponse,
+  NetworkLoadBalancerHealthValue,
+  NetworkLoadBalancerSslCertStatus,
+  NetworkLoadBalancerStatusCodeLabel,
+  NetworkPduHealthTableApiItem,
+  NetworkPduHealthTableResponse,
+  NetworkPduHealthValue,
   NetworkFanHealthByDeviceApiItem,
   NetworkFanHealthByDeviceResponse,
   NetworkStatusCodeLabel,
@@ -174,6 +180,7 @@ export class NetworkDashboardService {
     return this.http.get<NetworkTopConversationsTableResponse>(GET_NETWORK_DASHBOARD_TOP_10_CONVERSATIONS(), {
       params
     });
+
   }
 
   getPerformanceInsightsTable(
@@ -246,9 +253,80 @@ export class NetworkDashboardService {
     });
   }
 
-  getNetworkDeviceAvailabilityTable(filters?: NetworkDashboardFilterCriteria): Observable<NetworkDeviceAvailabilityTableResponse> {
+  getNetworkDeviceAvailabilityTable(
+    filters?: NetworkDashboardFilterCriteria,
+    page?: number,
+    pageSize?: number,
+    searchValue: string = ''
+  ): Observable<NetworkDeviceAvailabilityTableResponse> {
+    let params = this.buildFilterParams(filters);
+    if (page) {
+      params = params.set('page', String(page));
+    }
+    if (pageSize) {
+      params = params.set('page_size', String(pageSize));
+    }
+    if (searchValue?.trim()) {
+      params = params.set('search', searchValue.trim());
+    }
     return this.http.get<NetworkDeviceAvailabilityTableResponse>(GET_NETWORK_DASHBOARD_NETWORK_DEVICE_AVAILIBILITY(), {
-      params: this.buildFilterParams(filters)
+      params
+    });
+  }
+
+  getLoadBalancerHealthTable(filters?: NetworkDashboardFilterCriteria, page?: number, pageSize?: number, searchValue: string = '', ordering: string = ''): Observable<NetworkLoadBalancerHealthTableResponse> {
+    let params = this.buildFilterParams(filters);
+    if (page) {
+      params = params.set('page', String(page));
+    }
+    if (pageSize) {
+      params = params.set('page_size', String(pageSize));
+    }
+    if (searchValue?.trim()) {
+      params = params.set('search', searchValue.trim());
+    }
+    if (ordering?.trim()) {
+      params = params.set('ordering', ordering.trim());
+    }
+    return this.http.get<NetworkLoadBalancerHealthTableResponse>(GET_NETWORK_DASHBOARD_LOADBALANCER_HEALTH(), {
+      params
+    });
+  }
+
+  getPduHealthTable(
+    filters?: NetworkDashboardFilterCriteria,
+    page?: number,
+    pageSize?: number,
+    searchValue: string = '',
+    ordering: string = '',
+    vendor: string = '',
+    location: string = '',
+    health: string = ''
+  ): Observable<NetworkPduHealthTableResponse> {
+    let params = this.buildFilterParams(filters);
+    if (page) {
+      params = params.set('page', String(page));
+    }
+    if (pageSize) {
+      params = params.set('page_size', String(pageSize));
+    }
+    if (searchValue?.trim()) {
+      params = params.set('search', searchValue.trim());
+    }
+    if (ordering?.trim()) {
+      params = params.set('ordering', ordering.trim());
+    }
+    if (vendor?.trim()) {
+      params = params.set('vendor', vendor.trim());
+    }
+    if (location?.trim()) {
+      params = params.set('location', location.trim());
+    }
+    if (health?.trim()) {
+      params = params.set('health', health.trim());
+    }
+    return this.http.get<NetworkPduHealthTableResponse>(GET_NETWORK_DASHBOARD_PDU_HEALTH(), {
+      params
     });
   }
 
@@ -288,9 +366,28 @@ export class NetworkDashboardService {
     });
   }
 
-  getEnvironmentalHealthSummaryTable(filters?: NetworkDashboardFilterCriteria): Observable<NetworkEnvironmentalHealthSummaryTableResponse> {
-    return this.http.get<NetworkEnvironmentalHealthSummaryTableResponse>(GET_NETWORK_DASHBOARD_ENVIRONMENTAL_HEALTH_SUMMARY(), {
-      params: this.buildFilterParams(filters)
+  getEnvironmentalHealthSummaryTable(
+    filters?: NetworkDashboardFilterCriteria,
+    page?: number,
+    pageSize?: number,
+    searchValue: string = '',
+    ordering: string = ''
+  ): Observable<NetworkEnvironmentalHealthSummaryTableResponse> {
+    let params = this.buildFilterParams(filters);
+    if (page) {
+      params = params.set('page', String(page));
+    }
+    if (pageSize) {
+      params = params.set('page_size', String(pageSize));
+    }
+    if (searchValue?.trim()) {
+      params = params.set('search', searchValue.trim());
+    }
+    if (ordering?.trim()) {
+      params = params.set('ordering', ordering.trim());
+    }
+    return this.http.get<NetworkEnvironmentalHealthSummaryTableResponse>(GET_NETWORK_DASHBOARD_ENVIRONMENTAL_HEALTH_TABLE(), {
+      params
     });
   }
 
@@ -520,23 +617,23 @@ export class NetworkDashboardService {
     view.charts = [
       this.buildPerformanceScatterChart(
         'cpu-memory',
-        'CPU Vs Memory Performance',
+        'Top 10 CPU vs Memory Performance',
         this.formatAxisTitle(cpuVsMemory?.y_axis?.label, cpuVsMemory?.y_axis?.unit, 'CPU %'),
         this.formatAxisTitle(cpuVsMemory?.x_axis?.label, cpuVsMemory?.x_axis?.unit, 'Memory %'),
         cpuMemoryItems,
         item => item.memory_utilization_percent,
         item => item.cpu_utilization_percent,
         (item: NetworkPerformanceWorkloadInsightItem) => `Device: ${item.device_name}<br>CPU: ${item.cpu_utilization_percent}%<br>Memory: ${item.memory_utilization_percent}%`,
-        30,
+        0,
         100,
-        10,
-        30,
+        20,
+        0,
         100,
-        10
+        20
       ),
       this.buildPerformanceScatterChart(
         'traffic',
-        'Traffic In Vs Traffic Out',
+        'Top 10 Traffic In Vs Traffic Out',
         this.formatAxisTitle(trafficInVsOut?.y_axis?.label, trafficInVsOut?.y_axis?.unit, 'Traffic In'),
         this.formatAxisTitle(trafficInVsOut?.x_axis?.label, trafficInVsOut?.x_axis?.unit, 'Traffic Out'),
         trafficItems,
@@ -547,7 +644,7 @@ export class NetworkDashboardService {
         0,
         this.getRoundedAxisMax(trafficItems.map(item => item.interface_traffic_out_mbps), 10, 10),
         50,
-        30,
+        0,
         this.getRoundedAxisMax(trafficItems.map(item => item.interface_traffic_in_mbps), 10, 10),
         50
       )
@@ -565,23 +662,23 @@ export class NetworkDashboardService {
     view.charts = [
       this.buildPerformanceScatterChart(
         'cpu-memory',
-        'CPU Vs Memory Performance',
+        'Top 10 CPU vs Memory Performance',
         'CPU Utilization (%)',
         'Memory Utilization (%)',
         chartItems.filter(item => item.cpu_utilization_percent > 0 || item.memory_utilization_percent > 0),
         item => item.memory_utilization_percent,
         item => item.cpu_utilization_percent,
         (item: NetworkPerformanceWorkloadInsightItem) => `Device: ${item.device_name}<br>CPU: ${item.cpu_utilization_percent}%<br>Memory: ${item.memory_utilization_percent}%`,
-        30,
+        0,
         100,
-        10,
-        30,
+        20,
+        0,
         100,
-        10
+        20
       ),
       this.buildPerformanceScatterChart(
         'traffic',
-        'Traffic In Vs Traffic Out',
+        'Top 10 Traffic In Vs Traffic Out',
         'Traffic In (Mbps)',
         'Traffic Out (Mbps)',
         chartItems.filter(item => item.interface_traffic_in_mbps > 0 || item.interface_traffic_out_mbps > 0),
@@ -592,7 +689,7 @@ export class NetworkDashboardService {
         0,
         this.getRoundedAxisMax(chartItems.map(item => item.interface_traffic_out_mbps), 10, 10),
         50,
-        30,
+        0,
         this.getRoundedAxisMax(chartItems.map(item => item.interface_traffic_in_mbps), 10, 10),
         50
       )
@@ -678,45 +775,91 @@ export class NetworkDashboardService {
     const chartItems = this.convertInterfaceHealthTableItems(data?.data || []);
 
     view.charts = [
-      this.buildInterfaceHealthMetricChart(
-        'errors-in',
-        'Interface Errors (Inbound)',
-        'errors',
-        'Errors (In)',
+      this.buildInterfaceHealthMetricChartCard(
+        'inbound-bandwidth',
+        'Top 10 Interfaces by Inbound Bandwidth (Mbps)',
+        this.getInterfaceHealthTopItems(chartItems, item => Number(item.inbound_bandwidth_mbps || 0)),
+        item => Number(item.inbound_bandwidth_mbps || 0),
+        item => this.getInterfaceHealthToneColor(item.health_tone),
+        (item, value) =>
+          `Interface: ${item.interface_name}<br>Device: ${item.device_name}<br>Inbound Bandwidth: ${this.formatInterfaceAxisNumber(value, 3)} Mbps`,
+        'Mbps',
+        'Top interfaces ranked by inbound bandwidth from the selected result set.'
+      ),
+      this.buildInterfaceHealthMetricChartCard(
+        'outbound-bandwidth',
+        'Top 10 Interfaces by Outbound Bandwidth (Mbps)',
+        this.getInterfaceHealthTopItems(chartItems, item => Number(item.outbound_bandwidth_mbps || 0)),
+        item => Number(item.outbound_bandwidth_mbps || 0),
+        item => this.getInterfaceHealthToneColor(item.health_tone),
+        (item, value) =>
+          `Interface: ${item.interface_name}<br>Device: ${item.device_name}<br>Outbound Bandwidth: ${this.formatInterfaceAxisNumber(value, 3)} Mbps`,
+        'Mbps',
+        'Top interfaces ranked by outbound bandwidth from the selected result set.'
+      ),
+      this.buildInterfaceHealthMetricChartCard(
+        'busiest-interfaces',
+        'Top 10 Busiest Interfaces (In + Out)',
+        this.getInterfaceHealthTopItems(chartItems, item => Number(item.total_bandwidth_mbps || 0)),
+        item => Number(item.total_bandwidth_mbps || 0),
+        item => this.getInterfaceHealthToneColor(item.health_tone),
+        (item, value) =>
+          `Interface: ${item.interface_name}<br>Device: ${item.device_name}<br>Total Bandwidth: ${this.formatInterfaceAxisNumber(value, 3)} Mbps`,
+        'Mbps',
+        'Top interfaces ranked by combined inbound and outbound bandwidth.'
+      ),
+      this.buildInterfaceHealthMetricChartCard(
+        'inbound-errors',
+        'Top 10 Interfaces by Inbound Errors',
         this.getInterfaceHealthTopItems(chartItems, item => Number(item.errors_in_per_sec || 0)),
         item => Number(item.errors_in_per_sec || 0),
-        this.getRoundedAxisMax(chartItems.map(item => Number(item.errors_in_per_sec || 0)), 2, 2),
-        2
+        item => this.getInterfaceHealthMetricColor(Number(item.errors_in_per_sec || 0), 'errors'),
+        (item, value) =>
+          `Interface: ${item.interface_name}<br>Device: ${item.device_name}<br>Inbound Errors: ${this.formatInterfaceMetricValue(value)}`,
+        '',
+        'Top interfaces ranked by inbound error count.'
       ),
-      this.buildInterfaceHealthMetricChart(
-        'errors-out',
-        'Interface Errors (Outbound)',
-        'errors',
-        'Errors (Out)',
+      this.buildInterfaceHealthMetricChartCard(
+        'outbound-errors',
+        'Top 10 Interfaces by Outbound Errors',
         this.getInterfaceHealthTopItems(chartItems, item => Number(item.errors_out_per_sec || 0)),
         item => Number(item.errors_out_per_sec || 0),
-        this.getRoundedAxisMax(chartItems.map(item => Number(item.errors_out_per_sec || 0)), 2, 2),
-        2
+        item => this.getInterfaceHealthMetricColor(Number(item.errors_out_per_sec || 0), 'errors'),
+        (item, value) =>
+          `Interface: ${item.interface_name}<br>Device: ${item.device_name}<br>Outbound Errors: ${this.formatInterfaceMetricValue(value)}`,
+        '',
+        'Top interfaces ranked by outbound error count.'
       ),
-      this.buildInterfaceHealthMetricChart(
-        'discards-in',
-        'Interface Discards (Inbound)',
-        'discards',
-        'Discards (In)',
-        this.getInterfaceHealthTopItems(chartItems, item => Number(item.discards_in_per_sec || 0)),
-        item => Number(item.discards_in_per_sec || 0),
-        this.getRoundedAxisMax(chartItems.map(item => Number(item.discards_in_per_sec || 0)), 2, 2),
-        2
+      this.buildInterfaceHealthMetricChartCard(
+        'discards-total',
+        'Top 10 Interfaces by Discards (In + Out)',
+        this.getInterfaceHealthTopItems(chartItems, item => Number(item.total_discards_value || 0)),
+        item => Number(item.total_discards_value || 0),
+        item => this.getInterfaceHealthMetricColor(Number(item.total_discards_value || 0), 'discards'),
+        (item, value) =>
+          `Interface: ${item.interface_name}<br>Device: ${item.device_name}<br>Total Discards: ${this.formatInterfaceMetricValue(value)}`,
+        '',
+        'Top interfaces ranked by combined inbound and outbound discards.'
       ),
-      this.buildInterfaceHealthMetricChart(
-        'discards-out',
-        'Interface Discards (Outbound)',
-        'discards',
-        'Discards (Out)',
-        this.getInterfaceHealthTopItems(chartItems, item => Number(item.discards_out_per_sec || 0)),
-        item => Number(item.discards_out_per_sec || 0),
-        this.getRoundedAxisMax(chartItems.map(item => Number(item.discards_out_per_sec || 0)), 2, 2),
-        2
+      this.buildInterfaceHealthMetricSplitChartCard(
+        'warning-interfaces',
+        'Top 10 Warning Interfaces',
+        this.getInterfaceHealthTopStatusItems(chartItems, 'warning'),
+        item => Number(item.total_issue_value || 0),
+        () => '#ff912f',
+        (item, value) =>
+          `Interface: ${item.interface_name}<br>Device: ${item.device_name}<br>Total Issues: ${this.formatInterfaceMetricValue(value)}`,
+        'Interfaces in warning state ranked by combined errors and discards. Donut groups warning interfaces by interface type.'
+      ),
+      this.buildInterfaceHealthMetricSplitChartCard(
+        'critical-interfaces',
+        'Top 10 Critical Interfaces',
+        this.getInterfaceHealthTopStatusItems(chartItems, 'critical'),
+        item => Number(item.total_issue_value || 0),
+        () => '#e24a4a',
+        (item, value) =>
+          `Interface: ${item.interface_name}<br>Device: ${item.device_name}<br>Total Issues: ${this.formatInterfaceMetricValue(value)}`,
+        'Interfaces in critical state ranked by combined errors and discards. Donut groups critical interfaces by interface type.'
       )
     ];
 
@@ -729,7 +872,10 @@ export class NetworkDashboardService {
   ): InterfaceHealthMetricsWidgetViewData {
     const nextView = view || new InterfaceHealthMetricsWidgetViewData();
     nextView.tableColumns = this.buildInterfaceHealthMetricsTableColumns();
-    nextView.tableRows = (data?.data || []).map(item => this.buildInterfaceHealthMetricsTableRow(item));
+    nextView.tableRows = (data?.data || []).map(item => this.buildInterfaceHealthMetricsTableRow(this.convertInterfaceHealthTableItem(item)));
+    nextView.totalCount = Number(data?.count || nextView.tableRows.length || 0);
+    nextView.defaultSortColumn = 'interface';
+    nextView.defaultSortDirection = 'asc';
     return nextView;
   }
 
@@ -739,6 +885,64 @@ export class NetworkDashboardService {
     sortDirection: string
   ): InterfaceHealthMetricsTableRowViewData[] {
     return this.sortTableRows(rows, sortColumn, sortDirection);
+  }
+
+  private buildInterfaceHealthMetricChartCard(
+    key: string,
+    title: string,
+    items: NetworkInterfaceHealthMetricItem[],
+    getValue: (item: NetworkInterfaceHealthMetricItem) => number,
+    getColor: (item: NetworkInterfaceHealthMetricItem) => string,
+    getTooltip: (item: NetworkInterfaceHealthMetricItem, value: number) => string,
+    xAxisName: string,
+    infoTooltip: string
+  ): InterfaceHealthMetricChartViewData {
+    const chart = new InterfaceHealthMetricChartViewData();
+    const scale = this.getInterfaceHealthAxisScale(items.map(item => getValue(item)), xAxisName === 'Mbps' ? 4 : 5);
+    chart.key = key;
+    chart.title = title;
+    chart.infoTooltip = infoTooltip;
+    chart.chartHeight = 220;
+    chart.chartData = this.buildInterfaceHealthMetricBarChartData(
+      items,
+      getValue,
+      getColor,
+      getTooltip,
+      scale.max,
+      scale.interval,
+      xAxisName
+    );
+    return chart;
+  }
+
+  private buildInterfaceHealthMetricSplitChartCard(
+    key: string,
+    title: string,
+    items: NetworkInterfaceHealthMetricItem[],
+    getValue: (item: NetworkInterfaceHealthMetricItem) => number,
+    getColor: (item: NetworkInterfaceHealthMetricItem) => string,
+    getTooltip: (item: NetworkInterfaceHealthMetricItem, value: number) => string,
+    infoTooltip: string
+  ): InterfaceHealthMetricChartViewData {
+    const chart = this.buildInterfaceHealthMetricChartCard(
+      key,
+      title,
+      items,
+      getValue,
+      getColor,
+      getTooltip,
+      '',
+      infoTooltip
+    );
+    chart.layout = 'split';
+    chart.columnClass = 'col-xl-6 col-12';
+    chart.chartHeight = 210;
+    chart.secondaryTitle = 'By Interface Type';
+    chart.secondaryChartHeight = 178;
+    const distribution = this.buildInterfaceHealthInterfaceTypeDistribution(items);
+    chart.secondaryChartData = this.buildInterfaceHealthStatusDonutChartData(distribution);
+    chart.secondaryLegendItems = this.buildInterfaceHealthStatusLegendItems(distribution);
+    return chart;
   }
 
   convertToNetworkDeviceAvailabilityChartViewData(
@@ -872,6 +1076,7 @@ export class NetworkDashboardService {
     const nextView = view || new NetworkDeviceAvailabilityWidgetViewData();
     nextView.tableColumns = this.buildNetworkDeviceAvailabilityTableColumns();
     nextView.tableRows = (data?.data || []).map(item => this.buildNetworkDeviceAvailabilityTableRow(item));
+    nextView.totalCount = Number(data?.count || 0);
     return nextView;
   }
 
@@ -881,6 +1086,1260 @@ export class NetworkDashboardService {
     sortDirection: string
   ): NetworkDeviceAvailabilityTableRowViewData[] {
     return this.sortTableRows(rows, sortColumn, sortDirection);
+  }
+
+  convertToLoadBalancerHealthViewDataFromTable(
+    data: NetworkLoadBalancerHealthTableResponse
+  ): LoadBalancerHealthWidgetViewData {
+    const items = data?.data || [];
+    const view = new LoadBalancerHealthWidgetViewData();
+    view.charts = [
+      this.buildLoadBalancerHealthChart(
+        'top-active-connections',
+        'Top 10 by Active Connections',
+        this.convertToLoadBalancerTopConnectionsChartData(items),
+        238,
+        'Top load balancers ranked by active connections.'
+      ),
+      this.buildLoadBalancerHealthChart(
+        'top-slowest-response-time',
+        'Top 10 Slowest Avg Response Time',
+        this.convertToLoadBalancerSlowestResponseChartData(items),
+        238,
+        'Top load balancers ranked by average response time in milliseconds.'
+      ),
+      this.buildLoadBalancerHealthChart(
+        'response-time-vs-active-connections',
+        'Top 10 Response Time vs Active Connections',
+        this.convertToLoadBalancerResponseVsConnectionsChartData(items),
+        300,
+        'Scatter plot comparing active connections and average response time.'
+      )
+    ];
+    return this.applyLoadBalancerHealthTableData(view, data);
+  }
+
+  applyLoadBalancerHealthTableData(
+    view: LoadBalancerHealthWidgetViewData,
+    data: NetworkLoadBalancerHealthTableResponse
+  ): LoadBalancerHealthWidgetViewData {
+    const nextView = view || new LoadBalancerHealthWidgetViewData();
+    nextView.tableColumns = this.buildLoadBalancerHealthTableColumns();
+    nextView.tableRows = (data?.data || []).map(item => this.buildLoadBalancerHealthTableRow(item));
+    nextView.totalCount = Number(data?.count || 0);
+    nextView.defaultSortColumn = 'throughput';
+    nextView.defaultSortDirection = 'desc';
+    return nextView;
+  }
+
+  private buildLoadBalancerHealthChart(
+    key: string,
+    title: string,
+    chartData: UnityChartDetails,
+    chartHeight: number,
+    infoTooltip: string
+  ): LoadBalancerHealthChartViewData {
+    const chart = new LoadBalancerHealthChartViewData();
+    chart.key = key;
+    chart.title = title;
+    chart.chartData = chartData;
+    chart.chartHeight = chartHeight;
+    chart.infoTooltip = infoTooltip;
+    return chart;
+  }
+
+  private buildLoadBalancerHealthTableColumns(): LoadBalancerHealthTableColumnViewData[] {
+    return [
+      { key: 'loadBalancerName', label: 'Load Balancer', sortKey: 'load_balancer_name', type: 'text', align: 'left' },
+      { key: 'vendor', label: 'Vendor', sortKey: 'vendor', type: 'text', align: 'left' },
+      { key: 'virtualServer', label: 'Virtual Server', sortKey: 'virtual_server', type: 'text', align: 'left' },
+      { key: 'backendPool', label: 'Backend Pool', sortKey: 'backend_pool', type: 'text', align: 'left' },
+      { key: 'vipStatusLabel', label: 'VIP Status', sortKey: 'vip_status', type: 'status', align: 'left' },
+      { key: 'poolMemberHealthLabel', label: 'Pool Member Health', sortKey: 'pool_member_health', type: 'status', align: 'left' },
+      { key: 'activeConnectionsDisplay', label: 'Active Connections', sortKey: 'active_connections', type: 'metric', align: 'left' },
+      { key: 'newConnectionsDisplay', label: 'New Connections/s', sortKey: 'new_connections', type: 'metric', align: 'left' },
+      { key: 'throughputDisplay', label: 'Throughput (Mbps)', sortKey: 'throughput', type: 'metric', align: 'left' },
+      { key: 'requestsDisplay', label: 'Requests/s', sortKey: 'requests', type: 'metric', align: 'left' },
+      { key: 'avgResponseTimeDisplay', label: 'Avg Response Time (ms)', sortKey: 'avg_response_time', type: 'metric', align: 'left' },
+      { key: 'sslCertificateStatusLabel', label: 'SSL Certificate Status', sortKey: 'ssl_cert_status', type: 'status', align: 'left' },
+      { key: 'healthLabel', label: 'Health', sortKey: 'health', type: 'status', align: 'left' }
+    ];
+  }
+
+  private buildLoadBalancerHealthTableRow(item: NetworkLoadBalancerHealthTableApiItem): LoadBalancerHealthTableRowViewData {
+    const row = new LoadBalancerHealthTableRowViewData();
+    row.deviceId = item?.device_id || '';
+    row.loadBalancerName = item?.load_balancer_name || '';
+    row.vendor = item?.vendor || 'N/A';
+    row.virtualServer = this.formatLoadBalancerList(item?.virtual_server);
+    row.backendPool = this.formatLoadBalancerList(item?.backend_pool);
+    row.vipStatusTone = this.getLoadBalancerStatusCode(item?.vip_status);
+    row.vipStatusLabel = this.getLoadBalancerStatusLabel(item?.vip_status);
+    row.vipStatusRank = this.getLoadBalancerStatusRank(item?.vip_status);
+    row.poolMemberHealthTone = this.getLoadBalancerStatusCode(item?.pool_member_health);
+    row.poolMemberHealthLabel = this.getLoadBalancerStatusLabel(item?.pool_member_health);
+    row.poolMemberHealthRank = this.getLoadBalancerStatusRank(item?.pool_member_health);
+    row.activeConnectionsValue = this.getLoadBalancerRawNumericValue(item?.active_connections);
+    row.activeConnectionsDisplay = this.formatLoadBalancerRawDisplay(item?.active_connections, 0);
+    row.newConnectionsValue = this.getLoadBalancerRawNumericValue(item?.new_connections);
+    row.newConnectionsDisplay = this.formatLoadBalancerRawDisplay(item?.new_connections, 0);
+    row.throughputMbpsValue = this.getLoadBalancerThroughputMbpsValue(item?.throughput);
+    row.throughputDisplay = this.formatLoadBalancerThroughputDisplay(item?.throughput);
+    row.requestsValue = this.getLoadBalancerRawNumericValue(item?.requests);
+    row.requestsDisplay = this.formatLoadBalancerRawDisplay(item?.requests, 0);
+    row.avgResponseTimeValue = this.getLoadBalancerMetricNumericValue(item?.avg_response_time);
+    row.avgResponseTimeDisplay = this.formatLoadBalancerMetricDisplay(item?.avg_response_time, 0);
+    row.sslCertificateStatusTone = this.getLoadBalancerStatusCode(item?.ssl_cert_status);
+    row.sslCertificateStatusLabel = this.getLoadBalancerSslStatusLabel(item?.ssl_cert_status);
+    row.healthTone = this.getLoadBalancerStatusCode(item?.health);
+    row.healthLabel = this.getLoadBalancerStatusLabel(item?.health);
+    row.healthRank = this.getLoadBalancerStatusRank(item?.health);
+    return row;
+  }
+
+  private convertToLoadBalancerTopConnectionsChartData(items: NetworkLoadBalancerHealthTableApiItem[]): UnityChartDetails {
+    const rankedItems = (items || [])
+      .filter(item => this.getLoadBalancerRawNumericValue(item?.active_connections) >= 0)
+      .slice()
+      .sort((left, right) => this.getLoadBalancerRawNumericValue(right?.active_connections) - this.getLoadBalancerRawNumericValue(left?.active_connections))
+      .slice(0, 10);
+    const scale = this.getLoadBalancerHealthAxisScale(rankedItems.map(item => this.getLoadBalancerRawNumericValue(item?.active_connections)));
+    return this.buildLoadBalancerMetricBarChartData(
+      rankedItems,
+      item => this.getLoadBalancerRawNumericValue(item?.active_connections),
+      'Active Connections',
+      0,
+      '',
+      scale.max,
+      scale.interval,
+      ''
+    );
+  }
+
+  private convertToLoadBalancerSlowestResponseChartData(items: NetworkLoadBalancerHealthTableApiItem[]): UnityChartDetails {
+    const rankedItems = (items || [])
+      .filter(item => this.getLoadBalancerMetricNumericValue(item?.avg_response_time) >= 0)
+      .slice()
+      .sort((left, right) => this.getLoadBalancerMetricNumericValue(right?.avg_response_time) - this.getLoadBalancerMetricNumericValue(left?.avg_response_time))
+      .slice(0, 10);
+    const scale = this.getLoadBalancerHealthAxisScale(rankedItems.map(item => this.getLoadBalancerMetricNumericValue(item?.avg_response_time)));
+    return this.buildLoadBalancerMetricBarChartData(
+      rankedItems,
+      item => this.getLoadBalancerMetricNumericValue(item?.avg_response_time),
+      'Avg Response Time',
+      0,
+      ' ms',
+      scale.max,
+      scale.interval,
+      'ms'
+    );
+  }
+
+  private buildLoadBalancerMetricBarChartData(
+    items: NetworkLoadBalancerHealthTableApiItem[],
+    getValue: (item: NetworkLoadBalancerHealthTableApiItem) => number,
+    valueLabel: string,
+    decimals: number,
+    valueSuffix: string,
+    xAxisMax: number,
+    xAxisInterval: number,
+    xAxisName: string
+  ): UnityChartDetails {
+    const rankedItems = (items || [])
+      .filter(item => getValue(item) >= 0)
+      .slice()
+      .sort((left, right) => getValue(right) - getValue(left))
+      .slice(0, 10);
+
+    if (!rankedItems.length) {
+      return null;
+    }
+
+    const chart = new UnityChartDetails();
+    chart.type = UnityChartTypes.BAR;
+    chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+    chart.options = {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(33, 41, 52, 0.94)',
+        borderWidth: 0,
+        textStyle: {
+          color: '#ffffff'
+        },
+        formatter: (params: any) => {
+          const item = params?.data?.item;
+          const value = Number(params?.value || 0);
+          return `${item?.load_balancer_name || params?.name || ''}<br>${valueLabel}: ${this.formatLoadBalancerNumber(value, decimals, valueSuffix)}`;
+        }
+      },
+      grid: {
+        left: 112,
+        right: 18,
+        top: 8,
+        bottom: 18,
+        containLabel: false
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: xAxisMax,
+        interval: xAxisInterval,
+        name: xAxisName,
+        nameLocation: 'end',
+        nameGap: 10,
+        nameTextStyle: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e8edf3'
+          }
+        }
+      },
+      yAxis: {
+        type: 'category',
+        inverse: true,
+        data: rankedItems.map(item => item?.load_balancer_name || ''),
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10,
+          width: 96,
+          overflow: 'truncate'
+        }
+      },
+      series: [
+        {
+          type: 'bar',
+          barWidth: 12,
+          data: rankedItems.map(item => ({
+            value: getValue(item),
+            item,
+            itemStyle: {
+              color: this.getLoadBalancerStatusColor(item?.health)
+            }
+          }))
+        }
+      ]
+    };
+    return chart;
+  }
+
+  private convertToLoadBalancerResponseVsConnectionsChartData(items: NetworkLoadBalancerHealthTableApiItem[]): UnityChartDetails {
+    const rankedItems = (items || [])
+      .filter(item =>
+        this.getLoadBalancerRawNumericValue(item?.active_connections) >= 0
+        && this.getLoadBalancerMetricNumericValue(item?.avg_response_time) >= 0
+      )
+      .slice()
+      .sort((left, right) => this.getLoadBalancerRawNumericValue(right?.active_connections) - this.getLoadBalancerRawNumericValue(left?.active_connections))
+      .slice(0, 10);
+
+    if (!rankedItems.length) {
+      return null;
+    }
+
+    const xAxisScale = this.getLoadBalancerHealthAxisScale(rankedItems.map(item => this.getLoadBalancerRawNumericValue(item?.active_connections)));
+    const yAxisScale = this.getLoadBalancerHealthAxisScale(rankedItems.map(item => this.getLoadBalancerMetricNumericValue(item?.avg_response_time)));
+    return this.buildLoadBalancerScatterChartData(
+      rankedItems,
+      xAxisScale.max,
+      xAxisScale.interval,
+      yAxisScale.max,
+      yAxisScale.interval
+    );
+  }
+
+  private buildLoadBalancerScatterChartData(
+    items: NetworkLoadBalancerHealthTableApiItem[],
+    xAxisMax: number,
+    xAxisInterval: number,
+    yAxisMax: number,
+    yAxisInterval: number
+  ): UnityChartDetails {
+    if (!items?.length) {
+      return null;
+    }
+
+    const chart = new UnityChartDetails();
+    chart.type = UnityChartTypes.SCATTER;
+    chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.SCATTER);
+    chart.options = {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(33, 41, 52, 0.94)',
+        borderWidth: 0,
+        textStyle: {
+          color: '#ffffff'
+        },
+        formatter: (params: any) => {
+          const item = params?.data?.item;
+          return `${item?.load_balancer_name || params?.name || ''}<br>Active Connections: ${this.formatLoadBalancerRawDisplay(item?.active_connections, 0)}<br>Avg Response Time: ${this.formatLoadBalancerMetricDisplay(item?.avg_response_time, 0, ' ms')}`;
+        }
+      },
+      grid: {
+        left: 48,
+        right: 24,
+        top: 18,
+        bottom: 44,
+        containLabel: true
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: xAxisMax,
+        interval: xAxisInterval,
+        name: 'Active Connections',
+        nameLocation: 'middle',
+        nameGap: 24,
+        nameTextStyle: {
+          color: '#7d8793',
+          fontSize: 11
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#97a3b3'
+          }
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e8edf3'
+          }
+        }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: yAxisMax,
+        interval: yAxisInterval,
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e8edf3'
+          }
+        }
+      },
+      series: [
+        {
+          type: 'scatter',
+          symbolSize: 12,
+          emphasis: {
+            scale: true
+          },
+          data: items.map(item => ({
+            name: item?.load_balancer_name || '',
+            value: [
+              this.getLoadBalancerRawNumericValue(item?.active_connections),
+              this.getLoadBalancerMetricNumericValue(item?.avg_response_time)
+            ],
+            item,
+            itemStyle: {
+              color: this.getLoadBalancerStatusColor(item?.health),
+              borderColor: '#ffffff',
+              borderWidth: 1.5
+            }
+          }))
+        }
+      ]
+    };
+    return chart;
+  }
+
+  private getLoadBalancerHealthAxisScale(values: number[]): { max: number; interval: number } {
+    const maxValue = Math.max(...(values || []), 0);
+    let interval = 1;
+
+    if (maxValue > 5000) {
+      interval = 1000;
+    } else if (maxValue > 2500) {
+      interval = 500;
+    } else if (maxValue > 1000) {
+      interval = 250;
+    } else if (maxValue > 500) {
+      interval = 100;
+    } else if (maxValue > 250) {
+      interval = 50;
+    } else if (maxValue > 100) {
+      interval = 20;
+    } else if (maxValue > 50) {
+      interval = 10;
+    } else if (maxValue > 10) {
+      interval = 5;
+    } else if (maxValue > 5) {
+      interval = 2;
+    }
+
+    return {
+      interval,
+      max: Math.max(interval * 4, this.getRoundedAxisMax([maxValue], interval, interval))
+    };
+  }
+
+  private formatLoadBalancerList(values?: string[]): string {
+    return values?.length ? values.join(', ') : 'N/A';
+  }
+
+  private getLoadBalancerRawNumericValue(value?: number | string): number {
+    if (value === undefined || value === null || value === '') {
+      return -1;
+    }
+    const numericValue = Number(value);
+    return isNaN(numericValue) ? -1 : numericValue;
+  }
+
+  private getLoadBalancerMetricNumericValue(metric?: NetworkLoadBalancerHealthValue): number {
+    const rawValue = metric?.value;
+    if (rawValue === undefined || rawValue === null || rawValue === '') {
+      return -1;
+    }
+    const numericValue = Number(rawValue);
+    return isNaN(numericValue) ? -1 : numericValue;
+  }
+
+  private getLoadBalancerThroughputMbpsValue(metric?: NetworkLoadBalancerHealthValue): number {
+    const bytesPerSecond = this.getLoadBalancerMetricNumericValue(metric);
+    return bytesPerSecond < 0 ? -1 : (bytesPerSecond * 8) / 1000000;
+  }
+
+  private formatLoadBalancerRawDisplay(value?: number | string, decimals: number = 0): string {
+    if (value === undefined || value === null || value === '') {
+      return 'N/A';
+    }
+    const numericValue = Number(value);
+    if (isNaN(numericValue)) {
+      return String(value);
+    }
+    return this.formatLoadBalancerNumber(numericValue, decimals);
+  }
+
+  private formatLoadBalancerMetricDisplay(metric?: NetworkLoadBalancerHealthValue, decimals: number = 0, suffix: string = ''): string {
+    const rawValue = metric?.value;
+    if (rawValue === undefined || rawValue === null || rawValue === '') {
+      return 'N/A';
+    }
+    const numericValue = Number(rawValue);
+    if (isNaN(numericValue)) {
+      return String(rawValue);
+    }
+    return this.formatLoadBalancerNumber(numericValue, decimals, suffix);
+  }
+
+  private formatLoadBalancerThroughputDisplay(metric?: NetworkLoadBalancerHealthValue): string {
+    const throughputMbps = this.getLoadBalancerThroughputMbpsValue(metric);
+    if (throughputMbps < 0) {
+      return 'N/A';
+    }
+    return this.formatLoadBalancerNumber(throughputMbps, throughputMbps >= 100 ? 0 : 2);
+  }
+
+  private formatLoadBalancerNumber(value: number, decimals: number = 0, suffix: string = ''): string {
+    const formattedValue = value.toFixed(decimals)
+      .replace(/\.0+$/, '')
+      .replace(/(\.\d*?)0+$/, '$1');
+    return `${formattedValue}${suffix}`;
+  }
+
+  private getLoadBalancerStatusCode(
+    status?: NetworkLoadBalancerStatusCodeLabel | NetworkLoadBalancerSslCertStatus | string
+  ): 'normal' | 'warning' | 'critical' {
+    const rawValue = typeof status === 'string'
+      ? status
+      : status?.code || status?.label || '';
+    const normalizedValue = String(rawValue || '').trim().toLowerCase();
+
+    if (normalizedValue === 'critical' || normalizedValue === 'failed' || normalizedValue === 'down' || normalizedValue === 'expired' || normalizedValue === 'invalid') {
+      return 'critical';
+    }
+
+    if (normalizedValue === 'warning' || normalizedValue === 'unknown' || normalizedValue === 'expiring' || normalizedValue === 'degraded') {
+      return 'warning';
+    }
+
+    return 'normal';
+  }
+
+  private getLoadBalancerStatusLabel(
+    status?: NetworkLoadBalancerStatusCodeLabel | NetworkLoadBalancerSslCertStatus | string
+  ): string {
+    if (typeof status !== 'string' && status?.label) {
+      return status.label;
+    }
+
+    const rawValue = String(status || '').trim();
+    if (!rawValue) {
+      return 'N/A';
+    }
+
+    const normalizedValue = rawValue.toLowerCase();
+    if (normalizedValue === 'info' || normalizedValue === 'information') {
+      return 'Information';
+    }
+    if (normalizedValue === 'n/a' || normalizedValue === 'na') {
+      return 'N/A';
+    }
+
+    return rawValue
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b\w/g, character => character.toUpperCase());
+  }
+
+  private getLoadBalancerSslStatusLabel(status?: NetworkLoadBalancerSslCertStatus): string {
+    if (!status) {
+      return 'N/A';
+    }
+
+    const daysRemaining = Number(status?.days_remaining);
+    const statusLabel = status?.label?.trim();
+    const statusCode = String(status?.code || '').trim().toLowerCase();
+
+    if (statusCode === 'expired') {
+      return 'Expired';
+    }
+
+    if (!isNaN(daysRemaining) && daysRemaining >= 0 && daysRemaining <= 15) {
+      return `Expires in ${Math.ceil(daysRemaining)} Days`;
+    }
+
+    if (statusLabel) {
+      return statusLabel;
+    }
+
+    if (statusCode === 'valid') {
+      return 'Valid';
+    }
+
+    return 'N/A';
+  }
+
+  private getLoadBalancerStatusRank(
+    status?: NetworkLoadBalancerStatusCodeLabel | NetworkLoadBalancerSslCertStatus | string
+  ): number {
+    switch (this.getLoadBalancerStatusCode(status)) {
+      case 'critical':
+        return 3;
+      case 'warning':
+        return 2;
+      default:
+        return 1;
+    }
+  }
+
+  private getLoadBalancerStatusColor(
+    status?: NetworkLoadBalancerStatusCodeLabel | NetworkLoadBalancerSslCertStatus | string
+  ): string {
+    switch (this.getLoadBalancerStatusCode(status)) {
+      case 'critical':
+        return '#d10000';
+      case 'warning':
+        return '#ff8d0a';
+      default:
+        return '#19bb73';
+    }
+  }
+
+  convertToPduHealthViewDataFromTable(
+    data: NetworkPduHealthTableResponse
+  ): PduHealthWidgetViewData {
+    const items = data?.data || [];
+    const view = new PduHealthWidgetViewData();
+    view.charts = [
+      this.buildPduHealthChart(
+        'health-by-location',
+        'Health by Location',
+        this.convertToPduHealthByLocationChartData(items),
+        238,
+        'Green = Normal, Orange = Warning, Red = Critical.'
+      ),
+      this.buildPduHealthChart(
+        'top-load',
+        'Top 10 by Load %',
+        this.convertToPduHealthTopLoadChartData(items),
+        238,
+        'Top PDUs ranked by load percentage.'
+      ),
+      this.buildPduHealthChart(
+        'top-power',
+        'Top 10 by Power Draw (kW)',
+        this.convertToPduHealthTopPowerChartData(items),
+        238,
+        'Top PDUs ranked by power draw in kilowatts.'
+      ),
+      this.buildPduHealthChart(
+        'top-temperature',
+        'Top 10 Hottest PDUs (Temperature)',
+        this.convertToPduHealthTopTemperatureChartData(items),
+        238,
+        'Top PDUs ranked by temperature in degrees Celsius.'
+      ),
+      this.buildPduHealthChart(
+        'load-vs-temperature',
+        'Load % vs Temperature',
+        this.convertToPduHealthLoadVsTemperatureChartData(items),
+        238,
+        'Scatter plot comparing PDU load and temperature.'
+      ),
+      this.buildPduHealthChart(
+        'load-vs-power',
+        'Load % vs Power (kW)',
+        this.convertToPduHealthLoadVsPowerChartData(items),
+        238,
+        'Scatter plot comparing PDU load and power draw.'
+      )
+    ];
+    return this.applyPduHealthTableData(view, data);
+  }
+
+  applyPduHealthTableData(
+    view: PduHealthWidgetViewData,
+    data: NetworkPduHealthTableResponse
+  ): PduHealthWidgetViewData {
+    const nextView = view || new PduHealthWidgetViewData();
+    nextView.tableColumns = this.buildPduHealthTableColumns();
+    nextView.tableRows = (data?.data || []).map(item => this.buildPduHealthTableRow(item));
+    nextView.totalCount = Number(data?.count || 0);
+    nextView.defaultSortColumn = 'vendor';
+    nextView.defaultSortDirection = 'asc';
+    return nextView;
+  }
+
+  private buildPduHealthChart(
+    key: string,
+    title: string,
+    chartData: UnityChartDetails,
+    chartHeight: number,
+    infoTooltip: string
+  ): PduHealthChartViewData {
+    const chart = new PduHealthChartViewData();
+    chart.key = key;
+    chart.title = title;
+    chart.chartData = chartData;
+    chart.chartHeight = chartHeight;
+    chart.infoTooltip = infoTooltip;
+    return chart;
+  }
+
+  private buildPduHealthTableColumns(): PduHealthTableColumnViewData[] {
+    return [
+      { key: 'pduName', label: 'PDU Name', sortKey: 'pdu_name', type: 'text', align: 'left' },
+      { key: 'vendor', label: 'Vendor', sortKey: 'vendor', type: 'text', align: 'left' },
+      { key: 'location', label: 'Location', sortKey: 'location', type: 'text', align: 'left' },
+      { key: 'rack', label: 'Rack', sortKey: 'rack', type: 'text', align: 'left' },
+      { key: 'powerStatusLabel', label: 'Power Status', sortKey: 'power_status', type: 'status', align: 'left' },
+      { key: 'loadDisplay', label: 'Load (%)', sortKey: 'load', type: 'metric', align: 'left' },
+      { key: 'inputVoltageDisplay', label: 'Input Voltage (V)', sortKey: 'input_voltage', type: 'metric', align: 'left' },
+      { key: 'currentDisplay', label: 'Current (A)', sortKey: 'current', type: 'metric', align: 'left' },
+      { key: 'powerDisplay', label: 'Power (kW)', sortKey: 'power', type: 'metric', align: 'left' },
+      { key: 'temperatureDisplay', label: 'Temperature (°C)', sortKey: 'temperature', type: 'metric', align: 'left' },
+      { key: 'humidityDisplay', label: 'Humidity (%)', sortKey: 'humidity', type: 'metric', align: 'left' },
+      { key: 'outletStatus', label: 'Outlet Status', sortKey: 'outlet_status', type: 'text', align: 'left' },
+      { key: 'healthLabel', label: 'Health', sortKey: 'health', type: 'status', align: 'left' }
+    ];
+  }
+
+  private buildPduHealthTableRow(item: NetworkPduHealthTableApiItem): PduHealthTableRowViewData {
+    const row = new PduHealthTableRowViewData();
+    row.deviceId = item?.device_id || '';
+    row.pduName = item?.pdu_name || '';
+    row.vendor = item?.vendor || '';
+    row.location = item?.location || '';
+    row.rack = item?.rack || '';
+    row.powerStatusLabel = this.getPduHealthStatusLabel(item?.power_status);
+    row.loadValue = this.getPduHealthMetricNumericValue(item?.load);
+    row.loadDisplay = this.formatPduMetricDisplay(item?.load, 0, '%');
+    row.inputVoltageValue = this.getPduHealthMetricNumericValue(item?.input_voltage);
+    row.inputVoltageDisplay = this.formatPduMetricDisplay(item?.input_voltage, 0);
+    row.currentValue = this.getPduHealthMetricNumericValue(item?.current);
+    row.currentDisplay = this.formatPduMetricDisplay(item?.current, 1);
+    row.powerValue = this.getPduHealthMetricNumericValue(item?.power);
+    row.powerDisplay = this.formatPduMetricDisplay(item?.power, 2);
+    row.temperatureValue = this.getPduHealthMetricNumericValue(item?.temperature);
+    row.temperatureDisplay = this.formatPduMetricDisplay(item?.temperature, 0);
+    row.humidityValue = this.getPduHealthMetricNumericValue(item?.humidity);
+    row.humidityDisplay = this.formatPduMetricDisplay(item?.humidity, 0);
+    row.outletStatus = item?.outlet_status || '';
+    row.healthTone = this.getPduHealthStatusCode(item?.health);
+    row.healthLabel = this.getPduHealthStatusLabel(item?.health);
+    row.healthRank = this.getPduHealthStatusRank(item?.health);
+    return row;
+  }
+
+  private convertToPduHealthByLocationChartData(items: NetworkPduHealthTableApiItem[]): UnityChartDetails {
+    if (!items?.length) {
+      return null;
+    }
+
+    const grouped = new Map<string, { normal: number; warning: number; critical: number }>();
+    (items || []).forEach(item => {
+      const location = item?.location || 'Unknown';
+      const tone = this.getPduHealthStatusCode(item?.health);
+      const current = grouped.get(location) || { normal: 0, warning: 0, critical: 0 };
+      current[tone] += 1;
+      grouped.set(location, current);
+    });
+
+    const locations = Array.from(grouped.keys()).sort((left, right) => left.localeCompare(right, undefined, {
+      numeric: true,
+      sensitivity: 'base'
+    }));
+    const totals = locations.map(location => {
+      const current = grouped.get(location);
+      return Number(current?.normal || 0) + Number(current?.warning || 0) + Number(current?.critical || 0);
+    });
+    const scale = this.getPduHealthAxisScale(totals, 1, 4, 0);
+
+    const chart = new UnityChartDetails();
+    chart.type = UnityChartTypes.BAR;
+    chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+    chart.options = {
+      animation: false,
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+        backgroundColor: 'rgba(33, 41, 52, 0.94)',
+        borderWidth: 0,
+        textStyle: {
+          color: '#ffffff'
+        },
+        formatter: (params: any[]) => {
+          const total = (params || []).reduce((sum, current) => sum + Number(current?.value || 0), 0);
+          const lines = (params || [])
+            .filter(current => Number(current?.value || 0) > 0)
+            .map(current => `${current.seriesName}: ${current.value}`);
+          return `${params[0]?.axisValue || ''}<br>${lines.join('<br>')}<br>Total: ${total}`;
+        }
+      },
+      grid: {
+        left: 38,
+        right: 12,
+        top: 18,
+        bottom: 28,
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: locations,
+        axisLine: {
+          lineStyle: {
+            color: '#97a3b3'
+          }
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 11
+        }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: scale.max,
+        interval: scale.interval,
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e8edf3'
+          }
+        }
+      },
+      series: [
+        {
+          name: 'Normal',
+          type: 'bar',
+          stack: 'health',
+          barWidth: 54,
+          data: locations.map(location => Number(grouped.get(location)?.normal || 0)),
+          itemStyle: {
+            color: this.getPduHealthStatusColor('normal')
+          }
+        },
+        {
+          name: 'Warning',
+          type: 'bar',
+          stack: 'health',
+          barWidth: 54,
+          data: locations.map(location => Number(grouped.get(location)?.warning || 0)),
+          itemStyle: {
+            color: this.getPduHealthStatusColor('warning')
+          }
+        },
+        {
+          name: 'Critical',
+          type: 'bar',
+          stack: 'health',
+          barWidth: 54,
+          data: locations.map(location => Number(grouped.get(location)?.critical || 0)),
+          itemStyle: {
+            color: this.getPduHealthStatusColor('critical')
+          }
+        }
+      ]
+    };
+    return chart;
+  }
+
+  private convertToPduHealthTopLoadChartData(items: NetworkPduHealthTableApiItem[]): UnityChartDetails {
+    return this.buildPduHealthTopMetricBarChartData(
+      items,
+      item => this.getPduHealthMetricNumericValue(item?.load),
+      'Load',
+      0,
+      '%',
+      100,
+      20,
+      ''
+    );
+  }
+
+  private convertToPduHealthTopPowerChartData(items: NetworkPduHealthTableApiItem[]): UnityChartDetails {
+    const rankedItems = (items || [])
+      .filter(item => this.getPduHealthMetricNumericValue(item?.power) >= 0)
+      .slice()
+      .sort((left, right) => this.getPduHealthMetricNumericValue(right?.power) - this.getPduHealthMetricNumericValue(left?.power))
+      .slice(0, 10);
+    const scale = this.getPduHealthAxisScale(rankedItems.map(item => this.getPduHealthMetricNumericValue(item?.power)), 1, 5, 0);
+    return this.buildPduHealthTopMetricBarChartData(
+      rankedItems,
+      item => this.getPduHealthMetricNumericValue(item?.power),
+      'Power Draw',
+      2,
+      ' kW',
+      scale.max,
+      scale.interval,
+      'kW'
+    );
+  }
+
+  private convertToPduHealthTopTemperatureChartData(items: NetworkPduHealthTableApiItem[]): UnityChartDetails {
+    const rankedItems = (items || [])
+      .filter(item => this.getPduHealthMetricNumericValue(item?.temperature) >= 0)
+      .slice()
+      .sort((left, right) => this.getPduHealthMetricNumericValue(right?.temperature) - this.getPduHealthMetricNumericValue(left?.temperature))
+      .slice(0, 10);
+    const scale = this.getPduHealthAxisScale(rankedItems.map(item => this.getPduHealthMetricNumericValue(item?.temperature)), 10, 4, 0);
+    return this.buildPduHealthTopMetricBarChartData(
+      rankedItems,
+      item => this.getPduHealthMetricNumericValue(item?.temperature),
+      'Temperature',
+      0,
+      ' °C',
+      scale.max,
+      scale.interval,
+      '°C'
+    );
+  }
+
+  private buildPduHealthTopMetricBarChartData(
+    items: NetworkPduHealthTableApiItem[],
+    getValue: (item: NetworkPduHealthTableApiItem) => number,
+    valueLabel: string,
+    decimals: number,
+    valueSuffix: string,
+    xAxisMax: number,
+    xAxisInterval: number,
+    xAxisName: string
+  ): UnityChartDetails {
+    const rankedItems = (items || [])
+      .filter(item => getValue(item) >= 0)
+      .slice()
+      .sort((left, right) => getValue(right) - getValue(left))
+      .slice(0, 10);
+
+    if (!rankedItems.length) {
+      return null;
+    }
+
+    const chart = new UnityChartDetails();
+    chart.type = UnityChartTypes.BAR;
+    chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+    chart.options = {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(33, 41, 52, 0.94)',
+        borderWidth: 0,
+        textStyle: {
+          color: '#ffffff'
+        },
+        formatter: (params: any) => {
+          const item = params?.data?.item;
+          const value = Number(params?.value || 0);
+          return `${item?.pdu_name || params?.name || ''}<br>${valueLabel}: ${this.formatPduNumber(value, decimals, valueSuffix)}`;
+        }
+      },
+      grid: {
+        left: 112,
+        right: 18,
+        top: 8,
+        bottom: 18,
+        containLabel: false
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: xAxisMax,
+        interval: xAxisInterval,
+        name: xAxisName,
+        nameLocation: 'end',
+        nameGap: 10,
+        nameTextStyle: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e8edf3'
+          }
+        }
+      },
+      yAxis: {
+        type: 'category',
+        inverse: true,
+        data: rankedItems.map(item => item?.pdu_name || ''),
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10,
+          width: 92,
+          overflow: 'truncate'
+        }
+      },
+      series: [
+        {
+          type: 'bar',
+          barWidth: 12,
+          data: rankedItems.map(item => ({
+            value: getValue(item),
+            item,
+            itemStyle: {
+              color: this.getPduHealthStatusColor(item?.health)
+            }
+          }))
+        }
+      ]
+    };
+    return chart;
+  }
+
+  private convertToPduHealthLoadVsTemperatureChartData(items: NetworkPduHealthTableApiItem[]): UnityChartDetails {
+    const filteredItems = (items || []).filter(item =>
+      this.getPduHealthMetricNumericValue(item?.load) >= 0
+      && this.getPduHealthMetricNumericValue(item?.temperature) >= 0
+    );
+    const yAxisScale = this.getPduHealthAxisScale(filteredItems.map(item => this.getPduHealthMetricNumericValue(item?.temperature)), 10, 4, 0);
+    return this.buildPduHealthScatterChartData(
+      filteredItems,
+      item => this.getPduHealthMetricNumericValue(item?.temperature),
+      yAxisScale.max,
+      yAxisScale.interval,
+      'Temperature',
+      0,
+      ' °C'
+    );
+  }
+
+  private convertToPduHealthLoadVsPowerChartData(items: NetworkPduHealthTableApiItem[]): UnityChartDetails {
+    const filteredItems = (items || []).filter(item =>
+      this.getPduHealthMetricNumericValue(item?.load) >= 0
+      && this.getPduHealthMetricNumericValue(item?.power) >= 0
+    );
+    const yAxisScale = this.getPduHealthAxisScale(filteredItems.map(item => this.getPduHealthMetricNumericValue(item?.power)), 1, 5, 0);
+    return this.buildPduHealthScatterChartData(
+      filteredItems,
+      item => this.getPduHealthMetricNumericValue(item?.power),
+      yAxisScale.max,
+      yAxisScale.interval,
+      'Power',
+      2,
+      ' kW'
+    );
+  }
+
+  private buildPduHealthScatterChartData(
+    items: NetworkPduHealthTableApiItem[],
+    getYValue: (item: NetworkPduHealthTableApiItem) => number,
+    yAxisMax: number,
+    yAxisInterval: number,
+    yValueLabel: string,
+    decimals: number,
+    valueSuffix: string
+  ): UnityChartDetails {
+    if (!items?.length) {
+      return null;
+    }
+
+    const chart = new UnityChartDetails();
+    chart.type = UnityChartTypes.SCATTER;
+    chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.SCATTER);
+    chart.options = {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(33, 41, 52, 0.94)',
+        borderWidth: 0,
+        textStyle: {
+          color: '#ffffff'
+        },
+        formatter: (params: any) => {
+          const item = params?.data?.item;
+          const load = Number(item?.load?.value || 0);
+          const yValue = getYValue(item);
+          return `${item?.pdu_name || params?.name || ''}<br>Load: ${this.formatPduNumber(load, 0, '%')}<br>${yValueLabel}: ${this.formatPduNumber(yValue, decimals, valueSuffix)}`;
+        }
+      },
+      grid: {
+        left: 48,
+        right: 18,
+        top: 18,
+        bottom: 38,
+        containLabel: true
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        interval: 20,
+        name: 'Load (%)',
+        nameLocation: 'middle',
+        nameGap: 24,
+        nameTextStyle: {
+          color: '#7d8793',
+          fontSize: 11
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#97a3b3'
+          }
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e8edf3'
+          }
+        }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: yAxisMax,
+        interval: yAxisInterval,
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e8edf3'
+          }
+        }
+      },
+      series: [
+        {
+          type: 'scatter',
+          symbolSize: 12,
+          emphasis: {
+            scale: true
+          },
+          data: items.map(item => ({
+            name: item?.pdu_name || '',
+            value: [this.getPduHealthMetricNumericValue(item?.load), getYValue(item)],
+            item,
+            itemStyle: {
+              color: this.getPduHealthStatusColor(item?.health),
+              borderColor: '#ffffff',
+              borderWidth: 1.5
+            }
+          }))
+        }
+      ]
+    };
+    return chart;
+  }
+
+  private getPduHealthAxisScale(
+    values: number[],
+    interval: number,
+    minSections: number = 4,
+    padding: number = 0
+  ): { max: number; interval: number } {
+    const safeInterval = interval > 0 ? interval : 1;
+    const maxValue = Math.max(...(values || []), 0);
+    return {
+      interval: safeInterval,
+      max: Math.max(safeInterval * minSections, this.getRoundedAxisMax([maxValue], safeInterval, padding))
+    };
+  }
+
+  private getPduHealthMetricNumericValue(metric?: NetworkPduHealthValue): number {
+    const rawValue = metric?.value;
+    if (rawValue === undefined || rawValue === null || rawValue === '') {
+      return -1;
+    }
+    const value = Number(rawValue);
+    return isNaN(value) ? -1 : value;
+  }
+
+  private formatPduMetricDisplay(metric?: NetworkPduHealthValue, decimals: number = 0, suffix: string = ''): string {
+    const rawValue = metric?.value;
+    if (rawValue === undefined || rawValue === null || rawValue === '') {
+      return 'N/A';
+    }
+    const value = Number(rawValue);
+    if (isNaN(value)) {
+      return String(rawValue);
+    }
+    return this.formatPduNumber(value, decimals, suffix);
+  }
+
+  private formatPduNumber(value: number, decimals: number = 0, suffix: string = ''): string {
+    const formattedValue = value.toFixed(decimals)
+      .replace(/\.0+$/, '')
+      .replace(/(\.\d*?)0+$/, '$1');
+    return `${formattedValue}${suffix}`;
+  }
+
+  private getPduHealthStatusCode(status?: NetworkStatusCodeLabel | string): 'normal' | 'warning' | 'critical' {
+    const rawValue = typeof status === 'string'
+      ? status
+      : status?.code || status?.label || '';
+    const normalizedValue = String(rawValue || '').trim().toLowerCase();
+
+    if (normalizedValue === 'critical' || normalizedValue === 'failed' || normalizedValue === 'down') {
+      return 'critical';
+    }
+
+    if (normalizedValue === 'warning' || normalizedValue === 'unknown') {
+      return 'warning';
+    }
+
+    return 'normal';
+  }
+
+  private getPduHealthStatusLabel(status?: NetworkStatusCodeLabel | string): string {
+    if (typeof status !== 'string' && status?.label) {
+      return status.label;
+    }
+
+    const rawValue = String(status || '').trim().toLowerCase();
+    if (rawValue === 'on') {
+      return 'On';
+    }
+    if (rawValue === 'off') {
+      return 'Off';
+    }
+    if (rawValue === 'up') {
+      return 'Up';
+    }
+    if (rawValue === 'down') {
+      return 'Down';
+    }
+    if (rawValue === 'info' || rawValue === 'information') {
+      return 'Information';
+    }
+
+    switch (this.getPduHealthStatusCode(status)) {
+      case 'critical':
+        return 'Critical';
+      case 'warning':
+        return 'Warning';
+      default:
+        return 'Normal';
+    }
+  }
+
+  private getPduHealthStatusRank(status?: NetworkStatusCodeLabel | string): number {
+    switch (this.getPduHealthStatusCode(status)) {
+      case 'critical':
+        return 3;
+      case 'warning':
+        return 2;
+      default:
+        return 1;
+    }
+  }
+
+  private getPduHealthStatusColor(status?: NetworkStatusCodeLabel | string): string {
+    switch (this.getPduHealthStatusCode(status)) {
+      case 'critical':
+        return '#d10000';
+      case 'warning':
+        return '#ff8d0a';
+      default:
+        return '#19bb73';
+    }
   }
 
   convertToEnvironmentalHealthSummaryChartViewData(
@@ -896,7 +2355,8 @@ export class NetworkDashboardService {
         'Top 10 Devices by HotSpot Temperature',
         this.convertToHotSpotTemperatureChartData(hotSpotTemperature),
         248,
-        this.buildHotSpotTemperatureInfoTooltip(hotSpotTemperature?.thresholds)
+        this.buildHotSpotTemperatureInfoTooltip(hotSpotTemperature?.thresholds),
+        this.buildHotSpotLegendItems(hotSpotTemperature?.thresholds)
       ),
       this.buildEnvironmentalHealthChart(
         'average-temperature',
@@ -918,10 +2378,23 @@ export class NetworkDashboardService {
         'Fan Health by Device',
         this.convertToFanHealthByDeviceChartData(fanHealthByDevice?.data || []),
         248,
-        'Healthy fan count out of total fans for each device.'
+        'Healthy fan count out of total fans for each device.',
+        this.buildFanHealthLegendItems()
       )
     ];
     return view;
+  }
+
+  convertToEnvironmentalHealthSummaryViewDataFromTable(
+    data: NetworkEnvironmentalHealthSummaryTableResponse
+  ): EnvironmentalHealthSummaryWidgetViewData {
+    const items = data?.data || [];
+    return this.convertToEnvironmentalHealthSummaryChartViewData(
+      this.buildHotSpotTemperatureResponseFromEnvironmentalTable(items),
+      this.buildAverageTemperatureResponseFromEnvironmentalTable(items),
+      this.buildPowerSupplyDistributionResponseFromEnvironmentalTable(items),
+      this.buildFanHealthByDeviceResponseFromEnvironmentalTable(items)
+    );
   }
 
   applyEnvironmentalHealthSummaryTableData(
@@ -931,6 +2404,9 @@ export class NetworkDashboardService {
     const nextView = view || new EnvironmentalHealthSummaryWidgetViewData();
     nextView.tableColumns = this.buildEnvironmentalHealthTableColumns();
     nextView.tableRows = (data?.data || []).map(item => this.buildEnvironmentalHealthTableRow(item));
+    nextView.totalCount = Number(data?.count || 0);
+    nextView.defaultSortColumn = 'device_type';
+    nextView.defaultSortDirection = 'asc';
     return nextView;
   }
 
@@ -1011,7 +2487,7 @@ export class NetworkDashboardService {
       'success-failure',
       '',
       this.convertToAutoRemediationSuccessFailureChartData(summary),
-      148
+      176
     );
     view.topActionsChart = this.buildAutoRemediationChart(
       'top-actions',
@@ -1501,56 +2977,111 @@ export class NetworkDashboardService {
   private buildInterfaceHealthMetricsTableColumns(): InterfaceHealthMetricsTableColumnViewData[] {
     return [
       {
+        key: 'interfaceType',
+        label: 'Interface Type',
+        sortKey: 'interface_type',
+        align: 'left'
+      },
+      {
         key: 'interfaceName',
         label: 'Interface',
-        sortKey: 'interfaceName',
+        sortKey: 'interface',
         align: 'left'
       },
       {
         key: 'deviceName',
         label: 'Device',
-        sortKey: 'deviceName',
+        sortKey: 'device',
         align: 'left'
       },
       {
-        key: 'errorsInDisplay',
-        label: 'Errors (In)',
-        sortKey: 'errorsInValue',
+        key: 'duplexStatus',
+        label: 'Duplex Status',
+        sortKey: 'duplex_type',
         align: 'left'
       },
       {
-        key: 'errorsOutDisplay',
-        label: 'Errors (Out)',
-        sortKey: 'errorsOutValue',
+        key: 'inboundDiscardsDisplay',
+        label: 'Inbound Discards',
+        sortKey: 'discards_inbound',
         align: 'left'
       },
       {
-        key: 'discardsInDisplay',
-        label: 'Discards (In)',
-        sortKey: 'discardsInValue',
+        key: 'inboundErrorsDisplay',
+        label: 'Inbound Errors',
+        sortKey: 'errors_inbound',
         align: 'left'
       },
       {
-        key: 'discardsOutDisplay',
-        label: 'Discards (Out)',
-        sortKey: 'discardsOutValue',
+        key: 'bitsReceivedDisplay',
+        label: 'Bits Received',
+        sortKey: 'bits_received',
+        align: 'left'
+      },
+      {
+        key: 'outboundDiscardsDisplay',
+        label: 'Outbound Discards',
+        sortKey: 'discards_outbound',
+        align: 'left'
+      },
+      {
+        key: 'outboundErrorsDisplay',
+        label: 'Outbound Errors',
+        sortKey: 'errors_outbound',
+        align: 'left'
+      },
+      {
+        key: 'bitsSentDisplay',
+        label: 'Bits Sent',
+        sortKey: 'bits_sent',
+        align: 'left'
+      },
+      {
+        key: 'speedDisplay',
+        label: 'Speed',
+        sortKey: 'speed',
+        align: 'left'
+      },
+      {
+        key: 'operationalStatus',
+        label: 'Operational Status',
+        sortKey: 'operational_status',
+        align: 'left'
+      },
+      {
+        key: 'healthLabel',
+        label: 'Health',
+        sortKey: 'health',
         align: 'left'
       }
     ];
   }
 
-  private buildInterfaceHealthMetricsTableRow(item: NetworkInterfaceHealthMetricItem | NetworkInterfaceHealthMetricsTableApiItem): InterfaceHealthMetricsTableRowViewData {
+  private buildInterfaceHealthMetricsTableRow(item: NetworkInterfaceHealthMetricItem): InterfaceHealthMetricsTableRowViewData {
     const row = new InterfaceHealthMetricsTableRowViewData();
-    row.interfaceName = (item as NetworkInterfaceHealthMetricItem).interface_name || (item as NetworkInterfaceHealthMetricsTableApiItem).interface;
-    row.deviceName = (item as NetworkInterfaceHealthMetricItem).device_name || (item as NetworkInterfaceHealthMetricsTableApiItem).device;
-    row.errorsInValue = this.getInterfaceHealthErrorsInbound(item);
-    row.errorsInDisplay = this.formatPerSecondValue(row.errorsInValue);
-    row.errorsOutValue = this.getInterfaceHealthErrorsOutbound(item);
-    row.errorsOutDisplay = this.formatPerSecondValue(row.errorsOutValue);
-    row.discardsInValue = this.getInterfaceHealthDiscardsInbound(item);
-    row.discardsInDisplay = this.formatPerSecondValue(row.discardsInValue);
-    row.discardsOutValue = this.getInterfaceHealthDiscardsOutbound(item);
-    row.discardsOutDisplay = this.formatPerSecondValue(row.discardsOutValue);
+    row.deviceId = item.device_id || '';
+    row.interfaceType = item.interface_type_display || 'N/A';
+    row.interfaceTypeTooltip = item.interface_type || row.interfaceType;
+    row.interfaceName = item.interface_name || 'N/A';
+    row.deviceName = item.device_name || 'N/A';
+    row.duplexStatus = item.duplex_status || 'N/A';
+    row.inboundDiscardsValue = Number(item.discards_in_per_sec || 0);
+    row.inboundDiscardsDisplay = this.formatInterfaceMetricValue(row.inboundDiscardsValue);
+    row.inboundErrorsValue = Number(item.errors_in_per_sec || 0);
+    row.inboundErrorsDisplay = this.formatInterfaceMetricValue(row.inboundErrorsValue);
+    row.bitsReceivedValue = Number(item.bits_received_bps || 0);
+    row.bitsReceivedDisplay = this.formatInterfaceBitsRateDisplay(row.bitsReceivedValue);
+    row.outboundDiscardsValue = Number(item.discards_out_per_sec || 0);
+    row.outboundDiscardsDisplay = this.formatInterfaceMetricValue(row.outboundDiscardsValue);
+    row.outboundErrorsValue = Number(item.errors_out_per_sec || 0);
+    row.outboundErrorsDisplay = this.formatInterfaceMetricValue(row.outboundErrorsValue);
+    row.bitsSentValue = Number(item.bits_sent_bps || 0);
+    row.bitsSentDisplay = this.formatInterfaceBitsRateDisplay(row.bitsSentValue);
+    row.speedValue = Number(item.speed_gbps || 0);
+    row.speedDisplay = this.formatInterfaceSpeedDisplay(row.speedValue);
+    row.operationalStatus = item.operational_status || 'N/A';
+    row.healthTone = item.health_tone || 'unknown';
+    row.healthLabel = item.health_label || 'Unknown';
     return row;
   }
 
@@ -2552,56 +4083,56 @@ export class NetworkDashboardService {
       {
         key: 'deviceName',
         label: 'Device Name',
-        sortKey: 'deviceName',
+        sortKey: 'device_name',
         type: 'text',
         align: 'left'
       },
       {
         key: 'deviceType',
         label: 'Device Type',
-        sortKey: 'deviceType',
+        sortKey: 'device_type',
         type: 'text',
         align: 'left'
       },
       {
         key: 'powerSupplyADisplay',
         label: 'Power Supply A',
-        sortKey: 'powerSupplyAStatusRank',
+        sortKey: 'power_supply_a',
         type: 'status',
         align: 'left'
       },
       {
         key: 'powerSupplyBDisplay',
         label: 'Power Supply B',
-        sortKey: 'powerSupplyBStatusRank',
+        sortKey: 'power_supply_b',
         type: 'status',
         align: 'left'
       },
       {
         key: 'fanStatusDisplay',
         label: 'Fan Status',
-        sortKey: 'fanStatusRank',
+        sortKey: 'fan_status',
         type: 'fan',
         align: 'left'
       },
       {
         key: 'inletTempDisplay',
         label: 'Inlet Temp',
-        sortKey: 'inletTempValue',
+        sortKey: 'inlet_temperature',
         type: 'temperature',
         align: 'left'
       },
       {
         key: 'outletTempDisplay',
         label: 'Outlet Temp',
-        sortKey: 'outletTempValue',
+        sortKey: 'outlet_temperature',
         type: 'temperature',
         align: 'left'
       },
       {
         key: 'hotSpotTempDisplay',
         label: 'HotSpot Temp',
-        sortKey: 'hotSpotTempValue',
+        sortKey: 'hotspot_temperature',
         type: 'temperature',
         align: 'left'
       }
@@ -2610,8 +4141,8 @@ export class NetworkDashboardService {
 
   private buildEnvironmentalHealthTableRow(item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem): EnvironmentalHealthSummaryTableRowViewData {
     const row = new EnvironmentalHealthSummaryTableRowViewData();
-    row.deviceName = item.device_name;
-    row.deviceType = item.device_type;
+    row.deviceName = item.device_name || 'N/A';
+    row.deviceType = this.formatEnvironmentalDeviceType(item.device_type);
     row.powerSupplyADisplay = this.getPowerSupplyStatusLabel((item as NetworkEnvironmentalHealthSummaryTableApiItem).power_supply_a || (item as any).power_supply_a_status);
     row.powerSupplyAStatusTone = this.getPowerSupplyStatusCode((item as NetworkEnvironmentalHealthSummaryTableApiItem).power_supply_a || (item as any).power_supply_a_status);
     row.powerSupplyAStatusRank = this.getPowerSupplyStatusRank((item as NetworkEnvironmentalHealthSummaryTableApiItem).power_supply_a || (item as any).power_supply_a_status);
@@ -2623,15 +4154,169 @@ export class NetworkDashboardService {
     row.fanStatusRank = this.getFanStatusRank(row.fanStatusTone as any);
     row.fanStatusMeta = this.getEnvironmentalFanStatusMeta(item);
     row.inletTempValue = this.getEnvironmentalTemperatureValue(item, 'inlet');
-    row.inletTempDisplay = this.formatTemperature(row.inletTempValue, this.getEnvironmentalTemperatureUnit(item, 'inlet'));
+    row.inletTempDisplay = this.formatEnvironmentalTemperatureDisplay(item, 'inlet');
     row.inletTempTone = this.getEnvironmentalTemperatureTone(item, 'inlet');
     row.outletTempValue = this.getEnvironmentalTemperatureValue(item, 'outlet');
-    row.outletTempDisplay = this.formatTemperature(row.outletTempValue, this.getEnvironmentalTemperatureUnit(item, 'outlet'));
+    row.outletTempDisplay = this.formatEnvironmentalTemperatureDisplay(item, 'outlet');
     row.outletTempTone = this.getEnvironmentalTemperatureTone(item, 'outlet');
     row.hotSpotTempValue = this.getEnvironmentalTemperatureValue(item, 'hotspot');
-    row.hotSpotTempDisplay = this.formatTemperature(row.hotSpotTempValue, this.getEnvironmentalTemperatureUnit(item, 'hotspot'));
+    row.hotSpotTempDisplay = this.formatEnvironmentalTemperatureDisplay(item, 'hotspot');
     row.hotSpotTempTone = this.getEnvironmentalTemperatureTone(item, 'hotspot');
     return row;
+  }
+
+  private buildHotSpotTemperatureResponseFromEnvironmentalTable(
+    items: NetworkEnvironmentalHealthSummaryTableApiItem[]
+  ): NetworkTopDevicesByHotspotTemperatureResponse {
+    const thresholds = this.getEnvironmentalHotSpotThresholds();
+    const data = (items || [])
+      .filter(item => this.getEnvironmentalTemperatureValue(item, 'hotspot') >= 0)
+      .map(item => ({
+        device_id: item.device_id,
+        device_name: item.device_name || 'N/A',
+        device_type: item.device_type,
+        temperature: this.getEnvironmentalTemperatureValue(item, 'hotspot'),
+        unit: this.getEnvironmentalTemperatureUnit(item, 'hotspot'),
+        status: item.hotspot_temperature?.status
+      }));
+
+    return {
+      count: data.length,
+      time_range: 'custom',
+      thresholds,
+      data
+    };
+  }
+
+  private buildAverageTemperatureResponseFromEnvironmentalTable(
+    items: NetworkEnvironmentalHealthSummaryTableApiItem[]
+  ): NetworkAverageTemperatureBySensorTypeResponse {
+    const metrics: Array<{
+      sensor_type: string;
+      label: string;
+      average_temperature: number;
+      unit: string;
+      device_count: number;
+      warning_threshold: number;
+      critical_threshold: number;
+    }> = [];
+
+    const inletTemperatures = (items || [])
+      .map(item => this.getEnvironmentalTemperatureValue(item, 'inlet'))
+      .filter(value => value >= 0);
+    const outletTemperatures = (items || [])
+      .map(item => this.getEnvironmentalTemperatureValue(item, 'outlet'))
+      .filter(value => value >= 0);
+    const hotSpotTemperatures = (items || [])
+      .map(item => this.getEnvironmentalTemperatureValue(item, 'hotspot'))
+      .filter(value => value >= 0);
+
+    if (inletTemperatures.length) {
+      metrics.push({
+        sensor_type: 'inlet_temperature',
+        label: 'Inlet Temperature',
+        average_temperature: this.getRoundedAverage(inletTemperatures),
+        unit: this.getEnvironmentalTemperatureUnit((items || []).find(item => this.getEnvironmentalTemperatureValue(item, 'inlet') >= 0), 'inlet'),
+        device_count: inletTemperatures.length,
+        warning_threshold: 28,
+        critical_threshold: 31
+      });
+    }
+
+    if (outletTemperatures.length) {
+      metrics.push({
+        sensor_type: 'outlet_temperature',
+        label: 'Outlet Temperature',
+        average_temperature: this.getRoundedAverage(outletTemperatures),
+        unit: this.getEnvironmentalTemperatureUnit((items || []).find(item => this.getEnvironmentalTemperatureValue(item, 'outlet') >= 0), 'outlet'),
+        device_count: outletTemperatures.length,
+        warning_threshold: 36,
+        critical_threshold: 42
+      });
+    }
+
+    if (hotSpotTemperatures.length) {
+      metrics.push({
+        sensor_type: 'hotspot_temperature',
+        label: 'HotSpot Temperature',
+        average_temperature: this.getRoundedAverage(hotSpotTemperatures),
+        unit: this.getEnvironmentalTemperatureUnit((items || []).find(item => this.getEnvironmentalTemperatureValue(item, 'hotspot') >= 0), 'hotspot'),
+        device_count: hotSpotTemperatures.length,
+        warning_threshold: 40,
+        critical_threshold: 47
+      });
+    }
+
+    return {
+      time_range: 'custom',
+      data: metrics
+    };
+  }
+
+  private buildPowerSupplyDistributionResponseFromEnvironmentalTable(
+    items: NetworkEnvironmentalHealthSummaryTableApiItem[]
+  ): NetworkPowerSupplyStatusDistributionResponse {
+    return {
+      time_range: 'custom',
+      data: [
+        this.buildPowerSupplyDistributionItemFromEnvironmentalTable(items, 'power_supply_a', 'Power Supply A'),
+        this.buildPowerSupplyDistributionItemFromEnvironmentalTable(items, 'power_supply_b', 'Power Supply B')
+      ]
+    };
+  }
+
+  private buildPowerSupplyDistributionItemFromEnvironmentalTable(
+    items: NetworkEnvironmentalHealthSummaryTableApiItem[],
+    field: 'power_supply_a' | 'power_supply_b',
+    label: string
+  ): NetworkPowerSupplyStatusDistributionApiItem {
+    const statusCounts = {
+      normal: 0,
+      warning: 0,
+      failed: 0,
+      unknown: 0
+    };
+
+    (items || []).forEach(item => {
+      const status = field === 'power_supply_a' ? item.power_supply_a : item.power_supply_b;
+      const code = this.getPowerSupplyStatusCode(status);
+      statusCounts[code] += 1;
+    });
+
+    return {
+      power_supply: label,
+      normal: statusCounts.normal,
+      warning: statusCounts.warning,
+      failed: statusCounts.failed,
+      unknown: statusCounts.unknown
+    };
+  }
+
+  private buildFanHealthByDeviceResponseFromEnvironmentalTable(
+    items: NetworkEnvironmentalHealthSummaryTableApiItem[]
+  ): NetworkFanHealthByDeviceResponse {
+    const data = (items || [])
+      .filter(item => Number(item?.fan_status?.total || 0) > 0)
+      .slice()
+      .sort((left, right) => this.getFanStatusRank(this.getEnvironmentalFanStatusTone(right) as any) - this.getFanStatusRank(this.getEnvironmentalFanStatusTone(left) as any))
+      .map(item => ({
+        device_id: item.device_id,
+        device_name: item.device_name || 'N/A',
+        device_type: item.device_type,
+        healthy_fans: Number(item?.fan_status?.healthy || 0),
+        warning_fans: Number(item?.fan_status?.warning || 0),
+        failed_fans: Number(item?.fan_status?.failed || 0),
+        unknown_fans: Number(item?.fan_status?.unknown || 0),
+        total_fans: Number(item?.fan_status?.total || 0),
+        display: this.getEnvironmentalFanChartDisplay(item),
+        status: item?.fan_status?.status
+      }));
+
+    return {
+      count: data.length,
+      time_range: 'custom',
+      data
+    };
   }
 
   private convertToHotSpotTemperatureChartData(data: NetworkTopDevicesByHotspotTemperatureResponse): UnityChartDetails {
@@ -3271,6 +4956,9 @@ export class NetworkDashboardService {
   }
 
   private formatTemperature(value: number, unit: string = 'C'): string {
+    if (value === null || value === undefined || isNaN(Number(value))) {
+      return 'N/A';
+    }
     return `${Number(value || 0)}°${unit}`;
   }
 
@@ -3288,6 +4976,33 @@ export class NetworkDashboardService {
       .map(status => this.buildEnvironmentalLegendItem(this.getPowerSupplyStatusLabel(status), this.getPowerSupplyStatusColor(status)));
   }
 
+  private getEnvironmentalHotSpotThresholds(): NetworkEnvironmentalThresholds {
+    return {
+      warning: 40,
+      critical: 47,
+      unit: 'C'
+    };
+  }
+
+  private buildHotSpotLegendItems(thresholds?: { warning?: number; critical?: number; unit?: string }): EnvironmentalHealthLegendItemViewData[] {
+    const unit = thresholds?.unit || 'C';
+    const warningThreshold = Number(thresholds?.warning || 40);
+    const criticalThreshold = Number(thresholds?.critical || 47);
+    return [
+      this.buildEnvironmentalLegendItem(`Critical (>=${criticalThreshold}°${unit})`, '#df3b4a'),
+      this.buildEnvironmentalLegendItem(`Warning (${warningThreshold}°${unit}-${criticalThreshold - 1}°${unit})`, '#ffba08'),
+      this.buildEnvironmentalLegendItem(`Healthy (<${warningThreshold}°${unit})`, '#0db14b')
+    ];
+  }
+
+  private buildFanHealthLegendItems(): EnvironmentalHealthLegendItemViewData[] {
+    return [
+      this.buildEnvironmentalLegendItem('Off', '#df3b4a'),
+      this.buildEnvironmentalLegendItem('Warning', '#ffba08'),
+      this.buildEnvironmentalLegendItem('Up', '#0db14b')
+    ];
+  }
+
   private getAverageSensorColor(sensorType?: string): string {
     switch (sensorType) {
       case 'inlet_temperature':
@@ -3301,25 +5016,47 @@ export class NetworkDashboardService {
 
   private getEnvironmentalFanStatusLabel(item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem): string {
     const tableItem = item as NetworkEnvironmentalHealthSummaryTableApiItem;
+    const code = String(tableItem.fan_status?.status?.code || '').trim().toLowerCase();
+    if (code === 'failed' || code === 'critical') {
+      return 'Failed';
+    }
+    if (code === 'warning') {
+      return 'Warning';
+    }
+    if (code === 'unknown') {
+      return 'N/A';
+    }
+    if (code === 'normal' || code === 'healthy') {
+      return 'Healthy';
+    }
     if (tableItem.fan_status?.status?.label) {
       return tableItem.fan_status.status.label;
     }
-    return (item as NetworkEnvironmentalHealthSummaryItem).fan_status_label || '';
+    return (item as NetworkEnvironmentalHealthSummaryItem).fan_status_label || 'N/A';
   }
 
-  private getEnvironmentalFanStatusTone(item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem): 'healthy' | 'warning' | 'critical' {
+  private getEnvironmentalFanStatusTone(item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem): 'healthy' | 'warning' | 'critical' | 'unknown' {
     const tableItem = item as NetworkEnvironmentalHealthSummaryTableApiItem;
-    const code = tableItem.fan_status?.status?.code;
-    if (code === 'warning' || code === 'critical') {
-      return code;
+    const code = String(tableItem.fan_status?.status?.code || '').trim().toLowerCase();
+    if (code === 'warning') {
+      return 'warning';
+    }
+    if (code === 'failed' || code === 'critical') {
+      return 'critical';
+    }
+    if (code === 'unknown') {
+      return 'unknown';
     }
     return (item as NetworkEnvironmentalHealthSummaryItem).fan_status_tone || 'healthy';
   }
 
   private getEnvironmentalFanHealthTone(item: NetworkFanHealthByDeviceApiItem): 'healthy' | 'warning' | 'critical' {
-    const code = item.status?.code;
-    if (code === 'warning' || code === 'critical') {
-      return code;
+    const code = String(item.status?.code || '').trim().toLowerCase();
+    if (code === 'warning') {
+      return 'warning';
+    }
+    if (code === 'failed' || code === 'critical') {
+      return 'critical';
     }
     return 'healthy';
   }
@@ -3327,11 +5064,48 @@ export class NetworkDashboardService {
   private getEnvironmentalFanStatusMeta(item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem): string {
     const tableItem = item as NetworkEnvironmentalHealthSummaryTableApiItem;
     if (tableItem.fan_status) {
-      return `(${Number(tableItem.fan_status.healthy || 0)}/${Number(tableItem.fan_status.total || 0)})`;
+      const total = Number(tableItem.fan_status.total || 0);
+      if (!total || this.getEnvironmentalFanStatusTone(item) === 'unknown') {
+        return '';
+      }
+      return `(${Number(tableItem.fan_status.healthy || 0)}/${total})`;
     }
 
     const legacyItem = item as NetworkEnvironmentalHealthSummaryItem;
+    if (!legacyItem.fan_total_count) {
+      return '';
+    }
     return `(${legacyItem.fan_healthy_count}/${legacyItem.fan_total_count})`;
+  }
+
+  private getEnvironmentalFanChartDisplay(item: NetworkEnvironmentalHealthSummaryTableApiItem): string {
+    const failedFan = item?.fan_status?.failed_fans?.[0];
+    if (failedFan) {
+      return this.normalizeEnvironmentalFanName(failedFan, 'Off');
+    }
+
+    const warningFan = item?.fan_status?.warning_fans?.[0];
+    if (warningFan) {
+      return this.normalizeEnvironmentalFanName(warningFan, 'Warning');
+    }
+
+    const healthy = Number(item?.fan_status?.healthy || 0);
+    const total = Number(item?.fan_status?.total || 0);
+    return total ? `${healthy}/${total}` : '';
+  }
+
+  private normalizeEnvironmentalFanName(name: string, fallbackLabel: string): string {
+    const normalizedName = String(name || '').trim();
+    if (!normalizedName) {
+      return fallbackLabel;
+    }
+
+    const fanMatch = normalizedName.match(/Fan\s*#?\s*(\d+)/i);
+    if (fanMatch?.[1]) {
+      return `Fan ${fanMatch[1]} ${fallbackLabel}`;
+    }
+
+    return normalizedName;
   }
 
   private getEnvironmentalTemperatureValue(
@@ -3339,33 +5113,42 @@ export class NetworkDashboardService {
     metric: 'inlet' | 'outlet' | 'hotspot'
   ): number {
     const tableItem = item as NetworkEnvironmentalHealthSummaryTableApiItem;
+    const rawValue = metric === 'inlet'
+      ? tableItem.inlet_temperature?.value ?? (item as NetworkEnvironmentalHealthSummaryItem).inlet_temp_c
+      : metric === 'outlet'
+        ? tableItem.outlet_temperature?.value ?? (item as NetworkEnvironmentalHealthSummaryItem).outlet_temp_c
+        : tableItem.hotspot_temperature?.value ?? (item as NetworkEnvironmentalHealthSummaryItem).hotspot_temp_c;
+    const numericValue = Number(rawValue);
+    if (rawValue === undefined || rawValue === null || rawValue === '' || isNaN(numericValue)) {
+      return -1;
+    }
     if (metric === 'inlet') {
-      return Number(tableItem.inlet_temperature?.value ?? (item as NetworkEnvironmentalHealthSummaryItem).inlet_temp_c ?? 0);
+      return numericValue;
     }
     if (metric === 'outlet') {
-      return Number(tableItem.outlet_temperature?.value ?? (item as NetworkEnvironmentalHealthSummaryItem).outlet_temp_c ?? 0);
+      return numericValue;
     }
-    return Number(tableItem.hotspot_temperature?.value ?? (item as NetworkEnvironmentalHealthSummaryItem).hotspot_temp_c ?? 0);
+    return numericValue;
   }
 
   private getEnvironmentalTemperatureUnit(
-    item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem,
+    item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem | undefined,
     metric: 'inlet' | 'outlet' | 'hotspot'
   ): string {
     const tableItem = item as NetworkEnvironmentalHealthSummaryTableApiItem;
     if (metric === 'inlet') {
-      return tableItem.inlet_temperature?.unit || 'C';
+      return tableItem?.inlet_temperature?.unit || 'C';
     }
     if (metric === 'outlet') {
-      return tableItem.outlet_temperature?.unit || 'C';
+      return tableItem?.outlet_temperature?.unit || 'C';
     }
-    return tableItem.hotspot_temperature?.unit || 'C';
+    return tableItem?.hotspot_temperature?.unit || 'C';
   }
 
   private getEnvironmentalTemperatureTone(
     item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem,
     metric: 'inlet' | 'outlet' | 'hotspot'
-  ): 'healthy' | 'warning' | 'critical' {
+  ): 'healthy' | 'warning' | 'critical' | 'unknown' {
     const tableItem = item as NetworkEnvironmentalHealthSummaryTableApiItem;
     const status = metric === 'inlet'
       ? tableItem.inlet_temperature?.status?.code
@@ -3373,15 +5156,46 @@ export class NetworkDashboardService {
         ? tableItem.outlet_temperature?.status?.code
         : tableItem.hotspot_temperature?.status?.code;
 
-    if (status === 'warning' || status === 'critical') {
-      return status;
+    if (status === 'warning') {
+      return 'warning';
+    }
+
+    if (status === 'critical' || status === 'failed') {
+      return 'critical';
     }
 
     if (status === 'normal' || status === 'healthy') {
       return 'healthy';
     }
 
+    if (status === 'unknown' || this.getEnvironmentalTemperatureValue(item, metric) < 0) {
+      return 'unknown';
+    }
+
     return this.getTemperatureTone(metric, this.getEnvironmentalTemperatureValue(item, metric));
+  }
+
+  private formatEnvironmentalDeviceType(deviceType?: string): string {
+    const normalizedValue = String(deviceType || '').trim();
+    if (!normalizedValue) {
+      return 'N/A';
+    }
+
+    return normalizedValue
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/\b\w/g, (character: string) => character.toUpperCase());
+  }
+
+  private formatEnvironmentalTemperatureDisplay(
+    item: NetworkEnvironmentalHealthSummaryItem | NetworkEnvironmentalHealthSummaryTableApiItem,
+    metric: 'inlet' | 'outlet' | 'hotspot'
+  ): string {
+    const value = this.getEnvironmentalTemperatureValue(item, metric);
+    if (value < 0) {
+      return 'N/A';
+    }
+    return this.formatTemperature(value, this.getEnvironmentalTemperatureUnit(item, metric));
   }
 
   private getRoundedAverage(values: number[]): number {
@@ -3584,7 +5398,7 @@ export class NetworkDashboardService {
     chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
 
     const totals = items.map(item => Number(item?.critical || 0) + Number(item?.warning || 0) + Number(item?.information || 0));
-    const yMax = Math.max(1500, this.getRoundedAxisMax(totals, 300, 0));
+    const yAxisScale = this.getAlertEventsBarAxisScale(totals);
 
     chart.options = {
       animation: false,
@@ -3607,8 +5421,8 @@ export class NetworkDashboardService {
         left: 46,
         right: 12,
         top: 18,
-        bottom: 40,
-        containLabel: false
+        bottom: 45,
+        containLabel: true
       },
       xAxis: {
         type: 'category',
@@ -3624,14 +5438,15 @@ export class NetworkDashboardService {
         axisLabel: {
           color: '#7d8793',
           fontSize: 11,
+          margin: 6,
           rotate: 26
         }
       },
       yAxis: {
         type: 'value',
         min: 0,
-        max: yMax,
-        interval: 300,
+        max: yAxisScale.max,
+        interval: yAxisScale.interval,
         axisLine: {
           show: false
         },
@@ -3694,7 +5509,7 @@ export class NetworkDashboardService {
     chart.type = UnityChartTypes.BAR;
     chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
 
-    const yMax = Math.max(1500, this.getRoundedAxisMax(items.map(item => Number(item?.count || 0)), 300, 0));
+    const yAxisScale = this.getAlertEventsBarAxisScale(items.map(item => Number(item?.count || 0)));
 
     chart.options = {
       animation: false,
@@ -3711,8 +5526,8 @@ export class NetworkDashboardService {
         left: 46,
         right: 12,
         top: 18,
-        bottom: 40,
-        containLabel: false
+        bottom: 45,
+        containLabel: true
       },
       xAxis: {
         type: 'category',
@@ -3728,14 +5543,15 @@ export class NetworkDashboardService {
         axisLabel: {
           color: '#7d8793',
           fontSize: 11,
+          margin: 6,
           rotate: 26
         }
       },
       yAxis: {
         type: 'value',
         min: 0,
-        max: yMax,
-        interval: 300,
+        max: yAxisScale.max,
+        interval: yAxisScale.interval,
         axisLine: {
           show: false
         },
@@ -3886,7 +5702,7 @@ export class NetworkDashboardService {
       series: [
         {
           type: 'pie',
-          radius: ['44%', '72%'],
+          radius: ['58%', '80%'],
           center: ['50%', '50%'],
           startAngle: 90,
           avoidLabelOverlap: false,
@@ -4095,7 +5911,12 @@ export class NetworkDashboardService {
           label: {
             show: true,
             position: 'inside',
-            formatter: (params: any) => `${this.truncateChartLabel(params.data.conversationName, 22)}: ${params.data.displayValue}`,
+            formatter: (params: any) => this.formatConversationFunnelLabel(
+              params.data.conversationName,
+              params.data.displayValue,
+              Number(params.data.value || 0),
+              maxValue
+            ),
             color: '#f7fbff',
             fontSize: 9,
             fontWeight: 600
@@ -4125,6 +5946,20 @@ export class NetworkDashboardService {
     };
 
     return view;
+  }
+
+  private formatConversationFunnelLabel(
+    conversationName: string,
+    displayValue: string,
+    value: number,
+    maxValue: number
+  ): string {
+    const normalizedDisplayValue = String(displayValue || '');
+    const widthRatio = maxValue > 0 ? Math.max(0.18, Math.min(1, value / maxValue)) : 1;
+    const totalLabelBudget = Math.max(16, Math.round(14 + (widthRatio * 18)));
+    const reservedChars = normalizedDisplayValue.length + 2;
+    const availableNameChars = Math.max(6, totalLabelBudget - reservedChars);
+    return `${this.truncateChartLabel(conversationName, availableNameChars)}: ${normalizedDisplayValue}`;
   }
 
   private truncateChartLabel(value: string, maxLength: number): string {
@@ -4352,12 +6187,7 @@ export class NetworkDashboardService {
           scale: true
         },
         label: {
-          show: true,
-          position: 'right',
-          distance: 6,
-          color: '#7b8692',
-          fontSize: 10,
-          formatter: (params: any) => params.data.name
+          show: false
         },
         data: items.map(item => ({
           name: item.device_name,
@@ -4479,6 +6309,168 @@ export class NetworkDashboardService {
     return view;
   }
 
+  private buildInterfaceHealthMetricBarChartData(
+    items: NetworkInterfaceHealthMetricItem[],
+    getValue: (item: NetworkInterfaceHealthMetricItem) => number,
+    getColor: (item: NetworkInterfaceHealthMetricItem) => string,
+    getTooltip: (item: NetworkInterfaceHealthMetricItem, value: number) => string,
+    xAxisMax: number,
+    xAxisInterval: number,
+    xAxisName: string
+  ): UnityChartDetails {
+    if (!items?.length) {
+      return null;
+    }
+
+    const chart = new UnityChartDetails();
+    chart.type = UnityChartTypes.BAR;
+    chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+    chart.options = {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(33, 41, 52, 0.94)',
+        borderWidth: 0,
+        textStyle: {
+          color: '#ffffff'
+        },
+        formatter: (params: any) => {
+          const item = params?.data?.item as NetworkInterfaceHealthMetricItem;
+          const value = Number(params?.value || 0);
+          return item ? getTooltip(item, value) : '';
+        }
+      },
+      grid: {
+        left: 108,
+        right: 18,
+        top: 8,
+        bottom: xAxisName ? 22 : 18,
+        containLabel: false
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: xAxisMax,
+        interval: xAxisInterval,
+        name: xAxisName,
+        nameLocation: 'end',
+        nameGap: 10,
+        nameTextStyle: {
+          color: '#7d8793',
+          fontSize: 10
+        },
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10,
+          formatter: (value: number) => this.formatInterfaceAxisNumber(value, xAxisName === 'Mbps' ? 3 : 2)
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e8edf3'
+          }
+        }
+      },
+      yAxis: {
+        type: 'category',
+        inverse: true,
+        data: items.map(item => item.interface_name),
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#7d8793',
+          fontSize: 10,
+          width: 88,
+          overflow: 'truncate'
+        }
+      },
+      series: [
+        {
+          type: 'bar',
+          barWidth: 12,
+          data: items.map(item => ({
+            value: getValue(item),
+            item,
+            itemStyle: {
+              color: getColor(item)
+            }
+          }))
+        }
+      ]
+    };
+    return chart;
+  }
+
+  private buildInterfaceHealthStatusDonutChartData(
+    items: Array<{ label: string; value: number; color: string }>
+  ): UnityChartDetails {
+    if (!items?.length) {
+      return null;
+    }
+
+    const total = items.reduce((sum, item) => sum + Number(item.value || 0), 0);
+    const chart = new UnityChartDetails();
+    chart.type = UnityChartTypes.PIE;
+    chart.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
+    chart.options = {
+      animation: false,
+      graphic: this.chartConfigSvc.getPieChartCenterDataGraphicOptions([`${total}`, 'Total'], ['50%']),
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(33, 41, 52, 0.94)',
+        borderWidth: 0,
+        textStyle: {
+          color: '#ffffff'
+        },
+        formatter: (params: any) => `${params.name}: ${params.value.toLocaleString()} (${params.percent}%)`
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: ['44%', '68%'],
+          center: ['50%', '46%'],
+          startAngle: 90,
+          avoidLabelOverlap: false,
+          label: {
+            show: true,
+            color: '#566373',
+            fontSize: 10,
+            formatter: (params: any) => `${params.percent}%`
+          },
+          labelLine: {
+            show: true,
+            length: 12,
+            length2: 8,
+            lineStyle: {
+              color: '#95a2b0'
+            }
+          },
+          itemStyle: {
+            borderColor: '#ffffff',
+            borderWidth: 2
+          },
+          data: items.map(item => ({
+            name: item.label,
+            value: item.value,
+            itemStyle: {
+              color: item.color
+            }
+          }))
+        }
+      ]
+    };
+    return chart;
+  }
+
   private getPerformanceWorkloadTone(item: NetworkPerformanceWorkloadInsightItem | NetworkPerformanceInsightsTableApiItem): string {
     const peakUtilization = Math.max(this.getPerformanceCpuUtilization(item), this.getPerformanceMemoryUtilization(item));
 
@@ -4545,14 +6537,42 @@ export class NetworkDashboardService {
   }
 
   private convertInterfaceHealthTableItems(items: NetworkInterfaceHealthMetricsTableApiItem[]): NetworkInterfaceHealthMetricItem[] {
-    return (items || []).map(item => ({
-      interface_name: item.interface,
-      device_name: item.device,
-      errors_in_per_sec: Number(item.errors_inbound || 0),
-      errors_out_per_sec: Number(item.errors_outbound || 0),
-      discards_in_per_sec: Number(item.discards_inbound || 0),
-      discards_out_per_sec: Number(item.discards_outbound || 0)
-    }));
+    return (items || []).map(item => this.convertInterfaceHealthTableItem(item));
+  }
+
+  private convertInterfaceHealthTableItem(item: NetworkInterfaceHealthMetricsTableApiItem): NetworkInterfaceHealthMetricItem {
+    const errorsInbound = Number(item?.errors_inbound || 0);
+    const errorsOutbound = Number(item?.errors_outbound || 0);
+    const discardsInbound = Number(item?.discards_inbound || 0);
+    const discardsOutbound = Number(item?.discards_outbound || 0);
+    const inboundBandwidthMbps = this.convertInterfaceBitsPerSecondToMbps(Number(item?.inbound_bandwidth ?? item?.bits_received ?? 0));
+    const outboundBandwidthMbps = this.convertInterfaceBitsPerSecondToMbps(Number(item?.outbound_bandwidth ?? item?.bits_sent ?? 0));
+    const healthTone = this.getInterfaceHealthOverallTone(item, errorsInbound, errorsOutbound, discardsInbound, discardsOutbound);
+
+    return {
+      device_id: item?.device_id || '',
+      interface_name: item?.interface || '',
+      interface_type: item?.interface_type || '',
+      interface_type_display: this.getInterfaceHealthInterfaceTypeDisplay(item?.interface_type),
+      device_name: item?.device || '',
+      device_type: item?.device_type || '',
+      duplex_status: this.getInterfaceHealthDuplexStatus(item?.duplex_type),
+      operational_status: item?.operational_status || 'N/A',
+      inbound_bandwidth_mbps: inboundBandwidthMbps,
+      outbound_bandwidth_mbps: outboundBandwidthMbps,
+      bits_received_bps: Number(item?.bits_received ?? item?.inbound_bandwidth ?? 0),
+      bits_sent_bps: Number(item?.bits_sent ?? item?.outbound_bandwidth ?? 0),
+      speed_gbps: this.getInterfaceHealthSpeedGbps(item?.speed),
+      errors_in_per_sec: errorsInbound,
+      errors_out_per_sec: errorsOutbound,
+      discards_in_per_sec: discardsInbound,
+      discards_out_per_sec: discardsOutbound,
+      total_bandwidth_mbps: inboundBandwidthMbps + outboundBandwidthMbps,
+      total_discards_value: discardsInbound + discardsOutbound,
+      total_issue_value: errorsInbound + errorsOutbound + discardsInbound + discardsOutbound,
+      health_tone: healthTone,
+      health_label: this.getInterfaceHealthOverallLabel(healthTone)
+    };
   }
 
   private getInterfaceHealthTopItems(
@@ -4563,6 +6583,17 @@ export class NetworkDashboardService {
       .filter(item => getValue(item) > 0)
       .slice()
       .sort((left, right) => getValue(right) - getValue(left))
+      .slice(0, 10);
+  }
+
+  private getInterfaceHealthTopStatusItems(
+    items: NetworkInterfaceHealthMetricItem[],
+    tone: 'warning' | 'critical'
+  ): NetworkInterfaceHealthMetricItem[] {
+    return (items || [])
+      .filter(item => item.health_tone === tone)
+      .slice()
+      .sort((left, right) => Number(right.total_issue_value || 0) - Number(left.total_issue_value || 0))
       .slice(0, 10);
   }
 
@@ -4590,9 +6621,258 @@ export class NetworkDashboardService {
       ?? 0);
   }
 
+  private buildInterfaceHealthInterfaceTypeDistribution(
+    items: NetworkInterfaceHealthMetricItem[]
+  ): Array<{ label: string; value: number; color: string }> {
+    const grouped = new Map<string, number>();
+    const palette = ['#4c6ef5', '#845ef7', '#22b8cf', '#364fc7', '#c92a2a', '#f59f00', '#2f9e44', '#e8590c'];
+
+    (items || []).forEach(item => {
+      const label = item.interface_type_display || 'Other';
+      grouped.set(label, Number(grouped.get(label) || 0) + 1);
+    });
+
+    return Array.from(grouped.entries())
+      .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+      .map(([label, value], index) => ({
+        label,
+        value,
+        color: palette[index % palette.length]
+      }));
+  }
+
+  private buildInterfaceHealthStatusLegendItems(
+    items: Array<{ label: string; value: number; color: string }>
+  ): InterfaceHealthMetricLegendItemViewData[] {
+    const total = items.reduce((sum, item) => sum + Number(item.value || 0), 0);
+    return items.map(item => this.buildInterfaceHealthLegendItem(
+      `${item.label} ${item.value} (${total ? ((item.value / total) * 100).toFixed(1) : '0.0'}%)`,
+      item.color
+    ));
+  }
+
+  private getInterfaceHealthAxisScale(values: number[], minSections: number = 4): { max: number; interval: number } {
+    const maxValue = Math.max(...(values || []), 0);
+    if (maxValue <= 0) {
+      return {
+        interval: 1,
+        max: minSections
+      };
+    }
+
+    const roughInterval = maxValue / Math.max(minSections, 1);
+    const magnitude = Math.pow(10, Math.floor(Math.log10(roughInterval)));
+    const normalized = roughInterval / magnitude;
+    let niceStep = 1;
+
+    if (normalized > 5) {
+      niceStep = 10;
+    } else if (normalized > 2) {
+      niceStep = 5;
+    } else if (normalized > 1) {
+      niceStep = 2;
+    }
+
+    const interval = niceStep * magnitude;
+    return {
+      interval,
+      max: Math.max(interval * minSections, Math.ceil(maxValue / interval) * interval)
+    };
+  }
+
+  private getInterfaceHealthOverallTone(
+    item: NetworkInterfaceHealthMetricsTableApiItem,
+    errorsInbound: number,
+    errorsOutbound: number,
+    discardsInbound: number,
+    discardsOutbound: number
+  ): 'healthy' | 'warning' | 'critical' | 'unknown' {
+    const rawTone = this.getInterfaceHealthRawTone(item?.health);
+    const calculatedTone = this.getHighestInterfaceHealthTone([
+      this.getInterfaceHealthMetricTone(errorsInbound, 'errors'),
+      this.getInterfaceHealthMetricTone(errorsOutbound, 'errors'),
+      this.getInterfaceHealthMetricTone(discardsInbound, 'discards'),
+      this.getInterfaceHealthMetricTone(discardsOutbound, 'discards')
+    ]);
+
+    if (rawTone === 'unknown' && calculatedTone === 'healthy') {
+      return 'unknown';
+    }
+
+    return this.getInterfaceHealthToneRank(rawTone) > this.getInterfaceHealthToneRank(calculatedTone)
+      ? rawTone
+      : calculatedTone;
+  }
+
+  private getHighestInterfaceHealthTone(
+    tones: Array<'healthy' | 'warning' | 'critical' | 'unknown'>
+  ): 'healthy' | 'warning' | 'critical' | 'unknown' {
+    return tones.reduce((highest, tone) =>
+      this.getInterfaceHealthToneRank(tone) > this.getInterfaceHealthToneRank(highest) ? tone : highest
+    , 'healthy');
+  }
+
+  private getInterfaceHealthMetricTone(
+    value: number,
+    thresholdType: 'errors' | 'discards'
+  ): 'healthy' | 'warning' | 'critical' {
+    return this.getInterfaceHealthMetricColor(value, thresholdType) === '#ec6674'
+      ? 'critical'
+      : this.getInterfaceHealthMetricColor(value, thresholdType) === '#ffc233'
+        ? 'warning'
+        : 'healthy';
+  }
+
+  private getInterfaceHealthRawTone(value?: string): 'healthy' | 'warning' | 'critical' | 'unknown' {
+    const normalizedValue = String(value || '').trim().toLowerCase();
+
+    if (!normalizedValue || normalizedValue === 'n/a' || normalizedValue === 'unknown') {
+      return 'unknown';
+    }
+
+    if (normalizedValue === 'critical' || normalizedValue === 'down' || normalizedValue === 'failed') {
+      return 'critical';
+    }
+
+    if (normalizedValue === 'warning' || normalizedValue === 'degraded') {
+      return 'warning';
+    }
+
+    return 'healthy';
+  }
+
+  private getInterfaceHealthToneRank(
+    tone?: 'healthy' | 'warning' | 'critical' | 'unknown'
+  ): number {
+    switch (tone) {
+      case 'critical':
+        return 3;
+      case 'warning':
+        return 2;
+      case 'healthy':
+        return 1;
+      default:
+        return 0;
+    }
+  }
+
+  private getInterfaceHealthOverallLabel(
+    tone?: 'healthy' | 'warning' | 'critical' | 'unknown'
+  ): string {
+    switch (tone) {
+      case 'critical':
+        return 'Critical';
+      case 'warning':
+        return 'Warning';
+      case 'healthy':
+        return 'Information';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  private getInterfaceHealthToneColor(
+    tone?: 'healthy' | 'warning' | 'critical' | 'unknown'
+  ): string {
+    switch (tone) {
+      case 'critical':
+        return '#e24a4a';
+      case 'warning':
+        return '#ff912f';
+      case 'unknown':
+        return '#8a94a3';
+      default:
+        return '#22c55e';
+    }
+  }
+
+  private getInterfaceHealthInterfaceTypeDisplay(value?: string): string {
+    const rawValue = String(value || '').trim();
+    if (!rawValue) {
+      return 'N/A';
+    }
+
+    return rawValue.split(' (')[0] || rawValue;
+  }
+
+  private getInterfaceHealthDuplexStatus(value?: string): string {
+    const rawValue = String(value || '').trim();
+    return rawValue || 'N/A';
+  }
+
+  private getInterfaceHealthSpeedGbps(value?: number): number {
+    const speedValue = Number(value || 0);
+    return Number.isFinite(speedValue) && speedValue > 0 ? speedValue : 0;
+  }
+
+  private convertInterfaceBitsPerSecondToMbps(value: number): number {
+    return Number(((Number(value) || 0) / 1000000).toFixed(6));
+  }
+
+  private formatInterfaceBitsRateDisplay(value: number): string {
+    const rateValue = Number(value || 0);
+
+    if (rateValue >= 1000000000) {
+      return `${this.formatInterfaceAxisNumber(rateValue / 1000000000, 2)} Gbps`;
+    }
+
+    if (rateValue >= 1000000) {
+      return `${this.formatInterfaceAxisNumber(rateValue / 1000000, 2)} Mbps`;
+    }
+
+    if (rateValue >= 1000) {
+      return `${this.formatInterfaceAxisNumber(rateValue / 1000, 2)} Kbps`;
+    }
+
+    return `${this.formatInterfaceMetricValue(rateValue)} bps`;
+  }
+
+  private formatInterfaceSpeedDisplay(value: number): string {
+    const speedValue = Number(value || 0);
+    return speedValue > 0 ? `${this.formatInterfaceMetricValue(speedValue)} Gbps` : 'N/A';
+  }
+
+  private formatInterfaceMetricValue(value: number): string {
+    const numericValue = Number(value || 0);
+    const maximumFractionDigits = Number.isInteger(numericValue) ? 0 : 2;
+    return numericValue.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits
+    });
+  }
+
+  private formatInterfaceAxisNumber(value: number, maxDecimals: number): string {
+    return Number(value || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: maxDecimals
+    });
+  }
+
   private getRoundedAxisMax(values: number[], roundTo: number, padding: number): number {
     const maxValue = Math.max(...values, 0);
     return Math.ceil((maxValue + padding) / roundTo) * roundTo;
+  }
+
+  private getAlertEventsBarAxisScale(values: number[]): { max: number; interval: number } {
+    const maxValue = Math.max(...values, 0);
+    let interval = 1;
+
+    if (maxValue > 250) {
+      interval = 100;
+    } else if (maxValue > 100) {
+      interval = 50;
+    } else if (maxValue > 50) {
+      interval = 20;
+    } else if (maxValue > 20) {
+      interval = 10;
+    } else if (maxValue > 5) {
+      interval = 5;
+    }
+
+    return {
+      interval,
+      max: Math.max(interval * 4, this.getRoundedAxisMax([maxValue], interval, interval))
+    };
   }
 
   private getInterfaceHealthMetricColor(value: number, thresholdType: 'errors' | 'discards'): string {
@@ -4750,6 +7030,7 @@ export class InterfaceHealthMetricsWidgetViewData {
   charts: InterfaceHealthMetricChartViewData[] = [];
   tableColumns: InterfaceHealthMetricsTableColumnViewData[] = [];
   tableRows: InterfaceHealthMetricsTableRowViewData[] = [];
+  totalCount = 0;
   defaultSortColumn = '';
   defaultSortDirection = '';
 }
@@ -4760,7 +7041,13 @@ export class InterfaceHealthMetricChartViewData {
   infoTooltip: string;
   chartHeight: number;
   chartData: UnityChartDetails;
+  columnClass = 'col-xl-4 col-lg-6 col-12';
+  layout: 'single' | 'split' = 'single';
   legendItems: InterfaceHealthMetricLegendItemViewData[] = [];
+  secondaryTitle = '';
+  secondaryChartHeight = 0;
+  secondaryChartData: UnityChartDetails;
+  secondaryLegendItems: InterfaceHealthMetricLegendItemViewData[] = [];
 }
 
 export class InterfaceHealthMetricLegendItemViewData {
@@ -4776,16 +7063,29 @@ export class InterfaceHealthMetricsTableColumnViewData {
 }
 
 export class InterfaceHealthMetricsTableRowViewData {
+  deviceId: string;
+  interfaceType: string;
+  interfaceTypeTooltip: string;
   interfaceName: string;
   deviceName: string;
-  errorsInValue: number;
-  errorsInDisplay: string;
-  errorsOutValue: number;
-  errorsOutDisplay: string;
-  discardsInValue: number;
-  discardsInDisplay: string;
-  discardsOutValue: number;
-  discardsOutDisplay: string;
+  duplexStatus: string;
+  inboundDiscardsValue: number;
+  inboundDiscardsDisplay: string;
+  inboundErrorsValue: number;
+  inboundErrorsDisplay: string;
+  bitsReceivedValue: number;
+  bitsReceivedDisplay: string;
+  outboundDiscardsValue: number;
+  outboundDiscardsDisplay: string;
+  outboundErrorsValue: number;
+  outboundErrorsDisplay: string;
+  bitsSentValue: number;
+  bitsSentDisplay: string;
+  speedValue: number;
+  speedDisplay: string;
+  operationalStatus: string;
+  healthTone: string;
+  healthLabel: string;
 
   [key: string]: string | number;
 }
@@ -4794,6 +7094,7 @@ export class NetworkDeviceAvailabilityWidgetViewData {
   cards: NetworkDeviceAvailabilityCardViewData[] = [];
   tableColumns: NetworkDeviceAvailabilityTableColumnViewData[] = [];
   tableRows: NetworkDeviceAvailabilityTableRowViewData[] = [];
+  totalCount = 0;
   defaultSortColumn = '';
   defaultSortDirection = '';
 }
@@ -4851,10 +7152,119 @@ export class NetworkDeviceAvailabilityTableRowViewData {
   [key: string]: string | number;
 }
 
+export class PduHealthWidgetViewData {
+  charts: PduHealthChartViewData[] = [];
+  tableColumns: PduHealthTableColumnViewData[] = [];
+  tableRows: PduHealthTableRowViewData[] = [];
+  totalCount = 0;
+  defaultSortColumn = '';
+  defaultSortDirection = '';
+}
+
+export class LoadBalancerHealthWidgetViewData {
+  charts: LoadBalancerHealthChartViewData[] = [];
+  tableColumns: LoadBalancerHealthTableColumnViewData[] = [];
+  tableRows: LoadBalancerHealthTableRowViewData[] = [];
+  totalCount = 0;
+  defaultSortColumn = '';
+  defaultSortDirection = '';
+}
+
+export class LoadBalancerHealthChartViewData {
+  key: string;
+  title: string;
+  infoTooltip: string;
+  chartHeight: number;
+  chartData: UnityChartDetails;
+}
+
+export class LoadBalancerHealthTableColumnViewData {
+  key: string;
+  label: string;
+  sortKey: string;
+  type: 'text' | 'metric' | 'status';
+  align: 'left' | 'center' | 'right';
+}
+
+export class LoadBalancerHealthTableRowViewData {
+  deviceId: string;
+  loadBalancerName: string;
+  vendor: string;
+  virtualServer: string;
+  backendPool: string;
+  vipStatusTone: string;
+  vipStatusLabel: string;
+  vipStatusRank: number;
+  poolMemberHealthTone: string;
+  poolMemberHealthLabel: string;
+  poolMemberHealthRank: number;
+  activeConnectionsValue: number;
+  activeConnectionsDisplay: string;
+  newConnectionsValue: number;
+  newConnectionsDisplay: string;
+  throughputMbpsValue: number;
+  throughputDisplay: string;
+  requestsValue: number;
+  requestsDisplay: string;
+  avgResponseTimeValue: number;
+  avgResponseTimeDisplay: string;
+  sslCertificateStatusTone: string;
+  sslCertificateStatusLabel: string;
+  healthTone: string;
+  healthLabel: string;
+  healthRank: number;
+
+  [key: string]: string | number;
+}
+
+export class PduHealthChartViewData {
+  key: string;
+  title: string;
+  infoTooltip: string;
+  chartHeight: number;
+  chartData: UnityChartDetails;
+}
+
+export class PduHealthTableColumnViewData {
+  key: string;
+  label: string;
+  sortKey: string;
+  type: 'text' | 'metric' | 'status';
+  align: 'left' | 'center' | 'right';
+}
+
+export class PduHealthTableRowViewData {
+  deviceId: string;
+  pduName: string;
+  vendor: string;
+  location: string;
+  rack: string;
+  powerStatusLabel: string;
+  loadValue: number;
+  loadDisplay: string;
+  inputVoltageValue: number;
+  inputVoltageDisplay: string;
+  currentValue: number;
+  currentDisplay: string;
+  powerValue: number;
+  powerDisplay: string;
+  temperatureValue: number;
+  temperatureDisplay: string;
+  humidityValue: number;
+  humidityDisplay: string;
+  outletStatus: string;
+  healthTone: string;
+  healthLabel: string;
+  healthRank: number;
+
+  [key: string]: string | number;
+}
+
 export class EnvironmentalHealthSummaryWidgetViewData {
   charts: EnvironmentalHealthChartViewData[] = [];
   tableColumns: EnvironmentalHealthSummaryTableColumnViewData[] = [];
   tableRows: EnvironmentalHealthSummaryTableRowViewData[] = [];
+  totalCount = 0;
   defaultSortColumn = '';
   defaultSortDirection = '';
 }

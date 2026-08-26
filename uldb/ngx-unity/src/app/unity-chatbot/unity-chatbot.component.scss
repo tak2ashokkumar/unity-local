@@ -243,14 +243,66 @@ body.sidebar-minimized #chatbotPopUp.expanded {
 .expolre-icon {
   background-color: #e4e7ea;
   color: #73818f;
-  height: 3rem;
-  width: 3rem;
+  height: 2.75rem;
+  width: 2.75rem;
   cursor: pointer;
 }
 
 .expolre-icon.active {
   background-color: #cef1e2;
   color: #28a745;
+}
+
+.compact-explore-track.scroll-left {
+  animation: compact-explore-scroll-left 0.2s ease-in-out;
+}
+
+.compact-explore-track.scroll-right {
+  animation: compact-explore-scroll-right 0.2s ease-in-out;
+}
+
+.compact-explore-item {
+  flex: 0 0 16.6667%;
+  min-width: 0;
+}
+
+.compact-explore-arrow {
+  height: 2rem;
+  top: 0.35rem;
+  width: 2rem;
+  font-size: 1.35rem;
+}
+
+.compact-explore-arrow-left {
+  left: -6px;
+}
+
+.compact-explore-arrow-right {
+  right: -6px;
+}
+
+@keyframes compact-explore-scroll-left {
+  from {
+    opacity: 0.85;
+    transform: translateX(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes compact-explore-scroll-right {
+  from {
+    opacity: 0.85;
+    transform: translateX(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .angle-icon {

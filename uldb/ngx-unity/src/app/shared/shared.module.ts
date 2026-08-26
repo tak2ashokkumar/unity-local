@@ -73,6 +73,7 @@ import { ImageDropdownComponent } from './image-dropdown/image-dropdown.componen
 import { UnitySelectDropdownComponent } from './unity-select-dropdown/unity-select-dropdown.component';
 import { JsonComparisonComponent } from './json-comparison/json-comparison.component';
 import { CustomDateDropdownComponent } from './custom-date-dropdown/custom-date-dropdown.component';
+import { CustomDateFilterComponent } from './custom-date-filter/custom-date-filter.component';
 import { VmBackupHistoryComponent } from './vm-backup-history/vm-backup-history.component';
 import { UnityCodeEditorComponent } from './unity-code-editor/unity-code-editor.component';
 import { SearchDropdownComponent } from './search-dropdown/search-dropdown.component';
@@ -163,6 +164,7 @@ import { RemoteWebViewerComponent } from './remote-web-viewer/remote-web-viewer.
     UnitySelectDropdownComponent,
     JsonComparisonComponent,
     CustomDateDropdownComponent,
+    CustomDateFilterComponent,
     VmBackupHistoryComponent,
     SearchDropdownComponent,
     NowEnhancedTicketDetailsComponent,
@@ -254,6 +256,7 @@ import { RemoteWebViewerComponent } from './remote-web-viewer/remote-web-viewer.
     SharedApplicationTopologyComponent,
     CustomPasswordFieldComponent,
     CustomDateDropdownComponent,
+    CustomDateFilterComponent,
     VmBackupHistoryComponent,
     ConditionInvestigationComponent,
     ConditionInvestigationChatbotComponent,

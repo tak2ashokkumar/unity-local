@@ -254,7 +254,7 @@ export class AppPersonaDashboardViewComponent implements OnInit, OnDestroy {
     if (!dashboard?.uuid) {
       return;
     }
-    this.router.navigate([dashboard.uuid, 'edit'], { relativeTo: this.route });
+    this.router.navigate(['edit'], { relativeTo: this.route });
   }
 
   goBack() {

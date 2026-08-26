@@ -56,7 +56,7 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
         this.pendingCommandContext = context || this.terminalService.getPendingCommandContext();
         this.hosts = this.terminalService.getHosts();
         const savedDevice = this.pendingCommandContext?.device;
-        this.showMakeDefaultCheckbox = !!(this.pendingCommandContext?.conditionId && this.pendingCommandContext?.command);
+        this.showMakeDefaultCheckbox = !!this.pendingCommandContext?.conditionId;
         this.prefillAuthForm(savedDevice);
         this.getCollectors(savedDevice?.collector_uuid);
         this.modalRef = this.modalService.show(this.authModal, { class: 'modal-md', ignoreBackdropClick: true });
@@ -151,6 +151,8 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
     if (this.authForm.invalid) {
       this.authForm.markAllAsTouched();
       this.setFormErrors();
+      this.authForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(() => this.setFormErrors());
       return;
     }
     const payload = this.authForm.getRawValue();
@@ -183,28 +185,27 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
 
     const cmd = localStorage.getItem('terminal_command');
     const commandContext = this.pendingCommandContext || this.terminalService.getPendingCommandContext();
+    const device = {
+      device_name: payload.host,
+      host: payload.host,
+      port: payload.port,
+      username: payload.username,
+      password: payload.password,
+      collector_uuid: payload.collector.uuid,
+      connection_type: payload.connection_type,
+      engine: payload.connection_type === DATABASE_CONNECTION_TYPE ? payload.engine : null,
+      database: payload.connection_type === DATABASE_CONNECTION_TYPE ? payload.database : null,
+      transport: payload.connection_type === 'winrm' ? payload.transport : null,
+      shell: payload.connection_type === 'winrm' ? payload.shell : null,
+    };
+
+    if (payload.make_default_for_condition && commandContext?.conditionId) {
+      this.cliCommandService.saveDefaultDevice(commandContext, device)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(() => { }, () => { });
+    }
 
     if (commandContext?.command) {
-      const device = {
-        device_name: payload.host,
-        host: payload.host,
-        port: payload.port,
-        username: payload.username,
-        password: payload.password,
-        collector_uuid: payload.collector.uuid,
-        connection_type: payload.connection_type,
-        engine: payload.connection_type === DATABASE_CONNECTION_TYPE ? payload.engine : null,
-        database: payload.connection_type === DATABASE_CONNECTION_TYPE ? payload.database : null,
-        transport: payload.connection_type === 'winrm' ? payload.transport : null,
-        shell: payload.connection_type === 'winrm' ? payload.shell : null,
-      };
-
-      if (payload.make_default_for_condition) {
-        this.cliCommandService.saveDefaultDevice(commandContext, device)
-          .pipe(takeUntil(this.ngUnsubscribe))
-          .subscribe(() => { }, () => { });
-      }
-
       this.cliCommandService.executeWithCredentials(commandContext, device)
         .pipe(takeUntil(this.ngUnsubscribe))
         .subscribe(() => {

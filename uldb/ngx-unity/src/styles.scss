@@ -4,6 +4,7 @@
 **/
 
 @import "variables";
+@import "./styles//scss/dynamic-drawflow.scss";
 
 .tabs-level1-menu {
   margin-bottom: 0;
@@ -16,6 +17,18 @@
   padding: 0 0.5rem;
   border: none;
 }
+
+// .modal {
+//   z-index: 9997 !important;
+// }
+
+// .popover {
+//   z-index: 9998 !important;
+// }
+
+// bs-tooltip-container {
+//   z-index: 9999 !important;
+// }
 
 .modal-dialog {
   top: 55px;
@@ -356,7 +369,7 @@
 }
 
 .custom-agentic-modal-lg {
-  min-width: 1350px !important;
+   min-width: 1350px !important;
   margin: 85px auto !important;
   /* distance from top/bottom */
 }
@@ -365,4 +378,24 @@
   min-width: 750px !important;
   margin: 85px auto !important;
   /* distance from top/bottom */
+}
+
+.custom-dynamic-agentic-modal-lg {
+  min-width: 97% !important;
+  margin: 5px auto 5px auto !important;
+}
+
+.custom-dynamic-agentic-modal-lg .modal-content {
+  overflow: visible !important;
+}
+
+
+.wf-page {
+  .app-body>.main>div {
+    padding-bottom: 0 !important;
+  }
+
+  .app-body>.main>.unity-app-footer {
+    margin: 0 !important;
+  }
 }

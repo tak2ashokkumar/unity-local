@@ -51,7 +51,9 @@ export class ConditionInvestigationCliCommandService {
         if (device && device.id) {
           return this.executeWithDefaultDevice(commandContext, device);
         }
-        this.openCredentialsModal(commandContext);
+        const suggestedHost = device?.host || device?.device_ip_address;
+        const suggestedDevice = suggestedHost ? this.safeDevice(this.normalizeDeviceCredentials(device)) : undefined;
+        this.openCredentialsModal({ ...commandContext, device: suggestedDevice });
         return of({ opened_credentials_modal: true });
       })
     );

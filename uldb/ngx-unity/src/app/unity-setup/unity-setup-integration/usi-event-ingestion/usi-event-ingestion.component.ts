@@ -46,8 +46,8 @@ export class UsiEventIngestionComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.payloadModalRef?.hide();
     this.deleteModalRef?.hide();
+    this.payloadModalRef?.hide();
   }
 
   goBack() {

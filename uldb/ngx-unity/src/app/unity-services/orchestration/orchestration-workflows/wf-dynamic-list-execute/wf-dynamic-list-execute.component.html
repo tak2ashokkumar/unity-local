@@ -1,0 +1,300 @@
+<div class="row mt--3">
+    <div class="col-12 p-0">
+        <div class="card">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">
+                    Execute Workflow - {{ workflowName }}
+                    <span *ngIf="nodeType" class="text-muted">({{ nodeType }})</span>
+                </span>
+                <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+
+            <div class="card-body py-2 text-muted">
+                <form *ngIf="manualForm" [formGroup]="manualForm">
+                    <div class="row">
+                        <div formArrayName="inputs" class="col">
+                            <ng-container *ngIf="manualInputs && manualInputs.length > 0; else noManualInputs">
+                                <div class="form-group row"
+                                    *ngFor="let inputControl of manualInputs.controls; let i = index">
+                                    <div [formGroupName]="i" class="col-12 row">
+                                        <div class="col-2 ml-5 text-right col-form-label">
+                                            {{ formatParamName(inputControl.get('param_name')?.value) }}<em>*</em> :
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'TEXT'">
+                                            <input class="form-control text-dark" type="text"
+                                                formControlName="default_value" placeholder="Enter default value"
+                                                [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                            <div class="invalid-feedback"
+                                                *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                                {{ manualFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'NUMBER'">
+                                            <input class="form-control text-dark" type="number"
+                                                formControlName="default_value" placeholder="Enter default value"
+                                                [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                            <div class="invalid-feedback"
+                                                *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                                {{ manualFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'PASSWORD'">
+                                            <custom-password-field formControlName="default_value"
+                                                [options]="{ placeholder: 'Enter default value' }"
+                                                [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                            </custom-password-field>
+                                            <div class="invalid-feedback"
+                                                *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                                {{ manualFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'CLOUD ACCOUNT'">
+                                            <select class="text-dark form-control" formControlName="default_value"
+                                                [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                                <option value="">Select Cloud Account</option>
+                                                <option *ngFor="let account of cloudAccount" [ngValue]="account.uuid">
+                                                    {{ account.account_name }}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback"
+                                                *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                                {{ manualFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'CREDENTIAL'">
+                                            <select class="text-dark form-control" formControlName="default_value"
+                                                [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                                <option value="">Select Credential</option>
+                                                <option *ngFor="let account of credentials" [value]="account.uuid">
+                                                    {{ account.name }}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback"
+                                                *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                                {{ manualFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-7" *ngIf="getParamType(inputControl) === 'TARGET'">
+                                            <app-auto-complete-multi formControlName="default_value"
+                                                [apiFn]="searchTargets" placeholder="Search Targets"
+                                                class="mb-3"></app-auto-complete-multi>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-template #noManualInputs>
+                                <div class="text-center p-3">
+                                    There are no Inputs for Manual Trigger.
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </form>
+
+                <form *ngIf="scheduleForm" [formGroup]="scheduleForm">
+                    <div class="row px-2">
+                        <div formArrayName="inputs" class="col">
+                            <ng-container *ngIf="scheduleInputs && scheduleInputs.length > 0; else noScheduleInputs">
+                                <div class="form-group row"
+                                    *ngFor="let inputControl of scheduleInputs.controls; let i = index">
+                                    <div [formGroupName]="i" class="col-12 row">
+                                        <div class="col-2 ml-5 text-right col-form-label">
+                                            {{ formatParamName(inputControl.get('param_name')?.value) }}<em>*</em> :
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'TEXT'">
+                                            <input class="form-control text-dark" type="text"
+                                                formControlName="default_value" placeholder="Enter default value"
+                                                [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                            <div class="invalid-feedback"
+                                                *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                                {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'NUMBER'">
+                                            <input class="form-control text-dark" type="number"
+                                                formControlName="default_value" placeholder="Enter default value"
+                                                [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                            <div class="invalid-feedback"
+                                                *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                                {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'PASSWORD'">
+                                            <custom-password-field formControlName="default_value"
+                                                [options]="{ placeholder: 'Enter default value' }"
+                                                [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                            </custom-password-field>
+                                            <div class="invalid-feedback"
+                                                *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                                {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'CLOUD ACCOUNT'">
+                                            <select class="text-dark form-control" formControlName="default_value"
+                                                [compareWith]="compareAccounts"
+                                                [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                                <option value="">Select Cloud Account</option>
+                                                <option *ngFor="let account of cloudAccount" [ngValue]="account">
+                                                    {{ account.account_name }}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback"
+                                                *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                                {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4" *ngIf="getParamType(inputControl) === 'CREDENTIAL'">
+                                            <select class="text-dark form-control" formControlName="default_value"
+                                                [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                                <option value="">Select Credential</option>
+                                                <option *ngFor="let account of credentials" [value]="account.uuid">
+                                                    {{ account.name }}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback"
+                                                *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                                {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-7" *ngIf="getParamType(inputControl) === 'TARGET'">
+                                            <app-auto-complete-multi formControlName="default_value"
+                                                [apiFn]="searchTargets" placeholder="Search Targets"
+                                                class="mb-3"></app-auto-complete-multi>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-template #noScheduleInputs>
+                                <div class="text-center p-3">
+                                    There are no Inputs for Schedule Trigger.
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                    <div class="mt-2 mb-4 px-5">
+                        <unity-schedule></unity-schedule>
+                    </div>
+                </form>
+
+                <form *ngIf="webhookTriggerForm" [formGroup]="webhookTriggerForm">
+                    <div class="form-group row" *ngIf="webhookTriggerForm.get('webhook_url')">
+                        <label for="webhook_url" class="col-2 text-right col-form-label">Webhook Url :</label>
+                        <div class="col-5">
+                            <input id="webhook_url" class="form-control text-dark" type="text"
+                                formControlName="webhook_url">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="payload" class="col-2 text-right col-form-label">Payload<em>*</em> :</label>
+                        <div class="col-8">
+                            <textarea class="form-control text-dark" rows="8" formControlName="payload"
+                                placeholder="Enter Payload"
+                                [class.is-invalid]="webhookTriggerFormErrors.payload"></textarea>
+                            <div class="invalid-feedback d-block" *ngIf="webhookTriggerFormErrors.payload">
+                                {{ webhookTriggerFormErrors.payload }}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form *ngIf="itsmTriggerForm" [formGroup]="itsmTriggerForm">
+                    <div class="form-group row">
+                        <label for="record_uuid" class="col-2 text-right col-form-label">Ticket Record<em>*</em>
+                            :</label>
+                        <div class="col-3">
+                            <select class="text-dark form-control mb-2" formControlName="record_uuid"
+                                [class.is-invalid]="itsmTriggerFormErrors.record_uuid">
+                                <option value="" disabled>Select Record</option>
+                                <option *ngFor="let itsm of itsmData" [ngValue]="itsm.uuid">
+                                    {{ itsm.ticket_id }}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback d-block" *ngIf="itsmTriggerFormErrors.record_uuid">
+                                {{ itsmTriggerFormErrors.record_uuid }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="activity_id" class="col-2 text-right col-form-label">Event<em>*</em> :</label>
+                        <div class="col-3">
+                            <select class="text-dark form-control mb-2" formControlName="activity_id"
+                                [class.is-invalid]="itsmTriggerFormErrors.activity_id">
+                                <option value="" disabled>Select Event</option>
+                                <option *ngFor="let comm of commentData" [ngValue]="comm.id">
+                                    {{ comm.username }} - {{ formatActivityType(comm.activity_type) }}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback d-block" *ngIf="itsmTriggerFormErrors.activity_id">
+                                {{ itsmTriggerFormErrors.activity_id }}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form *ngIf="aimlTriggerForm" [formGroup]="aimlTriggerForm">
+                    <div class="form-group row">
+                        <label class="col-2 text-right col-form-label">Select Event<em>*</em> :</label>
+                        <div class="col-4 p-0 position-relative">
+                            <div class="form-control mb-1 dropdown-toggle-custom d-flex align-items-center justify-content-between"
+                                (click)="toggleDropdown(); $event.stopPropagation()"
+                                [class.is-invalid]="aimlTriggerFormErrors.id">
+                                <span class="text-truncate">
+                                    <ng-container *ngIf="!selectedItem">Select Event</ng-container>
+                                    <ng-container *ngIf="selectedItem">
+                                        {{ selectedItem.id }} - {{ selectedItem.status }} - {{ selectedItem.description
+                                        }}
+                                    </ng-container>
+                                </span>
+                                <i class="fa" [ngClass]="isDropdownOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                            </div>
+                            <div class="dropdown-menu show w-100 overflow-auto" *ngIf="isDropdownOpen"
+                                (scroll)="onScroll($event)"
+                                (click)="$event.stopPropagation()">
+                                <div *ngFor="let i of aimlData" class="dropdown-item" (click)="selectItem(i)">
+                                    {{ i.id }} - {{ i.status }} - {{ i.description }}
+                                </div>
+                                <div *ngIf="isLoading" class="text-center p-2 small text-muted">
+                                    Loading...
+                                </div>
+                                <div *ngIf="!hasNextPage && !isLoading" class="text-center p-2 small text-muted">
+                                    No more results
+                                </div>
+                            </div>
+                            <div class="invalid-feedback d-block" *ngIf="aimlTriggerFormErrors.id">
+                                {{ aimlTriggerFormErrors.id }}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div *ngIf="!manualForm && !scheduleForm && !webhookTriggerForm && !itsmTriggerForm && !aimlTriggerForm"
+                    class="text-center p-3">
+                    No execute form is available for this workflow.
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mb-3">
+                <button class="btn btn-md btn-outline-danger mr-2" type="button" (click)="goBack()">Cancel</button>
+                <button class="btn btn-md btn-success" type="button" (click)="onSubmit()" [disabled]="isSubmitting">
+                    {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

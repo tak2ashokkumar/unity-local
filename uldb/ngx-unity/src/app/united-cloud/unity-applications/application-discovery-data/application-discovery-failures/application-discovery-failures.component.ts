@@ -129,8 +129,8 @@ export class ApplicationDiscoveryFailuresComponent implements OnInit, OnDestroy 
   getEvents() {
     this.spinner.start('failureEventsLoader');
     this.svc.getEvents(this.eventsCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: PaginatedResult<any>) => {
-      this.eventsCount = data.count;
-      this.eventsViewData = this.svc.convertToEventsViewData(data.results);
+      this.eventsCount = data?.count || 0;
+      this.eventsViewData = this.svc.convertToEventsViewData(data?.results || []);
       this.spinner.stop('failureEventsLoader');
     }, err => {
       this.eventsViewData = [];

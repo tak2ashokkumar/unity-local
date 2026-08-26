@@ -105,6 +105,11 @@
           <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
         </td>
         <td class="action-icons-column">
+          <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerIcon"
+            [ngClass]="{'action-icons-disabled':!view.powerIconEnabled,'action-icons-on':view.powerStatusOn}"
+            [tooltip]="view.powerIconMsg" (click)="powerToggle(view)" *ngIf="view.isHyperVHypervisor" accessControl
+            moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn"></button>
+
           <!-- <span dropdown placement="bottom right" container="body">
             <button class="action-icons action-icons-disabled mb-0 fas fa-external-link-square-alt font-sm ml-1"
               (click)="false" [tooltip]="view.sameTabTootipMessage" container="body" *ngIf="!view.isSameTabEnabled"></button>
@@ -119,6 +124,14 @@
               </a>
             </div>
           </span> -->
+
+          <button *ngIf="view?.showRemoteWebAccessButton"
+            class="action-icons mb-0 fas fa-desktop font-sm ml-1"
+            [tooltip]="remoteWebLaunching ? 'Opening Remote Web Viewer' : view.newTabTooltipMessage"
+            [disabled]="remoteWebLaunching"
+            [ngClass]="{'action-icons-disabled': remoteWebLaunching || !view.showRemoteWebAccessButton}"
+            (click)="remoteWebAccessNewTab(view)" accessControl moduleName="Datacenter"
+            accessType="Remote Management" elementType="actionbtn"></button>
 
           <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
             [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
@@ -243,6 +256,11 @@
           <ng-container [ngTemplateOutlet]='usageRef' [ngTemplateOutletContext]="{view:view?.cpuUsage}"></ng-container>
         </td>
         <td class="action-icons-column">
+          <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerIcon"
+            [ngClass]="{'action-icons-disabled':!view.powerIconEnabled,'action-icons-on':view.powerStatusOn}"
+            [tooltip]="view.powerIconMsg" (click)="powerToggle(view)" *ngIf="view.isHyperVHypervisor" accessControl
+            moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn"></button>
+
           <!-- <span dropdown placement="bottom right" container="body">
             <button class="action-icons action-icons-disabled mb-0 fas fa-external-link-square-alt font-sm ml-1"
               (click)="false" [tooltip]="view.sameTabTootipMessage" container="body" *ngIf="!view.isSameTabEnabled"></button>
@@ -257,6 +275,14 @@
               </a>
             </div>
           </span> -->
+
+          <button *ngIf="view?.showRemoteWebAccessButton"
+            class="action-icons mb-0 fas fa-desktop font-sm ml-1"
+            [tooltip]="remoteWebLaunching ? 'Opening Remote Web Viewer' : view.newTabTooltipMessage"
+            [disabled]="remoteWebLaunching"
+            [ngClass]="{'action-icons-disabled': remoteWebLaunching || !view.showRemoteWebAccessButton}"
+            (click)="remoteWebAccessNewTab(view)" accessControl moduleName="Datacenter"
+            accessType="Remote Management" elementType="actionbtn"></button>
 
           <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
             [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
@@ -379,6 +405,11 @@
           <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
         </td>
         <td class="action-icons-column">
+          <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerIcon"
+            [ngClass]="{'action-icons-disabled':!view.powerIconEnabled,'action-icons-on':view.powerStatusOn}"
+            [tooltip]="view.powerIconMsg" (click)="powerToggle(view)" *ngIf="view.isHyperVHypervisor" accessControl
+            moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn"></button>
+
           <!-- <span dropdown placement="bottom right" container="body">
             <button class="action-icons action-icons-disabled mb-0 fas fa-external-link-square-alt font-sm ml-1"
               (click)="false" [tooltip]="view.sameTabTootipMessage" container="body" *ngIf="!view.isSameTabEnabled"></button>
@@ -393,6 +424,14 @@
               </a>
             </div>
           </span> -->
+
+          <button *ngIf="view?.showRemoteWebAccessButton"
+            class="action-icons mb-0 fas fa-desktop font-sm ml-1"
+            [tooltip]="remoteWebLaunching ? 'Opening Remote Web Viewer' : view.newTabTooltipMessage"
+            [disabled]="remoteWebLaunching"
+            [ngClass]="{'action-icons-disabled': remoteWebLaunching || !view.showRemoteWebAccessButton}"
+            (click)="remoteWebAccessNewTab(view)" accessControl moduleName="Datacenter"
+            accessType="Remote Management" elementType="actionbtn"></button>
 
           <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
             [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
@@ -517,4 +556,45 @@
 <ng-template #bulkEditModel>
   <device-details-bulk-update-popup [fieldsList]="fields" [deviceType]="'hypervisors'" (close)="cancelButton()"
     (onSubmit)="submit($event)"></device-details-bulk-update-popup>
+</ng-template>
+
+<ng-template #powerAuthenticate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Please provide credentials to <strong>{{powerAction}}</strong>
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closePowerAuthModal()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="powerAuthForm">
+        <div class="form-group">
+          <div class="invalid-credentials">Only authorized users are allowed to perform this action. Please provide
+            your credentials.</div>
+        </div>
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="powerAuthFormErrors.nonFieldErr">
+            {{powerAuthFormErrors.nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="hypervisor-power-username">Username<em>*</em></label>
+          <input class="form-control" id="hypervisor-power-username" type="text" formControlName="username"
+            [ngClass]="{'is-invalid' : powerAuthFormErrors.username}">
+          <div class="invalid-feedback" *ngIf="powerAuthFormErrors.username">{{powerAuthFormErrors.username}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="hypervisor-power-password">Password<em>*</em></label>
+          <input class="form-control" id="hypervisor-power-password" type="password" formControlName="password"
+            [ngClass]="{'is-invalid' : powerAuthFormErrors.password}">
+          <div class="invalid-feedback" *ngIf="powerAuthFormErrors.password">{{powerAuthFormErrors.password}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer text-right">
+      <button class="btn btn-sm btn-primary" type="button" (click)="onPowerSubmit()">Submit</button>
+      <button class="btn btn-outline-danger btn-sm ml-2" type="button" (click)="closePowerAuthModal()">Cancel</button>
+    </div>
+  </div>
 </ng-template>

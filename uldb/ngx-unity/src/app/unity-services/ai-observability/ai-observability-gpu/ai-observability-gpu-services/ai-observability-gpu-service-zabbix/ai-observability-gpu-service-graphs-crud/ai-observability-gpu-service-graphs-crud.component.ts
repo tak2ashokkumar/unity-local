@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { FormGroup } from '@angular/forms';
@@ -25,7 +25,7 @@ import { AiObservabilityGpuServiceGraphsCrudService, GpuGraphCRUDViewdata } from
   styleUrls: ['./ai-observability-gpu-service-graphs-crud.component.scss'],
   providers: [AiObservabilityGpuServiceGraphsCrudService]
 })
-export class AiObservabilityGpuServiceGraphsCrudComponent implements OnInit {
+export class AiObservabilityGpuServiceGraphsCrudComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   pcId: string;
   deviceId: string;

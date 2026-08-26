@@ -11,6 +11,7 @@ import { AIMLAlerts, AIMLAlertsSummary, AIMLSuppressedDisableTriggerType, AIMLSu
 import { Observable } from 'rxjs';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { AppLevelService } from 'src/app/app-level.service';
+import { AIMLEventMgmtDateRangeParams, AimlEventMgmtService } from '../aiml-event-mgmt.service';
 
 @Injectable()
 export class AimlAlertsService {
@@ -19,11 +20,11 @@ export class AimlAlertsService {
     private utilSvc: AppUtilityService,
     private tableService: TableApiServiceService,
     private appService: AppLevelService,
+    private aimlMgmtSvc: AimlEventMgmtService,
     private builder: FormBuilder) { }
 
-  getAlertsSummary() {
-    let params: HttpParams = new HttpParams();
-    params = params.append('last_n_days', 7);
+  getAlertsSummary(dateRangeParams?: AIMLEventMgmtDateRangeParams) {
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(new HttpParams(), dateRangeParams);
     return this.http.get<AIMLAlertsSummary>(GET_AIOPS_ALERTS_SUMMARY(), { params: params });
   }
 
@@ -35,8 +36,8 @@ export class AimlAlertsService {
     });
   }
 
-  getAlerts(criteria: SearchCriteria, filterData: any) {
-    let params: HttpParams = this.tableService.getWithParam(criteria);
+  getAlerts(criteria: SearchCriteria, filterData: any, dateRangeParams?: AIMLEventMgmtDateRangeParams) {
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(this.tableService.getWithParam(criteria), dateRangeParams);
     Object.keys(filterData).forEach(key => {
       if (filterData[key] && filterData[key].length) {
         if (Array.isArray(filterData[key])) {
@@ -117,8 +118,8 @@ export class AimlAlertsService {
     }
   }
 
-  getSuppressedEvents(criteria: SearchCriteria, filterData: any) {
-    let params: HttpParams = this.tableService.getWithParam(criteria);
+  getSuppressedEvents(criteria: SearchCriteria, filterData: any, dateRangeParams?: AIMLEventMgmtDateRangeParams) {
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(this.tableService.getWithParam(criteria), dateRangeParams);
     Object.keys(filterData).forEach(key => {
       if (filterData[key] && filterData[key].length) {
         if (Array.isArray(filterData[key])) {

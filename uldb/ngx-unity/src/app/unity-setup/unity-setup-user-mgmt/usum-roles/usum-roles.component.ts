@@ -46,8 +46,8 @@ export class UsumRolesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.toggleConfirmRoleModalRef?.hide();
     this.confirmDeleteModalRef?.hide();
+    this.toggleConfirmRoleModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

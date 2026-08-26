@@ -81,6 +81,8 @@ export class PcCrudComponent implements OnInit, OnDestroy {
       }
     });
 
+
+
     this.isAddorEditEnabled = (this.router.url.includes('add') || this.router.url.includes('edit')) ? true : false;
 
     // this.crudServie.addOrEditAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(param => {
@@ -138,14 +140,14 @@ export class PcCrudComponent implements OnInit, OnDestroy {
    * To enusure to close subscription on form submit
    */
   cleanUp() {
+    this.confirmModalRef?.hide();
+    this.passwordChangeRef?.hide();
     this.spinnerService.stop('main');
     this.vCenterFlag = false;
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
   ngOnDestroy() {
-    this.confirmModalRef?.hide();
-    this.passwordChangeRef?.hide();
     this.cleanUp();
   }
 
@@ -526,16 +528,16 @@ export class PcCrudComponent implements OnInit, OnDestroy {
   goBack() {
     if (this.router.url.includes("summary")) {
       if (this.action === 'Edit') {
-        this.router.navigate(['../../shared/../'], { relativeTo: this.route })
+        this.router.navigate(['../../'], { relativeTo: this.route })
       } else {
-        this.router.navigate(['../../shared/'], { relativeTo: this.route })
+        this.router.navigate(['../'], { relativeTo: this.route })
       }
     } else if (this.router.url.includes('integration')) {
-      this.router.navigate(['../../shared/../'], { relativeTo: this.route });
+      this.router.navigate(['../../'], { relativeTo: this.route });
     } else if (this.router.url.includes('new')) {
-      this.router.navigate(['../../shared/../'], { relativeTo: this.route });
+      this.router.navigate(['../../'], { relativeTo: this.route });
     } else {
-      this.router.navigate(['../../shared/'], { relativeTo: this.route });
+      this.router.navigate(['../'], { relativeTo: this.route });
     }
   }
 }

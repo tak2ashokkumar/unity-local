@@ -1,10 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { UNITY_CREDENTIALS, UNITY_CREDENTIALS_BY_ID } from 'src/app/shared/api-endpoint.const';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { GET_USER_GROUPS_LIST, LIST_ACTIVE_USER, UNITY_CREDENTIALS, UNITY_CREDENTIALS_BY_ID } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { DeviceIconService } from 'src/app/shared/device-icon.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
@@ -12,6 +12,7 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UnitySetupCredentials } from '../unity-setup-credentials.type';
+import { UserGroupType } from 'src/app/shared/SharedEntityTypes/user-mgmt.type';
 
 @Injectable()
 export class UnitySetupCredentialsCrudService {
@@ -26,12 +27,29 @@ export class UnitySetupCredentialsCrudService {
     return this.http.get<UnitySetupCredentials>(UNITY_CREDENTIALS_BY_ID(credentialId));
   }
 
+  getDropdownData(): Observable<{ userGroups: UserGroupType[], userList: string[] }> {
+    return forkJoin({
+      userGroups: this.getUserGroups().pipe(catchError(error => of(undefined))),
+      userList: this.getUserList().pipe(catchError(error => of(undefined))),
+    });
+  }
+
+  getUserGroups(): Observable<UserGroupType[]> {
+    let params: HttpParams = new HttpParams().set('status', true).set('page_size', 0);
+    return this.http.get<UserGroupType[]>(GET_USER_GROUPS_LIST(), { params: params });
+  }
+
+  getUserList(): Observable<string[]> {
+    return this.http.get<string[]>(LIST_ACTIVE_USER());
+  }
+
   buildForm(data?: UnitySetupCredentials) {
     if (data) {
       let form = this.builder.group({
         'id': [data.id],
         'name': [data.name, [Validators.required, NoWhitespaceValidator]],
         'description': [data.description],
+        'scope': [data.scope || 'ORGANIZATION', [Validators.required]],
         'type': [data.type, [Validators.required, NoWhitespaceValidator]],
       });
       if (data.type == 'SNMPv1' || data.type == 'SNMPv2') {
@@ -87,11 +105,19 @@ export class UnitySetupCredentialsCrudService {
           form.addControl('devices', new FormControl(data.devices, [Validators.required]));
         }
       }
+
+      if (data.scope == 'USER_GROUP') {
+        form.addControl('shared_groups', new FormControl(data.shared_groups || []));
+        form.addControl('shared_users', new FormControl(data.shared_users || []));
+        form.setValidators(AtLeastOneRequiredValidator(['shared_groups', 'shared_users']));
+        form.updateValueAndValidity();
+      }
       return form;
     } else {
       return this.builder.group({
         name: ['', [Validators.required]],
         description: [''],
+        scope: ['ORGANIZATION', [Validators.required]],
         type: ['', [Validators.required]],
       });
     }
@@ -117,7 +143,10 @@ export class UnitySetupCredentialsCrudService {
       'device_types': '',
       'devices': '',
       'database_type': '',
-      'port': ''
+      'port': '',
+      'scope': '',
+      'shared_groups': '',
+      'shared_users': '',
     };
     return formErrors;
   }
@@ -181,7 +210,16 @@ export class UnitySetupCredentialsCrudService {
     'port': {
       'required': 'Port selection is required',
       'min': 'Invalid port'
-    }
+    },
+    'scope': {
+      'required': 'Scope is required'
+    },
+    'shared_groups': {
+      'atLeastOneRequired': 'At least one Group or User is required'
+    },
+    'shared_users': {
+      'atLeastOneRequired': 'At least one Group or User is required'
+    },
   };
 
   getDeviceTypes() {
@@ -244,3 +282,16 @@ export const deviceTypes: { label: string, value: string }[] = [
   { label: 'OpenStack Virtual Machine', value: 'open_stack' },
   { label: 'Custom Virtual Machine', value: 'virtual_machine' },
 ];
+
+export function AtLeastOneRequiredValidator(controlNames: string[]): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    if (!(group instanceof FormGroup)) {
+      return null;
+    }
+    const hasValue = controlNames.some(name => {
+      const control = group.get(name);
+      return !!control && !!control.value && control.value.length > 0;
+    });
+    return hasValue ? null : { atLeastOneRequired: true };
+  };
+}

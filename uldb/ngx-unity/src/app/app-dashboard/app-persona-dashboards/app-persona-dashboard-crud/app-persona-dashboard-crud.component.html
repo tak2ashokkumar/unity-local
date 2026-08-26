@@ -58,8 +58,8 @@
                             <ng-container *ngIf="dashboardWidgets && dashboardWidgets.length > 0">
                                 <ul class="list-group">
                                     <ng-container *ngFor="let widget of dashboardWidgets">
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                        <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-2"
+                                            [class.list-group-item-primary]="widget.id==selectedDashboardWidget?.id">
                                             <div class="d-flex flex-column w-80 text-truncate">
                                                 <span class="text-left text-truncate">{{widget.name}}</span>
                                                 <span class="d-flex align-items-baseline">
@@ -313,7 +313,7 @@
                             </div>
                         </div>
                         <div class="row form-group">
-                            <label for="widget_type" class="col-2 h-form-label px-0">Category:</label>
+                            <label for="widget_type" class="col-2 h-form-label px-0">Category<em>*</em>:</label>
                             <div class="col-3">
                                 <select id="widget_type" class="form-control form-control-sm"
                                     formControlName="widget_type" [class.is-invalid]="widgetFormErrors.widget_type">
@@ -423,7 +423,7 @@
                                                 <div class="form-group mb-0">
                                                     <select class="form-control form-control-sm w-100"
                                                         formControlName="device_type">
-                                                        <option [value]="''">Device Type</option>
+                                                        <option [value]="''" disabled>Device Type</option>
                                                         <option *ngFor="let option of deviceTypeList"
                                                             [value]="option.name">
                                                             {{option.displayName}}

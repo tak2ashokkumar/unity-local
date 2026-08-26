@@ -1,0 +1,772 @@
+<div class="row m-0 h-100 dynamic-form-test">
+    <div class="col-6 h-100">
+        <textarea class="form-control h-100 w-100" [(ngModel)]="jsonData" (change)="displayForm()"></textarea>
+    </div>
+    <div class="col-6 h-100">
+        <div class="h-100 shadow-sm overflow-hidden" [class.prompt-expanded]="isPromptExpanded">
+            <!-- Middle Panel -->
+            <div class="d-flex flex-column h-100">
+                <ul class="nav nav-tabs bg-light mb-0" *ngIf="visibleTabs.length !== 0">
+                    <li class="nav-item" *ngFor="let tab of visibleTabs">
+                        <a class="nav-link" [class.active]="activeTab === tab.id" (click)="activeTab = tab.id">
+                            {{ tab.label }}
+                        </a>
+                    </li>
+                </ul>
+                <div class="flex-fill overflow-auto p-3">
+                    <form [formGroup]="nodeForm" class="w-100" *ngIf="dynamicSchema?.tabs?.length">
+                        <ng-container *ngFor="let field of activeFields">
+                            <ng-container
+                                *ngTemplateOutlet="dynamicField; context: { field: field, form: nodeForm, errors: formErrors }">
+                            </ng-container>
+                        </ng-container>
+                    </form>
+                </div>
+                <ng-template #fieldModeHeader let-field="field" let-form="form">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <label class="small font-weight-bold text-muted mb-0">
+                            {{ field.label || field.control_name }}
+                            <em *ngIf="isDynamicFieldRequired(field)">*</em>
+                            <span *ngIf="getDynamicTooltip(field)"
+                                class="fas fa-info-circle text-primary pointer-link text-info pl-1"
+                                [attr.title]="getDynamicTooltip(field)">
+                            </span>
+                        </label>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" (click)="setFieldMode(field, form, 'normal')"
+                                class="btn btn-outline-primary py-1"
+                                [class.active]="getFieldMode(field, form) === 'normal'">
+                                Value
+                            </button>
+                            <button type="button" (click)="setFieldMode(field, form, 'expression')"
+                                class="btn btn-outline-primary py-1"
+                                [class.active]="getFieldMode(field, form) === 'expression'">
+                                Expr
+                            </button>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template #fieldExpressionInput let-field="field" let-form="form" let-errors="errors">
+                    <ng-container [formGroup]="form">
+                        <input type="text" class="form-control text-dark font-monospace"
+                            formControlName="{{ field.control_name }}" [value]="getDisplayValue(field, form)"
+                            (input)="onExprInput($event, field, form)" [attr.placeholder]="'Drop expression here'"
+                            [class.is-invalid]="getDynamicError(errors, field)"
+                            [attr.disabled]="field.disabled ? true : null"
+                            [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'" />
+                    </ng-container>
+                </ng-template>
+
+                <ng-template #dynamicField let-field="field" let-form="form" let-errors="errors">
+                    <div [formGroup]="form" *ngIf="isDynamicFieldVisible(field, form)"
+                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'">
+                        <ng-container [ngSwitch]="getDynamicFieldType(field)">
+                            <div *ngSwitchCase="'text'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+                                <!-- Value mode -->
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <input type="text" class="form-control text-dark"
+                                        [value]="getDisplayValue(field, form)"
+                                        (input)="onNormalInput($event, field, form)"
+                                        [attr.maxlength]="field.maxlength || null"
+                                        [attr.placeholder]="field.placeholder || ''"
+                                        [attr.disabled]="field.disabled ? true : null"
+                                        [class.is-invalid]="getDynamicError(errors, field)" />
+                                </ng-container>
+
+                                <!-- Expression mode -->
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <input type="text" class="form-control text-dark font-monospace"
+                                        formControlName="{{ field.control_name }}"
+                                        [value]="getDisplayValue(field, form)"
+                                        (input)="onExprInput($event, field, form)"
+                                        [attr.placeholder]="'Drop expression here'"
+                                        [class.is-invalid]="getDynamicError(errors, field)"
+                                        [attr.disabled]="field.disabled ? true : null" />
+                                </ng-container>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'number'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <input type="number" class="form-control text-dark"
+                                        formControlName="{{ field.control_name }}"
+                                        [attr.placeholder]="field.placeholder || ''"
+                                        [class.is-invalid]="getDynamicError(errors, field)"
+                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'" />
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldExpressionInput; context: { field: field, form: form, errors: errors }">
+                                    </ng-container>
+                                </ng-container>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'checkbox'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <div class="ml-1 custom-control custom-switch">
+                                        <input class="custom-control-input" type="checkbox" [id]="field.control_name"
+                                            formControlName="{{ field.control_name }}" />
+                                        <label class="custom-control-label" [for]="field.control_name">
+                                            {{ field.label || field.control_name }}
+                                        </label>
+                                    </div>
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldExpressionInput; context: { field: field, form: form, errors: errors }">
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+
+                            <div *ngSwitchCase="'radio'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <div class="d-flex flex-wrap align-items-start ml-1">
+                                        <div *ngFor="let option of field.options" class="form-check mr-4 mb-0">
+                                            <input class="form-check-input" type="radio"
+                                                [id]="field.control_name + '_' + option.value" [value]="option.value"
+                                                formControlName="{{ field.control_name }}" />
+                                            <label class="form-check-label"
+                                                [for]="field.control_name + '_' + option.value">
+                                                {{ option.label || option.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldExpressionInput; context: { field: field, form: form, errors: errors }">
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+
+                            <div *ngSwitchCase="'text_area'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <!-- Value mode -->
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <textarea class="form-control text-dark" [value]="getDisplayValue(field, form)"
+                                        (input)="onNormalInput($event, field, form)" [rows]="field.rows || 3"
+                                        [attr.placeholder]="field.placeholder || ''"
+                                        [attr.disabled]="field.disabled ? true : null"
+                                        [class.is-invalid]="getDynamicError(errors, field)"
+                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'">
+                                    </textarea>
+                                </ng-container>
+
+                                <!-- Expression mode -->
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <textarea class="form-control text-dark font-monospace"
+                                        [value]="getDisplayValue(field, form)"
+                                        (input)="onExprInput($event, field, form)" [rows]="field.rows || 3"
+                                        placeholder="Drop expression here"
+                                        [attr.disabled]="field.disabled ? true : null"
+                                        [class.is-invalid]="getDynamicError(errors, field)"
+                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'">
+                                    </textarea>
+                                </ng-container>
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'select'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <select class="form-control text-dark" [formControlName]="field.control_name"
+                                        [class.is-invalid]="getDynamicError(errors, field)"
+                                        (change)="onDynamicFieldChange(field, form)">
+
+                                        <option [ngValue]="''" disabled>
+                                            {{ field.placeholder || ('Select ' + (field.label || field.control_name)) }}
+                                        </option>
+
+                                        <option *ngFor="let option of getDynamicOptions(field, form)"
+                                            [ngValue]="getDynamicOptionValue(option, field)">
+                                            {{ getDynamicOptionLabel(option, field) }}
+                                        </option>
+
+                                        <option
+                                            *ngIf="field.noOptionsText && !getDynamicOptions(field, form).length && !isDynamicOptionsLoading(field, form)"
+                                            disabled>
+                                            {{ field.noOptionsText }}
+                                        </option>
+                                    </select>
+
+                                    <div class="text-muted mt-1" *ngIf="isDynamicOptionsLoading(field, form)">
+                                        Loading options...
+                                    </div>
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldExpressionInput; context: { field: field, form: form, errors: errors }">
+                                    </ng-container>
+                                </ng-container>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'array'" class="mb-3">
+                                <label class="small font-weight-bold text-muted mb-1">
+                                    {{ field.label || field.control_name }}
+                                </label>
+
+                                <div [formArrayName]="field.control_name">
+                                    <div *ngFor="let group of getDynamicFormArray(form, field.control_name).controls; let i = index"
+                                        [formGroupName]="i" class="mb-4 border rounded px-3 py-1">
+
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button"
+                                                class="action-icons fas fa-minus btn-sm btn-outline-danger"
+                                                (click)="removeDynamicArrayItem(field, i, form)"></button>
+                                        </div>
+
+                                        <ng-container *ngFor="let childField of field.fields">
+                                            <ng-container
+                                                *ngTemplateOutlet="dynamicField; context: { field: childField, form: asDynamicFormGroup(group), errors: getDynamicArrayErrors(errors, field.control_name, i) }">
+                                            </ng-container>
+                                        </ng-container>
+                                    </div>
+                                </div>
+
+                                <div class="invalid-feedback d-block" *ngIf="formErrors[field.control_name + '_error']">
+                                    {{ formErrors[field.control_name + '_error'] }}
+                                </div>
+
+                                <div class="text-muted mb-2"
+                                    *ngIf="!getDynamicFormArray(form, field.control_name).length">
+                                    Items will appear once you add it.
+                                </div>
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-outline-primary"
+                                        (click)="addDynamicArrayItem(field, form)">
+                                        <i class="fas fa-plus mr-1"></i> {{ field.add_button_label || 'Add Item' }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'password'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <custom-password-field formControlName="{{ field.control_name }}" [options]="{
+                                            id: field.control_name,
+                                            errors: getDynamicError(errors, field),
+                                            placeholder: field.placeholder || ''
+                                            }" [class.is-invalid]="getDynamicError(errors, field)"
+                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'">
+                                    </custom-password-field>
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldExpressionInput; context: { field: field, form: form, errors: errors }">
+                                    </ng-container>
+                                </ng-container>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'target_search'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <app-auto-complete-multi formControlName="{{ field.control_name }}"
+                                        [apiFn]="getDynamicSearchFn(field)"
+                                        [placeholder]="field.placeholder || 'Search'"
+                                        [class.is-invalid]="getDynamicError(errors, field)">
+                                    </app-auto-complete-multi>
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldExpressionInput; context: { field: field, form: form, errors: errors }">
+                                    </ng-container>
+                                </ng-container>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'multiselect'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <multiselect-dropdown *ngIf="field.multiselect_properties && field.options"
+                                        [settings]="field.multiselect_properties" [options]="field.options"
+                                        class="form-control h-auto p-0"
+                                        formControlName="{{ field.control_name }}"
+                                        [class.is-invalid]="getDynamicError(errors, field)"
+                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'">
+                                    </multiselect-dropdown>
+                                </ng-container>
+
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldExpressionInput; context: { field: field, form: form, errors: errors }">
+                                    </ng-container>
+                                </ng-container>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'date'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <!-- Value mode -->
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <owl-date-time #datePicker [pickerType]="'calendar'"
+                                        [hour12Timer]="true"></owl-date-time>
+                                    <div class="d-flex">
+                                        <input class="form-control rounded-left text-dark"
+                                            [owlDateTimeTrigger]="datePicker" [owlDateTime]="datePicker"
+                                            [value]="getDisplayValue(field, form)"
+                                            (dateTimeChange)="onDateChange($event, field, form)"
+                                            [attr.placeholder]="field.placeholder || 'Select date'"
+                                            [attr.disabled]="field.disabled ? true : null" [max]="field.max || null"
+                                            [min]="field.min || null"
+                                            [class.is-invalid]="getDynamicError(errors, field)" type="text"
+                                            [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'"
+                                            readonly />
+                                        <div class="input-group-append" [owlDateTimeTrigger]="datePicker">
+                                            <span class="input-group-text bg-white">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </ng-container>
+
+                                <!-- Expression mode -->
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <input type="text" class="form-control text-dark font-monospace"
+                                        formControlName="{{ field.control_name }}"
+                                        [value]="getDisplayValue(field, form)"
+                                        (input)="onExprInput($event, field, form)"
+                                        [attr.placeholder]="'Drop expression here'"
+                                        [class.is-invalid]="getDynamicError(errors, field)"
+                                        [attr.disabled]="field.disabled ? true : null"
+                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'" />
+                                </ng-container>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'dateTime'" class="mb-3">
+                                <ng-container
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
+                                </ng-container>
+
+                                <!-- Value mode -->
+                                <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
+                                    <owl-date-time #dateTimePicker [pickerType]="'both'"
+                                        [hour12Timer]="true"></owl-date-time>
+                                    <div class="d-flex">
+                                        <input class="form-control rounded-left text-dark"
+                                            [owlDateTimeTrigger]="dateTimePicker" [owlDateTime]="dateTimePicker"
+                                            [value]="getDisplayValue(field, form)"
+                                            (dateTimeChange)="onDateChange($event, field, form)"
+                                            [attr.placeholder]="field.placeholder || 'Select date & time'"
+                                            [attr.disabled]="field.disabled ? true : null" [max]="field.max || null"
+                                            [min]="field.min || null"
+                                            [class.is-invalid]="getDynamicError(errors, field)" type="text"
+                                            [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'"
+                                            readonly />
+                                        <div class="input-group-append" [owlDateTimeTrigger]="dateTimePicker">
+                                            <span class="input-group-text bg-white">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </ng-container>
+
+                                <!-- Expression mode -->
+                                <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
+                                    <input type="text" class="form-control text-dark font-monospace"
+                                        formControlName="{{ field.control_name }}"
+                                        [value]="getDisplayValue(field, form)"
+                                        (input)="onExprInput($event, field, form)"
+                                        [attr.placeholder]="'Drop expression here'"
+                                        [class.is-invalid]="getDynamicError(errors, field)"
+                                        [attr.disabled]="field.disabled ? true : null"
+                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'" />
+                                </ng-container>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'schedule'" class="mb-3">
+                                <unity-schedule></unity-schedule>
+                            </div>
+
+
+                            <!-- <div *ngSwitchCase="'querybuilder'" class="mb-3">
+                                <label class="small font-weight-bold text-muted mb-1">
+                                    {{ field.label || field.control_name }}
+                                    <em *ngIf="isDynamicFieldRequired(field)">*</em>
+                                </label>
+
+                                <span *ngIf="getDynamicTooltip(field)"
+                                    class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                                    [attr.title]="getDynamicTooltip(field)">
+                                </span>
+                            </div> -->
+
+                            <!-- //////// CONDITION BUILDER /////// -->
+                            <div *ngSwitchCase="'condition'">
+                                <ng-template #groupTemplate let-group let-depth="depth">
+                                    <div class="border rounded bg-light overflow-hidden"
+                                        [class.nested-group]="depth > 0">
+                                        <div class="d-flex align-items-center p-3 border-bottom">
+                                            <span class="small font-weight-bold text-uppercase text-muted mr-3">
+                                                {{ depth === 0 ? (field?.label || field?.control_name || 'WHEN') :
+                                                'GROUP' }}
+                                                <em *ngIf="isDynamicFieldRequired(field)">*</em>
+                                                <span *ngIf="getDynamicTooltip(field)"
+                                                    class="fas fa-info-circle text-primary pointer-link text-info pl-1"
+                                                    [attr.title]="getDynamicTooltip(field)">
+                                                </span>
+                                            </span>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-outline-primary"
+                                                    [class.active]="group.condition === 'AND'"
+                                                    (click)="group.condition='AND'">
+                                                    AND
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary"
+                                                    [class.active]="group.condition === 'OR'"
+                                                    (click)="group.condition='OR'">
+                                                    OR
+                                                </button>
+                                            </div>
+                                            <!-- <span class="text-muted">
+                                                of the following match
+                                            </span> -->
+                                        </div>
+
+                                        <!-- CHILDREN -->
+                                        <div class="p-3">
+                                            <ng-container *ngFor="let child of group.children; let i=index">
+
+                                                <!-- CONNECTOR -->
+                                                <div *ngIf="i > 0"
+                                                    class="rule-divider d-flex align-items-center my-2">
+                                                    <span>
+                                                        {{ group.condition }}
+                                                    </span>
+                                                </div>
+
+                                                <!-- RULE -->
+                                                <ng-container *ngIf="child.type === 'rule'">
+                                                    <div class="position-relative p-2">
+                                                        <button type="button"
+                                                            class="btn btn-link text-muted position-absolute p-0 remove-icon"
+                                                            (click)="removeChild(group, i, field)">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+
+                                                        <!-- FIELD -->
+                                                        <div class="row">
+                                                            <!-- <div [ngClass]="getColClass(getFieldByKey(field,'field'))">
+                                                                <input type="text" class="form-control"
+                                                                    placeholder="field.path" [value]="child.field"
+                                                                    (input)="child.field = $any($event.target).value">
+                                                            </div> -->
+                                                            <div [ngClass]="getColClass(getFieldByKey(field,'field'))">
+                                                                <div class="mb-3">
+                                                                    <ng-container
+                                                                        *ngTemplateOutlet="fieldModeHeader; context: { field: getFieldByKey(field,'field'), form: form }">
+                                                                    </ng-container>
+
+                                                                    <ng-container
+                                                                        *ngIf="getFieldMode(getFieldByKey(field,'field'), form) === 'normal'">
+                                                                        <input type="text"
+                                                                            class="form-control text-dark"
+                                                                            placeholder="field.path"
+                                                                            [value]="child.field"
+                                                                            (input)="child.field = $any($event.target).value"
+                                                                            [attr.maxlength]="getFieldByKey(field,'field')?.maxlength || null"
+                                                                            [attr.disabled]="getFieldByKey(field,'field')?.disabled ? true : null"
+                                                                            [class.is-invalid]="getDynamicError(errors, getFieldByKey(field,'field'))" />
+                                                                    </ng-container>
+
+                                                                    <ng-container
+                                                                        *ngIf="getFieldMode(getFieldByKey(field,'field'), form) === 'expression'">
+                                                                        <input type="text"
+                                                                            class="form-control text-dark font-monospace"
+                                                                            placeholder="Drop expression here"
+                                                                            [value]="child.field"
+                                                                            (input)="child.field = $any($event.target).value"
+                                                                            [attr.disabled]="getFieldByKey(field,'field')?.disabled ? true : null"
+                                                                            [class.is-invalid]="getDynamicError(errors, getFieldByKey(field,'field'))" />
+                                                                    </ng-container>
+
+                                                                    <div class="invalid-feedback d-block"
+                                                                        *ngIf="getDynamicError(errors, getFieldByKey(field,'field'))">
+                                                                        {{ getDynamicError(errors,
+                                                                        getFieldByKey(field,'field')) }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- DATATYPE + OPERATOR -->
+                                                        <div class="row mt-2">
+                                                            <div [ngClass]="getColClass(getDataTypeField(field))">
+                                                                <div class="mb-3">
+                                                                    <ng-container
+                                                                        *ngTemplateOutlet="fieldModeHeader; context: { field: getDataTypeField(field), form: form }">
+                                                                    </ng-container>
+
+                                                                    <ng-container
+                                                                        *ngIf="getFieldMode(getDataTypeField(field), form) === 'normal'">
+                                                                        <select class="form-control text-dark"
+                                                                            [ngModel]="child.data_type"
+                                                                            (ngModelChange)="onDataTypeChange(field, child, $event)"
+                                                                            [ngModelOptions]="{ standalone: true }"
+                                                                            [class.is-invalid]="getDynamicError(errors, getDataTypeField(field))">
+                                                                            <option
+                                                                                *ngFor="let option of getDataTypeOptions(field)"
+                                                                                [value]="option.value">
+                                                                                {{ option.label }}
+                                                                            </option>
+                                                                        </select>
+                                                                    </ng-container>
+
+                                                                    <ng-container
+                                                                        *ngIf="getFieldMode(getDataTypeField(field), form) === 'expression'">
+                                                                        <input type="text"
+                                                                            class="form-control text-dark font-monospace"
+                                                                            placeholder="Drop expression here"
+                                                                            [value]="child.data_type"
+                                                                            (input)="child.data_type = $any($event.target).value"
+                                                                            [class.is-invalid]="getDynamicError(errors, getDataTypeField(field))" />
+                                                                    </ng-container>
+
+                                                                    <div class="invalid-feedback d-block"
+                                                                        *ngIf="getDynamicError(errors, getDataTypeField(field))">
+                                                                        {{ getDynamicError(errors,
+                                                                        getDataTypeField(field)) }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div
+                                                                [ngClass]="getColClass(getOperatorField(field, child))">
+                                                                <div class="mb-3">
+                                                                    <ng-container
+                                                                        *ngTemplateOutlet="fieldModeHeader; context: { field: getOperatorField(field, child), form: form }">
+                                                                    </ng-container>
+
+                                                                    <ng-container
+                                                                        *ngIf="getFieldMode(getOperatorField(field, child), form) === 'normal'">
+                                                                        <select class="form-control text-dark"
+                                                                            [ngModel]="child.operator"
+                                                                            (ngModelChange)="child.operator = $event"
+                                                                            [ngModelOptions]="{ standalone: true }"
+                                                                            [class.is-invalid]="getDynamicError(errors, getOperatorField(field, child))">
+                                                                            <option
+                                                                                *ngFor="let option of getOperatorOptions(field, child)"
+                                                                                [value]="option.value">
+                                                                                {{ option.label }}
+                                                                            </option>
+                                                                        </select>
+                                                                    </ng-container>
+
+                                                                    <ng-container
+                                                                        *ngIf="getFieldMode(getOperatorField(field, child), form) === 'expression'">
+                                                                        <input type="text"
+                                                                            class="form-control text-dark font-monospace"
+                                                                            placeholder="Drop expression here"
+                                                                            [value]="child.operator"
+                                                                            (input)="child.operator = $any($event.target).value"
+                                                                            [class.is-invalid]="getDynamicError(errors, getOperatorField(field, child))" />
+                                                                    </ng-container>
+
+                                                                    <div class="invalid-feedback d-block"
+                                                                        *ngIf="getDynamicError(errors, getOperatorField(field, child))">
+                                                                        {{ getDynamicError(errors,
+                                                                        getOperatorField(field, child)) }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <!-- VALUE -->
+                                                        <div class="row mt-2"
+                                                            *ngIf="getValueField(field, child) as valueField">
+                                                            <div [ngClass]="getColClass(valueField)">
+                                                                <div class="mb-3">
+                                                                    <ng-container
+                                                                        *ngTemplateOutlet="fieldModeHeader; context: { field: valueField, form: form }">
+                                                                    </ng-container>
+
+                                                                    <ng-container
+                                                                        *ngIf="getFieldMode(valueField, form) === 'normal'">
+                                                                        <input *ngIf="valueField.type === 'text'"
+                                                                            type="text" class="form-control text-dark"
+                                                                            [placeholder]="valueField.placeholder"
+                                                                            [value]="child.value"
+                                                                            (input)="child.value = $any($event.target).value"
+                                                                            [class.is-invalid]="getDynamicError(errors, valueField)" />
+
+                                                                        <input *ngIf="valueField.type === 'number'"
+                                                                            type="number" class="form-control text-dark"
+                                                                            [placeholder]="valueField.placeholder"
+                                                                            [value]="child.value"
+                                                                            (input)="child.value = $any($event.target).value"
+                                                                            [class.is-invalid]="getDynamicError(errors, valueField)" />
+
+                                                                        <input *ngIf="valueField.type === 'date'"
+                                                                            type="date" class="form-control text-dark"
+                                                                            [value]="child.value"
+                                                                            (change)="child.value = $any($event.target).value"
+                                                                            [class.is-invalid]="getDynamicError(errors, valueField)" />
+                                                                    </ng-container>
+
+                                                                    <ng-container
+                                                                        *ngIf="getFieldMode(valueField, form) === 'expression'">
+                                                                        <input type="text"
+                                                                            class="form-control text-dark font-monospace"
+                                                                            placeholder="Drop expression here"
+                                                                            [value]="child.value"
+                                                                            (input)="child.value = $any($event.target).value"
+                                                                            [class.is-invalid]="getDynamicError(errors, valueField)" />
+                                                                    </ng-container>
+
+                                                                    <div class="invalid-feedback d-block"
+                                                                        *ngIf="getDynamicError(errors, valueField)">
+                                                                        {{ getDynamicError(errors, valueField) }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- IGNORE CASE -->
+                                                        <!-- <div class="mt-2" *ngIf="showIgnoreCase(field, child)">
+                                                            <label class="checkbox-label">
+                                                                <input type="checkbox" [checked]="child.ignoreCase"
+                                                                    (change)="child.ignoreCase = $any($event.target).checked"
+                                                                    [ngModelOptions]="{standalone: true}">
+                                                                <span>
+                                                                    Ignore case
+                                                                </span>
+                                                            </label>
+                                                        </div> -->
+                                                    </div>
+                                                </ng-container>
+
+                                                <!-- GROUP -->
+                                                <ng-container *ngIf="child.type === 'group'">
+                                                    <div class="position-relative">
+                                                        <button type="button"
+                                                            class="btn btn-link text-muted position-absolute p-0 remove-group-icon"
+                                                            (click)="removeChild(group, i, field)">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                        <ng-container
+                                                            *ngTemplateOutlet="groupTemplate;context:{$implicit: child,depth: depth + 1}">
+                                                        </ng-container>
+                                                    </div>
+                                                </ng-container>
+                                            </ng-container>
+                                        </div>
+
+                                        <!-- FOOTER -->
+                                        <div class="d-flex p-3 border-top">
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                (click)="addRule(group)">
+                                                + Rule
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-primary ml-2"
+                                                (click)="addGroup(group)">
+                                                + Group
+                                            </button>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-container
+                                    *ngTemplateOutlet="groupTemplate;context:{$implicit: getConditionTree(field),depth: 0}">
+                                </ng-container>
+                            </div>
+                            <!-- //////// CONDITION BUILDER //////// -->
+
+                            <div *ngSwitchCase="'hidden'" class="mb-3">
+                                <input type="hidden" class="form-control text-dark"
+                                    formControlName="{{ field.control_name }}" />
+                            </div>
+
+                            <div *ngSwitchDefault class="mb-3">
+                                <label class="small font-weight-bold text-muted mb-1">
+                                    {{ field.label || field.control_name }}
+                                </label>
+
+                                <input type="text" class="form-control text-dark"
+                                    formControlName="{{ field.control_name }}"
+                                    [attr.placeholder]="field.placeholder || ''"
+                                    [class.is-invalid]="getDynamicError(errors, field)" />
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
+                        </ng-container>
+                    </div>
+                </ng-template>
+            </div>
+
+        </div>
+    </div>
+</div>

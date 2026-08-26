@@ -3,12 +3,12 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import { DELETE_CONTAINER_CONTROLLER, EDIT_CONTAINER_CONTROLLER, GET_DOCKER_CONTROLLERS, KUBERNETES_ACCOUNTS, KUBERNETES_ACCOUNT_BY_ID, KUBERNETES_DISCOVER_RESOURCES, KUBERNETES_SYNC_RESOURCES } from 'src/app/shared/api-endpoint.const';
 import { AppLevelService } from 'src/app/app-level.service';
+import { DELETE_CONTAINER_CONTROLLER, EDIT_CONTAINER_CONTROLLER, GET_DOCKER_CONTROLLERS, KUBERNETES_ACCOUNTS, KUBERNETES_ACCOUNT_BY_ID, KUBERNETES_DISCOVER_RESOURCES, KUBERNETES_SYNC_RESOURCES } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
-import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { CONTROLLER_TYPE_MAPPING, ContainerControllerType } from 'src/app/shared/SharedEntityTypes/container-contoller.type';
+import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 

@@ -100,11 +100,19 @@
                     <span class="ml-1 font-lg">Workflows</span>
                 </div>
                 <div class="d-flex justify-content-end align-items-center">
-                    <button class="btn btn-warning btn-pill btn-sm mr-2" type="button" (click)="openAgentic()">
+                    <button class="btn btn-warning btn-pill btn-sm mr-2" type="button" (click)="openDynamicAgentic()"
+                        accessControl moduleName="DevOps Automation" accessType="Manage Workflow" elementType="btn"
+                        aria-haspopup="true">
+                        <i class="fas fa-plus mr-1"></i>
+                        {{ globalReadOnlyUser ? 'Try Agentic Workflow' : 'Workflow' }}
+                    </button>
+                    <!-- <button class="btn btn-warning btn-pill btn-sm mr-2" type="button" (click)="openAgentic()"
+                        accessControl moduleName="DevOps Automation" accessType="Manage Workflow" elementType="btn"
+                        aria-haspopup="true">
                         <i class="fas fa-plus mr-1"></i>
                         {{ globalReadOnlyUser ? 'Try Agentic Workflow' : 'Agentic Workflow' }}
-                    </button>
-                    <div class="dropdown" #dropdown>
+                    </button> -->
+                    <!-- <div class="dropdown" #dropdown>
                         <button class="btn btn-warning btn-pill btn-sm dropdown-toggle" type="button"
                             (click)="toggleDropdown()" accessControl moduleName="DevOps Automation"
                             accessType="Manage Workflow" elementType="btn" aria-haspopup="true" aria-expanded="false"><i
@@ -115,20 +123,8 @@
                             moduleName="DevOps Automation" accessType="Manage Workflow" elementType="div">
                             <a class="dropdown-item p-2" (click)="newWorkflow()">Advanced Designer</a>
                             <a class="dropdown-item p-2" (click)="addProcessWorkflow()">Code Editor</a>
-                            <!-- <a class="dropdown-item p-2" (click)="addWorkflow()">Classic Designer</a> -->
-                            <!-- <button class="btn btn-pill btn-warning btn-sm mr-2" type="button"
-                                (click)="addProcessWorkflow()" accessControl moduleName="DevOps Automation"
-                                accessType="Manage Workflow" elementType="btn"><i class="fas fa-plus mr-1"></i>Process
-                                Workflow
-                            </button>
-                            <button class="btn btn-pill btn-sm btn-warning font-500" type="button"
-                                (click)="addWorkflow()" accessControl moduleName="DevOps Automation"
-                                accessType="Manage Workflow" elementType="btn">
-                                <span class="fas fa-plus"></span>
-                                <span class="font-xs-sm mx-1">Workflow</span>
-                            </button> -->
                         </div>
-                    </div>
+                    </div> -->
                     <data-refresh-btn [page]="currentCriteria.pageNo"
                         (refresh)="refreshData($event)"></data-refresh-btn>
                 </div>

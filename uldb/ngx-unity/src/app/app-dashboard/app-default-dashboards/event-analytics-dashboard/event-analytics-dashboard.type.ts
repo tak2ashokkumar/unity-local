@@ -5,6 +5,8 @@ export interface SelectOption {
   label: string;
 }
 
+export type DashboardFilterOptionValue = SelectOption | string;
+
 export interface DashboardHeaderApiResponse {
   lastRefreshed: string;
   scope: {
@@ -334,7 +336,7 @@ export interface DashboardFilters {
   analyticsSeverityType: SelectOption[];
   analyticsDatacenter: SelectOption[];
   analyticsCloud: SelectOption[];
-  analyticsCategory: SelectOption[];
+  analyticsDeviceTypes: SelectOption[];
   eventAndAlertTimeline: SelectOption[];
   noisyEventsCategory: SelectOption[];
   noisyHostsCategory: SelectOption[];
@@ -352,11 +354,11 @@ export interface DashboardFilterCriteria {
   trendTimelineTo?: Date | string;
   alertSegregationCategory: string;
   analyticsViewBy: string;
-  analyticsSourceType: string;
-  analyticsSeverityType: string;
-  analyticsDatacenter: string;
-  analyticsCloud: string;
-  analyticsCategory: string;
+  analyticsSourceTypes: DashboardFilterOptionValue[];
+  analyticsSeverityTypes: DashboardFilterOptionValue[];
+  analyticsDatacenters: DashboardFilterOptionValue[];
+  analyticsClouds: DashboardFilterOptionValue[];
+  analyticsDeviceTypes: DashboardFilterOptionValue[];
   eventAndAlertTimeline: string;
   eventAndAlertTimelineFrom?: Date | string;
   eventAndAlertTimelineTo?: Date | string;

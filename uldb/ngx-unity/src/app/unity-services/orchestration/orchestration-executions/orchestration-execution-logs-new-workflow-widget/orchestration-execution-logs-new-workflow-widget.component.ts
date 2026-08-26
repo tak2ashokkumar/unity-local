@@ -9,11 +9,11 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { OrchestrationWorkflowCrudUtilsService } from '../../orchestration-workflows/orchestration-workflow-crud/orchestration-workflow-crud.utils.service';
 import { WorkflowLogDetails } from '../orchestration-executions-workflow-logs/orchestration-executions-workflow-logs.type';
 import { TaskArrayModel } from '../../orchestration-workflows/orchestration-workflow-poc/orchestration-workflow-poc.type';
-import { DrawflowNode, NodeDetailsArrayModel, nodeTypes } from '../../orchestration-workflows/orchestration-agentic-workflow-container/orchestration-agentic-workflow-container.type';
-import { OrchestrationAgenticWorkflowContainerService } from '../../orchestration-workflows/orchestration-agentic-workflow-container/orchestration-agentic-workflow-container.service';
 import { environment } from 'src/environments/environment';
 import { cloneDeep as _clone } from 'lodash-es';
 import { DOCUMENT } from '@angular/common';
+import { WfDynamicContainerService } from '../../orchestration-workflows/wf-dynamic-container/wf-dynamic-container.service';
+import { DrawflowNode, NodeDetailsArrayModel, nodeTypes } from '../../orchestration-workflows/wf-dynamic-container/wf-dynamic-container.type';
 
 @Component({
   selector: 'orchestration-execution-logs-new-workflow-widget',
@@ -138,7 +138,7 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     private renderer: Renderer2,
     private spinner: AppSpinnerService,
     private crudSvc: OrchestrationWorkflowCrudUtilsService,
-    private containerSvc: OrchestrationAgenticWorkflowContainerService
+    private containerSvc: WfDynamicContainerService
   ) {
     this.currentCriteria = { searchValue: '', pageSize: 0 };
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
@@ -164,6 +164,7 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     this.editor = new Drawflow(container);
     this.editor.start();
     this.editor.curvature = 0.5;
+    this.editor.zoom_min = 0.1;
 
     this.editor.createCurvature = function (
       start_pos_x,
@@ -240,28 +241,14 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
 
   getWorkflowDetails() {
     if (this.isAgentic) {
+      const drawflowContainer = this.document.getElementById('drawflow');
+      if (drawflowContainer) drawflowContainer.style.visibility = 'hidden';
+
       // this.workflowDetails.nodes_execution.forEach(val => {
       //   this.nodeDetailsArr.push(val);
       // });
       // this.connectionList = this.mapConnectionsForEditApi(_clone(this.workFlowData?.connections));
       // this.workflowDetails = _clone(this.dummyJson)
-      const getId = (val: any) =>
-        val?.includes?.('-') ? Number(val.split('-')[1]) : Number(val);
-      this.workflowDetails?.nodes_execution?.forEach((n: any) => {
-        if (n?.node_type === nodeTypes.AIAgent) {
-          setTimeout(() => {
-            this.syncNodeUI(getId(n?.node_id));
-
-          }, 0);
-        }
-        if (n?.node_type === nodeTypes.LLM) {
-          setTimeout(() => {
-            this.workflowDetails?.nodes_execution?.forEach((n: any) => {
-              this.syncNodeUI(n?.node_id);
-            });
-          }, 0);
-        }
-      });
       const drawflowData = this.generateDrawflowStructureEdit(this.workflowDetails);
       console.log('<<<<<<<<<<<<<', this.editor)
       console.log('<<<<<<<<<<<<<&&&&&&&&&&&&&', drawflowData)
@@ -278,9 +265,12 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
 
           // Important: fix connection positions AFTER UI is applied
           requestAnimationFrame(() => {
+            this.applyApiNodePositions();
             this.workflowDetails?.nodes_execution?.forEach((n: any) => {
-              this.editor.updateConnectionNodes(`node-${n.node_id}`);
+              const nodeId = String(n?.node_id ?? '').replace(/^node-/, '');
+              this.editor.updateConnectionNodes(`node-${nodeId}`);
             });
+            requestAnimationFrame(() => this.fitApiWorkflowToViewport());
           });
         });
       }
@@ -335,6 +325,9 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     const tryImport = () => {
       if (container && container.offsetWidth > 0 && container.offsetHeight > 0) {
         try {
+          // Do not paint the imported nodes at their temporary canvas origin.
+          // The canvas is revealed after the API positions are fitted below.
+          this.editor.precanvas.style.visibility = 'hidden';
           this.editor.clear();
           this.editor.on('import', () => {
             Object.keys(drawflowData.drawflow.Home.data).forEach(nodeId => {
@@ -345,6 +338,8 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
           this.editor.import(drawflowData);
           console.log('Successfully imported into Drawflow');
         } catch (err) {
+          this.editor.precanvas.style.visibility = 'visible';
+          container.style.visibility = 'visible';
           console.error('Error during editor.import():', err);
         }
       } else {
@@ -371,6 +366,106 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     });
   }
 
+  private applyApiNodePositions(): void {
+    const drawflowNodes = this.editor?.drawflow?.drawflow?.Home?.data || {};
+
+    (this.workflowDetails?.nodes_execution || []).forEach((node: any) => {
+      const nodeId = String(node?.node_id ?? '').replace(/^node-/, '');
+      const posX = Number(node?.pos_x);
+      const posY = Number(node?.pos_y);
+      if (!nodeId || !Number.isFinite(posX) || !Number.isFinite(posY)) return;
+
+      const drawflowNode = drawflowNodes[nodeId];
+      if (drawflowNode) {
+        drawflowNode.pos_x = posX;
+        drawflowNode.pos_y = posY;
+      }
+
+      const nodeElement = this.document.getElementById(`node-${nodeId}`);
+      if (nodeElement) {
+        nodeElement.style.left = `${posX}px`;
+        nodeElement.style.top = `${posY}px`;
+      }
+    });
+  }
+
+  private fitApiWorkflowToViewport(): void {
+    const container = this.document.getElementById('drawflow');
+    const precanvas = this.editor?.precanvas;
+    const drawflowNodes = this.editor?.drawflow?.drawflow?.Home?.data || {};
+    const nodeIds = Object.keys(drawflowNodes);
+    if (!precanvas) {
+      if (container) container.style.visibility = 'visible';
+      return;
+    }
+    if (!container || !nodeIds.length) {
+      precanvas.style.visibility = 'visible';
+      if (container) container.style.visibility = 'visible';
+      return;
+    }
+
+    const bounds = nodeIds.reduce((current, nodeId) => {
+      const node = drawflowNodes[nodeId];
+      const element = this.document.getElementById(`node-${nodeId}`);
+      if (!node || !element) return current;
+
+      return {
+        minX: Math.min(current.minX, node.pos_x),
+        minY: Math.min(current.minY, node.pos_y),
+        maxX: Math.max(current.maxX, node.pos_x + element.offsetWidth),
+        maxY: Math.max(current.maxY, node.pos_y + element.offsetHeight)
+      };
+    }, {
+      minX: Number.POSITIVE_INFINITY,
+      minY: Number.POSITIVE_INFINITY,
+      maxX: Number.NEGATIVE_INFINITY,
+      maxY: Number.NEGATIVE_INFINITY
+    });
+    if (!Number.isFinite(bounds.minX) || !Number.isFinite(bounds.minY)) {
+      precanvas.style.visibility = 'visible';
+      container.style.visibility = 'visible';
+      return;
+    }
+
+    const padding = 32;
+    const visibleParent = container.parentElement;
+    const viewportWidth = Math.min(
+      container.clientWidth,
+      visibleParent?.clientWidth || container.clientWidth
+    );
+    const viewportHeight = Math.min(
+      container.clientHeight,
+      visibleParent?.clientHeight || container.clientHeight
+    );
+    const availableWidth = Math.max(1, viewportWidth - padding * 2);
+    const availableHeight = Math.max(1, viewportHeight - padding * 2);
+    const contentWidth = Math.max(1, bounds.maxX - bounds.minX);
+    const contentHeight = Math.max(1, bounds.maxY - bounds.minY);
+    const zoom = Math.max(
+      this.editor.zoom_min,
+      Math.min(1, availableWidth / contentWidth, availableHeight / contentHeight)
+    );
+    const transformOrigin = getComputedStyle(precanvas).transformOrigin.split(' ');
+    const originX = Number.parseFloat(transformOrigin[0]) || 0;
+    const originY = Number.parseFloat(transformOrigin[1]) || 0;
+    const translateX = padding
+      + (availableWidth - contentWidth * zoom) / 2
+      - bounds.minX * zoom
+      - originX * (1 - zoom);
+    const translateY = padding
+      + (availableHeight - contentHeight * zoom) / 2
+      - bounds.minY * zoom
+      - originY * (1 - zoom);
+
+    this.editor.zoom = zoom;
+    this.editor.zoom_last_value = zoom;
+    this.editor.canvas_x = translateX;
+    this.editor.canvas_y = translateY;
+    precanvas.style.transform =
+      `translate(${translateX}px, ${translateY}px) scale(${zoom})`;
+    precanvas.style.visibility = 'visible';
+    container.style.visibility = 'visible';
+  }
 
   mapConnectionsForEditApi(connectionList: any[]) {
     return connectionList.map(conn => ({
@@ -384,12 +479,14 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
   getStatusFaClass(status?: string): string {
     switch (status) {
       case 'Success': return 'fas fa-check-circle text-success';
-      case 'Failed': return 'fas fa-exclamation-circle text-danger';
+      case 'Failed':
+      case 'Failure':
+      case 'Stopped': return 'fas fa-exclamation-circle text-danger';
       case 'Skipped': return 'fas fa-clock text-warning';
       case 'Queued': return 'fas fa-clock text-muted';
-      case 'Started': return 'fas fa-check-circle text-success';
       case 'Canceled': return 'fas fa-exclamation-circle text-danger';
-      case 'Running': return 'fas fa-spinner text-primary';
+      case 'Running':
+      case 'Started': return 'fas fa-spinner fa-spin text-primary';
       default: return 'fas fa-circle text-primary'; // neutral dot
     }
   }
@@ -405,13 +502,15 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
         pos_y: node.pos_y,
         node_id: node.node_id,
         status: node.status,
+        node_meta: node.node_meta,
+        icon_path: node.icon_path,
         outputs: [], // will be populated later
         data: {
           uniqueNodeId: node.node_id,
           label: {
             type: node.node_type,
             name: node.name,
-            image: this.containerSvc.getCenterImageUrl(node.node_type),
+            image: this.containerSvc.getNewCenterImageUrl(node.icon_path),
             uuid: node.uuid,
             nodeType: node.node_type,
             pos_x: node.pos_x,
@@ -484,7 +583,7 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
           label: {
             type: node.type,
             name: node.name,
-            image: this.containerSvc.getCenterImageUrl(node.type),
+            image: this.containerSvc.getNewCenterImageUrl(node.icon_path),
             uuid: node.uuid,
             nodeType: node.nodeType,
           }
@@ -507,7 +606,10 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     const isTriggerNode =
       node.type === nodeTypes.ManualTrigger ||
       node.type === nodeTypes.ScheduleTrigger ||
-      node.type === nodeTypes.OnChatMessageTrigger;
+      node.type === nodeTypes.OnChatMessageTrigger ||
+      node.type === nodeTypes.ItsmTrigger ||
+      node.type === nodeTypes.WebhookTrigger ||
+      node.type === nodeTypes.AimlEventTrigger;
 
     const boxClass = node.type === nodeTypes.Switch
       ? 'node-box switch-case'
@@ -520,119 +622,109 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     const iconClass = node.type === nodeTypes.LLM ? 'node-center-icon-llm' : 'node-center-icon-ai';
     const statusFa = this.getStatusFaClass(node.status);
     const statusName = node.status;
-    // --- AI / LLM nodes logic (as in my previous message) ---
-    if (node.type === nodeTypes.AIAgent || node.type === nodeTypes.LLM) {
+    const hasNodeMeta = node?.node_meta != null;
+    const statusHtml = statusFa
+      ? `<span class="status-icon mt-1 mr-1" style="float:right;" title="${statusName}">
+          <i class="${statusFa}"></i>
+        </span>`
+      : '';
 
-      // --- AI / LLM nodes logic (as in my previous message) ---
-      if (node.type === nodeTypes.AIAgent || node.type === nodeTypes.LLM) {
-        const modelValue = node?.config?.model?.llm_integ || '';
-        const memoryEnabled = node?.config?.enable_memory === true;
-        if (node.type === nodeTypes.AIAgent) {
-          return `
-        <div class="agentic-custom-node" id="node-${nodeId}">
+    if (node.type === nodeTypes.AIAgent || node.type === nodeTypes.LLM) {
+      const modelValue = hasNodeMeta ? node?.node_meta?.model?.llm_integ || '' : '';
+      const escapedModelValue = this.escapeHtml(modelValue);
+      const memoryEnabled = hasNodeMeta && node?.node_meta?.enable_memory === true;
+
+      if (node.type === nodeTypes.AIAgent) {
+        return `
+        <div class="agentic-custom-node readonly-execution-node" id="node-${nodeId}">
           <div class="node-box ainode">
             <!-- Header -->
-            <div class="node-header">
-                <div class="node-center-icon-ai">
-                    <img src="static/assets/images/external-brand/workflow/AIAgent.svg">
-                </div>
-                <span class="node-title">AI Agent</span>
-                <span><i class="${statusFa}" title="${statusName}"></i></span>
+            <div class="node-header" style="display: flex; align-items: center; justify-content: center; gap: 0px;">
+              <div class="${iconClass}">
+                <img src="${this.containerSvc.getNewCenterImageUrl(node.icon_path)}" loading="eager"/>
+              </div>
+              <span class="node-title">${node.name || 'AI Agent'}</span>
+              ${statusHtml}
             </div>
 
-            <!-- Config Row -->
-            <div class="row">
+            ${hasNodeMeta ? `
+            <!-- Read-only execution configuration -->
+            <div class="row m-0 p-0">
 
-                <div class="col-8">
+                <div class="col-8 p-0 pr-1">
                     <span class="config-label">Model</span>
                     <select class="form-control text-dark model-select"
-                        style="border-radius: 20px"
-                        onchange="window.onModelChange(${nodeId}, this)">
-                        <option value="">Select Model</option>
-                        <option value="UnityOne AI" ${modelValue === 'UnityOne AI' ? 'selected' : ''}>
-                          UnityOne AI
+                        disabled>
+                        <option value="${escapedModelValue}" selected>
+                          ${escapedModelValue || 'Select Model'}
                         </option>
-                      </select>
+                    </select>
                 </div>
 
-                <div class="col-4 memory-col">
+                <div class="col-4 p-0 memory-col d-flex flex-column align-items-center">
                     <span class="config-label">Memory</span>
-                    <img class="memory-icon"
+                    <img class="memory-icon memory-brain-icon"
                         data-enabled="${memoryEnabled}"
-                        onclick="window.toggleMemoryIcon(${nodeId}, this)"
-                        src="${memoryEnabled ? environment.assetsUrl + 'external-brand/workflow/memory_enabled.svg'
-              : environment.assetsUrl + 'external-brand/workflow/memory_disabled.svg'}"/>
+                        src="${environment.assetsUrl}external-brand/workflow/dynamic/Brain.svg"
+                        loading="eager"/>
                 </div>
 
             </div>
 
             <!-- Tools Section -->
             <div class="tools-container"></div>
+            ` : ''}
           </div>
         </div>`;
-        }
+      }
 
-        if (node.type === nodeTypes.LLM) {
-          return `
-        <div class="agentic-custom-node" id="node-${nodeId}">
-          <div class="node-actions-llm"
-              onclick="event.stopPropagation();"
-              onmousedown="event.stopPropagation();"
-              onmouseup="event.stopPropagation();">
-            <i class="fas fa-play action test"
-              title="Test"></i>
-            <i class="fas fa-pen action edit"
-              title="Edit"></i>
-            <i class="fas fa-trash action delete"
-              title="Delete"></i>
-          </div>
+      if (node.type === nodeTypes.LLM) {
+        return `
+        <div class="agentic-custom-node readonly-execution-node" id="node-${nodeId}">
           <div class="node-box llm">
-            <div class="icon-and-title">
+            <div class="icon-and-title" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
               <div class="${iconClass}">
-                <img src="${this.containerSvc.getCenterImageUrl(node.type)}" loading="eager"/>
+                <img src="${this.containerSvc.getNewCenterImageUrl(node.icon_path)}" loading="eager"/>
               </div>
-              <span> LLM </span>
-              <span><i class="${statusFa}" title="${statusName}"></i></span>
-              <div class="node-status-right">
-                <span class="node-status" title="${node.hasErrors ? 'Validation errors' : 'All required fields are filled up!'}">
-                  <i class="${node.hasErrors ? 'fas fa-exclamation-triangle text-warning' : ''}"></i>
-                </span>
-              </div>
-            </div>  
-            <div class="row m-0 p-0 mt-2">              
-              <div class="col-12">
-                      <span class="config-label">Model</span>
-                      <select class="form-control text-dark model-select"
-                          style="border-radius: 20px"
-                          onchange="window.onModelChange(${nodeId}, this)">
-                          <option value="">Select Model</option>
-                          <option value="UnityOne AI" ${modelValue === 'UnityOne AI' ? 'selected' : ''}>
-                            UnityOne AI
-                          </option>
-                        </select>
+              <span class="node-title">LLM</span>
+              ${statusHtml}
+            </div>
+            ${hasNodeMeta ? `
+            <div class="row m-0 p-0 mt-2">
+              <div class="col-12 p-2">
+                <span class="config-label">Model</span>
+                <select class="form-control text-dark model-select" disabled>
+                  <option value="${escapedModelValue}" selected>
+                    ${escapedModelValue || 'Select Model'}
+                  </option>
+                </select>
               </div>
             </div>
+            ` : ''}
           </div>
           <div class="node-label">${node.name}</div>
         </div>
       `;
-        }
       }
     }
 
     // --- Other nodes (Triggers, Switch, Normal) ---
     return `
-      <div class="${isTriggerNode ? 'agentic-custom-node type-trigger' : 'agentic-custom-node'}" id="node-${nodeId}">
+      <div class="${isTriggerNode
+        ? 'agentic-custom-node type-trigger readonly-execution-node'
+        : 'agentic-custom-node readonly-execution-node'}" id="node-${nodeId}">
         <div class="node-wrapper">
           <div class="${boxClass}">
             ${isTriggerNode ? `
               <div class="node-left-icon">
-                <img src="${environment.assetsUrl}external-brand/workflow/OrangeTrigger.svg" />
+                <img src="${environment.assetsUrl}external-brand/workflow/OrangeTrigger.svg" loading="eager"/>
               </div>` : ''
       }
-              <span><i class="${statusFa} pr-1 pt-1" style="float: right"></i></span>
+
+            ${statusHtml}
+
             <div class="node-center-icon">
-              <img src="${this.containerSvc.getCenterImageUrl(node.type)}" />
+              <img src="${this.containerSvc.getNewCenterImageUrl(node.icon_path)}" loading="eager"/>
             </div>
           </div>
         </div>
@@ -641,31 +733,33 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     `;
   }
 
+  private escapeHtml(value: any): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
 
   updateAgentTools(nodeId: number, tools: any[]) {
-
-    const getId = (val: any) =>
-      val?.includes?.('-') ? val.split('-')[1] : val;
-
-    const safeTools = (tools || []).filter(t => t && (t?.node_id || t?.tool_id));
+    const safeTools = (tools || []).filter(Boolean);
 
     const toolsHTML = safeTools.map(tool => {
-      const id = Number(getId(tool?.node_id || tool?.tool_id));
+      const toolName = this.escapeHtml(tool.name);
 
-      return `<div class="tool-chip" data-node-id="${id}">
-          <div class="tool-delete-icon">×</div>
-
+      return `<div class="tool-chip" title="${toolName}">
           <div class="tool-icon">
-            <img src="${this.containerSvc.getCenterImageUrl(tool.node_type || tool.type)}" loading="eager" />
+            <img src="${this.containerSvc.getNewCenterImageUrl(tool.icon_path)}" loading="eager" />
           </div>
 
-          <span class="tool-name">${tool.name}</span>
+          <span class="tool-name">${toolName}</span>
         </div>`;
     }).join('');
 
     const nodeEl = document.getElementById(`node-${nodeId}`);
     if (nodeEl) {
-      const toolsContainer = nodeEl.querySelector('.drawflow_content_node .tools-container') as HTMLElement | null;
+      const toolsContainer = nodeEl.querySelector('.tools-container') as HTMLElement | null;
       if (toolsContainer) {
         toolsContainer.innerHTML = toolsHTML;
       } else {
@@ -673,77 +767,29 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
       }
     }
 
-    /* ---------- Update Stored HTML ---------- */
-
-    const dfNode = this.editor.drawflow.drawflow.Home.data[nodeId];
-    const htmlString = String(dfNode?.html || '');
-
-    if (htmlString) {
-      const temp = document.createElement('div');
-      temp.innerHTML = htmlString.trim();
-
-      const toolsContainer = temp.querySelector('.drawflow_content_node .tools-container') as HTMLElement | null;
-
-      if (toolsContainer) {
-        toolsContainer.innerHTML = toolsHTML;
-        dfNode.html = temp.innerHTML;
-      }
-    }
-
-
+    requestAnimationFrame(() => {
+      this.editor?.updateConnectionNodes(`node-${nodeId}`);
+    });
   }
 
 
   syncNodeUI(nodeId: number) {
+    const node: any = this.workflowDetails?.nodes_execution?.find(
+      (n: any) => Number(String(n?.node_id ?? '').replace(/^node-/, '')) === Number(nodeId)
+    );
+    const nodeMeta = node?.node_meta;
+
+    if (node?.node_type !== nodeTypes.AIAgent || nodeMeta == null) {
+      return;
+    }
+
     const root = this.document.getElementById(`node-${nodeId}`);
     if (!root) {
       setTimeout(() => this.syncNodeUI(nodeId), 0);
       return;
     }
 
-    const node: any = this.workflowDetails?.nodes_execution?.find((n: any) => n.node_id === Number(nodeId));
-    const config = node?.config || {};
-
-
-    if (node?.node_type === nodeTypes.AIAgent) {
-      //  MEMORY
-      const memoryEl = root.querySelector('.memory-icon') as HTMLImageElement;
-      if (memoryEl) {
-        const isEnabled = !!config?.enable_memory;
-
-        if (node) {
-          node.config = {
-            ...node.config,
-            enable_memory: isEnabled
-          };
-        }
-
-        memoryEl.src = isEnabled
-          ? `${environment.assetsUrl}external-brand/workflow/memory_enabled.svg`
-          : `${environment.assetsUrl}external-brand/workflow/memory_disabled.svg`;
-
-        memoryEl.setAttribute('data-enabled', isEnabled.toString());
-      }
-
-      this.updateAgentTools(nodeId, _clone(config?.tools)) //pass this.toolsArr m aybe
-
-    }
-
-    //  MODEL
-    const selectEl = root.querySelector('.model-select') as HTMLSelectElement;
-    if (selectEl) {
-      selectEl.value = config?.model?.llm_integ || '';
-
-      if (node) {
-        node.config = {
-          ...node.config,
-          model: {
-            ...node.config?.model,
-            llm_integ: config?.model?.llm_integ
-          }
-        };
-      }
-    }
+    this.updateAgentTools(nodeId, _clone(nodeMeta?.tools || []));
   }
 
 

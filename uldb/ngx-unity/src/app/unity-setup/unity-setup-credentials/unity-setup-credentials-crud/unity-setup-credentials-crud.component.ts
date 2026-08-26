@@ -15,7 +15,8 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { UnitySetupCredentials } from '../unity-setup-credentials.type';
-import { DevicesFastByDeviceTypes, deviceTypes, UnitySetupCredentialsCrudService } from './unity-setup-credentials-crud.service';
+import { AtLeastOneRequiredValidator, DevicesFastByDeviceTypes, deviceTypes, UnitySetupCredentialsCrudService } from './unity-setup-credentials-crud.service';
+import { UserGroupType } from 'src/app/shared/SharedEntityTypes/user-mgmt.type';
 
 @Component({
   selector: 'unity-setup-credentials-crud',
@@ -62,6 +63,56 @@ export class UnitySetupCredentialsCrudComponent implements OnInit, OnDestroy {
   devicesToBeRemoved: DevicesFastByDeviceTypes[] = [];
   selectedDevices: DevicesFastByDeviceTypes[] = [];
   devicesLoading: boolean = false;
+
+  userGroups: UserGroupType[] = [];
+  userList: string[] = [];
+
+  userGroupsSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: 'name',
+    keyToSelect: 'uuid',
+    selectAsObject: false,
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block btn-sm',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    appendToBody: true
+  };
+
+  userGroupTexts: IMultiSelectTexts = {
+    checkAll: 'Select all',
+    uncheckAll: 'Uncheck all',
+    checked: 'Group',
+    checkedPlural: 'Groups',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select User Groups',
+    allSelected: 'All Groups',
+  };
+
+  userListSettings: IMultiSelectSettings = {
+    isSimpleArray: true,
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block btn-sm',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    appendToBody: true
+  };
+
+  userTexts: IMultiSelectTexts = {
+    checkAll: 'Select all',
+    uncheckAll: 'Uncheck all',
+    checked: 'User',
+    checkedPlural: 'Users',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select Users',
+    allSelected: 'All Users',
+  };
 
   constructor(private svc: UnitySetupCredentialsCrudService,
     private router: Router,
@@ -138,6 +189,7 @@ export class UnitySetupCredentialsCrudComponent implements OnInit, OnDestroy {
     });
     this.subscribeToSNMPV3SecurityLevel();
     this.subscribeToDeviceMapping();
+    this.subscribeToScope();
   }
 
   subscribeToDeviceMapping() {
@@ -177,6 +229,53 @@ export class UnitySetupCredentialsCrudComponent implements OnInit, OnDestroy {
           this.handleSNMPV3NoAuthNoPriv();
         }
       });
+  }
+
+  subscribeToScope() {
+    this.form.get('scope')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe), distinctUntilChanged()).subscribe((val: string) => {
+      if (val == 'USER_GROUP') {
+        this.addFormControls([
+          { name: 'shared_groups', control: new FormControl([]) },
+          { name: 'shared_users', control: new FormControl([]) },
+        ]);
+        this.form.setValidators(AtLeastOneRequiredValidator(['shared_groups', 'shared_users']));
+        this.form.updateValueAndValidity();
+        if (!this.userGroups.length && !this.userList.length) {
+          this.getDropdownData();
+        }
+      } else {
+        this.removeFormControls(['shared_groups', 'shared_users']);
+        this.form.clearValidators();
+        this.form.updateValueAndValidity();
+      }
+    });
+
+    if (this.form.get('scope')?.value == 'USER_GROUP') {
+      this.form.setValidators(AtLeastOneRequiredValidator(['shared_groups', 'shared_users']));
+      this.form.updateValueAndValidity();
+      this.getDropdownData();
+    }
+  }
+
+  getDropdownData() {
+    this.spinner.start('main');
+    this.userGroups = [];
+    this.userList = [];
+    this.svc.getDropdownData().pipe(takeUntil(this.ngUnsubscribe)).subscribe(({ userGroups, userList }) => {
+      if (userGroups) {
+        this.userGroups = _clone(userGroups);
+      } else {
+        this.userGroups = [];
+        this.notification.error(new Notification("Error while fetching User Groups"));
+      }
+      if (userList) {
+        this.userList = _clone(userList);
+      } else {
+        this.userList = [];
+        this.notification.error(new Notification("Error while fetching User List"));
+      }
+      this.spinner.stop('main');
+    });
   }
 
   addFormControls(controls: Array<{ name: string, control: FormControl }>): void {
@@ -528,6 +627,10 @@ export class UnitySetupCredentialsCrudComponent implements OnInit, OnDestroy {
     this.manageSelectedDevices();
     if (this.form.invalid) {
       this.formErrors = this.utilSvc.validateForm(this.form, this.formValidationMessages, this.formErrors);
+      if (this.form.errors?.['atLeastOneRequired']) {
+        this.formErrors['shared_groups'] = 'At least one Group or User is required';
+        this.formErrors['shared_users'] = 'At least one Group or User is required';
+      }
       this.form.valueChanges
         .subscribe((data: any) => { this.formErrors = this.utilSvc.validateForm(this.form, this.formValidationMessages, this.formErrors); });
       return;

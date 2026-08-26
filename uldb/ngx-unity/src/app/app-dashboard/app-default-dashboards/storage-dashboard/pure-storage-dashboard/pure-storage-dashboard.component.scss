@@ -1,1 +1,174 @@
-@import '../netapp-storage-dashboard/netapp-storage-dashboard.component.scss';
+.stat-val-big {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.executive-summary-row {
+  min-height: 194px;
+}
+
+.auto-remediation-summary-row {
+  min-height: 100px;
+}
+
+.pure-chart-region {
+  min-height: 240px;
+}
+
+.pure-table-region {
+  min-height: 240px;
+}
+
+.chart-panel {
+  min-height: 240px;
+}
+
+.chart-panel-header {
+  min-height: 32px;
+}
+
+.chart-panel-body {
+  min-height: 0;
+}
+
+.pure-chart {
+  flex: 0 0 auto;
+  height: 200px;
+  min-height: 120px;
+}
+
+.storage-table-wrap {
+  max-height: 275px;
+  min-height: 240px;
+}
+
+.storage-table-wrap table {
+  min-width: 100%;
+  width: max-content;
+}
+
+.storage-table-wrap th {
+  background-color: var(--unity-table-header-bg);
+  border-bottom: 1px solid var(--unity-table-border);
+  border-top: 0;
+  color: var(--unity-table-header-text);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  vertical-align: middle;
+  white-space: nowrap;
+  z-index: 3;
+}
+
+.storage-table-wrap td {
+  border-bottom: 1px solid var(--unity-table-border);
+  border-top: 0;
+  color: var(--unity-text-primary);
+  font-size: 12px;
+  line-height: 19px;
+  max-width: 220px;
+  min-width: 90px;
+  overflow: hidden;
+  padding: 8px 12px;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.storage-table-wrap tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.storage-table-wrap td > .truncateText {
+  display: block;
+  max-width: 220px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.storage-table-wrap thead th.col-sorted {
+  background-color: var(--unity-color-primary-light);
+  border-bottom: 2px solid var(--unity-color-primary);
+  color: var(--unity-color-primary);
+}
+
+:host ::ng-deep .storage-table-wrap thead th .fa {
+  color: var(--unity-text-secondary);
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+:host ::ng-deep .storage-table-wrap thead th.col-sorted .fa {
+  color: var(--unity-color-primary);
+}
+
+.widget-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-title-row {
+  min-width: 0;
+}
+
+.info-icon {
+  cursor: help;
+}
+
+.info-icon:hover {
+  color: var(--unity-color-primary);
+}
+
+:host ::ng-deep .pure-storage-dashboard > app-spinner,
+:host ::ng-deep .dashboard-summary-row app-spinner,
+:host ::ng-deep .pure-chart-region app-spinner,
+:host ::ng-deep .pure-table-region app-spinner {
+  bottom: 0;
+  display: block;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 3;
+}
+
+:host ::ng-deep .pure-storage-dashboard > app-spinner .spinner-wrapper,
+:host ::ng-deep .dashboard-summary-row app-spinner .spinner-wrapper,
+:host ::ng-deep .pure-chart-region app-spinner .spinner-wrapper,
+:host ::ng-deep .pure-table-region app-spinner .spinner-wrapper {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.72);
+  bottom: 0;
+  box-sizing: border-box;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  min-height: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+:host ::ng-deep .pure-storage-dashboard > app-spinner .wave-spinner,
+:host ::ng-deep .dashboard-summary-row app-spinner .wave-spinner,
+:host ::ng-deep .pure-chart-region app-spinner .wave-spinner,
+:host ::ng-deep .pure-table-region app-spinner .wave-spinner {
+  margin: 0;
+  position: static;
+  transform: none;
+}
+
+:host ::ng-deep .pure-storage-dashboard > app-spinner .wave-spinner > div,
+:host ::ng-deep .dashboard-summary-row app-spinner .wave-spinner > div,
+:host ::ng-deep .pure-chart-region app-spinner .wave-spinner > div,
+:host ::ng-deep .pure-table-region app-spinner .wave-spinner > div {
+  background-color: var(--unity-color-warning) !important;
+}

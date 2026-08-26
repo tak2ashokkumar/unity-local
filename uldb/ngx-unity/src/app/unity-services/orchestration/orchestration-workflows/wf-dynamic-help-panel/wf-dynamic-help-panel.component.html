@@ -1,0 +1,53 @@
+<div class="right-sidebar position-absolute w-100 h-100 overflow-auto bg-white">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-dark">Help Guide</h5>
+        <button type="button" class="btn btn-link p-0 border-0 shadow-none" aria-label="Close" (click)="onClose()">
+            <i class="fas fa-times text-muted"></i>
+        </button>
+    </div>
+
+    <div class="accordion p-3">
+        <!-- MAIN ACCORDION LOOP -->
+        <div *ngFor="let section of helpSections; let i = index" class="mb-2">
+            <button type="button"
+                class="btn d-flex justify-content-between align-items-center w-100 p-2 border-bottom rounded font-weight-bold text-left shadow-none"
+                [attr.aria-expanded]="openAccordionIndex === i"
+                (click)="toggleAccordion(i)">
+                <span>{{ section.title }}</span>
+                <i class="fas" [ngClass]="{
+             'fa-chevron-down': openAccordionIndex === i,
+             'fa-chevron-right': openAccordionIndex !== i
+           }"></i>
+            </button>
+
+            <div class="accordion-body mt-2" *ngIf="openAccordionIndex === i">
+                <!-- Sub items (with subtitles + description) -->
+                <div *ngIf="section.items" class="accordion mt-2 pl-3">
+                    <div *ngFor="let item of section.items; let j = index" class="mb-1">
+                        <button type="button"
+                            class="btn d-flex justify-content-between align-items-center w-100 p-2 bg-light rounded font-weight-bold text-left shadow-none"
+                            [attr.aria-expanded]="isSubAccordionOpen(i, j)"
+                            (click)="toggleSubAccordion(i, j)">
+                            <span>{{ item.subtitle }}</span>
+                            <i class="fas" [ngClass]="{
+                   'fa-chevron-down': isSubAccordionOpen(i, j),
+                   'fa-chevron-right': !isSubAccordionOpen(i, j)
+                 }"></i>
+                        </button>
+
+                        <div class="accordion-body mt-1 pl-3" *ngIf="isSubAccordionOpen(i, j)">
+                            <p class="medium text-muted" [innerHTML]="item.description"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps (if present) -->
+                <div *ngIf="section.steps" class="mt-2">
+                    <ul class="list-unstyled mb-0 medium text-muted">
+                        <li *ngFor="let step of section.steps" class="mb-2" [innerHTML]="step"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

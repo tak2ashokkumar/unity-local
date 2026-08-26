@@ -1,1 +1,1534 @@
-<p>pure storage works!</p>
+<div class="pure-storage-dashboard d-flex flex-column position-relative" *ngIf="dashboardReady">
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card" *ngIf="dashboardNoData">
+    <div class="card-body bg-white border rounded text-center text-muted py-4">
+      No data available.
+    </div>
+  </div>
+
+  <ng-container *ngIf="!dashboardNoData">
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card" *ngIf="!executiveNoData">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold">Executive Summary</div>
+    <div class="card-body bg-white border rounded p-2 dashboard-summary-row executive-summary-row position-relative">
+      <app-spinner [name]="executiveSummaryLoader" [width]="0"></app-spinner>
+      <div *ngIf="executiveMetricRows.length">
+        <div class="row mx-auto align-items-center py-2 mb-2 no-gutters" [class.col-9]="lastRow" [class.col-10]="!lastRow"
+          *ngFor="let row of executiveMetricRows; let lastRow = last; trackBy: trackByIndex">
+          <div class="col text-center px-4" [class.border-right]="!lastMetric"
+            *ngFor="let metric of row; let lastMetric = last; trackBy: trackByMetric">
+            <div class="d-flex justify-content-center align-items-center mt-1 font-sm metric-trend" *ngIf="metric.trend">
+              <span class="text-success d-inline-flex align-items-center mr-2" [tooltip]="'Arrays trending up'"
+                container="body">
+                <i class="fa fa-arrow-up mr-1"></i>{{metric.trend.up}}
+              </span>
+              <span class="text-danger d-inline-flex align-items-center mr-2" [tooltip]="'Arrays trending down'"
+                container="body">
+                <i class="fa fa-arrow-down mr-1"></i>{{metric.trend.down}}
+              </span>
+              <span class="text-muted d-inline-flex align-items-center" [tooltip]="'Arrays unknown'" container="body">
+                <i class="fa fa-question-circle mr-1"></i>{{metric.trend.unknown}}
+              </span>
+            </div>
+            <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+            <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="text-center text-muted py-3" *ngIf="executiveNoData">
+        No data available.
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-arrays-section"
+    *ngIf="!arraysSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{arraysSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="arraysSection.viewMode !== 'table'"
+          [class.btn-primary]="arraysSection.viewMode === 'table'" [disabled]="!arraysSection.table.columns.length"
+          (click)="toggleArraysView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="arraysSection.viewMode !== 'chart'"
+          [class.btn-primary]="arraysSection.viewMode === 'chart'"
+          (click)="toggleArraysView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <div class="row col-9 mx-auto align-items-center py-2 mb-3 no-gutters" *ngIf="arraysSection.metrics.length">
+        <div class="col text-center px-4" [class.border-right]="!lastMetric"
+          *ngFor="let metric of arraysSection.metrics; let lastMetric = last; trackBy: trackByMetric">
+          <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+          <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="arraysSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="arraysSection.table.criteria.searchValue" [customClass]="'form-control-sm'"
+                (searched)="onArraysSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="arraysSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onArraysSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of arraysSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="arraysSection.table.criteria.sortColumn === col.sortKey ? arraysSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="arraysSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of arraysSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="arraysSection.table.noData">
+                    <td class="text-center text-muted py-3" [attr.colspan]="arraysSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="arraysSection.table.criteria.pageNo"
+              [pageSize]="arraysSection.table.criteria.pageSize" [totalCount]="arraysSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="arraysSection.table.rows.length" [compact]="true"
+              [pageNo]="arraysSection.table.criteria.pageNo" [pageSize]="arraysSection.table.criteria.pageSize"
+              [totalCount]="arraysSection.table.count" (pageChange)="onArraysPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="arraysSection.loading || arraysSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of arraysSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-hosts-section"
+    *ngIf="!hostsSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{hostsSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="hostsSection.viewMode !== 'table'"
+          [class.btn-primary]="hostsSection.viewMode === 'table'" [disabled]="!hostsSection.table.columns.length"
+          (click)="toggleHostsView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="hostsSection.viewMode !== 'chart'"
+          [class.btn-primary]="hostsSection.viewMode === 'chart'"
+          (click)="toggleHostsView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <div class="row col-10 mx-auto align-items-center py-2 mb-3 no-gutters" *ngIf="hostsSection.metrics.length">
+        <div class="col text-center px-4" [class.border-right]="!lastMetric"
+          *ngFor="let metric of hostsSection.metrics; let lastMetric = last; trackBy: trackByMetric">
+          <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+          <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="hostsSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="hostsSection.table.criteria.searchValue" [customClass]="'form-control-sm'"
+                (searched)="onHostsSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="hostsSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onHostsSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of hostsSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="hostsSection.table.criteria.sortColumn === col.sortKey ? hostsSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="hostsSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of hostsSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="hostsSection.table.noData">
+                    <td class="text-center text-muted py-3" [attr.colspan]="hostsSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="hostsSection.table.criteria.pageNo"
+              [pageSize]="hostsSection.table.criteria.pageSize" [totalCount]="hostsSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="hostsSection.table.rows.length" [compact]="true"
+              [pageNo]="hostsSection.table.criteria.pageNo" [pageSize]="hostsSection.table.criteria.pageSize"
+              [totalCount]="hostsSection.table.count" (pageChange)="onHostsPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="hostsSection.loading || hostsSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of hostsSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-host-groups-section"
+    *ngIf="!hostGroupsSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span class="d-inline-flex align-items-center">
+        <span>{{hostGroupsSection.title}}</span>
+        <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="hostGroupsSection.tooltip"
+          [tooltip]="hostGroupsSection.tooltip" container="body"></i>
+      </span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="hostGroupsSection.viewMode !== 'table'"
+          [class.btn-primary]="hostGroupsSection.viewMode === 'table'"
+          [disabled]="!hostGroupsSection.table.columns.length" (click)="toggleHostGroupsView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="hostGroupsSection.viewMode !== 'chart'"
+          [class.btn-primary]="hostGroupsSection.viewMode === 'chart'"
+          (click)="toggleHostGroupsView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <ng-container [ngSwitch]="hostGroupsSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="hostGroupsSection.table.criteria.searchValue"
+                [customClass]="'form-control-sm'" (searched)="onHostGroupsSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="hostGroupsSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onHostGroupsSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of hostGroupsSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="hostGroupsSection.table.criteria.sortColumn === col.sortKey ? hostGroupsSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="hostGroupsSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of hostGroupsSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="hostGroupsSection.table.noData">
+                    <td class="text-center text-muted py-3"
+                      [attr.colspan]="hostGroupsSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="hostGroupsSection.table.criteria.pageNo"
+              [pageSize]="hostGroupsSection.table.criteria.pageSize" [totalCount]="hostGroupsSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="hostGroupsSection.table.rows.length" [compact]="true"
+              [pageNo]="hostGroupsSection.table.criteria.pageNo"
+              [pageSize]="hostGroupsSection.table.criteria.pageSize" [totalCount]="hostGroupsSection.table.count"
+              (pageChange)="onHostGroupsPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="hostGroupsSection.loading || hostGroupsSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of hostGroupsSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-volumes-section"
+    *ngIf="!volumesSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{volumesSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="volumesSection.viewMode !== 'table'"
+          [class.btn-primary]="volumesSection.viewMode === 'table'" [disabled]="!volumesSection.table.columns.length"
+          (click)="toggleVolumesView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="volumesSection.viewMode !== 'chart'"
+          [class.btn-primary]="volumesSection.viewMode === 'chart'"
+          (click)="toggleVolumesView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <div class="row col-9 mx-auto align-items-center py-2 mb-3 no-gutters" *ngIf="volumesSection.metrics.length">
+        <div class="col text-center px-4" [class.border-right]="!lastMetric"
+          *ngFor="let metric of volumesSection.metrics; let lastMetric = last; trackBy: trackByMetric">
+          <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+          <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="volumesSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="volumesSection.table.criteria.searchValue" [customClass]="'form-control-sm'"
+                (searched)="onVolumesSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="volumesSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onVolumesSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of volumesSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="volumesSection.table.criteria.sortColumn === col.sortKey ? volumesSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="volumesSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of volumesSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="volumesSection.table.noData">
+                    <td class="text-center text-muted py-3" [attr.colspan]="volumesSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="volumesSection.table.criteria.pageNo"
+              [pageSize]="volumesSection.table.criteria.pageSize" [totalCount]="volumesSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="volumesSection.table.rows.length" [compact]="true"
+              [pageNo]="volumesSection.table.criteria.pageNo" [pageSize]="volumesSection.table.criteria.pageSize"
+              [totalCount]="volumesSection.table.count" (pageChange)="onVolumesPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="volumesSection.loading || volumesSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of volumesSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-volume-snapshots-section"
+    *ngIf="!volumeSnapshotsSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{volumeSnapshotsSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="volumeSnapshotsSection.viewMode !== 'table'"
+          [class.btn-primary]="volumeSnapshotsSection.viewMode === 'table'"
+          [disabled]="!volumeSnapshotsSection.table.columns.length" (click)="toggleVolumeSnapshotsView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="volumeSnapshotsSection.viewMode !== 'chart'"
+          [class.btn-primary]="volumeSnapshotsSection.viewMode === 'chart'"
+          (click)="toggleVolumeSnapshotsView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <ng-container [ngSwitch]="volumeSnapshotsSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="volumeSnapshotsSection.table.criteria.searchValue"
+                [customClass]="'form-control-sm'" (searched)="onVolumeSnapshotsSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="volumeSnapshotsSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onVolumeSnapshotsSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of volumeSnapshotsSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="volumeSnapshotsSection.table.criteria.sortColumn === col.sortKey ? volumeSnapshotsSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="volumeSnapshotsSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of volumeSnapshotsSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="volumeSnapshotsSection.table.noData">
+                    <td class="text-center text-muted py-3"
+                      [attr.colspan]="volumeSnapshotsSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="volumeSnapshotsSection.table.criteria.pageNo"
+              [pageSize]="volumeSnapshotsSection.table.criteria.pageSize"
+              [totalCount]="volumeSnapshotsSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="volumeSnapshotsSection.table.rows.length" [compact]="true"
+              [pageNo]="volumeSnapshotsSection.table.criteria.pageNo"
+              [pageSize]="volumeSnapshotsSection.table.criteria.pageSize"
+              [totalCount]="volumeSnapshotsSection.table.count" (pageChange)="onVolumeSnapshotsPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="volumeSnapshotsSection.loading || volumeSnapshotsSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of volumeSnapshotsSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-volume-groups-section"
+    *ngIf="!volumeGroupsSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{volumeGroupsSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="volumeGroupsSection.viewMode !== 'table'"
+          [class.btn-primary]="volumeGroupsSection.viewMode === 'table'"
+          [disabled]="!volumeGroupsSection.table.columns.length" (click)="toggleVolumeGroupsView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="volumeGroupsSection.viewMode !== 'chart'"
+          [class.btn-primary]="volumeGroupsSection.viewMode === 'chart'"
+          (click)="toggleVolumeGroupsView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <ng-container [ngSwitch]="volumeGroupsSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="volumeGroupsSection.table.criteria.searchValue"
+                [customClass]="'form-control-sm'" (searched)="onVolumeGroupsSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="volumeGroupsSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onVolumeGroupsSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of volumeGroupsSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="volumeGroupsSection.table.criteria.sortColumn === col.sortKey ? volumeGroupsSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="volumeGroupsSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of volumeGroupsSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="volumeGroupsSection.table.noData">
+                    <td class="text-center text-muted py-3"
+                      [attr.colspan]="volumeGroupsSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="volumeGroupsSection.table.criteria.pageNo"
+              [pageSize]="volumeGroupsSection.table.criteria.pageSize" [totalCount]="volumeGroupsSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="volumeGroupsSection.table.rows.length" [compact]="true"
+              [pageNo]="volumeGroupsSection.table.criteria.pageNo"
+              [pageSize]="volumeGroupsSection.table.criteria.pageSize" [totalCount]="volumeGroupsSection.table.count"
+              (pageChange)="onVolumeGroupsPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="volumeGroupsSection.loading || volumeGroupsSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of volumeGroupsSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-protection-replication-section"
+    *ngIf="!protectionReplicationSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{protectionReplicationSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="protectionReplicationSection.viewMode !== 'table'"
+          [class.btn-primary]="protectionReplicationSection.viewMode === 'table'"
+          [disabled]="!protectionReplicationSection.table.columns.length"
+          (click)="toggleProtectionReplicationView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="protectionReplicationSection.viewMode !== 'chart'"
+          [class.btn-primary]="protectionReplicationSection.viewMode === 'chart'"
+          (click)="toggleProtectionReplicationView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <ng-container [ngSwitch]="protectionReplicationSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="protectionReplicationSection.table.criteria.searchValue"
+                [customClass]="'form-control-sm'" (searched)="onProtectionReplicationSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="protectionReplicationSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onProtectionReplicationSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of protectionReplicationSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="protectionReplicationSection.table.criteria.sortColumn === col.sortKey ? protectionReplicationSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="protectionReplicationSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of protectionReplicationSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="protectionReplicationSection.table.noData">
+                    <td class="text-center text-muted py-3"
+                      [attr.colspan]="protectionReplicationSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="protectionReplicationSection.table.criteria.pageNo"
+              [pageSize]="protectionReplicationSection.table.criteria.pageSize"
+              [totalCount]="protectionReplicationSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="protectionReplicationSection.table.rows.length" [compact]="true"
+              [pageNo]="protectionReplicationSection.table.criteria.pageNo"
+              [pageSize]="protectionReplicationSection.table.criteria.pageSize"
+              [totalCount]="protectionReplicationSection.table.count"
+              (pageChange)="onProtectionReplicationPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="protectionReplicationSection.loading || protectionReplicationSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of protectionReplicationSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-protection-group-snapshots-section"
+    *ngIf="!protectionGroupSnapshotsSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{protectionGroupSnapshotsSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="protectionGroupSnapshotsSection.viewMode !== 'table'"
+          [class.btn-primary]="protectionGroupSnapshotsSection.viewMode === 'table'"
+          [disabled]="!protectionGroupSnapshotsSection.table.columns.length"
+          (click)="toggleProtectionGroupSnapshotsView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="protectionGroupSnapshotsSection.viewMode !== 'chart'"
+          [class.btn-primary]="protectionGroupSnapshotsSection.viewMode === 'chart'"
+          (click)="toggleProtectionGroupSnapshotsView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <ng-container [ngSwitch]="protectionGroupSnapshotsSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="protectionGroupSnapshotsSection.table.criteria.searchValue"
+                [customClass]="'form-control-sm'" (searched)="onProtectionGroupSnapshotsSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="protectionGroupSnapshotsSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onProtectionGroupSnapshotsSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of protectionGroupSnapshotsSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="protectionGroupSnapshotsSection.table.criteria.sortColumn === col.sortKey ? protectionGroupSnapshotsSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="protectionGroupSnapshotsSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of protectionGroupSnapshotsSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="protectionGroupSnapshotsSection.table.noData">
+                    <td class="text-center text-muted py-3"
+                      [attr.colspan]="protectionGroupSnapshotsSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="protectionGroupSnapshotsSection.table.criteria.pageNo"
+              [pageSize]="protectionGroupSnapshotsSection.table.criteria.pageSize"
+              [totalCount]="protectionGroupSnapshotsSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="protectionGroupSnapshotsSection.table.rows.length" [compact]="true"
+              [pageNo]="protectionGroupSnapshotsSection.table.criteria.pageNo"
+              [pageSize]="protectionGroupSnapshotsSection.table.criteria.pageSize"
+              [totalCount]="protectionGroupSnapshotsSection.table.count"
+              (pageChange)="onProtectionGroupSnapshotsPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="protectionGroupSnapshotsSection.loading || protectionGroupSnapshotsSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of protectionGroupSnapshotsSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-active-cluster-section"
+    *ngIf="!activeClusterSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{activeClusterSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="activeClusterSection.viewMode !== 'table'"
+          [class.btn-primary]="activeClusterSection.viewMode === 'table'"
+          [disabled]="!activeClusterSection.table.columns.length" (click)="toggleActiveClusterView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="activeClusterSection.viewMode !== 'chart'"
+          [class.btn-primary]="activeClusterSection.viewMode === 'chart'"
+          (click)="toggleActiveClusterView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <div class="row col-8 mx-auto align-items-center py-2 mb-3 no-gutters" *ngIf="activeClusterSection.metrics.length">
+        <div class="col text-center px-4" [class.border-right]="!lastMetric"
+          *ngFor="let metric of activeClusterSection.metrics; let lastMetric = last; trackBy: trackByMetric">
+          <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+          <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="activeClusterSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="activeClusterSection.table.criteria.searchValue"
+                [customClass]="'form-control-sm'" (searched)="onActiveClusterSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="activeClusterSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onActiveClusterSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of activeClusterSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="activeClusterSection.table.criteria.sortColumn === col.sortKey ? activeClusterSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="activeClusterSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of activeClusterSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="activeClusterSection.table.noData">
+                    <td class="text-center text-muted py-3"
+                      [attr.colspan]="activeClusterSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="activeClusterSection.table.criteria.pageNo"
+              [pageSize]="activeClusterSection.table.criteria.pageSize" [totalCount]="activeClusterSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="activeClusterSection.table.rows.length" [compact]="true"
+              [pageNo]="activeClusterSection.table.criteria.pageNo"
+              [pageSize]="activeClusterSection.table.criteria.pageSize" [totalCount]="activeClusterSection.table.count"
+              (pageChange)="onActiveClusterPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="activeClusterSection.loading || activeClusterSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of activeClusterSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-performance-section"
+    *ngIf="!performanceSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{performanceSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="performanceSection.viewMode !== 'table'"
+          [class.btn-primary]="performanceSection.viewMode === 'table'"
+          [disabled]="!performanceSection.table.columns.length" (click)="togglePerformanceView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="performanceSection.viewMode !== 'chart'"
+          [class.btn-primary]="performanceSection.viewMode === 'chart'"
+          (click)="togglePerformanceView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <div *ngIf="performanceMetricRows.length">
+        <div class="row col-8 mx-auto align-items-center py-2 mb-2 no-gutters"
+          *ngFor="let row of performanceMetricRows; trackBy: trackByIndex">
+          <div class="col text-center px-4" [class.border-right]="!lastMetric"
+            *ngFor="let metric of row; let lastMetric = last; trackBy: trackByMetric">
+            <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+            <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+          </div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="performanceSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="performanceSection.table.criteria.searchValue"
+                [customClass]="'form-control-sm'" (searched)="onPerformanceSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="performanceSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onPerformanceSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of performanceSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="performanceSection.table.criteria.sortColumn === col.sortKey ? performanceSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="performanceSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of performanceSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="performanceSection.table.noData">
+                    <td class="text-center text-muted py-3"
+                      [attr.colspan]="performanceSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="performanceSection.table.criteria.pageNo"
+              [pageSize]="performanceSection.table.criteria.pageSize" [totalCount]="performanceSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="performanceSection.table.rows.length" [compact]="true"
+              [pageNo]="performanceSection.table.criteria.pageNo" [pageSize]="performanceSection.table.criteria.pageSize"
+              [totalCount]="performanceSection.table.count" (pageChange)="onPerformancePageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="performanceSection.loading || performanceSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of performanceSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-capacity-planning-section"
+    *ngIf="!capacityPlanningSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{capacityPlanningSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="capacityPlanningSection.viewMode !== 'table'"
+          [class.btn-primary]="capacityPlanningSection.viewMode === 'table'"
+          [disabled]="!capacityPlanningSection.table.columns.length" (click)="toggleCapacityPlanningView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm"
+          [class.btn-outline-secondary]="capacityPlanningSection.viewMode !== 'chart'"
+          [class.btn-primary]="capacityPlanningSection.viewMode === 'chart'"
+          (click)="toggleCapacityPlanningView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <div class="row col-11 mx-auto align-items-center py-2 mb-3 no-gutters" *ngIf="capacityPlanningSection.metrics.length">
+        <div class="col text-center px-4" [class.border-right]="!lastMetric"
+          *ngFor="let metric of capacityPlanningSection.metrics; let lastMetric = last; trackBy: trackByMetric">
+          <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+          <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="capacityPlanningSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="capacityPlanningSection.table.criteria.searchValue"
+                [customClass]="'form-control-sm'" (searched)="onCapacityPlanningSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="capacityPlanningSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onCapacityPlanningSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of capacityPlanningSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="capacityPlanningSection.table.criteria.sortColumn === col.sortKey ? capacityPlanningSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="capacityPlanningSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of capacityPlanningSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="capacityPlanningSection.table.noData">
+                    <td class="text-center text-muted py-3"
+                      [attr.colspan]="capacityPlanningSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="capacityPlanningSection.table.criteria.pageNo"
+              [pageSize]="capacityPlanningSection.table.criteria.pageSize"
+              [totalCount]="capacityPlanningSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="capacityPlanningSection.table.rows.length" [compact]="true"
+              [pageNo]="capacityPlanningSection.table.criteria.pageNo"
+              [pageSize]="capacityPlanningSection.table.criteria.pageSize" [totalCount]="capacityPlanningSection.table.count"
+              (pageChange)="onCapacityPlanningPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="capacityPlanningSection.loading || capacityPlanningSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of capacityPlanningSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-hardware-section"
+    *ngIf="!hardwareSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{hardwareSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="hardwareSection.viewMode !== 'table'"
+          [class.btn-primary]="hardwareSection.viewMode === 'table'" [disabled]="!hardwareSection.table.columns.length"
+          (click)="toggleHardwareView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="hardwareSection.viewMode !== 'chart'"
+          [class.btn-primary]="hardwareSection.viewMode === 'chart'"
+          (click)="toggleHardwareView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <div class="row col-8 mx-auto align-items-center py-2 mb-3 no-gutters" *ngIf="hardwareSection.metrics.length">
+        <div class="col text-center px-4" [class.border-right]="!lastMetric"
+          *ngFor="let metric of hardwareSection.metrics; let lastMetric = last; trackBy: trackByMetric">
+          <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+          <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="hardwareSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="hardwareSection.table.criteria.searchValue" [customClass]="'form-control-sm'"
+                (searched)="onHardwareSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="hardwareSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onHardwareSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of hardwareSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="hardwareSection.table.criteria.sortColumn === col.sortKey ? hardwareSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="hardwareSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of hardwareSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="hardwareSection.table.noData">
+                    <td class="text-center text-muted py-3" [attr.colspan]="hardwareSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="hardwareSection.table.criteria.pageNo"
+              [pageSize]="hardwareSection.table.criteria.pageSize" [totalCount]="hardwareSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="hardwareSection.table.rows.length" [compact]="true"
+              [pageNo]="hardwareSection.table.criteria.pageNo" [pageSize]="hardwareSection.table.criteria.pageSize"
+              [totalCount]="hardwareSection.table.count" (pageChange)="onHardwarePageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="hardwareSection.loading || hardwareSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of hardwareSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-alerts-section"
+    *ngIf="!alertsSection.hidden">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{alertsSection.title}}</span>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="alertsSection.viewMode !== 'table'"
+          [class.btn-primary]="alertsSection.viewMode === 'table'" [disabled]="!alertsSection.table.columns.length"
+          (click)="toggleAlertsView('table')">
+          Table View
+        </button>
+        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="alertsSection.viewMode !== 'chart'"
+          [class.btn-primary]="alertsSection.viewMode === 'chart'"
+          (click)="toggleAlertsView('chart')">
+          Graph View
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2">
+      <div class="row col-8 mx-auto align-items-center py-2 mb-3 no-gutters" *ngIf="alertsSection.metrics.length">
+        <div class="col text-center px-4" [class.border-right]="!lastMetric"
+          *ngFor="let metric of alertsSection.metrics; let lastMetric = last; trackBy: trackByMetric">
+          <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+          <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="alertsSection.viewMode">
+        <ng-container *ngSwitchCase="'table'">
+          <div class="row align-items-center mb-2">
+            <div class="col-3">
+              <search-box [searchValue]="alertsSection.table.criteria.searchValue" [customClass]="'form-control-sm'"
+                (searched)="onAlertsSearched($event)">
+              </search-box>
+            </div>
+          </div>
+
+          <div class="pure-table-region position-relative">
+            <app-spinner [name]="alertsSection.table.loader" [width]="0"></app-spinner>
+            <div class="d-flex table-responsive storage-table-wrap border rounded bg-white mb-3 position-relative overflow-auto">
+              <table class="table table-sm table-hover mb-0" sortableTable
+                (sorted)="onAlertsSorted($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of alertsSection.table.columns; trackBy: trackByIndex"
+                      [sortable-column]="col.sortKey"
+                      [sort-direction]="alertsSection.table.criteria.sortColumn === col.sortKey ? alertsSection.table.criteria.sortDirection : ''"
+                      [class.col-sorted]="alertsSection.table.criteria.sortColumn === col.sortKey">
+                      {{col.label}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of alertsSection.table.rows; trackBy: trackByRow" truncateText>
+                    <td *ngFor="let cell of row.cells; trackBy: trackByIndex" [tooltip]="cell" container="body">
+                      <span class="truncateText">{{cell}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="alertsSection.table.noData">
+                    <td class="text-center text-muted py-3" [attr.colspan]="alertsSection.table.columns.length || 1">
+                      No data available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <table-entries [pageNo]="alertsSection.table.criteria.pageNo"
+              [pageSize]="alertsSection.table.criteria.pageSize" [totalCount]="alertsSection.table.count">
+            </table-entries>
+            <table-pager *ngIf="alertsSection.table.rows.length" [compact]="true"
+              [pageNo]="alertsSection.table.criteria.pageNo" [pageSize]="alertsSection.table.criteria.pageSize"
+              [totalCount]="alertsSection.table.count" (pageChange)="onAlertsPageChange($event)">
+            </table-pager>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="pure-chart-region position-relative" *ngIf="alertsSection.loading || alertsSection.showChartWidgets">
+            <div class="row mx-n2">
+              <div class="px-2 mb-3" [class.col-12]="chart.span === 12" [class.col-6]="chart.span === 6"
+                [class.col-4]="chart.span === 4" [class.col-3]="chart.span === 3"
+                *ngFor="let chart of alertsSection.charts; trackBy: trackByChart">
+                <div class="chart-panel bg-white border rounded h-100 d-flex flex-column" [ngClass]="'chart-panel-' + chart.key">
+                  <div class="chart-panel-header bg-light border-bottom rounded-top d-flex align-items-center justify-content-start text-left text-uppercase font-sm font-500 text-muted p-1">
+                    <div class="widget-title-row d-flex align-items-center justify-content-start w-100">
+                      <span class="widget-title" [tooltip]="chart.title" container="body">{{chart.title}}</span>
+                      <i class="fa fa-info-circle info-icon text-muted font-sm flex-shrink-0 ml-1" *ngIf="chart.tooltip" [tooltip]="chart.tooltip"
+                        container="body"></i>
+                    </div>
+                  </div>
+                  <div class="chart-panel-body d-flex align-items-center justify-content-center flex-fill p-1 position-relative">
+                    <app-spinner [name]="chart.loader" [width]="0"></app-spinner>
+                    <div echarts [options]="chart.chartData.options" [extentions]="chart.chartData.extensions"
+                      [defaultHeight]="chart.defaultHeight" class="pure-chart d-block w-100"
+                      [ngClass]="['pure-chart-' + chart.chartType, 'pure-chart-key-' + chart.key]"
+                      *ngIf="!chart.loading && chart.hasData">
+                    </div>
+                    <div class="text-center text-muted py-4 w-100" *ngIf="!chart.loading && !chart.hasData">
+                      No data available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="card bg-transparent border-0 shadow-none mb-3 main-section-card pure-auto-remediation-section"
+    *ngIf="!autoRemediationNoData">
+    <div class="card-header bg-transparent border-0 px-0 pt-0 pb-2 text-dark font-weight-bold d-flex justify-content-between align-items-center">
+      <span>{{autoRemediationSummaryTitle}}</span>
+    </div>
+
+    <div class="card-body bg-white border rounded p-2 dashboard-summary-row auto-remediation-summary-row position-relative">
+      <app-spinner [name]="autoRemediationSummaryLoader" [width]="0"></app-spinner>
+      <div class="row col-8 mx-auto align-items-center py-2 mb-2 no-gutters" *ngIf="autoRemediationMetrics.length">
+        <div class="col text-center px-4" [class.border-right]="!lastMetric"
+          *ngFor="let metric of autoRemediationMetrics; let lastMetric = last; trackBy: trackByMetric">
+          <div class="text-muted font-sm font-500 pb-2 text-nowrap">{{metric.label}}</div>
+          <div class="stat-val-big font-weight-bold" [ngClass]="toneClass(metric.tone)">{{metric.value}}</div>
+        </div>
+      </div>
+      <div class="text-center text-muted py-3" *ngIf="autoRemediationNoData">
+        No data available.
+      </div>
+    </div>
+  </div>
+  </ng-container>
+</div>

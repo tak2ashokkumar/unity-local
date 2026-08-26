@@ -1,97 +1,2341 @@
-<div class="netapp-storage-dashboard">
-  <div class="card main-section-card cluster-overview-card">
-    <div class="card-header">{{ data.clusterOverview.title }}</div>
-    <div class="card-body">
-      <div class="cluster-overview-note">{{ clusterOverviewNote }}</div>
-      <div class="row align-items-center no-gutters">
-        <div class="col text-center"
-          *ngFor="let metric of data.clusterOverview.metrics; trackBy: trackByMetric">
-          <div class="stat-val-big" [ngClass]="toneClass(metric.tone)">{{ metric.value }}</div>
-          <div class="text-muted metric-label">{{ metric.label }}</div>
-        </div>
-      </div>
+<div *ngIf="dashboardReady">
+  <div class="card bg-transparent border-0 shadow-none mb-0" *ngIf="dashboardNoData">
+    <div class="card-body text-center text-muted py-4">
+      No data available.
     </div>
   </div>
 
-  <div class="card main-section-card" *ngFor="let section of sections; trackBy: trackByKey">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <span>{{ section.title }}</span>
-      <div class="btn-group btn-group-sm" role="group">
-        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="viewModes[section.key] !== 'table'" [class.btn-primary]="viewModes[section.key] === 'table'" (click)="toggleView(section.key, 'table')">Table View</button>
-        <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="viewModes[section.key] !== 'chart'" [class.btn-primary]="viewModes[section.key] === 'chart'" (click)="toggleView(section.key, 'chart')">Chart View</button>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="row align-items-center mb-3 text-center">
-        <div class="col" *ngFor="let metric of section.metrics; trackBy: trackByMetric">
-          <div class="stat-val-big" [ngClass]="toneClass(metric.tone)">{{ metric.value }}</div>
-          <div class="text-muted metric-label">{{ metric.label }}</div>
-        </div>
-      </div>
-
-      <ng-container *ngIf="viewModes[section.key] === 'table'; else chartView">
-        <div class="table-responsive border rounded storage-table-wrap">
-          <table class="table custom-table table-hover mb-0">
-            <thead>
-              <tr>
-                <th *ngFor="let col of section.columns; trackBy: trackByIndex">{{ col }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of section.rows; trackBy: trackByIndex">
-                <td *ngFor="let cell of row; trackBy: trackByIndex">{{ cell }}</td>
-              </tr>
-              <tr *ngIf="!section.rows.length">
-                <td class="text-center text-muted" [attr.colspan]="section.columns.length">
-                  No data available for the selected filters.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </ng-container>
-
-      <ng-template #chartView>
-        <div class="row">
-          <div class="mb-3" [class.col-md-12]="(chart.span || 12) === 12"
-            [class.col-md-6]="chart.span === 6" [class.col-md-4]="chart.span === 4"
-            [class.col-md-3]="chart.span === 3"
-            *ngFor="let chart of section.charts; trackBy: trackByChart">
-            <div class="card border mb-0 chart-card">
-              <div class="card-header bg-light py-2 small font-weight-bold">{{ chart.title }}</div>
-              <div class="card-body p-1">
-                <div echarts [options]="chart.option" [autoResize]="true" class="netapp-chart"></div>
+  <ng-container *ngIf="!dashboardNoData">
+  <ng-container *ngIf="!clusterOverviewWidgetViewData.hidden">
+    <div class="h5 pb-3 pt-4 mb-0">Cluster Overview</div>
+    <div class="card rounded mb-4">
+      <div class="card-body">
+        <div class="cluster-overview-summary-row position-relative pt-2">
+          <app-spinner [name]="loaderNames.clusterOverviewSummary" [width]="0"></app-spinner>
+          <div *ngIf="clusterOverviewWidgetViewData?.summaryViewData"
+            class="d-flex justify-content-center align-items-center py-3">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Used Capacity</div>
+              <div class="stat-val-big text-primary">{{ clusterOverviewWidgetViewData?.summaryViewData?.usedCapacity ||
+                'N/A'
+                }}</div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Free Capacity</div>
+              <div class="stat-val-big text-primary">{{ clusterOverviewWidgetViewData?.summaryViewData?.freeCapacity ||
+                'N/A'
+                }}</div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Availability</div>
+              <div class="stat-val-big text-success">{{ clusterOverviewWidgetViewData?.summaryViewData?.availability ||
+                0
+                }}%</div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Active Alerts</div>
+              <div class="stat-val-big text-danger">{{ clusterOverviewWidgetViewData?.summaryViewData?.activeAlerts || 0
+                }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Nodes</div>
+              <div class="stat-val-big text-primary">{{ clusterOverviewWidgetViewData?.summaryViewData?.nodes || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Aggregates</div>
+              <div class="stat-val-big text-primary">{{ clusterOverviewWidgetViewData?.summaryViewData?.aggregates || 0
+                }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">SVMs</div>
+              <div class="stat-val-big text-primary">{{ clusterOverviewWidgetViewData?.summaryViewData?.svms || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Volumes</div>
+              <div class="stat-val-big text-primary">{{ clusterOverviewWidgetViewData?.summaryViewData?.volumes || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">LUNs</div>
+              <div class="stat-val-big text-primary">{{ clusterOverviewWidgetViewData?.summaryViewData?.luns || 0 }}
               </div>
             </div>
           </div>
         </div>
-      </ng-template>
+      </div>
     </div>
-  </div>
+  </ng-container>
 
-  <div class="card main-section-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <span>Auto-Remediation Summary</span>
+  <ng-container *ngIf="!nodeInfoAndMetricsViewData.hidden">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="h5 mb-0">Node Info &amp; Metrics</div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="nodeInfoAndMetricsViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setNodeInfoAndMetricsViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="nodeInfoAndMetricsViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setNodeInfoAndMetricsViewType('chart')">Chart View</button>
+      </div>
     </div>
-    <div class="card-body">
-      <div class="row align-items-center text-center">
-        <div class="col border-right">
-          <div class="stat-val-big text-green">1</div>
-          <div class="text-muted metric-label">Auto-Remediations</div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <div *ngIf="nodeInfoAndMetricsViewData?.hasSummaryData || !nodeInfoAndMetricsViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.nodeInfoAndMetricsSummary" [width]="0"></app-spinner>
+          <div *ngIf="nodeInfoAndMetricsViewData?.hasSummaryData"
+            class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Total Nodes</div>
+              <div class="d-flex align-items-baseline justify-content-center">
+                <div class="stat-val-big text-primary mb-0">{{
+                  nodeInfoAndMetricsViewData?.summaryViewData?.totalNodes || 0 }}</div>
+                <div class="trend-line ml-2">
+                  <span class="text-success">
+                    <i class="fas fa-arrow-up mr-1"></i>{{ nodeInfoAndMetricsViewData?.summaryViewData?.upNodes || 0 }}
+                  </span>
+                  <span class="text-danger">
+                    <i class="fas fa-arrow-down mr-1"></i>{{ nodeInfoAndMetricsViewData?.summaryViewData?.downNodes || 0
+                    }}
+                  </span>
+                  <span class="text-muted">
+                    <i class="fas fa-dot-circle mr-1"></i>{{
+                    nodeInfoAndMetricsViewData?.summaryViewData?.unknownNodes || 0 }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">CPU Utilization(Avg)</div>
+              <div class="stat-val-big text-primary">{{
+                nodeInfoAndMetricsViewData?.summaryViewData?.avgCpuUtilization || 0 }}%</div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Memory Utilization(Avg)</div>
+              <div class="stat-val-big text-primary">{{
+                nodeInfoAndMetricsViewData?.summaryViewData?.avgMemUtilization || 0 }}%</div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Network Utilization(Avg)</div>
+              <div class="stat-val-big text-primary">
+                {{nodeInfoAndMetricsViewData?.summaryViewData?.avgNetworkUtilization
+                || 0 }}%</div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">Uptime</div>
+              <div class="stat-val-big text-primary">{{
+                nodeInfoAndMetricsViewData?.summaryViewData?.avgUptime || 'N/A' }}</div>
+            </div>
+          </div>
         </div>
-        <div class="col border-right">
-          <div class="stat-val-big text-green">0 sec</div>
-          <div class="text-muted metric-label">Avg MTTR</div>
+
+        <div *ngIf="nodeInfoAndMetricsViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.nodeInfoAndMetricsTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="nodeInfoAndMetricsTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onNodeInfoAndMetricsSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border rounded storage-table-scroll mb-3">
+            <table class="table table-sm  table-sm mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onNodeInfoAndMetricsSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>Cluster</th>
+                  <th sortable-column="name"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'name')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'name')">Node Name</th>
+                  <th sortable-column="model"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'model')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'model')">Model</th>
+                  <th sortable-column="os"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'os')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'os')">OS Version</th>
+                  <th sortable-column="cpu"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'cpu')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'cpu')">CPU Usage</th>
+                  <th sortable-column="mem"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'mem')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'mem')">Memory Usage</th>
+                  <th sortable-column="net"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'net')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'net')">Net Throughput</th>
+                  <th sortable-column="rx"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'rx')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'rx')">IOPS (Read/Write)
+                  </th>
+                  <th sortable-column="rxLat"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'rxLat')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'rxLat')">Latency
+                    (Read/Write)</th>
+                  <th sortable-column="uptime"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'uptime')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'uptime')">Uptime</th>
+                  <th class="text-center" sortable-column="status"
+                    [sort-direction]="getTableSortDirection(nodeInfoAndMetricsTableCriteria, 'status')"
+                    [class.col-sorted]="isTableSortedColumn(nodeInfoAndMetricsTableCriteria, 'status')">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of nodeInfoAndMetricsViewData.tableViewData; trackBy: trackByNodeInfoAndMetricsRow"
+                  truncateText>
+                  <td class="tdw-7">
+                    <div [tooltip]="row.cluster">{{ row.cluster }}</div>
+                  </td>
+                  <td class="tdw-7">
+                    <div [tooltip]="row.name">{{ row.name }}</div>
+                  </td>
+                  <td class="tdw-7">
+                    <div [tooltip]="row.model">{{ row.model }}</div>
+                  </td>
+                  <td class="tdw-7">
+                    <div [tooltip]="row.os">{{ row.os }}</div>
+                  </td>
+                  <td class="node-utilization-column w-10">
+                    <div class="font-xs-sm font-500 text-dark mb-1">{{ row.cpu }}</div>
+                    <div class="progress node-utilization-progress bg-light">
+                      <div class="progress-bar" [ngClass]="row.cpuProgressClass" role="progressbar"
+                        [style.width.%]="row.cpuPercent" [attr.aria-valuenow]="row.cpuPercent" aria-valuemin="0"
+                        aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                  <td class="node-utilization-column w-10">
+                    <div class="font-xs-sm font-500 text-dark mb-1">{{ row.mem }}</div>
+                    <div class="progress node-utilization-progress bg-light">
+                      <div class="progress-bar" [ngClass]="row.memProgressClass" role="progressbar"
+                        [style.width.%]="row.memPercent" [attr.aria-valuenow]="row.memPercent" aria-valuemin="0"
+                        aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                  <td class="tdw-7">
+                    <div [tooltip]="row.net">{{ row.net }}</div>
+                  </td>
+                  <td class="tdw-7">
+                    <div [tooltip]="row.readWriteIops">{{ row.readWriteIops }}</div>
+                  </td>
+                  <td class="tdw-7">
+                    <div [tooltip]="row.readWriteLatency">{{ row.readWriteLatency }}</div>
+                  </td>
+                  <td class="tdw-7">
+                    <div [tooltip]="row.uptime">{{ row.uptime }}</div>
+                  </td>
+                  <td class="text-center w-10">
+                    <i class="fa font-lg" [ngClass]="[row.statusIcon, row.statusClass]" [tooltip]="row.status"></i>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="nodeInfoAndMetricsViewData.tableViewData.length"
+            [pageNo]="nodeInfoAndMetricsTableCriteria.pageNo" [pageSize]="nodeInfoAndMetricsTableCriteria.pageSize"
+            [totalCount]="nodeInfoAndMetricsViewData.tableCount"></table-entries>
+          <table-pager *ngIf="nodeInfoAndMetricsViewData.tableViewData.length"
+            [pageNo]="nodeInfoAndMetricsTableCriteria.pageNo" [pageSize]="nodeInfoAndMetricsTableCriteria.pageSize"
+            [totalCount]="nodeInfoAndMetricsViewData.tableCount"
+            (pageChange)="onNodeInfoAndMetricsPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.nodeInfoAndMetricsTable && !nodeInfoAndMetricsViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
         </div>
-        <div class="col border-right">
-          <div class="stat-val-big text-green">0%</div>
-          <div class="text-muted metric-label">Runbook Success</div>
+
+        <div
+          *ngIf="nodeInfoAndMetricsViewData.viewType === 'chart' && (!nodeInfoAndMetricsViewData.chartLoaded || nodeInfoAndMetricsViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-3">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.cpuUsageNodeDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">CPU Usage Node Distribution</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(nodeInfoAndMetricsViewData?.chartViewData?.cpuUsageNodeDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(nodeInfoAndMetricsViewData?.chartViewData?.cpuUsageNodeDistributionChartData); else cpuUsageNodeDistributionEmpty"
+                  echarts
+                  [options]="nodeInfoAndMetricsViewData?.chartViewData?.cpuUsageNodeDistributionChartData?.options"
+                  [extentions]="nodeInfoAndMetricsViewData?.chartViewData?.cpuUsageNodeDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #cpuUsageNodeDistributionEmpty>
+                  <div *ngIf="!widgetLoading.cpuUsageNodeDistribution" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.memUsageNodeDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Memory Usage Node Distribution</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(nodeInfoAndMetricsViewData?.chartViewData?.memUsageNodeDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(nodeInfoAndMetricsViewData?.chartViewData?.memUsageNodeDistributionChartData); else memUsageNodeDistributionEmpty"
+                  echarts
+                  [options]="nodeInfoAndMetricsViewData?.chartViewData?.memUsageNodeDistributionChartData?.options"
+                  [extentions]="nodeInfoAndMetricsViewData?.chartViewData?.cpuUsageNodeDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #memUsageNodeDistributionEmpty>
+                  <div *ngIf="!widgetLoading.memUsageNodeDistribution" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.networkThroughput" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top 10 Network Throughput (Gbps)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(nodeInfoAndMetricsViewData?.chartViewData?.networkThroughputChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(nodeInfoAndMetricsViewData?.chartViewData?.networkThroughputChartData); else networkThroughputEmpty"
+                  echarts [options]="nodeInfoAndMetricsViewData?.chartViewData?.networkThroughputChartData?.options"
+                  [extentions]="nodeInfoAndMetricsViewData?.chartViewData?.cpuUsageNodeDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #networkThroughputEmpty>
+                  <div *ngIf="!widgetLoading.networkThroughput" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.iopsTopNodes" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top 10 Read/Write IOPS by Node (K)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(nodeInfoAndMetricsViewData?.chartViewData?.iopsTopNodesChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(nodeInfoAndMetricsViewData?.chartViewData?.iopsTopNodesChartData); else iopsTopNodesEmpty"
+                  echarts [options]="nodeInfoAndMetricsViewData?.chartViewData?.iopsTopNodesChartData?.options"
+                  [extentions]="nodeInfoAndMetricsViewData?.chartViewData?.cpuUsageNodeDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #iopsTopNodesEmpty>
+                  <div *ngIf="!widgetLoading.iopsTopNodes" class="text-center text-muted py-4">No data available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col">
-          <div class="stat-val-big text-danger">0</div>
-          <div class="text-muted metric-label">Runbook Failures</div>
+
+        <div
+          *ngIf="nodeInfoAndMetricsViewData.viewType === 'chart' && (!nodeInfoAndMetricsViewData.chartLoaded || nodeInfoAndMetricsViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-12">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.devWriteThroughput" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top 10 Dev/Write Throughput</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(nodeInfoAndMetricsViewData?.chartViewData?.devWriteThroughputChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(nodeInfoAndMetricsViewData?.chartViewData?.devWriteThroughputChartData); else devWriteThroughputEmpty"
+                  echarts [options]="nodeInfoAndMetricsViewData?.chartViewData?.devWriteThroughputChartData?.options"
+                  [extentions]="nodeInfoAndMetricsViewData?.chartViewData?.cpuUsageNodeDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #devWriteThroughputEmpty>
+                  <div *ngIf="!widgetLoading.devWriteThroughput" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </ng-container>
+
+  <ng-container *ngIf="!aggregateOverviewViewData.hidden">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="h5 mb-0">Aggregate Overview</div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="aggregateOverviewViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setAggregateOverviewViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="aggregateOverviewViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setAggregateOverviewViewType('chart')">Chart View</button>
+      </div>
+    </div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div *ngIf="aggregateOverviewViewData?.hasSummaryData || !aggregateOverviewViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.aggregateOverviewSummary" [width]="0"></app-spinner>
+          <div *ngIf="aggregateOverviewViewData?.hasSummaryData"
+            class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Total Aggregates</div>
+              <div class="d-flex align-items-baseline justify-content-center">
+                <div class="stat-val-big text-primary">
+                  {{ aggregateOverviewViewData?.summaryViewData?.totalAggregates || 0 }}
+                </div>
+                <div class="trend-line ml-2">
+                  <span class="text-success">
+                    <i class="fas fa-arrow-up mr-1"></i>{{ aggregateOverviewViewData?.summaryViewData?.onlineAggregates
+                    || 0 }}
+                  </span>
+                  <span class="text-danger">
+                    <i class="fas fa-arrow-down mr-1"></i>{{
+                    aggregateOverviewViewData?.summaryViewData?.offlineAggregates
+                    || 0 }}
+                  </span>
+                  <span class="text-muted">
+                    <i class="fas fa-dot-circle mr-1"></i>{{
+                    aggregateOverviewViewData?.summaryViewData?.unknownAggregates
+                    || 0 }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Used Capacity</div>
+              <div class="stat-val-big text-primary">
+                {{ aggregateOverviewViewData?.summaryViewData?.usedCapacity || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Free Capacity</div>
+              <div class="stat-val-big text-primary">
+                {{ aggregateOverviewViewData?.summaryViewData?.freeCapacity || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">Overall Utilization</div>
+              <div class="stat-val-big text-primary">
+                {{ aggregateOverviewViewData?.summaryViewData?.utilizationPercent || 0 }}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="aggregateOverviewViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.aggregateOverviewTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="aggregateOverviewTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onAggregateOverviewSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border storage-table-scroll rounded mb-3">
+            <table class="table table-sm  table-sm mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onAggregateOverviewSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>Cluster</th>
+                  <th sortable-column="name"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'name')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'name')">Aggregate Name</th>
+                  <th sortable-column="total"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'total')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'total')">Total Capacity
+                  </th>
+                  <th sortable-column="used"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'used')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'used')">Used Capacity</th>
+                  <th sortable-column="free"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'free')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'free')">Free Capacity</th>
+                  <th sortable-column="util"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'util')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'util')">Utilization</th>
+                  <th sortable-column="nodes"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'nodes')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'nodes')">Nodes</th>
+                  <th sortable-column="raid"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'raid')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'raid')">RAID Type</th>
+                  <th sortable-column="state"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'state')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'state')">Aggregate State
+                  </th>
+                  <th sortable-column="snapUsed"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'snapUsed')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'snapUsed')">Snapshot Used
+                  </th>
+                  <th sortable-column="nearlyFull"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'nearlyFull')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'nearlyFull')">Nearly Full
+                  </th>
+                  <th class="text-center" sortable-column="status"
+                    [sort-direction]="getTableSortDirection(aggregateOverviewTableCriteria, 'status')"
+                    [class.col-sorted]="isTableSortedColumn(aggregateOverviewTableCriteria, 'status')">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of aggregateOverviewViewData.tableViewData; trackBy: trackByAggregateOverviewRow"
+                  truncateText>
+                  <td class="text-primary font-weight-bold tdw-6">
+                    <div [tooltip]="row.cluster">{{ row.cluster }}</div>
+                  </td>
+                  <td class="text-primary font-weight-bold tdw-6">
+                    <div [tooltip]="row.name">{{ row.name }}</div>
+                  </td>
+                  <td class="tdw-6">
+                    <div [tooltip]="row.total">{{ row.total }}</div>
+                  </td>
+                  <td class="tdw-6">
+                    <div [tooltip]="row.used">{{ row.used }}</div>
+                  </td>
+                  <td class="tdw-6">
+                    <div [tooltip]="row.free">{{ row.free }}</div>
+                  </td>
+                  <td class="storage-utilization-column w-10">
+                    <div class="font-xs-sm font-500 text-dark mb-1">{{ row.util }}</div>
+                    <div class="progress storage-utilization-progress bg-light">
+                      <div class="progress-bar" [ngClass]="row.utilProgressClass" role="progressbar"
+                        [style.width.%]="row.utilPercent" [attr.aria-valuenow]="row.utilPercent" aria-valuemin="0"
+                        aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                  <td class="tdw-6">
+                    <div [tooltip]="row.nodes">{{ row.nodes }}</div>
+                  </td>
+                  <td class="tdw-6">
+                    <div [tooltip]="row.raid">{{ row.raid }}</div>
+                  </td>
+                  <td><span class="badge" [ngClass]="row.stateBadgeClass">{{ row.state }}</span></td>
+                  <td class="storage-utilization-column w-10">
+                    <div class="font-xs-sm font-500 text-dark mb-1">{{ row.snapUsed }}</div>
+                    <div class="progress storage-utilization-progress bg-light">
+                      <div class="progress-bar" [ngClass]="row.snapshotProgressClass" role="progressbar"
+                        [style.width.%]="row.snapshotPercent" [attr.aria-valuenow]="row.snapshotPercent"
+                        aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                  <td><span class="badge" [ngClass]="row.nearlyFullBadgeClass">{{ row.nearlyFull }}</span>
+                  </td>
+                  <td class="text-center w-6"><i class="fa font-lg" [ngClass]="[row.statusIcon, row.statusClass]"
+                      [tooltip]="row.status"></i></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="aggregateOverviewViewData.tableViewData.length"
+            [pageNo]="aggregateOverviewTableCriteria.pageNo" [pageSize]="aggregateOverviewTableCriteria.pageSize"
+            [totalCount]="aggregateOverviewViewData.tableCount"></table-entries>
+          <table-pager *ngIf="aggregateOverviewViewData.tableViewData.length"
+            [pageNo]="aggregateOverviewTableCriteria.pageNo" [pageSize]="aggregateOverviewTableCriteria.pageSize"
+            [totalCount]="aggregateOverviewViewData.tableCount"
+            (pageChange)="onAggregateOverviewPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.aggregateOverviewTable && !aggregateOverviewViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
+        </div>
+
+        <div
+          *ngIf="aggregateOverviewViewData.viewType === 'chart' && (!aggregateOverviewViewData.chartLoaded || aggregateOverviewViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.aggregateCapacityDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Aggregate Capacity Distribution</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(aggregateOverviewViewData?.chartViewData?.capacityDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(aggregateOverviewViewData?.chartViewData?.capacityDistributionChartData); else aggregateCapacityDistributionEmpty"
+                  echarts [options]="aggregateOverviewViewData?.chartViewData?.capacityDistributionChartData?.options"
+                  class="chart"></div>
+                <ng-template #aggregateCapacityDistributionEmpty>
+                  <div *ngIf="!widgetLoading.aggregateCapacityDistribution" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.aggregateUtilization" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Aggregate Utilization (%)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(aggregateOverviewViewData?.chartViewData?.utilizationChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(aggregateOverviewViewData?.chartViewData?.utilizationChartData); else aggregateUtilizationEmpty"
+                  echarts [options]="aggregateOverviewViewData?.chartViewData?.utilizationChartData?.options"
+                  class="chart"></div>
+                <ng-template #aggregateUtilizationEmpty>
+                  <div *ngIf="!widgetLoading.aggregateUtilization" class="text-center text-muted py-4">No data
+                    available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.aggregateNearlyFull" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                  <span>Nearly Full Aggregates</span>
+                  <span class="text-muted ml-2" tooltip="Aggregates above 85% utilization">
+                    <i class="fa fa-info-circle" style="font-size: 11px;"></i>
+                  </span>
+                </div>
+                <span class="badge badge-danger" style="font-size: 9px;">
+                  {{ aggregateOverviewViewData?.chartViewData?.nearlyFullChartData?.length || 0 }}
+                </span>
+              </div>
+              <div class="card-body p-0 nearly-full-list"
+                [ngClass]="getChartBodyClass(aggregateOverviewViewData?.chartViewData?.nearlyFullChartData)">
+                <ng-container
+                  *ngIf="isWidgetDataAvailable(aggregateOverviewViewData?.chartViewData?.nearlyFullChartData); else aggregateNearlyFullEmpty">
+                  <div *ngFor="let aggregate of aggregateOverviewViewData?.chartViewData?.nearlyFullChartData"
+                    class="px-2 py-1">
+                    <div class="d-flex align-items-center">
+                      <div class="nearly-full-name text-truncate w-15" [tooltip]="aggregate.name"
+                        [ngClass]="aggregate.severity === 'critical' ? 'text-danger' : 'text-warning'">
+                        {{ aggregate.name }}
+                      </div>
+                      <div class="progress nearly-full-progress mx-2 flex-grow-1">
+                        <div class="progress-bar"
+                          [ngClass]="aggregate.severity === 'critical' ? 'bg-danger' : 'bg-warning'" role="progressbar"
+                          [style.width]="aggregate.util"></div>
+                      </div>
+                      <div class="nearly-full-util"
+                        [ngClass]="aggregate.severity === 'critical' ? 'text-danger' : 'text-warning'">
+                        {{ aggregate.util }}
+                      </div>
+                      <span class="badge ml-2 nearly-full-badge p-1 badge-pill"
+                        [ngClass]="aggregate.severity === 'critical' ? 'badge-danger' : 'badge-warning text-dark'">
+                        {{ aggregate.severity === 'critical' ? 'Critical' : 'Warning' }}
+                      </span>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-template #aggregateNearlyFullEmpty>
+                  <div *ngIf="!widgetLoading.aggregateNearlyFull" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          *ngIf="aggregateOverviewViewData.viewType === 'chart' && (!aggregateOverviewViewData.chartLoaded || aggregateOverviewViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-6">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.aggregateTop10Largest" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top 10 Largest Aggregates (TB)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(aggregateOverviewViewData?.chartViewData?.top10LargestChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(aggregateOverviewViewData?.chartViewData?.top10LargestChartData); else aggregateTop10LargestEmpty"
+                  echarts [options]="aggregateOverviewViewData?.chartViewData?.top10LargestChartData?.options"
+                  class="chart"></div>
+                <ng-template #aggregateTop10LargestEmpty>
+                  <div *ngIf="!widgetLoading.aggregateTop10Largest" class="text-center text-muted py-4">No data
+                    available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.aggregateGrowthTrend" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Aggregate Growth Trend (PB)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(aggregateOverviewViewData?.chartViewData?.aggregateGrowthTrendChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(aggregateOverviewViewData?.chartViewData?.aggregateGrowthTrendChartData); else aggregateGrowthTrendEmpty"
+                  echarts [options]="aggregateOverviewViewData?.chartViewData?.aggregateGrowthTrendChartData?.options"
+                  [extentions]="aggregateOverviewViewData?.chartViewData?.aggregateGrowthTrendChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #aggregateGrowthTrendEmpty>
+                  <div *ngIf="!widgetLoading.aggregateGrowthTrend" class="text-center text-muted py-4">No data
+                    available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!svmOverviewViewData.hidden">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="h5 mb-0">Storage Virtual Machine (SVM)</div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="svmOverviewViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setSvmOverviewViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="svmOverviewViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setSvmOverviewViewType('chart')">Chart View</button>
+      </div>
+    </div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div *ngIf="svmOverviewViewData?.hasSummaryData || !svmOverviewViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.svmOverviewSummary" [width]="0"></app-spinner>
+          <div *ngIf="svmOverviewViewData?.hasSummaryData"
+            class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2 text-nowrap">Total SVMs</div>
+              <div class="d-flex align-items-baseline justify-content-center">
+                <div class="stat-val-big text-primary">
+                  {{ svmOverviewViewData?.summaryViewData?.totalSVMs || 0 }}
+                </div>
+                <div class="trend-line ml-2">
+                  <span class="text-success">
+                    <i class="fas fa-arrow-up mr-1"></i>{{ svmOverviewViewData?.summaryViewData?.runningSVMs || 0 }}
+                  </span>
+                  <span class="text-danger">
+                    <i class="fas fa-arrow-down mr-1"></i>{{ svmOverviewViewData?.summaryViewData?.stoppedSVMs || 0 }}
+                  </span>
+                  <span class="text-muted">
+                    <i class="fas fa-dot-circle mr-1"></i>{{ svmOverviewViewData?.summaryViewData?.unknownSVMs || 0 }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2 text-nowrap">Capacity Used(Avg)</div>
+              <div class="stat-val-big text-primary">
+                {{ svmOverviewViewData?.summaryViewData?.avgCapacityUsed || 'N/A' }}
+              </div>
+            </div>
+
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="d-flex align-items-center pb-2 text-nowrap">
+                <span class="text-muted font-sm font-500">Avg IOPS</span>
+                <span class="text-success font-xs font-weight-bold ml-1">
+                  R {{ svmOverviewViewData?.summaryViewData?.avgIopsRead || 'N/A' }}
+                </span>
+                <span class="text-primary font-xs font-weight-bold ml-1">
+                  W {{ svmOverviewViewData?.summaryViewData?.avgIopsWrite || 'N/A' }}
+                </span>
+              </div>
+              <div class="stat-val-big"
+                [ngClass]="svmOverviewViewData?.summaryViewData?.avgIops ? 'text-primary' : 'text-muted'">
+                {{ svmOverviewViewData?.summaryViewData?.avgIops || 'N/A' }}
+              </div>
+            </div>
+
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="d-flex align-items-center pb-2 text-nowrap">
+                <span class="text-muted font-sm font-500">Avg Latency</span>
+                <span class="text-success font-xs font-weight-bold ml-1">
+                  R {{ svmOverviewViewData?.summaryViewData?.avgLatencyRead || 'N/A' }}
+                </span>
+                <span class="text-primary font-xs font-weight-bold ml-1">
+                  W {{ svmOverviewViewData?.summaryViewData?.avgLatencyWrite || 'N/A' }}
+                </span>
+              </div>
+              <div class="stat-val-big text-primary">
+                {{ svmOverviewViewData?.summaryViewData?.avgLatency || 'N/A' }}
+              </div>
+            </div>
+
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2 text-nowrap">Throughput (Avg)</div>
+              <div class="stat-val-big text-primary">
+                {{ svmOverviewViewData?.summaryViewData?.avgThroughput || 'N/A' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="svmOverviewViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.svmOverviewTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="svmOverviewTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onSvmOverviewSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border rounded storage-table-scroll mb-3">
+            <table class="table table-sm  mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onSvmOverviewSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>Cluster</th>
+                  <th sortable-column="name" [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'name')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'name')">SVM Name</th>
+                  <th sortable-column="state"
+                    [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'state')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'state')">State</th>
+                  <th sortable-column="vols" [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'vols')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'vols')">Volume Count</th>
+                  <th sortable-column="luns" [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'luns')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'luns')">LUN Count</th>
+                  <th sortable-column="cap" [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'cap')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'cap')">Capacity Used</th>
+                  <th sortable-column="rx" [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'rx')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'rx')">IOPS (Read/Write)</th>
+                  <th sortable-column="rxLat"
+                    [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'rxLat')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'rxLat')">Latency (Read/Write)
+                  </th>
+                  <th sortable-column="throughput"
+                    [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'throughput')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'throughput')">Throughput</th>
+                  <th class="text-center" sortable-column="status"
+                    [sort-direction]="getTableSortDirection(svmOverviewTableCriteria, 'status')"
+                    [class.col-sorted]="isTableSortedColumn(svmOverviewTableCriteria, 'status')">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of svmOverviewViewData.tableViewData; trackBy: trackBySvmOverviewRow" truncateText>
+                  <td class="text-primary font-weight-bold tdw-12">
+                    <div [tooltip]="row.cluster">{{ row.cluster }}</div>
+                  </td>
+                  <td class="text-primary font-weight-bold tdw-12">
+                    <div [tooltip]="row.name">{{ row.name }}</div>
+                  </td>
+                  <td><span class="badge" [ngClass]="row.stateBadgeClass">{{ row.state }}</span></td>
+                  <td class="tdw-8">
+                    <div [tooltip]="row.vols">{{ row.vols }}</div>
+                  </td>
+                  <td class="tdw-8">
+                    <div [tooltip]="row.luns">{{ row.luns }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.cap">{{ row.cap }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.readWriteIops">{{ row.readWriteIops }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.readWriteLatency">{{ row.readWriteLatency }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.throughput">{{ row.throughput }}</div>
+                  </td>
+                  <td class="text-center"><i class="fa font-lg" [ngClass]="[row.statusIcon, row.statusClass]"
+                      [tooltip]="row.status"></i></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="svmOverviewViewData.tableViewData.length" [pageNo]="svmOverviewTableCriteria.pageNo"
+            [pageSize]="svmOverviewTableCriteria.pageSize"
+            [totalCount]="svmOverviewViewData.tableCount"></table-entries>
+          <table-pager *ngIf="svmOverviewViewData.tableViewData.length" [pageNo]="svmOverviewTableCriteria.pageNo"
+            [pageSize]="svmOverviewTableCriteria.pageSize" [totalCount]="svmOverviewViewData.tableCount"
+            (pageChange)="onSvmOverviewPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.svmOverviewTable && !svmOverviewViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
+        </div>
+
+        <div
+          *ngIf="svmOverviewViewData.viewType === 'chart' && (!svmOverviewViewData.chartLoaded || svmOverviewViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.capacityBySvm" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Capacity by SVM (TB)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(svmOverviewViewData?.chartViewData?.capacityBySvmChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(svmOverviewViewData?.chartViewData?.capacityBySvmChartData); else capacityBySvmEmpty"
+                  echarts [options]="svmOverviewViewData?.chartViewData?.capacityBySvmChartData?.options"
+                  [extentions]="svmOverviewViewData?.chartViewData?.capacityBySvmChartData?.extensions" class="chart">
+                </div>
+                <ng-template #capacityBySvmEmpty>
+                  <div *ngIf="!widgetLoading.capacityBySvm" class="text-center text-muted py-4">No data available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.volumeCountBySvm" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6 d-flex align-items-center">
+                <span>Volume Count by SVM</span>
+                <span class="text-muted ml-2 cursor-pointer" [popover]="svmVolumeCountLegend"
+                  triggers="mouseenter:mouseleave" placement="right" container="body">
+                  <i class="fa fa-info-circle"></i>
+                </span>
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(svmOverviewViewData?.chartViewData?.volumeCountBySvmChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(svmOverviewViewData?.chartViewData?.volumeCountBySvmChartData); else volumeCountBySvmEmpty"
+                  echarts [options]="svmOverviewViewData?.chartViewData?.volumeCountBySvmChartData?.options"
+                  [extentions]="svmOverviewViewData?.chartViewData?.volumeCountBySvmChartData?.extensions"
+                  class="chart">
+                </div>
+                <ng-template #volumeCountBySvmEmpty>
+                  <div *ngIf="!widgetLoading.volumeCountBySvm" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.lunCountBySvm" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">LUN Count by SVM</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(svmOverviewViewData?.chartViewData?.lunCountBySvmChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(svmOverviewViewData?.chartViewData?.lunCountBySvmChartData); else lunCountBySvmEmpty"
+                  echarts [options]="svmOverviewViewData?.chartViewData?.lunCountBySvmChartData?.options"
+                  [extentions]="svmOverviewViewData?.chartViewData?.lunCountBySvmChartData?.extensions" class="chart">
+                </div>
+                <ng-template #lunCountBySvmEmpty>
+                  <div *ngIf="!widgetLoading.lunCountBySvm" class="text-center text-muted py-4">No data available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="svmOverviewViewData.viewType === 'chart' && (!svmOverviewViewData.chartLoaded || svmOverviewViewData.hasChartData)"
+          class="row mx-3 mb-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.throughputBySvm" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Throughput by SVM (GB/s)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(svmOverviewViewData?.chartViewData?.throughputBySvmChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(svmOverviewViewData?.chartViewData?.throughputBySvmChartData); else throughputBySvmEmpty"
+                  echarts [options]="svmOverviewViewData?.chartViewData?.throughputBySvmChartData?.options"
+                  [extentions]="svmOverviewViewData?.chartViewData?.throughputBySvmChartData?.extensions" class="chart">
+                </div>
+                <ng-template #throughputBySvmEmpty>
+                  <div *ngIf="!widgetLoading.throughputBySvm" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.top10CapacityConsumers" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top 10 Capacity Consumers</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(svmOverviewViewData?.chartViewData?.top10CapacityConsumersChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(svmOverviewViewData?.chartViewData?.top10CapacityConsumersChartData); else top10CapacityConsumersEmpty"
+                  echarts [options]="svmOverviewViewData?.chartViewData?.top10CapacityConsumersChartData?.options"
+                  [extentions]="svmOverviewViewData?.chartViewData?.top10CapacityConsumersChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #top10CapacityConsumersEmpty>
+                  <div *ngIf="!widgetLoading.top10CapacityConsumers" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.topPerformingSvms" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top Performing SVMs (IOPS)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(svmOverviewViewData?.chartViewData?.topPerformingSvmsChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(svmOverviewViewData?.chartViewData?.topPerformingSvmsChartData); else topPerformingSvmsEmpty"
+                  echarts [options]="svmOverviewViewData?.chartViewData?.topPerformingSvmsChartData?.options"
+                  [extentions]="svmOverviewViewData?.chartViewData?.topPerformingSvmsChartData?.extensions"
+                  class="chart">
+                </div>
+                <ng-template #topPerformingSvmsEmpty>
+                  <div *ngIf="!widgetLoading.topPerformingSvms" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #svmVolumeCountLegend>
+      <div class="font-weight-bold mb-1">Volume Count Legend</div>
+      <div class="text-muted font-xs mb-2">Each bubble represents an SVM, colored by volume count:</div>
+      <div class="d-flex justify-content-between align-items-center py-1 border-bottom font-xs">
+        <span><i class="fa fa-circle text-success mr-1"></i>Healthy / Low</span>
+        <span class="text-muted">&le; 20 Volumes</span>
+      </div>
+      <div class="d-flex justify-content-between align-items-center py-1 border-bottom font-xs">
+        <span><i class="fa fa-circle svm-volume-warning mr-1"></i>Warning / Medium</span>
+        <span class="text-muted">21 - 35 Volumes</span>
+      </div>
+      <div class="d-flex justify-content-between align-items-center pt-1 font-xs">
+        <span><i class="fa fa-circle text-danger mr-1"></i>Critical / High</span>
+        <span class="text-muted">&gt; 35 Volumes</span>
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <ng-container *ngIf="!volumeOverviewViewData.hidden">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="h5 mb-0">Volume Overview</div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="volumeOverviewViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setVolumeOverviewViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="volumeOverviewViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setVolumeOverviewViewType('chart')">Chart View</button>
+      </div>
+    </div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div *ngIf="volumeOverviewViewData?.hasSummaryData || !volumeOverviewViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.volumeOverviewSummary" [width]="0"></app-spinner>
+          <div *ngIf="volumeOverviewViewData?.hasSummaryData"
+            class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Total Volumes</div>
+              <div class="d-flex align-items-baseline justify-content-center">
+                <div class="stat-val-big text-primary mb-0">{{ volumeOverviewViewData?.summaryViewData?.totalVolumes
+                  || 0 }}</div>
+                <div class="trend-line ml-2">
+                  <span class="text-success">
+                    <i class="fas fa-arrow-up mr-1"></i>{{ volumeOverviewViewData?.summaryViewData?.onlineVolumes || 0
+                    }}
+                  </span>
+                  <span class="text-danger">
+                    <i class="fas fa-arrow-down mr-1"></i>{{ volumeOverviewViewData?.summaryViewData?.offlineVolumes ||
+                    0 }}
+                  </span>
+                  <span class="text-muted">
+                    <i class="fas fa-dot-circle mr-1"></i>{{ volumeOverviewViewData?.summaryViewData?.unknownVolumes ||
+                    0 }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Used Capacity</div>
+              <div class="stat-val-big text-primary">
+                {{ volumeOverviewViewData?.summaryViewData?.usedCapacity || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Avg Latency</div>
+              <div class="stat-val-big text-primary">
+                {{ volumeOverviewViewData?.summaryViewData?.avgLatency || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Total IOPS</div>
+              <div class="stat-val-big text-primary">
+                {{ volumeOverviewViewData?.summaryViewData?.totalIops || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">Snapshot Reserve</div>
+              <div class="stat-val-big text-primary">
+                {{ volumeOverviewViewData?.summaryViewData?.snapshotReserve || 0 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="volumeOverviewViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.volumeOverviewTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="volumeOverviewTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onVolumeOverviewSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border rounded storage-table-scroll mb-3">
+            <table class="table table-sm  mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onVolumeOverviewSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>Cluster</th>
+                  <th sortable-column="name"
+                    [sort-direction]="getTableSortDirection(volumeOverviewTableCriteria, 'name')"
+                    [class.col-sorted]="isTableSortedColumn(volumeOverviewTableCriteria, 'name')">Volume Name</th>
+                  <th sortable-column="svm" [sort-direction]="getTableSortDirection(volumeOverviewTableCriteria, 'svm')"
+                    [class.col-sorted]="isTableSortedColumn(volumeOverviewTableCriteria, 'svm')">SVM</th>
+                  <th sortable-column="agg" [sort-direction]="getTableSortDirection(volumeOverviewTableCriteria, 'agg')"
+                    [class.col-sorted]="isTableSortedColumn(volumeOverviewTableCriteria, 'agg')">Aggregate</th>
+                  <th sortable-column="state"
+                    [sort-direction]="getTableSortDirection(volumeOverviewTableCriteria, 'state')"
+                    [class.col-sorted]="isTableSortedColumn(volumeOverviewTableCriteria, 'state')">State</th>
+                  <th sortable-column="type"
+                    [sort-direction]="getTableSortDirection(volumeOverviewTableCriteria, 'type')"
+                    [class.col-sorted]="isTableSortedColumn(volumeOverviewTableCriteria, 'type')">Type</th>
+                  <th sortable-column="total"
+                    [sort-direction]="getTableSortDirection(volumeOverviewTableCriteria, 'total')"
+                    [class.col-sorted]="isTableSortedColumn(volumeOverviewTableCriteria, 'total')">Total Space (TB)</th>
+                  <th sortable-column="avail"
+                    [sort-direction]="getTableSortDirection(volumeOverviewTableCriteria, 'avail')"
+                    [class.col-sorted]="isTableSortedColumn(volumeOverviewTableCriteria, 'avail')">Available Space (TB)
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of volumeOverviewViewData.tableViewData; trackBy: trackByVolumeOverviewRow"
+                  truncateText>
+                  <td class="text-primary font-weight-bold tdw-14">
+                    <div [tooltip]="row.cluster">{{ row.cluster }}</div>
+                  </td>
+                  <td class="text-primary font-weight-bold tdw-14">
+                    <div [tooltip]="row.name">{{ row.name }}</div>
+                  </td>
+                  <td class="tdw-14">
+                    <div [tooltip]="row.svm">{{ row.svm }}</div>
+                  </td>
+                  <td class="tdw-14">
+                    <div [tooltip]="row.agg">{{ row.agg }}</div>
+                  </td>
+                  <td><span class="badge" [ngClass]="row.stateBadgeClass">{{ row.state }}</span></td>
+                  <td><span class="badge badge-secondary">{{ row.type }}</span></td>
+                  <td class="tdw-14">
+                    <div [tooltip]="row.total">{{ row.total }}</div>
+                  </td>
+                  <td class="tdw-14">
+                    <div [tooltip]="row.avail">{{ row.avail }}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="volumeOverviewViewData.tableViewData.length"
+            [pageNo]="volumeOverviewTableCriteria.pageNo" [pageSize]="volumeOverviewTableCriteria.pageSize"
+            [totalCount]="volumeOverviewViewData.tableCount"></table-entries>
+          <table-pager *ngIf="volumeOverviewViewData.tableViewData.length" [pageNo]="volumeOverviewTableCriteria.pageNo"
+            [pageSize]="volumeOverviewTableCriteria.pageSize" [totalCount]="volumeOverviewViewData.tableCount"
+            (pageChange)="onVolumeOverviewPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.volumeOverviewTable && !volumeOverviewViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
+        </div>
+
+        <div
+          *ngIf="volumeOverviewViewData.viewType === 'chart' && (!volumeOverviewViewData.chartLoaded || volumeOverviewViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-3">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.volumeUtilizationDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Volume Utilization Distribution</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(volumeOverviewViewData?.chartViewData?.stateDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(volumeOverviewViewData?.chartViewData?.stateDistributionChartData); else volumeUtilizationDistributionEmpty"
+                  echarts [options]="volumeOverviewViewData?.chartViewData?.stateDistributionChartData?.options"
+                  class="chart"></div>
+                <ng-template #volumeUtilizationDistributionEmpty>
+                  <div *ngIf="!widgetLoading.volumeUtilizationDistribution" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.volumeTop10Largest" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top 10 Largest Volumes (TB)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(volumeOverviewViewData?.chartViewData?.top10LargestChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(volumeOverviewViewData?.chartViewData?.top10LargestChartData); else volumeTop10LargestEmpty"
+                  echarts [options]="volumeOverviewViewData?.chartViewData?.top10LargestChartData?.options"
+                  class="chart">
+                </div>
+                <ng-template #volumeTop10LargestEmpty>
+                  <div *ngIf="!widgetLoading.volumeTop10Largest" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.volumeTop10MostUsed" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top 10 Used Volumes (%)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(volumeOverviewViewData?.chartViewData?.top10MostUsedChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(volumeOverviewViewData?.chartViewData?.top10MostUsedChartData); else volumeTop10MostUsedEmpty"
+                  echarts [options]="volumeOverviewViewData?.chartViewData?.top10MostUsedChartData?.options"
+                  class="chart"></div>
+                <ng-template #volumeTop10MostUsedEmpty>
+                  <div *ngIf="!widgetLoading.volumeTop10MostUsed" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.volumeIopsTrend" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6 d-flex align-items-center">
+                <span>Volume IOPS Trend</span>
+                <span class="text-muted ml-2" tooltip="Across all selected volumes">
+                  <i class="fa fa-info-circle" style="font-size: 11px;"></i>
+                </span>
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(volumeOverviewViewData?.chartViewData?.iopsTimeSeriesChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(volumeOverviewViewData?.chartViewData?.iopsTimeSeriesChartData); else volumeIopsTrendEmpty"
+                  echarts [options]="volumeOverviewViewData?.chartViewData?.iopsTimeSeriesChartData?.options"
+                  [extentions]="volumeOverviewViewData?.chartViewData?.iopsTimeSeriesChartData?.extensions"
+                  class="chart">
+                </div>
+                <ng-template #volumeIopsTrendEmpty>
+                  <div *ngIf="!widgetLoading.volumeIopsTrend" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="volumeOverviewViewData.viewType === 'chart' && (!volumeOverviewViewData.chartLoaded || volumeOverviewViewData.hasChartData)"
+          class="row mx-3 mb-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.volumeRwRatio" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6 d-flex align-items-center">
+                <span>Volume Read/Write Ratio</span>
+                <span class="text-muted ml-2" tooltip="Across all selected volumes">
+                  <i class="fa fa-info-circle" style="font-size: 11px;"></i>
+                </span>
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(volumeOverviewViewData?.chartViewData?.rwRatioChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(volumeOverviewViewData?.chartViewData?.rwRatioChartData); else volumeRwRatioEmpty"
+                  echarts [options]="volumeOverviewViewData?.chartViewData?.rwRatioChartData?.options"
+                  [extentions]="volumeOverviewViewData?.chartViewData?.rwRatioChartData?.extensions" class="chart">
+                </div>
+                <ng-template #volumeRwRatioEmpty>
+                  <div *ngIf="!widgetLoading.volumeRwRatio" class="text-center text-muted py-4">No data available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.volumeLatencyTrend" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6 d-flex align-items-center">
+                <span>Volume Read/Write Latency</span>
+                <span class="text-muted ml-2" tooltip="Across all selected volumes">
+                  <i class="fa fa-info-circle" style="font-size: 11px;"></i>
+                </span>
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(volumeOverviewViewData?.chartViewData?.latencyTimeSeriesChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(volumeOverviewViewData?.chartViewData?.latencyTimeSeriesChartData); else volumeLatencyTrendEmpty"
+                  echarts [options]="volumeOverviewViewData?.chartViewData?.latencyTimeSeriesChartData?.options"
+                  [extentions]="volumeOverviewViewData?.chartViewData?.latencyTimeSeriesChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #volumeLatencyTrendEmpty>
+                  <div *ngIf="!widgetLoading.volumeLatencyTrend" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.volumeSnapshotUsage" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Snapshot Usage (TB)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(volumeOverviewViewData?.chartViewData?.top10ByAvailChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(volumeOverviewViewData?.chartViewData?.top10ByAvailChartData); else volumeSnapshotUsageEmpty"
+                  echarts [options]="volumeOverviewViewData?.chartViewData?.top10ByAvailChartData?.options"
+                  [extentions]="volumeOverviewViewData?.chartViewData?.top10ByAvailChartData?.extensions" class="chart">
+                </div>
+                <ng-template #volumeSnapshotUsageEmpty>
+                  <div *ngIf="!widgetLoading.volumeSnapshotUsage" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!lunOvervieViewData.hidden">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="h5 mb-0">LUN Overview</div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="lunOvervieViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setLunOverviewViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="lunOvervieViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setLunOverviewViewType('chart')">Chart View</button>
+      </div>
+    </div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div *ngIf="lunOvervieViewData?.hasSummaryData || !lunOvervieViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.lunOverviewSummary" [width]="0"></app-spinner>
+          <div *ngIf="lunOvervieViewData?.hasSummaryData" class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Total LUNs</div>
+              <div class="d-flex align-items-baseline justify-content-center">
+                <div class="stat-val-big text-primary mb-0">{{ lunOvervieViewData?.summaryViewData?.totalLUNs || 0 }}
+                </div>
+                <div class="trend-line ml-2">
+                  <span class="text-success">
+                    <i class="fas fa-arrow-up mr-1"></i>{{ lunOvervieViewData?.summaryViewData?.onlineLUNs || 0 }}
+                  </span>
+                  <span class="text-danger">
+                    <i class="fas fa-arrow-down mr-1"></i>{{ lunOvervieViewData?.summaryViewData?.offlineLUNs || 0 }}
+                  </span>
+                  <span class="text-muted">
+                    <i class="fas fa-dot-circle mr-1"></i>{{ lunOvervieViewData?.summaryViewData?.unknownLUNs || 0 }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Avg Latency</div>
+              <div class="stat-val-big text-success">
+                {{ lunOvervieViewData?.summaryViewData?.avgLatency || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">Total IOPS</div>
+              <div class="stat-val-big text-primary">
+                {{ lunOvervieViewData?.summaryViewData?.totalIops || 0 }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="lunOvervieViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.lunOverviewTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="lunOverviewTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onLunOverviewSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border rounded storage-table-scroll mb-3">
+            <table class="table table-sm mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onLunOverviewSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>Cluster</th>
+                  <th sortable-column="name" [sort-direction]="getTableSortDirection(lunOverviewTableCriteria, 'name')"
+                    [class.col-sorted]="isTableSortedColumn(lunOverviewTableCriteria, 'name')">LUN Name</th>
+                  <th sortable-column="path" [sort-direction]="getTableSortDirection(lunOverviewTableCriteria, 'path')"
+                    [class.col-sorted]="isTableSortedColumn(lunOverviewTableCriteria, 'path')">Volume Path</th>
+                  <th sortable-column="state"
+                    [sort-direction]="getTableSortDirection(lunOverviewTableCriteria, 'state')"
+                    [class.col-sorted]="isTableSortedColumn(lunOverviewTableCriteria, 'state')">State</th>
+                  <th sortable-column="size" [sort-direction]="getTableSortDirection(lunOverviewTableCriteria, 'size')"
+                    [class.col-sorted]="isTableSortedColumn(lunOverviewTableCriteria, 'size')">Space</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of lunOvervieViewData.tableViewData; trackBy: trackByLunOverviewRow" truncateText>
+                  <td class="text-primary font-weight-bold tdw-20">
+                    <div [tooltip]="row.cluster">{{ row.cluster }}</div>
+                  </td>
+                  <td class="text-primary font-weight-bold tdw-20">
+                    <div [tooltip]="row.name">{{ row.name }}</div>
+                  </td>
+                  <td class="tdw-25">
+                    <div [tooltip]="row.path">{{ row.path }}</div>
+                  </td>
+                  <td><span class="badge" [ngClass]="row.stateBadgeClass">{{ row.state }}</span></td>
+                  <td class="lun-space-column w-25">
+                    <div class="d-flex justify-content-between font-xs-sm mb-1">
+                      <span class="text-muted">{{ row.usedSpace }} / {{ row.size }}</span>
+                      <span class="font-weight-bold text-dark">{{ row.util }}</span>
+                    </div>
+                    <div class="progress lun-space-progress bg-light">
+                      <div class="progress-bar" [ngClass]="row.utilProgressClass" role="progressbar"
+                        [style.width.%]="row.utilPercent" [attr.aria-valuenow]="row.utilPercent" aria-valuemin="0"
+                        aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="lunOvervieViewData.tableViewData.length" [pageNo]="lunOverviewTableCriteria.pageNo"
+            [pageSize]="lunOverviewTableCriteria.pageSize" [totalCount]="lunOvervieViewData.tableCount"></table-entries>
+          <table-pager *ngIf="lunOvervieViewData.tableViewData.length" [pageNo]="lunOverviewTableCriteria.pageNo"
+            [pageSize]="lunOverviewTableCriteria.pageSize" [totalCount]="lunOvervieViewData.tableCount"
+            (pageChange)="onLunOverviewPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.lunOverviewTable && !lunOvervieViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
+        </div>
+
+        <div
+          *ngIf="lunOvervieViewData.viewType === 'chart' && (!lunOvervieViewData.chartLoaded || lunOvervieViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.lunHealthDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">LUN Health &amp; Status</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(lunOvervieViewData?.chartViewData?.healthDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(lunOvervieViewData?.chartViewData?.healthDistributionChartData); else lunHealthDistributionEmpty"
+                  echarts [options]="lunOvervieViewData?.chartViewData?.healthDistributionChartData?.options"
+                  class="chart"></div>
+                <ng-template #lunHealthDistributionEmpty>
+                  <div *ngIf="!widgetLoading.lunHealthDistribution" class="text-center text-muted py-4">No data
+                    available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-8">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.lunTop10ByUsage" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Top 10 LUNs by Usage (%)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(lunOvervieViewData?.chartViewData?.top10ByUsageChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(lunOvervieViewData?.chartViewData?.top10ByUsageChartData); else lunTop10ByUsageEmpty"
+                  echarts [options]="lunOvervieViewData?.chartViewData?.top10ByUsageChartData?.options" class="chart">
+                </div>
+                <ng-template #lunTop10ByUsageEmpty>
+                  <div *ngIf="!widgetLoading.lunTop10ByUsage" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="lunOvervieViewData.viewType === 'chart' && (!lunOvervieViewData.chartLoaded || lunOvervieViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-6">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.lunGrowthTrend" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6 d-flex align-items-center">
+                <span>LUN Growth (TB)</span>
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(lunOvervieViewData?.chartViewData?.growthTrendChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(lunOvervieViewData?.chartViewData?.growthTrendChartData); else lunGrowthTrendEmpty"
+                  echarts [options]="lunOvervieViewData?.chartViewData?.growthTrendChartData?.options"
+                  [extentions]="lunOvervieViewData?.chartViewData?.growthTrendChartData?.extensions" class="chart">
+                </div>
+                <ng-template #lunGrowthTrendEmpty>
+                  <div *ngIf="!widgetLoading.lunGrowthTrend" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.lunAvailability" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6 d-flex align-items-center">
+                <span>Availability</span>
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(lunOvervieViewData?.chartViewData?.availabilityChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(lunOvervieViewData?.chartViewData?.availabilityChartData); else lunAvailabilityEmpty"
+                  echarts [options]="lunOvervieViewData?.chartViewData?.availabilityChartData?.options" class="chart">
+                </div>
+                <ng-template #lunAvailabilityEmpty>
+                  <div *ngIf="!widgetLoading.lunAvailability" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+
+  <ng-container *ngIf="!performanceMetricsViewData.hidden">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div>
+        <span class="h5 mb-0">Performance Metrics</span>
+        <span class="text-muted ml-2" tooltip="Across selected clusters">
+          <i class="fa fa-info-circle" style="font-size: 11px;"></i>
+        </span>
+      </div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="performanceMetricsViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setPerformanceMetricsViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="performanceMetricsViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setPerformanceMetricsViewType('chart')">Chart View</button>
+      </div>
+    </div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div *ngIf="performanceMetricsViewData?.hasSummaryData || !performanceMetricsViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.performanceMetricsSummary" [width]="0"></app-spinner>
+          <div *ngIf="performanceMetricsViewData?.hasSummaryData"
+            class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Total IOPS</div>
+              <div class="stat-val-big text-primary">{{ performanceMetricsViewData?.summaryViewData?.totalIops || 'N/A'
+                }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Read IOPS</div>
+              <div class="stat-val-big text-primary">{{ performanceMetricsViewData?.summaryViewData?.readIops || 'N/A'
+                }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Write IOPS</div>
+              <div class="stat-val-big text-success">{{ performanceMetricsViewData?.summaryViewData?.writeIops || 'N/A'
+                }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Throughput</div>
+              <div class="stat-val-big text-primary">{{ performanceMetricsViewData?.summaryViewData?.throughput || 'N/A'
+                }}</div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Read Latency</div>
+              <div class="stat-val-big text-success">{{ performanceMetricsViewData?.summaryViewData?.readLatency ||
+                'N/A'
+                }}</div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">Write Latency</div>
+              <div class="stat-val-big text-warning">{{ performanceMetricsViewData?.summaryViewData?.writeLatency ||
+                'N/A'
+                }}</div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="performanceMetricsViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.performanceMetricsTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="performanceMetricsTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onPerformanceMetricsSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border rounded storage-table-scroll mb-3">
+            <table class="table table-sm mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onPerformanceMetricsSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>Timestamp</th>
+                  <th sortable-column="rx"
+                    [sort-direction]="getTableSortDirection(performanceMetricsTableCriteria, 'rx')"
+                    [class.col-sorted]="isTableSortedColumn(performanceMetricsTableCriteria, 'rx')">IOPS (Read/Write)
+                  </th>
+                  <th sortable-column="rxLat"
+                    [sort-direction]="getTableSortDirection(performanceMetricsTableCriteria, 'rxLat')"
+                    [class.col-sorted]="isTableSortedColumn(performanceMetricsTableCriteria, 'rxLat')">Latency
+                    (Read/Write)</th>
+                  <th sortable-column="throughput"
+                    [sort-direction]="getTableSortDirection(performanceMetricsTableCriteria, 'throughput')"
+                    [class.col-sorted]="isTableSortedColumn(performanceMetricsTableCriteria, 'throughput')">Throughput
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of performanceMetricsViewData.tableViewData; trackBy: trackByPerformanceMetricsRow"
+                  truncateText>
+                  <td class="text-primary font-weight-bold tdw-25">
+                    <div [tooltip]="row.time">{{ row.time }}</div>
+                  </td>
+                  <td class="text-primary font-weight-bold tdw-25">
+                    <div [tooltip]="row.readWriteIops">{{ row.readWriteIops }}</div>
+                  </td>
+                  <td class="tdw-25">
+                    <div [tooltip]="row.readWriteLatency">{{ row.readWriteLatency }}</div>
+                  </td>
+                  <td class="tdw-25">
+                    <div [tooltip]="row.throughput">{{ row.throughput }}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="performanceMetricsViewData.tableViewData.length"
+            [pageNo]="performanceMetricsTableCriteria.pageNo" [pageSize]="performanceMetricsTableCriteria.pageSize"
+            [totalCount]="performanceMetricsViewData.tableCount"></table-entries>
+          <table-pager *ngIf="performanceMetricsViewData.tableViewData.length"
+            [pageNo]="performanceMetricsTableCriteria.pageNo" [pageSize]="performanceMetricsTableCriteria.pageSize"
+            [totalCount]="performanceMetricsViewData.tableCount"
+            (pageChange)="onPerformanceMetricsPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.performanceMetricsTable && !performanceMetricsViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
+        </div>
+
+        <div
+          *ngIf="performanceMetricsViewData.viewType === 'chart' && (!performanceMetricsViewData.chartLoaded || performanceMetricsViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.performanceIopsRealTimeTrend" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">IOPS Real-time Trend (K)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(performanceMetricsViewData?.chartViewData?.iopsRealTimeTrendChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(performanceMetricsViewData?.chartViewData?.iopsRealTimeTrendChartData); else performanceIopsRealTimeTrendEmpty"
+                  echarts [options]="performanceMetricsViewData?.chartViewData?.iopsRealTimeTrendChartData?.options"
+                  [extentions]="performanceMetricsViewData?.chartViewData?.iopsRealTimeTrendChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #performanceIopsRealTimeTrendEmpty>
+                  <div *ngIf="!widgetLoading.performanceIopsRealTimeTrend" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.performanceThroughputRealTimeTrend" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Throughput Real-time Trend (GB/s)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(performanceMetricsViewData?.chartViewData?.throughputRealTimeTrendChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(performanceMetricsViewData?.chartViewData?.throughputRealTimeTrendChartData); else performanceThroughputRealTimeTrendEmpty"
+                  echarts
+                  [options]="performanceMetricsViewData?.chartViewData?.throughputRealTimeTrendChartData?.options"
+                  [extentions]="performanceMetricsViewData?.chartViewData?.throughputRealTimeTrendChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #performanceThroughputRealTimeTrendEmpty>
+                  <div *ngIf="!widgetLoading.performanceThroughputRealTimeTrend" class="text-center text-muted py-4">No
+                    data available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.performanceLatencyTrend" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Latency Trend (ms)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(performanceMetricsViewData?.chartViewData?.latencyTrendChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(performanceMetricsViewData?.chartViewData?.latencyTrendChartData); else performanceLatencyTrendEmpty"
+                  echarts [options]="performanceMetricsViewData?.chartViewData?.latencyTrendChartData?.options"
+                  [extentions]="performanceMetricsViewData?.chartViewData?.latencyTrendChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #performanceLatencyTrendEmpty>
+                  <div *ngIf="!widgetLoading.performanceLatencyTrend" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          *ngIf="performanceMetricsViewData.viewType === 'chart' && (!performanceMetricsViewData.chartLoaded || performanceMetricsViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-12">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.performanceIopsActivityBreakdown" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">IOPS Activity Breakdown</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(performanceMetricsViewData?.chartViewData?.iopsActivityBreakdownChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(performanceMetricsViewData?.chartViewData?.iopsActivityBreakdownChartData); else performanceIopsActivityBreakdownEmpty"
+                  echarts [options]="performanceMetricsViewData?.chartViewData?.iopsActivityBreakdownChartData?.options"
+                  [extentions]="performanceMetricsViewData?.chartViewData?.iopsActivityBreakdownChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #performanceIopsActivityBreakdownEmpty>
+                  <div *ngIf="!widgetLoading.performanceIopsActivityBreakdown" class="text-center text-muted py-4">No
+                    data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!capacityPlanningViewData.hidden">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="h5 mb-0">Capacity Planning</div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="capacityPlanningViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setCapacityPlanningViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="capacityPlanningViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setCapacityPlanningViewType('chart')">Chart View</button>
+      </div>
+    </div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div *ngIf="capacityPlanningViewData?.hasSummaryData || !capacityPlanningViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.capacityPlanningSummary" [width]="0"></app-spinner>
+          <div *ngIf="capacityPlanningViewData?.hasSummaryData"
+            class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Used Capacity</div>
+              <div class="stat-val-big text-primary">
+                {{ capacityPlanningViewData?.summaryViewData?.usedCapacity || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Free Capacity</div>
+              <div class="stat-val-big text-primary">
+                {{ capacityPlanningViewData?.summaryViewData?.freeCapacity || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Usable Capacity</div>
+              <div class="stat-val-big text-primary">
+                {{ capacityPlanningViewData?.summaryViewData?.usableCapacity || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Growth Rate</div>
+              <div class="stat-val-big text-warning">
+                {{ capacityPlanningViewData?.summaryViewData?.growthRate || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Days Until Full</div>
+              <div class="stat-val-big text-danger">
+                {{ capacityPlanningViewData?.summaryViewData?.daysUntilFull || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">Thin Provisioning</div>
+              <div class="stat-val-big text-primary">
+                {{ capacityPlanningViewData?.summaryViewData?.thinProvisioningPct || 'N/A' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="capacityPlanningViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.capacityPlanningTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="capacityPlanningTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onCapacityPlanningSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border rounded storage-table-scroll mb-3">
+            <table class="table table-sm  mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onCapacityPlanningSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>Cluster</th>
+                  <th sortable-column="total"
+                    [sort-direction]="getTableSortDirection(capacityPlanningTableCriteria, 'total')"
+                    [class.col-sorted]="isTableSortedColumn(capacityPlanningTableCriteria, 'total')">Total Capacity</th>
+                  <th sortable-column="util"
+                    [sort-direction]="getTableSortDirection(capacityPlanningTableCriteria, 'util')"
+                    [class.col-sorted]="isTableSortedColumn(capacityPlanningTableCriteria, 'util')">Space Utilization
+                  </th>
+                  <th sortable-column="growth"
+                    [sort-direction]="getTableSortDirection(capacityPlanningTableCriteria, 'growth')"
+                    [class.col-sorted]="isTableSortedColumn(capacityPlanningTableCriteria, 'growth')">Growth Rate</th>
+                  <th sortable-column="days"
+                    [sort-direction]="getTableSortDirection(capacityPlanningTableCriteria, 'days')"
+                    [class.col-sorted]="isTableSortedColumn(capacityPlanningTableCriteria, 'days')">Days Until Full</th>
+                  <th sortable-column="ratio"
+                    [sort-direction]="getTableSortDirection(capacityPlanningTableCriteria, 'ratio')"
+                    [class.col-sorted]="isTableSortedColumn(capacityPlanningTableCriteria, 'ratio')">Data Reduction
+                    Ratio
+                  </th>
+                  <th sortable-column="status"
+                    [sort-direction]="getTableSortDirection(capacityPlanningTableCriteria, 'status')"
+                    [class.col-sorted]="isTableSortedColumn(capacityPlanningTableCriteria, 'status')">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of capacityPlanningViewData.tableViewData; trackBy: trackByCapacityPlanningRow"
+                  truncateText>
+                  <td class="text-primary font-weight-bold tdw-15">
+                    <div [tooltip]="row.cluster">{{ row.cluster }}</div>
+                  </td>
+                  <td class="tdw-15">
+                    <div [tooltip]="row.total">{{ row.total }}</div>
+                  </td>
+                  <td class="capacity-utilization-column w-22">
+                    <div class="d-flex justify-content-between font-xs-sm mb-1">
+                      <span class="text-muted">{{ row.used }} used / {{ row.free }} free</span>
+                      <span class="font-weight-bold text-dark">{{ row.util }}</span>
+                    </div>
+                    <div class="progress capacity-utilization-progress bg-light">
+                      <div class="progress-bar" [ngClass]="row.utilProgressClass" role="progressbar"
+                        [style.width.%]="row.utilPercent" [attr.aria-valuenow]="row.utilPercent" aria-valuemin="0"
+                        aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.growth">{{ row.growth }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.days">{{ row.days }}</div>
+                  </td>
+                  <td class="tdw-22">
+                    <div [tooltip]="row.ratio">{{ row.ratio }}</div>
+                  </td>
+                  <td><span class="badge" [ngClass]="row.statusBadgeClass">{{ row.status }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="capacityPlanningViewData.tableViewData.length"
+            [pageNo]="capacityPlanningTableCriteria.pageNo" [pageSize]="capacityPlanningTableCriteria.pageSize"
+            [totalCount]="capacityPlanningViewData.tableCount"></table-entries>
+          <table-pager *ngIf="capacityPlanningViewData.tableViewData.length"
+            [pageNo]="capacityPlanningTableCriteria.pageNo" [pageSize]="capacityPlanningTableCriteria.pageSize"
+            [totalCount]="capacityPlanningViewData.tableCount"
+            (pageChange)="onCapacityPlanningPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.capacityPlanningTable && !capacityPlanningViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
+        </div>
+
+        <div
+          *ngIf="capacityPlanningViewData.viewType === 'chart' && (!capacityPlanningViewData.chartLoaded || capacityPlanningViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.capacityForecast" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">
+                Capacity Growth Forecast (Jan - Dec)
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(capacityPlanningViewData?.chartViewData?.capacityForecastChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(capacityPlanningViewData?.chartViewData?.capacityForecastChartData); else capacityForecastEmpty"
+                  echarts [options]="capacityPlanningViewData?.chartViewData?.capacityForecastChartData?.options"
+                  [extentions]="capacityPlanningViewData?.chartViewData?.capacityForecastChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #capacityForecastEmpty>
+                  <div *ngIf="!widgetLoading.capacityForecast" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.capacityVolUtilDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">
+                Volume Utilization Distribution
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(capacityPlanningViewData?.chartViewData?.volUtilDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(capacityPlanningViewData?.chartViewData?.volUtilDistributionChartData); else capacityVolUtilDistributionEmpty"
+                  echarts [options]="capacityPlanningViewData?.chartViewData?.volUtilDistributionChartData?.options"
+                  [extentions]="capacityPlanningViewData?.chartViewData?.volUtilDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #capacityVolUtilDistributionEmpty>
+                  <div *ngIf="!widgetLoading.capacityVolUtilDistribution" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.capacityAggUtilDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">
+                Aggregate Utilization Distribution
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(capacityPlanningViewData?.chartViewData?.aggUtilDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(capacityPlanningViewData?.chartViewData?.aggUtilDistributionChartData); else capacityAggUtilDistributionEmpty"
+                  echarts [options]="capacityPlanningViewData?.chartViewData?.aggUtilDistributionChartData?.options"
+                  [extentions]="capacityPlanningViewData?.chartViewData?.aggUtilDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #capacityAggUtilDistributionEmpty>
+                  <div *ngIf="!widgetLoading.capacityAggUtilDistribution" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="capacityPlanningViewData.viewType === 'chart' && (!capacityPlanningViewData.chartLoaded || capacityPlanningViewData.hasChartData)"
+          class="row mx-3 mb-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.capacityTop5Consumers" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">
+                Top 5 Capacity Consumers
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(capacityPlanningViewData?.chartViewData?.top5ConsumersChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(capacityPlanningViewData?.chartViewData?.top5ConsumersChartData); else capacityTop5ConsumersEmpty"
+                  echarts [options]="capacityPlanningViewData?.chartViewData?.top5ConsumersChartData?.options"
+                  [extentions]="capacityPlanningViewData?.chartViewData?.top5ConsumersChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #capacityTop5ConsumersEmpty>
+                  <div *ngIf="!widgetLoading.capacityTop5Consumers" class="text-center text-muted py-4">No data
+                    available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.capacityPlanningBySvm" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">
+                Capacity by SVM (TB)
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(capacityPlanningViewData?.chartViewData?.capacityBySvmChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(capacityPlanningViewData?.chartViewData?.capacityBySvmChartData); else capacityPlanningBySvmEmpty"
+                  echarts [options]="capacityPlanningViewData?.chartViewData?.capacityBySvmChartData?.options"
+                  [extentions]="capacityPlanningViewData?.chartViewData?.capacityBySvmChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #capacityPlanningBySvmEmpty>
+                  <div *ngIf="!widgetLoading.capacityPlanningBySvm" class="text-center text-muted py-4">No data
+                    available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.capacityMonthlyGrowth" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">
+                Monthly Growth Increments (TB)
+              </div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(capacityPlanningViewData?.chartViewData?.monthlyGrowthChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(capacityPlanningViewData?.chartViewData?.monthlyGrowthChartData); else capacityMonthlyGrowthEmpty"
+                  echarts [options]="capacityPlanningViewData?.chartViewData?.monthlyGrowthChartData?.options"
+                  [extentions]="capacityPlanningViewData?.chartViewData?.monthlyGrowthChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #capacityMonthlyGrowthEmpty>
+                  <div *ngIf="!widgetLoading.capacityMonthlyGrowth" class="text-center text-muted py-4">No data
+                    available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!portOverviewViewData.hidden">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="h5 mb-0">Port Overview</div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="portOverviewViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setPortOverviewViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="portOverviewViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setPortOverviewViewType('chart')">Chart View</button>
+      </div>
+    </div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div *ngIf="portOverviewViewData?.hasSummaryData || !portOverviewViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.portOverviewSummary" [width]="0"></app-spinner>
+          <div *ngIf="portOverviewViewData?.hasSummaryData"
+            class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Total Ports</div>
+              <div class="d-flex align-items-baseline justify-content-center">
+                <div class="stat-val-big text-primary mb-0">
+                  {{ portOverviewViewData?.summaryViewData?.totalPorts || 0 }}
+                </div>
+                <div class="trend-line ml-2">
+                  <span class="text-success">
+                    <i class="fas fa-arrow-up mr-1"></i>{{ portOverviewViewData?.summaryViewData?.portsUp || 0 }}
+                  </span>
+                  <span class="text-danger">
+                    <i class="fas fa-arrow-down mr-1"></i>{{ portOverviewViewData?.summaryViewData?.portsDown ||
+                    0 }}
+                  </span>
+                  <span class="text-muted">
+                    <i class="fas fa-dot-circle mr-1"></i>{{ portOverviewViewData?.summaryViewData?.portsUnknown
+                    || 0 }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Ethernet Ports</div>
+              <div class="stat-val-big text-primary">
+                {{ portOverviewViewData?.summaryViewData?.totalEthernetPorts || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">FC Ports</div>
+              <div class="stat-val-big text-primary">
+                {{ portOverviewViewData?.summaryViewData?.totalFcPorts || 0 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="portOverviewViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.portOverviewTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="portOverviewTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onPortOverviewSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border rounded storage-table-scroll mb-3">
+            <table class="table table-sm  mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onPortOverviewSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>Cluster</th>
+                  <th sortable-column="node" [sort-direction]="getTableSortDirection(portOverviewTableCriteria, 'node')"
+                    [class.col-sorted]="isTableSortedColumn(portOverviewTableCriteria, 'node')">Node</th>
+                  <th sortable-column="name" [sort-direction]="getTableSortDirection(portOverviewTableCriteria, 'name')"
+                    [class.col-sorted]="isTableSortedColumn(portOverviewTableCriteria, 'name')">Port Name</th>
+                  <th sortable-column="type" [sort-direction]="getTableSortDirection(portOverviewTableCriteria, 'type')"
+                    [class.col-sorted]="isTableSortedColumn(portOverviewTableCriteria, 'type')">Port Type</th>
+                  <th sortable-column="proto"
+                    [sort-direction]="getTableSortDirection(portOverviewTableCriteria, 'proto')"
+                    [class.col-sorted]="isTableSortedColumn(portOverviewTableCriteria, 'proto')">Protocol</th>
+                  <th sortable-column="admin"
+                    [sort-direction]="getTableSortDirection(portOverviewTableCriteria, 'admin')"
+                    [class.col-sorted]="isTableSortedColumn(portOverviewTableCriteria, 'admin')">Admin Status</th>
+                  <th sortable-column="link" [sort-direction]="getTableSortDirection(portOverviewTableCriteria, 'link')"
+                    [class.col-sorted]="isTableSortedColumn(portOverviewTableCriteria, 'link')">Link Status</th>
+                  <th sortable-column="dev" [sort-direction]="getTableSortDirection(portOverviewTableCriteria, 'dev')"
+                    [class.col-sorted]="isTableSortedColumn(portOverviewTableCriteria, 'dev')">Connected Device</th>
+                  <th sortable-column="devPort"
+                    [sort-direction]="getTableSortDirection(portOverviewTableCriteria, 'devPort')"
+                    [class.col-sorted]="isTableSortedColumn(portOverviewTableCriteria, 'devPort')">Connected Port</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of portOverviewViewData.tableViewData; trackBy: trackByPortOverviewRow"
+                  truncateText>
+                  <td class="text-primary font-weight-bold tdw-12">
+                    <div [tooltip]="row.cluster">{{ row.cluster }}</div>
+                  </td>
+                  <td class="text-primary font-weight-bold tdw-12">
+                    <div [tooltip]="row.node">{{ row.node }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.name">{{ row.name }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.type">{{ row.type }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.proto">{{ row.proto }}</div>
+                  </td>
+                  <td><span class="badge" [ngClass]="row.adminBadgeClass">{{ row.admin }}</span></td>
+                  <td><span class="badge" [ngClass]="row.linkBadgeClass">{{ row.link }}</span></td>
+                  <td class="tdw-12">
+                    <div [tooltip]="row.dev">{{ row.dev }}</div>
+                  </td>
+                  <td class="tdw-12">
+                    <div [tooltip]="row.devPort">{{ row.devPort }}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="portOverviewViewData.tableViewData.length" [pageNo]="portOverviewTableCriteria.pageNo"
+            [pageSize]="portOverviewTableCriteria.pageSize"
+            [totalCount]="portOverviewViewData.tableCount"></table-entries>
+          <table-pager *ngIf="portOverviewViewData.tableViewData.length" [pageNo]="portOverviewTableCriteria.pageNo"
+            [pageSize]="portOverviewTableCriteria.pageSize" [totalCount]="portOverviewViewData.tableCount"
+            (pageChange)="onPortOverviewPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.portOverviewTable && !portOverviewViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
+        </div>
+
+        <div
+          *ngIf="portOverviewViewData.viewType === 'chart' && (!portOverviewViewData.chartLoaded || portOverviewViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.portLinkStatusDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Link Status Distribution</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(portOverviewViewData?.chartViewData?.linkStatusDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(portOverviewViewData?.chartViewData?.linkStatusDistributionChartData); else portLinkStatusDistributionEmpty"
+                  echarts [options]="portOverviewViewData?.chartViewData?.linkStatusDistributionChartData?.options"
+                  [extentions]="portOverviewViewData?.chartViewData?.linkStatusDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #portLinkStatusDistributionEmpty>
+                  <div *ngIf="!widgetLoading.portLinkStatusDistribution" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.portTypeAndProtocol" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Port Type &amp; Protocol</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(portOverviewViewData?.chartViewData?.portTypeAndProtocolChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(portOverviewViewData?.chartViewData?.portTypeAndProtocolChartData); else portTypeAndProtocolEmpty"
+                  echarts [options]="portOverviewViewData?.chartViewData?.portTypeAndProtocolChartData?.options"
+                  [extentions]="portOverviewViewData?.chartViewData?.portTypeAndProtocolChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #portTypeAndProtocolEmpty>
+                  <div *ngIf="!widgetLoading.portTypeAndProtocol" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.portCabledByNode" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Ports cabled by Node (Top 10)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(portOverviewViewData?.chartViewData?.cabledByNodeChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(portOverviewViewData?.chartViewData?.cabledByNodeChartData); else portCabledByNodeEmpty"
+                  echarts [options]="portOverviewViewData?.chartViewData?.cabledByNodeChartData?.options"
+                  [extentions]="portOverviewViewData?.chartViewData?.cabledByNodeChartData?.extensions" class="chart">
+                </div>
+                <ng-template #portCabledByNodeEmpty>
+                  <div *ngIf="!widgetLoading.portCabledByNode" class="text-center text-muted py-4">No data available.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!recentAlertsViewData.hidden">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="h5 mb-0">Recent Alerts</div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="recentAlertsViewData.viewType === 'table' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setRecentAlertsViewType('table')">Table View</button>
+        <button type="button" class="btn btn-sm px-1 font-lg"
+          [ngClass]="recentAlertsViewData.viewType === 'chart' ? 'btn-primary' : 'text-muted btn-outline-secondary'"
+          (click)="setRecentAlertsViewType('chart')">Chart View</button>
+      </div>
+    </div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div *ngIf="recentAlertsViewData?.hasSummaryData || !recentAlertsViewData?.chartLoaded"
+          class="dashboard-summary-row position-relative py-4">
+          <app-spinner [name]="loaderNames.recentAlertsSummary" [width]="0"></app-spinner>
+          <div *ngIf="recentAlertsViewData?.hasSummaryData"
+            class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Total Alerts</div>
+              <div class="stat-val-big text-primary">
+                {{ recentAlertsViewData?.summaryViewData?.totalAlerts || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Critical</div>
+              <div class="stat-val-big text-danger">
+                {{ recentAlertsViewData?.summaryViewData?.critical || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Warning</div>
+              <div class="stat-val-big text-warning">
+                {{ recentAlertsViewData?.summaryViewData?.warning || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">Information</div>
+              <div class="stat-val-big text-primary">
+                {{ recentAlertsViewData?.summaryViewData?.information || 0 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="recentAlertsViewData.viewType === 'table'" class="m-3 table-view-container">
+          <app-spinner [name]="loaderNames.recentAlertsTable" [width]="0"></app-spinner>
+          <div class="w-20 mb-2">
+            <search-box [searchValue]="recentAlertsTableCriteria.searchValue" customClass="form-control-sm"
+              (searched)="onRecentAlertsSearched($event)"></search-box>
+          </div>
+          <div class="table-responsive border rounded storage-table-scroll mb-3">
+            <table class="table table-sm  mb-0 storage-dashboard-table" sortableTable
+              (sorted)="onRecentAlertsSorted($event)">
+              <thead class="bg-light">
+                <tr>
+                  <th>ID</th>
+                  <th sortable-column="device"
+                    [sort-direction]="getTableSortDirection(recentAlertsTableCriteria, 'device')"
+                    [class.col-sorted]="isTableSortedColumn(recentAlertsTableCriteria, 'device')">Device Name</th>
+                  <th sortable-column="count"
+                    [sort-direction]="getTableSortDirection(recentAlertsTableCriteria, 'count')"
+                    [class.col-sorted]="isTableSortedColumn(recentAlertsTableCriteria, 'count')">Count</th>
+                  <th sortable-column="event"
+                    [sort-direction]="getTableSortDirection(recentAlertsTableCriteria, 'event')"
+                    [class.col-sorted]="isTableSortedColumn(recentAlertsTableCriteria, 'event')">Event Metric</th>
+                  <th sortable-column="time" [sort-direction]="getTableSortDirection(recentAlertsTableCriteria, 'time')"
+                    [class.col-sorted]="isTableSortedColumn(recentAlertsTableCriteria, 'time')">Alert Time</th>
+                  <th class="text-center" sortable-column="severity"
+                    [sort-direction]="getTableSortDirection(recentAlertsTableCriteria, 'severity')"
+                    [class.col-sorted]="isTableSortedColumn(recentAlertsTableCriteria, 'severity')">Severity</th>
+                  <th sortable-column="description"
+                    [sort-direction]="getTableSortDirection(recentAlertsTableCriteria, 'description')"
+                    [class.col-sorted]="isTableSortedColumn(recentAlertsTableCriteria, 'description')">Description</th>
+                  <th sortable-column="status"
+                    [sort-direction]="getTableSortDirection(recentAlertsTableCriteria, 'status')"
+                    [class.col-sorted]="isTableSortedColumn(recentAlertsTableCriteria, 'status')">Status</th>
+                  <th sortable-column="source"
+                    [sort-direction]="getTableSortDirection(recentAlertsTableCriteria, 'source')"
+                    [class.col-sorted]="isTableSortedColumn(recentAlertsTableCriteria, 'source')">Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of recentAlertsViewData.tableViewData; trackBy: trackByRecentAlertsRow"
+                  truncateText>
+                  <td class="tdw-8">
+                    <div [tooltip]="row.id">{{ row.id }}</div>
+                  </td>
+                  <td class="text-primary font-weight-bold tdw-12">
+                    <div [tooltip]="row.device">{{ row.device }}</div>
+                  </td>
+                  <td class="tdw-8">
+                    <div [tooltip]="row.count">{{ row.count }}</div>
+                  </td>
+                  <td class="tdw-12">
+                    <div [tooltip]="row.event">{{ row.event }}</div>
+                  </td>
+                  <td class="tdw-15">
+                    <div [tooltip]="row.time">{{ row.time }}</div>
+                  </td>
+                  <td class="text-center"><i class="fa font-lg" [ngClass]="[row.severityIcon, row.severityClass]"
+                      [tooltip]="row.severity"></i></td>
+                  <td class="tdw-18">
+                    <div [tooltip]="row.description">{{ row.description }}</div>
+                  </td>
+                  <td class="font-weight-bold tdw-10" [ngClass]="row.statusClass">
+                    <div [tooltip]="row.status">{{ row.status }}</div>
+                  </td>
+                  <td class="tdw-10">
+                    <div [tooltip]="row.source">{{ row.source }}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <table-entries *ngIf="recentAlertsViewData.tableViewData.length" [pageNo]="recentAlertsTableCriteria.pageNo"
+            [pageSize]="recentAlertsTableCriteria.pageSize"
+            [totalCount]="recentAlertsViewData.tableCount"></table-entries>
+          <table-pager *ngIf="recentAlertsViewData.tableViewData.length" [pageNo]="recentAlertsTableCriteria.pageNo"
+            [pageSize]="recentAlertsTableCriteria.pageSize" [totalCount]="recentAlertsViewData.tableCount"
+            (pageChange)="onRecentAlertsPageChange($event)"></table-pager>
+          <div *ngIf="!widgetLoading.recentAlertsTable && !recentAlertsViewData.tableViewData.length"
+            class="text-center text-muted py-4">No data available.</div>
+        </div>
+
+        <div
+          *ngIf="recentAlertsViewData.viewType === 'chart' && (!recentAlertsViewData.chartLoaded || recentAlertsViewData.hasChartData)"
+          class="row m-3">
+          <div class="col-6">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.recentAlertsSeverityDistribution" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Alert Severity Distribution</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(recentAlertsViewData?.chartViewData?.severityDistributionChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(recentAlertsViewData?.chartViewData?.severityDistributionChartData); else recentAlertsSeverityDistributionEmpty"
+                  echarts [options]="recentAlertsViewData?.chartViewData?.severityDistributionChartData?.options"
+                  [extentions]="recentAlertsViewData?.chartViewData?.severityDistributionChartData?.extensions"
+                  class="chart"></div>
+                <ng-template #recentAlertsSeverityDistributionEmpty>
+                  <div *ngIf="!widgetLoading.recentAlertsSeverityDistribution" class="text-center text-muted py-4">No
+                    data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card border mb-0 dashboard-chart-widget">
+              <app-spinner [name]="loaderNames.recentAlertsAlertTimeline" [width]="0"></app-spinner>
+              <div class="card-header bg-light py-2 h6">Alert Timeline (Count)</div>
+              <div class="card-body p-1"
+                [ngClass]="getChartBodyClass(recentAlertsViewData?.chartViewData?.alertTimelineChartData)">
+                <div
+                  *ngIf="isWidgetDataAvailable(recentAlertsViewData?.chartViewData?.alertTimelineChartData); else recentAlertsAlertTimelineEmpty"
+                  echarts [options]="recentAlertsViewData?.chartViewData?.alertTimelineChartData?.options"
+                  [extentions]="recentAlertsViewData?.chartViewData?.alertTimelineChartData?.extensions" class="chart">
+                </div>
+                <ng-template #recentAlertsAlertTimelineEmpty>
+                  <div *ngIf="!widgetLoading.recentAlertsAlertTimeline" class="text-center text-muted py-4">No data
+                    available.</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!autoRemediationViewData.hidden">
+    <div class="h5 mb-2">Auto-Remediation Summary</div>
+
+    <div class="card rounded mb-4">
+      <div class="card-body p-0">
+        <div class="auto-remediation-summary-row position-relative">
+          <app-spinner [name]="loaderNames.autoRemediationSummary" [width]="0"></app-spinner>
+          <div *ngIf="autoRemediationViewData?.summaryViewData"
+            class="d-flex justify-content-center align-items-center py-4">
+            <div class="d-flex flex-column pr-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Auto-Remediations</div>
+              <div class="stat-val-big text-success">
+                {{ autoRemediationViewData?.summaryViewData?.autoRemediations || 0 }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Avg MTTR</div>
+              <div class="stat-val-big text-success">
+                {{ autoRemediationViewData?.summaryViewData?.avgMttr || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column px-4 summary-divider">
+              <div class="text-muted font-sm font-500 pb-2">Runbook Success</div>
+              <div class="stat-val-big text-success">
+                {{ autoRemediationViewData?.summaryViewData?.runbookSuccess || 'N/A' }}
+              </div>
+            </div>
+            <div class="d-flex flex-column pl-4">
+              <div class="text-muted font-sm font-500 pb-2">Runbook Failures</div>
+              <div class="stat-val-big text-danger">
+                {{ autoRemediationViewData?.summaryViewData?.runbookFailures || 0 }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  </ng-container>
 </div>

@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { TabData } from 'src/app/shared/tabdata';
-import { Router, NavigationEnd } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { FaIconMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
+import { FaIconMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { TabData } from 'src/app/shared/tabdata';
 
 @Component({
   selector: 'assets',

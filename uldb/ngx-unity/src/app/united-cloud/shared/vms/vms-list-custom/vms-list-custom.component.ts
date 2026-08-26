@@ -148,11 +148,15 @@ export class VmsListCustomComponent implements OnInit, OnDestroy {
     if (!view.isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.customvmService.getConsoleAccessInput(view);
-    obj.newTab = true;
-    obj.managementIp = view.managementIp;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(view.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.customvmService.getConsoleAccessInput(view);
+      obj.newTab = true;
+      obj.managementIp = view.managementIp;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(view.newTabConsoleAccessUrl);
+    }
   }
 
   goToDetails(view: CustomVmViewData) {

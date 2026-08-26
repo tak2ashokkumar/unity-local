@@ -50,8 +50,8 @@ export class UsiWorkflowIntegrationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.editModelRef?.hide();
     this.deleteWorkflowIntegrationModalRef?.hide();
+    this.editModelRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

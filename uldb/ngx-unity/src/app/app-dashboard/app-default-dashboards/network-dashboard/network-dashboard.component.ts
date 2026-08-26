@@ -11,21 +11,21 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { ColumnSortedEvent } from 'src/app/shared/table-functionality/sortable-column/sort.service';
 import { MapService } from 'src/app/map.service';
+import { PAGE_SIZES } from 'src/app/shared/table-functionality/search-criteria';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import {
   NetworkAlertEventsSummaryResponse,
   NetworkAlertStatsResponse,
   NetworkAlertsByDeviceTypeResponse,
   NetworkAlertsBySeverityResponse,
-  NetworkAverageTemperatureBySensorTypeResponse,
   NetworkDashboardDatacenterOption,
   NetworkDashboardFilterCriteria,
+  NetworkDeviceAvailabilityTableResponse,
   NetworkEnvironmentalHealthSummaryTableResponse,
-  NetworkFanHealthByDeviceResponse,
+  NetworkLoadBalancerHealthTableResponse,
   NetworkOpenItsmTicketsByDeviceTypeResponse,
-  NetworkPowerSupplyStatusDistributionResponse,
-  NetworkTopCriticalAlertsResponse,
-  NetworkTopDevicesByHotspotTemperatureResponse
+  NetworkPduHealthTableResponse,
+  NetworkTopCriticalAlertsResponse
 } from './network-dashboard.type';
 import {
   NETWORK_DASHBOARD_TIME_RANGE_DEFAULT,
@@ -39,11 +39,15 @@ import {
   EnvironmentalHealthSummaryWidgetViewData,
   InterfaceHealthMetricChartViewData,
   InterfaceHealthMetricsWidgetViewData,
+  LoadBalancerHealthChartViewData,
+  LoadBalancerHealthWidgetViewData,
   NetworkDeviceAvailabilityCardViewData,
   NetworkDeviceAvailabilityWidgetViewData,
   NetworkDashboardService,
   NetworkOverviewViewData,
   PerformanceWorkloadChartViewData,
+  PduHealthChartViewData,
+  PduHealthWidgetViewData,
   PerformanceWorkloadInsightsWidgetViewData,
   TopConversationsCardViewData,
   TopConversationsWidgetViewData
@@ -77,6 +81,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     interfaceHealthMetrics: 'networkInterfaceHealthMetricsLoader',
     networkDeviceAvailability: 'networkDeviceAvailabilityLoader',
     environmentalHealthSummary: 'networkEnvironmentalHealthSummaryLoader',
+    loadBalancerHealth: 'networkLoadBalancerHealthLoader',
+    pduHealth: 'networkPduHealthLoader',
     alertEvents: 'networkAlertEventsLoader',
     autoRemediationSummary: 'networkAutoRemediationSummaryLoader'
   };
@@ -86,6 +92,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   isInterfaceHealthMetricsLoading = false;
   isNetworkDeviceAvailabilityLoading = false;
   isEnvironmentalHealthSummaryLoading = false;
+  isLoadBalancerHealthLoading = false;
+  isPduHealthLoading = false;
   isAlertEventsLoading = false;
   isAutoRemediationSummaryLoading = false;
   networkOverviewViewData: NetworkOverviewViewData;
@@ -94,16 +102,35 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   interfaceHealthMetricsViewData: InterfaceHealthMetricsWidgetViewData;
   networkDeviceAvailabilityViewData: NetworkDeviceAvailabilityWidgetViewData;
   environmentalHealthSummaryViewData: EnvironmentalHealthSummaryWidgetViewData;
+  loadBalancerHealthViewData: LoadBalancerHealthWidgetViewData;
+  pduHealthViewData: PduHealthWidgetViewData;
   alertEventsViewData: AlertEventsViewWidgetViewData;
   autoRemediationSummaryViewData: AutoRemediationSummaryWidgetViewData;
-  topConversationsViewMode: 'table' | 'chart' = 'chart';
+  topConversationsViewMode: 'table' | 'chart' = 'table';
   topConversationsSearch: string = '';
-  performanceWorkloadInsightsViewMode: 'table' | 'chart' = 'chart';
+  performanceWorkloadInsightsViewMode: 'table' | 'chart' = 'table';
   performanceWorkloadSearch: string = '';
-  interfaceHealthMetricsViewMode: 'table' | 'chart' = 'chart';
+  interfaceHealthMetricsViewMode: 'table' | 'chart' = 'table';
   interfaceHealthMetricsSearch: string = '';
-  networkDeviceAvailabilityViewMode: 'table' | 'chart' = 'chart';
-  environmentalHealthSummaryViewMode: 'table' | 'chart' = 'chart';
+  interfaceHealthMetricsPageNo: number = 1;
+  interfaceHealthMetricsPageSize: number = PAGE_SIZES.DEFAULT_PAGE_SIZE;
+  networkDeviceAvailabilityViewMode: 'table' | 'chart' = 'table';
+  networkDeviceAvailabilitySearch: string = '';
+  environmentalHealthSummaryViewMode: 'table' | 'chart' = 'table';
+  environmentalHealthSummarySearch: string = '';
+  loadBalancerHealthViewMode: 'table' | 'chart' = 'table';
+  loadBalancerHealthSearch: string = '';
+  pduHealthViewMode: 'table' | 'chart' = 'table';
+  pduHealthSearch: string = '';
+  alertEventsSearch: string = '';
+  networkDeviceAvailabilityPageNo: number = 1;
+  networkDeviceAvailabilityPageSize: number = PAGE_SIZES.DEFAULT_PAGE_SIZE;
+  environmentalHealthSummaryPageNo: number = 1;
+  environmentalHealthSummaryPageSize: number = PAGE_SIZES.DEFAULT_PAGE_SIZE;
+  loadBalancerHealthPageNo: number = 1;
+  loadBalancerHealthPageSize: number = PAGE_SIZES.DEFAULT_PAGE_SIZE;
+  pduHealthPageNo: number = 1;
+  pduHealthPageSize: number = PAGE_SIZES.DEFAULT_PAGE_SIZE;
   manufacturerModelLegendPage = 0;
   deviceTypeLegendPage = 0;
   readonly manufacturerModelLegendItemsPerPage = 5;
@@ -111,8 +138,9 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   topConversationSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   performanceWorkloadSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   interfaceHealthMetricsSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
-  networkDeviceAvailabilitySortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   environmentalHealthSummarySortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
+  loadBalancerHealthSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
+  pduHealthSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   alertEventsSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   datacenterMultiselectSettings: IMultiSelectSettings = {
     isSimpleArray: false,
@@ -189,8 +217,9 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       this.getPerformanceWorkloadInsights();
       this.getInterfaceHealthMetrics();
       this.getNetworkDeviceAvailability();
-      // Environmental Health Summary is intentionally disabled for now.
-      // this.getEnvironmentalHealthSummary();
+      this.getEnvironmentalHealthSummary();
+      this.getLoadBalancerHealth();
+      this.getPduHealth();
       this.getAlertEventsView();
       this.getAutoRemediationSummary();
     }, 0);
@@ -275,11 +304,29 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.isNetworkDeviceAvailabilityLoading = true;
     this.networkDeviceAvailabilityViewData = this.networkDeviceAvailabilityViewData || new NetworkDeviceAvailabilityWidgetViewData();
     this.startLoader(this.loaderNames.networkDeviceAvailability);
-    this.svc.getNetworkDeviceAvailabilityTable(this.appliedFilters).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.networkDeviceAvailabilityViewData = this.svc.convertToNetworkDeviceAvailabilityViewDataFromTable(res);
+    const emptyNetworkDeviceAvailabilityTable: NetworkDeviceAvailabilityTableResponse = { count: 0, data: [] };
+    forkJoin({
+      chartData: this.svc.getNetworkDeviceAvailabilityTable(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load Network Device Availability chart data. Showing available table data.',
+        emptyNetworkDeviceAvailabilityTable
+      ))),
+      tableData: this.svc.getNetworkDeviceAvailabilityTable(
+        this.appliedFilters,
+        this.networkDeviceAvailabilityPageNo,
+        this.networkDeviceAvailabilityPageSize,
+        this.networkDeviceAvailabilitySearch
+      ).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load Network Device Availability table data. Showing available chart data.',
+        emptyNetworkDeviceAvailabilityTable
+      )))
+    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.networkDeviceAvailabilityViewData = this.svc.convertToNetworkDeviceAvailabilityViewDataFromTable(res.chartData);
+      this.networkDeviceAvailabilityViewData = this.svc.applyNetworkDeviceAvailabilityTableData(
+        this.networkDeviceAvailabilityViewData,
+        res.tableData
+      );
       this.manufacturerModelLegendPage = 0;
       this.deviceTypeLegendPage = 0;
-      this.initializeNetworkDeviceAvailabilitySortState();
       this.isNetworkDeviceAvailabilityLoading = false;
       this.stopLoader(this.loaderNames.networkDeviceAvailability);
     }, (_err: HttpErrorResponse) => {
@@ -293,24 +340,29 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.isEnvironmentalHealthSummaryLoading = true;
     this.environmentalHealthSummaryViewData = this.environmentalHealthSummaryViewData || new EnvironmentalHealthSummaryWidgetViewData();
     this.startLoader(this.loaderNames.environmentalHealthSummary);
-    const emptyEnvironmentalTable: NetworkEnvironmentalHealthSummaryTableResponse = { data: [] };
-    const emptyHotSpotTemperature: NetworkTopDevicesByHotspotTemperatureResponse = { data: [] };
-    const emptyAverageTemperature: NetworkAverageTemperatureBySensorTypeResponse = { data: [] };
-    const emptyPowerSupplyDistribution: NetworkPowerSupplyStatusDistributionResponse = { data: [] };
-    const emptyFanHealth: NetworkFanHealthByDeviceResponse = { data: [] };
+    const emptyEnvironmentalTable: NetworkEnvironmentalHealthSummaryTableResponse = { count: 0, data: [] };
     forkJoin({
-      tableData: this.svc.getEnvironmentalHealthSummaryTable(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Environmental Health Summary table data. Showing available Environmental Health Summary data.', emptyEnvironmentalTable))),
-      hotSpotTemperature: this.svc.getTopDevicesByHotspotTemperature(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Top 10 Devices by HotSpot Temperature data. Showing available Environmental Health Summary data.', emptyHotSpotTemperature))),
-      averageTemperature: this.svc.getAverageTemperatureBySensorType(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Average Temperature by Sensor Type data. Showing available Environmental Health Summary data.', emptyAverageTemperature))),
-      powerSupplyStatusDistribution: this.svc.getPowerSupplyStatusDistribution(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Power Supply Status Distribution data. Showing available Environmental Health Summary data.', emptyPowerSupplyDistribution))),
-      fanHealthByDevice: this.svc.getFanHealthByDevice(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Fan Health by Device data. Showing available Environmental Health Summary data.', emptyFanHealth)))
+      chartData: this.svc.getEnvironmentalHealthSummaryTable(
+        this.appliedFilters,
+        1,
+        1000,
+        this.environmentalHealthSummarySearch
+      ).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load Environmental Health Summary chart data. Showing available Environmental Health Summary data.',
+        emptyEnvironmentalTable
+      ))),
+      tableData: this.svc.getEnvironmentalHealthSummaryTable(
+        this.appliedFilters,
+        this.environmentalHealthSummaryPageNo,
+        this.environmentalHealthSummaryPageSize,
+        this.environmentalHealthSummarySearch,
+        this.getEnvironmentalHealthSummaryOrdering()
+      ).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load Environmental Health Summary table data. Showing available Environmental Health Summary data.',
+        emptyEnvironmentalTable
+      )))
     }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      const view = this.svc.convertToEnvironmentalHealthSummaryChartViewData(
-        res.hotSpotTemperature,
-        res.averageTemperature,
-        res.powerSupplyStatusDistribution,
-        res.fanHealthByDevice
-      );
+      const view = this.svc.convertToEnvironmentalHealthSummaryViewDataFromTable(res.chartData);
       this.environmentalHealthSummaryViewData = this.svc.applyEnvironmentalHealthSummaryTableData(view, res.tableData);
       this.initializeEnvironmentalHealthSummarySortState();
       this.isEnvironmentalHealthSummaryLoading = false;
@@ -319,6 +371,82 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       this.isEnvironmentalHealthSummaryLoading = false;
       this.stopLoader(this.loaderNames.environmentalHealthSummary);
       this.notification.error(new Notification('Failed to load Environmental Health Summary widget data. Try again later.'));
+    });
+  }
+
+  getLoadBalancerHealth() {
+    this.isLoadBalancerHealthLoading = true;
+    this.loadBalancerHealthViewData = this.loadBalancerHealthViewData || new LoadBalancerHealthWidgetViewData();
+    this.startLoader(this.loaderNames.loadBalancerHealth);
+    const emptyLoadBalancerHealthTable: NetworkLoadBalancerHealthTableResponse = { count: 0, data: [] };
+    forkJoin({
+      chartData: this.svc.getLoadBalancerHealthTable(
+        this.appliedFilters,
+        1,
+        1000,
+        this.loadBalancerHealthSearch,
+        this.getLoadBalancerHealthOrdering()
+      ).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load Load Balancer Health chart data. Showing available table data.',
+        emptyLoadBalancerHealthTable
+      ))),
+      tableData: this.svc.getLoadBalancerHealthTable(
+        this.appliedFilters,
+        this.loadBalancerHealthPageNo,
+        this.loadBalancerHealthPageSize,
+        this.loadBalancerHealthSearch,
+        this.getLoadBalancerHealthOrdering()
+      ).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load Load Balancer Health table data. Showing available chart data.',
+        emptyLoadBalancerHealthTable
+      )))
+    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.loadBalancerHealthViewData = this.svc.convertToLoadBalancerHealthViewDataFromTable(res.chartData);
+      this.loadBalancerHealthViewData = this.svc.applyLoadBalancerHealthTableData(this.loadBalancerHealthViewData, res.tableData);
+      this.initializeLoadBalancerHealthSortState();
+      this.isLoadBalancerHealthLoading = false;
+      this.stopLoader(this.loaderNames.loadBalancerHealth);
+    }, (_err: HttpErrorResponse) => {
+      this.isLoadBalancerHealthLoading = false;
+      this.stopLoader(this.loaderNames.loadBalancerHealth);
+      this.notification.error(new Notification('Failed to load Load Balancer Health widget data. Try again later.'));
+    });
+  }
+
+  getPduHealth() {
+    this.isPduHealthLoading = true;
+    this.pduHealthViewData = this.pduHealthViewData || new PduHealthWidgetViewData();
+    this.startLoader(this.loaderNames.pduHealth);
+    const emptyPduHealthTable: NetworkPduHealthTableResponse = { count: 0, data: [] };
+    forkJoin({
+      chartData: this.svc.getPduHealthTable(
+        this.appliedFilters,
+        1,
+        1000
+      ).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load PDU Health chart data. Showing available table data.',
+        emptyPduHealthTable
+      ))),
+      tableData: this.svc.getPduHealthTable(
+        this.appliedFilters,
+        this.pduHealthPageNo,
+        this.pduHealthPageSize,
+        this.pduHealthSearch,
+        this.getPduHealthOrdering()
+      ).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load PDU Health table data. Showing available chart data.',
+        emptyPduHealthTable
+      )))
+    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.pduHealthViewData = this.svc.convertToPduHealthViewDataFromTable(res.chartData);
+      this.pduHealthViewData = this.svc.applyPduHealthTableData(this.pduHealthViewData, res.tableData);
+      this.initializePduHealthSortState();
+      this.isPduHealthLoading = false;
+      this.stopLoader(this.loaderNames.pduHealth);
+    }, (_err: HttpErrorResponse) => {
+      this.isPduHealthLoading = false;
+      this.stopLoader(this.loaderNames.pduHealth);
+      this.notification.error(new Notification('Failed to load PDU Health widget data. Try again later.'));
     });
   }
 
@@ -404,8 +532,136 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.networkDeviceAvailabilityViewMode = mode;
   }
 
+  onNetworkDeviceAvailabilitySearched(value: string) {
+    this.networkDeviceAvailabilitySearch = value || '';
+    this.networkDeviceAvailabilityPageNo = 1;
+    this.getNetworkDeviceAvailability();
+  }
+
+  onNetworkDeviceAvailabilityPageChanged(pageNo: number) {
+    this.networkDeviceAvailabilityPageNo = pageNo || 1;
+    this.getNetworkDeviceAvailability();
+  }
+
+  onNetworkDeviceAvailabilityPageSizeChanged(pageSize: number) {
+    this.networkDeviceAvailabilityPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.networkDeviceAvailabilityPageNo = 1;
+    this.getNetworkDeviceAvailability();
+  }
+
+  getVisibleNetworkDeviceAvailabilityRows() {
+    return this.networkDeviceAvailabilityViewData?.tableRows || [];
+  }
+
   setEnvironmentalHealthSummaryViewMode(mode: 'table' | 'chart') {
     this.environmentalHealthSummaryViewMode = mode;
+  }
+
+  onEnvironmentalHealthSummarySearched(value: string) {
+    this.environmentalHealthSummarySearch = value || '';
+    this.environmentalHealthSummaryPageNo = 1;
+    this.getEnvironmentalHealthSummary();
+  }
+
+  onEnvironmentalHealthSummaryPageChanged(pageNo: number) {
+    this.environmentalHealthSummaryPageNo = pageNo || 1;
+    this.getEnvironmentalHealthSummary();
+  }
+
+  onEnvironmentalHealthSummaryPageSizeChanged(pageSize: number) {
+    this.environmentalHealthSummaryPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.environmentalHealthSummaryPageNo = 1;
+    this.getEnvironmentalHealthSummary();
+  }
+
+  setLoadBalancerHealthViewMode(mode: 'table' | 'chart') {
+    this.loadBalancerHealthViewMode = mode;
+  }
+
+  onLoadBalancerHealthSearched(value: string) {
+    this.loadBalancerHealthSearch = value || '';
+    this.loadBalancerHealthPageNo = 1;
+    this.getLoadBalancerHealth();
+  }
+
+  onLoadBalancerHealthPageChanged(pageNo: number) {
+    this.loadBalancerHealthPageNo = pageNo || 1;
+    this.getLoadBalancerHealth();
+  }
+
+  onLoadBalancerHealthPageSizeChanged(pageSize: number) {
+    this.loadBalancerHealthPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.loadBalancerHealthPageNo = 1;
+    this.getLoadBalancerHealth();
+  }
+
+  onLoadBalancerHealthTableSorted(event: ColumnSortedEvent) {
+    if (!event?.sortColumn || !event?.sortDirection) {
+      return;
+    }
+
+    this.loadBalancerHealthSortState = {
+      sortColumn: event.sortColumn,
+      sortDirection: event.sortDirection
+    };
+    this.loadBalancerHealthPageNo = 1;
+    this.getLoadBalancerHealth();
+  }
+
+  getLoadBalancerHealthSortDirection(sortColumn: string): string {
+    if (this.loadBalancerHealthSortState.sortColumn !== sortColumn) {
+      return '';
+    }
+    return this.loadBalancerHealthSortState.sortDirection;
+  }
+
+  getVisibleLoadBalancerHealthRows() {
+    return this.loadBalancerHealthViewData?.tableRows || [];
+  }
+
+  setPduHealthViewMode(mode: 'table' | 'chart') {
+    this.pduHealthViewMode = mode;
+  }
+
+  onPduHealthSearched(value: string) {
+    this.pduHealthSearch = value || '';
+    this.pduHealthPageNo = 1;
+    this.getPduHealth();
+  }
+
+  onPduHealthPageChanged(pageNo: number) {
+    this.pduHealthPageNo = pageNo || 1;
+    this.getPduHealth();
+  }
+
+  onPduHealthPageSizeChanged(pageSize: number) {
+    this.pduHealthPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.pduHealthPageNo = 1;
+    this.getPduHealth();
+  }
+
+  onPduHealthTableSorted(event: ColumnSortedEvent) {
+    if (!event?.sortColumn || !event?.sortDirection) {
+      return;
+    }
+
+    this.pduHealthSortState = {
+      sortColumn: event.sortColumn,
+      sortDirection: event.sortDirection
+    };
+    this.pduHealthPageNo = 1;
+    this.getPduHealth();
+  }
+
+  getPduHealthSortDirection(sortColumn: string): string {
+    if (this.pduHealthSortState.sortColumn !== sortColumn) {
+      return '';
+    }
+    return this.pduHealthSortState.sortDirection;
+  }
+
+  getVisiblePduHealthRows() {
+    return this.pduHealthViewData?.tableRows || [];
   }
 
   onTopConversationTableSorted(event: ColumnSortedEvent) {
@@ -436,12 +692,6 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     return this.topConversationSortState.sortDirection;
   }
 
-  getTopConversationHeaderClass(sortColumn: string): string {
-    return this.topConversationSortState.sortColumn === sortColumn
-      ? 'network-dashboard-conversation-table-head-cell--active'
-      : '';
-  }
-
   onPerformanceWorkloadTableSorted(event: ColumnSortedEvent) {
     if (!this.performanceWorkloadInsightsViewData || !event?.sortColumn || !event?.sortDirection) {
       return;
@@ -470,12 +720,6 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     return this.performanceWorkloadSortState.sortDirection;
   }
 
-  getPerformanceWorkloadHeaderClass(sortColumn: string): string {
-    return this.performanceWorkloadSortState.sortColumn === sortColumn
-      ? 'network-dashboard-conversation-table-head-cell--active'
-      : '';
-  }
-
   onInterfaceHealthMetricsTableSorted(event: ColumnSortedEvent) {
     if (!this.interfaceHealthMetricsViewData || !event?.sortColumn || !event?.sortDirection) {
       return;
@@ -485,16 +729,29 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortColumn: event.sortColumn,
       sortDirection: event.sortDirection
     };
+    this.interfaceHealthMetricsPageNo = 1;
     this.getInterfaceHealthMetrics();
   }
 
   onInterfaceHealthMetricsSearched(value: string) {
     this.interfaceHealthMetricsSearch = value || '';
+    this.interfaceHealthMetricsPageNo = 1;
     this.getInterfaceHealthMetrics();
   }
 
+  onInterfaceHealthMetricsPageChanged(pageNo: number) {
+    this.interfaceHealthMetricsPageNo = pageNo || 1;
+  }
+
+  onInterfaceHealthMetricsPageSizeChanged(pageSize: number) {
+    this.interfaceHealthMetricsPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.interfaceHealthMetricsPageNo = 1;
+  }
+
   getVisibleInterfaceHealthMetricsRows() {
-    return this.interfaceHealthMetricsViewData?.tableRows || [];
+    const rows = this.interfaceHealthMetricsViewData?.tableRows || [];
+    const start = Math.max((this.interfaceHealthMetricsPageNo - 1) * this.interfaceHealthMetricsPageSize, 0);
+    return rows.slice(start, start + this.interfaceHealthMetricsPageSize);
   }
 
   getInterfaceHealthMetricsSortDirection(sortColumn: string): string {
@@ -504,43 +761,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     return this.interfaceHealthMetricsSortState.sortDirection;
   }
 
-  getInterfaceHealthMetricsHeaderClass(sortColumn: string): string {
-    return this.interfaceHealthMetricsSortState.sortColumn === sortColumn
-      ? 'network-dashboard-conversation-table-head-cell--active'
-      : '';
-  }
-
-  onNetworkDeviceAvailabilityTableSorted(event: ColumnSortedEvent) {
-    if (!this.networkDeviceAvailabilityViewData || !event?.sortColumn || !event?.sortDirection) {
-      return;
-    }
-
-    this.networkDeviceAvailabilitySortState = {
-      sortColumn: event.sortColumn,
-      sortDirection: event.sortDirection
-    };
-    this.networkDeviceAvailabilityViewData.tableRows = this.svc.sortNetworkDeviceAvailabilityRows(
-      this.networkDeviceAvailabilityViewData.tableRows,
-      event.sortColumn,
-      event.sortDirection
-    );
-  }
-
-  getNetworkDeviceAvailabilitySortDirection(sortColumn: string): string {
-    if (this.networkDeviceAvailabilitySortState.sortColumn !== sortColumn) {
-      return '';
-    }
-    return this.networkDeviceAvailabilitySortState.sortDirection;
-  }
-
-  getNetworkDeviceAvailabilityHeaderClass(sortColumn: string): string {
-    return this.networkDeviceAvailabilitySortState.sortColumn === sortColumn
-      ? 'network-dashboard-conversation-table-head-cell--active'
-      : '';
-  }
-
   onEnvironmentalHealthSummaryTableSorted(event: ColumnSortedEvent) {
-    if (!this.environmentalHealthSummaryViewData || !event?.sortColumn || !event?.sortDirection) {
+    if (!event?.sortColumn || !event?.sortDirection) {
       return;
     }
 
@@ -548,11 +770,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortColumn: event.sortColumn,
       sortDirection: event.sortDirection
     };
-    this.environmentalHealthSummaryViewData.tableRows = this.svc.sortEnvironmentalHealthSummaryRows(
-      this.environmentalHealthSummaryViewData.tableRows,
-      event.sortColumn,
-      event.sortDirection
-    );
+    this.environmentalHealthSummaryPageNo = 1;
+    this.getEnvironmentalHealthSummary();
   }
 
   getEnvironmentalHealthSummarySortDirection(sortColumn: string): string {
@@ -562,10 +781,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     return this.environmentalHealthSummarySortState.sortDirection;
   }
 
-  getEnvironmentalHealthSummaryHeaderClass(sortColumn: string): string {
-    return this.environmentalHealthSummarySortState.sortColumn === sortColumn
-      ? 'network-dashboard-conversation-table-head-cell--active'
-      : '';
+  getVisibleEnvironmentalHealthSummaryRows() {
+    return this.environmentalHealthSummaryViewData?.tableRows || [];
   }
 
   onAlertEventsTableSorted(event: ColumnSortedEvent) {
@@ -591,10 +808,26 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     return this.alertEventsSortState.sortDirection;
   }
 
-  getAlertEventsHeaderClass(sortColumn: string): string {
-    return this.alertEventsSortState.sortColumn === sortColumn
-      ? 'network-dashboard-conversation-table-head-cell--active'
-      : '';
+  onAlertEventsSearched(value: string) {
+    this.alertEventsSearch = value || '';
+  }
+
+  getVisibleAlertEventsRows() {
+    const rows = this.alertEventsViewData?.tableRows || [];
+    const searchValue = (this.alertEventsSearch || '').trim().toLowerCase();
+
+    if (!searchValue) {
+      return rows;
+    }
+
+    return rows.filter(row =>
+      String(row?.id || '').toLowerCase().includes(searchValue)
+      || String(row?.deviceName || '').toLowerCase().includes(searchValue)
+      || String(row?.description || '').toLowerCase().includes(searchValue)
+      || String(row?.source || '').toLowerCase().includes(searchValue)
+      || String(row?.acknowledgedDisplay || '').toLowerCase().includes(searchValue)
+      || String(row?.durationDisplay || '').toLowerCase().includes(searchValue)
+    );
   }
 
   trackByTopConversationCard(_index: number, card: TopConversationsCardViewData): string {
@@ -617,8 +850,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     return chart.key;
   }
 
-  trackByInterfaceHealthMetricRow(_index: number, row: { interfaceName: string }): string {
-    return row.interfaceName;
+  trackByInterfaceHealthMetricRow(_index: number, row: { deviceId?: string; interfaceName: string }): string {
+    return `${row.deviceId || ''}-${row.interfaceName}`;
   }
 
   trackByNetworkDeviceAvailabilityCard(_index: number, card: NetworkDeviceAvailabilityCardViewData): string {
@@ -683,6 +916,22 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
 
   trackByEnvironmentalHealthRow(_index: number, row: { deviceName: string }): string {
     return row.deviceName;
+  }
+
+  trackByLoadBalancerHealthChart(_index: number, chart: LoadBalancerHealthChartViewData): string {
+    return chart.key;
+  }
+
+  trackByLoadBalancerHealthRow(_index: number, row: { loadBalancerName: string }): string {
+    return row.loadBalancerName;
+  }
+
+  trackByPduHealthChart(_index: number, chart: PduHealthChartViewData): string {
+    return chart.key;
+  }
+
+  trackByPduHealthRow(_index: number, row: { pduName: string }): string {
+    return row.pduName;
   }
 
   trackByAlertEventsChart(_index: number, chart: AlertEventsChartViewData): string {
@@ -821,6 +1070,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.isInterfaceHealthMetricsLoading = false;
     this.isNetworkDeviceAvailabilityLoading = false;
     this.isEnvironmentalHealthSummaryLoading = false;
+    this.isLoadBalancerHealthLoading = false;
+    this.isPduHealthLoading = false;
     this.isAlertEventsLoading = false;
     this.isAutoRemediationSummaryLoading = false;
     this.networkOverviewViewData = null;
@@ -829,23 +1080,43 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.interfaceHealthMetricsViewData = null;
     this.networkDeviceAvailabilityViewData = null;
     this.environmentalHealthSummaryViewData = null;
+    this.loadBalancerHealthViewData = null;
+    this.pduHealthViewData = null;
     this.alertEventsViewData = null;
     this.autoRemediationSummaryViewData = null;
-    this.topConversationsViewMode = 'chart';
+    this.topConversationsViewMode = 'table';
     this.topConversationsSearch = '';
-    this.performanceWorkloadInsightsViewMode = 'chart';
+    this.performanceWorkloadInsightsViewMode = 'table';
     this.performanceWorkloadSearch = '';
-    this.interfaceHealthMetricsViewMode = 'chart';
+    this.interfaceHealthMetricsViewMode = 'table';
     this.interfaceHealthMetricsSearch = '';
-    this.networkDeviceAvailabilityViewMode = 'chart';
+    this.interfaceHealthMetricsPageNo = 1;
+    this.interfaceHealthMetricsPageSize = PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.networkDeviceAvailabilityViewMode = 'table';
+    this.networkDeviceAvailabilitySearch = '';
+    this.environmentalHealthSummaryViewMode = 'table';
+    this.environmentalHealthSummarySearch = '';
+    this.loadBalancerHealthViewMode = 'table';
+    this.loadBalancerHealthSearch = '';
+    this.pduHealthViewMode = 'table';
+    this.pduHealthSearch = '';
+    this.alertEventsSearch = '';
+    this.networkDeviceAvailabilityPageNo = 1;
+    this.networkDeviceAvailabilityPageSize = PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.environmentalHealthSummaryPageNo = 1;
+    this.environmentalHealthSummaryPageSize = PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.loadBalancerHealthPageNo = 1;
+    this.loadBalancerHealthPageSize = PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    this.pduHealthPageNo = 1;
+    this.pduHealthPageSize = PAGE_SIZES.DEFAULT_PAGE_SIZE;
     this.manufacturerModelLegendPage = 0;
     this.deviceTypeLegendPage = 0;
-    this.environmentalHealthSummaryViewMode = 'chart';
     this.topConversationSortState = { sortColumn: '', sortDirection: '' };
     this.performanceWorkloadSortState = { sortColumn: '', sortDirection: '' };
     this.interfaceHealthMetricsSortState = { sortColumn: '', sortDirection: '' };
-    this.networkDeviceAvailabilitySortState = { sortColumn: '', sortDirection: '' };
     this.environmentalHealthSummarySortState = { sortColumn: '', sortDirection: '' };
+    this.loadBalancerHealthSortState = { sortColumn: '', sortDirection: '' };
+    this.pduHealthSortState = { sortColumn: '', sortDirection: '' };
     this.alertEventsSortState = { sortColumn: '', sortDirection: '' };
   }
 
@@ -920,8 +1191,8 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     if (!this.interfaceHealthMetricsViewData?.tableRows?.length) {
       if (!this.interfaceHealthMetricsSortState.sortColumn || !this.interfaceHealthMetricsSortState.sortDirection) {
         this.interfaceHealthMetricsSortState = {
-          sortColumn: this.interfaceHealthMetricsViewData?.defaultSortColumn || 'errorsInValue',
-          sortDirection: this.interfaceHealthMetricsViewData?.defaultSortDirection || 'desc'
+          sortColumn: this.interfaceHealthMetricsViewData?.defaultSortColumn || 'interface',
+          sortDirection: this.interfaceHealthMetricsViewData?.defaultSortDirection || 'asc'
         };
       }
       return;
@@ -936,39 +1207,9 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   }
 
   private getInterfaceHealthMetricsOrdering(): string {
-    const sortColumn = this.interfaceHealthMetricsSortState.sortColumn || 'errorsInValue';
-    const sortDirection = this.interfaceHealthMetricsSortState.sortDirection || 'desc';
-    const orderingKeyMap: { [key: string]: string } = {
-      errorsInValue: 'errors_inbound',
-      errorsOutValue: 'errors_outbound',
-      discardsInValue: 'discards_inbound',
-      discardsOutValue: 'discards_outbound'
-    };
-    const orderingKey = orderingKeyMap[sortColumn] || '';
-    return orderingKey ? (sortDirection === 'desc' ? `-${orderingKey}` : orderingKey) : '';
-  }
-
-  private initializeNetworkDeviceAvailabilitySortState() {
-    if (!this.networkDeviceAvailabilityViewData?.tableRows?.length) {
-      this.networkDeviceAvailabilitySortState = { sortColumn: '', sortDirection: '' };
-      return;
-    }
-
-    this.networkDeviceAvailabilitySortState = {
-      sortColumn: this.networkDeviceAvailabilityViewData.defaultSortColumn,
-      sortDirection: this.networkDeviceAvailabilityViewData.defaultSortDirection
-    };
-
-    if (!this.networkDeviceAvailabilityViewData.defaultSortColumn || !this.networkDeviceAvailabilityViewData.defaultSortDirection) {
-      this.networkDeviceAvailabilityViewData.tableRows = this.networkDeviceAvailabilityViewData.tableRows.slice();
-      return;
-    }
-
-    this.networkDeviceAvailabilityViewData.tableRows = this.svc.sortNetworkDeviceAvailabilityRows(
-      this.networkDeviceAvailabilityViewData.tableRows,
-      this.networkDeviceAvailabilityViewData.defaultSortColumn,
-      this.networkDeviceAvailabilityViewData.defaultSortDirection
-    );
+    const sortColumn = this.interfaceHealthMetricsSortState.sortColumn || 'interface';
+    const sortDirection = this.interfaceHealthMetricsSortState.sortDirection || 'asc';
+    return sortDirection === 'desc' ? `-${sortColumn}` : sortColumn;
   }
 
   private getManufacturerModelLegendItems() {
@@ -983,25 +1224,78 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
 
   private initializeEnvironmentalHealthSummarySortState() {
     if (!this.environmentalHealthSummaryViewData?.tableRows?.length) {
-      this.environmentalHealthSummarySortState = { sortColumn: '', sortDirection: '' };
+      if (!this.environmentalHealthSummarySortState.sortColumn || !this.environmentalHealthSummarySortState.sortDirection) {
+        this.environmentalHealthSummarySortState = {
+          sortColumn: this.environmentalHealthSummaryViewData?.defaultSortColumn || 'device_type',
+          sortDirection: this.environmentalHealthSummaryViewData?.defaultSortDirection || 'asc'
+        };
+      }
       return;
     }
 
-    this.environmentalHealthSummarySortState = {
-      sortColumn: this.environmentalHealthSummaryViewData.defaultSortColumn,
-      sortDirection: this.environmentalHealthSummaryViewData.defaultSortDirection
-    };
+    if (!this.environmentalHealthSummarySortState.sortColumn || !this.environmentalHealthSummarySortState.sortDirection) {
+      this.environmentalHealthSummarySortState = {
+        sortColumn: this.environmentalHealthSummaryViewData.defaultSortColumn,
+        sortDirection: this.environmentalHealthSummaryViewData.defaultSortDirection
+      };
+    }
+  }
 
-    if (!this.environmentalHealthSummaryViewData.defaultSortColumn || !this.environmentalHealthSummaryViewData.defaultSortDirection) {
-      this.environmentalHealthSummaryViewData.tableRows = this.environmentalHealthSummaryViewData.tableRows.slice();
+  private getEnvironmentalHealthSummaryOrdering(): string {
+    const sortColumn = this.environmentalHealthSummarySortState.sortColumn || 'device_type';
+    const sortDirection = this.environmentalHealthSummarySortState.sortDirection || 'asc';
+    return sortDirection === 'desc' ? `-${sortColumn}` : sortColumn;
+  }
+
+  private initializeLoadBalancerHealthSortState() {
+    if (!this.loadBalancerHealthViewData?.tableRows?.length) {
+      if (!this.loadBalancerHealthSortState.sortColumn || !this.loadBalancerHealthSortState.sortDirection) {
+        this.loadBalancerHealthSortState = {
+          sortColumn: this.loadBalancerHealthViewData?.defaultSortColumn || 'throughput',
+          sortDirection: this.loadBalancerHealthViewData?.defaultSortDirection || 'desc'
+        };
+      }
       return;
     }
 
-    this.environmentalHealthSummaryViewData.tableRows = this.svc.sortEnvironmentalHealthSummaryRows(
-      this.environmentalHealthSummaryViewData.tableRows,
-      this.environmentalHealthSummaryViewData.defaultSortColumn,
-      this.environmentalHealthSummaryViewData.defaultSortDirection
-    );
+    if (!this.loadBalancerHealthSortState.sortColumn || !this.loadBalancerHealthSortState.sortDirection) {
+      this.loadBalancerHealthSortState = {
+        sortColumn: this.loadBalancerHealthViewData.defaultSortColumn,
+        sortDirection: this.loadBalancerHealthViewData.defaultSortDirection
+      };
+    }
+  }
+
+  private getLoadBalancerHealthOrdering(): string {
+    const sortColumn = this.loadBalancerHealthSortState.sortColumn || 'throughput';
+    const sortDirection = this.loadBalancerHealthSortState.sortDirection || 'desc';
+    return sortDirection === 'desc' ? `-${sortColumn}` : sortColumn;
+  }
+
+  private initializePduHealthSortState() {
+    if (!this.pduHealthViewData?.tableRows?.length) {
+      if (!this.pduHealthSortState.sortColumn || !this.pduHealthSortState.sortDirection) {
+        this.pduHealthSortState = {
+          sortColumn: this.pduHealthViewData?.defaultSortColumn || 'vendor',
+          sortDirection: this.pduHealthViewData?.defaultSortDirection || 'asc'
+        };
+      }
+      return;
+    }
+
+    if (!this.pduHealthSortState.sortColumn || !this.pduHealthSortState.sortDirection) {
+      this.pduHealthSortState = {
+        sortColumn: this.pduHealthViewData.defaultSortColumn,
+        sortDirection: this.pduHealthViewData.defaultSortDirection
+      };
+    }
+  }
+
+  private getPduHealthOrdering(): string {
+    const sortColumn = this.pduHealthSortState.sortColumn || 'vendor';
+    const sortDirection = this.pduHealthSortState.sortDirection || 'asc';
+    const orderingKey = sortColumn || 'vendor';
+    return sortDirection === 'desc' ? `-${orderingKey}` : orderingKey;
   }
 
   private initializeAlertEventsSortState() {

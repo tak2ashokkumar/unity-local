@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
-import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
@@ -82,6 +82,8 @@ export class PublicCloudAzureSummaryDetailsService {
       data.account = account.account;
       data.accountUuid = account.account_uuid;
       data.monitoring = account.monitoring;
+      data.collectorUuid = account.collector?.uuid;
+      data.isCollectorZtc = account.collector?.is_ztc;
 
       data.managementIp = account.management_ip ? account.management_ip : 'N/A';
       data.osType = account.os_type ? account.os_type : 'N/A';
@@ -133,7 +135,11 @@ export class PublicCloudAzureSummaryDetailsService {
           data.newTabToolipMessage = 'VM is Down';
         } else if (isWindows) {
           data.newTabToolipMessage = 'Open In New Tab';
-          data.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), data.managementIp) : WINDOWS_CONSOLE_CLIENT(data.managementIp);
+          if (account.collector?.is_ztc) {
+            data.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(data.collectorUuid, data.managementIp)}`;
+          } else {
+            data.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), data.managementIp) : WINDOWS_CONSOLE_CLIENT(data.managementIp);
+          }
         } else {
           data.newTabToolipMessage = 'Open In New Tab';
           data.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -524,6 +530,8 @@ export class AzureResourcesViewData {
 
   vmId: number;
   monitoring: DeviceMonitoringType;
+  collectorUuid: string;
+  isCollectorZtc: boolean;
 
   powerStatus: string;
   isPowerIconEnabled: boolean;

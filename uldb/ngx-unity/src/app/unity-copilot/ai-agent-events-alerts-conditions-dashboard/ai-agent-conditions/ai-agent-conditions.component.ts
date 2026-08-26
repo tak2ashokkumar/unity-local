@@ -109,7 +109,6 @@ export class AiAgentConditionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.modalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -628,9 +627,11 @@ export class AiAgentConditionsComponent implements OnInit, OnDestroy {
 
   @ViewChild('confirmLoadChatRef') confirmLoadChatRef: ElementRef;
   modalRef: BsModalRef;
+  isUnityChatbotOpen = false;
 
   openConfirmLoadChat() {
-    if (this.selectedCondition.conversation_detail.conversation_id) {
+    this.isUnityChatbotOpen = document.body.classList.contains('unity-chatbot-open');
+    if (this.selectedCondition.conversation_detail.conversation_id || this.isUnityChatbotOpen) {
       this.modalRef = this.modalService.show(this.confirmLoadChatRef,
         Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
     } else {

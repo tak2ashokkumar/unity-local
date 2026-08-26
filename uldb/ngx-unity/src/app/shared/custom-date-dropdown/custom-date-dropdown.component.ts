@@ -200,6 +200,13 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
     this.selected = _clone(opt?.label || this.getOptionLabel(opt?.value));
     this.drForm.get('period').setValue(opt.value);
 
+    if (this.isAllTimePeriod(opt?.value)) {
+      this.drForm.patchValue({ from: null, to: null }, { emitEvent: false });
+      this.drForm.updateValueAndValidity({ emitEvent: false });
+      this.submit();
+      return;
+    }
+
     if (opt?.value === DateRangePeriod.CUSTOM) {
       const customRange = this.getExistingOrDefaultCustomRange();
       this.drForm.get('from').setValue(new Date(customRange.from));
@@ -263,11 +270,22 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
     // console.log('form : ', this.drForm);
     // console.log('is Valid : ', this.drForm.valid);
     // console.log('****************************')
+    const formValue = this.drForm.getRawValue();
+    if (this.isAllTimePeriod(formValue?.period)) {
+      this.clickFlag = false;
+      this.onSubmit.emit({
+        period: formValue.period,
+        from: null,
+        to: null
+      });
+      return;
+    }
+
     if (this.drForm.invalid) {
       this.drFormErrors = this.utilSvc.validateForm(this.drForm, this.drFormValidationMsgs, this.drFormErrors);
     } else {
       this.clickFlag = false;
-      this.onSubmit.emit(this.drForm.getRawValue());
+      this.onSubmit.emit(formValue);
     }
   }
 
@@ -316,6 +334,10 @@ export class CustomDateDropdownComponent implements OnInit, OnChanges, OnDestroy
     const selectedOption = (this.options || []).find(opt => opt?.value === value);
     return _clone(selectedOption?.label || fallback);
   }
+
+  private isAllTimePeriod(period?: string): boolean {
+    return period === DateRangePeriod.ALLTIME;
+  }
 }
 
 export class DateRangeOption {
@@ -328,8 +350,8 @@ export class DateRangeOption {
 
 export interface DateRangeSubmitPayload {
   period?: string;
-  from?: Date | string;
-  to?: Date | string;
+  from?: Date | string | null;
+  to?: Date | string | null;
 }
 
 export enum DateRangePeriod {

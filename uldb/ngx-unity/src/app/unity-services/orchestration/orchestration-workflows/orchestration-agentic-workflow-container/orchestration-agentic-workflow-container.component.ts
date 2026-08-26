@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Inject, OnInit, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NodeDataModel, OrchestrationWorkflowMetadata, UnityWorkflowViewData } from '../orchestration-workflow-poc/orchestration-workflow-poc.type';
 import { Subject } from 'rxjs';
 import Drawflow from 'drawflow';
@@ -32,7 +32,7 @@ type AccessType = "dot" | "bracket";
   styleUrls: ['./orchestration-agentic-workflow-container.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
+export class OrchestrationAgenticWorkflowContainerComponent implements OnInit, OnDestroy {
 
   chatUpdates$ = new Subject<OnChatExecution>();
   noOfOutputNode: number;
@@ -305,11 +305,9 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   }
 
   ngOnDestroy() {
+    this.modalRef?.hide();
     this.workflowReturnModalRef?.hide();
     this.maximizeLeftPanel();
-    if (this.modalRef) {
-      this.modalRef.hide();
-    }
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
@@ -3577,4 +3575,3 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
     return true;
   }
 }
-

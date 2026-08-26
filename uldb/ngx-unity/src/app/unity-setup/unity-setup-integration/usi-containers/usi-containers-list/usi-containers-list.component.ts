@@ -68,6 +68,8 @@ export class UsiContainersListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.confirmModalRef?.hide();
+    this.dockerCredentialRef?.hide();
     this.spinnerSvc.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

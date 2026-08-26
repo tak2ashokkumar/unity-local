@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -29,6 +29,7 @@ export class NutanixVmsDetailsComponent implements OnInit {
   pcId: string;
 
   constructor(private route: ActivatedRoute,
+    private router: Router,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
     private svc: NutanixVmsDetailsService) {
@@ -78,5 +79,9 @@ export class NutanixVmsDetailsComponent implements OnInit {
     this.detailFormErrors = this.svc.resetDetailFormErrors();
     this.detailFormValidationMessages = this.svc.detailFormValidationMessages;
     this.detailForm.disable({ emitEvent: false });
+  }
+
+  goBack(): void {
+    this.router.navigate(['../../'], { relativeTo: this.route });
   }
 }

@@ -101,6 +101,28 @@
                                     [options]="{errors:agentFormErrors.password, placeholder:''}"></custom-password-field>
                             </div>
                         </ng-container>
+                        <ng-container *ngIf="dbType == 'PostgreSQL'">
+                            <div class="form-group col-4" *ngIf="agentForm.controls.service_name">
+                                <label class="form-col-form-label" for="service_name">Database
+                                    Name<em>*</em></label>
+                                <input id="service_name" class="form-control" type="text" formControlName="service_name"
+                                    [class.is-invalid]="agentFormErrors.service_name">
+                                <div class="invalid-feedback" *ngIf="agentFormErrors.service_name">
+                                    {{agentFormErrors.service_name}}</div>
+                            </div>
+                            <div class="form-group col-4" *ngIf="agentForm.controls.username">
+                                <label for="username" class="form-col-form-label">Username<em>*</em></label>
+                                <input id="username" class="form-control" type="username" formControlName="username"
+                                    [class.is-invalid]="agentFormErrors.username">
+                                <div class="invalid-feedback" *ngIf="agentFormErrors.username">
+                                    {{agentFormErrors.username}}</div>
+                            </div>
+                            <div class="form-group col-4" *ngIf="agentForm.controls.password">
+                                <label for="password" class="form-col-form-label">Password<em>*</em></label>
+                                <custom-password-field formControlName="password"
+                                    [options]="{errors:agentFormErrors.password, placeholder:''}"></custom-password-field>
+                            </div>
+                        </ng-container>
                     </ng-container>
                 </div>
             </div>

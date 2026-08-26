@@ -27,8 +27,9 @@
           </div>
           <div class="col-6 p-0" *ngIf="taskWidget?.count">
             <ng-container *ngIf="taskWidget?.byScriptTypeChartData">
-              <div echarts [options]="taskWidget?.byScriptTypeChartData.options" (chartInit)="onChartClick($event)"
-                [extentions]="taskWidget?.byScriptTypeChartData.extensions" [defaultHeight]="250"></div>
+              <div echarts class="task-by-type-chart" [options]="taskWidget?.byScriptTypeChartData.options"
+                (chartInit)="onChartClick($event)" [extentions]="taskWidget?.byScriptTypeChartData.extensions"
+                [defaultHeight]="280"></div>
             </ng-container>
           </div>
           <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!taskWidget?.count">No data

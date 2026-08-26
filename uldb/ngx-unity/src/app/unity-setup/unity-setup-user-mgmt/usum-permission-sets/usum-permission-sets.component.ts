@@ -44,8 +44,8 @@ export class UsumPermissionSetsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.toggleConfirmPermissionSetModalRef?.hide();
     this.confirmDeleteModalRef?.hide();
+    this.toggleConfirmPermissionSetModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

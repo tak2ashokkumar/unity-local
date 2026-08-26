@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
-import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
 import { AppLevelService } from 'src/app/app-level.service';
 import {
@@ -129,6 +129,8 @@ export class VmsListVmwareService {
     a.tags = vm.tags.filter(tg => tg);
     a.monitoring = vm.monitoring;
     a.toolsMounted = vm.vmware_tools_mounted;
+    a.collectorUuid = vm.collector?.uuid;
+    a.isCollectorZtc = vm.collector?.is_ztc;
     if (vm.status) {
       a.deviceStatus = this.utilService.getDeviceStatus(vm.status);
     }
@@ -169,7 +171,11 @@ export class VmsListVmwareService {
         a.newTabToolipMessage = 'VM is Down';
       } else if (isWindows) {
         a.newTabToolipMessage = 'Open In New Tab';
-        a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+        if (vm.collector?.is_ztc) {
+          a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(a.collectorUuid, a.managementIp)}`;
+        } else {
+          a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+        }
       } else {
         a.newTabToolipMessage = 'Open In New Tab';
         a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -453,6 +459,9 @@ export class VMwareViewData {
   lastBackupTime: string;
   rpo: string;
   isSelected: boolean;
+
+  collectorUuid: string;
+  isCollectorZtc: boolean;
 
   isSameTabEnabled: boolean;
   sameTabTootipMessage: string;
@@ -791,6 +800,7 @@ export interface VMwareVM {
   tags: string[];
   monitoring: DeviceMonitoringType;
   vmware_tools_mounted: boolean;
+  collector: CollectorType;
 }
 interface Cloud {
   id: number;

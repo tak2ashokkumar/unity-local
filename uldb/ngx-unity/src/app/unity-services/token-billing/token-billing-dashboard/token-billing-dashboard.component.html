@@ -197,7 +197,7 @@
                             [insideClick]="true" (isOpenChange)="onFilterDropdownOpenChange('model', $event)"
                             class="tb-graph-filter-dropdown">
                             <button id="model-filter-dropdown-toggle"
-                                class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                class="btn btn-sm btn-light border text-dark dropdown-toggle" type="button"
                                 data-toggle="dropdown" aria-controls="model-filter-dropdown-menu" dropdownToggle>
                                 {{modelUsageData.selectedModels.length}} Selected
                             </button>
@@ -243,15 +243,15 @@
                     <span class="font-weight-500 font-lg">Model Token Usage</span>
                     <div class="d-flex align-items-center">
                         <span class="font-weight-bold text-dark font-lg-xl mr-1">
-                            {{formatCost(modelTokenUsageData.totalCostUsd)}}
+                            {{formatTokens(modelTokenUsageData.totalTokens)}}
                         </span>
-                        <span class="text-muted font-xs mr-3">Total Cost</span>
+                        <span class="text-muted font-xs mr-3">Total Token</span>
                         <!-- User multi-select dropdown -->
                         <span dropdown #userFilterDropdown="bs-dropdown" placement="bottom right" container="body"
                             [insideClick]="true" (isOpenChange)="onFilterDropdownOpenChange('user', $event)"
                             class="tb-graph-filter-dropdown">
                             <button id="user-filter-dropdown-toggle"
-                                class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                class="btn btn-sm btn-light border text-dark dropdown-toggle" type="button"
                                 data-toggle="dropdown" aria-controls="user-filter-dropdown-menu" dropdownToggle>
                                 {{modelTokenUsageData.selectedUsers.length}} Selected
                             </button>

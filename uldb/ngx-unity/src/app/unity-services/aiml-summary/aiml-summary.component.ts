@@ -6,7 +6,8 @@ import { takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { AIMLSummaryAlertsCountViewData, AIMLSummaryNoisyEventsViewData, AIMLSummaryNoisyHostsViewData, AimlSummaryService, AIMLSummaryViewData, ChartData, Duration, eventCountTargets } from './aiml-summary.service';
+import { CustomDateFilterChange, CustomDateFilterOption, CustomDateFilterPeriod, getCustomDateFilterRange } from 'src/app/shared/custom-date-filter/custom-date-filter.type';
+import { AIMLSummaryAlertsCountViewData, AIMLSummaryDateRangeParams, AIMLSummaryNoisyEventsViewData, AIMLSummaryNoisyHostsViewData, AimlSummaryService, AIMLSummaryViewData, ChartData, Duration, eventCountTargets } from './aiml-summary.service';
 import { AIMLSummaryEventCount } from './aiml-summary.type';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
 
@@ -25,6 +26,15 @@ export class AimlSummaryComponent implements OnInit, OnDestroy {
   eventsData: AIMLSummaryEventCount[] = [];
 
   duration = Duration;
+  readonly dateRangeDefault: CustomDateFilterPeriod = CustomDateFilterPeriod.THIRTY_DAYS;
+  readonly dateRangeOptions: CustomDateFilterOption[] = [
+    { label: '24H', value: CustomDateFilterPeriod.LAST_24_HR },
+    { label: '7D', value: CustomDateFilterPeriod.SEVEN_DAYS },
+    { label: '30D', value: CustomDateFilterPeriod.THIRTY_DAYS },
+    { label: 'ALL', value: CustomDateFilterPeriod.ALL },
+    { label: 'CUSTOM', value: CustomDateFilterPeriod.CUSTOM }
+  ];
+  dateRangeParams: AIMLSummaryDateRangeParams = this.getDateRangeParamsByPeriod(this.dateRangeDefault);
   eventCountTargets: Array<{ name: string, key: string }> = eventCountTargets;
   eventCountForm: FormGroup;
   eventsCountChartData: ChartData;
@@ -59,7 +69,7 @@ export class AimlSummaryComponent implements OnInit, OnDestroy {
 
   getConditionsSummary() {
     this.spinner.start('main');
-    this.summarySvc.getConditionsSummary().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.summarySvc.getConditionsSummary(this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.summaryData = this.summarySvc.convertToSummaryViewdata(res);
       this.spinner.stop('main');
     }, err => {
@@ -70,7 +80,7 @@ export class AimlSummaryComponent implements OnInit, OnDestroy {
 
   getAlertsCountByDeviceType() {
     this.spinner.start('main');
-    this.summarySvc.getAlertsCountByDeviceType().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.summarySvc.getAlertsCountByDeviceType(this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.alertsData = this.summarySvc.convertToAlertsCountViewdata(res);
       this.spinner.stop('main');
     }, err => {
@@ -81,7 +91,7 @@ export class AimlSummaryComponent implements OnInit, OnDestroy {
 
   getNoisyEvents() {
     this.spinner.start('main');
-    this.summarySvc.getNoisyEvents().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.summarySvc.getNoisyEvents(this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.noisyEvents = this.summarySvc.convertToNoisyEventsViewdata(res);
       this.spinner.stop('main');
     }, err => {
@@ -92,7 +102,7 @@ export class AimlSummaryComponent implements OnInit, OnDestroy {
 
   getNoisyHosts() {
     this.spinner.start('main');
-    this.summarySvc.getNoisyHosts().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.summarySvc.getNoisyHosts(this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.noisyHosts = this.summarySvc.convertToNoisyHostsViewData(res);;
       this.spinner.stop('main');
     }, err => {
@@ -130,7 +140,7 @@ export class AimlSummaryComponent implements OnInit, OnDestroy {
   eventsCountEChartData: UnityChartDetails;
   getEventsCount() {
     this.spinner.start('main');
-    this.summarySvc.getEventsCount(this.eventCountForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.summarySvc.getEventsCount(this.eventCountForm.getRawValue(), this.dateRangeParams).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.eventsData = res;
       this.eventsCountEChartData = this.summarySvc.convertToEventsCountEChartData(res);
       // this.eventsCountChartData = this.summarySvc.convertToEventsCountChartData(res);
@@ -139,6 +149,22 @@ export class AimlSummaryComponent implements OnInit, OnDestroy {
       this.spinner.stop('main');
       this.notification.error(new Notification('Error while fetching alerts count!!'));
     });
+  }
+
+  onDateRangeChange(event: CustomDateFilterChange): void {
+    this.dateRangeParams = {
+      startDate: event?.from || null,
+      endDate: event?.to || null
+    };
+    this.refreshData();
+  }
+
+  private getDateRangeParamsByPeriod(period: CustomDateFilterPeriod): AIMLSummaryDateRangeParams {
+    const dateRange = getCustomDateFilterRange(period);
+    return {
+      startDate: dateRange?.from || null,
+      endDate: dateRange?.to || null
+    };
   }
 
   goTo(target: string) {

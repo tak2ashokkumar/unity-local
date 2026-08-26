@@ -1,6 +1,8 @@
-<app-main-tab [tabItems]="tabItems"></app-main-tab>
-<div class="container-fluid">
-  <div class="animated fadeIn">
-        <router-outlet></router-outlet>
+<div>
+  <app-main-tab *ngIf="!isServiceCatalogOnlyUser" [tabItems]="tabItems"></app-main-tab>
+  <div class="p-3" style="margin-top:-25px">
+    <div class="animated fadeIn">
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </div>

@@ -15,6 +15,7 @@ import { UnityconnectNetworkConnectionComponent } from './unityconnect-network-c
 import { UnityconnectNetworkBillingComponent } from './unityconnect-network-billing/unityconnect-network-billing.component';
 import { ChartsModule } from 'ng2-charts';
 import { GraphPortComponent } from './graph-port/graph-port.component';
+import { BandWidthPipe } from 'src/app/app-filters/pipes';
 
 @NgModule({
   declarations: [UnityConnectComponent,
@@ -33,6 +34,9 @@ import { GraphPortComponent } from './graph-port/graph-port.component';
     SharedModule,
     UnityconnectRoutingModule,
     UnitedCloudSharedModule
+  ],
+  providers: [
+    BandWidthPipe
   ]
 })
 export class UnityconnectModule { }

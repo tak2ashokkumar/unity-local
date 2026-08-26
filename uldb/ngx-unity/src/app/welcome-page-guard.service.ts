@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { UserInfoService } from './shared/user-info.service';
-import { Router, RouterStateSnapshot, ActivatedRouteSnapshot, CanActivate } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -12,13 +12,19 @@ export class WelcomePageGuardService implements CanActivate {
 
   canActivate(next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): boolean {
-    const goToWelcomePage = this.userService.goToWelcomePage;
-    if (goToWelcomePage) {
-      this.router.navigate(['welcomepage']);
+    if (this.userService.isServiceCatalogOnlyUser()) {
+      this.router.navigate(['services/service-catalog/redesign/catalog']);
+      return false;
     } else {
-      this.router.navigate(['home']);
-    }
+      console.log(this.userService.goToWelcomePage)
+      const goToWelcomePage = this.userService.goToWelcomePage;
+      if (goToWelcomePage) {
+        this.router.navigate(['welcomepage']);
+      } else {
+        this.router.navigate(['home']);
+      }
 
-    return !goToWelcomePage;
+      return !goToWelcomePage;
+    }
   }
 }

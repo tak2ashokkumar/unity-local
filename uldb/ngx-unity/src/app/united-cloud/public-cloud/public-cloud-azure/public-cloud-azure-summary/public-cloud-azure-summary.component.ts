@@ -287,10 +287,10 @@ export class PublicCloudAzureSummaryComponent implements OnInit, OnDestroy {
       this.scheduleHistoryView = view;
     }
     this.svc.getScheduleHistory(this.scheduleHistoryCurrentCriteria, this.scheduleHistoryView.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.scheduleHistoryCount = res.count; 
+      this.scheduleHistoryCount = res.count;
       this.scheduleHistory = this.svc.convertToHistoryViewData(res.results);
       this.spinner.stop('main');
-      if(view) {
+      if (view) {
         this.modalRef = this.modalService.show(this.scheduleHistoryRef, { class: 'modal-lg', keyboard: true, ignoreBackdropClick: true });
       }
     }, err => {

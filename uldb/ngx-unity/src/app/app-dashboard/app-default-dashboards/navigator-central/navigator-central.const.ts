@@ -65,14 +65,11 @@ export const UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND: UnifiedAiopsStatusLeg
 // Navigator Central uses its own extended executive-summary endpoint (adds by_type / by_provider /
 // by_vendor sub-breakdowns, per-cloud orphaned / idle, datacenter_and_iot, routers / wireless_ap /
 // services, databases.by_engine) so the original unified-aiops-command-centre response stays untouched.
-export const UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/navigator-central-executive-summary/';
+export const UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/executive-monitoring-summary/';
 export const UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT = '/customer/aiops-dashboard/discovery-vs-monitoring/';
 export const UNIFIED_AIOPS_ALERT_SEGREGATION_BY_TYPE_ENDPOINT = '/customer/aiops-dashboard/alert-segregation-by-type/';
 export const UNIFIED_AIOPS_BUSINESS_SERVICES_ENDPOINT = '/customer/aiops-dashboard/business-services/';
 export const UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT = '/customer/aiops-dashboard/geo-distribution-global-ops/';
-
-// Employee / Digital Experience is a static widget that links out to the external Nexthink dashboard.
-export const UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL = 'https://nam10.safelinks.protection.outlook.com/?url=https%3A%2F%2Fkanopy.us.nexthink.cloud%2Fdigital-experience%2Foverview&data=05%7C02%7Cakumar%40unityone.ai%7Cb44d558871ec43ece36d08dec17ad94b%7Cd5f609efb8ac4047a41f4efa1cbb5bc8%7C0%7C0%7C639160930561405792%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=xVjr9CeG4cYEUDs0MbqSAQnlf7eeqDDtnuT%2Fv3PEqp0%3D&reserved=0';
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/private-cloud-infra-coverage/';
 export const UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/public-cloud-infra-coverage/';
 export const UNIFIED_AIOPS_DATACENTER_GEOGRAPHY_ENDPOINT = '/customer/aiops-dashboard/datacenter-geography/';
@@ -153,7 +150,7 @@ export const UNIFIED_AIOPS_DATACENTER_OPTIONS: UnifiedAiopsFilterOption[] = [
 //  - UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: the top hero row (Private / Public / Bare Metal / Datacenter
 //    and IoTs). Each hero card reads a status object from the executive-monitoring-summary response
 //    (monitored / discovered + up / down / unknown), optional chips (Orphaned/Retired, Idle VMs), and
-//    a fixed set of sub-cards pulled from a by_type / by_provider / by_vendor array on that object.
+//    fixed or dynamic sub-cards pulled from a by_type / by_provider / by_vendor object on that object.
 //  - UNIFIED_AIOPS_EXECUTIVE_GROUPS: the category rows (Network, Storage, SD-WAN, Database,
 //    Applications, Kubernetes, AI / GPU / LLM). Each group has status cards and/or scalar tiles.
 // Status object shape: { discovered, monitored, total, up, down, unknown }. All keys are matched
@@ -170,10 +167,15 @@ export const UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: UnifiedAiopsExecCardConfig[] = 
       { label: 'Orphaned/Retired', keys: ['orphaned', 'orphaned_retired', 'orphanedRetired', 'retired'] },
       { label: 'Idle VMs', keys: ['idle', 'idle_vms', 'idleVms', 'idle_device_count'] }
     ],
-    subArrayKeys: ['by_type', 'byType', 'types', 'sub_types'],
+    subArrayKeys: ['private_cloud_compute_by_platform_type', 'privateCloudComputeByPlatformType', 'by_platform_type', 'byPlatformType'],
     subItems: [
-      { key: 'vmware', label: 'VMware VM', matchKeys: ['vmware', 'vmware_vm', 'esxi'], badgeText: 'VM', badgeClass: 'exec-badge-vmware', link: 'vmAll' },
-      { key: 'nutanix', label: 'Nutanix VM', matchKeys: ['nutanix', 'nutanix_vm', 'ahv'], badgeText: 'NX', badgeClass: 'exec-badge-nutanix', link: 'vmAll' }
+      { key: 'custom', label: 'Custom', matchKeys: ['custom'], badgeText: 'CU', badgeClass: 'exec-badge-vmware', link: 'vmCustom' },
+      { key: 'vmware', label: 'VMware', matchKeys: ['vmware'], badgeText: 'VM', badgeClass: 'exec-badge-vmware', link: 'vmVmware' },
+      { key: 'vcloud', label: 'vCloud', matchKeys: ['vcloud', 'v_cloud'], badgeText: 'VC', badgeClass: 'exec-badge-vmware', link: 'vmVcloud' },
+      { key: 'openstack', label: 'OpenStack', matchKeys: ['openstack', 'open_stack'], badgeText: 'OS', badgeClass: 'exec-badge-vmware', link: 'vmOpenstack' },
+      { key: 'proxmox', label: 'Proxmox', matchKeys: ['proxmox'], badgeText: 'PX', badgeClass: 'exec-badge-vmware', link: 'vmProxmox' },
+      { key: 'hyperv', label: 'Hyper-V', matchKeys: ['hyperv', 'hyper_v', 'hyper-v'], badgeText: 'HV', badgeClass: 'exec-badge-vmware', link: 'vmHyperv' },
+      { key: 'nutanix', label: 'Nutanix', matchKeys: ['nutanix'], badgeText: 'NX', badgeClass: 'exec-badge-nutanix', link: 'vmNutanix' }
     ]
   },
   {
@@ -187,11 +189,11 @@ export const UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: UnifiedAiopsExecCardConfig[] = 
       { label: 'Orphaned/Retired', keys: ['orphaned', 'orphaned_retired', 'orphanedRetired', 'retired'] },
       { label: 'Idle VMs', keys: ['idle', 'idle_vms', 'idleVms', 'idle_device_count'] }
     ],
-    subArrayKeys: ['by_provider', 'byProvider', 'providers'],
+    subArrayKeys: ['public_cloud_compute_by_platform_type', 'publicCloudComputeByPlatformType', 'by_platform_type', 'byPlatformType'],
     subItems: [
-      { key: 'aws', label: 'AWS Instance', matchKeys: ['aws', 'amazon', 'aws_instance'], badgeText: 'AWS', badgeClass: 'exec-badge-aws', link: 'publicCloud' },
-      { key: 'azure', label: 'Azure Virtual VM', matchKeys: ['azure', 'microsoft', 'azure_virtual_vm'], badgeText: 'AZ', badgeClass: 'exec-badge-azure', link: 'publicCloud' },
-      { key: 'gcp', label: 'Google VM Instances', matchKeys: ['gcp', 'google', 'google_vm_instances', 'googlecloud'], badgeText: 'GC', badgeClass: 'exec-badge-gcp', link: 'publicCloud' },
+      { key: 'aws', label: 'AWS', matchKeys: ['aws', 'amazon', 'aws_instance'], badgeText: 'AWS', badgeClass: 'exec-badge-aws', link: 'publicCloud' },
+      { key: 'azure', label: 'Azure', matchKeys: ['azure', 'microsoft', 'azure_virtual_vm'], badgeText: 'AZ', badgeClass: 'exec-badge-azure', link: 'publicCloud' },
+      { key: 'gcp', label: 'GCP', matchKeys: ['gcp', 'google', 'google_vm_instances', 'googlecloud'], badgeText: 'GC', badgeClass: 'exec-badge-gcp', link: 'publicCloud' },
       { key: 'oci', label: 'OCI', matchKeys: ['oci', 'oracle', 'oracle_cloud'], badgeText: 'OCI', badgeClass: 'exec-badge-oci', link: 'publicCloud' }
     ]
   },
@@ -202,13 +204,8 @@ export const UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: UnifiedAiopsExecCardConfig[] = 
     iconColor: '#20638f',
     payloadKeys: ['baremetal_servers', 'baremetalServers', 'bare_metal_servers', 'bareMetalServers'],
     link: 'bmservers',
-    subArrayKeys: ['by_vendor', 'byVendor', 'vendors'],
-    subItems: [
-      { key: 'dell', label: 'Dell', matchKeys: ['dell'], badgeText: 'DL', badgeClass: 'exec-badge-dell', link: 'bmservers' },
-      { key: 'hpe', label: 'HPE', matchKeys: ['hpe', 'hp'], badgeText: 'HPE', badgeClass: 'exec-badge-hpe', link: 'bmservers' },
-      { key: 'lenovo', label: 'Lenovo', matchKeys: ['lenovo'], badgeText: 'LN', badgeClass: 'exec-badge-lenovo', link: 'bmservers' },
-      { key: 'supermicro', label: 'SuperMicro', matchKeys: ['supermicro', 'super_micro'], badgeText: 'SM', badgeClass: 'exec-badge-supermicro', link: 'bmservers' }
-    ]
+    subArrayKeys: ['baremetal_servers_by_manufacturer', 'baremetalServersByManufacturer', 'by_manufacturer', 'byManufacturer'],
+    dynamicSubCards: true
   },
   {
     key: 'datacenter_iot',
@@ -217,11 +214,9 @@ export const UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: UnifiedAiopsExecCardConfig[] = 
     iconColor: '#8a6d1b',
     payloadKeys: ['datacenter_and_iot', 'datacenterAndIot', 'datacenter_and_iots', 'datacenter_iot'],
     link: 'datacenter',
-    subArrayKeys: ['by_type', 'byType', 'types'],
-    subItems: [
-      { key: 'pdu', label: 'PDU', matchKeys: ['pdu', 'pdus', 'smart_pdu'], badgeText: 'PDU', badgeClass: 'exec-badge-pdu', link: 'otherDevices' },
-      { key: 'temperature_sensors', label: 'Temperature Sensors', matchKeys: ['temperature_sensors', 'temperature', 'temp_sensors', 'sensor', 'sensors'], badgeText: 'TS', badgeClass: 'exec-badge-sensor', link: 'otherDevices' }
-    ]
+    subArrayKeys: ['datacenter_and_iot', 'datacenterAndIot', 'datacenter_and_iots', 'datacenter_iot'],
+    fallbackSubArrayKeys: ['network_and_other', 'networkAndOther'],
+    dynamicSubCards: true
   }
 ];
 
@@ -248,7 +243,8 @@ export const UNIFIED_AIOPS_EXECUTIVE_GROUPS: UnifiedAiopsExecGroupConfig[] = [
     containerKeys: ['storage'],
     cards: [
       { key: 'netapp', label: 'NetApp', payloadKeys: ['netapp_storage', 'netapp'], link: 'storage' },
-      { key: 'pure', label: 'Pure', payloadKeys: ['pure_storage', 'pure'], link: 'storage' }
+      { key: 'pure', label: 'Pure', payloadKeys: ['pure_storage', 'pure'], link: 'storage' },
+      { key: 'other_storage', label: 'Other Storage', payloadKeys: ['other_storage', 'otherStorage', 'other'], link: 'storage' }
     ]
   },
   {
@@ -258,6 +254,7 @@ export const UNIFIED_AIOPS_EXECUTIVE_GROUPS: UnifiedAiopsExecGroupConfig[] = [
     iconColor: '#6f42c1',
     containerKeys: ['sdwan', 'sd_wan', 'sdWan'],
     cards: [
+      { key: 'sd_wan_devices', label: 'SD-WAN Devices', payloadKeys: ['sd_wan_devices', 'sdWanDevices', 'sdwan_devices'] },
       { key: 'cisco_meraki', label: 'Cisco Meraki', payloadKeys: ['cisco_meraki_resources', 'cisco_meraki', 'meraki'], link: 'networkControllers' },
       { key: 'cisco_viptela', label: 'Cisco Viptela', payloadKeys: ['cisco_viptela_resources', 'cisco_viptela', 'viptela'], link: 'networkControllers' }
     ]
@@ -267,10 +264,10 @@ export const UNIFIED_AIOPS_EXECUTIVE_GROUPS: UnifiedAiopsExecGroupConfig[] = [
     title: 'Database',
     iconClass: 'fa fa-database',
     iconColor: '#d9822b',
-    containerKeys: ['network_and_other', 'networkAndOther', 'network'],
+    containerKeys: ['database_by_type', 'databaseByType', 'network_and_other', 'networkAndOther', 'network'],
     unit: 'Onboarded',
-    cardArrayContainerKeys: ['databases', 'database'],
-    cardArrayKeys: ['by_engine', 'byEngine', 'engines'],
+    cardArrayContainerKeys: ['database_by_type', 'databaseByType', 'databases', 'database'],
+    cardArrayKeys: ['database_by_type', 'databaseByType', 'by_engine', 'byEngine', 'engines'],
     cardItems: [
       { key: 'mysql', label: 'MySQL', matchKeys: ['mysql'], badgeText: 'My', badgeClass: 'exec-badge-mysql', link: 'databases' },
       { key: 'sqlserver', label: 'SQL Server', matchKeys: ['sqlserver', 'mssql', 'sql_server', 'mssqlserver', 'mssql_server'], badgeText: 'SQL', badgeClass: 'exec-badge-mssql', link: 'databases' },
@@ -286,7 +283,7 @@ export const UNIFIED_AIOPS_EXECUTIVE_GROUPS: UnifiedAiopsExecGroupConfig[] = [
     containerKeys: ['network_and_other', 'networkAndOther', 'network'],
     cards: [
       { key: 'applications', label: 'Applications', payloadKeys: ['applications', 'application'], link: 'applications' },
-      { key: 'services', label: 'Services', payloadKeys: ['services', 'service'], link: 'applications' },
+      { key: 'services', label: 'Services', payloadKeys: ['services', 'service', 'business_services', 'businessServices'], link: 'applications' },
       { key: 'urls', label: 'URL Monitored', payloadKeys: ['urls', 'url', 'urls_monitored', 'urlsMonitored'], link: 'otherDevices' }
     ]
   },
@@ -336,15 +333,35 @@ export const UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG: Array<{ label: string; ton
 ];
 
 export const UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS = [
-  '#4a63d6',
-  '#7d5fc4',
-  '#f2a32a',
-  '#33a06a',
-  '#e8554e',
-  '#23a8a0',
-  '#3a9fe0',
-  '#d76aa6'
+  '#2563eb',
+  '#0f766e',
+  '#4f46e5',
+  '#0891b2',
+  '#16a34a',
+  '#7c3aed',
+  '#0d9488',
+  '#64748b',
+  '#a16207',
+  '#0369a1',
+  '#15803d',
+  '#6d28d9'
 ];
+
+export const UNIFIED_AIOPS_PUBLIC_CLOUD_GEO_PROVIDER_COLORS: { [providerKey: string]: string } = {
+  aws: '#ff9900',
+  amazon: '#ff9900',
+  amazonwebservices: '#ff9900',
+  azure: '#0078d4',
+  microsoftazure: '#0078d4',
+  gcp: '#4285f4',
+  google: '#4285f4',
+  googlecloud: '#4285f4',
+  googlecloudplatform: '#4285f4',
+  oci: '#312d2a',
+  oracle: '#312d2a',
+  oraclecloud: '#312d2a',
+  oraclecloudinfrastructure: '#312d2a'
+};
 
 export const UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS = [
   '#6b7ff5',
@@ -430,14 +447,33 @@ export const UNIFIED_AIOPS_PRIVATE_RESOURCE_ICON_FALLBACK: UnifiedAiopsResourceI
   iconColor: '#6c757d'
 };
 
-// Private Cloud Geo Distribution - a map widget cloned from Datacenter Geographies, markers colored by
-// platform (VMware / Nutanix) and sized by total resources at the site.
+// Private Cloud Geo Distribution endpoint. The widget adapts this response into a tile chart in the UI.
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_DISTRIBUTION_ENDPOINT = '/customer/aiops-dashboard/private-cloud-geo-distribution/';
 
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLORS: { [platformKey: string]: string } = {
-  vmware: '#2f6bdf',
-  nutanix: '#7b5cd6'
+  vmware: '#0095D3',
+  nutanix: '#A4D233',
+  hyperv: '#0078D4',
+  openstack: '#ED1944',
+  proxmox: '#E57000',
+  vcloud: '#006990',
+  custom: '#4F46E5',
+  other: '#334155'
 };
+
+export const UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLOR_PALETTE = [
+  '#0E7490',
+  '#7C3AED',
+  '#047857',
+  '#0369A1',
+  '#4338CA',
+  '#0F766E',
+  '#A16207',
+  '#BE185D',
+  '#15803D',
+  '#475569',
+  '#0F172A'
+];
 
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS: UnifiedAiopsFilterOption[] = [
   { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'Select All' },
@@ -448,42 +484,4 @@ export const UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS: UnifiedAiopsFilte
 // Newly Provisioned VMs - a paginated table widget. The request carries the global top filters
 // (dc_uuids / cloud_uuids / time_range) plus these widget-local filters and page / page_size.
 export const UNIFIED_AIOPS_NEWLY_PROVISIONED_VMS_ENDPOINT = '/customer/aiops-dashboard/newly-provisioned-vms/';
-
-export const UNIFIED_AIOPS_NEW_VM_CLOUD_OPTIONS: UnifiedAiopsFilterOption[] = [
-  { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Clouds' },
-  { value: 'AWS', label: 'AWS' },
-  { value: 'Azure', label: 'Azure' },
-  { value: 'GCP', label: 'GCP' },
-  { value: 'OCI', label: 'OCI' }
-];
-
-export const UNIFIED_AIOPS_NEW_VM_STATUS_OPTIONS: UnifiedAiopsFilterOption[] = [
-  { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Statuses' },
-  { value: 'Running', label: 'Running' },
-  { value: 'Provisioning', label: 'Provisioning' },
-  { value: 'Stopped', label: 'Stopped' }
-];
-
-export const UNIFIED_AIOPS_NEW_VM_STATE_OPTIONS: UnifiedAiopsFilterOption[] = [
-  { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All States' },
-  { value: 'Up', label: 'Up' },
-  { value: 'Down', label: 'Down' },
-  { value: 'Unknown', label: 'Unknown' }
-];
-
-export const UNIFIED_AIOPS_NEW_VM_LIFECYCLE_STAGE_OPTIONS: UnifiedAiopsFilterOption[] = [
-  { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Stages' },
-  { value: 'Deployed', label: 'Deployed' },
-  { value: 'In Use', label: 'In Use' },
-  { value: 'Maintenance', label: 'Maintenance' },
-  { value: 'End of Life', label: 'End of Life' },
-  { value: 'Retired', label: 'Retired' }
-];
-
-export const UNIFIED_AIOPS_NEW_VM_LIFECYCLE_STATUS_OPTIONS: UnifiedAiopsFilterOption[] = [
-  { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Statuses' },
-  { value: 'Active', label: 'Active' },
-  { value: 'Under Maintenance', label: 'Under Maintenance' },
-  { value: 'Retired', label: 'Retired' },
-  { value: 'Decommissioned', label: 'Decommissioned' }
-];
+export const UNIFIED_AIOPS_NEWLY_PROVISIONED_VMS_DEFAULT_SORT = 'provisioned_date';

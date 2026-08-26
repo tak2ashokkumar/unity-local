@@ -1,0 +1,44 @@
+<form class="custom-date-filter d-flex align-items-center flex-wrap flex-column" [ngClass]="customClass"
+  [formGroup]="dateFilterForm" *ngIf="dateFilterForm && visibleOptions.length">
+  <div class="btn-group btn-group-sm bg-white rounded overflow-hidden mb-1" role="group" aria-label="Date duration">
+    <button type="button" class="btn text-muted border custom-date-filter-period-btn"
+      *ngFor="let opt of visibleOptions; trackBy: trackByOption" [class.active]="selectedPeriod === opt.value"
+      [attr.aria-pressed]="selectedPeriod === opt.value" (click)="selectPeriod(opt.value)">
+      {{opt.label}}
+    </button>
+  </div>
+
+  <div class="d-flex align-items-center custom-date-filter-dates" *ngIf="selectedPeriod === period.CUSTOM">
+    <div class="input-group input-group-sm custom-date-filter-date-input">
+      <owl-date-time #startPicker [hour12Timer]="true" [pickerType]="dateOnlyPicker ? 'calendar' : 'both'"
+        [scrollStrategy]="startScrollStrategy" [panelClass]="resolvedPopupPanelClass"
+        (afterPickerClosed)="onPickerClosed()"></owl-date-time>
+      <input class="form-control form-control-sm rounded-left custom-date-filter-input" formControlName="startDate"
+        type="text" placeholder="From" aria-label="Start date" autocomplete="off" [owlDateTimeTrigger]="startPicker"
+        [owlDateTime]="startPicker" (dateTimeChange)="onDateChange()" (change)="onDateChange()"
+        [class.in-valid]="selectedPeriod === period.CUSTOM && dateFilterForm.errors">
+      <div class="input-group-append" [owlDateTimeTrigger]="startPicker">
+        <span class="input-group-text bg-white custom-date-filter-calendar">
+          <i class="fas fa-calendar-alt"></i>
+        </span>
+      </div>
+    </div>
+
+    <span class="custom-date-filter-separator">-</span>
+
+    <div class="input-group input-group-sm custom-date-filter-date-input">
+      <owl-date-time #endPicker [hour12Timer]="true" [pickerType]="dateOnlyPicker ? 'calendar' : 'both'"
+        [scrollStrategy]="endScrollStrategy" [panelClass]="resolvedPopupPanelClass"
+        (afterPickerClosed)="onPickerClosed()"></owl-date-time>
+      <input class="form-control form-control-sm rounded-left custom-date-filter-input" formControlName="endDate"
+        type="text" placeholder="To" aria-label="End date" autocomplete="off" [owlDateTimeTrigger]="endPicker"
+        [owlDateTime]="endPicker" [min]="dateFilterForm.controls.startDate.value" (dateTimeChange)="onDateChange()"
+        (change)="onDateChange()" [class.in-valid]="selectedPeriod === period.CUSTOM && dateFilterForm.errors">
+      <div class="input-group-append" [owlDateTimeTrigger]="endPicker">
+        <span class="input-group-text bg-white custom-date-filter-calendar">
+          <i class="fas fa-calendar-alt"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { Subject } from 'rxjs';
 import { AuthType } from '../../check-auth/check-auth.service';
 import { AppNotificationService } from '../../app-notification/app-notification.service';
@@ -8,6 +8,11 @@ import { ConditionInvestigationNewTerminalService } from '../condition-investiga
 import { takeUntil } from 'rxjs/operators';
 import { Notification } from '../../app-notification/notification.type';
 import { ResizeEvent } from 'angular-resizable-element';
+import { ConditionInvestigationTerminalWindowRegistryService } from '../condition-investigation-new-terminal/condition-investigation-terminal-window-registry.service';
+import { ConditionInvestigationFloatingTerminalItemComponent } from './condition-investigation-floating-terminal-item/condition-investigation-floating-terminal-item.component';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ActivatedRoute } from '@angular/router';
+import { ConditionInvestigationAuthModalService } from '../condition-investigation-auth-modal/condition-investigation-auth-modal.service';
 
 @Component({
   selector: 'condition-investigation-floating-terminal',
@@ -15,6 +20,12 @@ import { ResizeEvent } from 'angular-resizable-element';
   styleUrls: ['./condition-investigation-floating-terminal.component.scss']
 })
 export class ConditionInvestigationFloatingTerminalComponent implements OnInit, OnDestroy {
+  @ViewChildren(ConditionInvestigationFloatingTerminalItemComponent)
+  terminalItems: QueryList<ConditionInvestigationFloatingTerminalItemComponent>;
+  @ViewChild('addTerminalConfirmation')
+  addTerminalConfirmation: TemplateRef<any>;
+  addTerminalModalRef: BsModalRef;
+
   private ngUnsubscribe = new Subject();
   terms: { tabId: string, input: any, auth: AuthType }[] = [];
   activeIndex: number;
@@ -23,7 +34,11 @@ export class ConditionInvestigationFloatingTerminalComponent implements OnInit, 
   constructor(private notification: AppNotificationService,
     private spinner: AppSpinnerService,
     private termService: ConditionInvestigationFloatingTerminalService,
-    private newTerminalService: ConditionInvestigationNewTerminalService) {
+    private newTerminalService: ConditionInvestigationNewTerminalService,
+    private windowRegistry: ConditionInvestigationTerminalWindowRegistryService,
+    private modalService: BsModalService,
+    private route: ActivatedRoute,
+    private authApi: ConditionInvestigationAuthModalService) {
     this.newTerminalService.terminalData$
       .subscribe((data: any) => {
         const { input, auth } = data;
@@ -95,6 +110,112 @@ export class ConditionInvestigationFloatingTerminalComponent implements OnInit, 
     this.autoRefresh = false;
     this.termService.termToggled(this.autoRefresh);
     this.publishActiveIndex();
+  }
+
+  openAddTerminalConfirmation() {
+    this.addTerminalModalRef = this.modalService.show(this.addTerminalConfirmation, {
+      class: '',
+      keyboard: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  confirmAddTerminal(tabType: 'sameTab' | 'newTab') {
+    const activeTerminal = this.terms[this.activeIndex];
+    if (!activeTerminal) {
+      return;
+    }
+
+    this.addTerminalModalRef.hide();
+
+    const conditionId = this.route.snapshot.paramMap.get('conditionId');
+    const conversationId = (activeTerminal.auth as any).conversation_id;
+
+    const openAuthForm = (device?: any) => {
+      this.newTerminalService.setBackendTabId(null);
+      this.newTerminalService.setPendingTabType(tabType);
+      this.newTerminalService.setConversationId(conversationId);
+      const hasUsableDevice = device?.id || device?.host || device?.device_ip_address;
+      this.newTerminalService.openTerminal({
+        command: '',
+        conditionId,
+        conversationId,
+        tabType,
+        device: hasUsableDevice ? device : undefined
+      });
+    };
+
+    this.authApi.getDefaultDevice(conditionId, conversationId)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(
+        (device: any) => openAuthForm(device),
+        () => openAuthForm()
+      );
+  }
+
+  openActiveTerminalInNewTab() {
+    const activeTerminal = this.terms[this.activeIndex];
+    if (!activeTerminal) {
+      return;
+    }
+
+    const tabId = 'tab-' + Math.random().toString(36).substring(2, 10);
+    const input = { ...activeTerminal.input, tabId };
+    const auth: any = { ...activeTerminal.auth, tab_type: 'new' };
+    const activeTerminalItem = this.terminalItems
+      ?.find(item => item.termInput?.input?.tabId === activeTerminal.input.tabId);
+    const terminalSnapshot = activeTerminalItem?.getTerminalSnapshot() || '';
+    const terminalData = { input, auth, terminalSnapshot };
+
+    const newWin = window.open(
+      `/main#/terminal-new-tab?conversationId=${auth.conversation_id || ''}&tabId=${tabId}`,
+      '_blank'
+    );
+
+    if (!newWin) {
+      this.notification.error(new Notification('Unable to open terminal in a new window.'));
+      return;
+    }
+
+    this.windowRegistry.register(tabId, newWin);
+    this.sendTerminalDataToNewTab(tabId, terminalData);
+  }
+
+  private sendTerminalDataToNewTab(tabId: string, terminalData: any) {
+    if (typeof BroadcastChannel === 'undefined') {
+      return;
+    }
+
+    const channel = new BroadcastChannel('terminal-tabs');
+    const payload = {
+      type: 'OPEN_TERMINAL',
+      tabId,
+      terminalData
+    };
+
+    let attempts = 0;
+    let interval: any;
+
+    const closeChannel = () => {
+      clearInterval(interval);
+      channel.close();
+    };
+
+    channel.onmessage = (event) => {
+      if (event.data.type === 'TERMINAL_ACK' && event.data.tabId === tabId) {
+        closeChannel();
+      }
+    };
+
+    const send = () => {
+      channel.postMessage(payload);
+      attempts++;
+      if (attempts >= 10) {
+        closeChannel();
+      }
+    };
+    send();
+    interval = setInterval(send, 250);
   }
 
   getDetails(input: any) {

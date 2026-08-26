@@ -79,6 +79,7 @@ export class AiAgentsNetworkAgentDashboardComponent implements OnInit, OnDestroy
   }
 
   ngOnDestroy(): void {
+    this.agentAnalysisModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

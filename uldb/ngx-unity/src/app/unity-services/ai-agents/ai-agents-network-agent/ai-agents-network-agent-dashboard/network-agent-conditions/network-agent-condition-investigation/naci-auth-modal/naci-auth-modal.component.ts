@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Component, EventEmitter, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
@@ -12,7 +12,7 @@ import { GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
   templateUrl: './naci-auth-modal.component.html',
   styleUrls: ['./naci-auth-modal.component.scss']
 })
-export class NaciAuthModalComponent implements OnInit {
+export class NaciAuthModalComponent implements OnInit, OnDestroy {
 
   @ViewChild('authModal') authModal: TemplateRef<any>;
   modalRef: BsModalRef;

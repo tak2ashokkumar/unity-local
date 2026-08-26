@@ -11,7 +11,7 @@ import { catchError, map } from 'rxjs/operators';
 import { DevicePopoverData } from '../../devices-popover/device-popover-data';
 import { PowerToggleInput } from '../../server-power-toggle/server-power-toggle.service';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
-import { WINDOWS_CONSOLE_CLIENT, VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { WINDOWS_CONSOLE_CLIENT, VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_VIA_AGENT, GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR } from 'src/app/app-constants';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
@@ -53,6 +53,8 @@ export class VmsListEsxiService {
     a.powerStatus = vm.state;
     a.tags = vm.tags.filter(tg => tg);
     a.monitoring = vm.monitoring;
+    a.collectorUuid = vm.collector?.uuid;
+    a.isCollectorZtc = vm.collector?.is_ztc;
 
     if (this.user.isManagementEnabled) {
       const isWindows: boolean = (vm.ssr_os == 'Windows') || (vm.os_name.lastIndexOf('Microsoft', 0) == 0);
@@ -74,7 +76,11 @@ export class VmsListEsxiService {
         a.newTabToolipMessage = 'VM is Down';
       } else if (isWindows) {
         a.newTabToolipMessage = 'Open In New Tab';
-        a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+        if (vm.collector?.is_ztc) {
+          a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(a.collectorUuid, a.managementIp)}`;
+        } else {
+          a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+        }
       } else {
         a.newTabToolipMessage = 'Open In New Tab';
         a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -273,7 +279,8 @@ export class EsxiViewData {
   updateIpIconEnabled: boolean;
 
   monitoring: DeviceMonitoringType;
-
+  collectorUuid: string;
+  isCollectorZtc: boolean;
   constructor() { }
 }
 
@@ -304,6 +311,7 @@ export interface EsxiVM {
   snmp_community: string;
   tags: string[];
   monitoring: DeviceMonitoringType;
+  collector: CollectorType;
 }
 interface Cloud {
   id: number;

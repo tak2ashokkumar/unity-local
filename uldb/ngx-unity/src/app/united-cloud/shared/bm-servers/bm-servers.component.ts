@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -32,7 +32,7 @@ import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
   templateUrl: './bm-servers.component.html',
   styleUrls: ['./bm-servers.component.scss']
 })
-export class BmServersComponent implements OnInit {
+export class BmServersComponent implements OnInit, OnDestroy {
   popData: DevicePopoverData;
   @ViewChild('serverinfo') serverinfo: ElementRef;
   modalRef: BsModalRef;
@@ -374,10 +374,14 @@ export class BmServersComponent implements OnInit {
     if (!this.viewData[index].isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.bmService.getConsoleAccessInput(this.viewData[index]);
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(accessUrl);
+    if (this.viewData[index].isCollectorZtc) {
+      window.open(accessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.bmService.getConsoleAccessInput(this.viewData[index]);
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(accessUrl);
+    }
   }
 
   createTicket(data: BMServerViewData) {

@@ -207,7 +207,7 @@
                 <ng-container *ngIf="workflowOutputViewData.length > 0; else noDetails">
                     <ng-container *ngFor="let output of workflowOutputViewData">
                         <ng-container *ngIf="selectedTask?.nodeId === output.id">
-                            <ng-container *ngIf="output.type !== 'Chart Task'">
+                            <ng-container *ngIf="!output.chartType">
                                 <div class="row mb-3" style="max-height: 300px; overflow-y: auto;"
                                     *ngIf="output?.output">
                                     <div class="col px-1">
@@ -220,7 +220,10 @@
                                                             tooltip="Copy" style="top: 8px; right: 4px; z-index: 1;"
                                                             (click)="copyOutput()">
                                                         </button>
-                                                        <pre class="mb-0 pr-4" #copyContent>{{ output?.output }}</pre>
+                                                        <div class="workflow-output-scroll">
+                                                            <pre class="workflow-output-json mb-0 pr-4"
+                                                                #copyContent>{{ output?.output | json }}</pre>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -228,26 +231,26 @@
                                     </div>
                                 </div>
                             </ng-container>
-                            <ng-container *ngIf="output.type === 'Chart Task'">
-                                <ng-container *ngIf="output.output.chart_type === 'Bar'">
+                            <ng-container *ngIf="output.chartType">
+                                <ng-container *ngIf="output.chartType === 'BAR' && barChartData">
                                     <div echarts [options]="barChartData.options" [extentions]="barChartData.extensions"
                                         [defaultHeight]="300"></div>
                                 </ng-container>
-                                <ng-conatiner *ngIf="output.output.chart_type === 'Pie'">
+                                <ng-container *ngIf="output.chartType === 'PIE' && pieChartData">
                                     <div echarts [options]="pieChartData.options" [extentions]="pieChartData.extensions"
                                         [defaultHeight]="300">
                                     </div>
-                                </ng-conatiner>
-                                <ng-conatiner *ngIf="output.output.chart_type === 'Line'">
+                                </ng-container>
+                                <ng-container *ngIf="output.chartType === 'LINE' && lineChartData">
                                     <div echarts [options]="lineChartData.options"
                                         [extentions]="lineChartData.extensions" [defaultHeight]="300">
                                     </div>
-                                </ng-conatiner>
-                                <ng-conatiner *ngIf="output.output.chart_type === 'Area'">
+                                </ng-container>
+                                <ng-container *ngIf="output.chartType === 'AREA' && AreaChartData">
                                     <div echarts [options]="AreaChartData.options"
                                         [extentions]="AreaChartData.extensions" [defaultHeight]="300">
                                     </div>
-                                </ng-conatiner>
+                                </ng-container>
                             </ng-container>
                         </ng-container>
 

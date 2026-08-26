@@ -40,11 +40,14 @@ import {
   UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG,
   UNIFIED_AIOPS_NEWLY_PROVISIONED_VMS_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT,
+  UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLORS,
+  UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLOR_PALETTE,
   UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_DISTRIBUTION_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_RESOURCE_ICONS,
   UNIFIED_AIOPS_PRIVATE_RESOURCE_ICON_FALLBACK,
   UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT,
+  UNIFIED_AIOPS_PUBLIC_CLOUD_GEO_PROVIDER_COLORS,
   UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_LABELS,
   UNIFIED_AIOPS_PUBLIC_CLOUD_GROUP_ORDER,
   UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT,
@@ -76,13 +79,17 @@ import {
   UnifiedAiopsExecGroup,
   UnifiedAiopsExecutiveTotals,
   UnifiedAiopsExecutiveView,
+  UnifiedAiopsPrivateCloudGeoLegendItem,
   UnifiedAiopsPrivateCloudGeoSite,
   UnifiedAiopsPrivateCloudGeoView,
   UnifiedAiopsNewVmRow,
   UnifiedAiopsNewVmsView,
   UnifiedAiopsNewVmsFilter,
+  UnifiedAiopsNewVmsFilterOptions,
   UnifiedAiopsFilterOption,
   UnifiedAiopsGeoCell,
+  UnifiedAiopsGeoDistributionLegendItem,
+  UnifiedAiopsGeoDistributionSummary,
   UnifiedAiopsIdleDeviceRow,
   UnifiedAiopsIdleDevicesResponse,
   UnifiedAiopsIdleDurationApiResponse,
@@ -253,24 +260,35 @@ export class NavigatorCentralService {
   // Builds the redesigned Executive Summary view-model: the Totals card, the hero cards
   // (Private / Public / Bare Metal / Datacenter and IoTs) and the category groups.
   private buildExecutiveView(response: any): UnifiedAiopsExecutiveView {
-    const summary = this.getPayloadByKeys(response, ['summary', 'metrics', 'summary_metrics']) || {};
+    const summary = this.getExecPayloadByKeys(response, ['summary', 'metrics', 'summary_metrics']) || response || {};
+    const heroCards = UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS
+      .map(config => this.buildExecHeroCard(response, summary, config))
+      .filter(card => this.hasExecStatusCardData(card) || !!card.subCards.length);
+    const groups = UNIFIED_AIOPS_EXECUTIVE_GROUPS
+      .map(group => this.buildExecGroup(response, summary, group))
+      .filter(group => !!group.cards.length || !!group.tiles.length);
     return {
-      totals: this.buildExecutiveTotals(summary),
-      heroCards: UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS.map(config => this.buildExecHeroCard(response, summary, config)),
-      groups: UNIFIED_AIOPS_EXECUTIVE_GROUPS.map(group => this.buildExecGroup(response, group))
+      totals: this.buildExecutiveTotals(response, summary),
+      heroCards,
+      groups
     };
   }
 
-  private buildExecutiveTotals(summary: any): UnifiedAiopsExecutiveTotals {
+  private buildExecutiveTotals(response: any, summary: any): UnifiedAiopsExecutiveTotals {
     const flatSummary = this.flattenPayload(summary || {});
-    const discovered = this.getNumberFromPayload(flatSummary, ['total_discovered_resources', 'totalDiscoveredResources', 'total_discovered']);
-    const monitoredObject = this.getFirstDefinedPayloadValue(summary, ['total_monitored_resources', 'totalMonitoredResources', 'total_monitored']);
+    const flatResponse = this.flattenPayload(response || {});
+    const discoveredObject = this.resolveExecObject(response, summary, ['total_discovered_resources', 'totalDiscoveredResources', 'total_discovered', 'discovered_resources', 'discoveredResources']);
+    const discoveredStatus = this.getExecStatus(discoveredObject);
+    const discovered = discoveredStatus.discovered || discoveredStatus.monitored ||
+      this.getNumberFromPayload(flatSummary, ['total_discovered_resources', 'totalDiscoveredResources', 'total_discovered', 'discovered_resources', 'discoveredResources'], this.getNumberFromPayload(flatResponse, ['total_discovered_resources', 'totalDiscoveredResources', 'total_discovered', 'discovered_resources', 'discoveredResources']));
+    const monitoredObject = this.resolveExecObject(response, summary, ['total_monitored_resources', 'totalMonitoredResources', 'total_monitored', 'monitored_resources', 'monitoredResources']);
     const status = this.getExecStatus(monitoredObject);
+    const monitoredOf = discovered || status.discovered;
     const split = this.getStatusSplit(status.up, status.down, status.unknown);
     return {
-      discovered: this.formatNumber(discovered),
+      discovered: this.formatNumber(monitoredOf),
       monitored: this.formatNumber(status.monitored),
-      monitoredOf: this.formatNumber(discovered),
+      monitoredOf: this.formatNumber(monitoredOf),
       up: this.formatNumber(status.up),
       down: this.formatNumber(status.down),
       unknown: this.formatNumber(status.unknown),
@@ -287,20 +305,33 @@ export class NavigatorCentralService {
     const payload = this.resolveExecObject(response, summary, config.payloadKeys);
     const card = this.buildExecStatusCard(payload, config);
     const flatPayload = this.flattenPayload(payload || {});
-    card.chips = (config.chipConfigs || []).map(chip => ({
-      label: chip.label,
-      value: this.formatNumber(this.getNumberFromPayload(flatPayload, chip.keys))
-    }));
-    card.subCards = this.buildExecSubCards(payload, config.subArrayKeys, config.subItems, config.unit);
+    card.chips = (config.chipConfigs || []).reduce((chips: { label: string; value: string }[], chip) => {
+      const value = this.getFirstDefinedPayloadValue(flatPayload, chip.keys);
+      if (value === undefined || value === null || value === '') {
+        return chips;
+      }
+      chips.push({
+        label: chip.label,
+        value: this.formatNumber(this.getNumberValue(value))
+      });
+      return chips;
+    }, []);
+    card.subCards = (config.dynamicSubCards
+      ? this.buildExecDynamicSubCards(payload, config.subArrayKeys, config.fallbackSubArrayKeys, config.unit, response, summary, config.link)
+      : this.buildExecSubCards(payload, config.subArrayKeys, config.subItems, config.unit, response, summary))
+      .filter(subCard => this.hasExecStatusCardData(subCard));
+    if (!this.hasExecStatusCardData(card) && card.subCards.length) {
+      this.applyExecSubCardTotals(card);
+    }
     return card;
   }
 
   // Builds the fixed set of sub-cards from a by_type / by_provider / by_vendor array on a hero object.
-  private buildExecSubCards(payload: any, arrayKeys?: string[], items?: UnifiedAiopsExecItemConfig[], unit?: string): UnifiedAiopsExecStatusCard[] {
+  private buildExecSubCards(payload: any, arrayKeys?: string[], items?: UnifiedAiopsExecItemConfig[], unit?: string, response?: any, summary?: any): UnifiedAiopsExecStatusCard[] {
     if (!items || !items.length) {
       return [];
     }
-    const entries = this.getExecArray(payload, arrayKeys);
+    const entries = this.getExecSubCardEntries(payload, arrayKeys, response, summary);
     return items.map(item => {
       const entry = this.findExecEntry(entries, item.matchKeys && item.matchKeys.length ? item.matchKeys : [item.key]);
       return this.buildExecStatusCard(entry || {}, {
@@ -314,17 +345,71 @@ export class NavigatorCentralService {
     });
   }
 
-  private buildExecGroup(response: any, group: UnifiedAiopsExecGroupConfig): UnifiedAiopsExecGroup {
-    const container = this.getPayloadByKeys(response, group.containerKeys) || {};
-    const cards: UnifiedAiopsExecStatusCard[] = (group.cards || []).map(cardConfig => {
-      const payload = this.getFirstDefinedPayloadValue(container, cardConfig.payloadKeys);
+  private buildExecDynamicSubCards(payload: any, arrayKeys?: string[], fallbackArrayKeys?: string[], unit?: string, response?: any, summary?: any, link?: string): UnifiedAiopsExecStatusCard[] {
+    let cards = this.getExecDynamicSubCardsFromEntries(
+      this.getExecSubCardEntries(payload, arrayKeys, response, summary),
+      unit,
+      link
+    );
+    if (!cards.some(card => this.hasExecStatusCardData(card)) && fallbackArrayKeys && fallbackArrayKeys.length) {
+      cards = this.getExecDynamicSubCardsFromEntries(
+        this.getExecSubCardEntries(payload, fallbackArrayKeys, response, summary),
+        unit,
+        link
+      );
+    }
+
+    return cards.sort((first, second) => first.label.localeCompare(second.label));
+  }
+
+  private getExecDynamicSubCardsFromEntries(entries: any[], unit?: string, link?: string): UnifiedAiopsExecStatusCard[] {
+    return (entries || [])
+      .map(entry => {
+        const label = this.getExecDynamicSubCardLabel(entry);
+        return this.buildExecStatusCard(entry || {}, {
+          key: this.normalizeKey(label) || 'unknown',
+          label,
+          unit,
+          link: this.getExecDynamicSubCardLink(label, link),
+          badgeText: this.getExecDynamicSubCardBadgeText(label),
+          badgeClass: this.getExecDynamicSubCardBadgeClass(label)
+        });
+      });
+  }
+
+  private getExecSubCardEntries(payload: any, arrayKeys?: string[], response?: any, summary?: any): any[] {
+    const entries = this.getExecArray(payload, arrayKeys);
+    if (entries.length) {
+      return entries;
+    }
+    const summaryEntries = this.getExecArray(summary, arrayKeys);
+    if (summaryEntries.length) {
+      return summaryEntries;
+    }
+    return this.getExecArray(response, arrayKeys);
+  }
+
+  private buildExecGroup(response: any, summary: any, group: UnifiedAiopsExecGroupConfig): UnifiedAiopsExecGroup {
+    const container = this.resolveExecObject(response, summary, group.containerKeys);
+    let cards: UnifiedAiopsExecStatusCard[] = (group.cards || []).map(cardConfig => {
+      let payload = this.getExecPayloadByKeys(container, cardConfig.payloadKeys);
+      if (payload === undefined || payload === null) {
+        payload = this.resolveExecObject(response, summary, cardConfig.payloadKeys);
+      }
       return this.buildExecStatusCard(payload || {}, { ...cardConfig, unit: cardConfig.unit || group.unit });
-    });
+    }).filter(card => this.hasExecStatusCardData(card));
     if (group.cardItems && group.cardItems.length) {
-      const arrayContainer = group.cardArrayContainerKeys
-        ? (this.getFirstDefinedPayloadValue(container, group.cardArrayContainerKeys) || {})
-        : container;
-      const entries = this.getExecArray(arrayContainer, group.cardArrayKeys);
+      const nestedArrayContainer = group.cardArrayContainerKeys
+        ? this.getExecPayloadByKeys(container, group.cardArrayContainerKeys)
+        : null;
+      const arrayContainer = nestedArrayContainer || container;
+      let entries = this.getExecArray(arrayContainer, group.cardArrayKeys);
+      if (!entries.length && arrayContainer === container) {
+        entries = this.getExecArray(container);
+      }
+      if (!entries.length) {
+        entries = this.getExecArray(response, group.cardArrayKeys);
+      }
       group.cardItems.forEach(item => {
         const entry = this.findExecEntry(entries, item.matchKeys && item.matchKeys.length ? item.matchKeys : [item.key]);
         cards.push(this.buildExecStatusCard(entry || {}, {
@@ -337,7 +422,10 @@ export class NavigatorCentralService {
         }));
       });
     }
-    const tiles: UnifiedAiopsExecTile[] = (group.tiles || []).map(tileConfig => this.buildExecTile(container, tileConfig));
+    cards = cards.filter(card => this.hasExecStatusCardData(card));
+    const tiles: UnifiedAiopsExecTile[] = (group.tiles || [])
+      .map(tileConfig => this.buildExecTile(container, tileConfig))
+      .filter(tile => this.hasExecTileData(tile));
     return {
       key: group.key,
       title: group.title,
@@ -374,16 +462,49 @@ export class NavigatorCentralService {
     };
   }
 
+  private hasExecStatusCardData(card: UnifiedAiopsExecStatusCard): boolean {
+    return this.getNumberValue(card?.monitored) > 0 || this.getNumberValue(card?.discovered) > 0;
+  }
+
+  private applyExecSubCardTotals(card: UnifiedAiopsExecStatusCard) {
+    const totals = (card.subCards || []).reduce((result, subCard) => {
+      result.monitored += this.getNumberValue(subCard.monitored);
+      result.discovered += this.getNumberValue(subCard.discovered);
+      result.up += this.getNumberValue(subCard.up);
+      result.down += this.getNumberValue(subCard.down);
+      result.unknown += this.getNumberValue(subCard.unknown);
+      return result;
+    }, { monitored: 0, discovered: 0, up: 0, down: 0, unknown: 0 });
+    const split = this.getStatusSplit(totals.up, totals.down, totals.unknown);
+    card.monitored = this.formatNumber(totals.monitored);
+    card.discovered = this.formatNumber(totals.discovered);
+    card.up = this.formatNumber(totals.up);
+    card.down = this.formatNumber(totals.down);
+    card.unknown = this.formatNumber(totals.unknown);
+    card.statusTotal = split.statusTotal;
+    card.upPercent = split.upPercent;
+    card.downPercent = split.downPercent;
+    card.unknownPercent = split.unknownPercent;
+  }
+
+  private hasExecTileData(tile: UnifiedAiopsExecTile): boolean {
+    if (!tile || tile.value === '-' || tile.value === '') {
+      return false;
+    }
+    return this.getNumberValue(tile.value) > 0;
+  }
+
   private buildExecTile(container: any, config: UnifiedAiopsExecTileConfig): UnifiedAiopsExecTile {
-    const raw = this.getFirstDefinedPayloadValue(container, config.keys);
+    const raw = this.getExecPayloadByKeys(container, config.keys);
     if (raw === undefined || raw === null || raw === '') {
       return { key: config.key, label: config.label, value: '-', tone: 'muted', link: config.link };
     }
-    const numericValue = this.getNumberValue(raw);
+    const tileValue = this.getExecScalarValue(raw);
+    const numericValue = this.getNumberValue(tileValue);
     return {
       key: config.key,
       label: config.label,
-      value: this.formatSummaryValue(raw, config.suffix),
+      value: this.formatSummaryValue(tileValue, config.suffix),
       tone: this.getThresholdTone(numericValue, config.threshold),
       link: config.link
     };
@@ -395,17 +516,119 @@ export class NavigatorCentralService {
     if (payload === null || payload === undefined) {
       return { monitored: 0, discovered: 0, up: 0, down: 0, unknown: 0 };
     }
+    if (Array.isArray(payload)) {
+      return this.getExecStatusFromStatusList(payload);
+    }
     if (typeof payload !== 'object' || Array.isArray(payload)) {
       const scalar = this.getNumberValue(payload);
-      return { monitored: scalar, discovered: scalar, up: 0, down: 0, unknown: 0 };
+      return { monitored: scalar, discovered: scalar, up: 0, down: 0, unknown: scalar };
+    }
+    const statusList = this.getFirstDefinedPayloadValue(payload, ['status', 'statuses', 'status_summary', 'statusSummary', 'health', 'health_summary', 'healthSummary']);
+    if (Array.isArray(statusList)) {
+      const statusFromList = this.getExecStatusFromStatusList(statusList);
+      const flatPayload = this.flattenPayload(payload);
+      const discoveredFromPayload = this.getNumberFromPayload(flatPayload, ['discovered', 'discovered_count', 'discoveredCount', 'total', 'count', 'total_resources', 'totalResources', 'resource_count', 'resourceCount', 'total_count', 'totalCount'], statusFromList.discovered);
+      const monitoredFromPayload = this.getNumberFromPayload(flatPayload, ['monitored', 'monitored_count', 'monitoredCount', 'monitoring_enabled', 'monitoringEnabled', 'enabled', 'onboarded', 'onboarded_count', 'onboardedCount', 'managed', 'managed_count'], statusFromList.monitored);
+      return { ...statusFromList, monitored: monitoredFromPayload, discovered: discoveredFromPayload };
+    }
+    if (!this.hasExecDirectStatusValue(payload)) {
+      const childStatus = this.getExecStatusFromChildMap(payload);
+      if (childStatus.discovered || childStatus.monitored || childStatus.up || childStatus.down || childStatus.unknown) {
+        return childStatus;
+      }
     }
     const flat = this.flattenPayload(payload);
-    const up = this.getNumberFromPayload(flat, ['up', 'online', 'healthy', 'active']);
-    const down = this.getNumberFromPayload(flat, ['down', 'offline', 'unhealthy', 'critical']);
-    const unknown = this.getNumberFromPayload(flat, ['unknown', 'unknowns', 'warning']);
-    const monitored = this.getNumberFromPayload(flat, ['monitored', 'monitored_count', 'monitoredCount'], up + down + unknown);
-    const discovered = this.getNumberFromPayload(flat, ['discovered', 'discovered_count', 'discoveredCount', 'total', 'count'], monitored);
+    const up = this.getNumberFromPayload(flat, ['up', 'online', 'healthy', 'active', 'available', 'running']);
+    const down = this.getNumberFromPayload(flat, ['down', 'offline', 'unhealthy', 'critical', 'failed']);
+    let unknown = this.getNumberFromPayload(flat, ['unknown', 'unknowns', 'warning', 'warnings', 'degraded', 'not_monitored', 'notMonitored']);
+    const total = this.getNumberFromPayload(flat, ['total', 'count', 'value', 'total_resources', 'totalResources', 'resource_count', 'resourceCount', 'total_count', 'totalCount']);
+    const monitored = this.getNumberFromPayload(flat, ['monitored', 'monitored_count', 'monitoredCount', 'monitoring_enabled', 'monitoringEnabled', 'enabled', 'onboarded', 'onboarded_count', 'onboardedCount', 'managed', 'managed_count'], up + down + unknown || total);
+    const discovered = this.getNumberFromPayload(flat, ['discovered', 'discovered_count', 'discoveredCount', 'total', 'count', 'value', 'total_resources', 'totalResources', 'resource_count', 'resourceCount', 'total_count', 'totalCount'], total || monitored);
+    if (!up && !down && !unknown && monitored > 0) {
+      unknown = monitored;
+    }
     return { monitored, discovered, up, down, unknown };
+  }
+
+  private hasExecDirectStatusValue(payload: any): boolean {
+    return this.getFirstDefinedPayloadValue(payload || {}, [
+      'monitored',
+      'monitored_count',
+      'monitoredCount',
+      'monitoring_enabled',
+      'monitoringEnabled',
+      'enabled',
+      'onboarded',
+      'onboarded_count',
+      'onboardedCount',
+      'managed',
+      'managed_count',
+      'discovered',
+      'discovered_count',
+      'discoveredCount',
+      'total',
+      'count',
+      'value',
+      'up',
+      'online',
+      'healthy',
+      'active',
+      'available',
+      'running',
+      'down',
+      'offline',
+      'unhealthy',
+      'critical',
+      'failed',
+      'unknown',
+      'unknowns',
+      'warning',
+      'warnings',
+      'degraded'
+    ]) !== undefined;
+  }
+
+  private getExecStatusFromChildMap(payload: any): { monitored: number; discovered: number; up: number; down: number; unknown: number } {
+    return Object.keys(payload || {}).reduce((result, key) => {
+      const value = payload[key];
+      if (!value || typeof value !== 'object' || Array.isArray(value) || !this.hasExecDirectStatusValue(value)) {
+        return result;
+      }
+      const status = this.getExecStatus(value);
+      result.monitored += status.monitored;
+      result.discovered += status.discovered;
+      result.up += status.up;
+      result.down += status.down;
+      result.unknown += status.unknown;
+      return result;
+    }, { monitored: 0, discovered: 0, up: 0, down: 0, unknown: 0 });
+  }
+
+  private getExecScalarValue(payload: any): any {
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+      return payload;
+    }
+    const flatPayload = this.flattenPayload(payload);
+    const value = this.getFirstDefinedPayloadValue(flatPayload, ['value', 'count', 'total', 'total_count', 'totalCount', 'avg', 'average', 'usage', 'usage_percent', 'usagePercent', 'percentage', 'percent', 'latency']);
+    return value !== undefined && value !== null ? value : payload;
+  }
+
+  private getExecStatusFromStatusList(statusList: any[]): { monitored: number; discovered: number; up: number; down: number; unknown: number } {
+    const status = (statusList || []).reduce((result, item) => {
+      const flatItem = this.flattenPayload(item || {});
+      const label = this.normalizeKey(String(this.getFirstDefinedValue(item?.status, item?.name, item?.label, item?.category, item?.state, item?.health)));
+      const count = this.getNumberFromPayload(flatItem, ['count', 'value', 'total', 'resource_count', 'resourceCount']);
+      if (['up', 'online', 'healthy', 'active', 'available', 'running'].some(key => label.indexOf(key) > -1)) {
+        result.up += count;
+      } else if (['down', 'offline', 'unhealthy', 'critical', 'failed'].some(key => label.indexOf(key) > -1)) {
+        result.down += count;
+      } else if (['unknown', 'warning', 'degraded', 'notmonitored'].some(key => label.indexOf(key) > -1)) {
+        result.unknown += count;
+      }
+      return result;
+    }, { up: 0, down: 0, unknown: 0 });
+    const monitored = status.up + status.down + status.unknown;
+    return { monitored, discovered: monitored, up: status.up, down: status.down, unknown: status.unknown };
   }
 
   // Splits up / down / unknown into percentages for the stacked health bar (total = up + down + unknown).
@@ -427,24 +650,231 @@ export class NavigatorCentralService {
     if (fromSummary !== undefined && fromSummary !== null) {
       return fromSummary;
     }
-    const fromRoot = this.getPayloadByKeys(response, keys);
+    const fromRoot = this.getExecPayloadByKeys(response, keys);
     return fromRoot || {};
   }
 
   private getExecArray(payload: any, keys?: string[]): any[] {
-    const value = this.getFirstDefinedPayloadValue(payload, keys || []);
-    return Array.isArray(value) ? value : [];
+    const value = keys && keys.length
+      ? this.getExecPayloadByKeys(payload, keys)
+      : payload;
+    return this.getExecEntries(value);
   }
 
   // Finds the array entry whose key / slug / name / label / provider / vendor / type matches one of matchKeys.
   private findExecEntry(entries: any[], matchKeys: string[]): any {
     const normalizedMatches = (matchKeys || []).map(key => this.normalizeKey(key));
     return (entries || []).find(entry => {
-      const entryKey = this.normalizeKey(String(
-        entry?.key ?? entry?.slug ?? entry?.name ?? entry?.label ?? entry?.provider ?? entry?.vendor ?? entry?.type ?? ''
-      ));
-      return !!entryKey && normalizedMatches.indexOf(entryKey) > -1;
+      const entryKeys = [
+        entry?.key,
+        entry?.slug,
+        entry?.name,
+        entry?.label,
+        entry?.provider,
+        entry?.cloud_provider,
+        entry?.cloudProvider,
+        entry?.vendor,
+        entry?.type,
+        entry?.resource_type,
+        entry?.resourceType,
+        entry?.engine,
+        entry?.platform
+      ].map(key => this.normalizeKey(String(key || ''))).filter(key => !!key);
+      return entryKeys.some(entryKey => normalizedMatches.some(matchKey => entryKey === matchKey || entryKey.indexOf(matchKey) > -1 || matchKey.indexOf(entryKey) > -1));
     }) || null;
+  }
+
+  private getExecDynamicSubCardLabel(entry: any): string {
+    const label = this.getFirstDefinedValue(entry?.label, entry?.name, entry?.vendor, entry?.manufacturer, entry?.category, entry?.resource_type, entry?.resourceType, entry?.key);
+    const normalizedLabel = this.normalizeKey(String(label || ''));
+    if (normalizedLabel === 'pdu' || normalizedLabel === 'pdus' || normalizedLabel === 'smartpdu') {
+      return 'PDU';
+    }
+    if (normalizedLabel === 'url' || normalizedLabel === 'urls') {
+      return 'URL Monitored';
+    }
+    return this.getReadableCoverageLabel(String(label || 'Unknown'));
+  }
+
+  private getExecDynamicSubCardBadgeText(label: string): string {
+    const normalizedLabel = this.normalizeKey(label);
+    if (normalizedLabel.indexOf('pdu') > -1) {
+      return 'PDU';
+    }
+    if (normalizedLabel.indexOf('sensor') > -1) {
+      return 'SN';
+    }
+    if (normalizedLabel.indexOf('switch') > -1) {
+      return 'SW';
+    }
+    if (normalizedLabel.indexOf('firewall') > -1) {
+      return 'FW';
+    }
+    if (normalizedLabel.indexOf('loadbalancer') > -1) {
+      return 'LB';
+    }
+    if (normalizedLabel.indexOf('application') > -1) {
+      return 'AP';
+    }
+    if (normalizedLabel.indexOf('database') > -1) {
+      return 'DB';
+    }
+    if (normalizedLabel.indexOf('url') > -1) {
+      return 'URL';
+    }
+    if (normalizedLabel.indexOf('supermicro') > -1) {
+      return 'SM';
+    }
+    if (normalizedLabel.indexOf('dell') > -1) {
+      return 'DL';
+    }
+    if (normalizedLabel.indexOf('hpe') > -1 || normalizedLabel === 'hp' || normalizedLabel.indexOf('hewlettpackard') > -1) {
+      return 'HPE';
+    }
+    if (normalizedLabel.indexOf('lenovo') > -1) {
+      return 'LN';
+    }
+    if (normalizedLabel.indexOf('unknown') > -1) {
+      return 'UN';
+    }
+
+    const words = String(label || '')
+      .replace(/[^a-z0-9]+/gi, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(word => !!word);
+    if (!words.length) {
+      return 'NA';
+    }
+    if (words.length === 1) {
+      return words[0].substring(0, 2).toUpperCase();
+    }
+    return words.slice(0, 2).map(word => word.charAt(0)).join('').toUpperCase();
+  }
+
+  private getExecDynamicSubCardBadgeClass(label: string): string {
+    const normalizedLabel = this.normalizeKey(label);
+    if (normalizedLabel.indexOf('pdu') > -1) {
+      return 'exec-badge-pdu';
+    }
+    if (normalizedLabel.indexOf('sensor') > -1) {
+      return 'exec-badge-sensor';
+    }
+    if (normalizedLabel.indexOf('switch') > -1) {
+      return 'exec-badge-network';
+    }
+    if (normalizedLabel.indexOf('firewall') > -1) {
+      return 'exec-badge-firewall';
+    }
+    if (normalizedLabel.indexOf('loadbalancer') > -1) {
+      return 'exec-badge-loadbalancer';
+    }
+    if (normalizedLabel.indexOf('application') > -1) {
+      return 'exec-badge-application';
+    }
+    if (normalizedLabel.indexOf('database') > -1) {
+      return 'exec-badge-database';
+    }
+    if (normalizedLabel.indexOf('url') > -1) {
+      return 'exec-badge-url';
+    }
+    if (normalizedLabel.indexOf('dell') > -1) {
+      return 'exec-badge-dell';
+    }
+    if (normalizedLabel.indexOf('hpe') > -1 || normalizedLabel === 'hp' || normalizedLabel.indexOf('hewlettpackard') > -1) {
+      return 'exec-badge-hpe';
+    }
+    if (normalizedLabel.indexOf('lenovo') > -1) {
+      return 'exec-badge-lenovo';
+    }
+    if (normalizedLabel.indexOf('supermicro') > -1) {
+      return 'exec-badge-supermicro';
+    }
+    return 'exec-badge-manufacturer';
+  }
+
+  private getExecDynamicSubCardLink(label: string, fallbackLink?: string): string | undefined {
+    const normalizedLabel = this.normalizeKey(label);
+    if (normalizedLabel.indexOf('pdu') > -1) {
+      return 'datacenterPdus';
+    }
+    if (normalizedLabel.indexOf('sensor') > -1) {
+      return 'iotDevices';
+    }
+    if (normalizedLabel.indexOf('switch') > -1) {
+      return 'switches';
+    }
+    if (normalizedLabel.indexOf('firewall') > -1) {
+      return 'firewalls';
+    }
+    if (normalizedLabel.indexOf('loadbalancer') > -1) {
+      return 'loadbalancers';
+    }
+    if (normalizedLabel.indexOf('application') > -1) {
+      return 'applications';
+    }
+    if (normalizedLabel.indexOf('database') > -1) {
+      return 'databases';
+    }
+    if (normalizedLabel.indexOf('url') > -1) {
+      return 'otherDevices';
+    }
+    return fallbackLink;
+  }
+
+  private getExecPayloadByKeys(response: any, keys: string[]): any {
+    const containers = this.getExecPayloadContainers(response);
+    for (const container of containers) {
+      const value = this.getFirstDefinedPayloadValue(container, keys);
+      if (value !== undefined && value !== null) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  private getExecPayloadContainers(response: any): any[] {
+    const containers: any[] = [];
+    const addContainer = (container: any) => {
+      if (container && typeof container === 'object' && !Array.isArray(container) && containers.indexOf(container) === -1) {
+        containers.push(container);
+      }
+    };
+    addContainer(response);
+    addContainer(response?.data);
+    addContainer(response?.result);
+    addContainer(response?.results);
+
+    const wrapperKeys = ['executive_summary', 'executiveSummary', 'executive_monitoring_summary', 'executiveMonitoringSummary', 'summary', 'metrics', 'summary_metrics'];
+    containers.slice().forEach(container => {
+      wrapperKeys.forEach(key => {
+        const value = this.getFirstDefinedPayloadValue(container, [key]);
+        addContainer(value);
+      });
+    });
+    return containers;
+  }
+
+  private getExecEntries(payload: any): any[] {
+    if (Array.isArray(payload)) {
+      return payload;
+    }
+    if (!payload || typeof payload !== 'object') {
+      return [];
+    }
+
+    const arrayPayload = this.getArrayFromPayload<any>(payload);
+    if (arrayPayload.length && !this.canConvertObjectToMetrics(payload)) {
+      return arrayPayload;
+    }
+
+    return Object.keys(payload).map(key => {
+      const value = payload[key];
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return { key, name: value.name || value.label || key, ...value };
+      }
+      return { key, name: key, count: value, total: value, discovered: value, monitored: value };
+    });
   }
 
   convertToMetricsViewData(data: UnifiedAiopsMetric[]): UnifiedAiopsMetric[] {
@@ -462,6 +892,182 @@ export class NavigatorCentralService {
     return this.getWidgetResponse(UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_DISTRIBUTION_ENDPOINT, criteria).pipe(map(res => this.convertToPrivateCloudGeoView(res)));
   }
 
+  convertToPrivateCloudGeoOptions(view: UnifiedAiopsPrivateCloudGeoView | null, sites?: UnifiedAiopsPrivateCloudGeoSite[]): EChartsOption {
+    const items = (sites || view?.sites || []).slice()
+      .filter(site => site && site.totalResources > 0)
+      .sort((first, second) => second.totalResources - first.totalResources)
+      .slice(0, 12);
+    if (!items.length) {
+      return {};
+    }
+
+    const platformColors = this.getPrivateCloudGeoPlatformColorMap(items);
+    const layout = this.getTreemapCells(this.getReadableTreemapWeights(items.map(site => site.totalResources)), { x: 0, y: 0, width: 100, height: 100 });
+    const cells = items.map((site, index) => {
+      const color = platformColors[site.platformKey] || '#334155';
+      return {
+        site,
+        name: site.cloudName || 'Private Cloud',
+        color,
+        textColor: this.getPrivateCloudGeoTextColor(color),
+        value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height],
+        totalResources: site.totalResources
+      };
+    });
+
+    return {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        confine: true,
+        backgroundColor: '#ffffff',
+        borderColor: '#e2e7ec',
+        borderWidth: 1,
+        padding: 0,
+        textStyle: { color: '#55606b' },
+        extraCssText: 'box-shadow: 0 6px 18px rgba(28, 45, 65, 0.18); border-radius: 8px;',
+        formatter: (info: any) => this.getPrivateCloudGeoTooltip(info.data?.site, info.data?.color)
+      },
+      grid: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
+      },
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        show: false
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        inverse: true,
+        show: false
+      },
+      series: [{
+        type: 'custom',
+        coordinateSystem: 'cartesian2d',
+        clip: false,
+        renderItem: (params: any, api: any) => {
+          const cell = cells[params.dataIndex];
+          const start = api.coord([cell.value[0], cell.value[1]]);
+          const end = api.coord([cell.value[0] + cell.value[2], cell.value[1] + cell.value[3]]);
+          const width = end[0] - start[0];
+          const height = end[1] - start[1];
+          const centerX = start[0] + width / 2;
+          const centerY = start[1] + height / 2;
+          const numberFontSize = Math.max(13, Math.min(24, Math.round(height * 0.3)));
+          const children: any[] = [{
+            type: 'rect',
+            shape: { x: start[0], y: start[1], width, height },
+            style: {
+              fill: cell.color,
+              stroke: '#ffffff',
+              lineWidth: 2,
+              shadowBlur: 4,
+              shadowColor: 'rgba(28, 45, 65, 0.16)'
+            }
+          }];
+
+          if (width > 52 && height > 30) {
+            children.push({
+              type: 'text',
+              silent: true,
+              style: {
+                text: cell.name,
+                x: start[0] + 10,
+                y: start[1] + 9,
+                fill: cell.textColor,
+                font: '600 11px Arial',
+                textAlign: 'left',
+                textVerticalAlign: 'top',
+                opacity: 0.95,
+                overflow: 'truncate',
+                width: Math.max(width - 18, 24),
+                textShadowColor: cell.textColor === '#ffffff' ? 'rgba(0, 0, 0, 0.18)' : 'rgba(255, 255, 255, 0.35)',
+                textShadowBlur: 2
+              }
+            });
+          }
+
+          children.push({
+            type: 'text',
+            silent: true,
+            style: {
+              text: this.formatNumber(cell.totalResources),
+              x: centerX,
+              y: height > 44 ? centerY - 4 : centerY,
+              fill: cell.textColor,
+              font: `700 ${numberFontSize}px Arial`,
+              textAlign: 'center',
+              textVerticalAlign: 'middle',
+              textShadowColor: cell.textColor === '#ffffff' ? 'rgba(0, 0, 0, 0.18)' : 'rgba(255, 255, 255, 0.35)',
+              textShadowBlur: 2
+            }
+          });
+
+          if (height > 44) {
+            children.push({
+              type: 'text',
+              silent: true,
+              style: {
+                text: 'Total Resources',
+                x: centerX,
+                y: centerY + 15,
+                fill: cell.textColor,
+                font: '400 11px Arial',
+                textAlign: 'center',
+                textVerticalAlign: 'middle',
+                opacity: 0.9
+              }
+            });
+          }
+
+          return { type: 'group', children };
+        },
+        data: cells
+      }]
+    };
+  }
+
+  convertToPrivateCloudGeoLegends(sites?: UnifiedAiopsPrivateCloudGeoSite[]): UnifiedAiopsPrivateCloudGeoLegendItem[] {
+    const items = (sites || []).slice()
+      .filter(site => site && site.totalResources > 0)
+      .sort((first, second) => second.totalResources - first.totalResources)
+      .slice(0, 12);
+    const platformColors = this.getPrivateCloudGeoPlatformColorMap(items);
+    const legends = items.reduce((result: { [key: string]: UnifiedAiopsPrivateCloudGeoLegendItem }, site) => {
+      const key = site.platformKey || 'other';
+      if (!result[key]) {
+        result[key] = {
+          key,
+          label: site.platformType || 'Other',
+          count: 0,
+          color: platformColors[key] || '#334155'
+        };
+      }
+      result[key].count += 1;
+      return result;
+    }, {});
+    return Object.keys(legends).map(key => legends[key]);
+  }
+
+  convertToPrivateCloudGeoPlatformOptions(sites?: UnifiedAiopsPrivateCloudGeoSite[]): UnifiedAiopsFilterOption[] {
+    const options = (sites || []).reduce((result: { [key: string]: UnifiedAiopsFilterOption }, site) => {
+      if (site?.platformKey && !result[site.platformKey]) {
+        result[site.platformKey] = { value: site.platformKey, label: site.platformType || site.platformKey };
+      }
+      return result;
+    }, {});
+    return [
+      { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'Select All' },
+      ...Object.keys(options).map(key => options[key]).sort((first, second) => first.label.localeCompare(second.label))
+    ];
+  }
+
   convertToPrivateCloudGeoView(response: any): UnifiedAiopsPrivateCloudGeoView {
     const source = response || {};
     const rawClouds = this.getFirstDefinedPayloadValue(source, ['private_clouds', 'privateClouds', 'results', 'data']);
@@ -474,6 +1080,7 @@ export class NavigatorCentralService {
     const maxResources = sites.reduce((max, site) => Math.max(max, site.totalResources), 0);
     const flat = this.flattenPayload(source);
     return {
+      totalPrivateClouds: this.getNumberFromPayload(flat, ['total_private_clouds', 'totalPrivateClouds', 'private_cloud_count', 'privateCloudCount'], sites.length),
       totalDatacenters: this.getNumberFromPayload(flat, ['total_datacenters', 'totalDatacenters', 'datacenter_count'], this.getUniquePrivateCloudDatacenterCount(sites)),
       totalResources: this.getNumberFromPayload(flat, ['total_resources', 'totalResources'], sites.reduce((sum, site) => sum + site.totalResources, 0)),
       totalAlerts: this.getNumberFromPayload(flat, ['total_alerts', 'totalAlerts'], sites.reduce((sum, site) => sum + site.totalAlerts, 0)),
@@ -497,17 +1104,24 @@ export class NavigatorCentralService {
     const resources = cloud.resources || {};
     const resourceSummary = resources.summary || resources || {};
     const networkSummary = (resources.network && resources.network.summary) || {};
+    const resourceRows = this.getPrivateCloudGeoResourceRows(resources);
+    const totalResources = this.getNumberValue(resourceSummary.total ?? resourceSummary.total_resources, resourceRows.reduce((sum, row) => sum + row.count, 0));
+    const datacenterName = String(datacenter.name ?? cloud.datacenter_location ?? 'Datacenter');
+    const rawCloudName = String(cloud.private_cloud_name ?? cloud.privateCloudName ?? cloud.cloud_name ?? cloud.cloudName ?? cloud.name ?? '').trim();
+    const cloudName = rawCloudName && rawCloudName !== datacenterName
+      ? rawCloudName
+      : `${platformType || 'Private'} Cloud`;
     return {
       key: String(cloud.uuid ?? cloud.id ?? `${datacenter.uuid ?? datacenter.id ?? ''}-${platformKey}`),
-      cloudName: String(cloud.name ?? cloud.cloud_name ?? 'Private Cloud'),
+      cloudName,
       platformType: platformType || 'Unknown',
       platformKey,
       datacenterUuid: String(datacenter.uuid ?? datacenter.id ?? ''),
-      datacenterName: String(datacenter.name ?? cloud.datacenter_location ?? 'Datacenter'),
+      datacenterName,
       location: String(datacenter.location ?? cloud.datacenter_location ?? ''),
       lat,
       long,
-      totalResources: this.getNumberValue(resourceSummary.total ?? resourceSummary.total_resources),
+      totalResources,
       totalAlerts: this.getNumberValue(cloud.total_alerts ?? cloud.totalAlerts),
       critical: this.getNumberValue(alertSegregation.critical),
       warning: this.getNumberValue(alertSegregation.warning),
@@ -517,12 +1131,16 @@ export class NavigatorCentralService {
       storageCount: this.getNumberValue(resourceSummary.storage ?? resourceSummary.datastore ?? resourceSummary.datastores ?? resourceSummary.storage_count),
       networkCount: this.getNumberValue(resourceSummary.network ?? networkSummary.total),
       hypervisorCount: this.getNumberValue(resourceSummary.hypervisor),
-      baremetalCount: this.getNumberValue(resourceSummary.baremetal_server ?? resourceSummary.baremetalServer)
+      baremetalCount: this.getNumberValue(resourceSummary.baremetal_server ?? resourceSummary.baremetalServer),
+      resourceRows
     };
   }
 
   private getPrivateCloudPlatformKey(platformType: string): string {
     const normalized = String(platformType || '').toLowerCase();
+    if (normalized.includes('vcloud') || normalized.includes('cloud director')) {
+      return 'vcloud';
+    }
     if (normalized.includes('vmware') || normalized.includes('vsphere') || normalized.includes('esxi')) {
       return 'vmware';
     }
@@ -532,9 +1150,226 @@ export class NavigatorCentralService {
     return normalized.replace(/[^a-z0-9]/g, '') || 'other';
   }
 
+  private getPrivateCloudGeoPlatformColorMap(sites: UnifiedAiopsPrivateCloudGeoSite[]): { [platformKey: string]: string } {
+    const usedColors = new Set<string>();
+    const platformKeys = (sites || []).reduce((keys: string[], site) => {
+      const key = site.platformKey || 'other';
+      if (keys.indexOf(key) === -1) {
+        keys.push(key);
+      }
+      return keys;
+    }, []);
+
+    return platformKeys.reduce((result: { [platformKey: string]: string }, key, index) => {
+      result[key] = this.getPrivateCloudGeoPlatformColor(key, index, usedColors);
+      usedColors.add(result[key]);
+      return result;
+    }, {});
+  }
+
+  private getPrivateCloudGeoPlatformColor(platformKey: string, index: number, usedColors: Set<string>): string {
+    const configuredColor = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLORS[platformKey];
+    if (configuredColor && !usedColors.has(configuredColor)) {
+      return configuredColor;
+    }
+
+    const palette = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLOR_PALETTE;
+    const paletteIndex = Math.abs(this.getPrivateCloudGeoHash(platformKey || String(index))) % palette.length;
+    for (let offset = 0; offset < palette.length; offset++) {
+      const color = palette[(paletteIndex + offset) % palette.length];
+      if (!usedColors.has(color)) {
+        return color;
+      }
+    }
+
+    let attempt = 0;
+    let generatedColor = this.getPrivateCloudGeoGeneratedColor(platformKey, attempt);
+    while (usedColors.has(generatedColor)) {
+      attempt += 1;
+      generatedColor = this.getPrivateCloudGeoGeneratedColor(platformKey, attempt);
+    }
+    return generatedColor;
+  }
+
+  private getPrivateCloudGeoTextColor(color: string): string {
+    const normalized = String(color || '').replace('#', '');
+    if (normalized.length !== 6) {
+      return '#ffffff';
+    }
+    const red = parseInt(normalized.substring(0, 2), 16) || 0;
+    const green = parseInt(normalized.substring(2, 4), 16) || 0;
+    const blue = parseInt(normalized.substring(4, 6), 16) || 0;
+    const luminance = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
+    return luminance > 150 ? '#0f172a' : '#ffffff';
+  }
+
+  private getPrivateCloudGeoGeneratedColor(platformKey: string, attempt: number): string {
+    const source = `${platformKey || 'other'}_${attempt}`;
+    const hash = this.getPrivateCloudGeoHash(source);
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 68%, 34%)`;
+  }
+
+  private getPrivateCloudGeoHash(value: string): number {
+    return String(value || '').split('').reduce((result, char) => ((result << 5) - result) + char.charCodeAt(0), 0);
+  }
+
+  private getPrivateCloudGeoResourceRows(resources: any): Array<{ key: string; label: string; count: number; iconClass: string; iconColor: string }> {
+    const rows: { [key: string]: { key: string; label: string; count: number; iconClass: string; iconColor: string } } = {};
+    this.addPrivateCloudGeoResourceRows(rows, resources?.summary || resources);
+    if (resources?.summary && Object.keys(rows).length <= 1) {
+      this.addPrivateCloudGeoResourceRows(rows, resources);
+    }
+    return Object.keys(rows)
+      .map(key => rows[key])
+      .filter(row => row.count > 0)
+      .sort((first, second) => second.count - first.count);
+  }
+
+  private addPrivateCloudGeoResourceRows(rows: { [key: string]: { key: string; label: string; count: number; iconClass: string; iconColor: string } }, payload: any) {
+    if (!payload) {
+      return;
+    }
+
+    if (Array.isArray(payload)) {
+      payload.forEach(item => {
+        const flatItem = this.flattenPayload(item || {});
+        const label = this.getFirstDefinedPayloadValue(flatItem, ['label', 'name', 'type', 'resource_type', 'resourceType', 'category']);
+        const count = this.getNumberFromPayload(flatItem, ['count', 'value', 'total', 'total_resources', 'totalResources', 'resource_count', 'resourceCount']);
+        if (label) {
+          this.addPrivateCloudGeoResourceRow(rows, label, count);
+        }
+      });
+      return;
+    }
+
+    if (typeof payload !== 'object') {
+      return;
+    }
+
+    Object.keys(payload).forEach(key => {
+      if (this.isPrivateCloudGeoResourceMetaKey(key)) {
+        return;
+      }
+
+      const value = payload[key];
+      if (this.isSimpleMetricValue(value)) {
+        this.addPrivateCloudGeoResourceRow(rows, key, this.getNumberValue(value));
+        return;
+      }
+
+      if (!value || typeof value !== 'object') {
+        return;
+      }
+
+      const nestedPayload = value.summary || value.counts || value.resources || value;
+      if (this.hasPrivateCloudGeoResourceLeaf(nestedPayload)) {
+        this.addPrivateCloudGeoResourceRows(rows, nestedPayload);
+        return;
+      }
+
+      const count = this.getNumberFromPayload(this.flattenPayload(value), ['count', 'value', 'total', 'total_resources', 'totalResources', 'resource_count', 'resourceCount']);
+      this.addPrivateCloudGeoResourceRow(rows, key, count);
+    });
+  }
+
+  private addPrivateCloudGeoResourceRow(rows: { [key: string]: { key: string; label: string; count: number; iconClass: string; iconColor: string } }, key: string, count: number) {
+    const normalizedKey = this.normalizeKey(key);
+    if (!normalizedKey || this.isPrivateCloudGeoResourceMetaKey(normalizedKey) || count <= 0) {
+      return;
+    }
+
+    const icon = this.getPrivateResourceIcon(normalizedKey);
+    if (!rows[normalizedKey]) {
+      rows[normalizedKey] = {
+        key: normalizedKey,
+        label: this.getReadableCoverageLabel(key),
+        count: 0,
+        iconClass: icon.iconClass,
+        iconColor: icon.iconColor
+      };
+    }
+    rows[normalizedKey].count += count;
+  }
+
+  private hasPrivateCloudGeoResourceLeaf(payload: any): boolean {
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+      return false;
+    }
+    return Object.keys(payload).some(key => !this.isPrivateCloudGeoResourceMetaKey(key) && this.isSimpleMetricValue(payload[key]));
+  }
+
+  private isPrivateCloudGeoResourceMetaKey(key: string): boolean {
+    const normalizedKey = this.normalizeKey(key);
+    return [
+      'summary',
+      'resources',
+      'counts',
+      'total',
+      'totalresources',
+      'resourcecount',
+      'totalcount',
+      'platform',
+      'platformtype',
+      'type',
+      'name',
+      'label',
+      'key',
+      'id',
+      'uuid'
+    ].indexOf(normalizedKey) > -1;
+  }
+
   private getUniquePrivateCloudDatacenterCount(sites: UnifiedAiopsPrivateCloudGeoSite[]): number {
     const keys = new Set(sites.map(site => site.datacenterUuid || `${site.lat}_${site.long}`));
     return keys.size;
+  }
+
+  private getPrivateCloudGeoTooltip(site: UnifiedAiopsPrivateCloudGeoSite, color?: string): string {
+    if (!site) {
+      return '';
+    }
+    const severityColors = UNIFIED_AIOPS_ALERT_SEVERITY_COLORS;
+    const neutralIconColor = '#7a8794';
+    const neutralValueColor = '#1f2a34';
+    const cloudColor = color || UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLORS[site.platformKey] || '#334155';
+    const row = (icon: string, iconColor: string, label: string, value: number, valueColor: string) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
+          <i class="fa ${icon}" style="width:14px;text-align:center;font-size:12px;color:${iconColor};"></i>${label}
+        </span>
+        <span style="font-weight:600;color:${valueColor};">${this.formatNumber(value)}</span>
+      </div>`;
+    const textRow = (icon: string, iconColor: string, label: string, value: string, valueColor: string) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
+          <i class="fa ${icon}" style="width:14px;text-align:center;font-size:12px;color:${iconColor};"></i>${label}
+        </span>
+        <span style="font-weight:600;color:${valueColor};">${value}</span>
+      </div>`;
+    const resourceRows = (site.resourceRows || []).map(resource => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
+          <i class="${resource.iconClass}" style="width:14px;text-align:center;font-size:12px;color:${resource.iconColor};"></i>${this.escapeTooltipText(resource.label)}
+        </span>
+        <span style="font-weight:600;color:${neutralValueColor};">${this.formatNumber(resource.count)}</span>
+      </div>`).join('');
+
+    return `<div style="min-width:216px;padding:11px 13px;font:12px/1.4 Arial;color:#5b6671;">
+      <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:#23303c;margin-bottom:8px;">
+        <span style="width:9px;height:9px;border-radius:50%;background:${cloudColor};display:inline-block;"></span>${this.escapeTooltipText(site.cloudName)}
+      </div>
+      ${textRow('fa-sitemap', neutralIconColor, 'Platform Type', this.escapeTooltipText(site.platformType), neutralValueColor)}
+      ${textRow('fa-building-o', neutralIconColor, 'Datacenter', this.escapeTooltipText(site.datacenterName), neutralValueColor)}
+      <div style="border-top:1px solid #e8edf1;margin:6px 0;"></div>
+      ${row('fa-th-large', '#3aa76d', 'Total Resources', site.totalResources, neutralValueColor)}
+      ${row('fa-bell', '#378ad8', 'Total Alerts', site.totalAlerts, neutralValueColor)}
+      ${row('fa-times-circle', severityColors.critical, 'Critical Alerts', site.critical, severityColors.critical)}
+      ${row('fa-exclamation-triangle', severityColors.warning, 'Warning Alerts', site.warning, severityColors.warning)}
+      ${row('fa-info-circle', severityColors.info, 'Information Alerts', site.info, severityColors.info)}
+      ${resourceRows ? '<div style="border-top:1px solid #e8edf1;margin:6px 0;"></div>' : ''}
+      ${resourceRows}
+    </div>`;
   }
   /*
    * ******End ****** Private Cloud Geo Distribution Widget Related ********************
@@ -557,18 +1392,21 @@ export class NavigatorCentralService {
     }
     if (this.isSelectedFilterValue(filter?.cloudPlatform)) {
       params = params.set('cloud_platform', filter.cloudPlatform);
-    }
-    if (this.isSelectedFilterValue(filter?.status)) {
-      params = params.set('status', filter.status);
+      params = params.set('cloud_type', filter.cloudPlatform);
     }
     if (this.isSelectedFilterValue(filter?.vmState)) {
       params = params.set('vm_state', filter.vmState);
     }
     if (this.isSelectedFilterValue(filter?.lifecycleStage)) {
       params = params.set('lifecycle_stage', filter.lifecycleStage);
+      params = params.set('life_cycle_stage', filter.lifecycleStage);
     }
     if (this.isSelectedFilterValue(filter?.lifecycleStageStatus)) {
       params = params.set('lifecycle_stage_status', filter.lifecycleStageStatus);
+      params = params.set('life_cycle_stage_status', filter.lifecycleStageStatus);
+    }
+    if (filter?.ordering) {
+      params = params.set('ordering', filter.ordering);
     }
     return params;
   }
@@ -578,50 +1416,144 @@ export class NavigatorCentralService {
   }
 
   convertToNewVmsView(response: any): UnifiedAiopsNewVmsView {
-    const rows = this.getArrayFromPayload<any>(response).map(item => this.convertToNewVmRow(item));
-    const total = this.getNumberValue(response?.count ?? response?.total ?? rows.length);
-    return { rows, total };
+    const payload = this.getNewVmsResponsePayload(response);
+    const rows = this.getArrayFromPayload<any>(payload).map(item => this.convertToNewVmRow(item));
+    const total = this.getNewVmsResponseTotal(response, payload, rows.length);
+    const filters = this.getNewVmsFilterOptions(response, payload);
+    return { rows, total, filters };
+  }
+
+  private getNewVmsResponsePayload(response: any): any {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    const containers = [response?.data, response?.result, response, response?.results];
+    return containers.find(container =>
+      Array.isArray(container) ||
+      (container && typeof container === 'object' && (
+        Array.isArray(container.results) ||
+        Array.isArray(container.data) ||
+        Array.isArray(container.items) ||
+        Array.isArray(container.rows)
+      ))
+    ) || response || {};
+  }
+
+  private getNewVmsResponseTotal(response: any, payload: any, fallback: number): number {
+    if (Array.isArray(payload) || Array.isArray(response)) {
+      return fallback;
+    }
+    const payloadTotal = this.getFirstDefinedPayloadValue(this.flattenPayload(payload || {}), ['count', 'total', 'total_count', 'totalCount']);
+    if (payloadTotal !== undefined) {
+      return this.getNumberValue(payloadTotal, fallback);
+    }
+    const responseTotal = this.getFirstDefinedPayloadValue(this.flattenPayload(response || {}), ['count', 'total', 'total_count', 'totalCount']);
+    return responseTotal !== undefined ? this.getNumberValue(responseTotal, fallback) : fallback;
+  }
+
+  private getNewVmsFilterOptions(response: any, payload: any): UnifiedAiopsNewVmsFilterOptions {
+    const filters = this.getNewVmsFilterPayload(response, payload);
+    return {
+      cloudType: this.convertToNewVmFilterOptions(filters?.cloud_type || filters?.cloudType, 'All Clouds'),
+      vmState: this.convertToNewVmFilterOptions(filters?.vm_state || filters?.vmState, 'All States'),
+      lifecycleStage: this.convertToNewVmFilterOptions(filters?.life_cycle_stage || filters?.lifecycle_stage || filters?.lifeCycleStage || filters?.lifecycleStage, 'All Stages'),
+      lifecycleStageStatus: this.convertToNewVmFilterOptions(filters?.life_cycle_stage_status || filters?.lifecycle_stage_status || filters?.lifeCycleStageStatus || filters?.lifecycleStageStatus, 'All Statuses')
+    };
+  }
+
+  private getNewVmsFilterPayload(response: any, payload: any): any {
+    return response?.filters || response?.data?.filters || response?.result?.filters || payload?.filters || {};
+  }
+
+  private convertToNewVmFilterOptions(values: any, allLabel: string): UnifiedAiopsFilterOption[] {
+    const options = this.getArrayFromPayload<any>(values).reduce((result: UnifiedAiopsFilterOption[], item) => {
+      const rawValue = this.getNewVmFilterValue(item);
+      if (!rawValue) {
+        return result;
+      }
+      result.push({
+        value: rawValue,
+        label: this.getNewVmFilterLabel(item, rawValue)
+      });
+      return result;
+    }, []);
+    return [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: allLabel }, ...options];
+  }
+
+  private getNewVmFilterValue(item: any): string {
+    if (item === null || item === undefined) {
+      return '';
+    }
+    if (this.isSimpleMetricValue(item)) {
+      return String(item);
+    }
+    return this.getNewVmText(item.value, item.key, item.name, item.label);
+  }
+
+  private getNewVmFilterLabel(item: any, fallback: string): string {
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      const label = this.getNewVmText(item.label, item.name, item.display_name, item.displayName);
+      if (label) {
+        return label;
+      }
+    }
+    return this.getNewVmDisplayText(fallback);
   }
 
   private convertToNewVmRow(item: any): UnifiedAiopsNewVmRow {
     const source = item || {};
-    const status = String(source.status ?? '');
-    const vmState = String(source.vm_state ?? source.vmState ?? '');
-    const lifecycleStageStatus = String(source.lifecycle_stage_status ?? source.lifecycleStageStatus ?? '');
+    const vmState = this.getNewVmDisplayText(source.vm_state, source.vmState, source.state, source.health_state, source.healthState);
+    const lifecycleStageStatus = this.getNewVmDisplayText(source.lifecycle_stage_status, source.lifecycleStageStatus, source.life_cycle_stage_status, source.lifeCycleStageStatus);
     return {
-      id: String(source.id ?? ''),
-      uuid: String(source.uuid ?? ''),
-      name: String(source.name ?? ''),
-      status,
-      statusTone: this.getNewVmStatusTone(status),
-      vmState,
+      id: this.getNewVmText(source.id, source.vm_id, source.vmId, source.instance_id, source.instanceId),
+      uuid: this.getNewVmText(source.uuid, source.resource_uuid, source.resourceUuid, source.vm_uuid, source.vmUuid, source.instance_uuid, source.instanceUuid),
+      name: this.getNewVmTextOrNa(source.name, source.vm_name, source.vmName, source.instance_name, source.instanceName),
+      vmState: this.getNewVmValueOrNa(vmState),
       vmStateTone: this.getNewVmStateTone(vmState),
-      osName: String(source.os_name ?? source.osName ?? ''),
-      cloudType: String(source.cloud_type ?? source.cloudType ?? ''),
-      cloudAccountName: String(source.cloud_account_name ?? source.cloudAccountName ?? ''),
-      provisionedDate: this.formatVmDate(source.provisioned_date ?? source.provisionedDate),
-      lastDiscoveredDate: this.formatVmDate(source.last_discovered_date ?? source.lastDiscoveredDate),
-      lifecycleStage: String(source.lifecycle_stage ?? source.lifecycleStage ?? ''),
-      lifecycleStageStatus,
+      osName: this.getNewVmTextOrNa(source.os_name, source.osName, source.os, source.operating_system, source.operatingSystem),
+      cloudType: this.getNewVmTextOrNa(source.cloud_type, source.cloudType, source.cloud, source.provider, source.platform, source.platform_type, source.platformType),
+      cloudAccountName: this.getNewVmTextOrNa(source.cloud_account_name, source.cloudAccountName, source.account_name, source.accountName, source.cloud_account, source.cloudAccount),
+      provisionedDate: this.formatVmDate(this.getFirstDefinedValue(source.provisioned_date, source.provisionedDate, source.provisioned_at, source.provisionedAt, source.created_at, source.createdAt)),
+      lastDiscoveredDate: this.formatVmDate(this.getFirstDefinedValue(source.last_discovered_date, source.lastDiscoveredDate, source.last_discovered_at, source.lastDiscoveredAt, source.discovered_at, source.discoveredAt)),
+      lifecycleStage: this.getNewVmValueOrNa(this.getNewVmDisplayText(source.lifecycle_stage, source.lifecycleStage, source.life_cycle_stage, source.lifeCycleStage)),
+      lifecycleStageStatus: this.getNewVmValueOrNa(lifecycleStageStatus),
       lifecycleStageStatusTone: this.getNewVmLifecycleStatusTone(lifecycleStageStatus)
     };
   }
 
+  private getNewVmText(...values: any[]): string {
+    const value = this.getFirstDefinedValue(...values);
+    return value === undefined || value === null ? '' : String(value);
+  }
+
+  private getNewVmTextOrNa(...values: any[]): string {
+    return this.getNewVmValueOrNa(this.getNewVmText(...values));
+  }
+
+  private getNewVmValueOrNa(value: string): string {
+    return value && String(value).trim() ? value : 'NA';
+  }
+
+  private getNewVmDisplayText(...values: any[]): string {
+    const text = this.getNewVmText(...values);
+    if (!text) {
+      return '';
+    }
+    return text
+      .replace(/_/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, char => char.toUpperCase());
+  }
+
   private formatVmDate(value: any): string {
     if (!value) {
-      return '';
+      return 'NA';
     }
     const date = moment(value);
     return date.isValid() ? date.format('MMM DD, YYYY, hh:mm A') : String(value);
-  }
-
-  private getNewVmStatusTone(status: string): UnifiedAiopsTone {
-    switch (String(status || '').toLowerCase()) {
-      case 'running': return 'success';
-      case 'provisioning': return 'warning';
-      case 'stopped': return 'danger';
-      default: return 'muted';
-    }
   }
 
   private getNewVmStateTone(state: string): UnifiedAiopsTone {
@@ -1043,7 +1975,50 @@ export class NavigatorCentralService {
   }
 
   convertToGeoHeatmapOptions(data: UnifiedAiopsGeoCell[]): EChartsOption {
-    return (data || []).length ? this.getGeoHeatmapOptions(data) : {};
+    const cells = this.getGeoHeatmapLayoutCells(data || []);
+    return cells.length ? this.getGeoHeatmapOptions(cells) : {};
+  }
+
+  convertToGeoDistributionSummary(cells: UnifiedAiopsGeoCell[]): UnifiedAiopsGeoDistributionSummary {
+    const viewCells = cells || [];
+    return {
+      totalLocations: viewCells.length,
+      totalResources: viewCells.reduce((sum, cell) => sum + cell.totalResources, 0),
+      totalAlerts: viewCells.reduce((sum, cell) => sum + cell.totalAlerts, 0)
+    };
+  }
+
+  convertToGeoDistributionCloudOptions(cells: UnifiedAiopsGeoCell[]): UnifiedAiopsFilterOption[] {
+    const options = (cells || []).reduce((result: { [key: string]: UnifiedAiopsFilterOption }, cell) => {
+      const label = cell.cloudType || 'Unknown';
+      const key = this.normalizeKey(label) || 'unknown';
+      if (!result[key]) {
+        result[key] = { value: key, label };
+      }
+      return result;
+    }, {});
+    return [
+      { value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'Select All' },
+      ...Object.keys(options).map(key => options[key]).sort((first, second) => first.label.localeCompare(second.label))
+    ];
+  }
+
+  convertToGeoDistributionLegends(cells: UnifiedAiopsGeoCell[]): UnifiedAiopsGeoDistributionLegendItem[] {
+    const legends = (cells || []).reduce((result: { [key: string]: UnifiedAiopsGeoDistributionLegendItem }, cell) => {
+      const label = cell.cloudType || 'Unknown';
+      const key = this.normalizeKey(label) || 'unknown';
+      if (!result[key]) {
+        result[key] = {
+          key,
+          label,
+          count: 0,
+          color: cell.color || '#4a63d6'
+        };
+      }
+      result[key].count += 1;
+      return result;
+    }, {});
+    return Object.keys(legends).map(key => legends[key]);
   }
 
   private getGeoHeatmapOptions(cells: UnifiedAiopsGeoCell[]): EChartsOption {
@@ -1061,10 +2036,10 @@ export class NavigatorCentralService {
         formatter: (info: any) => this.getGeoDistributionTooltip(info.data)
       },
       grid: {
-        top: 6,
-        right: 8,
-        bottom: 6,
-        left: 8
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
       },
       xAxis: {
         type: 'value',
@@ -1175,6 +2150,13 @@ export class NavigatorCentralService {
     const severityColors = UNIFIED_AIOPS_ALERT_SEVERITY_COLORS;
     const neutralIconColor = '#7a8794';
     const neutralValueColor = '#1f2a34';
+    const textRow = (icon: string, iconColor: string, label: string, value: string, valueColor: string) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
+          <i class="fa ${icon}" style="width:14px;text-align:center;font-size:12px;color:${iconColor};"></i>${label}
+        </span>
+        <span style="font-weight:600;color:${valueColor};">${value}</span>
+      </div>`;
     const row = (icon: string, iconColor: string, label: string, value: number, valueColor: string) => `
       <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
         <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
@@ -1185,8 +2167,10 @@ export class NavigatorCentralService {
 
     return `<div style="min-width:216px;padding:11px 13px;font:12px/1.4 Arial;color:#5b6671;">
       <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:#23303c;margin-bottom:8px;">
-        <span style="width:9px;height:9px;border-radius:50%;background:${cell.color};display:inline-block;"></span>${cell.name}
+        <span style="width:9px;height:9px;border-radius:50%;background:${cell.color};display:inline-block;"></span>${this.escapeTooltipText(cell.name)}
       </div>
+      ${cell.cloudType ? textRow('fa-cloud', neutralIconColor, 'Cloud Type', this.escapeTooltipText(cell.cloudType), neutralValueColor) : ''}
+      ${cell.cloudType ? '<div style="border-top:1px solid #e8edf1;margin:6px 0;"></div>' : ''}
       ${row('fa-th-large', '#3aa76d', 'Total Resources', cell.totalResources, neutralValueColor)}
       ${row('fa-bell', '#378ad8', 'Total Alerts', cell.totalAlerts, neutralValueColor)}
       ${row('fa-times-circle', severityColors.critical, 'Critical Alerts', cell.critical, severityColors.critical)}
@@ -1206,10 +2190,12 @@ export class NavigatorCentralService {
       return [];
     }
 
-    const layout = this.getTreemapCells(items.map(item => item.totalResources), { x: 0, y: 0, width: 100, height: 100 });
+    const colorMap = this.getGeoDistributionCloudColorMap(items.map(item => item.cloudType || 'Unknown'));
+    const layout = this.getTreemapCells(this.getReadableTreemapWeights(items.map(item => item.totalResources)), { x: 0, y: 0, width: 100, height: 100 });
     return items.map((item, index) => ({
       name: item.name,
-      color: UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS[index % UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS.length],
+      cloudType: item.cloudType,
+      color: colorMap[this.normalizeKey(item.cloudType || 'Unknown')] || UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS[index % UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS.length],
       value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height],
       totalResources: item.totalResources,
       totalAlerts: item.totalAlerts,
@@ -1222,7 +2208,7 @@ export class NavigatorCentralService {
     }));
   }
 
-  private getGeoDistributionItems(payload: any): Array<{ name: string; totalResources: number; totalAlerts: number; critical: number; warning: number; information: number; computeCount: number; platformServices: number; otherServices: number }> {
+  private getGeoDistributionItems(payload: any): Array<{ name: string; cloudType: string; totalResources: number; totalAlerts: number; critical: number; warning: number; information: number; computeCount: number; platformServices: number; otherServices: number }> {
     const source = Array.isArray(payload) ? payload : Object.keys(payload || {}).map(key => ({
       name: key,
       ...(payload[key] || {})
@@ -1233,6 +2219,7 @@ export class NavigatorCentralService {
       .map(item => {
         const flatPayload = this.flattenPayload(item);
         const name = String(item.name || item.location || item.datacenter || item.region || item.city || 'Unknown');
+        const cloudType = this.getGeoDistributionCloudType(flatPayload);
         const critical = this.getNumberFromPayload(flatPayload, ['critical_alerts', 'criticalAlerts', 'critical']);
         const warning = this.getNumberFromPayload(flatPayload, ['warning_alerts', 'warningAlerts', 'warning', 'warnings']);
         const information = this.getNumberFromPayload(flatPayload, ['information_alerts', 'informationAlerts', 'information', 'info', 'informative']);
@@ -1242,10 +2229,107 @@ export class NavigatorCentralService {
         const otherServices = this.getNumberFromPayload(flatPayload, ['other_services', 'otherServices', 'other']);
         const totalResources = this.getNumberFromPayload(flatPayload, ['total_resources', 'totalResources', 'total', 'count'], computeCount + platformServices + otherServices);
 
-        return { name, totalResources, totalAlerts, critical, warning, information, computeCount, platformServices, otherServices };
+        return { name, cloudType, totalResources, totalAlerts, critical, warning, information, computeCount, platformServices, otherServices };
       })
       .filter(item => item.name && item.totalResources > 0)
       .sort((first, second) => second.totalResources - first.totalResources);
+  }
+
+  private getGeoHeatmapLayoutCells(cells: UnifiedAiopsGeoCell[]): UnifiedAiopsGeoCell[] {
+    const viewCells = (cells || []).filter(cell => cell && cell.totalResources > 0);
+    const layout = this.getTreemapCells(this.getReadableTreemapWeights(viewCells.map(cell => cell.totalResources)), { x: 0, y: 0, width: 100, height: 100 });
+    return viewCells.map((cell, index) => ({
+      ...cell,
+      value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height]
+    }));
+  }
+
+  private getGeoDistributionCloudColorMap(cloudTypes: string[]): { [cloudType: string]: string } {
+    const usedColors = new Set<string>();
+    return (cloudTypes || []).reduce((result: { [cloudType: string]: string }, cloudType, index) => {
+      const key = this.normalizeKey(cloudType || 'Unknown') || 'unknown';
+      if (!result[key]) {
+        result[key] = this.getGeoDistributionCloudColor(cloudType || 'Unknown', index, usedColors);
+        usedColors.add(result[key]);
+      }
+      return result;
+    }, {});
+  }
+
+  private getGeoDistributionCloudColor(cloudType: string, index: number, usedColors: Set<string>): string {
+    const providerKeys = this.getGeoDistributionProviderKeys(cloudType);
+    if (providerKeys.length === 1) {
+      const color = UNIFIED_AIOPS_PUBLIC_CLOUD_GEO_PROVIDER_COLORS[providerKeys[0]];
+      if (color) {
+        return color;
+      }
+    }
+
+    const palette = UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS;
+    const paletteIndex = Math.abs(this.getGeoDistributionHash(this.normalizeKey(cloudType) || String(index))) % palette.length;
+    for (let offset = 0; offset < palette.length; offset++) {
+      const color = palette[(paletteIndex + offset) % palette.length];
+      if (!usedColors.has(color)) {
+        return color;
+      }
+    }
+    return palette[index % palette.length];
+  }
+
+  private getGeoDistributionProviderKeys(cloudType: string): string[] {
+    const normalizedValue = this.normalizeKey(cloudType || '');
+    const providerKeys = Object.keys(UNIFIED_AIOPS_PUBLIC_CLOUD_GEO_PROVIDER_COLORS).filter(key => normalizedValue.indexOf(key) > -1);
+    return providerKeys.reduce((result: string[], key) => {
+      const providerKey = this.getGeoDistributionPrimaryProviderKey(key);
+      if (result.indexOf(providerKey) === -1) {
+        result.push(providerKey);
+      }
+      return result;
+    }, []);
+  }
+
+  private getGeoDistributionPrimaryProviderKey(providerKey: string): string {
+    const normalizedKey = this.normalizeKey(providerKey);
+    if (normalizedKey.indexOf('amazon') > -1 || normalizedKey === 'aws') {
+      return 'aws';
+    }
+    if (normalizedKey.indexOf('azure') > -1) {
+      return 'azure';
+    }
+    if (normalizedKey.indexOf('google') > -1 || normalizedKey === 'gcp') {
+      return 'gcp';
+    }
+    if (normalizedKey.indexOf('oracle') > -1 || normalizedKey === 'oci') {
+      return 'oci';
+    }
+    return normalizedKey;
+  }
+
+  private getGeoDistributionHash(value: string): number {
+    return String(value || '').split('').reduce((result, char) => ((result << 5) - result) + char.charCodeAt(0), 0);
+  }
+
+  private getGeoDistributionCloudType(flatPayload: { [key: string]: any }): string {
+    const normalizedPayload = this.getNormalizedPayload(flatPayload || {});
+    const keys = ['cloud_type', 'cloudType', 'provider', 'cloud_provider', 'cloudProvider', 'platform', 'vendor'];
+    for (const key of keys) {
+      const value = normalizedPayload[this.normalizeKey(key)];
+      if (value !== undefined && value !== null && value !== '' && this.isSimpleMetricValue(value)) {
+        return String(value).trim();
+      }
+    }
+    return '';
+  }
+
+  private getReadableTreemapWeights(weights: number[]): number[] {
+    const values = (weights || []).map(weight => Math.max(Number(weight) || 0, 0));
+    const maxWeight = values.reduce((max, weight) => Math.max(max, weight), 0);
+    if (values.length <= 1 || maxWeight <= 0) {
+      return values;
+    }
+
+    const minimumWeight = maxWeight * 0.06;
+    return values.map(weight => weight > 0 ? Math.max(weight, minimumWeight) : weight);
   }
 
   // Squarified treemap: lays cells (sized by weight) into the bounds, keeping aspect ratios close to square.
@@ -3678,6 +4762,15 @@ export class NavigatorCentralService {
   private formatNumber(value: number | string): string {
     const numericValue = Number(value);
     return isNaN(numericValue) ? String(value || '0') : numericValue.toLocaleString('en-US');
+  }
+
+  private escapeTooltipText(value: string | number): string {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   private getArrayPayload<T>(response: any, keys: string[]): T[] {

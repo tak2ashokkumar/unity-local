@@ -74,10 +74,17 @@ export class UserInfoService {
     return (<User>this.storage.getByKey('user', StorageType.SESSIONSTORAGE)).org.name;
   }
 
+  get isTenantOrg() {
+    // return false;
+    return (<User>this.storage.getByKey('user', StorageType.SESSIONSTORAGE)).org.msp_tenant;
+  }
+
   get isWiproOrg() {
-    const user = this.userDetails;
-    const orgName = user && user.org ? user.org.name : '';
-    return String(orgName || '').toLowerCase().includes('wipro');
+    return String(this.userOrg || '').toLowerCase().includes('wipro');
+  }
+
+  get isPlayground() {
+    return String(this.userOrg || '').toLowerCase().includes('playground');
   }
 
   get selfBrandedOrgName() {
@@ -182,11 +189,6 @@ export class UserInfoService {
     return (<User>this.storage.getByKey('user', StorageType.SESSIONSTORAGE)).org.auto_ticketing_enabled;
   }
 
-  get isTenantOrg() {
-    // return false;
-    return (<User>this.storage.getByKey('user', StorageType.SESSIONSTORAGE)).org.msp_tenant;
-  }
-
   get defaultDashboard() {
     return (<User>this.storage.getByKey('user', StorageType.SESSIONSTORAGE)).default_dashboard;
   }
@@ -274,6 +276,17 @@ export class UserInfoService {
     } else {
       return this.hasViewAccess(input) && this.hasManageAccess(input);
     }
+  }
+
+  isServiceCatalogOnlyUser(): boolean {
+    // LOCAL TEST ONLY — remove after testing and uncomment the below commented line
+    // const permissions = ['Order Catalog', 'View Service Catalog'];
+    const permissions = this.userPermissions['Service Catalog'] || [];
+
+    const requiredPermissions = ['Order Catalog', 'View Service Catalog'];
+
+    return permissions.length === requiredPermissions.length
+      && requiredPermissions.every(permission => permissions.includes(permission));
   }
 }
 

@@ -11,13 +11,12 @@ import { EChartsOption } from 'echarts';
 import { forkJoin, Observable, of, Subject } from 'rxjs';
 import { catchError, finalize, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { DashboardMapWidgetService, WorldMapWidgetDCMap, WorldMapWidgetViewdata } from 'src/app/app-home/dashboard-map-widget/dashboard-map-widget.service';
-import { WorldMapWidgetDatacenterLocation } from 'src/app/app-home/dashboard-map-widget/map-widget.type';
+import { MapWidgetStatus, WorldMapWidgetDatacenter, WorldMapWidgetDatacenterLocation, WorldMapWidgetDCStatus } from 'src/app/app-home/dashboard-map-widget/map-widget.type';
 import { MapService } from 'src/app/map.service';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
-import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
 import { environment } from 'src/environments/environment';
 import { NavigatorCentralService } from './navigator-central.service';
@@ -28,14 +27,8 @@ import {
   UNIFIED_AIOPS_ALERT_VIEW_BY_OPTIONS,
   UNIFIED_AIOPS_ALL_SELECTED_VALUE,
   UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND,
-  UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL,
-  UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLORS,
+  UNIFIED_AIOPS_NEWLY_PROVISIONED_VMS_DEFAULT_SORT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS,
-  UNIFIED_AIOPS_NEW_VM_CLOUD_OPTIONS,
-  UNIFIED_AIOPS_NEW_VM_STATUS_OPTIONS,
-  UNIFIED_AIOPS_NEW_VM_STATE_OPTIONS,
-  UNIFIED_AIOPS_NEW_VM_LIFECYCLE_STAGE_OPTIONS,
-  UNIFIED_AIOPS_NEW_VM_LIFECYCLE_STATUS_OPTIONS,
   UNIFIED_AIOPS_TIME_RANGE_DEFAULT,
   UNIFIED_AIOPS_TIME_RANGE_OPTIONS
 } from './navigator-central.const';
@@ -51,12 +44,18 @@ import {
   UnifiedAiopsDeviceTypeOption,
   UnifiedAiopsDiscoveryCoverageRow,
   UnifiedAiopsDiscoverySummary,
+  UnifiedAiopsExecStatusCard,
   UnifiedAiopsExecutiveView,
+  UnifiedAiopsPrivateCloudGeoLegendItem,
   UnifiedAiopsPrivateCloudGeoSite,
   UnifiedAiopsPrivateCloudGeoView,
   UnifiedAiopsNewVmRow,
   UnifiedAiopsNewVmsFilter,
+  UnifiedAiopsNewVmsFilterOptions,
   UnifiedAiopsFilterOption,
+  UnifiedAiopsGeoCell,
+  UnifiedAiopsGeoDistributionLegendItem,
+  UnifiedAiopsGeoDistributionSummary,
   UnifiedAiopsViewByOption,
   UnifiedAiopsIdleDeviceRow,
   UnifiedAiopsIdleDurationItem,
@@ -140,23 +139,7 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   private datacenterGeographiesLoaded = false;
   private readonly datacenterGeographyInitialZoom = 2.2;
   private readonly datacenterGeographyInitialCenter = { lat: 25.738611, lng: 0 };
-  private privateCloudGeoMapElementRef: ElementRef<HTMLElement> | null = null;
-  private privateCloudGeoMap: google.maps.Map | null = null;
-  private privateCloudGeoCluster: MarkerClusterer | null = null;
-  private privateCloudGeoClusterInfoWindow: google.maps.InfoWindow | null = null;
-  private privateCloudGeoHoverInfoWindow: google.maps.InfoWindow | null = null;
-  private privateCloudGeoClusterListeners: google.maps.MapsEventListener[] = [];
-  private privateCloudGeoInfoWindowListeners: google.maps.MapsEventListener[] = [];
-  private privateCloudGeoInfoWindows: google.maps.InfoWindow[] = [];
-  private privateCloudGeoTilesLoaded: google.maps.MapsEventListener | null = null;
-  private privateCloudGeoMarkers: google.maps.marker.AdvancedMarkerElement[] = [];
-  private privateCloudGeoZIndexMap: { [key: string]: number } = {};
-  private privateCloudGeoOldZIndex: number | null = null;
   private privateCloudGeoAllSites: UnifiedAiopsPrivateCloudGeoSite[] = [];
-  private privateCloudGeoLoaded = false;
-  private privateCloudGeoNameMap: { [key: string]: string[] } = {};
-  private readonly privateCloudGeoInitialZoom = 2.2;
-  private readonly privateCloudGeoInitialCenter = { lat: 25.738611, lng: 0 };
   private readonly widgetLoadingKeys: Array<keyof UnifiedAiopsWidgetLoadingState> = [
     'summaryMetrics',
     'discovery',
@@ -198,6 +181,13 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   private readonly linkRoutes = {
     devices: ['/unitycloud/devices'],
     vmAll: ['/unitycloud/devices/vms/allvms'],
+    vmCustom: ['/unitycloud/devices/vms/custom'],
+    vmVmware: ['/unitycloud/devices/vms/vmware'],
+    vmVcloud: ['/unitycloud/devices/vms/vcloud'],
+    vmOpenstack: ['/unitycloud/devices/vms/openstack'],
+    vmProxmox: ['/unitycloud/devices/vms/proxmox'],
+    vmHyperv: ['/unitycloud/devices/vms/hyperv'],
+    vmNutanix: ['/unitycloud/devices/vms/nutanix'],
     vmProvider: {
       aws: ['/unitycloud/devices/vms/aws'],
       azure: ['/unitycloud/devices/vms/azure'],
@@ -213,6 +203,7 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     firewalls: ['/unitycloud/devices/firewalls'],
     loadbalancers: ['/unitycloud/devices/loadbalancers'],
     otherDevices: ['/unitycloud/devices/otherdevices'],
+    iotDevices: ['/unitycloud/devices/iot-devices'],
     networkControllers: ['/unitycloud/devices/network-controllers'],
     datacenter: ['/unitycloud/datacenter'],
     pccloud: ['/unitycloud/pccloud'],
@@ -280,35 +271,44 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   selectedAlertSegregationCategory = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   businessServices: UnifiedAiopsBusinessService[] = [];
   readonly businessServiceLegend = UNIFIED_AIOPS_BUSINESS_SERVICE_STATUS_LEGEND;
+  geoDistributionCells: UnifiedAiopsGeoCell[] = [];
   geoHeatmapOptions: EChartsOption = {};
+  geoDistributionSummary: UnifiedAiopsGeoDistributionSummary = { totalLocations: 0, totalResources: 0, totalAlerts: 0 };
+  geoDistributionCloudOptions: UnifiedAiopsFilterOption[] = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'Select All' }];
+  geoDistributionLegends: UnifiedAiopsGeoDistributionLegendItem[] = [];
+  selectedGeoDistributionCloudType = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   privateCloudCoverage: UnifiedAiopsCoverageCard[] = [];
+  privateCloudCoverageSource: UnifiedAiopsCoverageCard[] = [];
+  privateCloudCoverageSortOrder: 'asc' | 'desc' = 'asc';
   publicCloudCoverageGroups: UnifiedAiopsCoverageGroup[] = [];
+  publicCloudCoverageGroupsSource: UnifiedAiopsCoverageGroup[] = [];
+  publicCloudCoverageSortOrder: 'asc' | 'desc' = 'asc';
   privateCloudCoverageTotal = '0';
   publicCloudCoverageTotal = '0';
   datacenterGeographiesMapAvailable = false;
   datacenterGeographyViewData: WorldMapWidgetViewdata[] = [];
   datacenterGeographyDcMap: WorldMapWidgetDCMap = {};
-  privateCloudGeoMapAvailable = false;
   privateCloudGeoSites: UnifiedAiopsPrivateCloudGeoSite[] = [];
   privateCloudGeoView: UnifiedAiopsPrivateCloudGeoView | null = null;
-  readonly privateCloudGeoPlatformOptions = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS;
+  privateCloudGeoOptions: EChartsOption = {};
+  privateCloudGeoLegends: UnifiedAiopsPrivateCloudGeoLegendItem[] = [];
+  privateCloudGeoPlatformOptions = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS;
   selectedPrivateCloudPlatform: string = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   newVms: UnifiedAiopsNewVmRow[] = [];
   newVmsTotal = 0;
   newVmsPageNo = 1;
   newVmsPageSize = 10;
   newVmsLoaded = false;
+  newVmsSort = UNIFIED_AIOPS_NEWLY_PROVISIONED_VMS_DEFAULT_SORT;
   newVmsSearch = '';
   selectedNewVmCloud: string = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
-  selectedNewVmStatus: string = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   selectedNewVmState: string = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   selectedNewVmStage: string = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   selectedNewVmStageStatus: string = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
-  readonly newVmCloudOptions = UNIFIED_AIOPS_NEW_VM_CLOUD_OPTIONS;
-  readonly newVmStatusOptions = UNIFIED_AIOPS_NEW_VM_STATUS_OPTIONS;
-  readonly newVmStateOptions = UNIFIED_AIOPS_NEW_VM_STATE_OPTIONS;
-  readonly newVmLifecycleStageOptions = UNIFIED_AIOPS_NEW_VM_LIFECYCLE_STAGE_OPTIONS;
-  readonly newVmLifecycleStatusOptions = UNIFIED_AIOPS_NEW_VM_LIFECYCLE_STATUS_OPTIONS;
+  newVmCloudOptions: UnifiedAiopsFilterOption[] = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Clouds' }];
+  newVmStateOptions: UnifiedAiopsFilterOption[] = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All States' }];
+  newVmLifecycleStageOptions: UnifiedAiopsFilterOption[] = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Stages' }];
+  newVmLifecycleStatusOptions: UnifiedAiopsFilterOption[] = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'All Statuses' }];
   private newVmsSearchTimer: any = null;
   applicationRows: UnifiedAiopsTableRow[] = [];
   serviceApplicationOptions: UnifiedAiopsFilterOption[] = [];
@@ -493,7 +493,6 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private ngZone: NgZone,
     private spinnerService: AppSpinnerService,
-    private userInfoService: UserInfoService,
     private alertDetailSvc: AimlAlertDetailsService) { }
 
   @ViewChild('datacenterGeographyMap')
@@ -504,34 +503,19 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     }
   }
 
-  @ViewChild('privateCloudGeoMap')
-  set privateCloudGeoMapElement(element: ElementRef<HTMLElement> | undefined) {
-    this.privateCloudGeoMapElementRef = element || null;
-    if (element) {
-      this.initializePrivateCloudGeoMap().then(() => this.addPrivateCloudGeoMarkers());
-    }
-  }
-
   ngOnInit(): void {
     this.mapSvc.mapVisibilityChanged$
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(showMaps => {
         this.datacenterGeographiesLoaded = false;
-        this.privateCloudGeoLoaded = false;
         if (showMaps && this.hasFilterFormData()) {
           this.getDatacenterGeographies(this.appliedFilterCriteria);
-          this.getPrivateCloudGeo(this.appliedFilterCriteria);
         } else {
           this.datacenterGeographiesMapAvailable = false;
           this.datacenterGeographyAllLocations = [];
           this.datacenterGeographyViewData = [];
           this.datacenterGeographyDcMap = {};
           this.cleanupDatacenterGeographyMap();
-          this.privateCloudGeoMapAvailable = false;
-          this.privateCloudGeoAllSites = [];
-          this.privateCloudGeoSites = [];
-          this.privateCloudGeoNameMap = {};
-          this.cleanupPrivateCloudGeoMap();
         }
       });
     setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
@@ -540,7 +524,6 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed = true;
     this.cleanupDatacenterGeographyMap();
-    this.cleanupPrivateCloudGeoMap();
     if (this.newVmsSearchTimer) {
       clearTimeout(this.newVmsSearchTimer);
     }
@@ -626,24 +609,23 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.datacenterGeographyViewData = [];
     this.datacenterGeographyDcMap = {};
     this.cleanupDatacenterGeographyMap();
-    this.privateCloudGeoLoaded = false;
-    this.privateCloudGeoMapAvailable = false;
     this.privateCloudGeoAllSites = [];
     this.privateCloudGeoSites = [];
     this.privateCloudGeoView = null;
-    this.privateCloudGeoNameMap = {};
+    this.privateCloudGeoOptions = {};
+    this.privateCloudGeoLegends = [];
+    this.privateCloudGeoPlatformOptions = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS;
     this.selectedPrivateCloudPlatform = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
-    this.cleanupPrivateCloudGeoMap();
     this.newVms = [];
     this.newVmsTotal = 0;
     this.newVmsPageNo = 1;
     this.newVmsLoaded = false;
     this.newVmsSearch = '';
     this.selectedNewVmCloud = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
-    this.selectedNewVmStatus = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
     this.selectedNewVmState = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
     this.selectedNewVmStage = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
     this.selectedNewVmStageStatus = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    this.resetNewVmFilterOptions();
   }
 
   /** Reads selected option values from a filter form control. */
@@ -877,6 +859,14 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     return `${date.format('YYYY-MM-DD')}T${isEnd ? '23:59:59' : '00:00:00'}Z`;
   }
 
+  private formatDisplayTimeRangeDate(value: string | undefined): string {
+    if (!value) {
+      return '';
+    }
+    const date = moment(value);
+    return date.isValid() ? date.format('MMM DD, YYYY') : '';
+  }
+
   private clonePageSelection(controlName: string): UnifiedAiopsFilterOption[] {
     return [...((this.filterForm?.get(controlName)?.value as UnifiedAiopsFilterOption[]) || [])];
   }
@@ -926,10 +916,6 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     } catch {
       return '';
     }
-  }
-
-  get showEmployeeExperienceWidget(): boolean {
-    return this.userInfoService.isWiproOrg;
   }
 
   /** Loads all dashboard widgets only after the filter form exists and has loaded filter data. */
@@ -1092,36 +1078,115 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   }
 
   getGeoDistribution(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.geoDistributionCells = [];
     this.geoHeatmapOptions = {};
+    this.geoDistributionSummary = { totalLocations: 0, totalResources: 0, totalAlerts: 0 };
+    this.geoDistributionCloudOptions = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'Select All' }];
+    this.geoDistributionLegends = [];
     this.loadWidget(this.loaderNames.geoDistribution, this.svc.getGeoHeatmap(filterFormOutput), res => {
-      this.geoHeatmapOptions = this.svc.convertToGeoHeatmapOptions(res);
+      this.geoDistributionCells = res || [];
+      this.geoDistributionSummary = this.svc.convertToGeoDistributionSummary(this.geoDistributionCells);
+      this.geoDistributionCloudOptions = this.svc.convertToGeoDistributionCloudOptions(this.geoDistributionCells);
+      if (!this.geoDistributionCloudOptions.some(option => option.value === this.selectedGeoDistributionCloudType)) {
+        this.selectedGeoDistributionCloudType = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+      }
+      this.applyGeoDistributionCloudTypeFilter();
     }, () => {
+      this.geoDistributionCells = [];
       this.geoHeatmapOptions = {};
+      this.geoDistributionSummary = { totalLocations: 0, totalResources: 0, totalAlerts: 0 };
+      this.geoDistributionCloudOptions = [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label: 'Select All' }];
+      this.geoDistributionLegends = [];
     }, 'geoDistribution');
+  }
+
+  onGeoDistributionCloudTypeChange(event: Event) {
+    this.selectedGeoDistributionCloudType = String((event.target as HTMLSelectElement)?.value || UNIFIED_AIOPS_ALL_SELECTED_VALUE);
+    this.applyGeoDistributionCloudTypeFilter();
+  }
+
+  private applyGeoDistributionCloudTypeFilter() {
+    const selectedCloudType = this.selectedGeoDistributionCloudType;
+    const displayCells = selectedCloudType === UNIFIED_AIOPS_ALL_SELECTED_VALUE
+      ? this.geoDistributionCells
+      : (this.geoDistributionCells || []).filter(cell => this.getGeoDistributionCloudTypeKey(cell.cloudType) === selectedCloudType);
+    this.geoHeatmapOptions = this.svc.convertToGeoHeatmapOptions(displayCells);
+    this.geoDistributionLegends = this.svc.convertToGeoDistributionLegends(displayCells);
+  }
+
+  private getGeoDistributionCloudTypeKey(cloudType: string): string {
+    return String(cloudType || 'Unknown').replace(/[^a-z0-9]/gi, '').toLowerCase() || 'unknown';
   }
 
   getPrivateCloudCoverage(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     this.privateCloudCoverage = [];
+    this.privateCloudCoverageSource = [];
     this.privateCloudCoverageTotal = '0';
     this.loadWidget(this.loaderNames.privateCloudCoverage, this.svc.getPrivateCloudCoverage(filterFormOutput), res => {
-      this.privateCloudCoverage = this.svc.convertToCoverageCardsViewData(res);
+      this.privateCloudCoverageSource = this.svc.convertToCoverageCardsViewData(res);
+      this.privateCloudCoverage = this.getSortedPrivateCloudCoverage(this.privateCloudCoverageSource);
       this.privateCloudCoverageTotal = this.svc.getCoverageResourceTotal(this.privateCloudCoverage);
     }, () => {
       this.privateCloudCoverage = [];
+      this.privateCloudCoverageSource = [];
       this.privateCloudCoverageTotal = '0';
     }, 'privateCloudCoverage');
   }
 
+  onPrivateCloudCoverageSortChange(order: 'asc' | 'desc') {
+    if (this.privateCloudCoverageSortOrder === order) {
+      return;
+    }
+
+    this.privateCloudCoverageSortOrder = order;
+    this.privateCloudCoverage = this.getSortedPrivateCloudCoverage(this.privateCloudCoverageSource);
+  }
+
+  private getSortedPrivateCloudCoverage(cards: UnifiedAiopsCoverageCard[]): UnifiedAiopsCoverageCard[] {
+    const sortDirection = this.privateCloudCoverageSortOrder === 'asc' ? 1 : -1;
+    return (cards || []).map(card => ({
+      ...card,
+      rows: (card.rows || []).slice().sort((first, second) =>
+        String(first.label || '').localeCompare(String(second.label || ''), undefined, { sensitivity: 'base' }) * sortDirection
+      )
+    }));
+  }
+
   getPublicCloudCoverage(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     this.publicCloudCoverageGroups = [];
+    this.publicCloudCoverageGroupsSource = [];
     this.publicCloudCoverageTotal = '0';
     this.loadWidget(this.loaderNames.publicCloudCoverage, this.svc.getPublicCloudCoverage(filterFormOutput), res => {
-      this.publicCloudCoverageGroups = this.svc.convertToCoverageGroupsViewData(res);
+      this.publicCloudCoverageGroupsSource = this.svc.convertToCoverageGroupsViewData(res);
+      this.publicCloudCoverageGroups = this.getSortedPublicCloudCoverageGroups(this.publicCloudCoverageGroupsSource);
       this.publicCloudCoverageTotal = this.svc.getCoverageGroupsResourceTotal(this.publicCloudCoverageGroups);
     }, () => {
       this.publicCloudCoverageGroups = [];
+      this.publicCloudCoverageGroupsSource = [];
       this.publicCloudCoverageTotal = '0';
     }, 'publicCloudCoverage');
+  }
+
+  onPublicCloudCoverageSortChange(order: 'asc' | 'desc') {
+    if (this.publicCloudCoverageSortOrder === order) {
+      return;
+    }
+
+    this.publicCloudCoverageSortOrder = order;
+    this.publicCloudCoverageGroups = this.getSortedPublicCloudCoverageGroups(this.publicCloudCoverageGroupsSource);
+  }
+
+  private getSortedPublicCloudCoverageGroups(groups: UnifiedAiopsCoverageGroup[]): UnifiedAiopsCoverageGroup[] {
+    const sortDirection = this.publicCloudCoverageSortOrder === 'asc' ? 1 : -1;
+    return (groups || []).map(group => ({
+      ...group,
+      cards: (group.cards || []).map(card => ({
+        ...card,
+        rows: (card.rows || []).slice().sort((first, second) =>
+          String(first.label || '').localeCompare(String(second.label || ''), undefined, { sensitivity: 'base' }) * sortDirection
+        )
+      }))
+    }));
   }
 
   getDatacenterGeographies(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1306,7 +1371,7 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
         (marker as any).unityLocationKey = this.getDatacenterGeographyLocationKey(location);
 
         const infoWindow = new google.maps.InfoWindow({
-          content: this.dashboardMapWidgetService.createInfoWindowContent(location),
+          content: this.createDatacenterGeographyInfoWindowContent(location),
           position
         });
         infoWindow.open({
@@ -1367,9 +1432,10 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     }
 
     contentElement?.querySelectorAll<HTMLAnchorElement>('a[href]').forEach(anchor => {
+      const datacenterId = anchor.getAttribute('href')?.match(/datacenter\/([^/?#]+)/)?.[1];
+
       anchor.addEventListener('click', event => {
         event.preventDefault();
-        const datacenterId = anchor.getAttribute('href')?.match(/datacenter\/([^/?#]+)/)?.[1];
         this.ngZone.run(() => {
           this.openRouteInNewTab(datacenterId ? ['/unitycloud/datacenter', datacenterId] : this.linkRoutes.datacenter);
         });
@@ -1386,6 +1452,51 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
       infoWindow.setZIndex(this.datacenterGeographyOldZIndex || 0);
       this.datacenterGeographyOldZIndex = null;
     });
+  }
+
+  private createDatacenterGeographyInfoWindowContent(data: WorldMapWidgetViewdata): string {
+    const locPin = `<svg width="11" height="13" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5z" fill="#5f6368"/><circle cx="6" cy="5" r="2" fill="#fff"/></svg>`;
+    return `<div id="${data.lat}_${data.long}" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;width:240px;background:#fff;color:#1f2937;line-height:1;">`
+      + `<div style="padding:8px 12px 7px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:5px;">${locPin}<span style="font-size:11px;font-weight:500;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.escapeMapHtml(data.location)}</span></div>`
+      + `<div style="padding:8px 12px 10px;">${this.createDatacenterGeographyDatacentersContent(data.datacenters || [])}</div></div>`;
+  }
+
+  private createDatacenterGeographyDatacentersContent(datacenters: WorldMapWidgetDatacenter[]): string {
+    return (datacenters || []).map((datacenter, index) =>
+      `<div style="${index > 0 ? 'margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0;' : ''}">`
+      + `<a href="/main#/unitycloud/datacenter/${this.escapeMapHtml(datacenter.uuid)}" style="font-size:12px;font-weight:600;color:#1a73e8;text-decoration:none;display:block;margin-bottom:3px;line-height:1.3;">${this.escapeMapHtml(datacenter.name)}</a>`
+      + this.getDatacenterGeographyCategories(datacenter.status)
+      + `</div>`
+    ).join('');
+  }
+
+  private getDatacenterGeographyCategories(statuses: WorldMapWidgetDCStatus[]): string {
+    if (!statuses) {
+      return `<div style="color:#9ca3af;font-size:11px;margin-top:2px;"><i class="fa fa-spinner fa-spin"></i> Loading...</div>`;
+    }
+    return statuses.map(status =>
+      `<div style="display:flex;align-items:flex-start;gap:5px;margin-top:3px;">${this.getDatacenterGeographyStatusDot(status.status)}<span style="font-size:11px;color:#6b7280;line-height:1.4;">${this.escapeMapHtml(status.category)}</span></div>`
+    ).join('');
+  }
+
+  private getDatacenterGeographyStatusDot(status: MapWidgetStatus): string {
+    const bg: Record<MapWidgetStatus, string> = {
+      [MapWidgetStatus.UP]: '#1aad52',
+      [MapWidgetStatus.PARTIALLY_UP]: '#f59e0b',
+      [MapWidgetStatus.DOWN]: '#ef4444',
+      [MapWidgetStatus.NA]: '#9ca3af'
+    };
+    const color = bg[status] || bg[MapWidgetStatus.NA];
+    return `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;background:${color};"></span>`;
+  }
+
+  private escapeMapHtml(value: string | number): string {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   private getDatacenterGeographyPosition(location: WorldMapWidgetViewdata): google.maps.LatLngLiteral | null {
@@ -1425,68 +1536,30 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.datacenterGeographyClusterInfoWindow = null;
   }
 
-  // Private Cloud Geo Distribution - mirrors the Datacenter Geographies map. One marker per private
-  // cloud site, colored by platform (VMware / Nutanix) and sized by total resources at the site.
+  // Private Cloud Geo Distribution uses the same treemap surface as Public Cloud Geo Distribution.
   getPrivateCloudGeo(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    if (!this.mapSvc.shouldShowMapWidgets()) {
-      this.widgetLoading.privateCloudGeo = false;
-      this.privateCloudGeoLoaded = false;
-      this.privateCloudGeoMapAvailable = false;
-      this.privateCloudGeoAllSites = [];
-      this.privateCloudGeoSites = [];
-      this.privateCloudGeoNameMap = {};
-      this.cleanupPrivateCloudGeoMap();
-      return;
-    }
-
-    if (this.privateCloudGeoLoaded) {
-      this.applyPrivateCloudGeoFilter();
-      this.widgetLoading.privateCloudGeo = false;
-      return;
-    }
-
-    this.widgetLoading.privateCloudGeo = true;
+    this.privateCloudGeoView = null;
+    this.privateCloudGeoAllSites = [];
     this.privateCloudGeoSites = [];
-    this.privateCloudGeoNameMap = {};
-    this.clearPrivateCloudGeoMarkers();
-    this.spinnerService.start(this.loaderNames.privateCloudGeo);
-
-    this.mapSvc.loadMap().then(() => {
-      if (this.isDestroyed) {
-        this.widgetLoading.privateCloudGeo = false;
-        this.spinnerService.stop(this.loaderNames.privateCloudGeo);
-        return;
-      }
-
-      this.privateCloudGeoMapAvailable = this.mapSvc.isAvailable();
-      if (!this.privateCloudGeoMapAvailable) {
-        this.privateCloudGeoLoaded = true;
-        this.widgetLoading.privateCloudGeo = false;
-        this.spinnerService.stop(this.loaderNames.privateCloudGeo);
-        return;
-      }
-
-      this.svc.getPrivateCloudGeoDistribution(filterFormOutput).pipe(
-        takeUntil(this.ngUnsubscribe),
-        finalize(() => {
-          this.widgetLoading.privateCloudGeo = false;
-          setTimeout(() => this.spinnerService.stop(this.loaderNames.privateCloudGeo), 0);
-        })
-      ).subscribe(res => {
-        this.setPrivateCloudGeoData(res);
-      }, () => {
-        this.privateCloudGeoLoaded = true;
-        this.privateCloudGeoView = null;
-        this.privateCloudGeoAllSites = [];
-        this.applyPrivateCloudGeoFilter();
-      });
-    });
+    this.privateCloudGeoOptions = {};
+    this.privateCloudGeoLegends = [];
+    this.loadWidget(this.loaderNames.privateCloudGeo, this.svc.getPrivateCloudGeoDistribution(filterFormOutput), res => {
+      this.setPrivateCloudGeoData(res);
+    }, () => {
+      this.privateCloudGeoView = null;
+      this.privateCloudGeoAllSites = [];
+      this.privateCloudGeoPlatformOptions = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS;
+      this.applyPrivateCloudGeoFilter();
+    }, 'privateCloudGeo');
   }
 
   private setPrivateCloudGeoData(res: UnifiedAiopsPrivateCloudGeoView) {
-    this.privateCloudGeoLoaded = true;
     this.privateCloudGeoView = res || null;
     this.privateCloudGeoAllSites = (res && res.sites) || [];
+    this.privateCloudGeoPlatformOptions = this.svc.convertToPrivateCloudGeoPlatformOptions(this.privateCloudGeoAllSites);
+    if (!this.privateCloudGeoPlatformOptions.some(option => option.value === this.selectedPrivateCloudPlatform)) {
+      this.selectedPrivateCloudPlatform = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    }
     this.applyPrivateCloudGeoFilter();
   }
 
@@ -1495,19 +1568,8 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.privateCloudGeoSites = platform === UNIFIED_AIOPS_ALL_SELECTED_VALUE
       ? this.privateCloudGeoAllSites
       : (this.privateCloudGeoAllSites || []).filter(site => site.platformKey === platform);
-
-    this.privateCloudGeoNameMap = this.privateCloudGeoSites.reduce((result: { [key: string]: string[] }, site) => {
-      const key = this.getPrivateCloudGeoLocationKey(site);
-      result[key] = result[key] || [];
-      result[key].push(site.datacenterName);
-      return result;
-    }, {});
-
-    if (this.privateCloudGeoSites.length && this.privateCloudGeoMapAvailable) {
-      this.initializePrivateCloudGeoMap().then(() => this.addPrivateCloudGeoMarkers());
-    } else {
-      this.cleanupPrivateCloudGeoMap();
-    }
+    this.privateCloudGeoOptions = this.svc.convertToPrivateCloudGeoOptions(this.privateCloudGeoView, this.privateCloudGeoSites);
+    this.privateCloudGeoLegends = this.svc.convertToPrivateCloudGeoLegends(this.privateCloudGeoSites);
   }
 
   onPrivateCloudPlatformChange(event: Event) {
@@ -1515,283 +1577,20 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.applyPrivateCloudGeoFilter();
   }
 
-  private async initializePrivateCloudGeoMap() {
-    if (this.privateCloudGeoMap || !this.privateCloudGeoMapElementRef || !this.privateCloudGeoMapAvailable) {
-      return;
-    }
-
-    const mapsLibrary = await this.mapSvc.importMapsLibrary();
-    if (!mapsLibrary) {
-      this.privateCloudGeoMapAvailable = false;
-      return;
-    }
-    const { Map } = mapsLibrary;
-    if (this.isDestroyed || !this.privateCloudGeoMapElementRef) {
-      return;
-    }
-
-    this.ngZone.runOutsideAngular(() => {
-      const map = new Map(this.privateCloudGeoMapElementRef.nativeElement, {
-        center: this.privateCloudGeoInitialCenter,
-        zoom: this.privateCloudGeoInitialZoom,
-        minZoom: 2.2,
-        mapTypeControl: false,
-        streetViewControl: false,
-        rotateControl: false,
-        fullscreenControl: false,
-        mapId: environment.gmId
-      });
-      this.privateCloudGeoMap = map;
-      this.privateCloudGeoClusterInfoWindow = new google.maps.InfoWindow();
-      // disableAutoPan + an upward offset keep the hover card above the marker so it never pans the
-      // map (which would slide the marker out from under the cursor and cause an open/close flicker).
-      this.privateCloudGeoHoverInfoWindow = new google.maps.InfoWindow({ disableAutoPan: true, pixelOffset: new google.maps.Size(0, -8) });
-      this.privateCloudGeoTilesLoaded = map.addListener('tilesloaded', () => {
-        this.addPrivateCloudGeoMarkers();
-        this.privateCloudGeoTilesLoaded?.remove();
-        this.privateCloudGeoTilesLoaded = null;
-      });
-    });
-  }
-
-  private async addPrivateCloudGeoMarkers() {
-    if (!this.privateCloudGeoMap || !this.privateCloudGeoSites.length) {
-      return;
-    }
-
-    this.clearPrivateCloudGeoMarkers();
-    const markerLibrary = await this.mapSvc.importMarkerLibrary();
-    if (!markerLibrary) return;
-    const { AdvancedMarkerElement } = markerLibrary;
-    if (this.isDestroyed || !this.privateCloudGeoMap) {
-      return;
-    }
-
-    this.ngZone.runOutsideAngular(() => {
-      const map = this.privateCloudGeoMap;
-      if (!map) {
-        return;
-      }
-
-      this.privateCloudGeoSites.forEach(site => {
-        const position = this.getPrivateCloudGeoPosition(site);
-        if (!position) {
-          return;
-        }
-
-        const marker = new AdvancedMarkerElement({
-          position,
-          map,
-          title: `${site.datacenterName} - ${site.platformType}`,
-          content: this.createPrivateCloudMarkerContent(site)
-        });
-        (marker as any).unityLocationKey = this.getPrivateCloudGeoLocationKey(site);
-
-        const infoWindow = new google.maps.InfoWindow({
-          content: this.createPrivateCloudInfoWindowContent(site),
-          position
-        });
-        infoWindow.open({
-          map,
-          anchor: marker
-        });
-
-        this.privateCloudGeoInfoWindows.push(infoWindow);
-        this.privateCloudGeoMarkers.push(marker);
-        this.privateCloudGeoInfoWindowListeners.push(infoWindow.addListener('domready', () => this.bindPrivateCloudGeoPopover(site, infoWindow)));
-        this.privateCloudGeoClusterListeners.push(marker.addListener('click', () => {
-          this.ngZone.run(() => this.openPrivateCloudGeo(site));
-        }));
-
-        const markerContent = marker.content as HTMLElement;
-        if (markerContent) {
-          markerContent.style.cursor = 'pointer';
-          markerContent.addEventListener('mouseenter', () => this.showPrivateCloudGeoHoverCard(site, position));
-          markerContent.addEventListener('mouseleave', () => this.privateCloudGeoHoverInfoWindow?.close());
-        }
-      });
-
-      this.privateCloudGeoCluster = new MarkerClusterer({
-        map,
-        markers: this.privateCloudGeoMarkers as any
-      });
-
-      this.privateCloudGeoClusterListeners.push(
-        this.privateCloudGeoCluster.addListener('mouseover', (cluster: any) => this.openPrivateCloudGeoClusterPopover(cluster)),
-        this.privateCloudGeoCluster.addListener('mouseout', () => this.privateCloudGeoClusterInfoWindow?.close()),
-        this.privateCloudGeoCluster.addListener('click', () => this.privateCloudGeoClusterInfoWindow?.close())
-      );
-    });
-  }
-
-  private createPrivateCloudMarkerContent(site: UnifiedAiopsPrivateCloudGeoSite): HTMLElement {
-    const color = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLORS[site.platformKey] || '#6c757d';
-    const size = this.getPrivateCloudMarkerSize(site.totalResources);
-    const marker = document.createElement('div');
-    marker.style.width = `${size}px`;
-    marker.style.height = `${size}px`;
-    marker.style.borderRadius = '50%';
-    marker.style.background = color;
-    marker.style.border = '2px solid #ffffff';
-    marker.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.35)';
-    marker.style.opacity = '0.92';
-    return marker;
-  }
-
-  private getPrivateCloudMarkerSize(totalResources: number): number {
-    const minSize = 14;
-    const maxSize = 34;
-    const max = this.privateCloudGeoView?.maxResources || 0;
-    if (max <= 0) {
-      return minSize;
-    }
-    const ratio = Math.min(1, Math.max(0, totalResources / max));
-    return Math.round(minSize + (maxSize - minSize) * Math.sqrt(ratio));
-  }
-
-  private createPrivateCloudInfoWindowContent(site: UnifiedAiopsPrivateCloudGeoSite): string {
-    return `<div id="pcgeo_${site.key}" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;color:#1f2937;padding:3px 8px;border-radius:5px;white-space:nowrap;font-size:12px;font-weight:600;line-height:1.3;cursor:pointer;">${site.datacenterName}</div>`;
-  }
-
-  private showPrivateCloudGeoHoverCard(site: UnifiedAiopsPrivateCloudGeoSite, position: google.maps.LatLngLiteral) {
-    if (!this.privateCloudGeoHoverInfoWindow || !this.privateCloudGeoMap) {
-      return;
-    }
-    this.privateCloudGeoHoverInfoWindow.setContent(this.createPrivateCloudHoverCardContent(site));
-    this.privateCloudGeoHoverInfoWindow.setPosition(position);
-    this.privateCloudGeoHoverInfoWindow.open(this.privateCloudGeoMap);
-  }
-
-  // Rich detail card shown when the marker is hovered (name + platform + resource / alert breakdown).
-  private createPrivateCloudHoverCardContent(site: UnifiedAiopsPrivateCloudGeoSite): string {
-    const color = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_COLORS[site.platformKey] || '#6c757d';
-    const dark = '#1f2937';
-    const row = (icon: string, iconColor: string, label: string, value: number, valueColor: string): string =>
-      `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">`
-      + `<span style="display:flex;align-items:center;gap:8px;font-size:12px;color:#5f6b78;">`
-      + `<i class="fa ${icon}" style="width:14px;text-align:center;color:${iconColor};"></i>${label}</span>`
-      + `<span style="font-size:12px;font-weight:600;color:${valueColor};">${this.formatMapNumber(value)}</span></div>`;
-    const header = `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px 9px;border-bottom:1px solid #eef1f4;">`
-      + `<span style="width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0;"></span>`
-      + `<span style="font-size:14px;font-weight:700;color:${dark};">${site.datacenterName}</span></div>`;
-    const platform = `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #eef1f4;">`
-      + `<span style="display:flex;align-items:center;gap:8px;font-size:12px;color:#5f6b78;"><i class="fa fa-sitemap" style="width:14px;text-align:center;color:#8a96a3;"></i>Platform Type</span>`
-      + `<span style="font-size:12px;font-weight:700;color:${dark};">${site.platformType}</span></div>`;
-    const alerts = `<div style="padding:6px 14px;border-bottom:1px solid #eef1f4;">`
-      + row('fa-th-large', '#5f6b78', 'Total Resources', site.totalResources, dark)
-      + row('fa-bell', '#f0a020', 'Total Alerts', site.totalAlerts, dark)
-      + row('fa-times-circle', '#cc0000', 'Critical Alerts', site.critical, '#cc0000')
-      + row('fa-exclamation-triangle', '#ff8800', 'Warning Alerts', site.warning, '#ff8800')
-      + row('fa-info-circle', '#378ad8', 'Information Alerts', site.info, '#378ad8')
-      + `</div>`;
-    const resources = `<div style="padding:6px 14px 9px;">`
-      + row('fa-desktop', '#5f6b78', 'VM Count', site.vmCount, dark)
-      + row('fa-cubes', '#5f6b78', 'Clusters', site.clustersCount, dark)
-      + row('fa-hdd', '#5f6b78', 'Storage', site.storageCount, dark)
-      + `</div>`;
-    return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;width:250px;background:#fff;color:${dark};line-height:1.3;">${header}${platform}${alerts}${resources}</div>`;
-  }
-
-  private formatMapNumber(value: number): string {
-    return (Number(value) || 0).toLocaleString('en-US');
-  }
-
-  private openPrivateCloudGeoClusterPopover(cluster: any) {
-    if (!this.privateCloudGeoClusterInfoWindow || !this.privateCloudGeoMap) {
-      return;
-    }
-
-    let content = '<div style="font-weight:500;">Private Cloud Sites</div><br>';
-    (cluster.markers || []).forEach((marker: any) => {
-      const names = this.privateCloudGeoNameMap[marker.unityLocationKey] || [];
-      names.forEach(name => {
-        content = `${content}<span>${name}</span><br>`;
-      });
-    });
-
-    this.privateCloudGeoClusterInfoWindow.setContent(content);
-    this.privateCloudGeoClusterInfoWindow.setPosition(cluster.position || cluster.getCenter?.());
-    this.privateCloudGeoClusterInfoWindow.open(this.privateCloudGeoMap);
-  }
-
-  private bindPrivateCloudGeoPopover(site: UnifiedAiopsPrivateCloudGeoSite, infoWindow: google.maps.InfoWindow) {
-    const id = `pcgeo_${site.key}`;
-    const contentElement = document.getElementById(id);
-    if (!contentElement) {
-      return;
-    }
-
-    const infoWindowShell = contentElement.closest('.gm-style-iw-a')?.parentElement as HTMLElement;
-    if (infoWindowShell) {
-      this.privateCloudGeoZIndexMap[id] = Number.parseInt(infoWindowShell.style.getPropertyValue('z-index'), 10) || 0;
-    }
-
-    contentElement.addEventListener('click', () => {
-      this.ngZone.run(() => this.openPrivateCloudGeo(site));
-    });
-
-    contentElement.addEventListener('mouseover', () => {
-      const high = Math.max(...Object.keys(this.privateCloudGeoZIndexMap).map(key => this.privateCloudGeoZIndexMap[key]), 0);
-      this.privateCloudGeoOldZIndex = this.privateCloudGeoZIndexMap[id] || 0;
-      infoWindow.setZIndex(high + 1);
-    });
-
-    contentElement.addEventListener('mouseout', () => {
-      infoWindow.setZIndex(this.privateCloudGeoOldZIndex || 0);
-      this.privateCloudGeoOldZIndex = null;
-    });
-  }
-
-  private getPrivateCloudGeoPosition(site: UnifiedAiopsPrivateCloudGeoSite): google.maps.LatLngLiteral | null {
-    const lat = Number(site.lat);
-    const lng = Number(site.long);
-    if (!isFinite(lat) || !isFinite(lng)) {
-      return null;
-    }
-    return { lat, lng };
-  }
-
-  private getPrivateCloudGeoLocationKey(site: UnifiedAiopsPrivateCloudGeoSite): string {
-    return `${site.lat}_${site.long}`;
-  }
-
-  private clearPrivateCloudGeoMarkers() {
-    this.privateCloudGeoClusterListeners.forEach(listener => listener.remove());
-    this.privateCloudGeoClusterListeners = [];
-    this.privateCloudGeoInfoWindowListeners.forEach(listener => listener.remove());
-    this.privateCloudGeoInfoWindowListeners = [];
-    this.privateCloudGeoInfoWindows.forEach(infoWindow => infoWindow.close());
-    this.privateCloudGeoInfoWindows = [];
-    this.privateCloudGeoMarkers.forEach(marker => marker.map = null);
-    this.privateCloudGeoMarkers = [];
-    this.privateCloudGeoZIndexMap = {};
-    this.privateCloudGeoCluster?.clearMarkers();
-    this.privateCloudGeoCluster = null;
-    this.privateCloudGeoClusterInfoWindow?.close();
-    this.privateCloudGeoHoverInfoWindow?.close();
-  }
-
-  private cleanupPrivateCloudGeoMap() {
-    this.clearPrivateCloudGeoMarkers();
-    this.privateCloudGeoTilesLoaded?.remove();
-    this.privateCloudGeoTilesLoaded = null;
-    this.privateCloudGeoMapElementRef = null;
-    this.privateCloudGeoMap = null;
-    this.privateCloudGeoClusterInfoWindow = null;
-    this.privateCloudGeoHoverInfoWindow = null;
-  }
-
-  openPrivateCloudGeo(site: UnifiedAiopsPrivateCloudGeoSite) {
-    this.openRouteInNewTab(site?.datacenterUuid ? ['/unitycloud/datacenter', site.datacenterUuid] : this.linkRoutes.datacenter);
-  }
-
   openPrivateCloudGeoDistribution() {
     this.openRouteInNewTab(this.linkRoutes.pccloud);
   }
 
+  onPrivateCloudGeoChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openPrivateCloudGeoDistribution());
+  }
+
   get hasPrivateCloudGeo(): boolean {
-    return this.widgetLoading.privateCloudGeo ||
-      (this.mapSvc.shouldShowMapWidgets() && this.privateCloudGeoMapAvailable && !!this.privateCloudGeoSites?.length);
+    return this.widgetLoading.privateCloudGeo || this.hasPrivateCloudGeoSourceData();
+  }
+
+  private hasPrivateCloudGeoSourceData(): boolean {
+    return (this.privateCloudGeoAllSites || []).some(site => site.totalResources > 0);
   }
 
   // Newly Provisioned VMs - paginated table; the request carries the applied global filters plus the
@@ -1801,23 +1600,80 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.loadWidget(this.loaderNames.newVms, this.svc.getNewlyProvisionedVms(this.appliedFilterCriteria, filter, this.newVmsPageNo, this.newVmsPageSize), res => {
       this.newVms = (res && res.rows) || [];
       this.newVmsTotal = (res && res.total) || 0;
+      this.syncNewVmFilterOptions(res && res.filters);
       this.newVmsLoaded = true;
     }, () => {
       this.newVms = [];
       this.newVmsTotal = 0;
+      this.resetNewVmFilterOptions();
       this.newVmsLoaded = true;
     }, 'newVms');
+  }
+
+  private syncNewVmFilterOptions(filters?: UnifiedAiopsNewVmsFilterOptions) {
+    this.newVmCloudOptions = this.withSelectedNewVmOption(filters?.cloudType, this.selectedNewVmCloud, 'All Clouds');
+    this.newVmStateOptions = this.withSelectedNewVmOption(filters?.vmState, this.selectedNewVmState, 'All States');
+    this.newVmLifecycleStageOptions = this.withSelectedNewVmOption(filters?.lifecycleStage, this.selectedNewVmStage, 'All Stages');
+    this.newVmLifecycleStatusOptions = this.withSelectedNewVmOption(filters?.lifecycleStageStatus, this.selectedNewVmStageStatus, 'All Statuses');
+  }
+
+  private resetNewVmFilterOptions() {
+    this.newVmCloudOptions = this.getDefaultNewVmOption('All Clouds');
+    this.newVmStateOptions = this.getDefaultNewVmOption('All States');
+    this.newVmLifecycleStageOptions = this.getDefaultNewVmOption('All Stages');
+    this.newVmLifecycleStatusOptions = this.getDefaultNewVmOption('All Statuses');
+  }
+
+  private getDefaultNewVmOption(label: string): UnifiedAiopsFilterOption[] {
+    return [{ value: UNIFIED_AIOPS_ALL_SELECTED_VALUE, label }];
+  }
+
+  private withSelectedNewVmOption(options: UnifiedAiopsFilterOption[] | undefined, selectedValue: string, allLabel: string): UnifiedAiopsFilterOption[] {
+    const filterOptions = options && options.length ? options : this.getDefaultNewVmOption(allLabel);
+    if (!selectedValue || selectedValue === UNIFIED_AIOPS_ALL_SELECTED_VALUE || filterOptions.some(option => option.value === selectedValue)) {
+      return filterOptions;
+    }
+    return [...filterOptions, { value: selectedValue, label: this.getNewVmOptionLabel(selectedValue) }];
+  }
+
+  private getNewVmOptionLabel(value: string): string {
+    return String(value || '')
+      .replace(/_/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, char => char.toUpperCase());
   }
 
   private getNewVmsFilter(): UnifiedAiopsNewVmsFilter {
     return {
       search: this.newVmsSearch,
       cloudPlatform: this.selectedNewVmCloud,
-      status: this.selectedNewVmStatus,
       vmState: this.selectedNewVmState,
       lifecycleStage: this.selectedNewVmStage,
-      lifecycleStageStatus: this.selectedNewVmStageStatus
+      lifecycleStageStatus: this.selectedNewVmStageStatus,
+      ordering: this.newVmsSort
     };
+  }
+
+  sortNewVms(sortKey: string) {
+    this.newVmsSort = this.getNewVmSortKey(this.newVmsSort) === sortKey && this.newVmsSort === sortKey
+      ? `-${sortKey}`
+      : sortKey;
+    this.newVmsPageNo = 1;
+    this.getNewVms();
+  }
+
+  isNewVmSortActive(sortKey: string): boolean {
+    return this.getNewVmSortKey(this.newVmsSort) === sortKey;
+  }
+
+  getNewVmSortIcon(sortKey: string): string {
+    return this.newVmsSort === `-${sortKey}` ? 'fas fa-caret-up' : 'fas fa-caret-down';
+  }
+
+  private getNewVmSortKey(ordering: string): string {
+    return String(ordering || '').replace(/^-/, '');
   }
 
   newVmsPageChange(pageNo: number) {
@@ -1828,12 +1684,10 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.getNewVms();
   }
 
-  onNewVmSelectChange(field: 'cloud' | 'status' | 'state' | 'stage' | 'stageStatus', event: Event) {
+  onNewVmSelectChange(field: 'cloud' | 'state' | 'stage' | 'stageStatus', event: Event) {
     const value = String((event.target as HTMLSelectElement)?.value || UNIFIED_AIOPS_ALL_SELECTED_VALUE);
     if (field === 'cloud') {
       this.selectedNewVmCloud = value;
-    } else if (field === 'status') {
-      this.selectedNewVmStatus = value;
     } else if (field === 'state') {
       this.selectedNewVmState = value;
     } else if (field === 'stage') {
@@ -1857,7 +1711,15 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   }
 
   get hasNewVms(): boolean {
-    return this.widgetLoading.newVms || this.newVmsLoaded || !!this.newVms?.length;
+    return this.widgetLoading.newVms || this.newVmsTotal > 0 || !!this.newVms?.length || this.hasNewVmsFilterApplied;
+  }
+
+  private get hasNewVmsFilterApplied(): boolean {
+    return !!(this.newVmsSearch || '').trim() ||
+      this.selectedNewVmCloud !== UNIFIED_AIOPS_ALL_SELECTED_VALUE ||
+      this.selectedNewVmState !== UNIFIED_AIOPS_ALL_SELECTED_VALUE ||
+      this.selectedNewVmStage !== UNIFIED_AIOPS_ALL_SELECTED_VALUE ||
+      this.selectedNewVmStageStatus !== UNIFIED_AIOPS_ALL_SELECTED_VALUE;
   }
 
   getApplicationRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -2195,7 +2057,93 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   }
 
   get hasSummaryMetrics(): boolean {
-    return this.widgetLoading.summaryMetrics || !!this.executiveView;
+    return this.widgetLoading.summaryMetrics || this.hasExecutiveSummaryData();
+  }
+
+  getExecHeroCardClass(card: UnifiedAiopsExecStatusCard): string {
+    const subCardCount = (card?.subCards || []).length;
+    if (subCardCount >= 5) {
+      return 'exec-hero-card-wide';
+    }
+    if (subCardCount >= 3) {
+      return 'exec-hero-card-medium';
+    }
+    return 'exec-hero-card-compact';
+  }
+
+  getExecHeroTotalsGridClass(view: UnifiedAiopsExecutiveView): string {
+    return this.getExecHeroSpanClass(this.getExecHeroGridSpans(view)[0] || 12);
+  }
+
+  getExecHeroCardGridClass(view: UnifiedAiopsExecutiveView, index: number): string {
+    return this.getExecHeroSpanClass(this.getExecHeroGridSpans(view)[index + 1] || 2);
+  }
+
+  private getExecHeroGridSpans(view: UnifiedAiopsExecutiveView): number[] {
+    const cards = view?.heroCards || [];
+    const weights = [2, ...cards.map(card => this.getExecHeroCardWeight(card))];
+    if (!weights.length) {
+      return [12];
+    }
+
+    const spans = weights.map(() => 2);
+    let remaining = Math.max(12 - spans.length * 2, 0);
+    const priorities = weights
+      .map((weight, index) => ({
+        index,
+        weight,
+        subCardCount: index === 0 ? 0 : (cards[index - 1]?.subCards || []).length
+      }))
+      .sort((firstItem, secondItem) =>
+        secondItem.weight - firstItem.weight ||
+        secondItem.subCardCount - firstItem.subCardCount ||
+        firstItem.index - secondItem.index
+      );
+
+    while (remaining > 0 && priorities.some(item => spans[item.index] < item.weight)) {
+      priorities.forEach(item => {
+        if (remaining > 0 && spans[item.index] < item.weight) {
+          spans[item.index] += 1;
+          remaining -= 1;
+        }
+      });
+    }
+
+    while (remaining > 0) {
+      priorities.forEach(item => {
+        if (remaining > 0) {
+          spans[item.index] += 1;
+          remaining -= 1;
+        }
+      });
+    }
+
+    return spans;
+  }
+
+  private getExecHeroCardWeight(card: UnifiedAiopsExecStatusCard): number {
+    const subCardCount = (card?.subCards || []).length;
+    if (subCardCount >= 5) {
+      return 4;
+    }
+    if (subCardCount >= 3) {
+      return 3;
+    }
+    return 2;
+  }
+
+  private getExecHeroSpanClass(span: number): string {
+    return `exec-hero-span-${Math.max(Math.min(span, 12), 1)}`;
+  }
+
+  private hasExecutiveSummaryData(): boolean {
+    if (!this.executiveView) {
+      return false;
+    }
+    return this.getNumericValue(this.executiveView.totals?.discovered) > 0 ||
+      this.getNumericValue(this.executiveView.totals?.monitored) > 0 ||
+      !!this.executiveView.heroCards?.length ||
+      !!this.executiveView.groups?.length;
   }
 
   get hasDiscovery(): boolean {
@@ -2210,12 +2158,12 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     return this.widgetLoading.businessServices || !!this.businessServices?.length;
   }
 
-  get hasEmployeeExperience(): boolean {
-    return this.showEmployeeExperienceWidget;
+  get hasGeoDistribution(): boolean {
+    return this.widgetLoading.geoDistribution || this.hasGeoDistributionSourceData();
   }
 
-  get hasGeoDistribution(): boolean {
-    return this.widgetLoading.geoDistribution || this.hasChartData(this.geoHeatmapOptions);
+  private hasGeoDistributionSourceData(): boolean {
+    return (this.geoDistributionCells || []).some(cell => cell.totalResources > 0);
   }
 
   get hasPrivateCloudCoverage(): boolean {
@@ -2302,6 +2250,17 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     return this.widgetLoading.alertTrend || this.hasChartData(this.alertTrendOptions);
   }
 
+  get alertTrendTimeRangeLabel(): string {
+    const timeRange = this.appliedFilterCriteria?.timeRange || UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
+    if (timeRange === 'custom') {
+      const startDate = this.formatDisplayTimeRangeDate(this.appliedFilterCriteria?.startDate);
+      const endDate = this.formatDisplayTimeRangeDate(this.appliedFilterCriteria?.endDate);
+      return startDate && endDate ? `${startDate} - ${endDate}` : 'Custom Range';
+    }
+    const option = this.timeRangeOptions.find(item => item.value === timeRange);
+    return option?.label || 'Selected Range';
+  }
+
   get hasAnalyticsSection(): boolean {
     return this.hasDeviceAvailability || this.hasAvailabilityCategory || this.hasAlertTrend;
   }
@@ -2342,9 +2301,7 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   }
 
   get hasRecentAlertSummary(): boolean {
-    return this.widgetLoading.recentAlertSummary ||
-      this.hasMetricValues(this.recentAlertSummaryMetrics) ||
-      (this.recentAlertSummaryMetrics || []).some(metric => metric?.hasData);
+    return this.widgetLoading.recentAlertSummary || this.hasMetricValues(this.recentAlertSummaryMetrics);
   }
 
   get hasRecentAlerts(): boolean {
@@ -2380,11 +2337,11 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
       this.hasDiscovery ||
       this.hasAlertSegregation ||
       this.hasBusinessServices ||
-      this.hasEmployeeExperience ||
       this.hasGeoDistribution ||
       this.hasPrivateCloudCoverage ||
       this.hasPublicCloudCoverage ||
       this.hasDatacenterGeographies ||
+      this.hasNewVms ||
       this.hasApplicationRows ||
       this.hasServiceRows ||
       this.hasDatabaseRows ||
@@ -2429,6 +2386,14 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
       case 'info': return 'fa-info-circle';
       default: return 'fa-minus-circle';
     }
+  }
+
+  getNewVmStateTooltip(state: string): string {
+    return `VM State: ${state || 'NA'}`;
+  }
+
+  openNewVmList(vm: UnifiedAiopsNewVmRow) {
+    this.openRouteInNewTab(this.getNewVmListRoute(vm?.cloudType));
   }
 
   getRecentAlertSeverityTone(severity: string): UnifiedAiopsTone {
@@ -2531,8 +2496,18 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   }
 
   private getExecLinkRoute(link?: string): any[] | null {
+    if (link === 'datacenterPdus') {
+      return this.getDatacenterPduRoute();
+    }
     const route = link ? (this.linkRoutes as { [key: string]: any })[link] : null;
     return Array.isArray(route) ? route : null;
+  }
+
+  private getDatacenterPduRoute(): any[] {
+    const selectedDatacenters = (this.appliedFilterCriteria?.datacenters || []).filter(value => !!value);
+    return selectedDatacenters.length === 1
+      ? ['/unitycloud/datacenter', selectedDatacenters[0], 'pdus']
+      : this.linkRoutes.datacenter;
   }
 
   openDeviceDiscovery() {
@@ -2610,10 +2585,6 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
 
   canOpenBusinessService(row: UnifiedAiopsBusinessService): boolean {
     return !!row?.id;
-  }
-
-  openEmployeeExperience() {
-    window.open(UNIFIED_AIOPS_EMPLOYEE_EXPERIENCE_EXTERNAL_URL, '_blank', 'noopener');
   }
 
   openDatacenters() {
@@ -2846,6 +2817,38 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
       default:
         return value ? null : this.linkRoutes.vmAll;
     }
+  }
+
+  private getNewVmListRoute(value: string | undefined): any[] | null {
+    const normalizedValue = this.normalizeLinkText(value);
+    if (normalizedValue.includes('nutanix')) {
+      return this.linkRoutes.vmNutanix;
+    }
+    if (normalizedValue.includes('vcloud')) {
+      return this.linkRoutes.vmVcloud;
+    }
+    if (normalizedValue.includes('openstack') || normalizedValue.includes('open_stack')) {
+      return this.linkRoutes.vmOpenstack;
+    }
+    if (normalizedValue.includes('hyper_v') || normalizedValue.includes('hyperv')) {
+      return this.linkRoutes.vmHyperv;
+    }
+    if (normalizedValue.includes('proxmox')) {
+      return this.linkRoutes.vmProxmox;
+    }
+    if (normalizedValue.includes('g3_kvm') || normalizedValue.includes('g3kvm')) {
+      return ['/unitycloud/devices/vms/g3kvm'];
+    }
+    if (normalizedValue.includes('esxi')) {
+      return ['/unitycloud/devices/vms/esxi'];
+    }
+    if (normalizedValue.includes('custom')) {
+      return this.linkRoutes.vmCustom;
+    }
+    if (normalizedValue.includes('vmware') || normalizedValue.includes('vcenter') || normalizedValue.includes('vsphere')) {
+      return this.linkRoutes.vmVmware;
+    }
+    return this.getProviderVmRoute(this.getProviderKey(value)) || this.linkRoutes.vmAll;
   }
 
   private getProviderKey(value: string | undefined): string {

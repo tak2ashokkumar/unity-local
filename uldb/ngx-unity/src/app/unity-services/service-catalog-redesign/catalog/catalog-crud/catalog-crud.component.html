@@ -1,0 +1,948 @@
+<div class="row" *ngIf="form" [formGroup]="form">
+    <div class="col-12 px-0">
+        <div class="card">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">{{action}} Catalog</span>
+                <div class="d-flex align-items-center header-actions">
+                    <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <!-- ============ DESCRIPTIVE ============ -->
+                <div class="accordion-card">
+                    <div class="accordion-head" (click)="toggleAccordion('descriptive')">
+                        <span class="chevron" [class.open]="isOpen('descriptive')">&#9656;</span>
+                        <span class="title">Descriptive</span>
+                        <span class="text-muted small">What requesters see in the catalog</span>
+                    </div>
+                    <div class="accordion-body" *ngIf="isOpen('descriptive')">
+
+                        <div class="form-group row">
+                            <label for="name" class="col-2 text-right col-form-label">Name<em>*</em> :</label>
+                            <div class="col-6">
+                                <input id="name" class="form-control text-dark" type="text" formControlName="name"
+                                    [class.is-invalid]="formErrors.name" placeholder="Enter catalog name">
+                                <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="description" class="col-2 text-right col-form-label">Description<em>*</em>
+                                :</label>
+                            <div class="col-8">
+                                <textarea id="description" class="form-control text-dark" rows="2"
+                                    formControlName="description" [class.is-invalid]="formErrors.description"
+                                    placeholder="Enter description"></textarea>
+                                <div class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-2 text-right col-form-label">Logo<em>*</em> :</label>
+                            <div class="col-8">
+                                <div class="logo-upload-wrap d-flex align-items-center">
+                                    <div class="logo-preview mr-3">
+                                        <img *ngIf="logoPreviewUrl" [src]="logoPreviewUrl" alt="Catalog logo"
+                                            class="logo-preview-img">
+                                        <div *ngIf="!logoPreviewUrl" class="logo-preview-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <label class="btn btn-sm text-primary border-primary mb-0">
+                                            <i class="fas fa-upload mr-1"></i>
+                                            {{ logoPreviewUrl ? 'Replace logo' : 'Upload logo' }}
+                                            <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                                                hidden (change)="onLogoSelected($event)">
+                                        </label>
+                                        <button type="button" class="btn btn-sm text-danger border-danger ml-2"
+                                            *ngIf="logoPreviewUrl" (click)="removeLogo()">
+                                            <i class="fas fa-trash mr-1"></i> Remove
+                                        </button>
+
+                                        <!-- NEW: filename / path -->
+                                        <div class="text-muted small mt-1 text-truncate" style="max-width: 320px;"
+                                            *ngIf="logoFileName" [title]="logoFileName">
+                                            <i class="fas fa-paperclip mr-1"></i>{{ logoFileName }}
+                                        </div>
+
+                                        <div class="text-muted small mt-1" *ngIf="!logoFileName">PNG, JPG or WEBP.
+                                            Max 2MB. Uploaded when
+                                            you submit.</div>
+                                        <div class="text-danger small mt-1" *ngIf="logoUploadError">{{ logoUploadError
+                                            }}</div>
+                                        <div class="text-danger small mt-1" *ngIf="!logoUploadError && formErrors.logo">
+                                            {{ formErrors.logo }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="category" class="col-2 text-right col-form-label">Category<em>*</em> :</label>
+                            <div class="col-4">
+                                <select id="category" class="form-control text-dark" formControlName="category"
+                                    [class.is-invalid]="formErrors.category">
+                                    <option [value]="''" disabled>Select category</option>
+                                    <option *ngFor="let cat of meta.category" [value]="cat">{{cat}}</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.category">{{formErrors.category}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="platform" class="col-2 text-right col-form-label">Platform<em>*</em> :</label>
+                            <div class="col-4">
+                                <select id="platform" class="form-control text-dark" formControlName="platform"
+                                    [class.is-invalid]="formErrors.platform">
+                                    <option [value]="''">Select platform</option>
+                                    <option *ngFor="let p of meta.platform" [value]="p">{{p}}</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.platform">{{formErrors.platform}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="service" class="col-2 text-right col-form-label">Service<em>*</em> :</label>
+                            <div class="col-4">
+                                <input class="form-control text-dark" type="text" formControlName="service"
+                                    [class.is-invalid]="formErrors.service" placeholder="Enter service">
+                                <div class="invalid-feedback" *ngIf="formErrors.service">{{formErrors.service}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="datacenter" class="col-2 text-right col-form-label">Data
+                                Center :</label>
+                            <div class="col-4">
+                                <multiselect-dropdown [settings]="datacenterSettings" [options]="datacenterOptions"
+                                    class="form-control p-0" style="height:auto;" formControlName="datacenter"
+                                    [texts]="datacenterTexts"></multiselect-dropdown>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="management_type" class="col-2 text-right col-form-label">Management
+                                Type :</label>
+                            <div class="col-4">
+                                <select id="management_type" class="form-control text-dark"
+                                    formControlName="management_type">
+                                    <option [value]="''" disabled>Select management type</option>
+                                    <option *ngFor="let type of meta.management_type" [value]="type">{{type}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-2 text-right col-form-label">Use Cases :</label>
+                            <div class="col-8 repeat-block">
+                                <div class="repeat-row" *ngFor="let ctrl of useCases.controls; let i = index"
+                                    [formGroup]="$any(useCases)">
+                                    <input class="form-control text-dark" type="text" [formControlName]="i"
+                                        [class.is-invalid]="ctrl.invalid && (ctrl.touched || ctrl.dirty)"
+                                        placeholder="Enter use case">
+                                    <div class="invalid-feedback d-block"
+                                        *ngIf="ctrl.invalid && (ctrl.touched || ctrl.dirty)">This field is required.
+                                    </div>
+                                    <button type="button" class="kill"
+                                        (click)="removeStringRow(useCases, i)">&times;</button>
+                                </div>
+                                <div class="text-muted small mb-2" *ngIf="!useCases.length">No use cases yet.</div>
+                                <button type="button" class="btn text-primary border-primary btn-sm"
+                                    (click)="addStringRow(useCases)">
+                                    <i class="fas fa-plus mr-1"></i> Use case
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-2 text-right col-form-label">Key Features :</label>
+                            <div class="col-8 repeat-block">
+                                <div class="repeat-row" *ngFor="let ctrl of keyFeatures.controls; let i = index"
+                                    [formGroup]="$any(keyFeatures)">
+                                    <input class="form-control text-dark" type="text" [formControlName]="i"
+                                        [class.is-invalid]="ctrl.invalid && (ctrl.touched || ctrl.dirty)"
+                                        placeholder="Enter key feature">
+                                    <div class="invalid-feedback d-block"
+                                        *ngIf="ctrl.invalid && (ctrl.touched || ctrl.dirty)">This field is required.
+                                    </div>
+                                    <button type="button" class="kill"
+                                        (click)="removeStringRow(keyFeatures, i)">&times;</button>
+                                </div>
+                                <div class="text-muted small mb-2" *ngIf="!keyFeatures.length">No features yet.</div>
+                                <button type="button" class="btn text-primary border-primary btn-sm"
+                                    (click)="addStringRow(keyFeatures)">
+                                    <i class="fas fa-plus mr-1"></i> Feature
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-2 text-right col-form-label">Require Approval :</label>
+                            <div class="col-8">
+                                <div>
+                                    <input class="form-check-input ml-1 form-check-xl" type="checkbox"
+                                        formControlName="require_approval" style="min-width:20px; min-height:20px;">
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-muted small">
+                                        Approval will be triggered based on the approval policy configured in
+                                        UnitySetup > Policy.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============ CONFIGURATION ============ -->
+                <div class="accordion-card">
+                    <div class="accordion-head" (click)="toggleAccordion('configuration')">
+                        <span class="chevron" [class.open]="isOpen('configuration')">&#9656;</span>
+                        <span class="title">Configuration</span>
+                        <span class="text-muted small">Fields the requester fills in at order time</span>
+                    </div>
+                    <div class="accordion-body" *ngIf="isOpen('configuration')" formArrayName="configuration">
+
+                        <div class="cfg-card" *ngFor="let cfg of configuration.controls; let i = index"
+                            [formGroupName]="i">
+                            <div class="cfg-head">
+                                <span class="tag">FIELD {{i + 1}}</span>
+                                <div class="spacer"></div>
+                                <button type="button" class="kill" (click)="removeConfigField(i)">&times;</button>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 text-right col-form-label">Key<em>*</em> :</label>
+                                <div class="col-4">
+                                    <input class="form-control text-dark" type="text" formControlName="key"
+                                        (blur)="onConfigKeyChange()" [class.is-invalid]="configFieldErrors[i]?.key"
+                                        placeholder="Enter key">
+                                    <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.key">
+                                        {{ configFieldErrors[i].key }}
+                                    </div>
+                                </div>
+                                <label class="col-2 text-right col-form-label">Label<em>*</em> :</label>
+                                <div class="col-4">
+                                    <input class="form-control text-dark" type="text" formControlName="label"
+                                        [class.is-invalid]="configFieldErrors[i]?.label" placeholder="Enter label">
+                                    <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.label">
+                                        {{ configFieldErrors[i].label }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 text-right col-form-label">Type<em>*</em> :</label>
+                                <div class="col-4">
+                                    <select class="form-control text-dark" formControlName="type"
+                                        [class.is-invalid]="configFieldErrors[i]?.type">
+                                        <option *ngFor="let t of configFieldTypes" [value]="t">{{t}}</option>
+                                    </select>
+                                    <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.type">
+                                        {{ configFieldErrors[i].type }}
+                                    </div>
+                                </div>
+                                <label class="col-2 text-right col-form-label">Unit :</label>
+                                <div class="col-4">
+                                    <input class="form-control text-dark" type="text" formControlName="unit"
+                                        placeholder="Enter unit">
+                                </div>
+                            </div>
+
+                            <div class="form-group row" *ngIf="showPlaceholder(cfg.get('type').value)">
+                                <label class="col-2 text-right col-form-label">Placeholder :</label>
+                                <div class="col-4">
+                                    <input class="form-control text-dark" type="text" formControlName="placeholder"
+                                        placeholder="Enter placeholder value">
+                                </div>
+                                <label class="col-2 text-right col-form-label">Default :</label>
+                                <div class="col-4">
+                                    <input class="form-control text-dark" type="text" formControlName="default"
+                                        placeholder="Enter default value">
+                                </div>
+                            </div>
+                            <div class="form-group row" *ngIf="!showPlaceholder(cfg.get('type').value)">
+                                <label class="col-2 text-right col-form-label">Default :</label>
+                                <div class="col-4">
+                                    <input class="form-control text-dark" type="text" formControlName="default">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 text-right col-form-label">Help Text :</label>
+                                <div class="col-8">
+                                    <input class="form-control text-dark" type="text" formControlName="help_text"
+                                        placeholder="Enter help text">
+                                </div>
+                            </div>
+
+                            <div class="form-group row" *ngIf="showRange(cfg.get('type').value)">
+                                <label class="col-2 text-right col-form-label">Min / Max / Step :</label>
+                                <div class="col-2"><input class="form-control text-dark" type="number"
+                                        formControlName="min" placeholder="Enter min value"></div>
+                                <div class="col-2"><input class="form-control text-dark" type="number"
+                                        formControlName="max" placeholder="Enter max value"></div>
+                                <div class="col-2"><input class="form-control text-dark" type="number"
+                                        formControlName="step" placeholder="Enter step"></div>
+                            </div>
+
+                            <div class="form-group row" *ngIf="showOptions(cfg.get('type').value)">
+                                <label class="col-2 text-right col-form-label">Options :</label>
+                                <div class="col-8 repeat-block">
+                                    <div class="repeat-row cols-2"
+                                        *ngFor="let opt of optionsArray(i).controls; let j = index"
+                                        [formGroup]="$any(opt)">
+                                        <input class="form-control text-dark" type="text" formControlName="value"
+                                            [class.is-invalid]="opt.get('value').invalid && (opt.get('value').touched || opt.get('value').dirty)"
+                                            placeholder="Enter value">
+                                        <input class="form-control text-dark" type="text" formControlName="label"
+                                            placeholder="Enter label">
+                                        <button type="button" class="kill" (click)="removeOption(i, j)">&times;</button>
+                                    </div>
+                                    <div class="text-muted small mb-2" *ngIf="!optionsArray(i).length">No options yet.
+                                    </div>
+                                    <button type="button" class="btn text-primary border-primary btn-sm"
+                                        (click)="addOption(i)">
+                                        <i class="fas fa-plus mr-1"></i> Option
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 text-right col-form-label">Validators :</label>
+                                <div class="col-8 repeat-block">
+                                    <div class="repeat-row cols-2"
+                                        *ngFor="let v of validatorsArray(i).controls; let j = index"
+                                        [formGroup]="$any(v)">
+                                        <select class="form-control text-dark" formControlName="type">
+                                            <option *ngFor="let vt of validatorTypes" [value]="vt">{{vt}}</option>
+                                        </select>
+                                        <input class="form-control text-dark" type="text" formControlName="value"
+                                            [class.is-invalid]="v.get('value').invalid && (v.get('value').touched || v.get('value').dirty)"
+                                            placeholder="Enter value">
+                                        <button type="button" class="kill"
+                                            (click)="removeValidator(i, j)">&times;</button>
+                                    </div>
+                                    <div class="text-muted small mb-2" *ngIf="!validatorsArray(i).length">No validators
+                                        on this
+                                        field.</div>
+                                    <button type="button" class="btn text-primary border-primary btn-sm"
+                                        (click)="addValidator(i)">
+                                        <i class="fas fa-plus mr-1"></i> Validator
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-2"></div>
+                                <div class="col-8 d-flex" style="gap:24px;">
+                                    <label class="check-inline">
+                                        <input type="checkbox" formControlName="required"> Required
+                                    </label>
+                                    <label class="check-inline">
+                                        <input type="checkbox" formControlName="disabled"> Disabled
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn text-primary border-primary btn-sm" (click)="addConfigField()">
+                            <i class="fas fa-plus mr-1"></i> Field
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ============ BILLING ============ -->
+                <div class="accordion-card">
+                    <div class="accordion-head" (click)="toggleAccordion('billing')">
+                        <span class="chevron" [class.open]="isOpen('billing')">&#9656;</span>
+                        <span class="title">Billing</span>
+                        <span class="text-muted small">How the item is charged</span>
+                    </div>
+                    <div class="accordion-body" *ngIf="isOpen('billing')">
+
+                        <!-- Step 1: FinOps block always visible first -->
+                        <div class="form-group row">
+                            <label for="finops_block" class="col-2 text-right col-form-label">FinOps
+                                Block<em>*</em>:</label>
+                            <div class="col-4">
+                                <select id="finops_block" class="form-control text-dark" formControlName="finops_block"
+                                    [class.is-invalid]="formErrors.finops_block">
+                                    <option [value]="''" disabled>Select FinOps block</option>
+                                    <option *ngFor="let f of finopsOptions" [value]="f.uuid">
+                                        {{ f.building_block_code || f.description || f.uuid }}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.finops_block">
+                                    {{formErrors.finops_block}}</div>
+                                <div class="text-muted small" *ngIf="loadingFinops">Loading&</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <!-- Step 2: Billing model appears only after finops_block is picked -->
+                            <ng-container *ngIf="form.get('finops_block').value">
+                                <label class="col-2 text-right col-form-label">Billing Model :</label>
+                                <div class="col-4 mt-2">
+                                    <span class="font-weight-bold">{{ form.get('billing_model').value || '' }}</span>
+                                </div>
+                            </ng-container>
+                        </div>
+
+
+                        <!-- Step 3: Currency, Frequency, Cost mapping, Price only after billing_model is picked -->
+                        <ng-container *ngIf="form.get('finops_block').value && form.get('billing_model').value">
+                            <div class="form-group row">
+                                <label for="currency" class="col-2 text-right col-form-label">Currency :</label>
+                                <div class="col-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">{{ currencySymbol }}</span>
+                                        </div>
+                                        <input id="currency" class="form-control text-dark" type="text"
+                                            [value]="form.get('currency').value" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" *ngIf="form.get('billing_model').value !== 'Free'">
+                                <label for="frequency" class="col-2 text-right col-form-label">Frequency<em>*</em>
+                                    :</label>
+                                <div class="col-3">
+                                    <select id="frequency" class="form-control text-dark" formControlName="frequency"
+                                        [class.is-invalid]="formErrors.frequency">
+                                        <option [value]="''" disabled>Select frequency</option>
+                                        <option *ngFor="let fq of frequencyOptions" [value]="fq">{{fq}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.frequency">{{formErrors.frequency}}
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Cost components: backend-driven only, no manual add -->
+                            <div class="form-group row" formArrayName="cost_mapping">
+                                <label class="col-2 text-right col-form-label">Cost Mapping<em
+                                        *ngIf="form.get('billing_model').value !== 'Free'">*</em> :</label>
+                                <div class="col-9 repeat-block">
+                                    <p class="help-text" *ngIf="!form.get('frequency').value">
+                                        Select Frequency to load cost components.
+                                    </p>
+                                    <p class="help-text" *ngIf="loadingCostComponents">Loading cost components&</p>
+
+                                    <div class="cost-component-row mt-1"
+                                        *ngFor="let cc of costComponents.controls; let i = index" [formGroupName]="i">
+
+                                        <div class="d-flex align-items-baseline mb-1">
+                                            <strong class="mr-2">{{ cc.get('label').value }}</strong>
+                                            <span class="text-muted mr-2" *ngIf="cc.get('sentence').value">
+                                                {{ currencySymbol }}{{cc.get('sentence').value }}
+                                            </span>
+                                            <span class="text-muted mr-2" *ngIf="!cc.get('sentence').value">
+                                                {{ cc.get('subtitle').value }} <span *ngIf="cc.get('rate').value">{{
+                                                    currencySymbol }}{{
+                                                    cc.get('rate').value }} </span>
+                                            </span>
+                                            <button type="button" class="kill ml-auto" *ngIf="costComponents.length > 1"
+                                                (click)="removeCostComponent(i)">&times;</button>
+                                        </div>
+
+                                        <div class="d-flex align-items-center">
+                                            <select class="form-control text-dark mr-2" style="width:150px"
+                                                formControlName="source" (change)="onCostComponentSourceTypeChange(cc)">
+                                                <option [value]="''" disabled>Select source</option>
+                                                <option value="Config">Configuration</option>
+                                                <option value="Static">Static</option>
+                                                <option value="Fixed">Fixed</option>
+                                            </select>
+
+                                            <!-- config source -->
+                                            <ng-container *ngIf="cc.get('source').value === 'Config'">
+                                                <select class="form-control text-dark mr-2" style="width:180px"
+                                                    formControlName="config_key">
+                                                    <option [value]="''" disabled>Select field</option>
+                                                    <option
+                                                        *ngFor="let opt of configOptionsForCostComponent; trackBy: trackByConfigKey"
+                                                        [value]="opt.key">
+                                                        {{ opt.label }}
+                                                    </option>
+                                                </select>
+                                                <select class="form-control text-dark mr-2" style="width:130px"
+                                                    formControlName="mapping_type">
+                                                    <option [value]="''" disabled>Select mapping type</option>
+                                                    <option value="Multiply">Multiply</option>
+                                                </select>
+                                            </ng-container>
+
+                                            <!-- static source -->
+                                            <ng-container *ngIf="cc.get('source').value === 'Static'">
+                                                <input type="number" class="form-control text-dark mr-2"
+                                                    style="width:100px" formControlName="count" placeholder="Count">
+                                                <select class="form-control text-dark mr-2" style="width:130px"
+                                                    formControlName="mapping_type">
+                                                    <option value="Multiply">Multiply</option>
+                                                    <option value="lookup">Lookup</option>
+                                                </select>
+                                            </ng-container>
+
+                                            <!-- fixed source: just a count, no operation -->
+                                            <ng-container *ngIf="cc.get('source').value === 'Fixed'">
+                                                <input type="number" class="form-control text-dark mr-2"
+                                                    style="width:100px" formControlName="count"
+                                                    placeholder="Enter price">
+                                            </ng-container>
+
+                                            <span class="ml-2">
+                                                = <span *ngIf="computeRowResult(cc) === null"
+                                                    class="text-danger">Error</span>
+                                                <span *ngIf="computeRowResult(cc) !== null">
+                                                    {{ currencySymbol }}{{ computeRowResult(cc) | number:'1.2-2' }}/{{
+                                                    frequencyAbbrev(form.get('frequency').value) }}
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-danger small mt-2"
+                                        *ngIf="!costComponents.length && !loadingCostComponents && form.get('frequency').value">
+                                        No cost components returned for this selection. At least one cost component is
+                                        required.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Price: shown last, computed from cost components -->
+                            <div class="form-group row">
+                                <label class="col-2 text-right col-form-label">Price :</label>
+                                <div class="col-4 mt-2">
+                                    <span class="font-weight-bold" *ngIf="!costComponentHasError">
+                                        {{ currencySymbol }}{{ costComponentTotal | number:'1.2-2' }}{{
+                                        frequencySuffix(form.get('frequency').value) }}
+                                    </span>
+                                    <span class="text-danger" *ngIf="costComponentHasError">
+                                        Error one or more cost components unresolved
+                                    </span>
+                                    <div class="text-danger small" *ngIf="formErrors.price">{{ formErrors.price }}</div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+
+                    </div>
+                </div>
+
+                <!-- ============ SLA ============ -->
+                <div class="accordion-card" formGroupName="sla">
+                    <div class="accordion-head" (click)="toggleAccordion('sla')">
+                        <span class="chevron" [class.open]="isOpen('sla')">&#9656;</span>
+                        <span class="title">SLA &amp; Support</span>
+                        <span class="text-muted small">Commitments attached to this item</span>
+                    </div>
+                    <div class="accordion-body" *ngIf="isOpen('sla')">
+                        <div class="form-group row">
+                            <label for="provisioning_time" class="col-2 text-right col-form-label">Provisioning
+                                Time<em>*</em> :</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input id="provisioning_time" class="form-control text-dark" type="text"
+                                        formControlName="provisioning_time"
+                                        [class.is-invalid]="formErrors.provisioning_time" placeholder="30">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text sla-unit-suffix">Min</span>
+                                    </div>
+                                    <div class="invalid-feedback" *ngIf="formErrors.provisioning_time">
+                                        {{formErrors.provisioning_time}}</div>
+                                </div>
+                            </div>
+                            <label for="uptime_sla" class="col-2 text-right col-form-label">Uptime SLA :</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input id="uptime_sla" class="form-control text-dark" type="text"
+                                        formControlName="uptime_sla" placeholder="Uptime SLA">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text sla-unit-suffix">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="support_level" class="col-2 text-right col-form-label">Support Level :</label>
+                            <div class="col-2">
+                                <select id="support_level" class="form-control text-dark"
+                                    formControlName="support_level">
+                                    <option [value]="''">Not specified</option>
+                                    <option *ngFor="let s of supportLevels" [value]="s">{{s}}</option>
+                                </select>
+                            </div>
+                            <label for="response_time" class="col-2 text-right col-form-label">Response Time :</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input id="response_time" class="form-control text-dark" type="text"
+                                        formControlName="response_time" placeholder="Enter response time">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text sla-unit-suffix">Min</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============ GOVERNANCE ============ -->
+                <div class="accordion-card">
+                    <div class="accordion-head" (click)="toggleAccordion('governance')">
+                        <span class="chevron" [class.open]="isOpen('governance')">&#9656;</span>
+                        <span class="title">Governance</span>
+                        <span class="text-muted small">Policies, prerequisites, and scope</span>
+                    </div>
+                    <div class="accordion-body" *ngIf="isOpen('governance')">
+
+                        <div class="form-group row" formArrayName="policies">
+                            <label class="col-2 text-right col-form-label">Policies :</label>
+                            <div class="col-8 repeat-block">
+                                <div class="repeat-row cols-3" *ngFor="let p of policies.controls; let i = index"
+                                    [formGroupName]="i">
+                                    <input class="form-control text-dark" type="text" formControlName="policy"
+                                        [class.is-invalid]="p.get('policy').invalid && (p.get('policy').touched || p.get('policy').dirty)"
+                                        placeholder="Security Policy">
+                                    <input class="form-control text-dark" type="text" formControlName="description"
+                                        placeholder="CIS Level 1 hardening applied">
+                                    <select class="form-control text-dark" formControlName="type">
+                                        <option *ngFor="let pt of policyTypes" [value]="pt">{{pt}}</option>
+                                    </select>
+                                    <button type="button" class="kill" (click)="removePolicy(i)">&times;</button>
+                                </div>
+                                <div class="text-muted small mb-2" *ngIf="!policies.length">No policies yet.</div>
+                                <button type="button" class="btn text-primary border-primary btn-sm"
+                                    (click)="addPolicy()">
+                                    <i class="fas fa-plus mr-1"></i> Policy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" formGroupName="requirements">
+                            <label class="col-2 text-right col-form-label">Requirements :</label>
+                            <div class="col-8">
+                                <div class="req-columns">
+
+                                    <div class="req-column">
+                                        <span class="lbl">Functional</span>
+                                        <div class="repeat-row"
+                                            *ngFor="let ctrl of functionalReqs.controls; let i = index"
+                                            [formGroup]="$any(functionalReqs)">
+                                            <input class="form-control text-dark" type="text" [formControlName]="i"
+                                                [class.is-invalid]="ctrl.invalid && (ctrl.touched || ctrl.dirty)"
+                                                placeholder="Enter functional requirement">
+                                            <button type="button" class="kill"
+                                                (click)="removeStringRow(functionalReqs, i)">&times;</button>
+                                        </div>
+                                        <button type="button" class="btn text-primary border-primary btn-sm"
+                                            (click)="addStringRow(functionalReqs)">
+                                            <i class="fas fa-plus mr-1"></i> Requirement
+                                        </button>
+                                    </div>
+
+                                    <div class="req-column">
+                                        <span class="lbl">Technical</span>
+                                        <div class="repeat-row"
+                                            *ngFor="let ctrl of technicalReqs.controls; let i = index"
+                                            [formGroup]="$any(technicalReqs)">
+                                            <input class="form-control text-dark" type="text" [formControlName]="i"
+                                                [class.is-invalid]="ctrl.invalid && (ctrl.touched || ctrl.dirty)"
+                                                placeholder="Enter technical requirement">
+                                            <button type="button" class="kill"
+                                                (click)="removeStringRow(technicalReqs, i)">&times;</button>
+                                        </div>
+                                        <button type="button" class="btn text-primary border-primary btn-sm"
+                                            (click)="addStringRow(technicalReqs)">
+                                            <i class="fas fa-plus mr-1"></i> Requirement
+                                        </button>
+                                    </div>
+
+                                    <div class="req-column">
+                                        <span class="lbl">Access &amp; Permissions</span>
+                                        <div class="repeat-row"
+                                            *ngFor="let ctrl of accessPermissionReqs.controls; let i = index"
+                                            [formGroup]="$any(accessPermissionReqs)">
+                                            <input class="form-control text-dark" type="text" [formControlName]="i"
+                                                [class.is-invalid]="ctrl.invalid && (ctrl.touched || ctrl.dirty)"
+                                                placeholder="Enter access permissions">
+                                            <button type="button" class="kill"
+                                                (click)="removeStringRow(accessPermissionReqs, i)">&times;</button>
+                                        </div>
+                                        <button type="button" class="btn text-primary border-primary btn-sm"
+                                            (click)="addStringRow(accessPermissionReqs)">
+                                            <i class="fas fa-plus mr-1"></i> Requirement
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <div class="req-columns mt-3">
+                                    <div class="req-column">
+                                        <span class="lbl">Included</span>
+                                        <div class="repeat-row"
+                                            *ngFor="let ctrl of includedList.controls; let i = index"
+                                            [formGroup]="$any(includedList)">
+                                            <input class="form-control text-dark" type="text" [formControlName]="i"
+                                                [class.is-invalid]="ctrl.invalid && (ctrl.touched || ctrl.dirty)"
+                                                placeholder="Enter included detail">
+                                            <button type="button" class="kill"
+                                                (click)="removeStringRow(includedList, i)">&times;</button>
+                                        </div>
+                                        <button type="button" class="btn text-primary border-primary btn-sm"
+                                            (click)="addStringRow(includedList)">
+                                            <i class="fas fa-plus mr-1"></i> Item
+                                        </button>
+                                    </div>
+
+                                    <div class="req-column">
+                                        <span class="lbl">Not Included</span>
+                                        <div class="repeat-row"
+                                            *ngFor="let ctrl of notIncludedList.controls; let i = index"
+                                            [formGroup]="$any(notIncludedList)">
+                                            <input class="form-control text-dark" type="text" [formControlName]="i"
+                                                [class.is-invalid]="ctrl.invalid && (ctrl.touched || ctrl.dirty)"
+                                                placeholder="Enter not included detail">
+                                            <button type="button" class="kill"
+                                                (click)="removeStringRow(notIncludedList, i)">&times;</button>
+                                        </div>
+                                        <button type="button" class="btn text-primary border-primary btn-sm"
+                                            (click)="addStringRow(notIncludedList)">
+                                            <i class="fas fa-plus mr-1"></i> Item
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ============ AVAILABILITY ============ -->
+                <div class="accordion-card">
+                    <div class="accordion-head" (click)="toggleAccordion('availability')">
+                        <span class="chevron" [class.open]="isOpen('availability')">&#9656;</span>
+                        <span class="title">Availability</span>
+                        <span class="text-muted small">Ordering rules</span>
+                    </div>
+                    <div class="accordion-body" *ngIf="isOpen('availability')">
+
+                        <div class="form-group row">
+                            <label class="col-2 text-right col-form-label">Available to Order :</label>
+                            <div class="col-4">
+                                <input class="form-check-input ml-1 form-check-xl" type="checkbox"
+                                    formControlName="is_available" style="min-width:20px;min-height:20px;">
+                            </div>
+
+                            <label class="col-2 text-right col-form-label">Allow Quantity:</label>
+                            <div class="col-4">
+                                <input class="form-check-input ml-1 form-check-xl" type="checkbox"
+                                    formControlName="allow_quantity" style="min-width:20px;min-height:20px;">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="min_quantity" class="col-2 text-right col-form-label">Minimum Quantity :</label>
+                            <div class="col-2">
+                                <input id="min_quantity" class="form-control text-dark" type="number" min="1"
+                                    formControlName="min_quantity">
+                            </div>
+                            <div class="col-2"></div>
+                            <label for="max_quantity" class="col-2 text-right col-form-label">Maximum Quantity :</label>
+                            <div class="col-2">
+                                <input id="max_quantity" class="form-control text-dark" type="number" min="1"
+                                    formControlName="max_quantity" [class.is-invalid]="formErrors.max_quantity"
+                                    placeholder="No limit">
+                                <div class="invalid-feedback d-block" *ngIf="formErrors.max_quantity">
+                                    {{formErrors.max_quantity}}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ============ AUTOMATION ============ -->
+                <div class="accordion-card">
+                    <div class="accordion-head" (click)="toggleAccordion('automation')">
+                        <span class="chevron" [class.open]="isOpen('automation')">&#9656;</span>
+                        <span class="title">Automation</span>
+                        <span class="text-muted small">What runs when the order is approved</span>
+                    </div>
+                    <div class="accordion-body automation-body" *ngIf="isOpen('automation')">
+
+                        <div class="form-group row">
+                            <label for="automation_type" class="col-2 text-right col-form-label">Automation
+                                Type<em>*</em>
+                                :</label>
+                            <div class="col-5 d-inline-block">
+                                <ul class="automation-type-toggle d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('automation_type').value == 'Task'">
+                                            <input type="radio" formControlName="automation_type" value="Task">
+                                            <span class="font-sm">Task</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('automation_type').value == 'Workflow'">
+                                            <input type="radio" formControlName="automation_type" value="Workflow">
+                                            <span class="font-sm">Workflow</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                                <div class="invalid-feedback d-block" *ngIf="formErrors.automation_type">
+                                    {{formErrors.automation_type}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="form.get('automation_type').value == 'Task'">
+                            <label for="task" class="col-2 text-right col-form-label">Task<em>*</em> :</label>
+                            <div class="col-3 automation-select-wrap">
+                                <select id="task" class="form-control text-dark" formControlName="task"
+                                    [class.is-invalid]="formErrors.task">
+                                    <option [value]="''" disabled>Select task</option>
+                                    <option *ngFor="let t of tasks" [value]="t.uuid">{{t.name}}</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.task">{{formErrors.task}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="form.get('automation_type').value == 'Workflow'">
+                            <label for="workflow" class="col-2 text-right col-form-label">Workflow<em>*</em> :</label>
+                            <div class="col-3 automation-select-wrap">
+                                <select id="workflow" class="form-control text-dark" formControlName="workflow"
+                                    [class.is-invalid]="formErrors.workflow">
+                                    <option [value]="''" disabled>Select workflow</option>
+                                    <option *ngFor="let w of workflows" [value]="w.uuid">{{w.w_name}}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.workflow">{{formErrors.workflow}}</div>
+                            </div>
+
+                            <label for="workflow_version" class="col-2 text-right col-form-label">Version<em>*</em>
+                                :</label>
+                            <div class="col-3 automation-select-wrap">
+                                <select id="workflow_version" class="form-control text-dark"
+                                    formControlName="workflow_version" [class.is-invalid]="formErrors.workflow_version">
+                                    <option [value]="''" disabled>
+                                        {{ versionWorkflows.length ? 'Select version' : 'Select a workflow first' }}
+                                    </option>
+                                    <option *ngFor="let v of versionWorkflows" [value]="v.uuid">
+                                        Version {{v.version}}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.workflow_version">
+                                    {{formErrors.workflow_version}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" formArrayName="input_mapping">
+                            <label class="col-2 text-right col-form-label">Input Mapping :</label>
+                            <div class="col-9 repeat-block automation-input-mapping">
+                                <p class="help-text">Parameters are fetched from the selected task/workflow as Fixed
+                                    values switch to
+                                    Config to source from a configuration field instead.</p>
+
+                                <div class="repeat-row automation-mapping-row"
+                                    *ngFor="let m of inputMappings.controls; let i = index" [formGroupName]="i">
+
+                                    <input class="form-control text-dark automation-param-name" type="text"
+                                        formControlName="param_name"
+                                        [class.is-invalid]="m.get('param_name').invalid && (m.get('param_name').touched || m.get('param_name').dirty)"
+                                        placeholder="hostname">
+
+                                    <select class="form-control text-dark" formControlName="mapping_type"
+                                        (change)="onMappingTypeChange($any(m))">
+                                        <option value="static">Fixed</option>
+                                        <option value="catalog_field">Config</option>
+                                    </select>
+
+                                    <!-- Config: pick a configuration key -->
+                                    <select class="form-control text-dark" formControlName="value"
+                                        *ngIf="m.get('mapping_type').value === 'catalog_field'"
+                                        [class.is-invalid]="m.get('value').invalid && (m.get('value').touched || m.get('value').dirty)">
+                                        <option [value]="''">Select a configuration key</option>
+                                        <option *ngFor="let k of getConfigKeys()" [value]="k">{{k}}</option>
+                                    </select>
+
+                                    <!-- Fixed: editor depends on the source param_type -->
+                                    <ng-container *ngIf="m.get('mapping_type').value === 'static'">
+
+                                        <input *ngIf="paramControlKind($any(m)) === 'text'"
+                                            class="form-control text-dark" type="text" formControlName="value"
+                                            [class.is-invalid]="m.get('value').invalid && (m.get('value').touched || m.get('value').dirty)">
+
+                                        <input *ngIf="paramControlKind($any(m)) === 'number'"
+                                            class="form-control text-dark" type="number" formControlName="value"
+                                            [class.is-invalid]="m.get('value').invalid && (m.get('value').touched || m.get('value').dirty)">
+
+                                        <input *ngIf="paramControlKind($any(m)) === 'secret'"
+                                            class="form-control text-dark" type="password" formControlName="value"
+                                            [class.is-invalid]="m.get('value').invalid && (m.get('value').touched || m.get('value').dirty)">
+
+                                        <div *ngIf="paramControlKind($any(m)) === 'boolean'" class="pt-2">
+                                            <input type="checkbox" formControlName="value">
+                                        </div>
+
+                                        <textarea
+                                            *ngIf="paramControlKind($any(m)) === 'list' || paramControlKind($any(m)) === 'dictionary'"
+                                            class="form-control text-dark" rows="2" [value]="getJsonDisplay($any(m))"
+                                            (blur)="onJsonValueChange($any(m), $any($event.target).value)"></textarea>
+
+                                        <!-- Cloud Account -->
+                                        <select *ngIf="paramControlKind($any(m)) === 'cloud_account'"
+                                            class="form-control text-dark" formControlName="value"
+                                            [compareWith]="compareCloudAccount"
+                                            [class.is-invalid]="m.get('value').invalid && (m.get('value').touched || m.get('value').dirty)">
+                                            <option [value]="''">Select cloud account</option>
+                                            <option *ngFor="let ca of cloudAccounts" [ngValue]="ca">{{ ca.account_name
+                                                || ca.name }}</option>
+                                        </select>
+                                        <!-- Credential -->
+                                        <select *ngIf="paramControlKind($any(m)) === 'credential'"
+                                            class="form-control text-dark" formControlName="value"
+                                            [class.is-invalid]="m.get('value').invalid && (m.get('value').touched || m.get('value').dirty)">
+                                            <option [value]="''">Select credential</option>
+                                            <option *ngFor="let cred of credentials" [value]="cred.uuid">{{ cred.name }}
+                                            </option>
+                                        </select>
+
+                                        <!-- Target: autocomplete multi -->
+                                        <app-auto-complete-multi *ngIf="paramControlKind($any(m)) === 'target'"
+                                            formControlName="value" [apiFn]="searchTargets"
+                                            placeholder="Search Targets">
+                                        </app-auto-complete-multi>
+
+                                    </ng-container>
+
+                                    <!-- <button type="button" class="kill" (click)="removeInputMapping(i)">&times;</button> -->
+                                </div>
+
+                                <div class="text-muted small mb-2" *ngIf="!inputMappings.length">
+                                    Select a task or workflow to load parameters.
+                                </div>
+                                <!-- <button type="button" class="btn text-primary border-primary btn-sm"
+                                    (click)="addInputMapping()">
+                                    <i class="fas fa-plus mr-1"></i> Param
+                                </button> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mb-2">
+                <button class="btn btn-md btn-null btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                <button type="button" class="btn btn-success btn-sm ml-2" (click)="confirmCatalogCreate()">Save
+                    Catalog</button>
+            </div>
+        </div>
+    </div>
+</div>

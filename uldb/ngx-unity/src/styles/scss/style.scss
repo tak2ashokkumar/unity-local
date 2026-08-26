@@ -217,3 +217,31 @@ body main.no-main-content-scroll::-webkit-scrollbar {
 body main.no-main-content-scroll {
   -ms-overflow-style: none;
 }
+
+
+/// Invoice PDF print styles — scoped to body.printing-invoice, keep prefix on all rules ///////////////////
+
+@media print {
+  body.printing-invoice * {
+    visibility: hidden;
+  }
+
+  body.printing-invoice .inv-box,
+  body.printing-invoice .inv-box * {
+    visibility: visible;
+  }
+
+  body.printing-invoice .inv-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  body.printing-invoice .inv-close-btn,
+  body.printing-invoice .inv-download-row {
+    display: none !important;
+  }
+}
+
+//////////////////////// -END INVOICE ///////////////////////

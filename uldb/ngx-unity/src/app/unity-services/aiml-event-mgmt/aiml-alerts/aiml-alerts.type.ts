@@ -1,6 +1,6 @@
 export interface AIMLAlertsSummary {
     total: AIMLAlertsSummaryData;
-    last_7_days: AIMLAlertsSummaryData;
+    last_7_days?: AIMLAlertsSummaryData;
 }
 export interface AIMLAlertsSummaryData {
     alert_count: number;

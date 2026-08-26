@@ -245,7 +245,7 @@ export class DatacenterPrivateCloudsComponent implements OnInit, OnDestroy {
 
   addPrivateCloud() {
     // this.crudServie.addOrEdit(null, this.dcId);
-    this.router.navigate(['summary', this.dcId, 'add'], { relativeTo: this.route });
+    this.router.navigate(['summary', 'add'], { relativeTo: this.route });
   }
 
   goTo(tab: TabData) {

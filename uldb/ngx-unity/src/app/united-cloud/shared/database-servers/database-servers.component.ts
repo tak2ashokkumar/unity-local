@@ -141,7 +141,7 @@ export class DatabaseServersComponent implements OnInit, OnDestroy {
     this.currentCriteria.pageNo = pageNo;
     this.getDBServers();
   }
-  
+
   getDeviceBulkEditFields() {
     this.dbService.getDeviceBulkEditFields().pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: BulkUpdateFieldType[]) => {
       this.fields = res;
@@ -183,10 +183,14 @@ export class DatabaseServersComponent implements OnInit, OnDestroy {
     if (!view.sshOptions.isNewTabEnabled) {
       return;
     }
-    let obj: ConsoleAccessInput = this.dbService.getConsoleAccessInput(view);
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    window.open(view.sshOptions.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.sshOptions.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.dbService.getConsoleAccessInput(view);
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      window.open(view.sshOptions.newTabConsoleAccessUrl);
+    }
   }
 
   goToStats(view: DBServerViewData) {
@@ -227,7 +231,7 @@ export class DatabaseServersComponent implements OnInit, OnDestroy {
 
   goToDetails(view: DBServerViewData) {
     this.saveCriteria();
-    this.storageService.put('device', { name: view.instanceName, deviceType: DeviceMapping.DB_SERVER, configured: view.monitoring.configured}, StorageType.SESSIONSTORAGE);
+    this.storageService.put('device', { name: view.instanceName, deviceType: DeviceMapping.DB_SERVER, configured: view.monitoring.configured }, StorageType.SESSIONSTORAGE);
     this.router.navigate([view.instanceId, 'details'], { relativeTo: this.route });
   }
 
@@ -317,5 +321,5 @@ export class DatabaseServersComponent implements OnInit, OnDestroy {
       this.spinnerService.stop('main');
     });
   }
-  
+
 }

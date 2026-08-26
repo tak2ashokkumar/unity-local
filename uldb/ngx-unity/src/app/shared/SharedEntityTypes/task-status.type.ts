@@ -28,6 +28,7 @@ export class TaskError {
 }
 
 export interface ExecutionStatus {
-    output: string;
+    output?: string;
+    chat_response?: string;
     status: "Running" | "Success" | "Failed";
 }

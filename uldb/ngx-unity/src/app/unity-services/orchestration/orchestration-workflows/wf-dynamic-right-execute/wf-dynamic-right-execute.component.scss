@@ -1,0 +1,156 @@
+:host {
+    display: block;
+    background-color: #fff;
+    box-shadow: -2px 0 0 rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+}
+
+.event-select {
+    cursor: pointer;
+}
+
+.event-dropdown-menu {
+    max-height: 328px;
+
+    .dropdown-item {
+        cursor: pointer;
+    }
+}
+
+.messages-container {
+    min-height: 0;
+    overflow-x: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.chat-composer {
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-composer-input {
+    display: block;
+    width: 100%;
+    min-height: 8rem;
+    padding: 0.75rem 3.5rem 3.5rem 0.75rem;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    resize: none;
+
+    &:focus {
+        background: transparent;
+        box-shadow: none;
+        outline: none;
+    }
+}
+
+.chat-composer-send {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+}
+
+.message-box {
+    min-width: fit-content;
+    max-width: 75%;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: normal;
+    word-break: break-word;
+}
+
+:host ::ng-deep .message-box {
+    p {
+        display: inline-block;
+        max-width: 100%;
+        margin: 0;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    pre {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: normal;
+        word-break: break-word;
+    }
+}
+
+.user-message {
+    margin-left: 15px;
+    background-color: #ffc2c2;
+    border-radius: 10px 10px 2px;
+}
+
+.user-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.dots {
+    min-width: 1em;
+    margin-left: 4px;
+    font-size: 16px;
+
+    &::after {
+        display: inline-block;
+        content: '';
+        animation: dots 1.5s steps(3, end) infinite;
+    }
+}
+
+.pulse-loader {
+    width: 16px;
+    height: 5px;
+
+    > div {
+        width: 30%;
+        height: 100%;
+        margin-right: 5%;
+        background-color: #000;
+        border-radius: 50%;
+        animation: pulse 1s ease infinite;
+
+        &:nth-child(2) {
+            animation-delay: 100ms;
+        }
+
+        &:nth-child(3) {
+            margin-right: 0;
+            animation-delay: 200ms;
+        }
+    }
+}
+
+@keyframes dots {
+    25% {
+        content: '.';
+    }
+
+    50% {
+        content: '..';
+    }
+
+    75% {
+        content: '...';
+    }
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 0.35;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

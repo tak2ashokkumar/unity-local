@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
 import { DEVICE_DATA_BY_DEVICE_TYPE, GET_VM_LIST_BY_PLATFORM, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
@@ -41,6 +41,8 @@ export class VmsListCustomService {
       a.platformType = vm.os ? vm.os.platform_type : 'N/A';
       a.tags = vm.tags.filter(tg => tg);
       a.monitoring = vm.monitoring;
+      a.collectorUuid = vm.collector?.uuid;
+      a.isCollectorZtc = vm.collector?.is_ztc;
       if (this.user.isManagementEnabled) {
         const isWindows: boolean = vm.os ? (vm.os.platform_type == 'Windows' ? true : false) : false;
         a.isSameTabEnabled = ((vm.management_ip ? true : false) && !isWindows);
@@ -57,7 +59,11 @@ export class VmsListCustomService {
           a.newTabToolipMessage = 'Management IP not Configured';
         } else if (isWindows) {
           a.newTabToolipMessage = 'Open In New Tab';
-          a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+          if (vm.collector?.is_ztc) {
+            a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(a.collectorUuid, a.managementIp)}`;
+          } else {
+            a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+          }
         } else {
           a.newTabToolipMessage = 'Open In New Tab';
           a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -120,7 +126,8 @@ export class CustomVmViewData {
   statsTooltipMessage: string;
   tags: string[];
   monitoring: DeviceMonitoringType;
-
+  collectorUuid: string;
+  isCollectorZtc: boolean;
   isSameTabEnabled: boolean;
   sameTabTootipMessage: string;
   isNewTabEnabled: boolean;
@@ -226,4 +233,5 @@ interface EsxiItem {
 export interface CollectorType {
   name: string;
   uuid: string;
+  is_ztc: boolean;
 }

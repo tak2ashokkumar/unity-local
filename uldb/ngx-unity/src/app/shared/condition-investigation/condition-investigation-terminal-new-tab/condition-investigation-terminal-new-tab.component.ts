@@ -35,6 +35,7 @@ export class ConditionInvestigationTerminalNewTabComponent implements OnInit {
         }
       } else if (type === 'OPEN_TERMINAL' && tabId === this.currentTabId && terminalData) {
         this.terminalData = terminalData;
+        this.channel.postMessage({ type: 'TERMINAL_ACK', tabId });
       }
     };
 

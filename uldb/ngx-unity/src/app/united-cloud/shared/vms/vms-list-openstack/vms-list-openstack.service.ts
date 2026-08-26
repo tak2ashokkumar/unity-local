@@ -11,7 +11,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
 import { DevicePopoverData } from '../../devices-popover/device-popover-data';
 import { PowerToggleInput } from '../../server-power-toggle/server-power-toggle.service';
-import { VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { VM_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT, GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR } from 'src/app/app-constants';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
@@ -55,6 +55,8 @@ export class VmsListOpenstackService {
     a.ssrOS = vm.ssr_os;
     a.tags = vm.tags.filter(tg => tg);
     a.monitoring = vm.monitoring;
+    a.collectorUuid = vm.collector?.uuid;
+    a.isCollectorZtc = vm.collector?.is_ztc;
 
     if (this.user.isManagementEnabled) {
       a.isPowerButtonEnabled = true;
@@ -77,7 +79,11 @@ export class VmsListOpenstackService {
         a.newTabToolipMessage = 'VM is Down';
       } else if (isWindows) {
         a.newTabToolipMessage = 'Open In New Tab';
-        a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+        if (vm.collector?.is_ztc) {
+          a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(a.collectorUuid, a.managementIp)}`;
+        } else {
+          a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), a.managementIp) : WINDOWS_CONSOLE_CLIENT(a.managementIp);
+        }
       } else {
         a.newTabToolipMessage = 'Open In New Tab';
         a.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -164,6 +170,8 @@ export class OpenStackViewData {
   tags: string[];
   ssrOS: string;
   monitoring: DeviceMonitoringType;
+  collectorUuid: string;
+  isCollectorZtc: boolean;
 
   statsTooltipMessage: string;
 
@@ -202,6 +210,7 @@ export interface OpenStackVM {
   controller: string;
   tags: string[];
   monitoring: DeviceMonitoringType;
+  collector: CollectorType;
 }
 interface Cloud {
   id: number;

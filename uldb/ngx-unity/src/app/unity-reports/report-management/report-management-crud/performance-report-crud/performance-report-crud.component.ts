@@ -448,7 +448,7 @@ export class ReportManagementPerformanceCrudComponent
       .subscribe(
         (res) => {
           this.devices = this.svc.convertToViewData(res.results);
-          setTimeout((res) => {
+          setTimeout(() => {
             this.deviceCount = res.count;
             this.spinner.stop('devicesList');
           }, 500);
@@ -588,7 +588,7 @@ export class ReportManagementPerformanceCrudComponent
       .subscribe(
         (res) => {
           this.metrics = res.results;
-          setTimeout((res) => {
+          setTimeout(() => {
             this.metricsCount = res.count;
             this.spinner.stop('metricsList');
           }, 100);

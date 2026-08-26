@@ -1,0 +1,269 @@
+<div class="page-wrap" id="pageWrap" *ngIf="form" [formGroup]="form">
+    <div class="checkout-header-row">
+        <div>
+            <h1 class="checkout-heading">Cart &amp; checkout</h1>
+            <div class="checkout-subtext">Review, configure, and submit your infrastructure request.</div>
+        </div>
+        <button type="button" class="back-link" (click)="goBack()">
+            <i class="fa fa-arrow-left"></i> Back to catalog
+        </button>
+    </div>
+
+    <div class="checkout-loading" *ngIf="loading">
+        <span class="spinner-border" role="status" aria-hidden="true"></span>
+        <span>Loading your cart&hellip;</span>
+    </div>
+
+    <div class="checkout-alert" *ngIf="nonFieldErr">
+        <i class="fa fa-exclamation-circle"></i>
+        <span>{{ nonFieldErr }}</span>
+    </div>
+
+    <ng-container *ngIf="!loading && checkout">
+        <div class="empty-cart-card" *ngIf="!checkout.items?.length">
+            <i class="fa fa-shopping-cart empty-cart-icon"></i>
+            <h2>Your cart is empty</h2>
+            <p>Add a service from the catalog before submitting an infrastructure request.</p>
+            <button type="button" class="btn-submit-approval" (click)="goBack()">Browse the catalog</button>
+        </div>
+
+        <ng-container *ngIf="checkout.items?.length">
+            <div class="checkout-grid">
+                <div class="checkout-main-column">
+                    <div class="panel-card order-panel">
+                        <div class="order-items-head-row">
+                            <div class="order-items-title">Order items ({{ itemsCount }})</div>
+                            <div class="order-items-hint">Click the arrow on any item to see component breakdown</div>
+                        </div>
+
+                        <div class="order-items-list">
+                            <div class="order-item-block" *ngFor="let item of checkout.items">
+                                <div class="order-item-row" (click)="toggleExpand(item)">
+                                    <button type="button" class="oi-chevron" [class.expanded]="isExpanded(item)"
+                                        [attr.aria-expanded]="isExpanded(item)" aria-label="Toggle component breakdown">
+                                        <i class="fa fa-chevron-right"></i>
+                                    </button>
+
+                                    <div class="oi-icon avatar-purple">
+                                        <i class="fa fa-server"></i>
+                                    </div>
+
+                                    <div class="oi-name-block">
+                                        <div class="oi-title">{{ item.catalog?.name || 'Catalog service' }}</div>
+                                        <div class="oi-sub">
+                                            {{ item.catalog?.category }}
+                                            <span *ngIf="item.catalog?.platform"> &middot; {{ item.catalog.platform
+                                                }}</span>
+                                            <span *ngIf="item.catalog?.service"> &middot; {{
+                                                item.catalog?.service }}</span>
+                                        </div>
+                                        <!-- <div class="oi-config" *ngIf="item.configuration">
+                                            <span *ngIf="item.configuration.hostname">{{ item.configuration.hostname
+                                                }}</span>
+                                            <span *ngIf="item.configuration.os_version">{{
+                                                item.configuration.hostname ? ' | ' : '' }}{{
+                                                item.configuration.os_version }}</span>
+                                            <span *ngIf="item.configuration.vcpu != null">{{
+                                                (item.configuration.hostname || item.configuration.os_version) ? ' | ' :
+                                                ''
+                                                }}{{ item.configuration.vcpu }} vCPU</span>
+                                            <span *ngIf="item.configuration.memory != null"> | {{
+                                                item.configuration.memory }}GB RAM</span>
+                                            <span *ngIf="item.configuration.storage != null"> | {{
+                                                item.configuration.storage }}GB Storage</span>
+                                        </div> -->
+                                    </div>
+
+                                    <div class="oi-controls" (click)="$event.stopPropagation()">
+                                        <div class="qty-stepper">
+                                            <button type="button" class="qty-btn"
+                                                [disabled]="item.quantity <= 1 || isItemActionPending(item)"
+                                                (click)="onQuantityChange(item, -1)" aria-label="Decrease quantity">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                            <div class="qty-value">{{ item.quantity }}</div>
+                                            <button type="button" class="qty-btn" [disabled]="isItemActionPending(item)"
+                                                (click)="onQuantityChange(item, 1)" aria-label="Increase quantity">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="oi-price-block">
+                                            <div class="oi-price">{{ item.pricing?.amount |
+                                                currency:checkout.currency:'symbol':'1.2-2' }}/{{
+                                                billingSuffix(item.pricing?.frequency) }}</div>
+                                            <div class="oi-price-sub">{{ item.pricing?.rate |
+                                                currency:checkout.currency:'symbol':'1.2-2' }} &times; {{ item.quantity
+                                                }}</div>
+                                        </div>
+
+                                        <div class="oi-actions">
+                                            <!-- <button type="button" class="oi-edit" (click)="toggleExpand(item)"
+                                                title="View configuration">
+                                                <i class="fas fa-eye"></i>
+                                            </button> -->
+                                            <button type="button" class="oi-remove"
+                                                [disabled]="isItemActionPending(item)" (click)="onRemoveItem(item)"
+                                                title="Remove item">
+                                                <span class="spinner-border spinner-border-sm" role="status"
+                                                    aria-hidden="true" *ngIf="isItemActionPending(item)"></span>
+                                                <i class="far fa-trash-alt" *ngIf="!isItemActionPending(item)"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="oi-breakdown" [class.open]="isExpanded(item)">
+                                    <div class="oi-description" *ngIf="item.catalog?.description">
+                                        {{ item.catalog.description }}
+                                    </div>
+
+                                    <div class="pricing-meta">
+                                        <span><small>Billing model</small>{{ item.pricing?.billing_model || '—'
+                                            }}</span>
+                                        <span><small>Frequency</small>{{ item.pricing?.frequency || '—' }}</span>
+                                        <span><small>Currency</small>{{ item.pricing?.currency || checkout.currency
+                                            }}</span>
+                                    </div>
+
+                                    <div class="oi-table-wrap">
+                                        <table class="oi-breakdown-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Component</th>
+                                                    <th>Unit</th>
+                                                    <th>Usage</th>
+                                                    <th>Rate ({{ checkout.currency }})</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let component of item.cost_breakdown">
+                                                    <td class="oi-comp-name">{{ component.label || component.key }}</td>
+                                                    <td>{{ component.unit }}</td>
+                                                    <td>{{ component.usage }}</td>
+                                                    <td>{{ component.rate | currency:checkout.currency:'symbol':'1.2-2'
+                                                        }}</td>
+                                                    <td class="oi-amount">{{ component.amount |
+                                                        currency:checkout.currency:'symbol':'1.2-2' }}</td>
+                                                </tr>
+                                                <tr *ngIf="!item.cost_breakdown?.length">
+                                                    <td colspan="5" class="oi-empty-row">No component-level pricing is
+                                                        available.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="sla-row" *ngIf="item.sla">
+                                        <span><i class="fa fa-clock"></i> Provisioning Time: {{
+                                            item.sla.provisioning_time || '—' }} min</span>
+                                        <span>Uptime: {{ item.sla.uptime_sla || '—' }}%</span>
+                                        <span>Response: {{ item.sla.response_time || '—' }}min</span>
+                                        <span>Support: {{ item.sla.support_level || '—' }}</span>
+                                        <span [class.approval-required]="item.require_approval">
+                                            {{ item.require_approval ? 'Approval required' : 'No approval required' }}
+                                        </span>
+                                    </div>
+
+                                    <div class="oi-subtotal-row">
+                                        <span>Subtotal ({{ item.quantity }} unit{{ item.quantity !== 1 ? 's' : ''
+                                            }})</span>
+                                        <span>{{ item.pricing?.amount |
+                                            currency:checkout.currency:'symbol':'1.2-2' }}/{{
+                                            billingSuffix(item.pricing?.frequency) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cost-summary-wrap">
+                            <div class="cost-summary-title">Cost summary ({{ checkout.currency }})</div>
+                            <div class="cost-summary-row">
+                                <span>Infrastructure subtotal</span>
+                                <span>{{ checkout.subtotal | currency:checkout.currency:'symbol':'1.2-2' }}</span>
+                            </div>
+                            <div class="cost-summary-row">
+                                <span>Sales tax<span *ngIf="taxPercentage"> ({{ taxPercentage | number:'1.0-2'
+                                        }}%)</span></span>
+                                <span>{{ checkout.tax | currency:checkout.currency:'symbol':'1.2-2' }}</span>
+                            </div>
+                            <div class="cost-summary-divider"></div>
+                            <div class="cost-summary-total-row">
+                                <span class="cost-summary-total-label">Total monthly (incl. tax)</span>
+                                <span class="cost-summary-total-value">{{ checkout.grand_total |
+                                    currency:checkout.currency:'symbol':'1.2-2' }}</span>
+                            </div>
+                            <div class="cost-summary-annual">Annual forecast:
+                                <strong>{{ annualForecast | currency:checkout.currency:'symbol':'1.2-2' }}</strong>
+                                (excl. tax)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkout-side-column">
+                    <div class="panel-card approval-card">
+                        <div class="form-title approval-title">Approval path</div>
+                        <div class="approval-path-row">
+                            <ng-container *ngFor="let step of approvalSteps; let index = index; let last = last">
+                                <div class="approval-step">
+                                    <div class="approval-step-circle" [ngClass]="step.state">
+                                        <i class="fa fa-check" *ngIf="step.state === 'done'"></i>
+                                        <span *ngIf="step.state !== 'done'">{{ index + 1 }}</span>
+                                    </div>
+                                    <div class="approval-step-label" [class.current]="step.state === 'current'">
+                                        {{ step.label }}
+                                    </div>
+                                </div>
+                                <div class="approval-connector" [class.done]="step.state === 'done'" *ngIf="!last">
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="approval-note">Routing is automatic via ServiceNow RITM.</div>
+                    </div>
+
+                    <div class="panel-card request-card">
+                        <div class="form-title">Request details</div>
+                        <div class="form-group">
+                            <label class="form-label" for="purpose">Project / purpose <span
+                                    class="req-star">*</span></label>
+                            <input id="purpose" type="text" class="form-input" formControlName="purpose"
+                                [class.invalid]="formErrors.purpose" placeholder="e.g. Production web tier">
+                            <div class="field-error" *ngIf="formErrors.purpose">{{ formErrors.purpose }}</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="notes">Business justification <span
+                                    class="req-star">*</span></label>
+                            <textarea id="notes" class="form-textarea" rows="5" formControlName="notes"
+                                [class.invalid]="formErrors.notes"
+                                placeholder="Describe the business case..."></textarea>
+                            <div class="field-error" *ngIf="formErrors.notes">{{ formErrors.notes }}</div>
+                        </div>
+
+                        <div class="form-group form-group-last">
+                            <label class="form-label" for="priority">Priority</label>
+                            <select id="priority" class="form-select" formControlName="priority"
+                                [class.invalid]="formErrors.priority">
+                                <option value="Normal">Normal</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                            <div class="field-error" *ngIf="formErrors.priority">{{ formErrors.priority }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-actions-row">
+                <button type="button" class="btn-clear" [disabled]="submitting" (click)="clearForm()">Clear</button>
+                <button type="button" class="btn-submit-approval" [disabled]="submitting" (click)="submitForApproval()">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                        *ngIf="submitting"></span>
+                    {{ submitting ? 'Submitting...' : 'Submit for approval' }}
+                </button>
+            </div>
+        </ng-container>
+    </ng-container>
+</div>

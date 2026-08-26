@@ -1,9 +1,13 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Subject, from, interval } from 'rxjs';
-import { mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { Observable, Subject, Subscription, from, interval } from 'rxjs';
+import { finalize, mergeMap, switchMap, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
+import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
+import { TaskError, TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService, CRUDActionTypes, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
@@ -17,11 +21,17 @@ import { environment } from 'src/environments/environment';
 import { DevicePopoverData } from '../devices-popover/device-popover-data';
 import { Hypervisor } from '../entities/hypervisor.type';
 import { HypervisorsCrudService } from './hypervisors-crud/hypervisors-crud.service';
-import { HypervisorViewData, HypervisorsService } from './hypervisors.service';
+import { HypervisorPowerAuthFormErrors, HypervisorPowerTogglePayload, HypervisorViewData, HypervisorsService } from './hypervisors.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
+import { RemoteAccessService } from 'src/app/shared/remote-access/remote-access.service';
+
+enum HypervisorPowerAction {
+  POWER_ON = 'Power on',
+  POWER_OFF = 'Power off'
+}
 
 @Component({
   selector: 'hypervisors',
@@ -30,6 +40,7 @@ import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
 })
 export class HypervisorsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
+  private authFormSubscription: Subscription;
   private pcId: string;
   private clusterId: string;
   currentCriteria: SearchCriteria;
@@ -48,9 +59,17 @@ export class HypervisorsComponent implements OnInit, OnDestroy {
   @ViewChild('bulkDeleteModel') bulkDeleteModel: ElementRef;
   selectedHypervisorsIds: string[] = [];
   selectedAll: boolean = false;
+  remoteWebLaunching: boolean = false;
 
   @ViewChild('bulkEditModel') bulkEditModel: ElementRef;
   fields: BulkUpdateFieldType[] = [];
+
+  @ViewChild('powerAuthenticate') powerAuthenticate: ElementRef;
+  powerAuthModalRef: BsModalRef;
+  powerAuthForm: FormGroup;
+  powerAuthFormErrors: HypervisorPowerAuthFormErrors;
+  powerAuthValidationMessages: Record<string, Record<string, string>>;
+  powerAction: HypervisorPowerAction;
 
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -64,6 +83,7 @@ export class HypervisorsComponent implements OnInit, OnDestroy {
     private zabbixAlertConfig: DeviceZabbixEmailNotificationService,
     private termService: FloatingTerminalService,
     private modalService: BsModalService,
+    private remoteAccess: RemoteAccessService,
     private notificationService: AppNotificationService) {
 
     this.route.parent.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
@@ -116,9 +136,13 @@ export class HypervisorsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.modalRef?.hide();
+    this.powerAuthModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+    if (this.authFormSubscription && !this.authFormSubscription.closed) {
+      this.authFormSubscription.unsubscribe();
+    }
   }
 
   loadCriteria() {
@@ -277,22 +301,77 @@ export class HypervisorsComponent implements OnInit, OnDestroy {
   }
 
   webAccessNewTab(view: HypervisorViewData) {
-    if (!view.newTabWebAccessUrl) {
+    if (!view?.newTabWebAccessUrl) {
       return;
     }
     this.appService.updateActivityLog('servers', view.deviceId);
     window.open(view.newTabWebAccessUrl);
   }
 
+  remoteWebAccessNewTab(view: HypervisorViewData): void {
+    if (!view?.showRemoteWebAccessButton || this.remoteWebLaunching) {
+      return;
+    }
+    const resourceId = view.remoteWebAccess?.resource_id || view.deviceId;
+    if (!resourceId) {
+      this.notificationService.error(new Notification('Unable to open hypervisor web console. Resource identifier is missing.'));
+      return;
+    }
+    const viewerWindow = this.openIsolatedViewerTab();
+    if (!viewerWindow) {
+      this.notificationService.error(new Notification('Popup blocked. Allow popups for UnityOne and try opening the web console again.'));
+      return;
+    }
+
+    this.remoteWebLaunching = true;
+    this.remoteAccess.createVCenterWebLaunch(resourceId)
+      .pipe(
+        takeUntil(this.ngUnsubscribe),
+        finalize(() => this.remoteWebLaunching = false)
+      )
+      .subscribe(launch => {
+        if (!launch.viewerUrl) {
+          viewerWindow.close();
+          this.notificationService.error(new Notification('Remote web viewer URL was not returned by UnityOne.'));
+          return;
+        }
+        this.appService.updateActivityLog('servers', view.deviceId);
+        viewerWindow.location.replace(launch.viewerUrl);
+      }, err => {
+        viewerWindow.close();
+        this.notificationService.error(new Notification(this.remoteWebErrorMessage(err)));
+      });
+  }
+
+  private openIsolatedViewerTab(): Window | null {
+    const viewerWindow = window.open('about:blank', '_blank');
+    if (viewerWindow) {
+      viewerWindow.opener = null;
+      try {
+        viewerWindow.document.title = 'Opening UnityOne Remote Web Viewer';
+        viewerWindow.document.body.innerHTML = '<div style="font-family:Arial,sans-serif;padding:24px;">Opening UnityOne Remote Web Viewer...</div>';
+      } catch (e) { }
+    }
+    return viewerWindow;
+  }
+
+  private remoteWebErrorMessage(err: any): string {
+    return err?.error?.error || err?.error?.detail || err?.message || 'Unable to create remote web session. Please try again or contact support.';
+  }
+
   consoleNewTab(view: HypervisorViewData) {
     if (!view.newTabConsoleAccessUrl) {
       return;
     }
-    let obj: ConsoleAccessInput = this.hypervisorsService.getConsoleAccessInput(view);
-    obj.newTab = true;
-    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-    this.appService.updateActivityLog('servers', view.deviceId);
-    window.open(view.newTabConsoleAccessUrl);
+    if (view.isCollectorZtc) {
+      window.open(view.newTabConsoleAccessUrl);
+    } else {
+      let obj: ConsoleAccessInput = this.hypervisorsService.getConsoleAccessInput(view);
+      obj.newTab = true;
+      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+      this.appService.updateActivityLog('servers', view.deviceId);
+      window.open(view.newTabConsoleAccessUrl);
+    }
   }
 
   createTicket(data: HypervisorViewData) {
@@ -318,6 +397,120 @@ export class HypervisorsComponent implements OnInit, OnDestroy {
       return;
     }
     this.crudService.resetPassword(view.deviceId);
+  }
+
+  powerToggle(view: HypervisorViewData): void {
+    if (!view.powerIconEnabled) {
+      return;
+    }
+    this.powerAction = view.powerStatusOn ? HypervisorPowerAction.POWER_OFF : HypervisorPowerAction.POWER_ON;
+    this.buildPowerAuthForm(view.deviceId);
+  }
+
+  private buildPowerAuthForm(uuid: string): void {
+    this.powerAuthForm = this.hypervisorsService.buildPowerAuthForm(uuid);
+    this.powerAuthFormErrors = this.hypervisorsService.resetPowerAuthFormErrors();
+    this.powerAuthValidationMessages = this.hypervisorsService.powerAuthValidationMessages;
+    if (this.authFormSubscription && !this.authFormSubscription.closed) {
+      this.authFormSubscription.unsubscribe();
+    }
+    this.powerAuthModalRef = this.modalService.show(this.powerAuthenticate, Object.assign({}, { class: '', keyboard: false, ignoreBackdropClick: true }));
+  }
+
+  onPowerSubmit(): void {
+    if (this.powerAuthForm.invalid) {
+      this.powerAuthFormErrors = this.utilSvc.validateForm(this.powerAuthForm, this.powerAuthValidationMessages, this.powerAuthFormErrors);
+      if (this.authFormSubscription && !this.authFormSubscription.closed) {
+        this.authFormSubscription.unsubscribe();
+      }
+      this.authFormSubscription = this.powerAuthForm.valueChanges
+        .subscribe((data: any) => {
+          this.powerAuthFormErrors = this.utilSvc.validateForm(this.powerAuthForm, this.powerAuthValidationMessages, this.powerAuthFormErrors);
+        });
+      return;
+    }
+    this.spinnerService.start('main');
+    this.powerAuthFormErrors = this.hypervisorsService.resetPowerAuthFormErrors();
+    this.handlePower(this.powerAuthForm.getRawValue());
+  }
+
+  closePowerAuthModal(): void {
+    this.powerAuthModalRef?.hide();
+    if (this.authFormSubscription && !this.authFormSubscription.closed) {
+      this.authFormSubscription.unsubscribe();
+    }
+  }
+
+  private handlePower(data: HypervisorPowerTogglePayload): void {
+    const index = this.viewData.map(view => view.deviceId).indexOf(data.uuid);
+    if (index == -1) {
+      this.closePowerAuthModal();
+      this.spinnerService.stop('main');
+      this.notificationService.error(new Notification('Something went wrong!! Please try again.'));
+      return;
+    }
+    const powerStatusOn = this.viewData[index].powerStatusOn;
+    this.hypervisorsService.toggleHyperVHypervisorPower(data, powerStatusOn).pipe(switchMap((res: CeleryTask) => {
+      this.viewData[index].setPowerInProgress();
+      return this.pollForTask(res);
+    }), take(1), takeUntil(this.ngUnsubscribe)).subscribe((status: TaskStatus) => {
+      if (status.result['error']) {
+        this.notificationService.error(new Notification(status.result['error']));
+      } else {
+        const action = powerStatusOn ? 'off' : 'on';
+        this.notificationService.success(new Notification(`Hypervisor powered ${action} successfully`));
+      }
+      this.getHypervisors();
+    }, (err: HttpErrorResponse | TaskError | Error) => {
+      this.clearPowerInProgress(data.uuid);
+      this.handlePowerError(err);
+    });
+  }
+
+  private pollForTask(res: CeleryTask): Observable<TaskStatus> {
+    if (res.task_id) {
+      this.closePowerAuthModal();
+      this.spinnerService.stop('main');
+      this.notificationService.success(new Notification('Request is being processed. Status will be updated shortly'));
+      return this.appService.pollForTask(res.task_id, 3, 200).pipe(take(1));
+    } else {
+      throw new Error('Something went wrong !... Please try again later');
+    }
+  }
+
+  private clearPowerInProgress(uuid: string): void {
+    const index = this.viewData.map(view => view.deviceId).indexOf(uuid);
+    if (index != -1) {
+      this.viewData[index].clearPowerInProgress();
+    }
+  }
+
+  private handlePowerError(error: HttpErrorResponse | TaskError | Error): void {
+    if (error instanceof HttpErrorResponse) {
+      const err = error.error;
+      this.powerAuthFormErrors = this.hypervisorsService.resetPowerAuthFormErrors();
+      if (err?.detail) {
+        this.powerAuthFormErrors.nonFieldErr = err.detail;
+      } else if (err && typeof err == 'object') {
+        for (const field in err) {
+          if (field in this.powerAuthForm.controls) {
+            const fieldError = err[field];
+            this.powerAuthFormErrors[field] = Array.isArray(fieldError) ? fieldError[0] : fieldError;
+          }
+        }
+      } else {
+        this.closePowerAuthModal();
+        this.notificationService.error(new Notification('Something went wrong!! Please try again.'));
+      }
+    } else if (error instanceof TaskError) {
+      this.notificationService.warning(new Notification('Request is taking longer than usual. Please refresh after sometime'));
+    } else if (error instanceof Error && error.message) {
+      this.notificationService.error(new Notification(error.message));
+    } else {
+      this.closePowerAuthModal();
+      this.notificationService.error(new Notification('Something went wrong!! Please try again.'));
+    }
+    this.spinnerService.stop('main');
   }
 
   deleteHypervisor(deviceId: string) {
@@ -407,7 +600,7 @@ export class HypervisorsComponent implements OnInit, OnDestroy {
       this.getHypervisors();
       this.notificationService.success(new Notification('Hypervisors Updated successfully'));
       this.spinnerService.stop('main');
-      },
+    },
       err => {
         this.viewData.forEach(view => {
           view.isSelected = false;

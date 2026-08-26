@@ -1,0 +1,449 @@
+<div class="wf-page-container position-relative d-flex flex-column h-100 overflow-hidden">
+
+  <div *ngIf="isLoadingWorkflow" class="workflow-save-overlay d-flex align-items-center justify-content-center"
+    role="status" aria-live="polite" aria-label="Loading workflow">
+    <div class="workflow-save-status text-center">
+      <div class="workflow-save-spinner rounded-circle" aria-hidden="true"></div>
+      <div class="workflow-save-title">Loading workflow...</div>
+      <div class="workflow-save-message">Please wait while the workflow data is loaded.</div>
+    </div>
+  </div>
+
+  <div class="card wf-card rounded m-2 flex-grow-1 overflow-hidden">
+
+    <!-- CARD HEADER -->
+    <div
+      class="card-header wf-header bg-white border-bottom d-flex align-items-center justify-content-between flex-shrink-0">
+      <div class="d-flex align-items-center pl-3">
+        <div>
+          <span class="font-lg-xl font-500">{{workFlowViewData?.name}}</span>
+        </div>
+        <div *ngIf="workFlowViewData?.name">
+          <button class="btn btn-null text-muted fas fa-pencil-alt" title="Edit Workflow"
+            (click)="openWorkflowModal('edit')">
+          </button>
+        </div>
+      </div>
+      <div class="d-flex align-items-center justify-content-start gap-2 pr-3">
+
+        <button class="btn btn-sm btn-success font-500" type="button" [disabled]="isSavingWorkflow || isWorkflowSaved"
+          (click)="saveWorkFlow()">
+          <i class="fas mr-1"
+            [ngClass]="isSavingWorkflow ? 'fa-spinner fa-spin' : isWorkflowSaved ? 'fa-check' : 'fa-save'"
+            aria-hidden="true"></i>
+          <span class="font-xs-sm mx-1">{{ isSavingWorkflow ? 'Saving...' : isWorkflowSaved ? 'Saved' : 'Save
+            Workflow'}}</span>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm ml-2" (click)="openHelpPanel()">
+          <i class="fas fa-question-circle"></i>
+        </button>
+        <button class="btn btn-pill btn-warning rounded-circle pull-right btn-sm ml-2" type="button" container="body"
+          (click)="backWorkflow()"><i class="fa fa-arrow-left"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- CARD BODY -->
+    <div class="card-body wf-body p-0 d-flex flex-grow-1 overflow-hidden"
+      [ngClass]="isLeftCollapsed ? 'left-collapsed' : isBottomCollapsed ? 'bottom-collapsed' : ''">
+
+      <div class="container-fluid p-0 main-layout h-100 d-flex flex-column">
+        <div class="row no-gutters h-100 flex-nowrap">
+          <div class="workspace-shell position-relative w-100 overflow-hidden">
+
+            <!-- MAIN CANVAS -->
+            <div class="drawflow-canvas">
+              <div class="flex-grow-1 drawflow-canvas">
+                <div #drawflowContainer id="dynamic-drawflow" (dragover)="allowDrop($event)" (drop)="drop($event)">
+                  <div class="center-text-container text-center" *ngIf="emptyCanvas">
+                    <i class="fas fa-bolt mb-2 d-block" style="font-size: 1.4rem; opacity: 0.4;"></i>
+                    Add a Trigger to define the starting point of the workflow
+                  </div>
+
+                  <div *ngIf="selectedConnection" class="connection-editor" role="dialog"
+                    aria-label="Connection options" [style.left.px]="connectionMenuPosition.x"
+                    [style.top.px]="connectionMenuPosition.y" (mousedown)="$event.stopPropagation()">
+                    <div class="connection-editor-header">
+                      <span>Connection shape</span>
+                      <button class="connection-delete" type="button" title="Delete connection"
+                        aria-label="Delete connection" (click)="deleteSelectedConnection($event)">
+                        <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                      </button>
+                    </div>
+
+                    <div class="connection-shape-options" role="group" aria-label="Choose connection shape">
+                      <button *ngFor="let option of connectorShapeOptions" class="connection-shape-option" type="button"
+                        [class.active]="selectedConnectionShape === option.value"
+                        [attr.aria-pressed]="selectedConnectionShape === option.value" [title]="option.label"
+                        (click)="setSelectedConnectionShape(option.value)">
+                        <svg viewBox="0 0 40 18" aria-hidden="true">
+                          <path [attr.d]="option.previewPath"></path>
+                        </svg>
+                        <span>{{ option.label }}</span>
+                      </button>
+                    </div>
+
+                    <button *ngIf="showBulkConnectorShapeAction" class="connection-bulk-apply" type="button"
+                      (click)="applySelectedConnectionShapeToAll()">
+                      Apply {{ selectedConnectionShape === 'right-angle' ? 'right angled' : selectedConnectionShape }}
+                      to all connections
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- =========================
+     LEFT PANEL
+========================= -->
+
+            <!-- OUTSIDE BUTTON (VISIBLE WHEN CLOSED) -->
+            <div *ngIf="isLeftCollapsed"
+              class="panel-launcher left-launcher d-flex align-items-center justify-content-between"
+              (click)="toggleLeftPanel()">
+              <span class="pl-2">Nodes Library</span>
+              <i class="fas fa-chevron-right pr-2"></i>
+            </div>
+
+            <!-- PANEL -->
+            <div *ngIf="!isLeftCollapsed" class="left-overlay h-100" [style.width.px]="leftWidth">
+              <!-- HEADER -->
+              <div class="panel-header d-flex align-items-center position-relative">
+                <div class="panel-toggle w-100 d-flex justify-content-between align-items-center"
+                  (click)="toggleLeftPanel()">
+                  <span class="pl-2">Nodes Library</span>
+                  <i class="fas fa-chevron-left pr-2"></i>
+                </div>
+              </div>
+
+              <div class="left-panel-content w-100">
+                <wf-dynamic-left [workflowGroups]="workflowGroups" (dragStart)="onDragStart($event)"
+                  [emptyCanvas]="emptyCanvas">
+                </wf-dynamic-left>
+              </div>
+
+              <div class="left-resizer" (mousedown)="startLeftResize($event)"></div>
+            </div>
+
+
+            <!-- =========================
+     RIGHT PANEL
+========================= -->
+
+            <div *ngIf="isRightCollapsed" class="wf-launcher-btns d-flex align-items-center">
+              <div class="polling-loader mr-1" *ngIf="isRunning || resumeBtn" [title]="getStatusLabel(workflowStatus)">
+                <i [ngClass]="getStatusFaClass(workflowStatus)"></i>
+              </div>
+
+              <div *ngIf="erroredNodesCount > 0" class="workflow-error-badge mr-1" [title]="erroredNodesTooltip">
+                <i class="fas fa-exclamation-triangle text-warning"></i>
+              </div>
+
+              <button *ngIf="isRunning" class="btn btn-sm btn-outline-danger font-500" type="button"
+                (click)="stop($event)">
+                <i class="fas fa-stop mr-1"></i>
+                <span class="font-xs-sm mx-1">Stop</span>
+              </button>
+
+              <button *ngIf="currentSessionId && resumeBtn && !isRunning" class="btn btn-sm btn-outline-info font-500"
+                type="button" (click)="onResume()" [disabled]="erroredNodesCount > 0">
+                <span class="font-xs-sm mx-1">Resume</span>
+              </button>
+
+              <button *ngIf="hasNode && !isRunning && !resumeBtn" class="btn btn-sm btn-outline-primary font-500"
+                type="button" (click)="toggleRightPanel();run()" [disabled]="erroredNodesCount > 0">
+                <i class="fas fa-play mr-1"></i>
+                <span class="font-xs-sm mx-1">Run</span>
+              </button>
+
+              <button *ngIf="(hasNode && resumeBtn && !isRunning) || (hasNode && isRunning)"
+                class="btn btn-sm btn-outline-primary font-500" type="button"
+                (click)="toggleRightPanel();viewExecution()" [disabled]="erroredNodesCount > 0">
+                <i class="fas fa-play mr-1"></i>
+                <span class="font-xs-sm mx-1">Run</span>
+              </button>
+            </div>
+
+            <!-- PANEL -->
+            <div *ngIf="!isRightCollapsed" class="right-overlay h-100" [style.width.px]="rightWidth">
+              <div class="panel-header d-flex justify-content-between align-items-center position-relative">
+
+                <div class="panel-heading font-500" *ngIf="showRunHeading">Run Workflow</div>
+
+                <ng-container *ngIf="!showRunHeading">
+                  <div class="d-flex align-items-center">
+                    <i [ngClass]="getStatusFaClass(workflowStatus)"></i>
+                    <span class="ml-2 mr-3">{{ workflowStatus }}</span>
+
+                    <button *ngIf="isRunning" class="btn btn-sm btn-outline-danger font-500" type="button"
+                      (click)="stop($event)">
+                      <i class="fas fa-stop mr-1"></i>
+                      <span class="font-xs-sm mx-1">Stop</span>
+                    </button>
+
+                    <button *ngIf="currentSessionId && resumeBtn && !isRunning"
+                      class="btn btn-sm btn-outline-info font-500" type="button" (click)="onResume()">
+                      <span class="font-xs-sm mx-1">Resume</span>
+                    </button>
+
+                  </div>
+                </ng-container>
+
+                <div class="panel-toggle" (click)="closeRightPanel()">
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+
+              <div class="right-resizer" (mousedown)="startRightResize($event)"></div>
+              <div class="right-panel-content w-100">
+                <wf-dynamic-help-panel *ngIf="showHelpPanel && !showBeginner"
+                  (closeSidebar)="showBeginner = false; isRightCollapsed = !isRightCollapsed"></wf-dynamic-help-panel>
+                <wf-dynamic-right-execute *ngIf="!isRightCollapsed && showBeginner && !showHelpPanel"
+                  [selectedNode]="triggerNode" (triggerSubmit)="onTriggerSubmit($event)" [chatUpdates$]="chatUpdates$"
+                  [rightExecuteData]="rightExecuteData" [isRunning]="isRunning"
+                  (closeSidebar)="isRightCollapsed = true"></wf-dynamic-right-execute>
+              </div>
+            </div>
+
+            <!-- =========================
+     BOTTOM PANEL
+========================= -->
+
+            <!-- COLLAPSED HEADER BAR -->
+            <div *ngIf="isBottomCollapsed" class="bottom-collapsed-bar d-flex align-items-center border-top"
+              [style.left.px]="isLeftCollapsed ? 0 : leftWidth" [style.right.px]="isRightCollapsed ? 0 : rightWidth">
+              <div class="panel-toggle d-flex align-items-center justify-content-between w-100">
+
+                <!-- Toolbar -->
+                <div class="toolbar-container">
+                  <div class="toolbar-actions d-flex">
+                    <button class="icon-btn btn btn-null tb" (click)="changeZoom(-1, $event)">
+                      <i class="fa fa-search-minus text-muted"></i>
+                    </button>
+                    <button class="icon-btn btn btn-null tb" (click)="resetZoom($event)">
+                      <i class="fa fa-expand text-muted"></i>
+                    </button>
+                    <button class="icon-btn btn btn-null tb" (click)="changeZoom(1, $event)">
+                      <i class="fa fa-search-plus text-muted"></i>
+                    </button>
+                    <button class="icon-btn btn btn-null tb" type="button" title="Auto arrange and fit workflow"
+                      aria-label="Auto arrange and fit workflow" (click)="autoLayoutAndFit($event)">
+                      <i class="fas fa-project-diagram text-muted"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="bottom-panel-actions d-flex align-items-center ml-auto">
+                  <!-- Collapsed tabs — clicking opens the panel on that tab -->
+                  <div class="bottom-collapsed-tabs d-flex align-items-center">
+                    <button class="bottom-tab-pill d-inline-flex align-items-center"
+                      [class.active]="bottomActiveTab === 'variables'" (click)="openBottomPanel('variables', $event)">
+                      <span class="fx-icon"><i>f</i>(x)</span> Variables
+                    </button>
+                    <button class="bottom-tab-pill d-inline-flex align-items-center"
+                      [class.active]="bottomActiveTab === 'logs'" (click)="openBottomPanel('logs', $event)">
+                      <i class="fas fa-list-alt mr-1" style="opacity:0.7;"></i>Logs
+                    </button>
+                  </div>
+
+                  <!-- Expand chevron -->
+                  <button class="icon-btn btn btn-null tb" (click)="toggleBottomPanel($event)">
+                    <i class="fas fa-chevron-up text-muted"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- EXPANDED PANEL -->
+            <div *ngIf="!isBottomCollapsed" class="bottom-overlay d-flex flex-column"
+              [style.left.px]="isLeftCollapsed ? 0 : leftWidth" [style.right.px]="isRightCollapsed ? 0 : rightWidth"
+              [style.height.px]="bottomHeight">
+
+              <!-- TITLE HEADER -->
+              <div class="bottom-panel-header d-flex flex-column flex-shrink-0 border-top">
+                <div class="d-flex align-items-center w-100 px-3">
+                  <div class="bottom-panel-title">
+                    {{ bottomActiveTab === 'variables' ? 'Workflow Variables' : 'Execution Logs' }}
+                  </div>
+                  <button *ngIf="bottomActiveTab === 'logs'" type="button"
+                    class="btn btn-sm btn-link text-muted ml-auto p-1" title="Refresh execution logs"
+                    aria-label="Refresh execution logs" [disabled]="isLoadingExecutionLogs || !currentSessionId"
+                    (click)="getWorkflowExecutionLogs()">
+                    <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingExecutionLogs" aria-hidden="true"></i>
+                  </button>
+                </div>
+
+                <!-- RESIZER -->
+                <div class="bottom-resizer" (mousedown)="startBottomResize($event)"></div>
+              </div>
+
+              <!-- CONTENT -->
+              <div class="bottom-panel-content flex-grow-1 overflow-auto">
+
+                <!-- Variables tab content -->
+                <div [hidden]="bottomActiveTab !== 'variables'" class="bottom-tab-content h-100 overflow-auto">
+                  <orchestration-agentic-workflow-variables [isDynamicWorkflow]="true"
+                    [stackFields]="!isLeftCollapsed && !isRightCollapsed"
+                    (formDataChange)="onWorkflowVarsChange($event)"
+                    [initialData]="savedWorkflowVarsData"></orchestration-agentic-workflow-variables>
+                </div>
+
+                <!-- Logs tab content -->
+                <div *ngIf="bottomActiveTab === 'logs'" class="bottom-tab-content h-100 overflow-auto">
+                  <!-- Your logs content goes here -->
+                  <div class="p-3">
+                    <ng-container *ngIf="workflowLogsViewData?.executionLog; else noLogs">
+                      <pre class="mb-0">{{ workflowLogsViewData.executionLog }}</pre>
+                    </ng-container>
+
+                    <!-- Show placeholder if no logs -->
+                    <ng-template #noLogs>
+                      <p class="text-muted small mb-0">
+                        Execution logs will appear here.
+                      </p>
+                    </ng-template>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Controls remain at the bottom in both collapsed and expanded states -->
+              <div class="bottom-expanded-bar d-flex align-items-center">
+                <div class="toolbar-container">
+                  <div class="toolbar-actions d-flex">
+                    <button class="icon-btn btn btn-null tb" (click)="changeZoom(-1, $event)">
+                      <i class="fa fa-search-minus text-muted"></i>
+                    </button>
+                    <button class="icon-btn btn btn-null tb" (click)="resetZoom($event)">
+                      <i class="fa fa-expand text-muted"></i>
+                    </button>
+                    <button class="icon-btn btn btn-null tb" (click)="changeZoom(1, $event)">
+                      <i class="fa fa-search-plus text-muted"></i>
+                    </button>
+                    <button class="icon-btn btn btn-null tb" type="button" title="Auto arrange and fit workflow"
+                      aria-label="Auto arrange and fit workflow" (click)="autoLayoutAndFit($event)">
+                      <i class="fas fa-project-diagram text-muted"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="bottom-collapsed-tabs d-flex align-items-center ml-auto">
+                  <button class="bottom-tab-pill d-inline-flex align-items-center"
+                    [class.active]="bottomActiveTab === 'variables'" (click)="setBottomTab('variables', $event)">
+                    <span class="fx-icon"><i>f</i>(x)</span> Variables
+                  </button>
+                  <button class="bottom-tab-pill d-inline-flex align-items-center"
+                    [class.active]="bottomActiveTab === 'logs'" (click)="setBottomTab('logs', $event)">
+                    <i class="fas fa-list-alt mr-1" style="opacity:0.7;"></i>Logs
+                  </button>
+                </div>
+
+                <!-- Keep the expanded panel collapse control fixed at the bottom-right -->
+                <button class="icon-btn btn btn-null tb bottom-collapse-toggle" type="button"
+                  title="Collapse bottom panel" aria-label="Collapse bottom panel" (click)="toggleBottomPanel($event)">
+                  <i class="fas fa-chevron-down text-muted"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+<!-- SVG Arrow Markers -->
+<svg width="0" height="0">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#5C6873" />
+    </marker>
+  </defs>
+</svg>
+
+<ng-template #confirmBack>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Back
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="backModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to go back?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-warning pull-right ml-1" type="button" (click)="returnToList()">Yes</button>
+      <button class="btn btn-sm btn-outline-dark pull-right" (click)="backModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Workflow Modal Start -->
+<ng-template #workflowDetailsFormRef>
+  <div class="modal-header border-0 px-4 pt-4 pb-2">
+    <div>
+      <h5 class="modal-title font-weight-bold text-dark">
+        {{editWorkflowFlag ? 'Update Workflow' : 'Create Workflow'}}
+      </h5>
+      <p class="small text-muted mb-0 mt-1">
+        {{editWorkflowFlag ? 'Update the workflow name and description.' : 'Add a name and description to get started.'}}
+      </p>
+    </div>
+    <button class="close ml-3" type="button" aria-label="Close" (click)="onCloseWorkFlowDetails()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <form *ngIf="workflowDetailsForm" [formGroup]="workflowDetailsForm"
+    (ngSubmit)="onSubmitWorkflowDetails()">
+    <div class="modal-body px-4 pt-3 pb-4">
+      <div class="alert alert-danger py-2" role="alert" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+
+      <div class="form-group">
+        <label for="name" class="font-weight-bold text-dark">
+          Name <span class="text-danger" aria-hidden="true">*</span>
+        </label>
+        <input id="name" class="form-control" type="text" formControlName="name"
+          placeholder="Enter a workflow name" autocomplete="off" autofocus
+          [class.is-invalid]="workflowDetailsFormErrors.name"
+          [attr.aria-invalid]="!!workflowDetailsFormErrors.name"
+          [attr.aria-describedby]="workflowDetailsFormErrors.name ? 'workflow-name-error' : null">
+        <div id="workflow-name-error" class="invalid-feedback" *ngIf="workflowDetailsFormErrors.name">
+          {{workflowDetailsFormErrors.name}}
+        </div>
+      </div>
+
+      <div class="form-group mb-0">
+        <label for="description" class="font-weight-bold text-dark">
+          Description <span class="small font-weight-normal text-muted">(optional)</span>
+        </label>
+        <textarea id="description" class="form-control" rows="3" formControlName="description"
+          [class.is-invalid]="workflowDetailsFormErrors.description" placeholder="What does this workflow do?"
+          [attr.aria-invalid]="!!workflowDetailsFormErrors.description"
+          [attr.aria-describedby]="workflowDetailsFormErrors.description ? 'workflow-description-error' : null"></textarea>
+        <div id="workflow-description-error" class="invalid-feedback"
+          *ngIf="workflowDetailsFormErrors.description">
+          {{workflowDetailsFormErrors.description}}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer bg-light border-top px-4 py-3">
+      <button class="btn btn-outline-danger" type="button" (click)="onCloseWorkFlowDetails()">
+        {{editWorkflowFlag ? 'Back' : 'Cancel'}}
+      </button>
+      <button class="btn btn-success ml-2" type="submit">
+        {{editWorkflowFlag ? 'Update' : 'Start'}}
+      </button>
+    </div>
+  </form>
+</ng-template>
+<!-- Workflow Modal End -->

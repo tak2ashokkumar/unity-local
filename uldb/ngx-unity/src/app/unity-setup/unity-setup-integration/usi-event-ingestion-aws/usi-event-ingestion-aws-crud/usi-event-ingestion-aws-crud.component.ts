@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
@@ -16,7 +16,7 @@ import { AwsInstanceViewData } from '../usi-event-ingestion-aws.service';
   templateUrl: './usi-event-ingestion-aws-crud.component.html',
   styleUrls: ['./usi-event-ingestion-aws-crud.component.scss']
 })
-export class UsiEventIngestionAwsCrudComponent implements OnInit {
+export class UsiEventIngestionAwsCrudComponent implements OnInit, OnDestroy {
 
   @Output('onCrud') onCrud = new EventEmitter<CRUDActionTypes>();
 

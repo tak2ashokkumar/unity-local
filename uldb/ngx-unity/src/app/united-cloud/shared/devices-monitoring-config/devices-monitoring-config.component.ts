@@ -96,8 +96,6 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.isTenantOrg = this.userInfo.isTenantOrg;
     this.device = <DeviceTabData>this.storageService.getByKey('device', StorageType.SESSIONSTORAGE);
 
-    // Kubernetes account + resource monitoring behaves like the container controller (Agent-based).
-    const isKubernetesMonitoring = !!KUBERNETES_MONITORING_SEGMENT[this.device?.deviceType];
     const apiDeviceTypes = new Set([
       'Azure VM',
       DeviceMapping.VIPTELA_ACCOUNT,
@@ -109,7 +107,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.isAPIOptionRequired = apiDeviceTypes.has(this.device?.deviceType) || this.device?.hasPureOs || this.device?.devicePlatform === 'Dell Storage';
     this.isAgentOptionRequired = !(this.device?.deviceType == DeviceMapping.STORAGE_DEVICES || this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT || this.device?.deviceType == DeviceMapping.SENSOR || this.device?.deviceType == DeviceMapping.SMART_PDU || this.device?.deviceType == DeviceMapping.RFID_READER);
     this.isSNMPOptionRequired = !(this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT);
-    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER || isKubernetesMonitoring);
+    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
 
     /** THIS IS BC FOR STATS DRILLDOWN
     *   OBSERVIUM server.uuid is used and zabbix bms.uuid is used

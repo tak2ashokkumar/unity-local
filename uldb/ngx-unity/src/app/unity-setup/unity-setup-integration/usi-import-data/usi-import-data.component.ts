@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -20,7 +20,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   providers: [UsiImportDataService]
 })
 
-export class UsiImportDataComponent implements OnInit {
+export class UsiImportDataComponent implements OnInit, OnDestroy {
 
   public tabItems: TabData[] = [{
     name: 'Import Data',

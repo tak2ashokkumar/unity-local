@@ -9,8 +9,15 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    align-content: flex-start;
+    /* important: keeps rows packed at top when scrolling */
     gap: 6px;
-    height: calc(1.5em + 0.75rem + 2px)
+    min-height: calc(1.5em + 0.75rem + 2px);
+    max-height: 176px;
+    /* ~5 lines, adjust to taste */
+    overflow-y: auto;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 .tag {

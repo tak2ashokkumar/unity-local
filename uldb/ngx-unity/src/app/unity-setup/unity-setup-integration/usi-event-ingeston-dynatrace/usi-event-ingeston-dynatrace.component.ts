@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { TabData } from 'src/app/shared/tabdata';
 import { DynatraceAccountViewData, UsiEventIngestionDynatraceService } from './usi-event-ingestion-dynatrace.service';
@@ -21,7 +21,7 @@ import { isString } from 'lodash-es';
   styleUrls: ['./usi-event-ingeston-dynatrace.component.scss'],
   providers: [UsiEventIngestionDynatraceService]
 })
-export class UsiEventIngestonDynatraceComponent implements OnInit {
+export class UsiEventIngestonDynatraceComponent implements OnInit, OnDestroy {
 
   public tabItems: TabData[] = [{
     name: 'Dynatrace Event Ingestion',

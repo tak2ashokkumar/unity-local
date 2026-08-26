@@ -236,7 +236,7 @@ export const UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG: Array<{ label: string; ton
   { label: 'Avg CPU', keys: ['avg_cpu', 'avgCpu', 'average_cpu', 'averageCpu', 'cpu', 'cpu_usage', 'cpuUsage'], suffix: '%' },
   { label: 'Avg Memory', tone: 'primary', keys: ['avg_memory', 'avgMemory', 'average_memory', 'averageMemory', 'memory', 'memory_usage', 'memoryUsage'], suffix: '%' },
   { label: 'Avg Bandwidth Utilization', tone: 'primary', keys: ['avg_bandwidth_utilization', 'avgBandwidthUtilization', 'average_bandwidth_utilization', 'averageBandwidthUtilization', 'bandwidth_utilization', 'bandwidthUtilization'], suffix: '%' },
-  { label: 'Total Storage Capacity', tone: 'primary', keys: ['total_storage_capacity', 'totalStorageCapacity', 'storage_capacity', 'storageCapacity', 'total_storage', 'totalStorage'] }
+  { label: 'Total Storage Capacity', tone: 'primary', keys: ['total_storage_capacity', 'totalStorageCapacity', 'storage_capacity', 'storageCapacity', 'total_storage', 'totalStorage'], suffix: ' TB' }
 ];
 
 export const UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS = [

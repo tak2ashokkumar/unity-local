@@ -293,43 +293,48 @@
                 </div>
                 <div class="filter-control analytics-filter" *ngIf="showAnalyticsSourceTypeFilter">
                     <label class="d-block font-sm-xs text-muted mb-0">Source Type</label>
-                    <select class="form-control form-control-sm" formControlName="analyticsSourceType"
-                        (change)="onAnalyticsFilterChange()">
-                        <option *ngFor="let option of analyticsSourceTypeOptions; trackBy: trackByKey"
-                            [value]="option.value">{{option.label}}</option>
-                    </select>
+                    <multiselect-dropdown [options]="analyticsSourceTypeOptions" [settings]="analyticsMultiselectSettings"
+                        [texts]="analyticsSourceTypeTexts"
+                        class="form-control form-control-sm p-0 dashboard-multiselect"
+                        formControlName="analyticsSourceTypes" (dropdownOpened)="onAnalyticsFilterOpen()"
+                        (dropdownClosed)="onAnalyticsFilterClose()">
+                    </multiselect-dropdown>
                 </div>
                 <div class="filter-control analytics-filter" *ngIf="showAnalyticsSeverityTypeFilter">
                     <label class="d-block font-sm-xs text-muted mb-0">Severity Type</label>
-                    <select class="form-control form-control-sm" formControlName="analyticsSeverityType"
-                        (change)="onAnalyticsFilterChange()">
-                        <option *ngFor="let option of analyticsSeverityTypeOptions; trackBy: trackByKey"
-                            [value]="option.value">{{option.label}}</option>
-                    </select>
+                    <multiselect-dropdown [options]="analyticsSeverityTypeOptions" [settings]="analyticsMultiselectSettings"
+                        [texts]="analyticsSeverityTypeTexts"
+                        class="form-control form-control-sm p-0 dashboard-multiselect"
+                        formControlName="analyticsSeverityTypes" (dropdownOpened)="onAnalyticsFilterOpen()"
+                        (dropdownClosed)="onAnalyticsFilterClose()">
+                    </multiselect-dropdown>
                 </div>
                 <div class="filter-control analytics-filter">
                     <label class="d-block font-sm-xs text-muted mb-0">Datacenter</label>
-                    <select class="form-control form-control-sm" formControlName="analyticsDatacenter"
-                        (change)="onAnalyticsFilterChange()">
-                        <option *ngFor="let option of analyticsDatacenterOptions; trackBy: trackByKey"
-                            [value]="option.value">{{option.label}}</option>
-                    </select>
+                    <multiselect-dropdown [options]="analyticsDatacenterOptions" [settings]="analyticsMultiselectSettings"
+                        [texts]="analyticsDatacenterTexts"
+                        class="form-control form-control-sm p-0 dashboard-multiselect"
+                        formControlName="analyticsDatacenters" (dropdownOpened)="onAnalyticsFilterOpen()"
+                        (dropdownClosed)="onAnalyticsFilterClose()">
+                    </multiselect-dropdown>
                 </div>
                 <div class="filter-control analytics-filter">
                     <label class="d-block font-sm-xs text-muted mb-0">Cloud</label>
-                    <select class="form-control form-control-sm" formControlName="analyticsCloud"
-                        (change)="onAnalyticsFilterChange()">
-                        <option *ngFor="let option of analyticsCloudOptions; trackBy: trackByKey"
-                            [value]="option.value">{{option.label}}</option>
-                    </select>
+                    <multiselect-dropdown [options]="analyticsCloudOptions" [settings]="analyticsMultiselectSettings"
+                        [texts]="analyticsCloudTexts"
+                        class="form-control form-control-sm p-0 dashboard-multiselect"
+                        formControlName="analyticsClouds" (dropdownOpened)="onAnalyticsFilterOpen()"
+                        (dropdownClosed)="onAnalyticsFilterClose()">
+                    </multiselect-dropdown>
                 </div>
                 <div class="filter-control analytics-filter">
-                    <label class="d-block font-sm-xs text-muted mb-0">Category</label>
-                    <select class="form-control form-control-sm" formControlName="analyticsCategory"
-                        (change)="onAnalyticsFilterChange()">
-                        <option *ngFor="let option of analyticsCategoryOptions; trackBy: trackByKey"
-                            [value]="option.value">{{option.label}}</option>
-                    </select>
+                    <label class="d-block font-sm-xs text-muted mb-0">Devices</label>
+                    <multiselect-dropdown [options]="analyticsDeviceTypeOptions" [settings]="analyticsMultiselectSettings"
+                        [texts]="analyticsDeviceTypeTexts"
+                        class="form-control form-control-sm p-0 dashboard-multiselect"
+                        formControlName="analyticsDeviceTypes" (dropdownOpened)="onAnalyticsFilterOpen()"
+                        (dropdownClosed)="onAnalyticsFilterClose()">
+                    </multiselect-dropdown>
                 </div>
                 <div class="filter-control analytics-filter analytics-duration-filter">
                     <label class="d-block font-sm-xs text-muted mb-0">Duration</label>
@@ -836,7 +841,7 @@
                                             <input type="text" class="form-control form-control-sm"
                                                 formControlName="itsmTicketSearch" placeholder="Enter Keyword">
                                         </div>
-                                        <div class="col-2 px-2">
+                                        <div class="col-2 px-2" *ngIf="itsmTicketStateOptions?.length">
                                             <label class="font-sm text-muted mb-1">State</label>
                                             <select class="form-control form-control-sm"
                                                 formControlName="itsmTicketState">
@@ -853,7 +858,7 @@
                                                 [owlDateTime]="itsmDateRangePicker" [selectMode]="'range'"
                                                 type="text" formControlName="itsmTicketDateRange">
                                         </div>
-                                        <div class="col-2 px-2">
+                                        <div class="col-2 px-2" *ngIf="itsmTicketPriorityOptions?.length">
                                             <label class="font-sm text-muted mb-1">Priority</label>
                                             <select class="form-control form-control-sm"
                                                 formControlName="itsmTicketPriority">
@@ -861,7 +866,7 @@
                                                     [value]="option.value">{{option.label}}</option>
                                             </select>
                                         </div>
-                                        <div class="col-2 px-2">
+                                        <div class="col-2 px-2" *ngIf="itsmTicketTypeOptions?.length">
                                             <label class="font-sm text-muted mb-1">Type</label>
                                             <select class="form-control form-control-sm" formControlName="itsmTicketType">
                                                 <option *ngFor="let option of itsmTicketTypeOptions; trackBy: trackByKey"

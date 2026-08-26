@@ -126,6 +126,7 @@ export interface NodeDetailsArrayModel {
   pos_x: number;
   pos_y: number;
   config: any,
+  formData?: any,
   inputs: InputParamsType[],
   outputs: OutputParamsType[]
   form?: any;
@@ -133,6 +134,7 @@ export interface NodeDetailsArrayModel {
   formValidationMessages?: any;
   isTool?: boolean;
   human_approval?: boolean;
+  icon_path?: string;
 }
 
 export interface DrawflowNode {

@@ -1,26 +1,36 @@
 <div class="discovery-dashboard">
-    <div class="discovery-header">
-        <div class="discovery-heading">
-            <div class="discovery-title">Discovery Dashboard</div>
-            <div class="discovery-subtitle">Infrastructure discovery &amp; CMDB synchronization - UnityOne AI</div>
+    <div class="bg-white d-flex flex-wrap align-items-start justify-content-between px-3 py-2 border-bottom">
+        <div class="mr-3">
+            <div class="discovery-title text-success">Discovery Dashboard</div>
+            <div class="discovery-subtitle text-muted">Infrastructure discovery &amp; CMDB synchronization - UnityOne AI
+            </div>
         </div>
 
         <div class="discovery-filter-loading" *ngIf="!filterForm && !filterLoadFailed">
             <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
         </div>
 
-        <form class="discovery-filters" *ngIf="filterForm" [formGroup]="filterForm">
+        <form class="d-flex flex-wrap align-items-end justify-content-end mb-0" *ngIf="filterForm"
+            [formGroup]="filterForm">
             <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
-            <div class="discovery-filter-control">
-                <label>Regions</label>
+            <div class="form-group mb-0 mr-2 discovery-filter-control discovery-filter-control--wide">
+                <label class="d-block mb-1 small text-dark font-weight-normal">Deployment Environment</label>
+                <multiselect-dropdown [options]="deploymentEnvironmentOptions" [settings]="regionMultiselectSettings"
+                    [texts]="deploymentEnvironmentMultiselectTexts" class="form-control p-0 dashboard-multiselect"
+                    formControlName="deploymentEnvironment">
+                </multiselect-dropdown>
+            </div>
+
+            <div class="form-group mb-0 mr-2 discovery-filter-control">
+                <label class="d-block mb-1 small text-dark font-weight-normal">Regions</label>
                 <multiselect-dropdown [options]="regionOptions" [settings]="regionMultiselectSettings"
                     [texts]="regionMultiselectTexts" class="form-control p-0 dashboard-multiselect"
                     formControlName="region">
                 </multiselect-dropdown>
             </div>
 
-            <div class="discovery-filter-control discovery-filter-control--small">
-                <label>Time Range</label>
+            <div class="form-group mb-0 mr-2 discovery-filter-control discovery-filter-control--small">
+                <label class="d-block mb-1 small text-dark font-weight-normal">Time Range</label>
                 <custom-date-dropdown [options]="timeRangeOptions" [enableCustomDateRange]="true"
                     [default]="selectedTimeRange" [customClass]="'form-control-sm'" [emitOnInit]="false"
                     [emitOnExternalChanges]="false" [viewportSafePopup]="true"
@@ -28,17 +38,20 @@
                 </custom-date-dropdown>
             </div>
 
-            <button class="discovery-action-button" type="button" (click)="applyFilters(); loadData()"
-                [tooltip]="'Apply Filters'" container="body">
+            <button
+                class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center discovery-action-btn"
+                type="button" (click)="applyFilters(); loadData()" [tooltip]="'Apply Filters'" container="body">
                 <i class="fas fa-filter"></i>
             </button>
-            <span class="discovery-action-separator"></span>
-            <button class="discovery-action-button" type="button" (click)="refreshFilters()" [tooltip]="'Refresh'"
-                container="body">
+            <span class="border-right align-self-center mx-1 discovery-action-separator"></span>
+            <button
+                class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center discovery-action-btn"
+                type="button" (click)="refreshFilters()" [tooltip]="'Refresh'" container="body">
                 <i class="fas fa-sync-alt"></i>
             </button>
-            <button class="discovery-action-button" type="button" (click)="goBack()" [tooltip]="'Go Back'"
-                container="body">
+            <button
+                class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center ml-1 discovery-action-btn"
+                type="button" (click)="goBack()" [tooltip]="'Go Back'" container="body">
                 <i class="fa fa-arrow-left"></i>
             </button>
         </form>
@@ -47,7 +60,7 @@
     <div class="container-fluid px-3 py-3" *ngIf="filterForm && !filterLoadFailed">
         <div class="d-flex flex-wrap align-items-start justify-content-between mb-2">
             <div class="discovery-section-title font-600">Executive KPIs</div>
-            <div class="discovery-section-note">
+            <div class="discovery-section-note text-left text-lg-right text-muted">
                 *The displayed values represent only devices discovered and currently onboarded for monitoring within
                 the selected time range
             </div>
@@ -56,51 +69,57 @@
         <div class="card discovery-kpi-card">
             <app-spinner [name]="loaderNames.executiveKpis" [width]="0"></app-spinner>
             <div class="card-body p-0">
-                <div class="row no-gutters text-center">
-                    <div class="col discovery-kpi-item px-3 py-2">
-                        <div class="discovery-kpi-content">
-                            <div class="discovery-kpi-label">Discovered Devices (Total)</div>
-                            <div class="discovery-kpi-value text-primary">
+                <div class="row no-gutters text-center align-items-stretch">
+                    <div
+                        class="col-12 col-sm-6 col-lg discovery-kpi-item d-flex align-items-center justify-content-center px-3 py-3">
+                        <div class="d-flex flex-column align-items-center justify-content-center w-100">
+                            <div class="discovery-kpi-label text-muted mb-2">Discovered Devices (Total)</div>
+                            <div class="discovery-kpi-value text-primary font-weight-bold mt-1">
                                 {{ executiveKpiViewData.discoveredDevicesTotal | number:'1.0-0' }}
                             </div>
                         </div>
                     </div>
-                    <div class="col discovery-kpi-item px-3 py-2">
-                        <div class="discovery-kpi-content">
-                            <div class="discovery-kpi-label">Newly Discovered<br>Resources</div>
-                            <div class="discovery-kpi-value text-success">
+                    <div
+                        class="col-12 col-sm-6 col-lg discovery-kpi-item d-flex align-items-center justify-content-center px-3 py-3">
+                        <div class="d-flex flex-column align-items-center justify-content-center w-100">
+                            <div class="discovery-kpi-label text-muted mb-2">Newly Discovered Resources</div>
+                            <div class="discovery-kpi-value text-success font-weight-bold mt-1">
                                 {{ executiveKpiViewData.newlyDiscoveredResources | number:'1.0-0' }}
                             </div>
                         </div>
                     </div>
-                    <div class="col discovery-kpi-item px-3 py-2">
-                        <div class="discovery-kpi-content">
-                            <div class="discovery-kpi-label">Discovery Success Rate</div>
-                            <div class="discovery-kpi-value text-success">
+                    <div
+                        class="col-12 col-sm-6 col-lg discovery-kpi-item d-flex align-items-center justify-content-center px-3 py-3">
+                        <div class="d-flex flex-column align-items-center justify-content-center w-100">
+                            <div class="discovery-kpi-label text-muted mb-2">Discovery Success Rate</div>
+                            <div class="discovery-kpi-value text-success font-weight-bold mt-1">
                                 {{ executiveKpiViewData.discoverySuccessRate | number:'1.0-1' }}%
                             </div>
                         </div>
                     </div>
-                    <div class="col discovery-kpi-item px-3 py-2">
-                        <div class="discovery-kpi-content">
-                            <div class="discovery-kpi-label">Discovery Failures</div>
-                            <div class="discovery-kpi-value text-danger">
+                    <div
+                        class="col-12 col-sm-6 col-lg discovery-kpi-item d-flex align-items-center justify-content-center px-3 py-3">
+                        <div class="d-flex flex-column align-items-center justify-content-center w-100">
+                            <div class="discovery-kpi-label text-muted mb-2">Discovery Failures</div>
+                            <div class="discovery-kpi-value text-danger font-weight-bold mt-1">
                                 {{ executiveKpiViewData.discoveryFailures | number:'1.0-0' }}
                             </div>
                         </div>
                     </div>
-                    <div class="col discovery-kpi-item px-3 py-2">
-                        <div class="discovery-kpi-content">
-                            <div class="discovery-kpi-label">Devices Pending<br>Monitoring</div>
-                            <div class="discovery-kpi-value text-primary">
+                    <div
+                        class="col-12 col-sm-6 col-lg discovery-kpi-item d-flex align-items-center justify-content-center px-3 py-3">
+                        <div class="d-flex flex-column align-items-center justify-content-center w-100">
+                            <div class="discovery-kpi-label text-muted mb-2">Devices Pending Monitoring</div>
+                            <div class="discovery-kpi-value text-primary font-weight-bold mt-1">
                                 {{ executiveKpiViewData.devicesPendingMonitoring | number:'1.0-0' }}
                             </div>
                         </div>
                     </div>
-                    <div class="col discovery-kpi-item px-3 py-2">
-                        <div class="discovery-kpi-content">
-                            <div class="discovery-kpi-label">Orphan Devices</div>
-                            <div class="discovery-kpi-value text-primary">
+                    <div
+                        class="col-12 col-sm-6 col-lg discovery-kpi-item d-flex align-items-center justify-content-center px-3 py-3">
+                        <div class="d-flex flex-column align-items-center justify-content-center w-100">
+                            <div class="discovery-kpi-label text-muted mb-2">Orphan Devices</div>
+                            <div class="discovery-kpi-value text-primary font-weight-bold mt-1">
                                 {{ executiveKpiViewData.orphanDevices | number:'1.0-0' }}
                             </div>
                         </div>
@@ -111,9 +130,11 @@
 
         <div class="row mt-2">
             <div class="col-12 col-xl-6">
-                <div class="discovery-trend-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
                     <div class="discovery-chart-section-title">Discovery Trend Analytics</div>
-                    <div class="discovery-view-toggle" role="group" aria-label="Discovery trend analytics view toggle">
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
+                        aria-label="Discovery trend analytics view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="trendAnalyticsViewMode === 'chart'"
                             (click)="setTrendAnalyticsViewMode('chart')">
@@ -128,30 +149,30 @@
                 </div>
                 <div class="card discovery-chart-card discovery-policy-os-card">
                     <app-spinner [name]="loaderNames.trendAnalytics" [width]="0"></app-spinner>
-                    <div class="card-body" [ngClass]="trendAnalyticsViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                    <div class="card-body"
+                        [ngClass]="trendAnalyticsViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container *ngIf="trendAnalyticsViewMode === 'chart'; else trendAnalyticsTableView">
                             <div echarts *ngIf="trendAnalyticsChartOptions; else trendAnalyticsNoData"
                                 [options]="trendAnalyticsChartOptions" class="discovery-trend-chart"></div>
                         </ng-container>
                         <ng-template #trendAnalyticsTableView>
                             <div *ngIf="trendAnalyticsTableRows?.length; else trendAnalyticsNoData"
-                                class="table-responsive discovery-trend-table-wrap">
-                                <table class="table table-sm mb-0 discovery-trend-table" sortableTable
+                                class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
+                                <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
                                     (sorted)="onTrendAnalyticsTableSorted($event)">
-                                    <thead>
+                                    <thead class="bg-light">
                                         <tr>
-                                            <th class="discovery-trend-table-col--week" [sortable-column]="'weekOrder'"
+                                            <th class="tdw-22" [sortable-column]="'weekOrder'"
                                                 [sort-direction]="getTrendAnalyticsSortDirection('weekOrder')"
                                                 [ngClass]="getTrendAnalyticsHeaderClass('weekOrder')">
                                                 Week
                                             </th>
-                                            <th class="discovery-trend-table-col--total"
-                                                [sortable-column]="'totalDevices'"
+                                            <th class="tdw-42" [sortable-column]="'totalDevices'"
                                                 [sort-direction]="getTrendAnalyticsSortDirection('totalDevices')"
                                                 [ngClass]="getTrendAnalyticsHeaderClass('totalDevices')">
                                                 Total Devices
                                             </th>
-                                            <th class="discovery-trend-table-col--new" [sortable-column]="'newDevices'"
+                                            <th class="tdw-36" [sortable-column]="'newDevices'"
                                                 [sort-direction]="getTrendAnalyticsSortDirection('newDevices')"
                                                 [ngClass]="getTrendAnalyticsHeaderClass('newDevices')">
                                                 New Devices
@@ -159,21 +180,27 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr
-                                            *ngFor="let row of trendAnalyticsTableRows; trackBy: trackByTrendAnalyticsRow">
-                                            <td class="discovery-trend-table-week discovery-trend-table-col--week">{{
-                                                row.week }}</td>
-                                            <td class="discovery-trend-table-col--total">{{ row.totalDevices |
-                                                number:'1.0-0' }}</td>
-                                            <td class="discovery-trend-table-col--new">{{ row.newDevices |
-                                                number:'1.0-0' }}</td>
+                                        <tr *ngFor="let row of trendAnalyticsTableRows; trackBy: trackByTrendAnalyticsRow"
+                                            truncateText>
+                                            <td class="tdw-22 text-primary font-500">
+                                                <div [tooltip]="row.week">{{ row.week }}</div>
+                                            </td>
+                                            <td class="tdw-42">
+                                                <div [tooltip]="row.totalDevices | number:'1.0-0'">{{ row.totalDevices |
+                                                    number:'1.0-0' }}</div>
+                                            </td>
+                                            <td class="tdw-36">
+                                                <div [tooltip]="row.newDevices | number:'1.0-0'">{{ row.newDevices |
+                                                    number:'1.0-0' }}</div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </ng-template>
                         <ng-template #trendAnalyticsNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -181,9 +208,10 @@
                 </div>
             </div>
             <div class="col-12 col-xl-6">
-                <div class="discovery-success-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
                     <div class="discovery-chart-section-title">Discovery Success vs Failure</div>
-                    <div class="discovery-view-toggle" role="group"
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
                         aria-label="Discovery success vs failure view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="successAndFailureViewMode === 'chart'"
@@ -199,37 +227,35 @@
                 </div>
                 <div class="card discovery-chart-card discovery-policy-os-card">
                     <app-spinner [name]="loaderNames.successAndFailure" [width]="0"></app-spinner>
-                    <div class="card-body" [ngClass]="successAndFailureViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                    <div class="card-body"
+                        [ngClass]="successAndFailureViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container *ngIf="successAndFailureViewMode === 'chart'; else successFailureTableView">
                             <div echarts *ngIf="sucessAndFailureChartOptions; else successFailureNoData"
                                 [options]="sucessAndFailureChartOptions" class="discovery-trend-chart"></div>
                         </ng-container>
                         <ng-template #successFailureTableView>
                             <div *ngIf="successAndFailureTableRows?.length; else successFailureNoData"
-                                class="table-responsive discovery-success-table-wrap">
-                                <table class="table table-sm mb-0 discovery-success-table" sortableTable
+                                class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
+                                <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
                                     (sorted)="onSuccessAndFailureTableSorted($event)">
-                                    <thead>
+                                    <thead class="bg-light">
                                         <tr>
-                                            <th class="discovery-success-table-col--week"
-                                                [sortable-column]="'weekOrder'"
+                                            <th class="tdw-22" [sortable-column]="'weekOrder'"
                                                 [sort-direction]="getSuccessAndFailureSortDirection('weekOrder')"
                                                 [ngClass]="getSuccessAndFailureHeaderClass('weekOrder')">
                                                 Week
                                             </th>
-                                            <th class="discovery-success-table-col--success"
-                                                [sortable-column]="'success'"
+                                            <th class="tdw-32" [sortable-column]="'success'"
                                                 [sort-direction]="getSuccessAndFailureSortDirection('success')"
                                                 [ngClass]="getSuccessAndFailureHeaderClass('success')">
                                                 Success
                                             </th>
-                                            <th class="discovery-success-table-col--failure"
-                                                [sortable-column]="'failure'"
+                                            <th class="tdw-24" [sortable-column]="'failure'"
                                                 [sort-direction]="getSuccessAndFailureSortDirection('failure')"
                                                 [ngClass]="getSuccessAndFailureHeaderClass('failure')">
                                                 Failure
                                             </th>
-                                            <th class="discovery-success-table-col--total" [sortable-column]="'total'"
+                                            <th class="tdw-22" [sortable-column]="'total'"
                                                 [sort-direction]="getSuccessAndFailureSortDirection('total')"
                                                 [ngClass]="getSuccessAndFailureHeaderClass('total')">
                                                 Total
@@ -237,23 +263,31 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr
-                                            *ngFor="let row of successAndFailureTableRows; trackBy: trackBySuccessAndFailureRow">
-                                            <td class="discovery-success-table-week discovery-success-table-col--week">
-                                                {{ row.week }}</td>
-                                            <td class="discovery-success-table-col--success">{{ row.success |
-                                                number:'1.0-0' }}</td>
-                                            <td class="discovery-success-table-col--failure">{{ row.failure |
-                                                number:'1.0-0' }}</td>
-                                            <td class="discovery-success-table-col--total">{{ row.total | number:'1.0-0'
-                                                }}</td>
+                                        <tr *ngFor="let row of successAndFailureTableRows; trackBy: trackBySuccessAndFailureRow"
+                                            truncateText>
+                                            <td class="tdw-22 text-primary font-500">
+                                                <div [tooltip]="row.week">{{ row.week }}</div>
+                                            </td>
+                                            <td class="tdw-32">
+                                                <div [tooltip]="row.success | number:'1.0-0'">{{ row.success |
+                                                    number:'1.0-0' }}</div>
+                                            </td>
+                                            <td class="tdw-24">
+                                                <div [tooltip]="row.failure | number:'1.0-0'">{{ row.failure |
+                                                    number:'1.0-0' }}</div>
+                                            </td>
+                                            <td class="tdw-22">
+                                                <div [tooltip]="row.total | number:'1.0-0'">{{ row.total |
+                                                    number:'1.0-0' }}</div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </ng-template>
                         <ng-template #successFailureNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -264,9 +298,11 @@
 
         <div class="row mt-2">
             <div class="col-12 col-xl-6 mb-3 order-2 order-xl-2">
-                <div class="discovery-device-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
                     <div class="discovery-chart-section-title">Device Type Distribution</div>
-                    <div class="discovery-view-toggle" role="group" aria-label="Device type distribution view toggle">
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
+                        aria-label="Device type distribution view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="ciDistributionByDeviceViewMode === 'chart'"
                             (click)="setCiDistributionByDeviceViewMode('chart')">
@@ -281,61 +317,85 @@
                 </div>
                 <div class="card discovery-chart-card discovery-chart-card--device">
                     <app-spinner [name]="loaderNames.ciDistributionByDevice" [width]="0"></app-spinner>
-                    <div class="card-body" [ngClass]="ciDistributionByDeviceViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                    <div class="card-body"
+                        [ngClass]="ciDistributionByDeviceViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container
                             *ngIf="ciDistributionByDeviceViewMode === 'chart'; else ciDistributionByDeviceTableView">
                             <div echarts *ngIf="ciDistributionByDeviceChartData; else ciDistributionByDeviceNoData"
                                 [options]="ciDistributionByDeviceChartData" class="discovery-device-chart"></div>
                         </ng-container>
                         <ng-template #ciDistributionByDeviceTableView>
-                            <div *ngIf="ciDistributionByDeviceTableRows?.length; else ciDistributionByDeviceNoData"
-                                class="table-responsive discovery-device-distribution-table-wrap">
-                                <table class="table table-sm mb-0 discovery-device-distribution-table" sortableTable
-                                    (sorted)="onCiDistributionByDeviceTableSorted($event)">
-                                    <thead>
-                                        <tr>
-                                            <th class="discovery-device-distribution-table-col--type"
-                                                [sortable-column]="'deviceType'"
-                                                [sort-direction]="getCiDistributionByDeviceSortDirection('deviceType')"
-                                                [ngClass]="getCiDistributionByDeviceHeaderClass('deviceType')">
-                                                Device Type
-                                            </th>
-                                            <th class="discovery-device-distribution-table-col--count"
-                                                [sortable-column]="'count'"
-                                                [sort-direction]="getCiDistributionByDeviceSortDirection('count')"
-                                                [ngClass]="getCiDistributionByDeviceHeaderClass('count')">
-                                                Count
-                                            </th>
-                                            <th class="discovery-device-distribution-table-col--share"
-                                                [sortable-column]="'share'"
-                                                [sort-direction]="getCiDistributionByDeviceSortDirection('share')"
-                                                [ngClass]="getCiDistributionByDeviceHeaderClass('share')">
-                                                Share
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let row of ciDistributionByDeviceTableRows; trackBy: trackByCiDistributionByDeviceRow"
-                                            truncateText>
-                                            <td
-                                                class="discovery-device-distribution-table-type discovery-device-distribution-table-col--type tdw-52">
-                                                <div [tooltip]="row.deviceType">{{ row.deviceType }}</div>
-                                            </td>
-                                            <td class="discovery-device-distribution-table-col--count tdw-24">
-                                                <div [tooltip]="row.count | number:'1.0-0'">{{ row.count |
-                                                    number:'1.0-0' }}</div>
-                                            </td>
-                                            <td class="discovery-device-distribution-table-col--share tdw-24">
-                                                <div [tooltip]="(row.share | number:'1.1-1') + '%'">{{ row.share |
-                                                    number:'1.1-1' }}%</div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <ng-container
+                                *ngIf="ciDistributionByDeviceTableRows?.length; else ciDistributionByDeviceNoData">
+                                <div class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
+                                    <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
+                                        (sorted)="onCiDistributionByDeviceTableSorted($event)">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th class="tdw-18" [sortable-column]="'deploymentEnvironment'"
+                                                    [sort-direction]="getCiDistributionByDeviceSortDirection('deploymentEnvironment')"
+                                                    [ngClass]="getCiDistributionByDeviceHeaderClass('deploymentEnvironment')">
+                                                    Deployment Environment
+                                                </th>
+                                                <th class="tdw-34" [sortable-column]="'deviceType'"
+                                                    [sort-direction]="getCiDistributionByDeviceSortDirection('deviceType')"
+                                                    [ngClass]="getCiDistributionByDeviceHeaderClass('deviceType')">
+                                                    Device Type
+                                                </th>
+                                                <th class="tdw-24" [sortable-column]="'count'"
+                                                    [sort-direction]="getCiDistributionByDeviceSortDirection('count')"
+                                                    [ngClass]="getCiDistributionByDeviceHeaderClass('count')">
+                                                    Count
+                                                </th>
+                                                <th class="tdw-24" [sortable-column]="'share'"
+                                                    [sort-direction]="getCiDistributionByDeviceSortDirection('share')"
+                                                    [ngClass]="getCiDistributionByDeviceHeaderClass('share')">
+                                                    Share
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let row of ciDistributionByDeviceTableRows; trackBy: trackByCiDistributionByDeviceRow"
+                                                truncateText>
+                                                <td class="tdw-18">
+                                                    <div [tooltip]="row.deploymentEnvironment">
+                                                        <span
+                                                            class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
+                                                            [ngClass]="'discovery-distribution-env-pill--' + row.deploymentEnvironmentTone">
+                                                            {{ row.deploymentEnvironment }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="tdw-34 text-primary font-500">
+                                                    <div [tooltip]="row.deviceType">{{ row.deviceType }}</div>
+                                                </td>
+                                                <td class="tdw-24">
+                                                    <div [tooltip]="row.count | number:'1.0-0'">{{ row.count |
+                                                        number:'1.0-0' }}</div>
+                                                </td>
+                                                <td class="tdw-24">
+                                                    <div [tooltip]="(row.share | number:'1.1-1') + '%'">{{ row.share |
+                                                        number:'1.1-1' }}%</div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between px-3 pb-3"
+                                    *ngIf="ciDistributionByDeviceCount">
+                                    <div class="small text-muted font-italic mb-2 mb-sm-0">
+                                        {{ getCiDistributionByDevicePageSummary() }}
+                                    </div>
+                                    <table-pager [compact]="true" [pageNo]="ciDistributionByDevicePageNo"
+                                        [pageSize]="ciDistributionByDevicePageSize"
+                                        [totalCount]="ciDistributionByDeviceCount"
+                                        (pageChange)="ciDistributionByDevicePageChange($event)"></table-pager>
+                                </div>
+                            </ng-container>
                         </ng-template>
                         <ng-template #ciDistributionByDeviceNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -343,9 +403,11 @@
                 </div>
             </div>
             <div class="col-12 col-xl-6 mb-3 order-1 order-xl-1">
-                <div class="discovery-distribution-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
                     <div class="discovery-chart-section-title">Discovery Distribution</div>
-                    <div class="discovery-view-toggle" role="group" aria-label="Discovery distribution view toggle">
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
+                        aria-label="Discovery distribution view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="ciDistributionByDiscoveryViewMode === 'chart'"
                             (click)="setCiDistributionByDiscoveryViewMode('chart')">
@@ -361,7 +423,7 @@
                 <div class="card discovery-chart-card discovery-chart-card--discovery">
                     <app-spinner [name]="loaderNames.ciDistributionByDiscovery" [width]="0"></app-spinner>
                     <div class="card-body"
-                        [ngClass]="ciDistributionByDiscoveryViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                        [ngClass]="ciDistributionByDiscoveryViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container
                             *ngIf="ciDistributionByDiscoveryViewMode === 'chart'; else ciDistributionByDiscoveryTableView">
                             <div echarts
@@ -369,100 +431,131 @@
                                 [options]="ciDistributionByDiscoveryChartData" class="discovery-discovery-chart"></div>
                         </ng-container>
                         <ng-template #ciDistributionByDiscoveryTableView>
-                            <div *ngIf="ciDistributionByDiscoveryTableRows?.length; else ciDistributionByDiscoveryNoData"
-                                class="table-responsive discovery-distribution-table-wrap">
-                                <table class="table table-sm mb-0 discovery-distribution-table" sortableTable
-                                    (sorted)="onCiDistributionByDiscoveryTableSorted($event)">
-                                    <thead>
-                                        <tr>
-                                            <th class="discovery-distribution-table-col--method"
-                                                [sortable-column]="'discoveryMethod'"
-                                                [sort-direction]="getCiDistributionByDiscoverySortDirection('discoveryMethod')"
-                                                [ngClass]="getCiDistributionByDiscoveryHeaderClass('discoveryMethod')">
-                                                Discovery Method
-                                            </th>
-                                            <th class="discovery-distribution-table-col--target"
-                                                [sortable-column]="'targetResources'"
-                                                [sort-direction]="getCiDistributionByDiscoverySortDirection('targetResources')"
-                                                [ngClass]="getCiDistributionByDiscoveryHeaderClass('targetResources')">
-                                                Target Resources
-                                            </th>
-                                            <th class="discovery-distribution-table-col--protocol"
-                                                [sortable-column]="'protocol'"
-                                                [sort-direction]="getCiDistributionByDiscoverySortDirection('protocol')"
-                                                [ngClass]="getCiDistributionByDiscoveryHeaderClass('protocol')">
-                                                Protocol
-                                            </th>
-                                            <th class="discovery-distribution-table-col--resources"
-                                                [sortable-column]="'resourcesDiscovered'"
-                                                [sort-direction]="getCiDistributionByDiscoverySortDirection('resourcesDiscovered')"
-                                                [ngClass]="getCiDistributionByDiscoveryHeaderClass('resourcesDiscovered')">
-                                                Resources Discovered
-                                            </th>
-                                            <th class="discovery-distribution-table-col--up" [sortable-column]="'up'"
-                                                [sort-direction]="getCiDistributionByDiscoverySortDirection('up')"
-                                                [ngClass]="getCiDistributionByDiscoveryHeaderClass('up')">
-                                                Up
-                                            </th>
-                                            <th class="discovery-distribution-table-col--down"
-                                                [sortable-column]="'down'"
-                                                [sort-direction]="getCiDistributionByDiscoverySortDirection('down')"
-                                                [ngClass]="getCiDistributionByDiscoveryHeaderClass('down')">
-                                                Down
-                                            </th>
-                                            <th class="discovery-distribution-table-col--unknown"
-                                                [sortable-column]="'unknown'"
-                                                [sort-direction]="getCiDistributionByDiscoverySortDirection('unknown')"
-                                                [ngClass]="getCiDistributionByDiscoveryHeaderClass('unknown')">
-                                                Unknown
-                                            </th>
-                                            <th class="discovery-distribution-table-col--last-run"
-                                                [sortable-column]="'lastRun'"
-                                                [sort-direction]="getCiDistributionByDiscoverySortDirection('lastRun')"
-                                                [ngClass]="getCiDistributionByDiscoveryHeaderClass('lastRun')">
-                                                Last Run
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let row of ciDistributionByDiscoveryTableRows; trackBy: trackByCiDistributionByDiscoveryRow"
-                                            truncateText>
-                                            <td
-                                                class="discovery-distribution-table-method discovery-distribution-table-col--method tdw-24">
-                                                <div [tooltip]="row.discoveryMethod">{{ row.discoveryMethod }}</div>
-                                            </td>
-                                            <td class="discovery-distribution-table-col--target tdw-16">
-                                                <div [tooltip]="row.targetResources">{{ row.targetResources }}</div>
-                                            </td>
-                                            <td class="discovery-distribution-table-col--protocol tdw-18">
-                                                <div [tooltip]="row.protocol">{{ row.protocol }}</div>
-                                            </td>
-                                            <td class="discovery-distribution-table-col--resources tdw-10">
-                                                <div [tooltip]="row.resourcesDiscovered | number:'1.0-0'">{{
-                                                    row.resourcesDiscovered | number:'1.0-0' }}</div>
-                                            </td>
-                                            <td class="discovery-distribution-table-col--up tdw-5">
-                                                <div [tooltip]="row.up | number:'1.0-0'">{{ row.up | number:'1.0-0'
-                                                    }}</div>
-                                            </td>
-                                            <td class="discovery-distribution-table-col--down tdw-5">
-                                                <div [tooltip]="row.down | number:'1.0-0'">{{ row.down |
-                                                    number:'1.0-0' }}</div>
-                                            </td>
-                                            <td class="discovery-distribution-table-col--unknown tdw-5">
-                                                <div [tooltip]="row.unknown | number:'1.0-0'">{{ row.unknown |
-                                                    number:'1.0-0' }}</div>
-                                            </td>
-                                            <td class="discovery-distribution-table-col--last-run tdw-10">
-                                                <div [tooltip]="row.lastRun">{{ row.lastRun }}</div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <ng-container
+                                *ngIf="ciDistributionByDiscoveryTableRows?.length; else ciDistributionByDiscoveryNoData">
+                                <div class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
+                                    <table
+                                        class="table table-sm text-left mb-0 discovery-dashboard-table discovery-distribution-table"
+                                        sortableTable (sorted)="onCiDistributionByDiscoveryTableSorted($event)">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th class="tdw-14" [sortable-column]="'deploymentEnvironment'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('deploymentEnvironment')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('deploymentEnvironment')">
+                                                    Deployment Environment
+                                                </th>
+                                                <th class="tdw-12" [sortable-column]="'infrastructureType'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('infrastructureType')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('infrastructureType')">
+                                                    Infrastructure Type
+                                                </th>
+                                                <th class="tdw-10" [sortable-column]="'discoveryMethod'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('discoveryMethod')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('discoveryMethod')">
+                                                    Discovery Protocol
+                                                </th>
+                                                <th class="tdw-12" [sortable-column]="'vendorPlatform'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('vendorPlatform')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('vendorPlatform')">
+                                                    Vendor / Platform
+                                                </th>
+                                                <th class="tdw-10" [sortable-column]="'resourcesDiscovered'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('resourcesDiscovered')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('resourcesDiscovered')">
+                                                    Resources Discovered
+                                                </th>
+                                                <th class="tdw-8" [sortable-column]="'resourceCount'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('resourceCount')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('resourceCount')">
+                                                    Resource Count
+                                                </th>
+                                                <th class="tdw-4" [sortable-column]="'up'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('up')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('up')">
+                                                    UP
+                                                </th>
+                                                <th class="tdw-4" [sortable-column]="'down'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('down')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('down')">
+                                                    DOWN
+                                                </th>
+                                                <th class="tdw-4" [sortable-column]="'unknown'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('unknown')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('unknown')">
+                                                    UNKNOWN
+                                                </th>
+                                                <th class="tdw-8" [sortable-column]="'lastRun'"
+                                                    [sort-direction]="getCiDistributionByDiscoverySortDirection('lastRun')"
+                                                    [ngClass]="getCiDistributionByDiscoveryHeaderClass('lastRun')">
+                                                    Last Discovered
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let row of ciDistributionByDiscoveryTableRows; trackBy: trackByCiDistributionByDiscoveryRow"
+                                                truncateText>
+                                                <td class="tdw-14">
+                                                    <div [tooltip]="row.deploymentEnvironment">
+                                                        <span
+                                                            class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
+                                                            [ngClass]="'discovery-distribution-env-pill--' + row.deploymentEnvironmentTone">
+                                                            {{ row.deploymentEnvironment }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="tdw-12">
+                                                    <div [tooltip]="row.infrastructureType">{{ row.infrastructureType }}
+                                                    </div>
+                                                </td>
+                                                <td class="tdw-10 text-primary font-500">
+                                                    <div [tooltip]="row.discoveryMethod">{{ row.discoveryMethod }}</div>
+                                                </td>
+                                                <td class="tdw-12">
+                                                    <div [tooltip]="row.vendorPlatform">{{ row.vendorPlatform }}</div>
+                                                </td>
+                                                <td class="tdw-10">
+                                                    <div [tooltip]="row.resourcesDiscovered">{{ row.resourcesDiscovered
+                                                        }}</div>
+                                                </td>
+                                                <td class="tdw-8">
+                                                    <div [tooltip]="row.resourceCount | number:'1.0-0'">{{
+                                                        row.resourceCount |
+                                                        number:'1.0-0' }}</div>
+                                                </td>
+                                                <td class="tdw-4">
+                                                    <div [tooltip]="row.up | number:'1.0-0'">{{ row.up | number:'1.0-0'
+                                                        }}</div>
+                                                </td>
+                                                <td class="tdw-4">
+                                                    <div [tooltip]="row.down | number:'1.0-0'">{{ row.down |
+                                                        number:'1.0-0' }}</div>
+                                                </td>
+                                                <td class="tdw-4">
+                                                    <div [tooltip]="row.unknown | number:'1.0-0'">{{ row.unknown |
+                                                        number:'1.0-0' }}</div>
+                                                </td>
+                                                <td class="tdw-8">
+                                                    <div [tooltip]="row.lastRun">{{ row.lastRun }}</div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between px-3 pb-3"
+                                    *ngIf="ciDistributionByDiscoveryCount">
+                                    <div class="small text-muted font-italic mb-2 mb-sm-0">
+                                        {{ getCiDistributionByDiscoveryPageSummary() }}
+                                    </div>
+                                    <table-pager [compact]="true" [pageNo]="ciDistributionByDiscoveryPageNo"
+                                        [pageSize]="ciDistributionByDiscoveryPageSize"
+                                        [totalCount]="ciDistributionByDiscoveryCount"
+                                        (pageChange)="ciDistributionByDiscoveryPageChange($event)"></table-pager>
+                                </div>
+                            </ng-container>
                         </ng-template>
                         <ng-template #ciDistributionByDiscoveryNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -473,9 +566,11 @@
 
         <div class="row">
             <div class="col-12 col-xl-6 mb-3">
-                <div class="discovery-failures-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
                     <div class="discovery-chart-section-title">Top discovery failures by policy</div>
-                    <div class="discovery-view-toggle" role="group" aria-label="Top discovery failures view toggle">
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
+                        aria-label="Top discovery failures view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="topDiscoveryFailuresViewMode === 'chart'"
                             (click)="setTopDiscoveryFailuresViewMode('chart')">
@@ -491,56 +586,83 @@
 
                 <div class="card discovery-chart-card">
                     <app-spinner [name]="loaderNames.topDiscoveryFailures" [width]="0"></app-spinner>
-                    <div class="card-body" [ngClass]="topDiscoveryFailuresViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                    <div class="card-body"
+                        [ngClass]="topDiscoveryFailuresViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container
                             *ngIf="topDiscoveryFailuresViewMode === 'chart'; else topDiscoveryFailuresTableView">
                             <div echarts *ngIf="topDiscoveryFailuresChartData; else topDiscoveryFailuresNoData"
                                 [options]="topDiscoveryFailuresChartData" class="discovery-failures-chart"></div>
                         </ng-container>
                         <ng-template #topDiscoveryFailuresTableView>
-                            <div *ngIf="topDiscoveryFailures.length; else topDiscoveryFailuresNoData"
-                                class="table-responsive discovery-failures-table-wrap">
-                                <table class="table table-sm mb-0 discovery-failures-table" sortableTable
-                                    (sorted)="onTopDiscoveryFailuresTableSorted($event)">
-                                    <thead>
-                                        <tr>
-                                            <th class="discovery-failures-table-col--policy"
-                                                [sortable-column]="'policyName'"
-                                                [sort-direction]="getTopDiscoveryFailuresSortDirection('policyName')"
-                                                [ngClass]="getTopDiscoveryFailuresHeaderClass('policyName')">
-                                                Policy name
-                                            </th>
-                                            <th class="discovery-failures-table-col--count"
-                                                [sortable-column]="'failureCount'"
-                                                [sort-direction]="getTopDiscoveryFailuresSortDirection('failureCount')"
-                                                [ngClass]="getTopDiscoveryFailuresHeaderClass('failureCount')">
-                                                Failures
-                                            </th>
-                                            <th class="discovery-failures-table-col--last-failure"
-                                                [sortable-column]="'lastFailure'"
-                                                [sort-direction]="getTopDiscoveryFailuresSortDirection('lastFailure')"
-                                                [ngClass]="getTopDiscoveryFailuresHeaderClass('lastFailure')">
-                                                Last failure
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr
-                                            *ngFor="let failure of topDiscoveryFailures; trackBy: trackByTopDiscoveryFailure">
-                                            <td
-                                                class="discovery-failures-table-policy discovery-failures-table-col--policy">
-                                                {{ failure.policyName }}</td>
-                                            <td class="discovery-failures-table-col--count">{{ failure.failureCount |
-                                                number:'1.0-0' }}</td>
-                                            <td class="discovery-failures-table-col--last-failure">{{
-                                                failure.lastFailure }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <ng-container *ngIf="topDiscoveryFailures.length; else topDiscoveryFailuresNoData">
+                                <div class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
+                                    <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
+                                        (sorted)="onTopDiscoveryFailuresTableSorted($event)">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th class="tdw-24" [sortable-column]="'deploymentEnvironment'"
+                                                    [sort-direction]="getTopDiscoveryFailuresSortDirection('deploymentEnvironment')"
+                                                    [ngClass]="getTopDiscoveryFailuresHeaderClass('deploymentEnvironment')">
+                                                    Deployment Environment
+                                                </th>
+                                                <th class="tdw-32" [sortable-column]="'policyName'"
+                                                    [sort-direction]="getTopDiscoveryFailuresSortDirection('policyName')"
+                                                    [ngClass]="getTopDiscoveryFailuresHeaderClass('policyName')">
+                                                    Policy name
+                                                </th>
+                                                <th class="tdw-18" [sortable-column]="'failureCount'"
+                                                    [sort-direction]="getTopDiscoveryFailuresSortDirection('failureCount')"
+                                                    [ngClass]="getTopDiscoveryFailuresHeaderClass('failureCount')">
+                                                    Failures
+                                                </th>
+                                                <th class="tdw-26" [sortable-column]="'lastFailure'"
+                                                    [sort-direction]="getTopDiscoveryFailuresSortDirection('lastFailure')"
+                                                    [ngClass]="getTopDiscoveryFailuresHeaderClass('lastFailure')">
+                                                    Last failure
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let failure of topDiscoveryFailures; trackBy: trackByTopDiscoveryFailure"
+                                                truncateText>
+                                                <td class="tdw-24">
+                                                    <div [tooltip]="failure.deploymentEnvironment">
+                                                        <span
+                                                            class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
+                                                            [ngClass]="'discovery-distribution-env-pill--' + failure.deploymentEnvironmentTone">
+                                                            {{ failure.deploymentEnvironment }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="tdw-32 text-primary font-500">
+                                                    <div [tooltip]="failure.policyName">{{ failure.policyName }}</div>
+                                                </td>
+                                                <td class="tdw-18">
+                                                    <div [tooltip]="failure.failureCount | number:'1.0-0'">{{
+                                                        failure.failureCount | number:'1.0-0' }}</div>
+                                                </td>
+                                                <td class="tdw-26">
+                                                    <div [tooltip]="failure.lastFailure">{{ failure.lastFailure }}</div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between px-3 pb-3"
+                                    *ngIf="topDiscoveryFailuresCount">
+                                    <div class="small text-muted font-italic mb-2 mb-sm-0">
+                                        {{ getTopDiscoveryFailuresPageSummary() }}
+                                    </div>
+                                    <table-pager [compact]="true" [pageNo]="topDiscoveryFailuresPageNo"
+                                        [pageSize]="topDiscoveryFailuresPageSize"
+                                        [totalCount]="topDiscoveryFailuresCount"
+                                        (pageChange)="topDiscoveryFailuresPageChange($event)"></table-pager>
+                                </div>
+                            </ng-container>
                         </ng-template>
                         <ng-template #topDiscoveryFailuresNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -549,9 +671,11 @@
             </div>
 
             <div class="col-12 col-xl-6 mb-3">
-                <div class="discovery-os-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
                     <div class="discovery-chart-section-title">OS Overview</div>
-                    <div class="discovery-view-toggle" role="group" aria-label="OS overview view toggle">
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
+                        aria-label="OS overview view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="operatingSystemsViewMode === 'chart'"
                             (click)="setOperatingSystemsViewMode('chart')">
@@ -567,29 +691,32 @@
 
                 <div class="card discovery-chart-card">
                     <app-spinner [name]="loaderNames.operatingSystems" [width]="0"></app-spinner>
-                    <div class="card-body" [ngClass]="operatingSystemsViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                    <div class="card-body"
+                        [ngClass]="operatingSystemsViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container *ngIf="operatingSystemsViewMode === 'chart'; else operatingSystemsTableView">
                             <div echarts *ngIf="operatingSystemsChartData; else operatingSystemsNoData"
                                 [options]="operatingSystemsChartData" class="discovery-os-chart"></div>
-                            <div class="discovery-os-legend-row" *ngIf="operatingSystemsLegendItems.length">
-                                <div class="discovery-os-legend">
-                                    <div class="d-inline-flex align-items-center discovery-html-legend-item"
+                            <div class="discovery-os-legend-row d-flex flex-column flex-sm-row align-items-start align-items-sm-end justify-content-between"
+                                *ngIf="operatingSystemsLegendItems.length">
+                                <div class="discovery-os-legend d-flex">
+                                    <div class="d-inline-flex align-items-center discovery-html-legend-item mr-3 mb-1"
                                         *ngFor="let item of getVisibleOperatingSystemsLegendItems()">
                                         <span class="discovery-html-legend-dot mr-2"
                                             [style.background-color]="item.color"></span>
                                         <span>{{ item.label }}</span>
                                     </div>
                                 </div>
-                                <div class="discovery-os-legend-pager" *ngIf="getOperatingSystemsLegendPageCount() > 1">
-                                    <button type="button" class="discovery-os-legend-arrow"
+                                <div class="discovery-os-legend-pager d-inline-flex align-items-center mt-2 mt-sm-0"
+                                    *ngIf="getOperatingSystemsLegendPageCount() > 1">
+                                    <button type="button" class="btn btn-link p-0 discovery-os-legend-arrow"
                                         (click)="previousOperatingSystemsLegendPage()"
                                         [disabled]="operatingSystemsLegendPage === 0" aria-label="Previous legends">
                                         <i class="fas fa-caret-left"></i>
                                     </button>
-                                    <span class="discovery-os-legend-page">
+                                    <span class="discovery-os-legend-page mx-2">
                                         {{ operatingSystemsLegendPage + 1 }}/{{ getOperatingSystemsLegendPageCount() }}
                                     </span>
-                                    <button type="button" class="discovery-os-legend-arrow"
+                                    <button type="button" class="btn btn-link p-0 discovery-os-legend-arrow"
                                         (click)="nextOperatingSystemsLegendPage()"
                                         [disabled]="operatingSystemsLegendPage >= getOperatingSystemsLegendPageCount() - 1"
                                         aria-label="Next legends">
@@ -600,27 +727,32 @@
                         </ng-container>
                         <ng-template #operatingSystemsTableView>
                             <div *ngIf="operatingSystems.length; else operatingSystemsNoData"
-                                class="table-responsive discovery-os-table-wrap">
-                                <table class="table table-sm mb-0 discovery-os-table" sortableTable
+                                class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
+                                <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
                                     (sorted)="onOperatingSystemsTableSorted($event)">
-                                    <thead>
+                                    <thead class="bg-light">
                                         <tr>
-                                            <th class="discovery-os-table-col--type" [sortable-column]="'osType'"
+                                            <th class="tdw-24" [sortable-column]="'deploymentEnvironment'"
+                                                [sort-direction]="getOperatingSystemsSortDirection('deploymentEnvironment')"
+                                                [ngClass]="getOperatingSystemsHeaderClass('deploymentEnvironment')">
+                                                Deployment Environment
+                                            </th>
+                                            <th class="tdw-22" [sortable-column]="'osType'"
                                                 [sort-direction]="getOperatingSystemsSortDirection('osType')"
                                                 [ngClass]="getOperatingSystemsHeaderClass('osType')">
                                                 OS Type
                                             </th>
-                                            <th class="discovery-os-table-col--version" [sortable-column]="'osVersion'"
+                                            <th class="tdw-22" [sortable-column]="'osVersion'"
                                                 [sort-direction]="getOperatingSystemsSortDirection('osVersion')"
                                                 [ngClass]="getOperatingSystemsHeaderClass('osVersion')">
                                                 OS Version
                                             </th>
-                                            <th class="discovery-os-table-col--count" [sortable-column]="'count'"
+                                            <th class="tdw-12" [sortable-column]="'count'"
                                                 [sort-direction]="getOperatingSystemsSortDirection('count')"
                                                 [ngClass]="getOperatingSystemsHeaderClass('count')">
                                                 Count
                                             </th>
-                                            <th class="discovery-os-table-col--eol" [sortable-column]="'eolData'"
+                                            <th class="tdw-20" [sortable-column]="'eolData'"
                                                 [sort-direction]="getOperatingSystemsSortDirection('eolData')"
                                                 [ngClass]="getOperatingSystemsHeaderClass('eolData')">
                                                 EOL Data
@@ -630,19 +762,31 @@
                                     <tbody>
                                         <tr *ngFor="let operatingSystem of operatingSystems; trackBy: trackByOperatingSystem"
                                             truncateText>
-                                            <td class="discovery-os-table-type discovery-os-table-col--type tdw-22">
-                                                <div [tooltip]="operatingSystem.osType">{{ operatingSystem.osType }}</div>
-                                            </td>
-                                            <td class="discovery-os-table-col--version tdw-24">
-                                                <div [tooltip]="operatingSystem.osVersion">{{ operatingSystem.osVersion }}
+                                            <td class="tdw-24">
+                                                <div [tooltip]="operatingSystem.deploymentEnvironment">
+                                                    <span
+                                                        class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
+                                                        [ngClass]="'discovery-distribution-env-pill--' + operatingSystem.deploymentEnvironmentTone">
+                                                        {{ operatingSystem.deploymentEnvironment }}
+                                                    </span>
                                                 </div>
                                             </td>
-                                            <td class="discovery-os-table-col--count tdw-10">
+                                            <td class="tdw-22 text-primary font-500">
+                                                <div [tooltip]="operatingSystem.osType">{{ operatingSystem.osType }}
+                                                </div>
+                                            </td>
+                                            <td class="tdw-22">
+                                                <div [tooltip]="operatingSystem.osVersion">{{ operatingSystem.osVersion
+                                                    }}
+                                                </div>
+                                            </td>
+                                            <td class="tdw-12">
                                                 <div [tooltip]="operatingSystem.count | number:'1.0-0'">{{
                                                     operatingSystem.count | number:'1.0-0' }}</div>
                                             </td>
-                                            <td class="discovery-os-table-col--eol tdw-18">
-                                                <div [tooltip]="operatingSystem.eolData">{{ operatingSystem.eolData }}</div>
+                                            <td class="tdw-20">
+                                                <div [tooltip]="operatingSystem.eolData">{{ operatingSystem.eolData }}
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -650,7 +794,8 @@
                             </div>
                         </ng-template>
                         <ng-template #operatingSystemsNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -667,7 +812,8 @@
                     <div class="card-body p-0">
                         <div class="row no-gutters text-center">
                             <div class="col discovery-cmdb-item px-3 py-2">
-                                <div class="discovery-cmdb-content">
+                                <div
+                                    class="d-flex flex-column align-items-center justify-content-center w-100 text-center">
                                     <div class="discovery-cmdb-label">{{ cmdbSyncInsights.cmdbSyncRate.label }}</div>
                                     <div class="discovery-cmdb-value"
                                         [ngClass]="cmdbSyncInsights.cmdbSyncRate.valueClass">
@@ -680,7 +826,8 @@
                                 </div>
                             </div>
                             <div class="col discovery-cmdb-item px-3 py-2">
-                                <div class="discovery-cmdb-content">
+                                <div
+                                    class="d-flex flex-column align-items-center justify-content-center w-100 text-center">
                                     <div class="discovery-cmdb-label">{{ cmdbSyncInsights.ciUpdateFailures.label }}
                                     </div>
                                     <div class="discovery-cmdb-value"
@@ -694,7 +841,8 @@
                                 </div>
                             </div>
                             <div class="col discovery-cmdb-item px-3 py-2">
-                                <div class="discovery-cmdb-content">
+                                <div
+                                    class="d-flex flex-column align-items-center justify-content-center w-100 text-center">
                                     <div class="discovery-cmdb-label">{{ cmdbSyncInsights.orphanedCis.label }}</div>
                                     <div class="discovery-cmdb-value"
                                         [ngClass]="cmdbSyncInsights.orphanedCis.valueClass">
@@ -707,7 +855,8 @@
                                 </div>
                             </div>
                             <div class="col discovery-cmdb-item px-3 py-2">
-                                <div class="discovery-cmdb-content">
+                                <div
+                                    class="d-flex flex-column align-items-center justify-content-center w-100 text-center">
                                     <div class="discovery-cmdb-label">{{ cmdbSyncInsights.unmappedCis.label }}</div>
                                     <div class="discovery-cmdb-value"
                                         [ngClass]="cmdbSyncInsights.unmappedCis.valueClass">
@@ -720,7 +869,8 @@
                                 </div>
                             </div>
                             <div class="col discovery-cmdb-item px-3 py-2">
-                                <div class="discovery-cmdb-content">
+                                <div
+                                    class="d-flex flex-column align-items-center justify-content-center w-100 text-center">
                                     <div class="discovery-cmdb-label">{{ cmdbSyncInsights.duplicateCis.label }}</div>
                                     <div class="discovery-cmdb-value"
                                         [ngClass]="cmdbSyncInsights.duplicateCis.valueClass">
@@ -740,9 +890,10 @@
 
         <div class="row mt-2">
             <div class="col-12 col-xl-6 mb-3">
-                <div class="discovery-trend-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
                     <div class="discovery-chart-section-title">Discovery vs CMDB Sync Trend</div>
-                    <div class="discovery-view-toggle" role="group"
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
                         aria-label="Discovery vs CMDB sync trend view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="cmdbSyncTrendViewMode === 'chart'"
@@ -758,40 +909,40 @@
                 </div>
                 <div class="card discovery-chart-card equalize-card">
                     <app-spinner [name]="loaderNames.cmdbSyncTrend" [width]="0"></app-spinner>
-                    <div class="card-body" [ngClass]="cmdbSyncTrendViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                    <div class="card-body"
+                        [ngClass]="cmdbSyncTrendViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container *ngIf="cmdbSyncTrendViewMode === 'chart'; else cmdbSyncTrendTableView">
                             <div echarts *ngIf="cmdbSyncTrend; else cmdbSyncTrendNoData" [options]="cmdbSyncTrend"
                                 class="discovery-trend-chart"></div>
                         </ng-container>
                         <ng-template #cmdbSyncTrendTableView>
                             <div *ngIf="cmdbSyncTrendTableRows?.length; else cmdbSyncTrendNoData"
-                                class="table-responsive discovery-trend-table-wrap">
-                                <table class="table table-sm mb-0 discovery-trend-table" sortableTable
+                                class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
+                                <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
                                     (sorted)="onCmdbSyncTrendTableSorted($event)">
-                                    <thead>
+                                    <thead class="bg-light">
                                         <tr>
-                                            <th class="discovery-trend-table-col--week" [sortable-column]="'weekOrder'"
+                                            <th class="tdw-20" [sortable-column]="'weekOrder'"
                                                 [sort-direction]="getCmdbSyncTrendSortDirection('weekOrder')"
                                                 [ngClass]="getCmdbSyncTrendHeaderClass('weekOrder')">
                                                 Week
                                             </th>
-                                            <th class="discovery-trend-table-col--total"
-                                                [sortable-column]="'discoveredCis'"
+                                            <th class="tdw-20" [sortable-column]="'discoveredCis'"
                                                 [sort-direction]="getCmdbSyncTrendSortDirection('discoveredCis')"
                                                 [ngClass]="getCmdbSyncTrendHeaderClass('discoveredCis')">
                                                 Discovered CIs
                                             </th>
-                                            <th class="discovery-trend-table-col--total" [sortable-column]="'syncedCis'"
+                                            <th class="tdw-20" [sortable-column]="'syncedCis'"
                                                 [sort-direction]="getCmdbSyncTrendSortDirection('syncedCis')"
                                                 [ngClass]="getCmdbSyncTrendHeaderClass('syncedCis')">
                                                 Synced CIs
                                             </th>
-                                            <th class="discovery-trend-table-col--new" [sortable-column]="'failed'"
+                                            <th class="tdw-20" [sortable-column]="'failed'"
                                                 [sort-direction]="getCmdbSyncTrendSortDirection('failed')"
                                                 [ngClass]="getCmdbSyncTrendHeaderClass('failed')">
                                                 Failed
                                             </th>
-                                            <th class="discovery-trend-table-col--new" [sortable-column]="'pending'"
+                                            <th class="tdw-20" [sortable-column]="'pending'"
                                                 [sort-direction]="getCmdbSyncTrendSortDirection('pending')"
                                                 [ngClass]="getCmdbSyncTrendHeaderClass('pending')">
                                                 Pending
@@ -799,25 +950,35 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr
-                                            *ngFor="let row of cmdbSyncTrendTableRows; trackBy: trackByCmdbSyncTrendRow">
-                                            <td class="discovery-trend-table-week discovery-trend-table-col--week">{{
-                                                row.week }}</td>
-                                            <td class="discovery-trend-table-col--total">{{ row.discoveredCis |
-                                                number:'1.0-0' }}</td>
-                                            <td class="discovery-trend-table-col--total">{{ row.syncedCis |
-                                                number:'1.0-0' }}</td>
-                                            <td class="discovery-trend-table-col--new">{{ row.failed | number:'1.0-0' }}
+                                        <tr *ngFor="let row of cmdbSyncTrendTableRows; trackBy: trackByCmdbSyncTrendRow"
+                                            truncateText>
+                                            <td class="tdw-20 text-primary font-500">
+                                                <div [tooltip]="row.week">{{ row.week }}</div>
                                             </td>
-                                            <td class="discovery-trend-table-col--new">{{ row.pending | number:'1.0-0'
-                                                }}</td>
+                                            <td class="tdw-20">
+                                                <div [tooltip]="row.discoveredCis | number:'1.0-0'">{{
+                                                    row.discoveredCis | number:'1.0-0' }}</div>
+                                            </td>
+                                            <td class="tdw-20">
+                                                <div [tooltip]="row.syncedCis | number:'1.0-0'">{{ row.syncedCis |
+                                                    number:'1.0-0' }}</div>
+                                            </td>
+                                            <td class="tdw-20">
+                                                <div [tooltip]="row.failed | number:'1.0-0'">{{ row.failed |
+                                                    number:'1.0-0' }}</div>
+                                            </td>
+                                            <td class="tdw-20">
+                                                <div [tooltip]="row.pending | number:'1.0-0'">{{ row.pending |
+                                                    number:'1.0-0' }}</div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </ng-template>
                         <ng-template #cmdbSyncTrendNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -826,9 +987,11 @@
             </div>
 
             <div class="col-12 col-xl-6 mb-3">
-                <div class="discovery-distribution-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
                     <div class="discovery-chart-section-title">New CI's Distribution</div>
-                    <div class="discovery-view-toggle" role="group" aria-label="New CI distribution view toggle">
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
+                        aria-label="New CI distribution view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="ciDistributionViewMode === 'chart'"
                             (click)="setCiDistributionViewMode('chart')">
@@ -841,16 +1004,18 @@
                         </button>
                     </div>
                 </div>
-                <div class="card discovery-chart-card discovery-chart-card--ci-distribution equalize-card">
+                <div class="card discovery-chart-card discovery-chart-card--ci-distribution equalize-card h-100">
                     <app-spinner [name]="loaderNames.ciDistribution" [width]="0"></app-spinner>
-                    <div class="card-body" [ngClass]="ciDistributionViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                    <div class="card-body"
+                        [ngClass]="ciDistributionViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container *ngIf="ciDistributionViewMode === 'chart'; else ciDistributionTableView">
                             <div echarts *ngIf="ciDistributionChartData; else ciDistributionNoData"
                                 [options]="ciDistributionChartData" (chartInit)="onCiDistributionChartInit($event)"
                                 class="discovery-ci-distribution-chart"></div>
-                            <div class="discovery-ci-distribution-legend" *ngIf="ciDistributionLegendItems.length">
+                            <div class="discovery-ci-distribution-legend d-flex flex-wrap justify-content-center mx-auto"
+                                *ngIf="ciDistributionLegendItems.length">
                                 <button type="button"
-                                    class="d-inline-flex align-items-center discovery-html-legend-item border-0 bg-transparent p-0"
+                                    class="d-inline-flex align-items-center discovery-html-legend-item border-0 bg-transparent p-0 mr-3 mb-2"
                                     *ngFor="let item of ciDistributionLegendItems"
                                     (click)="openCiDistributionLegend(item.label)">
                                     <span class="discovery-html-legend-dot mr-2"
@@ -860,48 +1025,76 @@
                             </div>
                         </ng-container>
                         <ng-template #ciDistributionTableView>
-                            <div *ngIf="ciDistributionTableRows?.length; else ciDistributionNoData"
-                                class="table-responsive discovery-distribution-table-wrap">
-                                <table class="table table-sm mb-0 discovery-distribution-table" sortableTable
-                                    (sorted)="onCiDistributionTableSorted($event)">
-                                    <thead>
-                                        <tr>
-                                            <th class="discovery-distribution-table-col--method"
-                                                [sortable-column]="'category'"
-                                                [sort-direction]="getCiDistributionSortDirection('category')"
-                                                [ngClass]="getCiDistributionHeaderClass('category')">
-                                                Category
-                                            </th>
-                                            <th class="discovery-distribution-table-col--resources"
-                                                [sortable-column]="'count'"
-                                                [sort-direction]="getCiDistributionSortDirection('count')"
-                                                [ngClass]="getCiDistributionHeaderClass('count')">
-                                                Count
-                                            </th>
-                                            <th class="discovery-distribution-table-col--up" [sortable-column]="'share'"
-                                                [sort-direction]="getCiDistributionSortDirection('share')"
-                                                [ngClass]="getCiDistributionHeaderClass('share')">
-                                                Share
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr
-                                            *ngFor="let row of ciDistributionTableRows; trackBy: trackByCiDistributionRow">
-                                            <td
-                                                class="discovery-distribution-table-method discovery-distribution-table-col--method">
-                                                {{ row.category }}</td>
-                                            <td class="discovery-distribution-table-col--resources">{{ row.count |
-                                                number:'1.0-0' }}</td>
-                                            <td class="discovery-distribution-table-col--up">{{ row.share |
-                                                number:'1.0-1' }}%</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <ng-container *ngIf="ciDistributionTableRows?.length; else ciDistributionNoData">
+                                <div
+                                    class="table-responsive discovery-dashboard-table-wrap discovery-dashboard-table-wrap--tall p-3 flex-fill h-100">
+                                    <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
+                                        (sorted)="onCiDistributionTableSorted($event)">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th class="tdw-24" [sortable-column]="'deploymentEnvironment'"
+                                                    [sort-direction]="getCiDistributionSortDirection('deploymentEnvironment')"
+                                                    [ngClass]="getCiDistributionHeaderClass('deploymentEnvironment')">
+                                                    Deployment Environment
+                                                </th>
+                                                <th class="tdw-36" [sortable-column]="'category'"
+                                                    [sort-direction]="getCiDistributionSortDirection('category')"
+                                                    [ngClass]="getCiDistributionHeaderClass('category')">
+                                                    Category
+                                                </th>
+                                                <th class="tdw-20" [sortable-column]="'count'"
+                                                    [sort-direction]="getCiDistributionSortDirection('count')"
+                                                    [ngClass]="getCiDistributionHeaderClass('count')">
+                                                    Count
+                                                </th>
+                                                <th class="tdw-20" [sortable-column]="'share'"
+                                                    [sort-direction]="getCiDistributionSortDirection('share')"
+                                                    [ngClass]="getCiDistributionHeaderClass('share')">
+                                                    Share
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let row of ciDistributionTableRows; trackBy: trackByCiDistributionRow"
+                                                truncateText>
+                                                <td class="tdw-24">
+                                                    <div [tooltip]="row.deploymentEnvironment">
+                                                        <span
+                                                            class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
+                                                            [ngClass]="'discovery-distribution-env-pill--' + row.deploymentEnvironmentTone">
+                                                            {{ row.deploymentEnvironment }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="tdw-36 text-primary font-500">
+                                                    <div [tooltip]="row.category">{{ row.category }}</div>
+                                                </td>
+                                                <td class="tdw-20">
+                                                    <div [tooltip]="row.count | number:'1.0-0'">{{ row.count |
+                                                        number:'1.0-0' }}</div>
+                                                </td>
+                                                <td class="tdw-20">
+                                                    <div [tooltip]="(row.share | number:'1.0-1') + '%'">{{ row.share |
+                                                        number:'1.0-1' }}%</div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between px-3 pb-3 mt-auto"
+                                    *ngIf="ciDistributionCount">
+                                    <div class="small text-muted font-italic mb-2 mb-sm-0">
+                                        {{ getCiDistributionPageSummary() }}
+                                    </div>
+                                    <table-pager [compact]="true" [pageNo]="ciDistributionPageNo"
+                                        [pageSize]="ciDistributionPageSize" [totalCount]="ciDistributionCount"
+                                        (pageChange)="ciDistributionPageChange($event)"></table-pager>
+                                </div>
+                            </ng-container>
                         </ng-template>
                         <ng-template #ciDistributionNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -912,9 +1105,10 @@
 
         <div class="row mt-4">
             <div class="col-12">
-                <div class="discovery-new-ci-head mb-2">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2 mt-2">
                     <div class="discovery-section-title mb-0">Recently Discovered Configuration Items</div>
-                    <div class="discovery-view-toggle" role="group"
+                    <div class="discovery-view-toggle d-inline-flex align-items-center" role="group"
                         aria-label="Recently discovered configuration items view toggle">
                         <button type="button" class="discovery-view-toggle-btn"
                             [class.discovery-view-toggle-btn--active]="newlyDiscoveredDevicesViewMode === 'chart'"
@@ -931,36 +1125,38 @@
 
                 <div class="card discovery-table-card discovery-new-ci-card">
                     <app-spinner [name]="loaderNames.newlyDiscoveredDevices" [width]="0"></app-spinner>
-                    <div class="card-body" [ngClass]="newlyDiscoveredDevicesViewMode === 'chart' ? 'px-3 py-3' : 'p-0'">
+                    <div class="card-body"
+                        [ngClass]="newlyDiscoveredDevicesViewMode === 'chart' ? 'px-3 py-3' : 'p-0 d-flex flex-column h-100'">
                         <ng-container
                             *ngIf="newlyDiscoveredDevicesViewMode === 'chart'; else newlyDiscoveredDevicesTableView">
                             <div *ngIf="newlyDiscoveredDevices.length; else newlyDiscoveredDevicesNoData"
-                                class="discovery-new-ci-chart-grid">
-                                <div class="discovery-new-ci-chart-item">
+                                class="row mx-n2 discovery-new-ci-chart-grid">
+                                <div class="col-md-6 col-12 px-2 mb-3">
                                     <div echarts [options]="newlyDiscoveredDevicesManufacturerModelChart"
                                         class="discovery-new-ci-chart-panel"></div>
-                                    <div class="discovery-new-ci-legend-row"
+                                    <div class="discovery-new-ci-legend-row d-flex flex-column flex-sm-row align-items-start align-items-sm-end justify-content-between"
                                         *ngIf="newlyDiscoveredDevicesManufacturerLegendItems.length">
-                                        <div class="discovery-os-legend">
-                                            <div class="d-inline-flex align-items-center discovery-html-legend-item"
+                                        <div class="discovery-os-legend d-flex">
+                                            <div class="d-inline-flex align-items-center discovery-html-legend-item mr-3 mb-1"
                                                 *ngFor="let item of getVisibleNewlyDiscoveredManufacturerLegendItems()">
                                                 <span class="discovery-html-legend-dot mr-2"
                                                     [style.background-color]="item.color"></span>
                                                 <span>{{ item.label }}</span>
                                             </div>
                                         </div>
-                                        <div class="discovery-os-legend-pager"
+                                        <div class="discovery-os-legend-pager d-inline-flex align-items-center mt-2 mt-sm-0"
                                             *ngIf="getNewlyDiscoveredManufacturerLegendPageCount() > 1">
-                                            <button type="button" class="discovery-os-legend-arrow"
+                                            <button type="button" class="btn btn-link p-0 discovery-os-legend-arrow"
                                                 (click)="previousNewlyDiscoveredManufacturerLegendPage()"
                                                 [disabled]="newlyDiscoveredDevicesManufacturerLegendPage === 0"
                                                 aria-label="Previous legends">
                                                 <i class="fas fa-caret-left"></i>
                                             </button>
-                                            <span class="discovery-os-legend-page">
-                                                {{ newlyDiscoveredDevicesManufacturerLegendPage + 1 }}/{{ getNewlyDiscoveredManufacturerLegendPageCount() }}
+                                            <span class="discovery-os-legend-page mx-2">
+                                                {{ newlyDiscoveredDevicesManufacturerLegendPage + 1 }}/{{
+                                                getNewlyDiscoveredManufacturerLegendPageCount() }}
                                             </span>
-                                            <button type="button" class="discovery-os-legend-arrow"
+                                            <button type="button" class="btn btn-link p-0 discovery-os-legend-arrow"
                                                 (click)="nextNewlyDiscoveredManufacturerLegendPage()"
                                                 [disabled]="newlyDiscoveredDevicesManufacturerLegendPage >= getNewlyDiscoveredManufacturerLegendPageCount() - 1"
                                                 aria-label="Next legends">
@@ -969,105 +1165,97 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="discovery-new-ci-chart-item">
+                                <div class="col-md-6 col-12 px-2 mb-3">
                                     <div echarts [options]="newlyDiscoveredDevicesAvailabilityTrendChart"
                                         class="discovery-new-ci-chart-panel"></div>
                                 </div>
-                                <div class="discovery-new-ci-chart-item">
+                                <div class="col-md-6 col-12 px-2 mb-3">
                                     <div echarts [options]="newlyDiscoveredDevicesDatacenterChart"
                                         class="discovery-new-ci-chart-panel"></div>
                                 </div>
-                                <div class="discovery-new-ci-chart-item">
+                                <div class="col-md-6 col-12 px-2 mb-3">
                                     <div echarts [options]="newlyDiscoveredDevicesStatusByDatacenterChart"
                                         class="discovery-new-ci-chart-panel"></div>
                                 </div>
                             </div>
                         </ng-container>
                         <ng-template #newlyDiscoveredDevicesTableView>
-                            <div
-                                class="d-flex flex-wrap justify-content-end align-items-center px-3 py-2 border-bottom discovery-new-ci-toolbar">
-                                <div class="d-flex flex-wrap align-items-center justify-content-end w-100">
-                                    <span class="discovery-new-ci-search-label mr-2">Search CI Name:</span>
-                                    <div class="input-group discovery-table-search">
-                                        <div class="w-100">
-                                            <search-box [searchValue]="newlyDiscoveredDevicesSearch"
-                                                [customClass]="'form-control-sm'"
-                                                (searched)="onNewlyDiscoveredDevicesSearched($event)"></search-box>
-                                        </div>
-                                    </div>
+                            <div class="row no-gutters px-3 pt-3 pb-2">
+                                <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                                    <search-box class="d-block w-100" [searchValue]="newlyDiscoveredDevicesSearch"
+                                        [customClass]="'form-control-sm'"
+                                        (searched)="onNewlyDiscoveredDevicesSearched($event)"></search-box>
                                 </div>
                             </div>
 
                             <div *ngIf="newlyDiscoveredDevices.length; else newlyDiscoveredDevicesNoData"
-                                class="table-responsive discovery-new-ci-table-wrap">
-                                <table class="table table-sm mb-0 discovery-new-ci-table" sortableTable
-                                    (sorted)="onNewlyDiscoveredDevicesTableSorted($event)">
-                                    <thead>
+                                class="table-responsive discovery-dashboard-table-wrap discovery-dashboard-table-wrap--tall p-3 flex-fill">
+                                <table
+                                    class="table table-sm text-left mb-0 discovery-dashboard-table discovery-new-ci-table"
+                                    sortableTable (sorted)="onNewlyDiscoveredDevicesTableSorted($event)">
+                                    <thead class="bg-light">
                                         <tr>
-                                            <th class="discovery-new-ci-table-col--name" [sortable-column]="'ciName'"
+                                            <th class="tdw-14" [sortable-column]="'deploymentEnvironment'"
+                                                [sort-direction]="getNewlyDiscoveredDevicesSortDirection('deploymentEnvironment')"
+                                                [ngClass]="getNewlyDiscoveredDevicesHeaderClass('deploymentEnvironment')">
+                                                Deployment Environment
+                                            </th>
+                                            <th class="tdw-13" [sortable-column]="'ciName'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('ciName')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('ciName')">
                                                 CI Name
                                             </th>
-                                            <th class="discovery-new-ci-table-col--type" [sortable-column]="'ciType'"
+                                            <th class="tdw-10" [sortable-column]="'ciType'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('ciType')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('ciType')">
                                                 CI Type
                                             </th>
-                                            <th class="discovery-new-ci-table-col--platform"
-                                                [sortable-column]="'platform'"
+                                            <th class="tdw-10" [sortable-column]="'platform'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('platform')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('platform')">
                                                 Platform
                                             </th>
-                                            <th class="discovery-new-ci-table-col--serial"
-                                                [sortable-column]="'serialNumber'"
+                                            <th class="tdw-10" [sortable-column]="'serialNumber'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('serialNumber')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('serialNumber')">
                                                 Serial Number
                                             </th>
-                                            <th class="discovery-new-ci-table-col--manufacturer"
-                                                [sortable-column]="'manufacturer'"
+                                            <th class="tdw-10" [sortable-column]="'manufacturer'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('manufacturer')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('manufacturer')">
                                                 Manufacturer
                                             </th>
-                                            <th class="discovery-new-ci-table-col--model" [sortable-column]="'model'"
+                                            <th class="tdw-10" [sortable-column]="'model'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('model')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('model')">
                                                 Model
                                             </th>
-                                            <th class="discovery-new-ci-table-col--datacenter"
-                                                [sortable-column]="'datacenter'"
+                                            <th class="tdw-8" [sortable-column]="'datacenter'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('datacenter')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('datacenter')">
                                                 Datacenter
                                             </th>
-                                            <th class="discovery-new-ci-table-col--os" [sortable-column]="'osTypeGroup'"
+                                            <th class="tdw-12" [sortable-column]="'osTypeGroup'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('osTypeGroup')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('osTypeGroup')">
                                                 OS Type / Group
                                             </th>
-                                            <th class="discovery-new-ci-table-col--method"
-                                                [sortable-column]="'discoveryMethod'"
+                                            <th [sortable-column]="'discoveryMethod'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('discoveryMethod')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('discoveryMethod')">
                                                 Discovery Method
                                             </th>
-                                            <th class="discovery-new-ci-table-col--last-discovered"
-                                                [sortable-column]="'lastDiscoveredTimestamp'"
+                                            <th class="tdw-9" [sortable-column]="'lastDiscoveredTimestamp'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('lastDiscoveredTimestamp')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('lastDiscoveredTimestamp')">
                                                 Last Discovered
                                             </th>
-                                            <th class="discovery-new-ci-table-col--uptime"
-                                                [sortable-column]="'uptimeDays'"
+                                            <th class="tdw-9" [sortable-column]="'uptimeDays'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('uptimeDays')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('uptimeDays')">
                                                 Uptime
                                             </th>
-                                            <th class="discovery-new-ci-table-col--status"
-                                                [sortable-column]="'availabilityStatus'"
+                                            <th [sortable-column]="'availabilityStatus'"
                                                 [sort-direction]="getNewlyDiscoveredDevicesSortDirection('availabilityStatus')"
                                                 [ngClass]="getNewlyDiscoveredDevicesHeaderClass('availabilityStatus')">
                                                 Availability Status
@@ -1077,49 +1265,68 @@
                                     <tbody>
                                         <tr *ngFor="let device of newlyDiscoveredDevices; trackBy: trackByNewlyDiscoveredDevice"
                                             truncateText>
-                                            <td
-                                                class="discovery-new-ci-table-name discovery-new-ci-table-col--name tdw-12">
-                                                <div [tooltip]="device.ciName">{{ device.ciName }}</div>
+                                            <td class="tdw-14">
+                                                <div [tooltip]="device.deploymentEnvironment" container="body">
+                                                    <span
+                                                        class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
+                                                        [ngClass]="'discovery-distribution-env-pill--' + device.deploymentEnvironmentTone">
+                                                        {{ device.deploymentEnvironment }}
+                                                    </span>
+                                                </div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--type tdw-10">
-                                                <div [tooltip]="device.ciType">{{ device.ciType }}</div>
+                                            <td class="tdw-13 text-primary font-500">
+                                                <div [tooltip]="device.ciName" container="body">{{ device.ciName }}
+                                                </div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--platform tdw-10">
-                                                <div [tooltip]="device.platform">{{ device.platform }}</div>
+                                            <td class="tdw-10">
+                                                <div [tooltip]="device.ciType" container="body">{{ device.ciType }}
+                                                </div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--serial tdw-10">
-                                                <div [tooltip]="device.serialNumber">{{ device.serialNumber }}</div>
+                                            <td class="tdw-10">
+                                                <div [tooltip]="device.platform" container="body">{{ device.platform }}
+                                                </div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--manufacturer tdw-10">
-                                                <div [tooltip]="device.manufacturer">{{ device.manufacturer }}</div>
+                                            <td class="tdw-10">
+                                                <div [tooltip]="device.serialNumber" container="body">{{
+                                                    device.serialNumber }}</div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--model tdw-10">
-                                                <div [tooltip]="device.model">{{ device.model }}</div>
+                                            <td class="tdw-10">
+                                                <div [tooltip]="device.manufacturer" container="body">{{
+                                                    device.manufacturer }}</div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--datacenter tdw-8">
-                                                <div [tooltip]="device.datacenter">
+                                            <td class="tdw-10">
+                                                <div [tooltip]="device.model" container="body">{{ device.model }}</div>
+                                            </td>
+                                            <td class="tdw-8">
+                                                <div [tooltip]="device.datacenter" container="body">
                                                     <span [class]="device.datacenterClass">{{ device.datacenter
                                                         }}</span>
                                                 </div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--os tdw-12">
-                                                <div [tooltip]="device.osTypeGroup">{{ device.osTypeGroup }}</div>
+                                            <td class="tdw-12">
+                                                <div [tooltip]="device.osTypeGroup" container="body">{{
+                                                    device.osTypeGroup }}</div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--method tdw-10">
-                                                <span [class]="device.discoveryMethodClass"
-                                                    [tooltip]="device.discoveryMethod">{{ device.discoveryMethod
-                                                    }}</span>
+                                            <td>
+                                                <div [tooltip]="device.discoveryMethod" container="body">
+                                                    <span [class]="device.discoveryMethodClass">{{
+                                                        device.discoveryMethod
+                                                        }}</span>
+                                                </div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--last-discovered tdw-8">
-                                                <div [tooltip]="device.lastDiscovered">{{ device.lastDiscovered }}</div>
+                                            <td class="tdw-9">
+                                                <div [tooltip]="device.lastDiscovered" container="body">{{
+                                                    device.lastDiscovered }}</div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--uptime tdw-8">
-                                                <div [tooltip]="device.uptime">{{ device.uptime }}</div>
+                                            <td class="tdw-9">
+                                                <div [tooltip]="device.uptime" container="body">{{ device.uptime }}
+                                                </div>
                                             </td>
-                                            <td class="discovery-new-ci-table-col--status tdw-10">
-                                                <span [class]="device.availabilityStatusClass"
-                                                    [tooltip]="device.availabilityStatus">{{
-                                                    device.availabilityStatus }}</span>
+                                            <td>
+                                                <div [tooltip]="device.availabilityStatus" container="body">
+                                                    <span [class]="device.availabilityStatusClass">{{
+                                                        device.availabilityStatus }}</span>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -1127,13 +1334,15 @@
                             </div>
                         </ng-template>
                         <ng-template #newlyDiscoveredDevicesNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
-                        <div class="discovery-new-ci-pagination-row"
+                        <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between px-3 py-3 border-top mt-auto"
                             *ngIf="newlyDiscoveredDevicesViewMode === 'table' && newlyDiscoveredDevices.length">
-                            <div class="discovery-new-ci-pagination-text">{{ getNewlyDiscoveredDevicesPageSummary() }}
+                            <div class="small text-muted font-italic mb-2 mb-lg-0">{{
+                                getNewlyDiscoveredDevicesPageSummary() }}
                             </div>
                             <table-pager [compact]="true" [pageNo]="newlyDiscoveredDevicesPageNo"
                                 [pageSize]="newlyDiscoveredDevicesPageSize" [totalCount]="newlyDiscoveredDevicesCount"
@@ -1149,13 +1358,15 @@
                 <div class="card discovery-table-card discovery-orphan-card h-100">
                     <div class="card-header bg-transparent border-0 px-3 pt-3 pb-2">
                         <div class="d-flex align-items-center">
-                            <span class="discovery-orphan-count-badge mr-2">{{ orphanedDeviceByTypeCount || 0 }}</span>
+                            <span
+                                class="d-inline-flex align-items-center justify-content-center discovery-orphan-count-badge mr-2">{{
+                                orphanedDeviceByTypeCount || 0 }}</span>
                             <div class="discovery-section-title mb-0">Orphaned Device List</div>
                         </div>
                     </div>
                     <div class="card-body pt-0 px-3 pb-2 position-relative d-flex flex-column">
                         <app-spinner [name]="loaderNames.orphanedDeviceByType" [width]="0"></app-spinner>
-                        <div class="d-flex align-items-center flex-wrap discovery-orphan-status-legend">
+                        <div class="d-flex align-items-center flex-wrap text-muted small mt-2 mb-3">
                             <div class="d-flex align-items-center mr-4 mb-2">
                                 <i class="fa fa-check-circle text-success mr-1"></i>
                                 <span>Active / Reachable</span>
@@ -1170,72 +1381,100 @@
                             </div>
                         </div>
 
-                        <div class="table-responsive">
+                        <div class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
                             <table *ngIf="orphanedDeviceByTypeRows.length; else orphanedDeviceByTypeNoData"
-                                class="table table-sm mb-0 discovery-orphan-table" sortableTable
+                                class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
                                 (sorted)="onOrphanedDeviceByTypeTableSorted($event)">
-                                <thead>
+                                <thead class="bg-light">
                                     <tr>
+                                        <th [sortable-column]="'deploymentEnvironment'"
+                                            [sort-direction]="getOrphanedDeviceByTypeSortDirection('deploymentEnvironment')"
+                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('deploymentEnvironment')"
+                                            class="tdw-18">
+                                            Deployment Environment
+                                        </th>
                                         <th [sortable-column]="'deviceName'"
                                             [sort-direction]="getOrphanedDeviceByTypeSortDirection('deviceName')"
-                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('deviceName')">
+                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('deviceName')" class="tdw-25">
                                             Device Name
                                         </th>
                                         <th [sortable-column]="'status'"
                                             [sort-direction]="getOrphanedDeviceByTypeSortDirection('status')"
-                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('status')">
+                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('status')"
+                                            class="tdw-10 text-center">
                                             Status
                                         </th>
                                         <th [sortable-column]="'deviceType'"
                                             [sort-direction]="getOrphanedDeviceByTypeSortDirection('deviceType')"
-                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('deviceType')">
+                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('deviceType')" class="tdw-18">
                                             Type
                                         </th>
                                         <th [sortable-column]="'lastSeenTimestamp'"
                                             [sort-direction]="getOrphanedDeviceByTypeSortDirection('lastSeenTimestamp')"
-                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('lastSeenTimestamp')">
+                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('lastSeenTimestamp')"
+                                            class="tdw-15">
                                             Last Seen
                                         </th>
                                         <th [sortable-column]="'datacenter'"
                                             [sort-direction]="getOrphanedDeviceByTypeSortDirection('datacenter')"
-                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('datacenter')">
+                                            [ngClass]="getOrphanedDeviceByTypeHeaderClass('datacenter')" class="tdw-14">
                                             Datacenter
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr
-                                        *ngFor="let row of orphanedDeviceByTypeRows; trackBy: trackByOrphanedDeviceByType">
-                                        <td>
-                                            <button *ngIf="canOpenOrphanedDeviceDetails(row); else orphanedDeviceNameText"
-                                                type="button" class="discovery-orphan-link text-primary"
-                                                (click)="openOrphanedDeviceDetails(row)">
-                                                <span>{{ row.deviceName }}</span>
-                                            </button>
-                                            <ng-template #orphanedDeviceNameText>
-                                                <span>{{ row.deviceName }}</span>
-                                            </ng-template>
+                                    <tr *ngFor="let row of orphanedDeviceByTypeRows; trackBy: trackByOrphanedDeviceByType"
+                                        truncateText>
+                                        <td class="tdw-18">
+                                            <div [tooltip]="row.deploymentEnvironment">
+                                                <span
+                                                    class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
+                                                    [ngClass]="'discovery-distribution-env-pill--' + row.deploymentEnvironmentTone">
+                                                    {{ row.deploymentEnvironment }}
+                                                </span>
+                                            </div>
                                         </td>
-                                        <td [tooltip]="row.status">
+                                        <td class="tdw-25">
+                                            <div [tooltip]="row.deviceName">
+                                                <button
+                                                    *ngIf="canOpenOrphanedDeviceDetails(row); else orphanedDeviceNameText"
+                                                    type="button"
+                                                    class="bg-transparent border-0 p-0 w-100 text-left discovery-orphan-link text-primary"
+                                                    (click)="openOrphanedDeviceDetails(row)">
+                                                    <span>{{ row.deviceName }}</span>
+                                                </button>
+                                                <ng-template #orphanedDeviceNameText>
+                                                    <span>{{ row.deviceName }}</span>
+                                                </ng-template>
+                                            </div>
+                                        </td>
+                                        <td class="tdw-10 text-center" [tooltip]="row.status">
                                             <i [ngClass]="row.statusIconClass"></i>
                                         </td>
-                                        <td>{{ row.deviceType }}</td>
-                                        <td>{{ row.lastSeen }}</td>
-                                        <td>{{ row.datacenter }}</td>
+                                        <td class="tdw-18">
+                                            <div [tooltip]="row.deviceType">{{ row.deviceType }}</div>
+                                        </td>
+                                        <td class="tdw-15">
+                                            <div [tooltip]="row.lastSeen">{{ row.lastSeen }}</div>
+                                        </td>
+                                        <td class="tdw-14">
+                                            <div [tooltip]="row.datacenter">{{ row.datacenter }}</div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                             <ng-template #orphanedDeviceByTypeNoData>
-                                <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                                <div
+                                    class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                     No data available
                                 </div>
                             </ng-template>
                         </div>
 
-                        <div class="discovery-orphan-pagination-row" *ngIf="orphanedDeviceByTypeRows.length">
-                            <p class="discovery-orphan-note mb-0">*Devices discovered but no longer reachable,
-                                reporting,
-                                or mapped to an active source</p>
+                        <div class="discovery-orphan-pagination-row d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between"
+                            *ngIf="orphanedDeviceByTypeRows.length">
+                            <p class="discovery-orphan-note mb-2 mb-lg-0">Devices With Lifecycle Stages Classified As
+                                Retired, Disposed, Or Donated Are Considered Orphaned Devices.</p>
                             <table-pager [compact]="true" [pageNo]="orphanedDeviceByTypePageNo"
                                 [pageSize]="orphanedDeviceByTypePageSize" [totalCount]="orphanedDeviceByTypeCount"
                                 (pageChange)="orphanedDeviceByTypePageChange($event)"></table-pager>
@@ -1256,8 +1495,8 @@
                                 <div echarts [options]="orphanedDevicesBreakdownChartData"
                                     class="discovery-orphan-chart"></div>
                             </div>
-                            <div class="discovery-orphan-legend">
-                                <div class="discovery-orphan-legend-item"
+                            <div class="discovery-orphan-legend d-flex flex-column mt-3">
+                                <div class="discovery-orphan-legend-item d-flex align-items-center justify-content-between mb-2"
                                     *ngFor="let item of orphanedDevicesBreakdown; let i = index">
                                     <div class="d-flex align-items-center">
                                         <span class="discovery-orphan-legend-dot"
@@ -1270,7 +1509,8 @@
                             </div>
                         </ng-container>
                         <ng-template #orphanedDevicesBreakdownNoData>
-                            <div class="discovery-chart-empty d-flex align-items-center justify-content-center">
+                            <div
+                                class="discovery-chart-empty d-flex align-items-center justify-content-center text-center text-muted">
                                 No data available
                             </div>
                         </ng-template>
@@ -1281,5 +1521,6 @@
 
     </div>
 
-    <div class="discovery-empty-state" *ngIf="filterLoadFailed">No data available</div>
+    <div class="discovery-empty-state d-flex align-items-center justify-content-center bg-white text-muted"
+        *ngIf="filterLoadFailed">No data available</div>
 </div>

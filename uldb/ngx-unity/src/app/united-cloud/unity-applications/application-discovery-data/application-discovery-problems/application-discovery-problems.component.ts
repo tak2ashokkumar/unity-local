@@ -472,16 +472,16 @@ export class ApplicationDiscoveryProblemsComponent implements OnInit, OnDestroy 
       let obj = Object.assign({}, this.acknowledgeForm.getRawValue());
       let selectedAlertIndex = _clone(this.selectedAlertIndex);
       this.onCloseAlertAcknowledge();
-      this.conditionsViewData[this.selectedConditionIndex].alerts[selectedAlertIndex].isAcknowledged = true;
-      this.svc.onAlertAcknowledge(this.conditionsViewData[this.selectedConditionIndex].alerts[selectedAlertIndex].uuid, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-        this.conditionsViewData[this.selectedConditionIndex].alerts[selectedAlertIndex].isAcknowledged = res.is_acknowledged;
-        this.conditionsViewData[this.selectedConditionIndex].alerts[selectedAlertIndex].acknowledgedTime = res.acknowledged_time;
-        this.conditionsViewData[this.selectedConditionIndex].alerts[selectedAlertIndex].acknowledgedComment = res.acknowledged_comment;
-        this.conditionsViewData[this.selectedConditionIndex].alerts[selectedAlertIndex].acknowledgedBy = res.acknowledged_by;
-        this.conditionsViewData[this.selectedConditionIndex].alerts[selectedAlertIndex].acknowledgedTooltipMsg = `Acknowledged by ${res.acknowledged_by} at ${res.acknowledged_time}`;
+      this.alerts[selectedAlertIndex].isAcknowledged = true;
+      this.svc.onAlertAcknowledge(this.alerts[selectedAlertIndex].uuid, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+        this.alerts[selectedAlertIndex].isAcknowledged = res.is_acknowledged;
+        this.alerts[selectedAlertIndex].acknowledgedTime = res.acknowledged_time;
+        this.alerts[selectedAlertIndex].acknowledgedComment = res.acknowledged_comment;
+        this.alerts[selectedAlertIndex].acknowledgedBy = res.acknowledged_by;
+        this.alerts[selectedAlertIndex].acknowledgedTooltipMsg = `Acknowledged by ${res.acknowledged_by} at ${res.acknowledged_time}`;
         this.spinner.stop('main');
       }, err => {
-        this.conditionsViewData[this.selectedConditionIndex].alerts[selectedAlertIndex].isAcknowledged = false;
+        this.alerts[selectedAlertIndex].isAcknowledged = false;
         this.spinner.stop('main');
         this.notification.error(new Notification('Error while acknowledging an events'));
       });

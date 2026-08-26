@@ -370,77 +370,52 @@ export class CostIntelligenceService {
   }
 
 
-  getDateTimeIntervalsByFrequency(frequency: string): string[] {
-    const now = new Date();
-    const intervals: string[] = [];
+  getCostUtilizationTrendLabels(data: CostUtilizationByMetrics): string[] {
+    const labels = new Set<string>();
+    [
+      data?.metrics?.cpu?.data_points || [],
+      data?.metrics?.memory?.data_points || [],
+      data?.metrics?.storage?.data_points || []
+    ].forEach(points => {
+      points.forEach(point => {
+        if (point.date) {
+          labels.add(point.date);
+        }
+      });
+    });
 
-    const formatDate = (d: Date) => {
-      const day = d.getDate().toString().padStart(2, '0');
-      const month = (d.getMonth() + 1).toString().padStart(2, '0'); // numeric month
-      const year = d.getFullYear().toString(); // last 4 digits
+    return Array.from(labels).sort((a, b) => {
+      const firstDate = new Date(a).getTime();
+      const secondDate = new Date(b).getTime();
 
-      if (frequency === 'daily') {
-        const hour = d.getHours().toString().padStart(2, '0');
-        const minute = d.getMinutes().toString().padStart(2, '0');
-        return `${hour}:${minute}`;
-      } else if (frequency === 'weekly' || frequency === 'monthly') {
-        return `${year}-${month}-${day}`;
-      } else {
-        return d.toISOString(); // fallback
+      if (!isNaN(firstDate) && !isNaN(secondDate)) {
+        return firstDate - secondDate;
       }
-    };
 
-    switch (frequency) {
-      case 'daily':
-        // 24 hourly intervals from start of today
-        const startOfDay = new Date(now);
-        startOfDay.setHours(0, 0, 0, 0);
-        for (let i = 0; i < 24; i++) {
-          const d = new Date(now);
-          d.setHours(now.getHours() - i);
-          intervals.push(formatDate(d));
-        }
-        break;
-
-      case 'weekly':
-        for (let i = 0; i < 7; i++) {
-          const d = new Date(now);
-          d.setDate(now.getDate() - i);
-          intervals.push(formatDate(d));
-        }
-        break;
-
-      case 'monthly':
-        for (let i = 0; i < 30; i++) {
-          const d = new Date(now);
-          d.setDate(now.getDate() - i);
-          intervals.push(formatDate(d));
-        }
-        break;
-
-      default:
-        return [];
-    }
-
-    return intervals.reverse();
+      return a.localeCompare(b);
+    });
   }
 
-  mapMonthlyData(monthlyDates: string[], dataPoints: CostUtilizationDataPoints[]): number[] {
-    // Convert dataPoints array into a lookup map for quick access
+  mapCostUtilizationTrendData(labels: string[], dataPoints: CostUtilizationDataPoints[]): Array<number | null> {
     const dataMap = new Map(
-      dataPoints.map(dp => [dp.date, dp.avg_utilization])
+      (dataPoints || []).map(point => [point.date, point.avg_utilization])
     );
-    // Map generated dates to required format with utilization
-    return monthlyDates.map(label => {
-      return dataMap.get(label) ?? 0;
+
+    return labels.map(label => {
+      if (!dataMap.has(label)) {
+        return null;
+      }
+
+      const value = Number(dataMap.get(label));
+      return isNaN(value) ? null : value;
     });
   }
 
   convertToCostUtilizationByMetricsChartData(data: CostUtilizationByMetrics): UnityChartDetails {
-    const intervals = this.getDateTimeIntervalsByFrequency(data.frequency);
-    const cpuData = this.mapMonthlyData(intervals, data.metrics.cpu.data_points);
-    const memData = this.mapMonthlyData(intervals, data.metrics.memory.data_points);
-    const storageData = this.mapMonthlyData(intervals, data.metrics.storage.data_points);
+    const labels = this.getCostUtilizationTrendLabels(data);
+    const cpuData = this.mapCostUtilizationTrendData(labels, data.metrics.cpu.data_points);
+    const memData = this.mapCostUtilizationTrendData(labels, data.metrics.memory.data_points);
+    const storageData = this.mapCostUtilizationTrendData(labels, data.metrics.storage.data_points);
 
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.LINE;
@@ -461,10 +436,11 @@ export class CostIntelligenceService {
       bottom: 5,
       data: ['CPU', 'Memory', 'Storage'],
     }
+    view.options.color = ['#5470C6', '#91CC75', '#FAC858'];
     view.options.xAxis = {
       type: 'category',
       boundaryGap: false,
-      data: intervals,
+      data: labels,
       axisLabel: {
         rotate: 35
       }
@@ -489,7 +465,8 @@ export class CostIntelligenceService {
         type: 'line',
         smooth: true,
         symbol: 'none',
-        lineStyle: { color: '#3296FF' },
+        itemStyle: { color: '#5470C6' },
+        lineStyle: { color: '#5470C6' },
         data: cpuData
       },
       {
@@ -497,7 +474,8 @@ export class CostIntelligenceService {
         type: 'line',
         smooth: true,
         symbol: 'none',
-        lineStyle: { color: '#6C4EE3' },
+        itemStyle: { color: '#91CC75' },
+        lineStyle: { color: '#91CC75' },
         data: memData
       },
       {
@@ -505,7 +483,8 @@ export class CostIntelligenceService {
         type: 'line',
         smooth: true,
         symbol: 'none',
-        lineStyle: { color: '#002D62' },
+        itemStyle: { color: '#FAC858' },
+        lineStyle: { color: '#FAC858' },
         data: storageData
       }
     ]

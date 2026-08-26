@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DeviceDiscoveryScanOpService, DeviceDiscoveryScanOpViewdata } from './device-discovery-scan-op.service';
 import { Subject } from 'rxjs';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -14,7 +14,7 @@ import { DOWNLOAD_SCAN_RESULT } from 'src/app/shared/api-endpoint.const';
   styleUrls: ['./device-discovery-scan-op.component.scss'],
   providers: [DeviceDiscoveryScanOpService]
 })
-export class DeviceDiscoveryScanOpComponent implements OnInit {
+export class DeviceDiscoveryScanOpComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   viewData: DeviceDiscoveryScanOpViewdata[] = [];
   count: number = 0;

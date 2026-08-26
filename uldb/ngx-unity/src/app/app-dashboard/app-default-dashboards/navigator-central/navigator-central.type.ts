@@ -99,6 +99,7 @@ export interface UnifiedAiopsAlertSource {
 
 export interface UnifiedAiopsGeoCell {
   name: string;
+  cloudType: string;
   color: string;
   value: number[];
   totalResources: number;
@@ -109,6 +110,19 @@ export interface UnifiedAiopsGeoCell {
   computeCount: number;
   platformServices: number;
   otherServices: number;
+}
+
+export interface UnifiedAiopsGeoDistributionSummary {
+  totalLocations: number;
+  totalResources: number;
+  totalAlerts: number;
+}
+
+export interface UnifiedAiopsGeoDistributionLegendItem {
+  key: string;
+  label: string;
+  count: number;
+  color: string;
 }
 
 export interface UnifiedAiopsLegendMetric {
@@ -625,7 +639,9 @@ export interface UnifiedAiopsExecCardConfig {
   link?: string;
   chipConfigs?: UnifiedAiopsExecChipConfig[];
   subArrayKeys?: string[];
+  fallbackSubArrayKeys?: string[];
   subItems?: UnifiedAiopsExecItemConfig[];
+  dynamicSubCards?: boolean;
 }
 
 export interface UnifiedAiopsExecTileConfig {
@@ -653,8 +669,21 @@ export interface UnifiedAiopsExecGroupConfig {
 // -----End----- Navigator Central Executive Summary (redesign) view-model + config -------------------
 
 // -----Start----- Navigator Central Private Cloud Geo Distribution -------------------
-// One marker per private cloud site (positioned at its datacenter), colored by platform and sized by
-// total resources. Mirrors the Datacenter Geographies map; only the markers / info windows differ.
+export interface UnifiedAiopsPrivateCloudGeoResourceRow {
+  key: string;
+  label: string;
+  count: number;
+  iconClass: string;
+  iconColor: string;
+}
+
+export interface UnifiedAiopsPrivateCloudGeoLegendItem {
+  key: string;
+  label: string;
+  count: number;
+  color: string;
+}
+
 export interface UnifiedAiopsPrivateCloudGeoSite {
   key: string;
   cloudName: string;
@@ -676,9 +705,11 @@ export interface UnifiedAiopsPrivateCloudGeoSite {
   networkCount: number;
   hypervisorCount: number;
   baremetalCount: number;
+  resourceRows: UnifiedAiopsPrivateCloudGeoResourceRow[];
 }
 
 export interface UnifiedAiopsPrivateCloudGeoView {
+  totalPrivateClouds: number;
   totalDatacenters: number;
   totalResources: number;
   totalAlerts: number;
@@ -694,8 +725,6 @@ export interface UnifiedAiopsNewVmRow {
   id: string;
   uuid: string;
   name: string;
-  status: string;
-  statusTone: UnifiedAiopsTone;
   vmState: string;
   vmStateTone: UnifiedAiopsTone;
   osName: string;
@@ -711,15 +740,23 @@ export interface UnifiedAiopsNewVmRow {
 export interface UnifiedAiopsNewVmsView {
   rows: UnifiedAiopsNewVmRow[];
   total: number;
+  filters: UnifiedAiopsNewVmsFilterOptions;
+}
+
+export interface UnifiedAiopsNewVmsFilterOptions {
+  cloudType: UnifiedAiopsFilterOption[];
+  vmState: UnifiedAiopsFilterOption[];
+  lifecycleStage: UnifiedAiopsFilterOption[];
+  lifecycleStageStatus: UnifiedAiopsFilterOption[];
 }
 
 // The Newly Provisioned VMs widget-local filters (in addition to the global top filters).
 export interface UnifiedAiopsNewVmsFilter {
   search?: string;
   cloudPlatform?: string;
-  status?: string;
   vmState?: string;
   lifecycleStage?: string;
   lifecycleStageStatus?: string;
+  ordering?: string;
 }
 // -----End----- Navigator Central Newly Provisioned VMs -------------------

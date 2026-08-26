@@ -154,7 +154,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   tags: PublicCloudTagItem[] = [];
   geoHeatmapOptions: EChartsOption = {};
   publicCloudCoverageGroups: PublicCloudCoverageGroup[] = [];
+  publicCloudCoverageGroupsSource: PublicCloudCoverageGroup[] = [];
   publicCloudCoverageTotal = '0';
+  publicCloudCoverageSortOrder: 'asc' | 'desc' = 'asc';
   performanceHotspots: PublicCloudPerformanceHotspotRow[] = [];
   performanceHotspotsSort = PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT;
   performanceHotspotsLoaded = false;
@@ -578,15 +580,40 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   getPublicCloudCoverage(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.publicCloudCoverageGroups = [];
+    this.publicCloudCoverageGroupsSource = [];
     this.publicCloudCoverageTotal = '0';
     this.widgetLoading.publicCloudCoverage = true;
     this.loadWidget(this.loaderNames.publicCloudCoverage, this.svc.getPublicCloudCoverage(filterFormOutput), res => {
-      this.publicCloudCoverageGroups = this.svc.convertToCoverageGroupsViewData(res);
+      this.publicCloudCoverageGroupsSource = this.svc.convertToCoverageGroupsViewData(res);
+      this.publicCloudCoverageGroups = this.getSortedPublicCloudCoverageGroups(this.publicCloudCoverageGroupsSource);
       this.publicCloudCoverageTotal = this.svc.getCoverageGroupsResourceTotal(this.publicCloudCoverageGroups);
     }, () => {
       this.publicCloudCoverageGroups = [];
+      this.publicCloudCoverageGroupsSource = [];
       this.publicCloudCoverageTotal = '0';
     }, () => this.widgetLoading.publicCloudCoverage = false);
+  }
+
+  onPublicCloudCoverageSortChange(order: 'asc' | 'desc') {
+    if (this.publicCloudCoverageSortOrder === order) {
+      return;
+    }
+
+    this.publicCloudCoverageSortOrder = order;
+    this.publicCloudCoverageGroups = this.getSortedPublicCloudCoverageGroups(this.publicCloudCoverageGroupsSource);
+  }
+
+  private getSortedPublicCloudCoverageGroups(groups: PublicCloudCoverageGroup[]): PublicCloudCoverageGroup[] {
+    const sortDirection = this.publicCloudCoverageSortOrder === 'asc' ? 1 : -1;
+    return (groups || []).map(group => ({
+      ...group,
+      cards: (group.cards || []).map(card => ({
+        ...card,
+        rows: (card.rows || []).slice().sort((first, second) =>
+          String(first.label || '').localeCompare(String(second.label || ''), undefined, { sensitivity: 'base' }) * sortDirection
+        )
+      }))
+    }));
   }
 
   getPerformanceHotspots(filterFormOutput: PublicCloudDashboardFilterCriteria) {
@@ -603,15 +630,22 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   }
 
   sortPerformanceHotspots(sortKey: string) {
-    if (this.performanceHotspotsSort === sortKey) {
-      return;
-    }
-    this.performanceHotspotsSort = sortKey;
+    this.performanceHotspotsSort = this.getPerformanceHotspotSortKey(this.performanceHotspotsSort) === sortKey && this.performanceHotspotsSort === sortKey
+      ? `-${sortKey}`
+      : sortKey;
     this.getPerformanceHotspots(this.appliedFilterCriteria);
   }
 
   isHotspotSortActive(sortKey: string): boolean {
-    return this.performanceHotspotsSort === sortKey;
+    return this.getPerformanceHotspotSortKey(this.performanceHotspotsSort) === sortKey;
+  }
+
+  getHotspotSortIcon(sortKey: string): string {
+    return this.performanceHotspotsSort === `-${sortKey}` ? 'fas fa-caret-up' : 'fas fa-caret-down';
+  }
+
+  private getPerformanceHotspotSortKey(sortKey: string): string {
+    return String(sortKey || '').replace(/^-/, '');
   }
 
   getDatabaseOverview(filterFormOutput: PublicCloudDashboardFilterCriteria) {
@@ -682,8 +716,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.storagePerformanceCards = results.map((res, index) => {
         const metric = PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS[index];
         return metric.kind === 'highLatency'
-          ? this.svc.convertToStorageHighLatencyCard(res, metric.color)
-          : this.svc.convertToStorageTrendCard(res, metric.color);
+          ? this.svc.convertToStorageHighLatencyCard(res, metric.color, metric.title)
+          : this.svc.convertToStorageTrendCard(res, metric.color, metric.title);
       }).filter(card => card.hasData);
     }, () => {
       this.storagePerformanceCards = [];
@@ -898,6 +932,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.clearInventorySummaryViewData();
     this.geoHeatmapOptions = {};
     this.publicCloudCoverageGroups = [];
+    this.publicCloudCoverageGroupsSource = [];
     this.publicCloudCoverageTotal = '0';
     this.performanceHotspots = [];
     this.performanceHotspotsLoaded = false;

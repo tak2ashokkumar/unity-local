@@ -3,6 +3,8 @@ import { DeviceMonitoringType } from "src/app/shared/SharedEntityTypes/devices-m
 import { SNMPCrudType } from "./snmp-crud.type";
 import { DeviceInterface } from 'src/app/shared/SharedEntityTypes/inventory-attributes.type';
 import { UnityCredentialsFast } from 'src/app/shared/SharedEntityTypes/unity-credentials.type';
+import { PrivateCloudRemoteWebAccessType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
+
 export interface Hypervisor extends SNMPCrudType {
     url: string;
     id: number;
@@ -72,6 +74,8 @@ export interface Hypervisor extends SNMPCrudType {
     cpu_usage?: HypervisorUsageType;
     memory_usage?: HypervisorUsageType;
     storage_usage?: HypervisorUsageType;
+    remote_web_access?: PrivateCloudRemoteWebAccessType;
+    actions_in_progress?: HypervisorActionsInProgressType;
     custom_attribute_data?: { [key: string]: any };
     life_cycle_stage: string;
     life_cycle_stage_status: string;
@@ -189,6 +193,7 @@ export interface ServerPrivateCloud {
 export interface CollectorType {
     name: string;
     uuid: string;
+    is_ztc: boolean;
 }
 export interface CredentialType {
     uuid: string;
@@ -205,4 +210,9 @@ export interface HypervisorUsageType {
 export interface HypervisorUsageValueUnitType {
     value: number;
     unit: string;
+}
+
+export interface HypervisorActionsInProgressType {
+    power_on: boolean;
+    power_off: boolean;
 }

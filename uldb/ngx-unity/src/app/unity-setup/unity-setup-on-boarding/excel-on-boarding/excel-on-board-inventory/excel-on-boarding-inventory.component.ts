@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -15,7 +15,7 @@ import { ExcelOnboardingInventoryViewdata, ExcelOnBoardingInventoryService } fro
   styleUrls: ['./excel-on-boarding-inventory.component.scss'],
   providers: [ExcelOnBoardingInventoryService]
 })
-export class ExcelOnBoardingInventoryComponent implements OnInit {
+export class ExcelOnBoardingInventoryComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   viewData: ExcelOnboardingInventoryViewdata = new ExcelOnboardingInventoryViewdata();
 

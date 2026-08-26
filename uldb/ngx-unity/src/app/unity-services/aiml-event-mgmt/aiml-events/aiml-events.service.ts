@@ -9,6 +9,7 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { AIOPS_DEVICE_TYPES } from '../../aiml/aiml.component';
+import { AIMLEventMgmtDateRangeParams, AimlEventMgmtService } from '../aiml-event-mgmt.service';
 import { TableColumnMapping } from '../../green-it/green-it-usage/green-it-usage.service';
 import { AIMLEventDisableTriggerType, AIMLEventResolveType, AIMLEvents, AIMLEventsSummary } from './aiml-events.type';
 
@@ -18,11 +19,11 @@ export class AimlEventsService {
   constructor(private http: HttpClient,
     private utilSvc: AppUtilityService,
     private tableService: TableApiServiceService,
+    private aimlMgmtSvc: AimlEventMgmtService,
     private builder: FormBuilder) { }
 
-  getEventSummary() {
-    let params: HttpParams = new HttpParams();
-    params = params.append('last_n_days', 7);
+  getEventSummary(dateRangeParams?: AIMLEventMgmtDateRangeParams) {
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(new HttpParams(), dateRangeParams);
     return this.http.get<AIMLEventsSummary>(GET_AIOPS_EVENT_SUMMARY(), { params: params });
   }
 
@@ -35,8 +36,8 @@ export class AimlEventsService {
     });
   }
 
-  getEvents(criteria: SearchCriteria, filterData: any) {
-    let params: HttpParams = this.tableService.getWithParam(criteria);
+  getEvents(criteria: SearchCriteria, filterData: any, dateRangeParams?: AIMLEventMgmtDateRangeParams) {
+    let params: HttpParams = this.aimlMgmtSvc.appendDateRangeParams(this.tableService.getWithParam(criteria), dateRangeParams);
     Object.keys(filterData).forEach(key => {
       if (filterData[key] && filterData[key].length) {
         if (Array.isArray(filterData[key])) {

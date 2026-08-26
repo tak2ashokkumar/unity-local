@@ -1,18 +1,21 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EMPTY, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
+import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { DEVICE_DATA_BY_DEVICE_TYPE, DEVICE_LIST_BY_DEVICE_TYPE, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
-import { AppUtilityService, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, DeviceMapping, NoWhitespaceValidator, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DevicePopoverData } from '../devices-popover/device-popover-data';
+import { PrivateCloudRemoteWebAccessType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { Hypervisor, HypervisorUsageType } from '../entities/hypervisor.type';
 import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
 
@@ -20,6 +23,7 @@ import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
 export class HypervisorsService {
 
   constructor(private http: HttpClient,
+    private builder: FormBuilder,
     private utilService: AppUtilityService,
     private tableService: TableApiServiceService,
     private user: UserInfoService) { }
@@ -70,7 +74,12 @@ export class HypervisorsService {
       a.virtualizationType = d.instance.virtualization_type ? d.instance.virtualization_type : 'N/A';
       a.name = d.name;
       a.monitoring = d.monitoring;
+      a.collectorUuid = d.collector?.uuid;
+      a.isCollectorZtc = d.collector?.is_ztc;
       a.tags = d.tags.filter(tg => tg);
+      a.remoteWebAccess = d.remote_web_access;
+      a.showRemoteWebAccessButton = !!d.remote_web_access?.can_create_session;
+      a.newTabTooltipMessage = d.remote_web_access?.message || 'Remote web access unavailable';
       if (d.instance.os) {
         a.hasOS = true;
         a.platformType = d.instance.os.platform_type ? d.instance.os.platform_type : 'N/A';
@@ -95,6 +104,10 @@ export class HypervisorsService {
       } else {
         a.isESXIHypervisor = d.instance.virtualization_type == PlatFormMapping.ESXI;
       }
+      a.isHyperVHypervisor = this.isHyperVHypervisor(d);
+      a.powerStatus = d.last_known_state;
+      a.powerOnInProgress = !!d.actions_in_progress?.power_on;
+      a.powerOffInProgress = !!d.actions_in_progress?.power_off;
 
       if (clusterId) {
         a.resetPasswordTooltip = a.isESXIHypervisor ? 'Reset Password' : 'Reset password is available only for ESXI Hosts';
@@ -114,6 +127,17 @@ export class HypervisorsService {
       viewData.push(a);
     });
     return viewData;
+  }
+
+  private isHyperVHypervisor(hypervisor: Hypervisor): boolean {
+    return [
+      hypervisor.private_cloud?.platform_type,
+      hypervisor.instance?.virtualization_type
+    ].some(type => this.normalizePlatformType(type) == 'hyperv' || this.normalizePlatformType(type) == 'hypev');
+  }
+
+  private normalizePlatformType(type?: string): string {
+    return type ? type.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
   }
 
   private getUsageData(d: HypervisorUsageType) {
@@ -183,8 +207,13 @@ export class HypervisorsService {
     viewData.isNewTabEnabled = (!viewData.managementIP.match('N/A') && viewData.hasOS && (viewData.platformType.match('Windows') || viewData.platformType.match('Linux'))) ? true : false;
     if (viewData.isNewTabEnabled && viewData.hasOS) {
       switch (viewData.platformType) {
-        case 'Windows': viewData.newTabTootipMessage = 'Open In New Tab';
-          viewData.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), viewData.managementIP) : WINDOWS_CONSOLE_CLIENT(viewData.managementIP);
+        case 'Windows':
+          viewData.newTabTootipMessage = 'Open In New Tab';
+          if (viewData.isCollectorZtc) {
+            viewData.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(viewData.collectorUuid, viewData.managementIP)}`;
+          } else {
+            viewData.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), viewData.managementIP) : WINDOWS_CONSOLE_CLIENT(viewData.managementIP);
+          }
           break;
         case 'Hyper-V': viewData.newTabTootipMessage = 'Open In New Tab';
           viewData.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), viewData.managementIP) : WINDOWS_CONSOLE_CLIENT(viewData.managementIP);
@@ -210,6 +239,36 @@ export class HypervisorsService {
     };
   }
 
+  resetPowerAuthFormErrors(): HypervisorPowerAuthFormErrors {
+    return {
+      username: '',
+      password: '',
+      nonFieldErr: ''
+    };
+  }
+
+  powerAuthValidationMessages: Record<string, Record<string, string>> = {
+    username: {
+      required: 'Username is required'
+    },
+    password: {
+      required: 'Password is required'
+    }
+  };
+
+  buildPowerAuthForm(uuid: string): FormGroup {
+    return this.builder.group({
+      uuid: [uuid],
+      username: ['', [Validators.required, NoWhitespaceValidator]],
+      password: ['', [Validators.required, NoWhitespaceValidator]]
+    });
+  }
+
+  toggleHyperVHypervisorPower(data: HypervisorPowerTogglePayload, currentPowerStatus: boolean): Observable<CeleryTask> {
+    const powerStatus = currentPowerStatus ? 'power_off' : 'power_on';
+    return this.http.post<CeleryTask>(`customer/hyperv/hypervisors/${data.uuid}/${powerStatus}/`, data);
+  }
+
   deleteMulitpleHypervisors(uuids: string[]) {
     let params: HttpParams = new HttpParams();
     uuids.map(uuid => params = params.append('uuids', uuid));
@@ -226,6 +285,9 @@ export class HypervisorsService {
 
 
 export class HypervisorViewData {
+  private static readonly POWER_ON_STATES = ['poweredon', 'active', 'running', 'vmrunning', 'run', 'on', 'up'];
+  private static readonly POWER_OFF_STATES = ['poweredoff', 'shutoff', 'stopped', 'vmstopped', 'terminated', 'off', 'down'];
+
   deviceId: string;
   name: string;
   deviceStatus: string;
@@ -244,9 +306,13 @@ export class HypervisorViewData {
   newTabWebAccessUrl: string;
   newTabConsoleAccessUrl: string;
   newTabTootipMessage: string;
+  remoteWebAccess?: PrivateCloudRemoteWebAccessType;
+  newTabTooltipMessage: string = 'Remote web access unavailable';
+  showRemoteWebAccessButton: boolean = false;
   statsTooltipMessage: string;
 
   isESXIHypervisor: boolean;
+  isHyperVHypervisor: boolean;
   resetPasswordTooltip: string;
   monitoring: DeviceMonitoringType;
   tags: string[];
@@ -257,7 +323,93 @@ export class HypervisorViewData {
 
   isSelected: boolean;
 
+  collectorUuid: string;
+  isCollectorZtc: boolean;
+  private _powerStatus: string = '';
+  private _powerOnInProgress: boolean = false;
+  private _powerOffInProgress: boolean = false;
+
   constructor() { };
+
+  set powerStatus(status: string) {
+    this._powerStatus = status;
+  }
+
+  get powerStatus(): string {
+    if (this.powerInProgress) {
+      return this._powerOffInProgress ? 'Stopping' : 'Starting';
+    }
+    if (this.powerStatusOn) {
+      return 'Up';
+    }
+    if (this.powerStatusOff) {
+      return 'Down';
+    }
+    return 'Unknown';
+  }
+
+  set powerOnInProgress(powerOnInProgress: boolean) {
+    this._powerOnInProgress = powerOnInProgress;
+  }
+
+  set powerOffInProgress(powerOffInProgress: boolean) {
+    this._powerOffInProgress = powerOffInProgress;
+  }
+
+  get powerStatusOn(): boolean {
+    return HypervisorViewData.POWER_ON_STATES.includes(this.normalizedPowerStatus);
+  }
+
+  get powerIcon(): string {
+    return this.powerInProgress ? 'fa fa-spinner fa-spin' : 'fa-power-off';
+  }
+
+  get powerIconEnabled(): boolean {
+    // return this.isHyperVHypervisor && this.powerStatusKnown && !this.powerInProgress;
+    return this.isHyperVHypervisor && !this.powerInProgress;
+  }
+
+  get powerIconMsg(): string {
+    if (this.powerInProgress) {
+      return this._powerOffInProgress ? 'Stopping' : 'Starting';
+    }
+    if (!this.powerStatusKnown) {
+      return 'Power status unavailable';
+    }
+    return this.powerStatusOn ? 'Power Off' : 'Power On';
+  }
+
+  setPowerInProgress(): void {
+    if (this.powerStatusOn) {
+      this._powerOffInProgress = true;
+      this._powerOnInProgress = false;
+    } else {
+      this._powerOnInProgress = true;
+      this._powerOffInProgress = false;
+    }
+    this._powerStatus = '';
+  }
+
+  clearPowerInProgress(): void {
+    this._powerOnInProgress = false;
+    this._powerOffInProgress = false;
+  }
+
+  private get powerStatusOff(): boolean {
+    return HypervisorViewData.POWER_OFF_STATES.includes(this.normalizedPowerStatus);
+  }
+
+  private get powerStatusKnown(): boolean {
+    return this.powerStatusOn || this.powerStatusOff;
+  }
+
+  private get powerInProgress(): boolean {
+    return this._powerOnInProgress || this._powerOffInProgress;
+  }
+
+  private get normalizedPowerStatus(): string {
+    return this._powerStatus ? this._powerStatus.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+  }
 }
 
 export class HypervisorUsageViewData {
@@ -271,4 +423,17 @@ export class HypervisorUsageViewData {
   availablePercentageValue: number;
   usedBarColor: string;
   constructor() { }
+}
+
+export interface HypervisorPowerTogglePayload {
+  uuid: string;
+  username: string;
+  password: string;
+}
+
+export interface HypervisorPowerAuthFormErrors {
+  [key: string]: string;
+  username: string;
+  password: string;
+  nonFieldErr: string;
 }

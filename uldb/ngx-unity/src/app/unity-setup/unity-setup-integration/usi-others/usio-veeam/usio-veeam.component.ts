@@ -105,6 +105,7 @@ export class UsioVeeamComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.deleteModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

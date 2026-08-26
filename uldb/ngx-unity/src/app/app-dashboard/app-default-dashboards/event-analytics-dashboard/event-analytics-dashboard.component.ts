@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EChartsOption } from 'echarts';
@@ -15,9 +15,6 @@ import { ColumnSortedEvent } from 'src/app/shared/table-functionality/sortable-c
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import {
-  EVENT_ANALYTICS_ALL_DATACENTER_VALUE,
-  EVENT_ANALYTICS_ALL_SEVERITY_VALUE,
-  EVENT_ANALYTICS_ALL_SOURCE_VALUE,
   EVENT_ANALYTICS_CUSTOM_TIMELINE_VALUE,
   EVENT_ANALYTICS_TREND_ALERT_TYPE_OPTIONS
 } from './event-analytics-dashboard.const';
@@ -25,6 +22,7 @@ import { EventAnalyticsDashboardService } from './event-analytics-dashboard.serv
 import {
   EventAlertAnalyticsApiResponse,
   DashboardFilterCriteria,
+  DashboardFilterOptionValue,
   DashboardFilters,
   DashboardHeader,
   EventAnalyticsTone,
@@ -57,7 +55,6 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
   trendTimelineOptions: SelectOption[] = [];
   eventDeviceCategoryOptions: SelectOption[] = [];
   alertSegregationCategoryOptions: SelectOption[] = [];
-  analyticsCategoryOptions: SelectOption[] = [];
   noisyEventsCategoryOptions: SelectOption[] = [];
   noisyHostsCategoryOptions: SelectOption[] = [];
   incidentCategoryOptions: SelectOption[] = [];
@@ -68,6 +65,7 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
   analyticsSeverityTypeOptions: SelectOption[] = [];
   analyticsDatacenterOptions: SelectOption[] = [];
   analyticsCloudOptions: SelectOption[] = [];
+  analyticsDeviceTypeOptions: SelectOption[] = [];
   eventAndAlertTimelineOptions: SelectOption[] = [];
   timeRangeDropdownOptions: DateRangeOption[] = [];
   trendTimelineDropdownOptions: DateRangeOption[] = [];
@@ -92,6 +90,9 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
   eventReductionFlowOptions: EChartsOption;
   incidentResolutionFlowOptions: EChartsOption;
   private eventAlertAnalyticsResponse: EventAlertAnalyticsApiResponse | null = null;
+  private analyticsFilterSnapshot = '';
+  private analyticsSourceTypesSeeded = false;
+  private analyticsDeviceTypesSeeded = false;
 
   noisyEvents: NoisyEventRowViewData[] = [];
   noisyHosts: NoisyEventRowViewData[] = [];
@@ -158,11 +159,42 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     allSelected: 'All'
   };
 
+  analyticsMultiselectSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: 'label',
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-sm btn-block shadow-none',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    selectAsObject: true,
+    maxHeight: '240px'
+  };
+
+  analyticsMultiselectTexts: IMultiSelectTexts = {
+    checkAll: 'Select all',
+    uncheckAll: 'Unselect all',
+    checked: 'item selected',
+    checkedPlural: 'items selected',
+    searchPlaceholder: 'Find',
+    defaultTitle: 'Select',
+    allSelected: 'All Selected'
+  };
+
+  analyticsSourceTypeTexts: IMultiSelectTexts = { ...this.analyticsMultiselectTexts, defaultTitle: 'All Source', allSelected: 'All Source' };
+  analyticsSeverityTypeTexts: IMultiSelectTexts = { ...this.analyticsMultiselectTexts, defaultTitle: 'All Severity', allSelected: 'All Severity' };
+  analyticsDatacenterTexts: IMultiSelectTexts = { ...this.analyticsMultiselectTexts, defaultTitle: 'All Datacenter', allSelected: 'All Datacenter' };
+  analyticsCloudTexts: IMultiSelectTexts = { ...this.analyticsMultiselectTexts, defaultTitle: 'All Cloud', allSelected: 'All Cloud' };
+  analyticsDeviceTypeTexts: IMultiSelectTexts = { ...this.analyticsMultiselectTexts, defaultTitle: 'All Devices', allSelected: 'All Devices' };
+
   constructor(private svc: EventAnalyticsDashboardService,
     private router: Router,
     private route: ActivatedRoute,
     private location: Location,
     private spinnerService: AppSpinnerService,
+    private cdr: ChangeDetectorRef,
     private notification: AppNotificationService) { }
 
   ngOnInit(): void {
@@ -217,6 +249,16 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
 
   onAnalyticsFilterChange() {
     this.getEventAlertAnalytics(this.getFilterCriteria());
+  }
+
+  onAnalyticsFilterOpen() {
+    this.analyticsFilterSnapshot = this.getAnalyticsCriteriaKey(this.getFilterCriteria());
+  }
+
+  onAnalyticsFilterClose() {
+    if (this.getAnalyticsCriteriaKey(this.getFilterCriteria()) !== this.analyticsFilterSnapshot) {
+      this.getEventAlertAnalytics(this.getFilterCriteria());
+    }
   }
 
   onEventAndAlertTimelineDropdownSubmit(event: DateRangeSubmitPayload) {
@@ -323,18 +365,23 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
         this.notification.error(new Notification('Failed to get event analytics filters. Try again later.'));
         return of(null);
       })),
-      datacenters: this.svc.getAnalyticsDatacenters().pipe(catchError(() => of(this.svc.getFallbackAnalyticsDatacenters())))
+      datacenters: this.svc.getAnalyticsDatacenters().pipe(catchError(() => of(this.svc.getFallbackAnalyticsDatacenters()))),
+      clouds: this.svc.getAnalyticsClouds().pipe(catchError(() => of([])))
     }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       const filters = {
         ...(res.filters ? this.svc.buildDashboardFilters(res.filters) : this.svc.getDefaultDashboardFilters()),
-        analyticsDatacenter: res.datacenters
+        analyticsDatacenter: res.datacenters,
+        analyticsCloud: res.clouds
       };
       this.applyDashboardFilters(filters);
       this.buildFilterForm(filters);
+      this.analyticsSourceTypesSeeded = false;
+      this.analyticsDeviceTypesSeeded = false;
       this.ensureFilterSelections();
       this.syncCustomTimelineControls();
       this.syncTrendCustomTimelineControls();
       this.syncEventAndAlertTimelineControls();
+      this.cdr.detectChanges();
       this.loadData();
     });
   }
@@ -476,30 +523,18 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     this.eventAlertAnalyticsResponse = null;
     this.eventReductionFlowOptions = null;
     this.incidentResolutionFlowOptions = null;
+    this.getEventAlertAnalyticsFilterOptions(criteria);
     this.loadWidget(this.loaderNames.eventAlertAnalytics, this.svc.getEventAlertAnalytics(criteria), res => {
       this.eventAlertAnalyticsResponse = res;
       const metricGroups = this.svc.convertToEventAlertAnalyticsMetricGroups(res);
       this.eventAlertAnalyticsLeftMetrics = metricGroups.left;
       this.eventAlertAnalyticsRightMetrics = metricGroups.right;
-      this.analyticsViewByOptions = res.viewOptions?.length ? res.viewOptions : this.analyticsViewByOptions;
-      if ((criteria.analyticsViewBy || res.viewBy) === 'source') {
-        this.analyticsSourceTypeOptions = this.svc.getAnalyticsSourceTypeOptions(res.rows);
-      }
       this.analyticsSeverityTypeOptions = this.svc.getAnalyticsSeverityTypeOptions();
-      this.analyticsCloudOptions = res.cloudOptions?.length ? res.cloudOptions : this.analyticsCloudOptions;
-      this.analyticsCategoryOptions = this.svc.getCategoryOptions(res.categoryOptions);
-      if (res.timeRangeOptions?.length) {
-        const eventAndAlertTimelineOptions = this.svc.getTimeRangeOptions(res.timeRangeOptions);
-        this.eventAndAlertTimelineOptions = eventAndAlertTimelineOptions;
-        this.eventAndAlertTimelineDropdownOptions = this.getDateDropdownOptions(eventAndAlertTimelineOptions);
-      }
       this.ensureSelectSelection('analyticsViewBy', this.analyticsViewByOptions, criteria.analyticsViewBy || res.viewBy);
-      this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, criteria.analyticsSourceType);
-      this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, criteria.analyticsSeverityType);
-      this.ensureSelectSelection('analyticsDatacenter', this.analyticsDatacenterOptions, criteria.analyticsDatacenter);
-      this.ensureSelectSelection('analyticsCloud', this.analyticsCloudOptions, criteria.analyticsCloud);
-      this.ensureSelectSelection('analyticsCategory', this.analyticsCategoryOptions, this.svc.getActiveCategory(res.activeCategory, criteria.analyticsCategory));
-      this.ensureSelectSelection('eventAndAlertTimeline', this.eventAndAlertTimelineOptions, this.svc.getActiveTimeRange(res.activeTimeRange, criteria.eventAndAlertTimeline));
+      this.setMultiSelectSelection('analyticsSeverityTypes', this.analyticsSeverityTypeOptions, this.getValuesFromOptions(criteria.analyticsSeverityTypes), false);
+      this.setMultiSelectSelection('analyticsDatacenters', this.analyticsDatacenterOptions, this.getValuesFromOptions(criteria.analyticsDatacenters), false);
+      this.setMultiSelectSelection('analyticsClouds', this.analyticsCloudOptions, this.getValuesFromOptions(criteria.analyticsClouds), false);
+      this.ensureSelectSelection('eventAndAlertTimeline', this.eventAndAlertTimelineOptions, criteria.eventAndAlertTimeline);
       this.applyEventAlertAnalyticsView();
     }, () => {
       this.eventAlertAnalyticsResponse = null;
@@ -532,12 +567,46 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.selectedAnalyticsViewBy === 'source') {
-      this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, EVENT_ANALYTICS_ALL_SOURCE_VALUE);
-      this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, EVENT_ANALYTICS_ALL_SEVERITY_VALUE);
+      this.setMultiSelectSelection('analyticsSourceTypes', this.analyticsSourceTypeOptions);
+      this.setMultiSelectSelection('analyticsSeverityTypes', this.analyticsSeverityTypeOptions);
       return;
     }
-    this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, EVENT_ANALYTICS_ALL_SEVERITY_VALUE);
-    this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, EVENT_ANALYTICS_ALL_SOURCE_VALUE);
+    this.setMultiSelectSelection('analyticsSeverityTypes', this.analyticsSeverityTypeOptions);
+    this.setMultiSelectSelection('analyticsSourceTypes', this.analyticsSourceTypeOptions);
+  }
+
+  private getEventAlertAnalyticsFilterOptions(criteria: DashboardFilterCriteria): void {
+    const optionsCriteria: DashboardFilterCriteria = {
+      ...criteria,
+      analyticsViewBy: 'source',
+      analyticsSourceTypes: [],
+      analyticsSeverityTypes: [],
+      analyticsDeviceTypes: []
+    };
+    this.svc.getEventAlertAnalyticsFilterOptions(optionsCriteria)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(options => {
+        const sourceTypeOptions = options?.sourceTypeOptions || [];
+        const selectedSourceValues = this.analyticsSourceTypesSeeded
+          ? this.getValuesFromOptions(this.filterForm?.get('analyticsSourceTypes')?.value || [])
+          : sourceTypeOptions.map(option => option.value);
+        this.analyticsSourceTypesSeeded = true;
+        this.analyticsSourceTypeOptions = sourceTypeOptions;
+        this.setMultiSelectSelection('analyticsSourceTypes', sourceTypeOptions, selectedSourceValues, false);
+
+        const deviceTypeOptions = options?.deviceTypeOptions || [];
+        const selectedDeviceValues = this.analyticsDeviceTypesSeeded
+          ? this.getValuesFromOptions(this.filterForm?.get('analyticsDeviceTypes')?.value || [])
+          : deviceTypeOptions.map(option => option.value);
+        this.analyticsDeviceTypesSeeded = true;
+        this.analyticsDeviceTypeOptions = deviceTypeOptions;
+        this.setMultiSelectSelection('analyticsDeviceTypes', deviceTypeOptions, selectedDeviceValues, false);
+      }, () => {
+        this.analyticsSourceTypeOptions = [];
+        this.analyticsDeviceTypeOptions = [];
+        this.setMultiSelectSelection('analyticsSourceTypes', [], [], false);
+        this.setMultiSelectSelection('analyticsDeviceTypes', [], [], false);
+      });
   }
 
   getNoisyEvents(criteria: DashboardFilterCriteria) {
@@ -746,7 +815,7 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     this.analyticsSeverityTypeOptions = filters?.analyticsSeverityType || [];
     this.analyticsDatacenterOptions = filters?.analyticsDatacenter || [];
     this.analyticsCloudOptions = filters?.analyticsCloud || [];
-    this.analyticsCategoryOptions = this.svc.getCategoryOptions();
+    this.analyticsDeviceTypeOptions = filters?.analyticsDeviceTypes || [];
     this.eventAndAlertTimelineOptions = filters?.eventAndAlertTimeline || [];
     this.eventAndAlertTimelineDropdownOptions = this.getDateDropdownOptions(this.eventAndAlertTimelineOptions);
     this.noisyEventsCategoryOptions = this.svc.getCategoryOptions();
@@ -762,18 +831,62 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     return this.filterForm?.getRawValue();
   }
 
+  private getValuesFromOptions(options: DashboardFilterOptionValue[]): string[] {
+    return (options || [])
+      .map((item: DashboardFilterOptionValue) => typeof item === 'string' ? item : item?.value)
+      .filter((value: string | undefined) => !!value) as string[];
+  }
+
+  private setMultiSelectSelection(
+    controlName: string,
+    options: SelectOption[],
+    preferredValues?: string[],
+    selectAllWhenEmpty = true
+  ): void {
+    const control = this.filterForm?.get(controlName);
+    if (!control) {
+      return;
+    }
+    const availableOptions = options || [];
+    const selectedValues = preferredValues || this.getValuesFromOptions(control.value || []);
+    const selectedOptions = selectedValues.length
+      ? availableOptions.filter(option => selectedValues.indexOf(option.value) > -1)
+      : [];
+
+    if (selectedOptions.length) {
+      control.setValue(selectedOptions, { emitEvent: false });
+      return;
+    }
+    control.setValue(selectAllWhenEmpty ? [...availableOptions] : [], { emitEvent: false });
+  }
+
+  private getAnalyticsCriteriaKey(criteria: DashboardFilterCriteria): string {
+    const sortedCsv = (values?: DashboardFilterOptionValue[]) => this.getValuesFromOptions(values || []).sort().join(',');
+    return [
+      criteria?.analyticsViewBy || '',
+      sortedCsv(criteria?.analyticsSourceTypes),
+      sortedCsv(criteria?.analyticsSeverityTypes),
+      sortedCsv(criteria?.analyticsDatacenters),
+      sortedCsv(criteria?.analyticsClouds),
+      sortedCsv(criteria?.analyticsDeviceTypes),
+      criteria?.eventAndAlertTimeline || '',
+      criteria?.eventAndAlertTimelineFrom || '',
+      criteria?.eventAndAlertTimelineTo || ''
+    ].join('|');
+  }
+
   private ensureFilterSelections() {
     this.ensureSelectSelection('timeline', this.timeRangeOptions, 'last_30_days');
     this.ensureSelectSelection('trendTimeline', this.trendTimelineOptions, 'last_month');
     this.ensureSelectSelection('eventDeviceCategory', this.eventDeviceCategoryOptions, 'all');
     this.ensureSelectSelection('alertSegregationCategory', this.alertSegregationCategoryOptions, 'all');
     this.ensureSelectSelection('analyticsViewBy', this.analyticsViewByOptions, 'source');
-    this.ensureSelectSelection('analyticsSourceType', this.analyticsSourceTypeOptions, EVENT_ANALYTICS_ALL_SOURCE_VALUE);
-    this.ensureSelectSelection('analyticsSeverityType', this.analyticsSeverityTypeOptions, EVENT_ANALYTICS_ALL_SEVERITY_VALUE);
-    this.ensureSelectSelection('analyticsDatacenter', this.analyticsDatacenterOptions, EVENT_ANALYTICS_ALL_DATACENTER_VALUE);
-    this.ensureSelectSelection('analyticsCloud', this.analyticsCloudOptions, 'all_cloud');
-    this.ensureSelectSelection('analyticsCategory', this.analyticsCategoryOptions, 'all');
-    this.ensureSelectSelection('eventAndAlertTimeline', this.eventAndAlertTimelineOptions, 'last_week');
+    this.setMultiSelectSelection('analyticsSourceTypes', this.analyticsSourceTypeOptions);
+    this.setMultiSelectSelection('analyticsSeverityTypes', this.analyticsSeverityTypeOptions);
+    this.setMultiSelectSelection('analyticsDatacenters', this.analyticsDatacenterOptions);
+    this.setMultiSelectSelection('analyticsClouds', this.analyticsCloudOptions);
+    this.setMultiSelectSelection('analyticsDeviceTypes', this.analyticsDeviceTypeOptions);
+    this.ensureSelectSelection('eventAndAlertTimeline', this.eventAndAlertTimelineOptions, 'last_30_days');
     this.ensureSelectSelection('noisyEventsCategory', this.noisyEventsCategoryOptions, 'all');
     this.ensureSelectSelection('noisyHostsCategory', this.noisyHostsCategoryOptions, 'all');
     this.ensureSelectSelection('incidentCategory', this.incidentCategoryOptions, 'all');

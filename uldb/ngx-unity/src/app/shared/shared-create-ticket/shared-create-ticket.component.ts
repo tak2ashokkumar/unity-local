@@ -110,7 +110,7 @@ export class SharedCreateTicketComponent implements OnInit, OnDestroy {
       }
     }
     setTimeout(() => {
-      this.ticketFormSvc.createTicket(this.params.input, this.selectedTcktMgmt.uuid,  this.params.deviceMapping);
+      this.ticketFormSvc.createTicket(this.params.input, this.selectedTcktMgmt.uuid, this.params.deviceMapping);
     }, 0)
   }
 
@@ -140,7 +140,7 @@ export class SharedCreateTicketComponent implements OnInit, OnDestroy {
     this.attachmentForm.removeControl(attachment);
   }
 
-  handleError(err: any) {}
+  handleError(err: any) { }
 
   onSubmit() {
     this.ticketFormSvc.submit();

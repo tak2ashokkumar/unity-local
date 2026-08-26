@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -24,7 +24,7 @@ import { MeshBackendService, MeshBackendViewDataType } from './mesh-backend.serv
   styleUrls: ['./mesh-backend.component.scss'],
   providers: [MeshBackendService]
 })
-export class MeshBackendComponent implements OnInit {
+export class MeshBackendComponent implements OnInit, OnDestroy {
   meshId: string;
   serviceName: string;
   zone: string;
@@ -273,4 +273,3 @@ export class MeshBackendComponent implements OnInit {
     });
   }
 }
-

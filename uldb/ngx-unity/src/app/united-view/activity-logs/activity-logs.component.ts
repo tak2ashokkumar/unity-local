@@ -29,6 +29,8 @@ export const MY_NATIVE_FORMATS = {
   monthYearA11yLabel: 'MMMM YYYY',
 };
 
+const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+
 @Component({
   selector: 'activity-logs',
   templateUrl: './activity-logs.component.html',
@@ -50,11 +52,14 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
   @ViewChild('loginfo') loginfo: ElementRef;
   poll: boolean = false;
 
-  public logDateRange: Array<string> = [moment().subtract(14, 'd').set({ hour: 0o0, minute: 0o0, second: 0o1 }).format('YYYY-MM-DDTHH:mm:ss'), moment().set({ hour: 23, minute: 59, second: 59 }).format('YYYY-MM-DDTHH:mm:ss')];
-  end_date: string = moment(this.logDateRange[1]).format('YYYY-MM-DDTHH:mm:ss');
-  start_date: string = moment(this.logDateRange[0]).format('YYYY-MM-DDTHH:mm:ss');
+  public logDateRange: Array<string> = [
+    moment().subtract(14, 'd').startOf('day').format(DATE_TIME_FORMAT),
+    moment().endOf('day').format(DATE_TIME_FORMAT)
+  ];
+  end_date: string = moment(this.logDateRange[1]).format(DATE_TIME_FORMAT);
+  start_date: string = moment(this.logDateRange[0]).format(DATE_TIME_FORMAT);
   downloadUrl: string = DOWNLOAD_URL(this.end_date, this.start_date);
-  maxDate: string = moment().format('YYYY-MM-DDTHH:mm:ss');
+  maxDate: string = moment().format(DATE_TIME_FORMAT);
 
   constructor(
     private logService: ActivityLogsService,
@@ -83,8 +88,12 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
   }
 
   setDates() {
-    this.start_date = moment(this.logDateRange[0]).set({ hour: 0o0, minute: 0o0, second: 0o1 }).format('YYYY-MM-DDTHH:mm:ss');
-    this.end_date = moment(this.logDateRange[1]).set({ hour: 23, minute: 59, second: 59 }).format('YYYY-MM-DDTHH:mm:ss');
+    if (!this.logDateRange || this.logDateRange.length < 2 || !this.logDateRange[0] || !this.logDateRange[1]) {
+      return;
+    }
+
+    this.start_date = moment(this.logDateRange[0]).startOf('day').format(DATE_TIME_FORMAT);
+    this.end_date = moment(this.logDateRange[1]).endOf('day').format(DATE_TIME_FORMAT);
     this.downloadUrl = DOWNLOAD_URL(this.end_date, this.start_date);
     this.currentCriteria.pageNo = 1;
     this.getlogs();

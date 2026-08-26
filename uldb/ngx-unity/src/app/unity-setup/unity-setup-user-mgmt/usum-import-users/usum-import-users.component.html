@@ -2,39 +2,67 @@
     <div class="col">
         <div class="card">
             <div class="card-header bg-white d-flex justify-content-between align-items-center pl-0 py-2">
-                <div class=" d-flex justify-content-between ml-3">
+                <div class="d-flex justify-content-between ml-3">
                     <div class="d-flex align-items-center justify-content-center">
-                        <span
-                            class="badge bg-secondary user-count font-weight-bold rounded-3 align-middle">{{viewData.length}}</span>
-                        <span class="ml-2 font-weight-bold font-lg">Users</span>
+                        <span *ngIf="showUserCount"
+                            class="badge bg-secondary user-count font-weight-bold rounded-3 align-middle">{{userCount}}</span>
+                        <span class="font-weight-bold font-lg" [ngClass]="{'ml-2': showUserCount}">Users</span>
                     </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-end">
                     <button class="btn btn-pill btn-warning btn-sm ml-2" type="button" container="body"
-                        (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                        aria-label="Back" tooltip="Back" (click)="goBack()"><i class="fa fa-arrow-left"></i>
                     </button>
-                    <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+                    <data-refresh-btn [page]="currentPage" (refresh)="refreshData($event)"></data-refresh-btn>
                 </div>
             </div>
             <div class="card-body pt-0">
-                <div class="row my-2 justify-content-end">
+                <div class="row py-2 d-flex justify-content-between align-items-center">
                     <div class="col-2">
-                        <select class="form-control form-control-sm" type="text" [(ngModel)]="selectedAccount"
-                            (ngModelChange)="getUsers()">
+                        <search-box [searchValue]="searchValue" (searched)="onSearched($event)"></search-box>
+                    </div>
+                    <div class="col-4 d-flex align-items-center">
+                        <span class="d-inline-flex align-items-center" *ngIf="hasSelectedUsers">
+                            <span>Selected: {{selectedUsersPrimaryLabel}}</span>
+                            <span class="scope-more-count" *ngIf="selectedUsersPopoverLabels.length"
+                                [popover]="selectedUsersPopoverTmpl"
+                                [popoverContext]="{ labels: selectedUsersPopoverLabels }"
+                                triggers="mouseenter:mouseleave" placement="bottom" container="body">
+                                {{selectedUsersMoreLabel}}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="col-6 d-flex justify-content-end align-items-center">
+                        <select class="form-control form-control-sm w-auto mr-2" [(ngModel)]="selectedAccount"
+                            (ngModelChange)="onAccountChanged()" aria-label="Select Account">
                             <option [value]="''" disabled>Select Account</option>
-                            <option *ngFor="let account of accounts" [value]="account.uuid">{{account.name}}
+                            <option *ngFor="let account of accounts; trackBy: trackByAccount"
+                                [value]="account.uuid">{{account.name}}
                             </option>
                         </select>
+                        <div class="d-flex align-items-center">
+                            <label for="import-users-page-size" class="mr-2 my-1">Show</label>
+                            <select id="import-users-page-size" name="import-users-page-size"
+                                class="form-control form-control-sm w-auto" [ngModel]="pageSize"
+                                (ngModelChange)="pageSizeChange($event)">
+                                <option [ngValue]="25">25</option>
+                                <option [ngValue]="50">50</option>
+                                <option [ngValue]="100">100</option>
+                                <option [ngValue]="200">200</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <table class="table text-left">
                     <thead class="bg-light">
                         <tr>
-                            <th *ngIf="viewData.length" scope="col" style="font-size:1rem;"
+                            <th *ngIf="viewData.length" scope="col"
                                 (click)="$event.stopPropagation();selectAll()" accessControl moduleName="Public Cloud"
-                                accessType="Manage Public Cloud" elementType="div-hide">
+                                accessType="Manage Public Cloud" elementType="div-hide"
+                                [tooltip]="isSelectAllChecked ? 'Clear selection' : 'Import all matching users'"
+                                container="body">
                                 <span class="ml-2 text-primary">
-                                    <i class="far" [ngClass]="selectedAll? 'fa-check-square':'fa-square'"></i>
+                                    <i class="far" [ngClass]="isSelectAllChecked? 'fa-check-square':'fa-square'"></i>
                                 </span>
                             </th>
                             <th>Email ID</th>
@@ -43,15 +71,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let view of viewData; let i = index" truncateText>
-                            <td class="w-3" (click)="$event.stopPropagation();select(view);" style="font-size:1rem;">
-                                <span class="ml-2 bg-white text-primary" accessControl moduleName="Public Cloud"
-                                    accessType="Manage Public Cloud" elementType="div-hide">
+                        <tr *ngFor="let view of viewData; let i = index; trackBy: trackByUser" truncateText>
+                            <td class="w-3" (click)="$event.stopPropagation();select(view);"
+                                [tooltip]="view.canSelect ? '' : 'Email unavailable'" container="body">
+                                <span class="ml-2 bg-white" [ngClass]="view.canSelect ? 'text-primary' : 'text-muted'"
+                                    [class.reset-cursor]="!view.canSelect" accessControl moduleName="Public Cloud"
+                                    accessType="Manage Public Cloud" elementType="div-hide"
+                                    [attr.aria-disabled]="!view.canSelect">
                                     <i class="far" [ngClass]="view.isSelected? 'fa-check-square':'fa-square'"></i>
                                 </span>
                             </td>
                             <td class="tdw-35">
-                                <div [tooltip]="view.email">{{view.email}}</div>
+                                <div [tooltip]="view.email">{{view.email || '-'}}</div>
                             </td>
                             <td class="tdw-35">
                                 <div [tooltip]="view.firstName">{{view.firstName}}</div>
@@ -62,14 +93,36 @@
                         </tr>
                     </tbody>
                 </table>
+                <div class="d-flex justify-content-end" *ngIf="viewData.length || canGoPrevious || canGoNext">
+                    <ul class="pagination mb-0">
+                        <li class="page-item" [ngClass]="{'disabled': !canGoPrevious}">
+                            <button class="page-link" type="button" [disabled]="!canGoPrevious"
+                                (click)="previousPage()">Previous</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">Page {{currentPage}}</span>
+                        </li>
+                        <li class="page-item" [ngClass]="{'disabled': !canGoNext}">
+                            <button class="page-link" type="button" [disabled]="!canGoNext"
+                                (click)="nextPage()">Next</button>
+                        </li>
+                    </ul>
+                </div>
                 <div *ngIf="!viewData.length" class="py-5 d-flex justify-content-center align-items-center">
                     No users available.
                 </div>
             </div>
-            <div *ngIf="selectedUsers.length"
+            <div *ngIf="hasSelectedUsers"
                 class="card-footer bg-white border-top-0 d-flex justify-content-center pt-0 mb-3">
-                <button class="btn btn-primary" type="button" (click)="confirmImport()">Submit</button>
+                <button class="btn btn-primary" type="button"
+                    (click)="confirmImport()">{{selectedAll ? 'Import All' : 'Import Selected'}}</button>
             </div>
         </div>
     </div>
 </div>
+
+<ng-template #selectedUsersPopoverTmpl let-labels="labels">
+    <div class="scope-popover-list">
+        <div class="scope-popover-item" *ngFor="let label of labels; trackBy: trackByIndex">{{label}}</div>
+    </div>
+</ng-template>

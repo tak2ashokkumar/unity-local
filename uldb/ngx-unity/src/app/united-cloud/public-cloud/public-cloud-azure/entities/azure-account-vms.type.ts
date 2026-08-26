@@ -24,6 +24,8 @@ export interface AzureAccountVMSType {
     monitoring: DeviceMonitoringType;
     account_uuid: string;
     uuid: string;
+
+    collector: CollectorType;
 }
 interface AzureAccountVMSNetworkProfileItem {
     id: string;

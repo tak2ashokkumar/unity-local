@@ -15,7 +15,7 @@ import { AzurePowerToggleInput } from 'src/app/united-cloud/assets/assets-vms/as
 import { AzureAccountVMSType } from '../../public-cloud/public-cloud-azure/entities/azure-account-vms.type';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 
 @Injectable()
@@ -51,13 +51,15 @@ export class AzureVirtualMachinesService {
 
   convertToViewData(vms): AzureVMSViewData[] {
     let viewData: AzureVMSViewData[] = [];
-    let results : AzureAccountVMSType[] = vms.results;
+    let results: AzureAccountVMSType[] = vms.results;
     results.map(vm => {
       let data = new AzureVMSViewData();
       data.vmId = vm.id;
       data.name = vm.name;
       data.accountId = vm.account_id;
       data.monitoring = vm.monitoring;
+      data.collectorUuid = vm.collector?.uuid;
+      data.isCollectorZtc = vm.collector?.is_ztc;
       data.instanceType = vm.type;
       data.accountName = vm.account_name;
       data.resourceGroup = vm.resource_group;
@@ -117,7 +119,11 @@ export class AzureVirtualMachinesService {
           data.newTabToolipMessage = 'VM is Down';
         } else if (isWindows) {
           data.newTabToolipMessage = 'Open In New Tab';
-          data.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), data.managementIp) : WINDOWS_CONSOLE_CLIENT(data.managementIp);
+          if (vm.collector?.is_ztc) {
+            data.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(data.collectorUuid, data.managementIp)}`;
+          } else {
+            data.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), data.managementIp) : WINDOWS_CONSOLE_CLIENT(data.managementIp);
+          }
         } else {
           data.newTabToolipMessage = 'Open In New Tab';
           data.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -167,7 +173,7 @@ export class AzureVirtualMachinesService {
 
   deleteVM(vmName: string, resourceGroup: string, account_uuid: string) {
     // let params = new HttpParams().set('vm_name', vmName).set('resource_group', resourceGroup).set;
-    return this.http.post<CeleryTask>(DELETE_AZURE_VMS(), {vm_name: vmName, resource_group: resourceGroup, account_uuid: account_uuid})
+    return this.http.post<CeleryTask>(DELETE_AZURE_VMS(), { vm_name: vmName, resource_group: resourceGroup, account_uuid: account_uuid })
       .pipe(switchMap(res => {
         if (res.task_id) {
           this.notification.success(new Notification('Delete request for Virtual machine submitted'));
@@ -328,6 +334,8 @@ export class AzureVMSViewData {
   osName: string;
   managementIp: string;
   monitoring: DeviceMonitoringType;
+  collectorUuid: string;
+  isCollectorZtc: boolean;
   powerStatus: string;
   isPowerIconEnabled: boolean;
   powerTooltipMessage: string;

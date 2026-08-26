@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { TabData } from 'src/app/shared/tabdata';
 import { UsiEventIngestionZabbixService, ZabbixAccountViewData } from './usi-event-ingestion-zabbix.service';
@@ -21,7 +21,7 @@ import { isString } from 'lodash-es';
   styleUrls: ['./usi-event-ingestion-zabbix.component.scss'],
   providers: [UsiEventIngestionZabbixService]
 })
-export class UsiEventIngestionZabbixComponent implements OnInit {
+export class UsiEventIngestionZabbixComponent implements OnInit, OnDestroy {
 
   public tabItems: TabData[] = [{
     name: 'Zabbix Event Ingestion',

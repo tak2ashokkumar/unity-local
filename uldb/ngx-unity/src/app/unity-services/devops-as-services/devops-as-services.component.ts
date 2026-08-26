@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, interval } from 'rxjs';
@@ -35,7 +35,7 @@ const tabData: TabData[] = [
   styleUrls: ['./devops-as-services.component.scss'],
   providers: [DevopsAsServicesService]
 })
-export class DevopsAsServicesComponent implements OnInit {
+export class DevopsAsServicesComponent implements OnInit, OnDestroy {
   tabItems: TabData[] = tabData;
   viewData: DevopsControllerViewData[] = [];
   count: number;
@@ -82,8 +82,8 @@ export class DevopsAsServicesComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.confirmModalRef?.hide();
     this.createModalRef?.hide();
+    this.confirmModalRef?.hide();
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

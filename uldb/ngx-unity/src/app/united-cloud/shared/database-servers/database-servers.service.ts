@@ -11,7 +11,7 @@ import { map, catchError } from 'rxjs/operators';
 import { DevicePopoverData } from '../devices-popover/device-popover-data';
 import { DatabaseServer } from '../entities/database-servers.type';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
-import { VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT, WINDOWS_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE } from 'src/app/app-constants';
+import { VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT, WINDOWS_CONSOLE_CLIENT, MANAGEMENT_NOT_ENABLED_MESSAGE, GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR } from 'src/app/app-constants';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
@@ -57,7 +57,7 @@ export class DatabaseServersService {
     }
   }
 
-  private getBMSSHData(mgmtIp: string, osType: string): ServerSSHOptions {
+  private getBMSSHData(mgmtIp: string, osType: string, collectorUuid: string, isCollectorZtc: boolean): ServerSSHOptions {
     let a: ServerSSHOptions = new ServerSSHOptions();
     a.isSameTabEnabled = osType?.match('Linux') ? true : false;
     a.isNewTabEnabled = osType?.match('Linux') || osType?.match('Windows') ? true : false;
@@ -70,7 +70,11 @@ export class DatabaseServersService {
       case 'Windows':
         a.sameTabTooltipMessage = 'Open in same tab option is not available for windows machines';
         a.newTabTooltipMessage = 'Open In New Tab';
-        a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), mgmtIp) : WINDOWS_CONSOLE_CLIENT(mgmtIp);
+        if (isCollectorZtc) {
+          a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(collectorUuid, mgmtIp)}`;
+        } else {
+          a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), mgmtIp) : WINDOWS_CONSOLE_CLIENT(mgmtIp);
+        }
         break;
       default:
         a.sameTabTooltipMessage = 'Open in same tab option is not available';
@@ -80,7 +84,7 @@ export class DatabaseServersService {
     return a;
   }
 
-  private getVMSSHData(mgmtIp: string, osType: string, powerStatus: boolean): ServerSSHOptions {
+  private getVMSSHData(mgmtIp: string, osType: string, powerStatus: boolean, collectorUuid: string, isCollectorZtc: boolean): ServerSSHOptions {
     let a: ServerSSHOptions = new ServerSSHOptions();
     const isWindows: boolean = osType.lastIndexOf('Microsoft', 0) == 0;
     a.isSameTabEnabled = powerStatus && !isWindows;
@@ -91,7 +95,11 @@ export class DatabaseServersService {
     } else if (isWindows) {
       a.sameTabTooltipMessage = 'Open in Same tab option is not available for windows based machines';
       a.newTabTooltipMessage = 'Open In New Tab';
-      a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), mgmtIp) : WINDOWS_CONSOLE_CLIENT(mgmtIp);
+      if (isCollectorZtc) {
+        a.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(collectorUuid, mgmtIp)}`;
+      } else {
+        a.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), mgmtIp) : WINDOWS_CONSOLE_CLIENT(mgmtIp);
+      }
     } else {
       a.sameTabTooltipMessage = 'Open in same tab';
       a.newTabTooltipMessage = 'Open In New Tab';
@@ -105,9 +113,11 @@ export class DatabaseServersService {
     if (this.user.isManagementEnabled) {
       const osType = server.device_object ? server.device_object.os_type : null;
       const mgmtIp: string = server.device_object ? server.device_object.management_ip : null;
+      const collectorUuid: string = server.collector?.uuid ? server.collector.uuid : null;
+      const isCollectorZtc: boolean = server.collector?.is_ztc ? server.collector.is_ztc : false;
       if (mgmtIp) {
         if (server.server_type == 'BMS') {
-          return this.getBMSSHData(mgmtIp, osType);
+          return this.getBMSSHData(mgmtIp, osType, collectorUuid, isCollectorZtc);
         } else {
           switch (server.device_object.cloud_type) {
             case 'VMware':
@@ -115,9 +125,9 @@ export class DatabaseServersService {
             case 'vCloud Director':
             case 'Proxmox':
             case 'G3 KVM':
-              return this.getVMSSHData(mgmtIp, osType, server.device_object.power_status);
+              return this.getVMSSHData(mgmtIp, osType, server.device_object.power_status, collectorUuid, isCollectorZtc);
             case 'Custom':
-              return this.getBMSSHData(mgmtIp, osType);
+              return this.getBMSSHData(mgmtIp, osType, collectorUuid, isCollectorZtc);
             default: return a;
           }
         }
@@ -151,6 +161,8 @@ export class DatabaseServersService {
       a.osType = s.device_object && s.device_object.os_type ? s.device_object.os_type : 'N/A';
       a.tags = s.tags.filter(tg => tg);
       a.monitoring = s.monitoring;
+      a.collectorUuid = s.collector?.uuid;
+      a.isCollectorZtc = s.collector?.is_ztc;
 
       a.sshOptions = this.getSSHData(s);
       a.editBtnTooltipMsg = 'Edit';
@@ -254,7 +266,9 @@ export class DBServerViewData {
 
   sshOptions: ServerSSHOptions = null;
   monitoring: DeviceMonitoringType;
-  
+  collectorUuid: string;
+  isCollectorZtc: boolean;
+
   isSelected: boolean;
   applicableModulePermissions: any[];
   constructor() { }

@@ -4,9 +4,11 @@ import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ChartDataSets, ChartLegendLabelItem, ChartOptions } from 'chart.js';
 import * as pluginDataLabels from 'chartjs-plugin-datalabels';
+import moment from 'moment';
 import { Color, Label } from 'ng2-charts';
 import { GET_AIOPS_ALERTS_COUNT, GET_AIOPS_CONDITIONS_SUMMARY, GET_AIOPS_EVENT_COUNT_BY_TYPE, GET_AIOPS_EVENT_NOISY_HOSTS, GET_AIOPS_NOISY_EVENTS } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
+import { CUSTOM_DATE_FILTER_DATE_FORMAT } from 'src/app/shared/custom-date-filter/custom-date-filter.type';
 import { UnityChartConfigService, UnityChartDataType, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment.prod';
@@ -14,6 +16,7 @@ import { AIMLConditionsSummary, AIMLSummaryAlertCountByDeviceType, AIMLSummaryNo
 
 @Injectable()
 export class AimlSummaryService {
+  private readonly dateFormat = CUSTOM_DATE_FILTER_DATE_FORMAT;
 
   constructor(private http: HttpClient,
     private builder: FormBuilder,
@@ -21,11 +24,23 @@ export class AimlSummaryService {
     private chartConfigSvc: UnityChartConfigService,
     private userInfo: UserInfoService) { }
 
-  getConditionsSummary() {
+  getConditionsSummary(dateRangeParams?: AIMLSummaryDateRangeParams) {
     let params: HttpParams = new HttpParams();
     params = params.append('last_n_days', 7);
     params = params.append('last_n_days', 14);
+    params = this.appendDateRangeParams(params, dateRangeParams);
     return this.http.get<AIMLConditionsSummary>(GET_AIOPS_CONDITIONS_SUMMARY(), { params: params });
+  }
+
+  appendDateRangeParams(params?: HttpParams | null, dateRangeParams?: AIMLSummaryDateRangeParams): HttpParams {
+    let requestParams = params || new HttpParams();
+    const startDate = dateRangeParams?.startDate;
+    const endDate = dateRangeParams?.endDate;
+    if (this.isValidDateParam(startDate) && this.isValidDateParam(endDate)) {
+      requestParams = requestParams.set('start_date', startDate);
+      requestParams = requestParams.set('end_date', endDate);
+    }
+    return requestParams;
   }
 
   getPercentage(last7DaysCount: number, last14DaysCount: number): { percentage: number, isIncreased: boolean } {
@@ -72,8 +87,9 @@ export class AimlSummaryService {
     return a;
   }
 
-  getAlertsCountByDeviceType() {
-    return this.http.post<AIMLSummaryAlertCountByDeviceType[]>(GET_AIOPS_ALERTS_COUNT(), {});
+  getAlertsCountByDeviceType(dateRangeParams?: AIMLSummaryDateRangeParams) {
+    const params = this.appendDateRangeParams(new HttpParams(), dateRangeParams);
+    return this.http.post<AIMLSummaryAlertCountByDeviceType[]>(GET_AIOPS_ALERTS_COUNT(), {}, { params: params });
   }
 
   convertToAlertsCountViewdata(alertData: AIMLSummaryAlertCountByDeviceType[]): AIMLSummaryAlertsCountViewData {
@@ -94,8 +110,9 @@ export class AimlSummaryService {
     return a;
   }
 
-  getNoisyEvents() {
-    return this.http.post<AIMLSummaryNoisyEvent[]>(GET_AIOPS_NOISY_EVENTS(), {});
+  getNoisyEvents(dateRangeParams?: AIMLSummaryDateRangeParams) {
+    const params = this.appendDateRangeParams(new HttpParams(), dateRangeParams);
+    return this.http.post<AIMLSummaryNoisyEvent[]>(GET_AIOPS_NOISY_EVENTS(), {}, { params: params });
   }
 
   convertToNoisyEventsViewdata(events: AIMLSummaryNoisyEvent[]): AIMLSummaryNoisyEventsViewData[] {
@@ -126,8 +143,9 @@ export class AimlSummaryService {
     return viewData;
   }
 
-  getNoisyHosts() {
-    return this.http.post<AIMLSummaryNoisyEventHost[]>(GET_AIOPS_EVENT_NOISY_HOSTS(), {});
+  getNoisyHosts(dateRangeParams?: AIMLSummaryDateRangeParams) {
+    const params = this.appendDateRangeParams(new HttpParams(), dateRangeParams);
+    return this.http.post<AIMLSummaryNoisyEventHost[]>(GET_AIOPS_EVENT_NOISY_HOSTS(), {}, { params: params });
   }
 
   convertToNoisyHostsViewData(hostData: AIMLSummaryNoisyEventHost[]): AIMLSummaryNoisyHostsViewData[] {
@@ -156,9 +174,10 @@ export class AimlSummaryService {
     })
   }
 
-  getEventsCount(formData: any) {
+  getEventsCount(formData: any, dateRangeParams?: AIMLSummaryDateRangeParams) {
     let obj = { count_by: formData.target_type.key };
-    return this.http.post<any[]>(GET_AIOPS_EVENT_COUNT_BY_TYPE(), obj);
+    const params = this.appendDateRangeParams(new HttpParams(), dateRangeParams);
+    return this.http.post<any[]>(GET_AIOPS_EVENT_COUNT_BY_TYPE(), obj, { params: params });
   }
 
   convertToEventsCountEChartData(eventData: any[]): UnityChartDetails {
@@ -225,6 +244,15 @@ export class AimlSummaryService {
       },
     }
   }
+
+  private isValidDateParam(value?: string | null): value is string {
+    return typeof value === 'string' && moment(value, this.dateFormat, true).isValid();
+  }
+}
+
+export interface AIMLSummaryDateRangeParams {
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 export class AIMLSummaryViewData {

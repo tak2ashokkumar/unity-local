@@ -17,7 +17,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   @Input() navbarBrandFull: NavbarBrandConfig;
   @Input() navbarBrandMinimized: NavbarBrandConfig;
   @Input() navbarBrandText: { icon: string; text: string } = { icon: 'UL', text: 'UNITY' };
-  @Input() navbarBrandHref = 'app-dashboard';
+  @Input() navbarBrandHref = 'home';
 
   @Input() sidebarToggler: any;
   @Input() mobileSidebarToggler: any;

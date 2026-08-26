@@ -2249,7 +2249,7 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  convertToStorageTrendCard(data: PublicCloudStorageMetricResponse, color: string): PublicCloudStoragePerformanceCard {
+  convertToStorageTrendCard(data: PublicCloudStorageMetricResponse, color: string, fallbackTitle = ''): PublicCloudStoragePerformanceCard {
     const points = data?.points || [];
     const labels = points.map(point => this.getFirstValue(point?.time));
     const values = points.map(point => this.getNumericValue(point?.value));
@@ -2258,7 +2258,7 @@ export class PublicCloudComputeDashboardService {
     const direction = this.normalizeDeltaDirection(data?.trend_direction);
     return {
       key: this.getFirstValue(data?.metric),
-      title: this.getFirstValue(data?.title),
+      title: this.getFirstValue(data?.title, fallbackTitle),
       valueLabel: this.getFirstValue(data?.value),
       unit,
       deltaLabel: changeValue ? `${changeValue}%` : '',
@@ -2271,12 +2271,12 @@ export class PublicCloudComputeDashboardService {
     };
   }
 
-  convertToStorageHighLatencyCard(data: PublicCloudStorageHighLatencyResponse, color: string): PublicCloudStoragePerformanceCard {
+  convertToStorageHighLatencyCard(data: PublicCloudStorageHighLatencyResponse, color: string, fallbackTitle = 'High Latency Devices'): PublicCloudStoragePerformanceCard {
     const devices = data?.data || [];
     const values = devices.map(device => this.getNumericValue(device?.p95_latency));
     return {
       key: 'high_latency_devices',
-      title: 'High Latency Devices',
+      title: fallbackTitle,
       valueLabel: this.getFirstValue(data?.value),
       unit: '',
       deltaLabel: '',

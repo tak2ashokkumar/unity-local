@@ -1,19 +1,20 @@
 import { Routes, UrlSegment } from '@angular/router';
-import { UsiPcVmwareVcenterCrudComponent } from 'src/app/unity-setup/unity-setup-integration/usi-private-clouds/usi-pc-vmware-vcenter-crud/usi-pc-vmware-vcenter-crud.component';
-import { AllDevicesComponent } from './all-devices/all-devices.component';
-import { ALL_DEVICES_BMS_ROUTES, BMS_ROUTES } from './bm-servers/bm-servers-routing.const';
-import { ZABBIX_CONTAINER_CONTROLLER_ROUTES } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix-routing.const';
-import { KUBERNETES_MONITORING_CHILDREN } from './container-controllers/kubernetes-monitoring-routing.const';
-import { ContainerControllersZabbixComponent } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
-import { ContainerControllersComponent } from './container-controllers/container-controllers.component';
+import { PcCrudComponent } from 'src/app/app-shared-crud/pc-crud/pc-crud.component';
+import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
 import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers/docker-tabs/docker-tabs.component';
 import { KubernetesNodesComponent } from 'src/app/shared/shared-container-controllers/kubernetes-nodes/kubernetes-nodes.component';
 import { KubernetesContainersComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-containers/kubernetes-containers.component';
 import { KubernetesPodsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-pods/kubernetes-pods.component';
 import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
-import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
-import { DockerContainersZabbixComponent } from './container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
+import { UsiPcVmwareVcenterCrudComponent } from 'src/app/unity-setup/unity-setup-integration/usi-private-clouds/usi-pc-vmware-vcenter-crud/usi-pc-vmware-vcenter-crud.component';
+import { AllDevicesComponent } from './all-devices/all-devices.component';
+import { ALL_DEVICES_BMS_ROUTES, BMS_ROUTES } from './bm-servers/bm-servers-routing.const';
+import { ZABBIX_CONTAINER_CONTROLLER_ROUTES } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix-routing.const';
+import { ContainerControllersZabbixComponent } from './container-controllers/container-controllers-zabbix/container-controllers-zabbix.component';
+import { ContainerControllersComponent } from './container-controllers/container-controllers.component';
 import { ZABBIX_DOCKER_CONTAINER_ROUTES } from './container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix-routing.const';
+import { DockerContainersZabbixComponent } from './container-controllers/docker-containers/docker-containers-zabbix/docker-containers-zabbix.component';
+import { KUBERNETES_MONITORING_CHILDREN } from './container-controllers/kubernetes-monitoring-routing.const';
 import { ZABBIX_DBS_ROUTES } from './database-servers/database-zabbix-routing.const';
 import { ALL_DEVICES_FIREWALL_ROUTES, FIREWALL_ROUTES } from './firewalls/firewalls-routing.const';
 import { ALL_DEVICES_HYPERVISOR_ROUTES, HYPERVISOR_ROUTES } from './hypervisors/hypervisors-routing.const';
@@ -55,7 +56,6 @@ import { ZABBIX_VMS_ROUTES } from './vms/vms-zabbix/vms-zabbix-routing.const';
 import { VmsZabbixComponent } from './vms/vms-zabbix/vms-zabbix.component';
 import { VmsComponent } from './vms/vms.component';
 import { WebAccessComponent } from './web-access/web-access.component';
-import { PcCrudComponent } from 'src/app/app-shared-crud/pc-crud/pc-crud.component';
 
 export const SharedVMsRoutes: Routes = OBSERVIUM_VMS_ROUTES;
 

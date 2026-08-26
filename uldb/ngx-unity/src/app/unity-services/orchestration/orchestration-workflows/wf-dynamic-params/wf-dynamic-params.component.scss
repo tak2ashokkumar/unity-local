@@ -1,0 +1,695 @@
+@import "variables";
+
+// ─── Tokens ───────────────────────────────────────────────────────────────────
+$bg: #ffffff;
+$surface: #f1f3f9;
+$sidebar-bg: #e7ebf3;
+$border: #dce1e5;
+$steel: #5c6873;
+$blue: #378ad8;
+$blue-dark: #1769b5;
+$text-dark: #1f2937;
+$text-muted: #6b7280;
+$snap: cubic-bezier(0.4, 0, 0.2, 1);
+
+// ─── Modal shell ──────────────────────────────────────────────────────────────
+.agentic-params-modal {
+  height: calc(100dvh - 75px);
+  min-height: 0;
+  border-radius: 8px;
+}
+
+.schema-loader {
+  min-height: 260px;
+
+  .spinner-border {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .fa-exclamation-circle {
+    font-size: 2.5rem;
+  }
+}
+
+// ─── Three-column layout ──────────────────────────────────────────────────────
+.params-layout {
+  min-height: 0;
+  border-radius: inherit;
+}
+
+// ─── Side panels ──────────────────────────────────────────────────────────────
+.side-panel {
+  flex: 0 0 30%;
+  min-width: 360px;
+  max-width: 540px;
+  transition: flex-basis 0.18s $snap, min-width 0.18s $snap;
+
+  &.is-collapsed {
+    min-width: 38px;
+    max-width: 38px;
+  }
+}
+
+// ─── Middle panel ─────────────────────────────────────────────────────────────
+.side-panel.output-panel:not(.is-collapsed) {
+  min-width: 240px !important;
+}
+
+.middle-panel {
+  flex: 1 1 40%;
+  min-width: 360px;
+}
+
+// Browser zoom reduces the CSS viewport width. Keep the three panels in their
+// 30 / 40 / 30 layout instead of allowing the fixed side widths to crush the
+// middle panel when the available width drops below their combined minimums.
+@media (max-width: 1120px) {
+  .side-panel {
+    flex: 0 1 30% !important;
+    min-width: 0 !important;
+  }
+
+  .middle-panel {
+    flex: 1 1 40%;
+    min-width: 0;
+  }
+}
+
+// ─── Panel collapse toggle ────────────────────────────────────────────────────
+.panel-collapse-toggle {
+  position: absolute;
+  top: 10px;
+  z-index: 4;
+  width: 24px;
+  height: 24px;
+  background: $bg;
+  color: $blue;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.14);
+  transition: background 0.14s ease, color 0.14s ease;
+
+  &:hover {
+    background: $surface;
+    color: $blue-dark;
+    box-shadow: 0 4px 14px $blue-dark;
+    transform: translateY(-1px);
+  }
+
+  &.input-toggle {
+    right: 8px;
+  }
+
+  &.output-toggle {
+    left: 8px;
+  }
+}
+
+.btn {
+  &:hover {
+    box-shadow: 0 4px 14px $blue-dark;
+    transform: translateY(-1px);
+  }
+}
+
+// ─── Collapsed label ──────────────────────────────────────────────────────────
+.collapsed-panel-label {
+  color: $steel;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+// ─── Resizer strips ───────────────────────────────────────────────────────────
+.panel-resizer {
+  top: 0;
+  z-index: 3;
+  width: 4px;
+  cursor: ew-resize;
+  background: $border;
+  transition: background 0.15s ease;
+
+  &.input-resizer {
+    right: 0;
+  }
+
+  &.output-resizer {
+    left: 0;
+  }
+
+  &:hover {
+    background: $blue;
+  }
+}
+
+:host(.panel-resizing),
+:host(.panel-resizing) * {
+  cursor: ew-resize !important;
+  user-select: none;
+}
+
+// ─── Round close button ───────────────────────────────────────────────────────
+.btn-close-round {
+  top: -25px;
+  width: 22px;
+  height: 22px;
+  background: $bg;
+  font-size: 11px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  transition: background 0.14s ease, color 0.14s ease;
+  right: 0;
+  z-index: 5;
+
+  &:hover {
+    background: #fdecea;
+    color: #d9534f;
+  }
+}
+
+// ─── Sidebar (INPUT panel) ────────────────────────────────────────────────────
+.sidebarParam {
+  min-height: 0;
+  background: $sidebar-bg;
+  border-right: 1px solid $border;
+}
+
+// ─── Right output sidebar ─────────────────────────────────────────────────────
+.rightbarParam {
+  background: $sidebar-bg;
+  border-left: 1px solid $border;
+  min-width: 0;
+}
+
+.sidebarParam h6,
+.rightbarParam h6 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: $steel;
+}
+
+.drag-handle {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: #adb5bd;
+  opacity: 0.5;
+  cursor: grab;
+}
+
+.drag-highlight {
+  border: 2px dashed $blue !important;
+  background: rgba(55, 138, 216, 0.07) !important;
+}
+
+// ─── Form section ─────────────────────────────────────────────────────────────
+.form-section {
+  flex: 1;
+  min-width: 0;
+
+  >.properties {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+  }
+}
+
+.form-section-shadow {
+  box-shadow: -3px 0 6px -2px rgba(0, 0, 0, 0.14), 3px 0 6px -2px rgba(0, 0, 0, 0.14);
+  z-index: 1;
+}
+
+// ─── Shared thin scrollbar ────────────────────────────────────────────────────
+%thin-scroll {
+  scrollbar-color: #aaa transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #999;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #666;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+.form-section>.properties,
+.sidebarParam {
+  @extend %thin-scroll;
+}
+
+// ─── Accordion ────────────────────────────────────────────────────────────────
+.accordion {
+  border-bottom: 1px solid $border;
+}
+
+.accordion-headers {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.14s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  h6 {
+    margin-bottom: 0;
+    font-size: 12.5px;
+  }
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+
+  &.active {
+    max-height: none;
+    height: auto;
+    overflow: visible;
+  }
+}
+
+// ─── Nav tabs ─────────────────────────────────────────────────────────────────
+.custom-tabs,
+.output-tabs {
+  border-bottom: 1px solid $border;
+  margin-bottom: 12px;
+
+  .nav-link {
+    border: none;
+    color: $text-muted;
+    font-weight: 500;
+    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 6px 6px 0 0;
+    transition: color 0.15s ease, background 0.15s ease;
+
+    &:hover {
+      color: $text-dark;
+      background: $surface;
+    }
+
+    &.active {
+      color: $blue;
+      background: $surface;
+      border-bottom: 2px solid $blue;
+      font-weight: 600;
+    }
+  }
+}
+
+.output-tabs {
+  .nav-item {
+    flex: 1 1 50%;
+    width: 50%;
+    text-align: center;
+  }
+
+  .nav-link {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.bg-header {
+  background: $surface !important;
+}
+
+.editable-node-name {
+  cursor: pointer;
+
+  .edit-name-icon {
+    color: $text-muted;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  &:hover .edit-name-icon {
+    color: $blue;
+  }
+}
+
+.node-name-input {
+  flex: 0 1 50%;
+  width: 50%;
+}
+
+// ─── Form elements ────────────────────────────────────────────────────────────
+.form-label {
+  font-weight: 600;
+  font-size: 12.5px;
+}
+
+.form-control {
+  font-size: 13px;
+  border-radius: 8px;
+  border-color: $border;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus {
+  border-color: $blue;
+  box-shadow: 0 0 0 3px rgba(55, 138, 216, 0.12);
+}
+
+.field-mode-toggle {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.field-mode-option {
+  cursor: pointer;
+  user-select: none;
+}
+
+// ─── Output JSON block ────────────────────────────────────────────────────────
+.output-panel-content {
+  min-width: 0;
+  min-height: 0;
+}
+
+.output-panel-header {
+  padding: 1rem 1rem 0 2.5rem;
+}
+
+.output-empty {
+  padding: 0 1rem;
+}
+
+.output-data {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.output-scroll-container {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  @extend %thin-scroll;
+}
+
+.output-tree > .drop-list {
+  width: max-content;
+  min-width: 100%;
+}
+
+.output-json {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 10px 12px;
+  white-space: pre;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $text-dark;
+  font-size: 12px;
+}
+
+// ─── Cursor / badge ───────────────────────────────────────────────────────────
+.badge {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+::ng-deep app-auto-complete-multi .dropdown {
+  width: 100% !important;
+}
+
+// Condition builder
+.condition-group {
+  border: 1px solid #dbe4f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.nested-group {
+  background: #faf5ff;
+  border-color: #e9d5ff;
+}
+
+.condition-header {
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #dbe4f0;
+}
+
+.nested-group .condition-header {
+  background: #faf5ff;
+  border-bottom-color: #e9d5ff;
+}
+
+.condition-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.logic-switch {
+  border: 1px solid #dbe4f0;
+  border-radius: 8px;
+}
+
+.logic-switch button {
+  border: none;
+  background: transparent;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.logic-switch button.active {
+  background: #2563eb;
+  color: white;
+}
+
+.group-body {
+  padding: 14px;
+}
+
+.rule-container {
+  padding: 10px;
+}
+
+.remove-icon,
+.remove-group-icon {
+  right: 8px;
+  font-size: 18px;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.remove-icon {
+  top: -15px;
+}
+
+.remove-group-icon {
+  top: -22px;
+}
+
+.remove-icon:hover,
+.remove-group-icon:hover {
+  color: #a71d2a;
+}
+
+.rule-divider {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.rule-divider::before,
+.rule-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid #dbe4f0;
+}
+
+.rule-divider span {
+  margin: 0 10px;
+  padding: 2px 12px;
+  border-radius: 20px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.condition-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #dbe4f0;
+}
+
+// End condition builder
+
+// Outputs
+
+.output-string {
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+// Tree
+.drop-list {
+  min-height: 4px;
+}
+
+.drag-placeholder {
+  height: 26px;
+  background: #e7f1ff;
+  border: 1.5px dashed #0d6efd;
+  border-radius: 4px;
+  margin: 2px 0;
+}
+
+.tree-node {
+  user-select: none;
+}
+
+.tree-row {
+  gap: 5px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 0; // ← allows children to shrink/truncate properly
+
+  &:hover {
+    background: #f8f9fa;
+  }
+}
+
+.chevron {
+  font-size: 10px;
+  width: 14px;
+  color: #adb5bd;
+  display: inline-block;
+  transition: transform .15s;
+
+  &.open {
+    transform: rotate(90deg);
+  }
+}
+
+.chev-space {
+  width: 14px;
+  display: inline-block;
+}
+
+.node-key {
+  font-weight: 500;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px; // ← constrain long keys
+  flex-shrink: 0;
+}
+
+.node-preview {
+  font-size: 11px;
+  color: #6c757d;
+  font-family: monospace;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  // max-width: 160px;
+  // margin-left: 4px;
+  flex: 1; // ← takes remaining space
+  min-width: 0; // ← required for ellipsis to work in flex
+  cursor: default;
+
+  // subtle underline hint that tooltip exists
+  &:hover {
+    color: #212529;
+  }
+}
+
+.tree-children {
+  margin-left: 18px;
+  border-left: 1.5px solid #e9ecef;
+  padding-left: 8px;
+}
+
+// Type badges
+.type-badge {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+.t-string {
+  background: #e7f1ff;
+  color: #0c447c;
+}
+
+.t-number {
+  background: #faeeda;
+  color: #633806;
+}
+
+.t-boolean {
+  background: #eaf3de;
+  color: #27500a;
+}
+
+.t-array {
+  background: #eeedfe;
+  color: #3c3489;
+}
+
+.t-object {
+  background: #faece7;
+  color: #712b13;
+}
+
+.t-null {
+  background: #e9ecef;
+  color: #6c757d;
+}
+
+.dynamic-radio-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem 1.5rem;
+}
+
+.dynamic-radio-option {
+  margin-bottom: 0;
+}

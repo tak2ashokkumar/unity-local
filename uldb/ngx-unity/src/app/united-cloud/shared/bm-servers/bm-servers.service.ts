@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -86,6 +86,8 @@ export class BmServersService {
       a.memory = d.server.memory_mb ? d.server.memory_mb.toString() : 'N/A';
       a.capacity = d.server.capacity_gb ? d.server.capacity_gb.toString() : 'N/A';
       a.redfish = d.server.redfish;
+      a.collectorUuid = d.collector?.uuid;
+      a.isCollectorZtc = d.collector?.is_ztc; 
       this.setXtermAttributes(a);
       viewData.push(a);
     });
@@ -157,8 +159,13 @@ export class BmServersService {
     viewData.isNewTabEnabled = (!viewData.managementIP.match('N/A') && viewData.hasOS && (viewData.platformType.match('Windows') || viewData.platformType.match('Linux'))) ? true : false;
     if (viewData.isNewTabEnabled && viewData.hasOS) {
       switch (viewData.platformType) {
-        case 'Windows': viewData.newTabTootipMessage = 'Open In New Tab';
-          viewData.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), viewData.managementIP) : WINDOWS_CONSOLE_CLIENT(viewData.managementIP);
+        case 'Windows':
+          viewData.newTabTootipMessage = 'Open In New Tab';
+          if (viewData.isCollectorZtc) {
+            viewData.newTabConsoleAccessUrl = `${window.location.origin}${GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR(viewData.collectorUuid, viewData.managementIP)}`;
+          } else {
+            viewData.newTabConsoleAccessUrl = this.user.rdpUrls.length ? WINDOWS_CONSOLE_VIA_AGENT(this.user.rdpUrls.getLast(), viewData.managementIP) : WINDOWS_CONSOLE_CLIENT(viewData.managementIP);
+          }
           break;
         case 'Linux': viewData.newTabTootipMessage = 'Open In New Tab';
           viewData.newTabConsoleAccessUrl = VM_CONSOLE_CLIENT();
@@ -300,6 +307,8 @@ export class BMServerViewData {
   capacity: string;
   monitoring: DeviceMonitoringType;
   tags: string[];
+  collectorUuid: string;
+  isCollectorZtc: boolean;
   isSelected: boolean;
   redfish: boolean;
 

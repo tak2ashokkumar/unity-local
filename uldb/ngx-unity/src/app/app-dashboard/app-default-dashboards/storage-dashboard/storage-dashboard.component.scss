@@ -10,6 +10,7 @@
 }
 
 .storage-dashboard-topbar {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -19,11 +20,26 @@
   border-bottom: 1px solid #cfd6dc;
 }
 
-.storage-dashboard-filter-loading {
-  position: relative;
-  min-height: 64px;
-  background: #ffffff;
-  border-bottom: 1px solid #cfd6dc;
+:host ::ng-deep .storage-dashboard-filters app-spinner {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  z-index: 5;
+}
+
+:host ::ng-deep .storage-dashboard-filters app-spinner .spinner-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 43px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+:host ::ng-deep .storage-dashboard-filters app-spinner .wave-spinner > div {
+  background-color: #ff8900 !important;
 }
 
 .storage-dashboard-heading {
@@ -44,13 +60,19 @@
   white-space: nowrap;
 }
 
-.storage-vendor-select {
+.storage-type-select {
   width: 150px;
   height: 28px;
   margin-left: 8px;
   border-color: #b8c2cc;
+  background-color: #ffffff;
   color: #405162;
   font-size: 12px;
+}
+
+.storage-type-select option {
+  background-color: #ffffff;
+  color: #405162;
 }
 
 .storage-dashboard-subtitle {
@@ -89,11 +111,13 @@
 }
 
 .storage-dashboard-filters {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: flex-end;
   gap: 7px;
+  min-height: 43px;
 }
 
 .storage-filter-control {
@@ -147,9 +171,9 @@
 }
 
 .storage-round-action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  // display: inline-flex;
+  // align-items: center;
+  // justify-content: center;
   width: 28px;
   height: 28px;
   padding: 0;
@@ -157,11 +181,16 @@
   border-radius: 50%;
   color: #ffffff;
   background: #ff8900;
-  margin-bottom: 0;
+  margin-bottom: 2px;
 
   &:focus {
-    outline: 2px solid rgba(255, 137, 0, 0.35);
-    outline-offset: 2px;
+    outline: none;
+    outline-offset: 0;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
   }
 }
 
@@ -212,6 +241,11 @@
     font-size: 12px;
   }
 
+  .arrow-down-icon{
+    padding: 2px 0;
+    line-height: 14px;
+  }
+
   .dropdownClick {
     right: 0;
     left: auto;
@@ -248,7 +282,7 @@
     flex-direction: column;
   }
 
-  .storage-vendor-select {
+  .storage-type-select {
     margin-left: 0;
   }
 

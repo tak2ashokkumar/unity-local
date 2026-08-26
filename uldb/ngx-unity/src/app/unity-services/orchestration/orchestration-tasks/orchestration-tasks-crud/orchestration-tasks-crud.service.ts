@@ -9,7 +9,6 @@ import { OrchestrationTaskDataType } from '../orchestration-task.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { inputTemplateType, OrchestrationTaskCrudDataType, parameterDataType, parameterRestApi, parametersType, Token } from './orchestration-tasks-crud.type';
 import { catchError, switchMap, take } from 'rxjs/operators';
-import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { AppLevelService } from 'src/app/app-level.service';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 
@@ -533,7 +532,7 @@ export class OrchestrationTasksCrudService {
     return this.http.post<any>(ORCHESTRATION_ADD_TASK(), obj);
   }
 
-  updateTask(uuid: string, data: any): Observable<CeleryTask> {
+  updateTask(uuid: string, data: any): Observable<any> {
     return this.http.put<any>(ORCHESTRATION_EDIT_TASK(uuid), data);
   }
 

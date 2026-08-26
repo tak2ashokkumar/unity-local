@@ -119,7 +119,7 @@ export class DatabaseServerCrudComponent implements OnInit, OnDestroy {
       this.dbFormErrors = this.crudService.resetDBFormErrors();
       this.dbFormValidationMessages = this.crudService.dbFormValidationMessages;
 
-      if(dbInstanceId){
+      if (dbInstanceId) {
         this.dbForm.get('life_cycle_stage').enable;
         this.dbForm.get('life_cycle_stage_status').enable;
       }

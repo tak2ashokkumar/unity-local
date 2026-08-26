@@ -1,0 +1,164 @@
+:host {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+$surface-alt: #f7f8f9;
+$color-dark: #2f353a;
+$color-light: #8a9aa4;
+$accent: #4a90a4;
+$accent-soft: #e8f4f7;
+$border-color: #dce1e5;
+$transition-snap: cubic-bezier(0.4, 0, 0.2, 1);
+
+.left-sidebar {
+    min-width: 0;
+    min-height: 100%;
+}
+
+.menu-title {
+    color: $color-dark;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.sub-headers {
+    color: $color-dark;
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.description {
+    display: inline-block;
+    max-width: 20rem;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.menu-card,
+.drag-card {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    transition: background-color 0.16s $transition-snap,
+        border-color 0.16s $transition-snap,
+        box-shadow 0.16s $transition-snap;
+}
+
+.menu-card:hover,
+.drag-card:hover,
+.drag-item:hover {
+    background-color: $accent-soft;
+}
+
+.menu-card:hover {
+    border-color: rgba($accent, 0.25);
+    box-shadow: 0 2px 10px rgba(60, 72, 82, 0.09);
+
+    .menu-title,
+    .fa-arrow-right {
+        color: $accent !important;
+    }
+
+    .fa-arrow-right {
+        opacity: 1;
+        transform: translateX(3px);
+    }
+}
+
+.menu-card .fa-arrow-right {
+    opacity: 0.4;
+    transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+}
+
+.drag-card:hover {
+    border-color: rgba($accent, 0.2);
+    box-shadow: 0 1px 6px rgba($accent, 0.12);
+}
+
+.item-icon {
+    flex-basis: 24px;
+}
+
+.item-content,
+.task-name {
+    min-width: 0;
+}
+
+.drag-item {
+    color: $color-dark;
+    cursor: grab !important;
+    user-select: none;
+
+    &:active {
+        cursor: grabbing !important;
+    }
+}
+
+.submenu-header {
+    border-bottom: 1px solid $border-color;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background-color: $surface-alt;
+
+        .fa-arrow-left,
+        .menu-title {
+            color: $accent !important;
+        }
+
+        .fa-arrow-left {
+            transform: translateX(-2px);
+        }
+    }
+
+    .fa-arrow-left {
+        transition: color 0.15s ease, transform 0.15s ease;
+    }
+}
+
+.accordion {
+    overflow: hidden;
+}
+
+.accordion-headers {
+    border-bottom: 1px solid $border-color;
+    border-radius: 4px 4px 0 0;
+    transition: background-color 0.15s ease;
+
+    .sub-headers,
+    i {
+        transition: color 0.15s ease;
+    }
+
+    i {
+        color: $color-light;
+        font-size: 10px;
+    }
+
+    &:hover {
+        background-color: $surface-alt;
+
+        .sub-headers,
+        i {
+            color: $accent;
+        }
+    }
+}
+
+.accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.28s $transition-snap;
+
+    &.active {
+        max-height: 9999px;
+        overflow: visible;
+    }
+}
+
+.task-name {
+    font-size: 12.5px;
+}

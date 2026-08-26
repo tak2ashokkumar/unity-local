@@ -164,6 +164,18 @@ export const configDeviceTypeList: LabelValueType[] = [
     'value': 'fortinet'
   },
   {
+    'label': 'Juniper',
+    'value': 'juniper'
+  },
+  {
+    'label': 'Juniper JunOS',
+    'value': 'juniper_junos'
+  },
+  // {
+  //   'label': 'Juniper ScreenOS',
+  //   'value': 'juniper_screenos'
+  // },
+  {
     'label': 'Palo Alto',
     'value': 'paloalto_panos'
   }

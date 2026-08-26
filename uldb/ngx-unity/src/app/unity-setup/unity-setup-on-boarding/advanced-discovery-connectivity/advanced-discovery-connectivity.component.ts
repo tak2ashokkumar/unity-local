@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -23,7 +23,7 @@ import { CollectorUpdateAction, ConsoleResult } from './advanced-discovery-conne
   templateUrl: './advanced-discovery-connectivity.component.html',
   styleUrls: ['./advanced-discovery-connectivity.component.scss']
 })
-export class AdvancedDiscoveryConnectivityComponent implements OnInit {
+export class AdvancedDiscoveryConnectivityComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   viewData: AgentConfigurationViewData[] = [];
   applianceViewData: AgentConfigurationViewData[] = [];

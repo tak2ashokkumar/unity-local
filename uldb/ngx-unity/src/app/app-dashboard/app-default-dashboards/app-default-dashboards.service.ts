@@ -68,6 +68,8 @@ export class AppDefaultDashboardsService {
       case 'unified aiops command centre':
       case 'unified aiops command centre dashboard':
         return 'unified-aiops-command-centre';
+      case 'storage dashboard':
+        return 'storage';
     }
   }
 }

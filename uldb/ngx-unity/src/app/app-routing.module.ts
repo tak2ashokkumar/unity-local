@@ -16,6 +16,7 @@ import { RemoteWebViewerComponent } from './shared/remote-web-viewer/remote-web-
 import { AiInfraMgmtGuard } from './unity-ai-infra-mgmt/unity-ai-infra-mgmt.guard';
 import { UnityCopilotGuard } from './unity-copilot/unity-copilot.guard';
 import { CostAnalysisGuard } from './unity-cost-analysis/unity-cost-analysis.guard';
+import { ServiceCatalogAccessGuard } from './unity-services/service-catalog/service-catalog-access.guard';
 import { WelcomePageGuardService } from './welcome-page-guard.service';
 
 export const routes: Routes = [
@@ -51,6 +52,7 @@ export const routes: Routes = [
       },
       {
         path: 'home',
+        canActivate: [ServiceCatalogAccessGuard],
         loadChildren: () => import('src/app/app-home/app-home.module').then(m => m.AppHomeModule)
       },
       {

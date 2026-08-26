@@ -1,0 +1,267 @@
+<section class="orders-page p-0">
+  <div class="orders-card">
+    <header class="orders-toolbar">
+      <div class="orders-title-block">
+        <span class="orders-count-badge">{{ orders.length }}</span>
+        <h1 class="orders-title">Orders</h1>
+      </div>
+
+      <div class="orders-toolbar-actions">
+        <button type="button" class="btn-orange-icon" title="Refresh orders" aria-label="Refresh orders"
+          (click)="loadOrders(true)">
+          <i class="fas fa-sync" [class.fa-spin]="isLoading" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="orders-search-row">
+      <label class="orders-search-wrap">
+        <i class="fa fa-search" aria-hidden="true"></i>
+        <input type="search" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()" placeholder="Search"
+          aria-label="Search orders">
+      </label>
+
+      <div class="orders-filter-actions">
+        <div class="status-filter-wrap" [class.open]="isStatusFilterOpen">
+          <button type="button" class="status-filter" (click)="isStatusFilterOpen = !isStatusFilterOpen"
+            [attr.aria-expanded]="isStatusFilterOpen">
+            <span>{{ activeStatus === 'All' ? 'Status' : activeStatus }}</span>
+            <i class="fa fa-chevron-down chev" aria-hidden="true"></i>
+          </button>
+          <div class="status-filter-menu">
+            <button type="button" class="status-filter-option" *ngFor="let status of statusOptions"
+              [class.selected]="status === activeStatus" (click)="selectStatus(status)">
+              {{ status }}
+            </button>
+          </div>
+        </div>
+
+        <label class="show-select-wrap m-0">
+          <span>Show</span>
+          <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+            <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="orders-table-wrap">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>ORDER ID</th>
+            <th>CATALOG ITEMS</th>
+            <!-- <th>RITM</th> -->
+            <th>REQUEST</th>
+            <th>REQUESTED BY</th>
+            <th>STATUS</th>
+            <th>PRIORITY</th>
+            <th>CREATED ON</th>
+            <th>PRICE</th>
+            <th class="action-heading">ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of pagedOrders">
+            <td>
+              <button type="button" class="order-id-link muted-link" (click)="openPricingDetails(order)">
+                {{ order.order_number }}
+              </button>
+            </td>
+            <td class="catalog-items">{{ order.catalog_name }} x{{ order.quantity }}</td>
+            <td><a class="order-id-link">{{ orderRequest(order) }}</a></td>
+            <!-- <td><a href="javascript:void(0)" class="order-id-link">{{ orderRitm(order) }}</a></td>
+            <td class="request-id">{{ orderRequest(order) }}</td> -->
+            <td>{{ order.requested_by }}</td>
+            <td>
+              <span class="status-pill" [ngClass]="statusClass(order.status)">
+                <span class="dot"></span>{{ order.status }}
+              </span>
+            </td>
+            <td><span class="priority-badge" [ngClass]="priorityClass(order.priority)">{{ order.priority }}</span></td>
+            <td class="created-date">{{ order.created_at | date:'dd MMM yyyy' }}</td>
+            <td class="monthly-cost">{{ order.total_amount | currency:order.currency:'symbol':'1.2-2' }}</td>
+            <td>
+              <div class="invoice-actions">
+                <button type="button" class="invoice-action-btn view" title="View order"
+                  (click)="openPricingDetails(order)"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                <!-- <button type="button" class="invoice-action-btn invoice" title="View pricing details"
+                  (click)="openPricingDetails(order)"><i class="fa fa-file-text-o" aria-hidden="true"></i></button> -->
+              </div>
+            </td>
+          </tr>
+
+          <tr class="no-results-row" *ngIf="isLoading">
+            <td colspan="10"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading orders...</td>
+          </tr>
+          <tr class="no-results-row error" *ngIf="!isLoading && hasLoadError">
+            <td colspan="10">Orders could not be loaded. <button type="button" (click)="loadOrders()">Try again</button>
+            </td>
+          </tr>
+          <tr class="no-results-row" *ngIf="!isLoading && !hasLoadError && !pagedOrders.length">
+            <td colspan="10">No orders match your search.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="orders-footer">
+      <div class="orders-footer-text">
+        Showing {{ firstVisibleEntry }} to {{ lastVisibleEntry }} of {{ filteredOrders.length }} entries
+      </div>
+      <nav class="pagination" aria-label="Orders pagination">
+        <button type="button" class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(1)"
+          aria-label="First page"><i class="fa fa-angle-double-left" aria-hidden="true"></i></button>
+        <button type="button" class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)"
+          aria-label="Previous page"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+        <button type="button" class="page-btn" *ngFor="let page of pageNumbers" [class.active]="page === currentPage"
+          (click)="goToPage(page)">{{ page }}</button>
+        <button type="button" class="page-btn" [disabled]="currentPage === totalPages"
+          (click)="goToPage(currentPage + 1)" aria-label="Next page">
+          <i class="fa fa-chevron-right" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(totalPages)"
+          aria-label="Last page">
+          <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+        </button>
+      </nav>
+    </footer>
+  </div>
+</section>
+
+<div class="inv-overlay" *ngIf="selectedOrder as order" (click)="onOverlayClick($event)">
+  <section class="inv-box" role="dialog" aria-modal="true" [attr.aria-label]="'Pricing details ' + order.order_number">
+    <header class="inv-header">
+      <h2 class="inv-header-title">Pricing Details - {{ order.order_number }}</h2>
+      <button type="button" class="inv-close-btn" aria-label="Close pricing details" (click)="closePricingDetails()">
+        <i class="fa fa-times" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="inv-body">
+      <div class="inv-grid">
+        <div class="inv-main-column">
+          <div class="inv-panel">
+            <div class="inv-panel-title">Order Details</div>
+            <div class="inv-panel-sub">Detailed breakdown of charges</div>
+
+            <div class="inv-detail-grid">
+              <div>
+                <div class="inv-detail-label">Order Number</div>
+                <div class="inv-detail-value">{{ order.order_number }}</div>
+              </div>
+              <!-- <div>
+                <div class="inv-detail-label">RITM</div>
+                <div class="inv-detail-value">{{ orderRitm(order) }}</div>
+              </div> -->
+              <div>
+                <div class="inv-detail-label">Request</div>
+                <div class="inv-detail-value">{{ orderRequest(order) }}</div>
+              </div>
+              <div>
+                <div class="inv-detail-label">Requested By</div>
+                <div class="inv-detail-value">{{ order.requested_by || '-' }}</div>
+              </div>
+              <div>
+                <div class="inv-detail-label">Status</div>
+                <span class="status-pill" [ngClass]="statusClass(order.status)">
+                  <span class="dot"></span>{{ order.status }}
+                </span>
+              </div>
+              <div>
+                <div class="inv-detail-label">Currency</div>
+                <div class="inv-detail-value">{{ order.currency }}</div>
+              </div>
+            </div>
+
+            <article class="inv-service-card">
+              <div class="inv-service-head">
+                <div class="inv-service-icon"><i class="fa fa-server" aria-hidden="true"></i></div>
+                <div class="inv-service-info">
+                  <div class="inv-service-title">{{ order.catalog_name }}</div>
+                  <div class="inv-service-sub">
+                    {{ order.pricing_snapshot.billing_model || 'Standard pricing' }}
+                    | {{ order.pricing_snapshot.frequency || 'One time' }}
+                    | {{ order.catalog_snapshot.platform || '' }}
+                  </div>
+                </div>
+                <div class="inv-service-amount">{{ order.price | currency:order.currency:'symbol':'1.2-2' }}</div>
+              </div>
+              <div class="inv-comp-table-wrap">
+                <table class="inv-comp-table">
+                  <thead>
+                    <tr>
+                      <th>Component</th>
+                      <th>Unit</th>
+                      <th>Usage</th>
+                      <th>Rate ({{ order.currency }})</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let component of order.cost_breakdown">
+                      <td class="inv-comp-name">{{ component.label }}</td>
+                      <td>{{ component.unit }}</td>
+                      <td>{{ component.usage }}</td>
+                      <td>{{ component.rate | currency:order.currency:'symbol':'1.2-2' }}</td>
+                      <td class="inv-amt">{{ component.amount | currency:order.currency:'symbol':'1.2-2' }}</td>
+                    </tr>
+                    <!-- <tr *ngIf="!order.cost_mapping.length">
+                      <td class="inv-comp-name">Base price</td>
+                      <td>-</td>
+                      <td>{{ order.quantity }} x {{ order.pricing_snapshot.frequency || 'unit' }}</td>
+                      <td>{{ order.price | currency:order.currency:'symbol':'1.2-2' }}</td>
+                      <td class="inv-amt">{{ order.price | currency:order.currency:'symbol':'1.2-2' }}</td>
+                    </tr> -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="inv-comp-total-row">
+                <span>Total ({{ order.quantity }} {{ order.quantity === 1 ? 'unit' : 'units' }})</span>
+                <span>{{ order.total_amount | currency:order.currency:'symbol':'1.2-2' }}</span>
+              </div>
+            </article>
+
+            <div class="inv-grand-total-row">
+              <span class="inv-grand-total-label">Total</span>
+              <span class="inv-grand-total-value">{{ order.total_amount | currency:order.currency:'symbol':'1.2-2'
+                }}</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="inv-panel inv-summary-panel">
+          <div class="inv-panel-title summary-title">Pricing Summary</div>
+          <div class="inv-sum-row"><span class="inv-sum-label">Subtotal</span><span class="inv-sum-value">{{
+              order.total_amount | currency:order.currency:'symbol':'1.2-2' }}</span></div>
+          <div class="inv-sum-row"><span class="inv-sum-label">Sales Tax ({{ taxPercentage(order) | number:'1.2-2'
+              }}%)</span><span class="inv-sum-value">{{ order.tax_amount | currency:order.currency:'symbol':'1.2-2'
+              }}</span></div>
+          <div class="inv-sum-divider"></div>
+          <div class="inv-sum-row bold"><span class="inv-sum-label">Total</span><span class="inv-sum-value">{{
+              order.total_amount | currency:order.currency:'symbol':'1.2-2' }}</span></div>
+
+          <div class="inv-billing-title">Billing Information</div>
+          <div class="inv-billing-row"><span class="inv-billing-label">Requested By</span><span
+              class="inv-billing-value">{{ order.requested_by || '-' }}</span></div>
+          <!-- <div class="inv-billing-row"><span class="inv-billing-label">RITM</span><span class="inv-billing-value">{{
+              orderRitm(order) }}</span></div> -->
+          <div class="inv-billing-row"><span class="inv-billing-label">Request</span><span class="inv-billing-value">{{
+              orderRequest(order) }}</span></div>
+          <div class="inv-billing-row"><span class="inv-billing-label">Currency</span><span class="inv-billing-value">{{
+              order.currency }}</span></div>
+          <div class="inv-billing-row" *ngIf="order.rejection_reason"><span class="inv-billing-label">Rejection
+              Reason</span><span class="inv-billing-value">{{ order.rejection_reason }}</span></div>
+
+
+          <div class="inv-download-row">
+            <button type="button" class="inv-download-btn" (click)="printPricingDetails()"><i class="fa fa-download"
+                aria-hidden="true"></i> Download PDF</button>
+            <button type="button" class="inv-download-btn" (click)="downloadPricingCsv(order)"><i class="fa fa-download"
+                aria-hidden="true"></i> Download CSV</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</div>

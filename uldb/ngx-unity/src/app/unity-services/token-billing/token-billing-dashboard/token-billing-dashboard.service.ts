@@ -98,7 +98,11 @@ export class TokenBillingDashboardService {
     const src: any[] = (data?.model_costs?.length)
       ? data.model_costs
       : (data?.billing?.model_costs || []).map(m => ({ ...m, total_cost_usd: m.cost_usd ?? m.billable_cost_usd ?? 0 }));
-    w.rows = src.filter(r => r.total_tokens > 0);
+    w.rows = src
+      .filter(r => r.total_tokens > 0)
+      .map(r => ({ ...r, total_cost_usd: r.total_cost_usd ?? r.cost_usd ?? r.billable_cost_usd ?? 0 }))
+      .sort((a, b) => (Number(b.total_cost_usd) || 0) - (Number(a.total_cost_usd) || 0))
+      .slice(0, 5);
     return w;
   }
 
@@ -151,6 +155,7 @@ export class TokenBillingDashboardService {
     w.selectedUsers = selectedUsers == null ? [...w.allUsers] : selectedUsers;
     const activeSeries = series.filter(s => w.selectedUsers.includes(s.name));
     w.totalCostUsd = data?.token_summary?.total_cost_usd ?? 0;
+    w.totalTokens = data?.token_summary?.total_tokens ?? 0;
     const labels = mts.labels.map(l => this.utilSvc.toUnityOneDateFormat(l, 'M/D H:mm'));
     w.chartData = this.buildUserConsumptionAreaChart(labels, activeSeries);
     return w;

@@ -160,6 +160,7 @@ export class ApplicationOnboardingCrudComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.instructionModalRef?.hide();
     this.spinnerSvc.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

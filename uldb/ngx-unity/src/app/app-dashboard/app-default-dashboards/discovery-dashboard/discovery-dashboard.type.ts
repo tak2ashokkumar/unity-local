@@ -4,12 +4,19 @@ export interface DiscoveryDashboardFilterOption {
   value: string;
 }
 
+export interface DiscoveryDashboardDeploymentEnvironmentApiOption {
+  key: string;
+  value: string;
+}
+
 export interface DiscoveryDashboardFilterOptions {
   time_range: string[];
   regions: string[];
+  deployment_environment: DiscoveryDashboardDeploymentEnvironmentApiOption[];
 }
 
 export interface DiscoveryDashboardFilterCriteria {
+  deploymentEnvironment: string[];
   region: string[];
   timeRange: string;
   startDate?: string;
@@ -17,10 +24,20 @@ export interface DiscoveryDashboardFilterCriteria {
 }
 
 export interface DiscoveryDashboardFilterFormValue {
+  deploymentEnvironment: DiscoveryDashboardFilterOption[];
   region: DiscoveryDashboardFilterOption[];
   timeRange: string;
   startDate?: string;
   endDate?: string;
+}
+
+export interface DiscoveryDashboardPaginatedResponse<T> {
+  count?: number;
+  total?: number;
+  next?: string | null;
+  previous?: string | null;
+  data?: T[];
+  results: T[];
 }
 
 export interface ExecutiveKpiData {
@@ -140,6 +157,7 @@ export class CmdbSyncInsightsViewData {
 }
 
 export interface CiDistributionItem {
+  deployment_environment?: string;
   category: string;
   category_key: string;
   count: number;
@@ -147,12 +165,11 @@ export interface CiDistributionItem {
   redirect_url?: string;
 }
 
-export interface CiDistributionByDevice {
-  total: number;
-  results: CiDistributionItem[];
-}
+export interface CiDistributionByDevice extends DiscoveryDashboardPaginatedResponse<CiDistributionItem> { }
 
 export class CiDistributionTableRowViewData {
+  deploymentEnvironment: string;
+  deploymentEnvironmentTone: 'public-cloud' | 'private-cloud' | 'datacenter' | 'default';
   category: string;
   categoryKey: string;
   count: number;
@@ -160,9 +177,10 @@ export class CiDistributionTableRowViewData {
   redirectUrl: string;
 }
 
-export type CiDistributionSortColumn = 'category' | 'count' | 'share';
+export type CiDistributionSortColumn = 'deploymentEnvironment' | 'category' | 'count' | 'share';
 
 export interface CiDistributionByDeviceDataItem {
+  deployment_environment?: string;
   device_type?: string;
   device_type_key?: string;
   category?: string;
@@ -174,12 +192,11 @@ export interface CiDistributionByDeviceDataItem {
   share: number;
 }
 
-export interface CiDistributionByDeviceData {
-  total: number;
-  results: CiDistributionByDeviceDataItem[];
-}
+export interface CiDistributionByDeviceData extends DiscoveryDashboardPaginatedResponse<CiDistributionByDeviceDataItem> { }
 
 export class CiDistributionByDeviceTableRowViewData {
+  deploymentEnvironment: string;
+  deploymentEnvironmentTone: 'public-cloud' | 'private-cloud' | 'datacenter' | 'default';
   deviceType: string;
   deviceTypeKey: string;
   redirectUrl: string;
@@ -189,41 +206,53 @@ export class CiDistributionByDeviceTableRowViewData {
   share: number;
 }
 
-export type CiDistributionByDeviceSortColumn = 'deviceType' | 'count' | 'share';
+export type CiDistributionByDeviceSortColumn = 'deploymentEnvironment' | 'deviceType' | 'count' | 'share';
 
 export interface CiDistributionByDiscoveryItem {
   down: number;
   protocol: string;
+  deployment_environment?: string;
   unknown: number;
-  target_resources: string;
+  target_resources?: string;
+  infrastructure_type?: string;
+  resource_count?: number;
+  vendor_platform?: string;
   discovery_method: string;
-  resources_discovered: number;
+  resources_discovered?: string | number;
   up: number;
   last_run: string;
 }
 
 export type CiDistributionByDiscovery = CiDistributionByDiscoveryItem[];
+export type CiDistributionByDiscoveryResponse = DiscoveryDashboardPaginatedResponse<CiDistributionByDiscoveryItem> | CiDistributionByDiscoveryItem[];
 
 export class CiDistributionByDiscoveryTableRowViewData {
-  discoveryMethod: string;
-  targetResources: string;
+  deploymentEnvironment: string;
+  deploymentEnvironmentTone: 'public-cloud' | 'private-cloud' | 'datacenter' | 'default';
   protocol: string;
-  resourcesDiscovered: number;
-  up: number;
+  discoveryMethod: string;
+  infrastructureType: string;
+  vendorPlatform: string;
+  resourceCount: number;
   down: number;
+  resourcesDiscovered: string;
   unknown: number;
+  up: number;
   lastRun: string;
 }
 
 export type CiDistributionByDiscoverySortColumn =
-  'discoveryMethod'
-  | 'targetResources'
-  | 'protocol'
-  | 'resourcesDiscovered'
-  | 'up'
+  'protocol'
+  | 'deploymentEnvironment'
   | 'down'
+  | 'infrastructureType'
+  | 'resourceCount'
   | 'unknown'
-  | 'lastRun';
+  | 'discoveryMethod'
+  | 'up'
+  | 'lastRun'
+  | 'vendorPlatform'
+  | 'resourcesDiscovered';
 
 export interface ResourceDiscoveryData {
   [key: string]: number;
@@ -289,6 +318,7 @@ export interface OrphanedDeviceByTypeResponse {
 
 export interface OrphanedDeviceByTypeItem {
   uuid: string;
+  deployment_environment?: string;
   device_name?: string;
   name?: string;
   device?: string;
@@ -304,6 +334,8 @@ export interface OrphanedDeviceByTypeItem {
 
 export class OrphanedDeviceByTypeItemViewData {
   uuid: string;
+  deploymentEnvironment: string;
+  deploymentEnvironmentTone: 'public-cloud' | 'private-cloud' | 'datacenter' | 'default';
   deviceName: string;
   device?: string;
   deviceTypeKey?: string;
@@ -318,7 +350,8 @@ export class OrphanedDeviceByTypeItemViewData {
 }
 
 export type OrphanedDeviceByTypeSortColumn =
-  'deviceName'
+  'deploymentEnvironment'
+  | 'deviceName'
   | 'status'
   | 'deviceType'
   | 'lastSeenTimestamp'
@@ -336,6 +369,7 @@ export interface OrphanedDevicesBreakdownResponse {
 }
 
 export interface NewlyDiscoveredDeviceItem {
+  deployment_environment?: string;
   availability_status: string;
   ci_name: string;
   ci_type: string;
@@ -352,6 +386,8 @@ export interface NewlyDiscoveredDeviceItem {
 }
 
 export class NewlyDiscoveredDeviceItemViewData {
+  deploymentEnvironment: string;
+  deploymentEnvironmentTone: 'public-cloud' | 'private-cloud' | 'datacenter' | 'default';
   availabilityStatus: string;
   availabilityStatusClass: string;
   ciName: string;
@@ -372,7 +408,8 @@ export class NewlyDiscoveredDeviceItemViewData {
 }
 
 export type NewlyDiscoveredDevicesSortColumn =
-  'ciName'
+  'deploymentEnvironment'
+  | 'ciName'
   | 'ciType'
   | 'platform'
   | 'serialNumber'
@@ -385,22 +422,27 @@ export type NewlyDiscoveredDevicesSortColumn =
   | 'uptimeDays'
   | 'availabilityStatus';
 export interface TopDiscoveryFailuresItem {
+  deployment_environment?: string;
   policy_name: string;
   failure_count: number;
   last_failure: string;
 }
 
 export class TopDiscoveryFailuresItemViewData {
+  deploymentEnvironment: string;
+  deploymentEnvironmentTone: 'public-cloud' | 'private-cloud' | 'datacenter' | 'default';
   policyName: string;
   failureCount: number;
   lastFailure: string;
 }
 
 export type TopDiscoveryFailures = TopDiscoveryFailuresItem[];
+export type TopDiscoveryFailuresResponse = DiscoveryDashboardPaginatedResponse<TopDiscoveryFailuresItem> | TopDiscoveryFailuresItem[];
 
-export type TopDiscoveryFailuresSortColumn = 'policyName' | 'failureCount' | 'lastFailure';
+export type TopDiscoveryFailuresSortColumn = 'deploymentEnvironment' | 'policyName' | 'failureCount' | 'lastFailure';
 
 export interface OperatingSystemsItem {
+  deployment_environment?: string;
   count: number;
   eol_data: string | null;
   os_type: string;
@@ -408,6 +450,8 @@ export interface OperatingSystemsItem {
 }
 
 export class OperatingSystemsItemViewData {
+  deploymentEnvironment: string;
+  deploymentEnvironmentTone: 'public-cloud' | 'private-cloud' | 'datacenter' | 'default';
   count: number;
   eolData: string;
   osType: string;
@@ -416,9 +460,10 @@ export class OperatingSystemsItemViewData {
 
 export type OperatingSystems = OperatingSystemsItem[];
 
-export type OperatingSystemsSortColumn = 'osType' | 'osVersion' | 'count' | 'eolData';
+export type OperatingSystemsSortColumn = 'deploymentEnvironment' | 'osType' | 'osVersion' | 'count' | 'eolData';
 
 export interface CmdbSyncTrendItem {
+  deployment_environment?: string;
   week: string;
   failed: number;
   pending: number;
@@ -429,6 +474,8 @@ export interface CmdbSyncTrendItem {
 export type CmdbSyncTrend = CmdbSyncTrendItem[];
 
 export class CmdbSyncTrendTableRowViewData {
+  deploymentEnvironment: string;
+  deploymentEnvironmentTone: 'public-cloud' | 'private-cloud' | 'datacenter' | 'default';
   week: string;
   weekOrder: number;
   discoveredCis: number;
@@ -437,4 +484,4 @@ export class CmdbSyncTrendTableRowViewData {
   pending: number;
 }
 
-export type CmdbSyncTrendSortColumn = 'weekOrder' | 'discoveredCis' | 'syncedCis' | 'failed' | 'pending';
+export type CmdbSyncTrendSortColumn = 'deploymentEnvironment' | 'weekOrder' | 'discoveredCis' | 'syncedCis' | 'failed' | 'pending';

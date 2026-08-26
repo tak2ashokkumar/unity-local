@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { TabData } from 'src/app/shared/tabdata';
 import { NewRelicAccountViewData, UsiEventIngestionNewRelicService } from './usi-event-ingestion-new-relic.service';
@@ -21,7 +21,7 @@ import { isString } from 'lodash-es';
   styleUrls: ['./usi-event-ingestion-new-relic.component.scss'],
   providers: [UsiEventIngestionNewRelicService]
 })
-export class UsiEventIngestionNewRelicComponent implements OnInit {
+export class UsiEventIngestionNewRelicComponent implements OnInit, OnDestroy {
 
   public tabItems: TabData[] = [{
     name: 'New Relic Event Ingestion',

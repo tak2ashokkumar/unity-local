@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { InputTemplateModel, OrchestrationInputTemplateService } from './orchestration-input-template.service';
 import { Subject } from 'rxjs';
@@ -15,7 +15,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
   templateUrl: './orchestration-input-template.component.html',
   styleUrls: ['./orchestration-input-template.component.scss']
 })
-export class OrchestrationInputTemplateComponent implements OnInit {
+export class OrchestrationInputTemplateComponent implements OnInit, OnDestroy {
 
   currentCriteria: SearchCriteria;
   private ngUnsubscribe = new Subject();

@@ -19,6 +19,8 @@ export interface AzureResourceDetail {
     management_ip: string;
     os_name: string;
     os_type: string;
+
+    collector: CollectorType;
 }
 
 export interface AccountCostDetail {
@@ -38,9 +40,9 @@ interface Current {
     month: string;
 }
 interface ResourceCounts {
-    id:number;
+    id: number;
     resource_count: number;
-    icon_path:string;
+    icon_path: string;
     display_name: string;
     name: string;
 }

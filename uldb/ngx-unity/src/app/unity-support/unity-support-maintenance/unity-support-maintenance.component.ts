@@ -187,7 +187,11 @@ export class UnitySupportMaintenanceComponent implements OnInit, OnDestroy {
     this.startDate = moment(this.logDateRange[0]).format('YYYY-MM-DD');
     this.endDate = moment(this.logDateRange[1]).format('YYYY-MM-DD');
     this.currentCriteria.pageNo = 1;
-    this.currentCriteria.params = [{ 'startDate': this.startDate, 'endDate': this.endDate }];
+    this.currentCriteria.params[0] = {
+      ...this.currentCriteria.params[0],
+      startDate: this.startDate,
+      endDate: this.endDate
+    };
 
     this.getInstances();
   }

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subject } from 'rxjs';
@@ -25,7 +25,7 @@ import { FormGroup } from '@angular/forms';
   styleUrls: ['./public-cloud-gcp-summary.component.scss'],
   providers: [PublicCloudGcpSummaryService]
 })
-export class PublicCloudGcpSummaryComponent implements OnInit {
+export class PublicCloudGcpSummaryComponent implements OnInit, OnDestroy {
 
   // @Output('onCrud') onCrud = new EventEmitter<CRUDActionTypes>();
   private ngUnsubscribe = new Subject();

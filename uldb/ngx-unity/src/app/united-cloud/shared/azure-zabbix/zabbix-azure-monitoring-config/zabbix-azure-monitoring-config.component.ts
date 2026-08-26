@@ -76,7 +76,7 @@ export class ZabbixAzureMonitoringConfigComponent implements OnInit {
     }
   }
 
-  refreshData(){
+  refreshData() {
     this.getDeviceMonitoring();
     this.getCollectors();
   }
