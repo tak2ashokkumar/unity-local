@@ -1,0 +1,103 @@
+{
+  "servers": [
+    {
+      "id": 724,
+      "name": "001 Dell Poweredge R430",
+      "asset_tag": "UL-4412",
+      "ip_address": "10.1.0.27"
+    },
+    {
+      "id": 725,
+      "name": "002 Dell Poweredge R430",
+      "asset_tag": "UL-4413",
+      "ip_address": "10.1.0.28"
+    }
+  ],
+  "virtual_machines": [
+    {
+      "id": 644,
+      "name": "10.128.7.96",
+      "management_ip": "10.128.7.247",
+      "num_cpus": 2
+    }
+  ],
+  "firewalls": [
+    {
+      "id": 11,
+      "name": "fw1-sf10",
+      "asset_tag": "UL-FW-11"
+    }
+  ],
+  "switches": [
+    {
+      "id": 6043,
+      "name": "ar2-221.lv1",
+      "asset_tag": "UL-SW-6043"
+    }
+  ],
+  "load_balancers": [
+    {
+      "id": 21,
+      "name": "lb1-4234.lv1-UL"
+    }
+  ],
+  "cabinets": [
+    {
+      "id": 775,
+      "name": "SF8-CAB-02.02",
+      "cage": "Cage 4"
+    }
+  ],
+  "cages": [
+    {
+      "id": 4,
+      "name": "Cage 4",
+      "datacenter": "SF8"
+    }
+  ],
+  "pdus": [
+    {
+      "id": 91,
+      "hostname": "pdu1-sf8-0202",
+      "asset_tag": "UL-PDU-91"
+    }
+  ],
+  "opportunities": [
+    {
+      "id": 5001,
+      "name": "Colo expansion FY26",
+      "stage_name": "Closed Won",
+      "mrc": 4200.0,
+      "nrc": 1500.0,
+      "account_name": "1st Century Bank"
+    }
+  ],
+  "invoices": [
+    {
+      "id": 9001,
+      "billing_month": "July",
+      "billing_year": "2026",
+      "amount_billed": 4200.0,
+      "opportunity": {
+        "id": 5001,
+        "name": "Colo expansion FY26"
+      },
+      "created_at": "2026-08-01T00:12:00Z",
+      "updated_at": "2026-08-01T00:12:00Z",
+      "invoice_line_items": [
+        {
+          "product": "Cabinet 42U",
+          "UnitPrice": 1200.0,
+          "Quantity": 2,
+          "TotalPrice": 2400.0
+        },
+        {
+          "product": "Cross Connect",
+          "UnitPrice": 300.0,
+          "Quantity": 6,
+          "TotalPrice": 1800.0
+        }
+      ]
+    }
+  ]
+}

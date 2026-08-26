@@ -7,7 +7,7 @@
 - Also please don't run any scripts to change anything apart from the content inside unity-local folder.
 - Donot add corrupted/non-ASCII section-divider symbols in comments or in any places. Always Keep the comments readable using simple ASCII text. Do not change any component logic, imports, API calls, template, service, or mock files while handling ASCII Text...
 - PRODUCTION WRITE SAFETY: whenever the proxy is on a LIVE environment (any API_ENV other
-  than mock - prod, ams, play, alpha) the apps are pointed at a REAL system. In that mode you MUST NOT
+  than mock - sf, ams, play, alpha) the apps are pointed at a REAL system. In that mode you MUST NOT
   trigger any write API - POST / PUT / PATCH / DELETE - without asking me first and getting
   an explicit yes for that specific action. That includes clicking Save / Create / Delete in
   the UI, running a scripted fetch, "just testing" a form, and anything that buys, imports,
@@ -27,7 +27,7 @@
     navigate  : cdd, uldb, unity, mtp, mockapi, proxy, admin, adminreact
     mock api  : startmock                      (Express mock on :3001, needed for MOCK)
     MOCK      : mock-admin, mock-unity, mock-mtp        (+ mock-admin-legacy)
-    PROD      : prod-admin, prod-unity, prod-mtp        (+ prod-admin-legacy)
+    SF        : sf-admin, sf-unity, sf-mtp              (+ sf-admin-legacy)
     AMS       : ams-admin, ams-unity, ams-mtp           (+ ams-admin-legacy)
     PLAY      : play-admin, play-unity, play-mtp        (+ play-admin-legacy)
     ALPHA     : alpha-admin, alpha-unity, alpha-mtp     (+ alpha-admin-legacy)
@@ -58,7 +58,7 @@
   tools/proxy/server.js. Do not set it by hand; use the dev.sh group for that
   environment (see Command Execution Rules).
       mock   local mock API on :3001   (tools/mock-api JSON files)   [default, safe]
-      prod   https://unity.unitedlayer.com
+      sf     https://unity.unitedlayer.com        (named after the site; was "prod")
       ams    http://unity-ams.unitedlayer.com
       play   https://play.unityone.ai
       alpha  https://alpha.unityone.ai
@@ -71,8 +71,8 @@
 - The mock JSON files always stay in place; switching environments never touches them.
 - Auth on a live environment: the API accepts ONLY Django SessionAuthentication - there is
   no API token. Each environment is a separate login, so each needs its own session file:
-      tools/proxy/.cookie-<env>      e.g. .cookie-prod, .cookie-play, .cookie-alpha
-  (.prod-cookie still works for prod). Gitignored, re-read per request, so refreshing an
+      tools/proxy/.cookie-<env>      e.g. .cookie-sf, .cookie-play, .cookie-alpha
+  (.cookie-prod / .prod-cookie still work for sf). Gitignored, re-read per request, so an
   expired session needs no restart. Never commit, print, echo or log a cookie value.
 - For writes the proxy adds Origin, Referer and X-CSRFToken, which DRF SessionAuthentication
   requires. An expired session comes back as a clean JSON 401, not login HTML.

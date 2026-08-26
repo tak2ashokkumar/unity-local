@@ -1,0 +1,20 @@
+[
+  {
+    "instance_id": "vm-1001",
+    "vm_name": "app01",
+    "power_state": "poweredOn",
+    "cpus": 4,
+    "ram_size": 8192,
+    "internal_ip": "10.20.0.11",
+    "guest_os": "Ubuntu 22.04"
+  },
+  {
+    "instance_id": "vm-1002",
+    "vm_name": "db01",
+    "power_state": "poweredOff",
+    "cpus": 8,
+    "ram_size": 32768,
+    "internal_ip": "10.20.0.12",
+    "guest_os": "RHEL 9"
+  }
+]

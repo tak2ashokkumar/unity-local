@@ -11,7 +11,7 @@ const app = express();
  *  Pick an environment with API_ENV (default "mock"):
  *
  *      API_ENV=mock    local mock API on :3001      (tools/mock-api JSON files)
- *      API_ENV=prod    https://unity.unitedlayer.com
+ *      API_ENV=sf      https://unity.unitedlayer.com      (was "prod"; still accepted)
  *      API_ENV=ams     http://unity-ams.unitedlayer.com
  *      API_ENV=play    https://play.unityone.ai
  *      API_ENV=alpha   https://alpha.unityone.ai
@@ -27,28 +27,44 @@ const app = express();
  *
  *  Auth on any live environment: the API accepts ONLY Django SessionAuthentication -
  *  there is no API token. Put that environment's browser session in
- *      tools/proxy/.cookie-<env>       e.g. .cookie-prod, .cookie-play
- *  (.prod-cookie is still honoured for prod). Every environment is a separate login,
- *  so each needs its own cookie file. They are gitignored and re-read per request, so
+ *      tools/proxy/.cookie-<env>       e.g. .cookie-sf, .cookie-play
+ *  (.cookie-prod / .prod-cookie are still honoured for sf). Every environment is a
+ *  separate login, so each needs its own file. Gitignored and re-read per request, so
  *  refreshing an expired session needs no restart.
  *  Copy from DevTools > Application > Cookies: "sessionid=...; csrftoken=..."
  *
  *  In any live environment the apps READ AND WRITE the real system.
  * ===================================================================== */
 const API_ENVIRONMENTS = {
-  mock:  { label: "Local Mock",  url: "http://localhost:3001",            live: false },
-  prod:  { label: "Production",  url: "https://unity.unitedlayer.com",    live: true  },
-  ams:   { label: "AMS",         url: "http://unity-ams.unitedlayer.com", live: true  },
-  play:  { label: "Play",        url: "https://play.unityone.ai",         live: true  },
-  alpha: { label: "Alpha",       url: "https://alpha.unityone.ai",        live: true  },
+  mock:  { label: "Local Mock", url: "http://localhost:3001",            live: false },
+  sf:    { label: "SF",         url: "https://unity.unitedlayer.com",    live: true  },
+  ams:   { label: "AMS",        url: "http://unity-ams.unitedlayer.com", live: true  },
+  play:  { label: "Play",       url: "https://play.unityone.ai",         live: true  },
+  alpha: { label: "Alpha",      url: "https://alpha.unityone.ai",        live: true  },
 };
+
+// Older name for the SF environment, still accepted so nothing breaks.
+const ENV_ALIASES = { prod: "sf" };
+
+/* ---------------------------------------------------------------------
+ *  WHICH ENVIRONMENT IS ACTIVE?
+ *  There is no stored "current environment" - it is chosen per run by the
+ *  dev.sh alias you start (each one sets API_ENV). So:
+ *      mock-unity  -> mock        sf-admin   -> sf
+ *      play-mtp    -> play        alpha-unity-> alpha
+ *  DEFAULT_API_ENV below is only used when nothing sets API_ENV, i.e. a bare
+ *  `node server.js`. Change it if you want a different bare-run default.
+ *  To see what a RUNNING proxy is on:  GET http://localhost:8091/__admin_env
+ * --------------------------------------------------------------------- */
+const DEFAULT_API_ENV = "mock";
 
 function resolveEnv() {
   let name = (process.env.API_ENV || "").toLowerCase().trim();
-  // Back-compat: USE_PROD_API=true is a shortcut for API_ENV=prod.
+  // Back-compat: USE_PROD_API=true is a shortcut for the SF environment.
   if (!name) {
-    name = String(process.env.USE_PROD_API || "false").toLowerCase() === "true" ? "prod" : "mock";
+    name = String(process.env.USE_PROD_API || "false").toLowerCase() === "true" ? "sf" : DEFAULT_API_ENV;
   }
+  if (ENV_ALIASES[name]) name = ENV_ALIASES[name];
   if (!API_ENVIRONMENTS[name]) {
     console.error(`
   Unknown API_ENV "${name}". Valid: ${Object.keys(API_ENVIRONMENTS).join(", ")}. Falling back to mock.
@@ -67,7 +83,19 @@ const MOCK_API_URL = API_ENVIRONMENTS.mock.url;
 /* API path prefixes that follow the environment above. */
 const API_PREFIXES = [
   "/customer", "/rest", "/orchestration", "/chatbot", "/task",
-  "/apm", "/func", "/mcp", "/ssr", "/tools", "/hijack"
+  "/apm", "/func", "/mcp", "/ssr", "/tools", "/hijack",
+  // Django's two-factor pages (account/two_factor). Both front ends reach the
+  // 2FA wizard by loading this path from their own origin, so it has to be
+  // proxied like any other backend path rather than falling through to an app.
+  "/account",
+  // The Salesforce bridge is mounted OUTSIDE /rest: the Import Opportunities page
+  // reads GET /salesforce/opportunities/ and marks one imported with
+  // PUT /salesforce/link_opportunity/ (controllers/billing.js:135). Without this
+  // prefix those two calls fell through to the Angular app and returned HTML.
+  "/salesforce",
+  // The VM web console's SSH stream. It is a WebSocket, so it also needs the
+  // upgrade handler wired below the listen() call - a prefix alone is not enough.
+  "/webterminal"
 ];
 
 const isApiPath = (url) =>
@@ -77,9 +105,27 @@ const isApiPath = (url) =>
  * Each environment is a separate login, so each has its own cookie file. */
 const COOKIE_FILES = [
   path.resolve(__dirname, ".cookie-" + API_ENV),
-  ...(API_ENV === "prod" ? [path.resolve(__dirname, ".prod-cookie")] : []),
+  // Names used before the SF rename, still honoured.
+  ...(API_ENV === "sf" ? [path.resolve(__dirname, ".cookie-prod"), path.resolve(__dirname, ".prod-cookie")] : []),
 ];
 let cookieCache = { key: "", mtime: 0, value: "" };
+
+// A cookie file may contain "#" comment lines, blank lines, and the cookie split over
+// several lines - so the file can carry its own instructions without those notes
+// ending up in the Cookie header.
+function parseCookieFile(text) {
+  const value = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"))
+    .join("; ")
+    .replace(/;\s*;/g, ";")
+    .replace(/^;\s*|;\s*$/g, "")
+    .trim();
+  // A file still holding the PASTE_... placeholders is not a real session; treat it as
+  // unconfigured so /__admin_env reports the truth instead of a misleading "authenticated".
+  return /PASTE_[A-Z_]*_HERE/.test(value) ? "" : value;
+}
 
 function prodCookie() {
   if (process.env.ADMIN_COOKIE) return process.env.ADMIN_COOKIE.trim();
@@ -87,7 +133,7 @@ function prodCookie() {
     try {
       const st = fs.statSync(file);
       if (cookieCache.key !== file || cookieCache.mtime !== st.mtimeMs) {
-        cookieCache = { key: file, mtime: st.mtimeMs, value: fs.readFileSync(file, "utf8").trim() };
+        cookieCache = { key: file, mtime: st.mtimeMs, value: parseCookieFile(fs.readFileSync(file, "utf8")) };
       }
       return cookieCache.value;
     } catch (e) { /* try next candidate */ }
@@ -102,7 +148,9 @@ const MTP_PROXY_PORT = Number(process.env.MTP_PROXY_PORT || 8061);
 /* MOCK API PROXY */
 const mockProxy = createProxyMiddleware({
   target: MOCK_API_URL,
-  changeOrigin: true
+  changeOrigin: true,
+  // The VM console's SSH stream is a WebSocket (see the upgrade handler below).
+  ws: true
 });
 
 /* LIVE API PROXY (used whenever the active environment is not mock).
@@ -112,6 +160,8 @@ const mockProxy = createProxyMiddleware({
 const prodProxy = createProxyMiddleware({
   target: API_TARGET,
   changeOrigin: true,
+  // The VM console's SSH stream is a WebSocket (see the upgrade handler below).
+  ws: true,
   secure: true,
   on: {
     proxyReq: (proxyReq, req) => {
@@ -133,7 +183,12 @@ const prodProxy = createProxyMiddleware({
       const ctype = proxyRes.headers["content-type"] || "";
       const redirectToLogin =
         (proxyRes.statusCode === 301 || proxyRes.statusCode === 302) && /\/account\/login/.test(loc);
-      if (redirectToLogin || ctype.indexOf("text/html") !== -1) {
+      // /account/* (the Django two-factor wizard) serves real HTML pages on
+      // purpose, so the "HTML means the session died" rule must not apply there -
+      // it would turn the whole 2FA flow into a 401. A genuine login redirect is
+      // still caught for those paths by the redirectToLogin check above.
+      const isHtmlPage = /^\/account(\/|$|\?)/.test(req.url || "");
+      if (redirectToLogin || (!isHtmlPage && ctype.indexOf("text/html") !== -1)) {
         proxyRes.statusCode = 401;
         proxyRes.headers["content-type"] = "application/json; charset=utf-8";
         delete proxyRes.headers.location;
@@ -211,7 +266,7 @@ app.use((req, res, next) => {
 
 });
 
-app.listen(PROXY_PORT, () => {
+const server = app.listen(PROXY_PORT, () => {
   console.log(`Proxy running at http://localhost:${PROXY_PORT}`);
   console.log(`Admin UI mode: ${ADMIN_UI.toUpperCase()} -> ${ADMIN_TARGET} (set ADMIN_UI=react to use ngx-admin)`);
   if (IS_LIVE) {
@@ -226,6 +281,28 @@ app.listen(PROXY_PORT, () => {
     console.log("");
   } else {
     console.log(`API source: MOCK -> ${MOCK_API_URL}   (envs: ${Object.keys(API_ENVIRONMENTS).join(", ")})`);
+  }
+});
+
+/* WEBSOCKET UPGRADE -> the API environment.
+ *
+ * The VM web console streams its SSH session over ws://<this proxy>/webterminal/<vm>/,
+ * which never reaches the express middleware chain - an upgrade is a separate event on
+ * the HTTP server. Without this handler the console connects to the front end instead of
+ * the backend and the socket dies immediately.
+ *
+ * http-proxy-middleware exposes its own upgrade handler; the same apiProxy instance
+ * (and therefore the same target, cookie and headers) serves both. */
+server.on("upgrade", (req, socket, head) => {
+  if (!isApiPath(req.url || "")) {
+    socket.destroy();
+    return;
+  }
+  console.log(`-> ${API_ENV.toUpperCase()} [ws]: ${req.url}`);
+  if (typeof apiProxy.upgrade === "function") {
+    apiProxy.upgrade(req, socket, head);
+  } else {
+    socket.destroy();
   }
 });
 

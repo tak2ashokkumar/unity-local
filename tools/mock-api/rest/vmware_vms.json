@@ -1,0 +1,28 @@
+[
+  {
+    "uuid": "5029b1f0-1a2b-4c3d-8e4f-6a7b8c9d0e11",
+    "vm_name": "app01",
+    "power_state": "poweredOn",
+    "cpus": 4,
+    "ram_size": 8192,
+    "internal_ip": "10.20.0.11",
+    "guest_os": "Ubuntu 22.04",
+    "cloud": {
+      "uuid": "f1ba14ff-fbb0-4cd5-b5a8-5fae9374d11f",
+      "name": "VCS-Demo1"
+    }
+  },
+  {
+    "uuid": "5029b1f0-1a2b-4c3d-8e4f-6a7b8c9d0e22",
+    "vm_name": "db01",
+    "power_state": "poweredOff",
+    "cpus": 8,
+    "ram_size": 32768,
+    "internal_ip": "10.20.0.12",
+    "guest_os": "RHEL 9",
+    "cloud": {
+      "uuid": "f1ba14ff-fbb0-4cd5-b5a8-5fae9374d11f",
+      "name": "VCS-Demo1"
+    }
+  }
+]

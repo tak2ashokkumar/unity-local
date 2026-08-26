@@ -107,6 +107,11 @@ serveadminreact() {     # serve dist/ on :8096
     npm run static-server
 }
 
+devadmin() {            # vite dev server + HMR on :8098 (needs startmock)
+    adminreact || return
+    npm run dev -- --port 8098 --strictPort
+}
+
 # ---- production build (run from inside ngx-unity or ngx-mtp) ----
 buildprod() {
     node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --configuration production
@@ -116,8 +121,19 @@ buildprod() {
 # =====================================================================
 #  MOCK   ->  local mock API on :3001   (default, safe, offline)
 # ---------------------------------------------------------------------
-#  Writes only get echoed back, nothing is persisted.
-#  Needs the mock API running:  startmock
+#  Writes are only echoed back, nothing is persisted. No login needed.
+#
+#  WHAT TO RUN  (one command per terminal, in this order):
+#
+#    MOCK + ADMIN (React)      MOCK + UNITY              MOCK + MTP
+#    --------------------      ------------              ----------
+#    1. startmock              1. startmock              1. startmock
+#    2. buildadminwatch        2. buildunity             2. buildmtp
+#    3. serveadminreact        3. serveunity             3. servemtp
+#    4. mock-admin             4. mock-unity             4. mock-mtp
+#
+#    then open:                then open:                then open:
+#    localhost:8091/admin      localhost:8091            localhost:8061
 # =====================================================================
 
 # to run the admin panel (React) against MOCK
@@ -146,41 +162,72 @@ mock-mtp() {
 
 
 # =====================================================================
-#  PROD   ->  https://unity.unitedlayer.com
+#  SF     ->  https://unity.unitedlayer.com
 # ---------------------------------------------------------------------
 #  LIVE data. Reads AND writes hit the real system.
-#  Session required:  tools/proxy/.cookie-prod
+#  Requires a session in tools/proxy/.cookie-sf
+#  (sign in to the site, then copy sessionid + csrftoken into that file).
 #  See the write-safety rule in CLAUDE.md before changing anything.
+#
+#  WHAT TO RUN  (one command per terminal, in this order):
+#
+#    SF + ADMIN (React)        SF + UNITY                SF + MTP
+#    ------------------        ----------                --------
+#    1. buildadminwatch        1. buildunity             1. buildmtp
+#    2. serveadminreact        2. serveunity             2. servemtp
+#    3. sf-admin               3. sf-unity               3. sf-mtp
+#
+#    then open:                then open:                then open:
+#    localhost:8091/admin      localhost:8091            localhost:8061
+#
+#    (no startmock - the data comes from SF)
 # =====================================================================
 
-# to run the admin panel (React) against PROD
-prod-admin() {
+# to run the admin panel (React) against SF
+sf-admin() {
     proxy || return
-    API_ENV=prod ADMIN_UI=react node server.js
+    API_ENV=sf ADMIN_UI=react node server.js
 }
 
-# to run the admin panel (legacy AngularJS) against PROD
-prod-admin-legacy() {
+# to run the admin panel (legacy AngularJS) against SF
+sf-admin-legacy() {
     proxy || return
-    API_ENV=prod node server.js
+    API_ENV=sf node server.js
 }
 
-# to run ngx-unity against PROD          (browse http://localhost:8091)
-prod-unity() {
+# to run ngx-unity against SF            (browse http://localhost:8091)
+sf-unity() {
     proxy || return
-    API_ENV=prod ADMIN_UI=react node server.js
+    API_ENV=sf ADMIN_UI=react node server.js
 }
 
-# to run ngx-mtp against PROD            (browse http://localhost:8061)
-prod-mtp() {
+# to run ngx-mtp against SF              (browse http://localhost:8061)
+sf-mtp() {
     proxy || return
-    API_ENV=prod ADMIN_UI=react node server.js
+    API_ENV=sf ADMIN_UI=react node server.js
 }
 
 
 # =====================================================================
 #  AMS    ->  http://unity-ams.unitedlayer.com
-#  Session required:  tools/proxy/.cookie-ams
+# ---------------------------------------------------------------------
+#  LIVE data. Reads AND writes hit the real system.
+#  Requires a session in tools/proxy/.cookie-ams
+#  (sign in to the site, then copy sessionid + csrftoken into that file).
+#  See the write-safety rule in CLAUDE.md before changing anything.
+#
+#  WHAT TO RUN  (one command per terminal, in this order):
+#
+#    AMS + ADMIN (React)       AMS + UNITY               AMS + MTP
+#    -------------------       -----------               ---------
+#    1. buildadminwatch        1. buildunity             1. buildmtp
+#    2. serveadminreact        2. serveunity             2. servemtp
+#    3. ams-admin              3. ams-unity              3. ams-mtp
+#
+#    then open:                then open:                then open:
+#    localhost:8091/admin      localhost:8091            localhost:8061
+#
+#    (no startmock - the data comes from AMS)
 # =====================================================================
 
 ams-admin() {           # admin panel (React) against AMS
@@ -206,7 +253,24 @@ ams-admin-legacy() {  # admin panel (legacy AngularJS) against AMS
 
 # =====================================================================
 #  PLAY   ->  https://play.unityone.ai
-#  Session required:  tools/proxy/.cookie-play
+# ---------------------------------------------------------------------
+#  LIVE data. Reads AND writes hit the real system.
+#  Requires a session in tools/proxy/.cookie-play
+#  (sign in to the site, then copy sessionid + csrftoken into that file).
+#  See the write-safety rule in CLAUDE.md before changing anything.
+#
+#  WHAT TO RUN  (one command per terminal, in this order):
+#
+#    PLAY + ADMIN (React)      PLAY + UNITY              PLAY + MTP
+#    --------------------      ------------              ----------
+#    1. buildadminwatch        1. buildunity             1. buildmtp
+#    2. serveadminreact        2. serveunity             2. servemtp
+#    3. play-admin             3. play-unity             3. play-mtp
+#
+#    then open:                then open:                then open:
+#    localhost:8091/admin      localhost:8091            localhost:8061
+#
+#    (no startmock - the data comes from PLAY)
 # =====================================================================
 
 play-admin() {          # admin panel (React) against PLAY
@@ -232,7 +296,24 @@ play-admin-legacy() {  # admin panel (legacy AngularJS) against PLAY
 
 # =====================================================================
 #  ALPHA  ->  https://alpha.unityone.ai
-#  Session required:  tools/proxy/.cookie-alpha
+# ---------------------------------------------------------------------
+#  LIVE data. Reads AND writes hit the real system.
+#  Requires a session in tools/proxy/.cookie-alpha
+#  (sign in to the site, then copy sessionid + csrftoken into that file).
+#  See the write-safety rule in CLAUDE.md before changing anything.
+#
+#  WHAT TO RUN  (one command per terminal, in this order):
+#
+#    ALPHA + ADMIN (React)     ALPHA + UNITY             ALPHA + MTP
+#    ---------------------     -------------             -----------
+#    1. buildadminwatch        1. buildunity             1. buildmtp
+#    2. serveadminreact        2. serveunity             2. servemtp
+#    3. alpha-admin            3. alpha-unity            3. alpha-mtp
+#
+#    then open:                then open:                then open:
+#    localhost:8091/admin      localhost:8091            localhost:8061
+#
+#    (no startmock - the data comes from ALPHA)
 # =====================================================================
 
 alpha-admin() {         # admin panel (React) against ALPHA
@@ -261,8 +342,8 @@ alpha-admin-legacy() {  # admin panel (legacy AngularJS) against ALPHA
 # =====================================================================
 startproxy()          { mock-unity; }          # mock, legacy admin
 startproxyreact()     { mock-admin; }          # mock, React admin
-startproxyprod()      { prod-unity; }          # prod, legacy admin
-startproxyreactprod() { prod-admin; }          # prod, React admin
+startproxyprod()      { sf-unity; }            # sf, React admin
+startproxyreactprod() { sf-admin; }            # sf, React admin
 
 
 # --- Python (3.13.12) ---

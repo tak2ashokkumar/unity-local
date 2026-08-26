@@ -1,6 +1,11 @@
 [
-  { "id": 1, "name": "ul-web-01", "uuid": "34c19565-3072-464e-bb79-18f1dfe090a5", "power_state": "poweredOn", "guest_os": "Ubuntu 20.04", "cpus": 4, "memory_mb": 8192, "disk_gb": 120, "host": "esx-sf10-04", "migration_status": "READY", "cloud_id": "0bd6781e-eb51-4f2c-affd-74bfac9f9097" },
-  { "id": 2, "name": "ul-db-01", "uuid": "63bc2476-8299-4f87-9d5c-289b00377baa", "power_state": "poweredOn", "guest_os": "CentOS 7.9", "cpus": 8, "memory_mb": 32768, "disk_gb": 500, "host": "esx-sf10-04", "migration_status": "READY", "cloud_id": "0bd6781e-eb51-4f2c-affd-74bfac9f9097" },
-  { "id": 3, "name": "ul-cache-02", "uuid": "df250342-06d0-4892-9689-fb1c957bd623", "power_state": "poweredOff", "guest_os": "CentOS 7.9", "cpus": 2, "memory_mb": 8192, "disk_gb": 80, "host": "esx-lv1-01", "migration_status": "IN_PROGRESS", "cloud_id": "b1d4e6a2-55f7-4f0b-8c3e-9d7a1f2c8e60" },
-  { "id": 4, "name": "bank-app-prod", "uuid": "8eea103c-6209-4d58-9e09-9a2c2633b620", "power_state": "poweredOn", "guest_os": "Windows Server 2019", "cpus": 4, "memory_mb": 16384, "disk_gb": 250, "host": "kvm-ash1-02", "migration_status": "READY", "cloud_id": "3c874681-c479-497d-9689-9c1c29a85efc" }
+  {
+    "id": 1,
+    "instance_id": "vm-1001",
+    "vm_name": "app01",
+    "status": "COMPLETED",
+    "target": "aws",
+    "started_at": "2026-08-01T10:00:00Z",
+    "finished_at": "2026-08-01T11:12:00Z"
+  }
 ]

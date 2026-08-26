@@ -1,0 +1,24 @@
+[
+  {
+    "volume_id": "vol-0b1c2d3e4f5a60711",
+    "availability_zone": "us-west-1a",
+    "encrypted": true,
+    "volume_type": "gp3",
+    "volume_size": 30,
+    "state": "in-use",
+    "iops": 3000,
+    "create_time": "2026-03-14T09:22:38Z",
+    "tags": "Name=web-01-root"
+  },
+  {
+    "volume_id": "vol-0b1c2d3e4f5a60722",
+    "availability_zone": "us-west-1b",
+    "encrypted": false,
+    "volume_type": "gp2",
+    "volume_size": 100,
+    "state": "in-use",
+    "iops": 300,
+    "create_time": "2026-01-08T17:04:58Z",
+    "tags": "Name=api-02-data"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "name": "unity-prod-vnet",
+    "type": "Microsoft.Network/virtualNetworks",
+    "location": "eastus",
+    "sku": "",
+    "kind": ""
+  },
+  {
+    "name": "unity-prod-storage",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "eastus",
+    "sku": "Standard_LRS",
+    "kind": "StorageV2"
+  },
+  {
+    "name": "unity-prod-kv",
+    "type": "Microsoft.KeyVault/vaults",
+    "location": "eastus",
+    "sku": "standard",
+    "kind": ""
+  }
+]

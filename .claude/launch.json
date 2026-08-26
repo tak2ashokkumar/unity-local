@@ -16,6 +16,20 @@
       "port": 8096
     },
     {
+      "name": "ngx-admin-dev",
+      "runtimeExecutable": "C:\\Users\\AshokKumar\\Desktop\\unity-local\\tools\\node\\node.exe",
+      "runtimeArgs": [
+        "uldb/ngx-admin/node_modules/vite/bin/vite.js",
+        "uldb/ngx-admin",
+        "--port",
+        "8098",
+        "--strictPort",
+        "--host",
+        "127.0.0.1"
+      ],
+      "port": 8098
+    },
+    {
       "name": "ngx-admin-static",
       "runtimeExecutable": "C:\\Users\\AshokKumar\\Desktop\\unity-local\\tools\\node\\node.exe",
       "runtimeArgs": [
@@ -40,7 +54,7 @@
       "port": 8092
     },
     {
-      "name": "proxy-prod",
+      "name": "proxy-sf",
       "runtimeExecutable": "C:\\Users\\AshokKumar\\Desktop\\unity-local\\tools\\node\\node.exe",
       "runtimeArgs": [
         "tools/proxy/server.js"
@@ -48,7 +62,7 @@
       "env": {
         "PROXY_PORT": "8092",
         "MTP_PROXY_PORT": "8062",
-        "API_ENV": "prod"
+        "API_ENV": "sf"
       },
       "port": 8092
     },
@@ -88,6 +102,19 @@
         "PROXY_PORT": "8092",
         "MTP_PROXY_PORT": "8062",
         "API_ENV": "alpha"
+      },
+      "port": 8092
+    },
+    {
+      "name": "proxy-prod",
+      "runtimeExecutable": "C:\\Users\\AshokKumar\\Desktop\\unity-local\\tools\\node\\node.exe",
+      "runtimeArgs": [
+        "tools/proxy/server.js"
+      ],
+      "env": {
+        "PROXY_PORT": "8092",
+        "MTP_PROXY_PORT": "8062",
+        "API_ENV": "prod"
       },
       "port": 8092
     }

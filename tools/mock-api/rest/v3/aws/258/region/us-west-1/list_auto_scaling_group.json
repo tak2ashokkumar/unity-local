@@ -1,0 +1,25 @@
+[
+  {
+    "name": "unity-web-asg",
+    "instances": [
+      "i-0a1b2c3d4e5f60011"
+    ],
+    "availability_zone": [
+      "us-west-1a",
+      "us-west-1b"
+    ],
+    "min_size": 1,
+    "max_size": 4,
+    "desired_capacity": 2
+  },
+  {
+    "name": "unity-batch-asg",
+    "instances": [],
+    "availability_zone": [
+      "us-west-1a"
+    ],
+    "min_size": 0,
+    "max_size": 10,
+    "desired_capacity": 0
+  }
+]

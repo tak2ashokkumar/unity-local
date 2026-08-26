@@ -1,0 +1,23 @@
+[
+  {
+    "name": "unity-dev-vnet",
+    "type": "Microsoft.Network/virtualNetworks",
+    "location": "westus2",
+    "sku": "",
+    "kind": ""
+  },
+  {
+    "name": "unity-dev-storage",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "westus2",
+    "sku": "Standard_LRS",
+    "kind": "StorageV2"
+  },
+  {
+    "name": "unity-dev-kv",
+    "type": "Microsoft.KeyVault/vaults",
+    "location": "westus2",
+    "sku": "standard",
+    "kind": ""
+  }
+]

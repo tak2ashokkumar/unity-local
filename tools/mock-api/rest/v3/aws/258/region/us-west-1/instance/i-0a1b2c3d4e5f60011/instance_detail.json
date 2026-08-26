@@ -1,0 +1,23 @@
+[
+  {
+    "InstanceId": "i-0a1b2c3d4e5f60011",
+    "ImageId": "ami-0d5eff06f840b45e9",
+    "RamdiskId": "",
+    "KeyName": "ul-ops-keypair",
+    "HostId": "",
+    "AvailabilityZone": "us-west-1a",
+    "PrivateDnsName": "ip-10-0-1-11.us-west-1.compute.internal",
+    "PublicDnsName": "ec2-54-183-20-11.us-west-1.compute.amazonaws.com",
+    "KernelId": "",
+    "InstanceState": "running",
+    "MonitoringState": "disabled",
+    "SecurityGroup": "sg-0f14ac9e2b6d7a301",
+    "GroupName": "unity-web-sg",
+    "LaunchTime": "2026-03-14T09:22:41Z",
+    "Platform": "Linux/UNIX",
+    "SubnetId": "subnet-0b7c1d2e3f4a5b6c7",
+    "InstanceType": "t3.medium",
+    "LoadBalancers": "unity-web-alb",
+    "Tags": "Name=web-01, env=prod"
+  }
+]

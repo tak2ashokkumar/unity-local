@@ -1,0 +1,25 @@
+{
+  "instance_types": [
+    "t3.micro",
+    "t3.medium",
+    "m5.large",
+    "c5.xlarge"
+  ],
+  "key_pairs": [
+    {
+      "KeyName": "ul-ops-keypair"
+    }
+  ],
+  "subnets": [
+    {
+      "SubnetId": "subnet-0b7c1d2e3f4a5b6c7",
+      "AvailabilityZone": "us-west-1a"
+    }
+  ],
+  "security_groups": [
+    {
+      "group_id": "sg-0f14ac9e2b6d7a301",
+      "group_name": "unity-web-sg"
+    }
+  ]
+}
