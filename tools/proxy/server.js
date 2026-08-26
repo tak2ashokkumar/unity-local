@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const zlib = require("zlib");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const app = express();
@@ -141,6 +142,43 @@ function prodCookie() {
   return "";
 }
 
+/* ---- Helpers for the live proxy's response handling (see prodProxy below) ---- */
+
+/* Sends our own JSON answer. Never reuse the upstream headers here - the body is
+ * different, so its content-length and content-encoding no longer apply. */
+function sendJson(req, res, status, payload) {
+  const body = Buffer.from(JSON.stringify(payload), "utf8");
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": body.length,
+    "Cache-Control": "no-store"
+  });
+  // A HEAD reply carries the headers only.
+  if ((req.method || "GET").toUpperCase() === "HEAD") return res.end();
+  res.end(body);
+}
+
+/* Reads a whole response into text. Only used for small HTML error pages, so the
+ * buffering is bounded in practice. nginx may compress them, hence the decode. */
+function readBody(stream, headers, cb) {
+  const chunks = [];
+  stream.on("data", (chunk) => chunks.push(chunk));
+  stream.on("error", () => cb(""));
+  stream.on("end", () => {
+    let buf = Buffer.concat(chunks);
+    const encoding = String(headers["content-encoding"] || "").toLowerCase();
+    try {
+      if (encoding === "gzip") buf = zlib.gunzipSync(buf);
+      else if (encoding === "deflate") buf = zlib.inflateSync(buf);
+      else if (encoding === "br" && zlib.brotliDecompressSync) buf = zlib.brotliDecompressSync(buf);
+    } catch (e) { /* not decodable - fall back to the raw bytes */ }
+    cb(buf.toString("utf8"));
+  });
+}
+
+/* How much of an HTML error page to quote back in the JSON envelope. */
+const MAX_ERROR_BODY = 2000;
+
 /* Listen ports (override only when running a second instance side by side). */
 const PROXY_PORT = Number(process.env.PROXY_PORT || 8091);
 const MTP_PROXY_PORT = Number(process.env.MTP_PROXY_PORT || 8061);
@@ -163,6 +201,11 @@ const prodProxy = createProxyMiddleware({
   // The VM console's SSH stream is a WebSocket (see the upgrade handler below).
   ws: true,
   secure: true,
+  // We answer the client ourselves in proxyRes below, so the backend's real status
+  // survives instead of being flattened. With this flag http-proxy stops copying the
+  // status/headers and stops piping - both are done by hand in the pass-through
+  // branch. Streaming still works there; only HTML error pages are buffered.
+  selfHandleResponse: true,
   on: {
     proxyReq: (proxyReq, req) => {
       const cookie = prodCookie();
@@ -175,29 +218,66 @@ const prodProxy = createProxyMiddleware({
         if (m) proxyReq.setHeader("x-csrftoken", m[1]);
       }
     },
+    /* What the backend answered is what the browser sees. The DevTools Network tab
+     * is the place these are read, so the status code and the body have to be the
+     * real ones - a backend 500 reported as a 401 sends app-http-interceptor.ts
+     * straight to the login page and hides the actual fault. Only a genuine session
+     * expiry is translated, because there Django answers an XHR with a login page
+     * the app cannot use. */
     proxyRes: (proxyRes, req, res) => {
-      // An expired session makes Django redirect to the login page (or return the
-      // login HTML). Convert that into a clear JSON 401 so the UI can say so
-      // instead of choking on unparsable HTML.
-      const loc = proxyRes.headers.location || "";
-      const ctype = proxyRes.headers["content-type"] || "";
-      const redirectToLogin =
-        (proxyRes.statusCode === 301 || proxyRes.statusCode === 302) && /\/account\/login/.test(loc);
+      const status = proxyRes.statusCode;
+      const loc = String(proxyRes.headers.location || "");
+      const ctype = String(proxyRes.headers["content-type"] || "");
+      const isHtml = ctype.indexOf("text/html") !== -1;
       // /account/* (the Django two-factor wizard) serves real HTML pages on
-      // purpose, so the "HTML means the session died" rule must not apply there -
-      // it would turn the whole 2FA flow into a 401. A genuine login redirect is
-      // still caught for those paths by the redirectToLogin check above.
+      // purpose, so the HTML rules below must not apply there - they would turn
+      // the whole 2FA flow into an error. A genuine login redirect is still caught
+      // for those paths by the redirectToLogin check just below.
       const isHtmlPage = /^\/account(\/|$|\?)/.test(req.url || "");
-      if (redirectToLogin || (!isHtmlPage && ctype.indexOf("text/html") !== -1)) {
-        proxyRes.statusCode = 401;
-        proxyRes.headers["content-type"] = "application/json; charset=utf-8";
-        delete proxyRes.headers.location;
+
+      // A) Session expired: Django either redirects to the login page or serves it
+      // inline with a 200. Both mean the same thing, so say it once, in JSON.
+      const redirectToLogin = (status === 301 || status === 302) && /\/account\/login/.test(loc);
+      const loginPageInline = status >= 200 && status < 300 && isHtml && !isHtmlPage;
+      if (redirectToLogin || loginPageInline) {
+        // Drain rather than destroy - destroying would surface as a proxy error and
+        // turn this into the 502 handler below.
+        proxyRes.resume();
+        return sendJson(req, res, 401, {
+          detail: `Session expired for "${API_ENV}" - refresh tools/proxy/.cookie-${API_ENV}.`,
+          status: 401,
+          upstream_status: status,
+          path: req.url
+        });
       }
+
+      // B) A Django error page. Keep the real status; swap only the unparsable HTML
+      // body for JSON that still quotes what the page said.
+      if (isHtml && status >= 400 && !isHtmlPage) {
+        return readBody(proxyRes, proxyRes.headers, (text) => {
+          sendJson(req, res, status, {
+            detail: `${API_TARGET} returned ${status} (${ctype.split(";")[0]}).`,
+            status: status,
+            upstream: API_TARGET + req.url,
+            body: text.slice(0, MAX_ERROR_BODY)
+          });
+        });
+      }
+
+      // C) Everything else goes back untouched - same status, same headers, same
+      // bytes. DRF's own JSON errors land here, and so does the APPEND_SLASH
+      // redirect for an endpoint declared without its trailing slash.
+      res.writeHead(status, proxyRes.statusMessage, proxyRes.headers);
+      proxyRes.pipe(res);
     },
     error: (err, req, res) => {
-      if (res && res.writeHead) {
+      // headersSent matters now that the pass-through branch pipes by hand: if the
+      // upstream drops mid-body the reply has already started and cannot be redone.
+      if (res && res.writeHead && !res.headersSent) {
         res.writeHead(502, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({ detail: "Production API unreachable (" + err.code + ")." }));
+      } else if (res && typeof res.end === "function") {
+        res.end();
       }
     }
   }
