@@ -33,6 +33,7 @@ import {
   UNIFIED_AIOPS_IDLE_DEVICES_ENDPOINT,
   UNIFIED_AIOPS_IDLE_DURATION_COLORS,
   UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT,
+  UNIFIED_AIOPS_LIFECYCLE_SANKEY_NODE_ORDER,
   UNIFIED_AIOPS_OS_MONITORING_ENDPOINT,
   UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS,
   UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
@@ -4085,7 +4086,7 @@ export class NavigatorCentralService {
       const hasSeverity = criticalCount > 0 || warningCount > 0 || infoCount > 0;
 
       if (hasSeverity) {
-        // Scenario A: severity data present  3 tiles per source (Critical, Warning, Info)
+        // Scenario A: severity data present - one tile per non-zero severity (Critical / Warning / Info).
         const severityTotal = Math.max(criticalCount + warningCount + infoCount, 1);
         const clampedGroup = Math.min(Math.max(severityTotal, minGroupValue), maxGroupValue);
 
@@ -4093,19 +4094,21 @@ export class NavigatorCentralService {
           { suffix: 'Critical', count: criticalCount },
           { suffix: 'Warning',  count: warningCount },
           { suffix: 'Info',     count: infoCount }
-        ];
+        ].filter(severity => severity.count > 0);
 
-        let sourceLabelAssigned = false;
-        severities.forEach(({ suffix, count }) => {
-          if (count <= 0) { return; }
+        // One label per source, carrying the source's total, placed on the MIDDLE tile so it reads as a
+        // label for the whole group instead of sitting against the topmost severity. Tiles are only a few
+        // pixels tall next to the 30px nodeGap, so the group's visual centre is the middle tile by index.
+        const sourceTotal = severities.reduce((total, severity) => total + severity.count, 0);
+        const labelIndex = Math.floor((severities.length - 1) / 2);
+
+        severities.forEach(({ suffix, count }, index) => {
           const nodeName = `${sourceName} :: ${suffix}`;
           const color = SEVERITY_COLORS[suffix];
           const tileValue = (count / severityTotal) * clampedGroup;
           nodeColors[nodeName] = color;
           nodeTotals[nodeName] = count;
-          // Show the source name on the topmost existing tile only; remaining tiles stay blank
-          nodeLabels[nodeName] = sourceLabelAssigned ? '' : sourceName;
-          sourceLabelAssigned = true;
+          nodeLabels[nodeName] = index === labelIndex ? `${sourceName}\n(${this.formatNumber(sourceTotal)})` : '';
           links.push({ source: nodeName, target: 'Events', value: tileValue, count, lineStyle: { color, opacity: 0.35 } });
         });
       } else {
@@ -4167,13 +4170,20 @@ export class NavigatorCentralService {
       'Auto Remediation': this.getNumberFromPayload(flatConditions, ['resolved_auto_remediation_count', 'resolved.autoRemediation.count'])
     };
 
-    // Let ECharts optimize this chart's layout (layoutIterations 32) so each node settles near its
-    // source's band - e.g. Auto Healed aligns with Resolved (not up at Open's level) even when the
-    // Acknowledged branch is absent. Accepted trade-off: the optimizer orders same-parent siblings
-    // by tile height, so the duration buckets may not keep strict 5/30/>30 Min input order (e.g.
-    // > 30 Min lands above 30 Min when its count is larger).
-    // The source sankey keeps 0 to preserve the order of its many parallel source tiles.
-    return this.getSankeyOptions(links, nodeTotals, { ...UNIFIED_AIOPS_SANKEY_NODE_COLORS }, {}, 32);
+    // layoutIterations MUST stay 0 so the explicit node order below is what renders: branches stay
+    // parallel (Open -> Acknowledged above Resolved -> Auto Healed) and the duration buckets stay at
+    // 5 / 30 / >30. Any relaxation re-sorts same-parent siblings by tile height, which pulls the large
+    // Auto Healed above the tiny Acknowledged and crosses the branches - verified at both 32 and 5, so
+    // do not reintroduce it. Accepted trade-off: Resolved -> Auto Healed runs diagonally rather than
+    // straight across, because column 3 stacks from the top and Acknowledged is far shorter than Open.
+    return this.getSankeyOptions(
+      links,
+      nodeTotals,
+      { ...UNIFIED_AIOPS_SANKEY_NODE_COLORS },
+      {},
+      0,
+      UNIFIED_AIOPS_LIFECYCLE_SANKEY_NODE_ORDER
+    );
   }
 
   private addDurationSankeyLinks(links: Array<{ source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } }>, source: string, duration: any) {
@@ -4198,13 +4208,25 @@ export class NavigatorCentralService {
     nodeTotals: { [name: string]: number } = {},
     nodeColors: { [name: string]: string } = {},
     nodeLabels: { [name: string]: string } = {},
-    layoutIterations: number = 0
+    layoutIterations: number = 0,
+    nodeOrder: string[] = []
   ): EChartsOption {
     if (!links.length) {
       return {};
     }
 
     const allNames = Array.from(new Set(links.reduce((result: string[], link) => result.concat(link.source, link.target), [])));
+    // ECharts lays each column out in data order first, then runs `layoutIterations` relaxation passes
+    // over it - so this sets the STARTING order (and, at 0 iterations, the final one). Unlisted names
+    // keep their first-appearance order behind the listed ones.
+    if (nodeOrder.length) {
+      const firstSeenOrder = [...allNames];
+      const rank = (name: string) => {
+        const index = nodeOrder.indexOf(name);
+        return index === -1 ? nodeOrder.length + firstSeenOrder.indexOf(name) : index;
+      };
+      allNames.sort((first, second) => rank(first) - rank(second));
+    }
 
     const nodes = allNames.map(name => {
       const incoming = links.filter(link => link.target === name).reduce((total, link) => total + link.value, 0);
@@ -4255,16 +4277,18 @@ export class NavigatorCentralService {
     // Edge labels anchor their text to the node (zrender aligns them outward), so the painted
     // width is the text itself - labelWidth above only controls wrapping and caps the estimate.
     const estimateLineWidth = (text: string) => Math.ceil(String(text || '').length * 6.5);
+    // Mirrors the label formatter below: severity tiles use their pre-built label (name + total, blank on
+    // every tile but the group's middle one), everything else is name + count. Both can wrap to two
+    // lines, so the widest rendered line decides the margin.
     const estimateLabelWidth = (name: string, count: number) => {
-      const display = name.includes(' :: ') ? (nodeLabels[name] || '') : name;
+      const display = name.includes(' :: ')
+        ? (nodeLabels[name] || '')
+        : (count ? `${name}\n(${this.formatNumber(count)})` : name);
       if (!display) {
         return 0;
       }
-      const lines = [Math.min(estimateLineWidth(display), labelWidth)];
-      if (count && !name.includes(' :: ')) {
-        lines.push(estimateLineWidth(`(${this.formatNumber(count)})`));
-      }
-      return Math.max(...lines);
+      return display.split('\n')
+        .reduce((widest, line) => Math.max(widest, Math.min(estimateLineWidth(line), labelWidth)), 0);
     };
     const sideLabelWidth = (side: 'left' | 'right') => nodes
       .filter(node => node.label && node.label.position === side)
@@ -4315,7 +4339,8 @@ export class NavigatorCentralService {
           formatter: (params: any) => {
             const name: string = params?.name || '';
             const count = params?.data?.count;
-            // Scenario A severity tile: source name shows only on the designated topmost tile
+            // Scenario A severity tile: the pre-built label (source name + total) sits on the group's
+            // middle tile; every other tile in the group resolves to an empty label.
             if (name.includes(' :: ')) {
               return nodeLabels[name] || '';
             }

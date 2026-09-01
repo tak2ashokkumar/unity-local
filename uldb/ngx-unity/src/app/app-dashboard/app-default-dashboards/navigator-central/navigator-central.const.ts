@@ -41,6 +41,23 @@ export const UNIFIED_AIOPS_SANKEY_NODE_COLORS: { [name: string]: string } = {
   '> 30 Min': '#df9090'
 };
 
+// Fixed top-to-bottom order for the Alert Lifecycle sankey. Rendered with layoutIterations 0 so this
+// order is honoured: each column lists its nodes in the same order as the branch they come from, which
+// keeps the ribbons from crossing (Open -> Acknowledged stays above Resolved -> Auto Healed), and holds
+// the duration buckets at 5 / 30 / >30 instead of letting the optimizer sort them by tile height.
+// Names not listed here keep their first-appearance order after the listed ones.
+export const UNIFIED_AIOPS_LIFECYCLE_SANKEY_NODE_ORDER = [
+  'Condition',
+  'Open',
+  'Resolved',
+  'Acknowledged',
+  'Auto Healed',
+  'Auto Remediation',
+  '5 Min',
+  '30 Min',
+  '> 30 Min'
+];
+
 // Device Discovery vs Monitoring coverage bars: Monitored vs Not Monitored.
 export const UNIFIED_AIOPS_DISCOVERY_COLORS = {
   monitored: '#4f93e3',
