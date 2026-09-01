@@ -27,6 +27,7 @@ import {
   UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS,
   UNIFIED_AIOPS_EXECUTIVE_GROUPS,
   UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS,
+  UNIFIED_AIOPS_GEO_DISTRIBUTION_MAX_TILES,
   UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT,
   UNIFIED_AIOPS_IDLE_DEVICES_BY_DURATION_ENDPOINT,
   UNIFIED_AIOPS_IDLE_DEVICES_ENDPOINT,
@@ -56,6 +57,8 @@ import {
   UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT,
   UNIFIED_AIOPS_SANKEY_NODE_COLORS,
   UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT,
+  UNIFIED_AIOPS_TOP_NETWORK_DEVICE_COLORS,
+  UNIFIED_AIOPS_TOP_NETWORK_DEVICES_LIMIT,
   UNIFIED_AIOPS_TIME_RANGE_PARAM_MAP
 } from './navigator-central.const';
 import { environment } from 'src/environments/environment';
@@ -81,6 +84,7 @@ import {
   UnifiedAiopsExecutiveView,
   UnifiedAiopsPrivateCloudGeoLegendItem,
   UnifiedAiopsPrivateCloudGeoSite,
+  UnifiedAiopsPrivateCloudGeoSummary,
   UnifiedAiopsPrivateCloudGeoView,
   UnifiedAiopsNewVmRow,
   UnifiedAiopsNewVmsView,
@@ -317,7 +321,7 @@ export class NavigatorCentralService {
       return chips;
     }, []);
     card.subCards = (config.dynamicSubCards
-      ? this.buildExecDynamicSubCards(payload, config.subArrayKeys, config.fallbackSubArrayKeys, config.unit, response, summary, config.link)
+      ? this.buildExecDynamicSubCards(payload, config.subArrayKeys, config.unit, response, summary, config.link)
       : this.buildExecSubCards(payload, config.subArrayKeys, config.subItems, config.unit, response, summary))
       .filter(subCard => this.hasExecStatusCardData(subCard));
     if (!this.hasExecStatusCardData(card) && card.subCards.length) {
@@ -345,19 +349,15 @@ export class NavigatorCentralService {
     });
   }
 
-  private buildExecDynamicSubCards(payload: any, arrayKeys?: string[], fallbackArrayKeys?: string[], unit?: string, response?: any, summary?: any, link?: string): UnifiedAiopsExecStatusCard[] {
-    let cards = this.getExecDynamicSubCardsFromEntries(
+  // Renders one sub-card per entry the API actually sends under the card's own array keys. There is no
+  // cross-block fallback: a card with no matching block renders nothing rather than borrowing another
+  // block's devices (that fallback used to duplicate the Network group under Datacenter and IoTs).
+  private buildExecDynamicSubCards(payload: any, arrayKeys?: string[], unit?: string, response?: any, summary?: any, link?: string): UnifiedAiopsExecStatusCard[] {
+    const cards = this.getExecDynamicSubCardsFromEntries(
       this.getExecSubCardEntries(payload, arrayKeys, response, summary),
       unit,
       link
     );
-    if (!cards.some(card => this.hasExecStatusCardData(card)) && fallbackArrayKeys && fallbackArrayKeys.length) {
-      cards = this.getExecDynamicSubCardsFromEntries(
-        this.getExecSubCardEntries(payload, fallbackArrayKeys, response, summary),
-        unit,
-        link
-      );
-    }
 
     return cards.sort((first, second) => first.label.localeCompare(second.label));
   }
@@ -896,7 +896,7 @@ export class NavigatorCentralService {
     const items = (sites || view?.sites || []).slice()
       .filter(site => site && site.totalResources > 0)
       .sort((first, second) => second.totalResources - first.totalResources)
-      .slice(0, 12);
+      .slice(0, UNIFIED_AIOPS_GEO_DISTRIBUTION_MAX_TILES);
     if (!items.length) {
       return {};
     }
@@ -1037,7 +1037,7 @@ export class NavigatorCentralService {
     const items = (sites || []).slice()
       .filter(site => site && site.totalResources > 0)
       .sort((first, second) => second.totalResources - first.totalResources)
-      .slice(0, 12);
+      .slice(0, UNIFIED_AIOPS_GEO_DISTRIBUTION_MAX_TILES);
     const platformColors = this.getPrivateCloudGeoPlatformColorMap(items);
     const legends = items.reduce((result: { [key: string]: UnifiedAiopsPrivateCloudGeoLegendItem }, site) => {
       const key = site.platformKey || 'other';
@@ -1053,6 +1053,25 @@ export class NavigatorCentralService {
       return result;
     }, {});
     return Object.keys(legends).map(key => legends[key]);
+  }
+
+  // KPI strip for the Private Cloud Geo widget. With no platform selected the API-provided totals are
+  // kept as-is; once a platform is selected they are recomputed from the visible sites so the KPIs
+  // agree with the chart.
+  convertToPrivateCloudGeoSummary(sites: UnifiedAiopsPrivateCloudGeoSite[], view?: UnifiedAiopsPrivateCloudGeoView | null): UnifiedAiopsPrivateCloudGeoSummary {
+    if (view) {
+      return {
+        totalPrivateClouds: view.totalPrivateClouds,
+        totalResources: view.totalResources,
+        totalAlerts: view.totalAlerts
+      };
+    }
+    const viewSites = sites || [];
+    return {
+      totalPrivateClouds: viewSites.length,
+      totalResources: viewSites.reduce((sum, site) => sum + site.totalResources, 0),
+      totalAlerts: viewSites.reduce((sum, site) => sum + site.totalAlerts, 0)
+    };
   }
 
   convertToPrivateCloudGeoPlatformOptions(sites?: UnifiedAiopsPrivateCloudGeoSite[]): UnifiedAiopsFilterOption[] {
@@ -2003,8 +2022,9 @@ export class NavigatorCentralService {
     ];
   }
 
+  // The legend describes the rendered tiles, so it reads the same capped set the chart does.
   convertToGeoDistributionLegends(cells: UnifiedAiopsGeoCell[]): UnifiedAiopsGeoDistributionLegendItem[] {
-    const legends = (cells || []).reduce((result: { [key: string]: UnifiedAiopsGeoDistributionLegendItem }, cell) => {
+    const legends = this.getGeoDistributionTileCells(cells).reduce((result: { [key: string]: UnifiedAiopsGeoDistributionLegendItem }, cell) => {
       const label = cell.cloudType || 'Unknown';
       const key = this.normalizeKey(label) || 'unknown';
       if (!result[key]) {
@@ -2183,20 +2203,22 @@ export class NavigatorCentralService {
     </div>`;
   }
 
+  // Returns EVERY location the API sends (sorted largest-first) so the KPI strip and the Cloud Type
+  // dropdown cover the whole set. The tile layout is assigned per render in getGeoHeatmapLayoutCells,
+  // which is also where the chart is capped to UNIFIED_AIOPS_GEO_DISTRIBUTION_MAX_TILES.
   private getGeoHeatmapGroups(response: any): UnifiedAiopsGeoCell[] {
     const payload = this.getMetricPayload(response, ['groups', 'heatmap', 'geo_distribution', 'geo_heatmap', 'locations', 'results', 'items', 'rows', 'data']);
-    const items = this.getGeoDistributionItems(payload || response).slice(0, 12);
+    const items = this.getGeoDistributionItems(payload || response);
     if (!items.length) {
       return [];
     }
 
     const colorMap = this.getGeoDistributionCloudColorMap(items.map(item => item.cloudType || 'Unknown'));
-    const layout = this.getTreemapCells(this.getReadableTreemapWeights(items.map(item => item.totalResources)), { x: 0, y: 0, width: 100, height: 100 });
     return items.map((item, index) => ({
       name: item.name,
       cloudType: item.cloudType,
       color: colorMap[this.normalizeKey(item.cloudType || 'Unknown')] || UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS[index % UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS.length],
-      value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height],
+      value: [],
       totalResources: item.totalResources,
       totalAlerts: item.totalAlerts,
       critical: item.critical,
@@ -2235,8 +2257,16 @@ export class NavigatorCentralService {
       .sort((first, second) => second.totalResources - first.totalResources);
   }
 
+  // The cells the treemap actually paints: locations with resources, capped to the readable tile count.
+  // Cells arrive sorted largest-first, so this keeps the biggest locations.
+  private getGeoDistributionTileCells(cells: UnifiedAiopsGeoCell[]): UnifiedAiopsGeoCell[] {
+    return (cells || [])
+      .filter(cell => cell && cell.totalResources > 0)
+      .slice(0, UNIFIED_AIOPS_GEO_DISTRIBUTION_MAX_TILES);
+  }
+
   private getGeoHeatmapLayoutCells(cells: UnifiedAiopsGeoCell[]): UnifiedAiopsGeoCell[] {
-    const viewCells = (cells || []).filter(cell => cell && cell.totalResources > 0);
+    const viewCells = this.getGeoDistributionTileCells(cells);
     const layout = this.getTreemapCells(this.getReadableTreemapWeights(viewCells.map(cell => cell.totalResources)), { x: 0, y: 0, width: 100, height: 100 });
     return viewCells.map((cell, index) => ({
       ...cell,
@@ -3050,18 +3080,21 @@ export class NavigatorCentralService {
       return {};
     }
 
-    const viewItems = items.slice(0, 8).reverse();
+    // items arrive sorted largest-first, so viewItems stays in rank order and the color is picked by
+    // rank. A horizontal bar chart draws its category axis bottom-up, so the axis labels and the bars
+    // are reversed at render time only - that keeps the largest bar on top without shifting colors.
+    const viewItems = items.slice(0, UNIFIED_AIOPS_TOP_NETWORK_DEVICES_LIMIT);
     const maxValue = Math.max(...viewItems.map(item => item.value), 0);
     return {
       grid: { left: 72, right: 18, top: 12, bottom: 24 },
       xAxis: { type: 'value', max: maxValue <= 100 ? 100 : Math.ceil(maxValue * 1.1), axisLabel: { fontSize: 9, color: '#7b8794' }, splitLine: { lineStyle: { color: '#edf0f2' } } },
-      yAxis: { type: 'category', data: viewItems.map(item => item.name), axisLabel: { fontSize: 9, color: '#5f6d7b' }, axisTick: { show: false }, axisLine: { show: false } },
+      yAxis: { type: 'category', data: viewItems.map(item => item.name).reverse(), axisLabel: { fontSize: 9, color: '#5f6d7b' }, axisTick: { show: false }, axisLine: { show: false } },
       series: [{
         type: 'bar',
         data: viewItems.map((item, index) => ({
           value: item.value,
-          itemStyle: { color: ['#2f80ed', '#2f80ed', '#2f80ed', '#e68612', '#e5232b', '#617887', '#00a0df', '#4285f4'][index] }
-        })),
+          itemStyle: { color: UNIFIED_AIOPS_TOP_NETWORK_DEVICE_COLORS[index % UNIFIED_AIOPS_TOP_NETWORK_DEVICE_COLORS.length] }
+        })).reverse(),
         barWidth: 13
       }]
     };
@@ -4003,7 +4036,7 @@ export class NavigatorCentralService {
   }
 
   private getAlertSourceSankeyOptionsFromPayload(response: any): EChartsOption {
-    type SankeyLink = { source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } };
+    type SankeyLink = { source: string; target: string; value: number; count?: number; lineStyle?: { color: string; opacity: number } };
     const links: SankeyLink[] = [];
     const nodeTotals: { [name: string]: number } = {};
     // Seed downstream node colors from the curated palette; severity tiles add their own colors below.
@@ -4073,7 +4106,7 @@ export class NavigatorCentralService {
           // Show the source name on the topmost existing tile only; remaining tiles stay blank
           nodeLabels[nodeName] = sourceLabelAssigned ? '' : sourceName;
           sourceLabelAssigned = true;
-          links.push({ source: nodeName, target: 'Events', value: tileValue, lineStyle: { color, opacity: 0.35 } });
+          links.push({ source: nodeName, target: 'Events', value: tileValue, count, lineStyle: { color, opacity: 0.35 } });
         });
       } else {
         // Scenario B: no severity data  single node per source, gradient flow
@@ -4087,9 +4120,9 @@ export class NavigatorCentralService {
         const severityColor = SEVERITY_COLORS[sourceName];
         if (severityColor) {
           nodeColors[sourceName] = severityColor;
-          links.push({ source: sourceName, target: 'Events', value: clampedValue, lineStyle: { color: severityColor, opacity: 0.35 } });
+          links.push({ source: sourceName, target: 'Events', value: clampedValue, count: totalSourceEvents, lineStyle: { color: severityColor, opacity: 0.35 } });
         } else {
-          links.push({ source: sourceName, target: 'Events', value: clampedValue });
+          links.push({ source: sourceName, target: 'Events', value: clampedValue, count: totalSourceEvents });
         }
       }
     });
@@ -4161,7 +4194,7 @@ export class NavigatorCentralService {
   }
 
   private getSankeyOptions(
-    links: Array<{ source: string; target: string; value: number; lineStyle?: { color: string; opacity: number } }>,
+    links: Array<{ source: string; target: string; value: number; count?: number; lineStyle?: { color: string; opacity: number } }>,
     nodeTotals: { [name: string]: number } = {},
     nodeColors: { [name: string]: string } = {},
     nodeLabels: { [name: string]: string } = {},
@@ -4204,7 +4237,13 @@ export class NavigatorCentralService {
     }));
     const compress = (value: number) => Math.sqrt(Math.max(value, 0));
     const minLayoutValue = compress(maxFlow) * 0.2;
-    const layoutLinks = links.map(link => ({ ...link, value: Math.max(compress(link.value), minLayoutValue) }));
+    // `value` becomes the compressed layout height; `count` keeps the REAL flow count for the tooltip.
+    // Source tiles already carry a synthetic value, so they pass their own count in explicitly.
+    const layoutLinks = links.map(link => ({
+      ...link,
+      value: Math.max(compress(link.value), minLayoutValue),
+      count: link.count === undefined ? link.value : link.count
+    }));
 
     // Fixed label box width keeps wall spacing consistent and wraps long names instead of
     // letting them spill past the left/right chart edges.
@@ -4236,7 +4275,17 @@ export class NavigatorCentralService {
     return {
       tooltip: {
         trigger: 'item',
-        triggerOn: 'mousemove'
+        triggerOn: 'mousemove',
+        // Events / alerts / conditions are whole things, so the tooltip shows the real count as a
+        // rounded number - never the fractional layout value the tiles are sized with.
+        formatter: (params: any) => {
+          const data = params?.data || {};
+          const count = this.formatNumber(Math.round(this.getNumberValue(data.count)));
+          if (params?.dataType === 'edge') {
+            return `${this.escapeTooltipText(data.source)} &rarr; ${this.escapeTooltipText(data.target)}: <strong>${count}</strong>`;
+          }
+          return `${this.escapeTooltipText(data.name)}: <strong>${count}</strong>`;
+        }
       },
       series: [{
         type: 'sankey',

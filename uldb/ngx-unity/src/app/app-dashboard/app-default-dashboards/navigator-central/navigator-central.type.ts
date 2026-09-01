@@ -639,7 +639,6 @@ export interface UnifiedAiopsExecCardConfig {
   link?: string;
   chipConfigs?: UnifiedAiopsExecChipConfig[];
   subArrayKeys?: string[];
-  fallbackSubArrayKeys?: string[];
   subItems?: UnifiedAiopsExecItemConfig[];
   dynamicSubCards?: boolean;
 }
@@ -706,6 +705,12 @@ export interface UnifiedAiopsPrivateCloudGeoSite {
   hypervisorCount: number;
   baremetalCount: number;
   resourceRows: UnifiedAiopsPrivateCloudGeoResourceRow[];
+}
+
+export interface UnifiedAiopsPrivateCloudGeoSummary {
+  totalPrivateClouds: number;
+  totalResources: number;
+  totalAlerts: number;
 }
 
 export interface UnifiedAiopsPrivateCloudGeoView {

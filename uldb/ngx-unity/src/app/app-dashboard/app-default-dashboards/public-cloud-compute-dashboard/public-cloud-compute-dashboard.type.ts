@@ -170,6 +170,12 @@ export interface PublicCloudPerformanceHotspotResponseItem {
   disk_size?: PublicCloudPerformanceHotspotDiskResponse;
   data_disk_read_write_bytes?: { read?: string | number; write?: string | number };
   data_disk_read_write_rates?: { read_ops?: string | number; write_ops?: string | number };
+  // Current response carries the read/write metrics as flat per-second fields; the nested
+  // data_disk_read_write_* objects above come from the older response shape.
+  disk_read_bytes_per_second?: string | number;
+  disk_write_bytes_per_second?: string | number;
+  disk_read_operations_per_second?: string | number;
+  disk_write_operations_per_second?: string | number;
   avg_network_traffic?: string | number;
   network_traffic?: string | number;
 }
@@ -816,16 +822,25 @@ export interface PublicCloudDatabaseOverviewResponse {
   data?: PublicCloudDatabaseOverviewRowResponse[];
 }
 
+// Top 10 Performance Summary header column; label already carries the unit read from the response.
+export interface PublicCloudDatabaseOverviewColumn {
+  key: string;
+  label: string;
+  numeric: boolean;
+}
+
+// Metrics are null when the response omits them, so a missing reading renders as NA instead of a
+// fabricated 0.00 (the KPI strip likewise excludes missing readings from its averages).
 export interface PublicCloudDatabaseOverviewRow {
   instance: string;
   uuid: string;
-  writeThroughput: number;
-  writeLatency: number;
-  writeIops: number;
-  readThroughput: number;
-  readLatency: number;
-  readIops: number;
-  queueDepth: number;
+  writeThroughput: number | null;
+  writeLatency: number | null;
+  writeIops: number | null;
+  readThroughput: number | null;
+  readLatency: number | null;
+  readIops: number | null;
+  queueDepth: number | null;
 }
 
 // write_performance_trend / read_performance_trend response (per-resource metric series over time).
@@ -1006,6 +1021,8 @@ export interface PublicCloudStorageResourcesResponse {
   data?: PublicCloudStorageResourceRowResponse[];
 }
 
+// Numeric fields are null when the response omits them, so a missing reading renders as NA rather
+// than a fabricated 0 (SF returns null latency and capacity on every storage row today).
 export interface PublicCloudStorageResourceRow {
   deviceName: string;
   uuid: string;
@@ -1013,11 +1030,11 @@ export interface PublicCloudStorageResourceRow {
   cloud: string;
   cloudRegion: string;
   capacity: string;
-  capacityValue: number;
-  e2eLatency: number;
-  successServerLatency: number;
-  networkQueueDelay: number;
-  latencyHealthScore: number;
+  capacityValue: number | null;
+  e2eLatency: number | null;
+  successServerLatency: number | null;
+  networkQueueDelay: number | null;
+  latencyHealthScore: number | null;
   status: string;
 }
 

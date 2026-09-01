@@ -323,19 +323,19 @@
                 </div>
                 <div class="dashboard-card private-cloud-geo-card">
                     <app-spinner [name]="loaderNames.privateCloudGeo" [width]="0"></app-spinner>
-                    <div class="pcgeo-header" *ngIf="privateCloudGeoView as pcView">
+                    <div class="pcgeo-header" *ngIf="privateCloudGeoView">
                         <div class="pcgeo-kpis">
                             <div class="pcgeo-kpi">
                                 <div class="pcgeo-kpi-label">Private Clouds</div>
-                                <div class="pcgeo-kpi-value">{{pcView.totalPrivateClouds | number}}</div>
+                                <div class="pcgeo-kpi-value">{{privateCloudGeoSummary.totalPrivateClouds | number}}</div>
                             </div>
                             <div class="pcgeo-kpi">
                                 <div class="pcgeo-kpi-label">Total Resources</div>
-                                <div class="pcgeo-kpi-value">{{pcView.totalResources | number}}</div>
+                                <div class="pcgeo-kpi-value">{{privateCloudGeoSummary.totalResources | number}}</div>
                             </div>
                             <div class="pcgeo-kpi">
                                 <div class="pcgeo-kpi-label">Total Alerts</div>
-                                <div class="pcgeo-kpi-value">{{pcView.totalAlerts | number}}</div>
+                                <div class="pcgeo-kpi-value">{{privateCloudGeoSummary.totalAlerts | number}}</div>
                             </div>
                         </div>
                         <div class="pcgeo-platform-filter">
@@ -799,7 +799,7 @@
                             <div class="new-vms-empty" *ngIf="!widgetLoading.newVms && !newVms.length">No newly
                                 provisioned VMs found.</div>
                         </div>
-                        <div class="new-vms-pagination-row" *ngIf="newVms.length">
+                        <div class="new-vms-pagination-row" *ngIf="newVmsTotal">
                             <table-pager [pageNo]="newVmsPageNo" [pageSize]="newVmsPageSize"
                                 [totalCount]="newVmsTotal" (pageChange)="newVmsPageChange($event)"></table-pager>
                         </div>
@@ -953,7 +953,7 @@
                                         <th>Database Type</th>
                                         <th>Count</th>
                                         <th>Status</th>
-                                        <th>Queries/a</th>
+                                        <th>Queries</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1398,8 +1398,12 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <div class="dashboard-empty-state"
+                                *ngIf="!widgetLoading.orphanedDevices && !orphanedDevices.length">
+                                No related data available
+                            </div>
                         </div>
-                        <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
+                        <div class="orphaned-pagination-row" *ngIf="orphanedDevicesTotal">
                             <div class="orphaned-footer-note">Devices With
                                 Lifecycle Stages Classified As Retired, Disposed, Or Donated Are Considered
                                 Orphaned Devices.</div>
@@ -1510,8 +1514,12 @@
                                 </tbody>
                             </table>
                             </div>
+                            <div class="dashboard-empty-state"
+                                *ngIf="!widgetLoading.idleDevices && !idleDevices.length">
+                                No related data available
+                            </div>
                         </div>
-                        <div class="idle-pagination-row" *ngIf="idleDevices.length">
+                        <div class="idle-pagination-row" *ngIf="idleDevicesTotal">
                             <div class="orphaned-footer-note">*Device With <20% Memory And <5% CPU Utilization,
                                     Indicating Low Activity.</div>
                                     <table-pager [compact]="true" [pageNo]="idleDevicesPageNo"

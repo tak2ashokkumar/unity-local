@@ -215,7 +215,6 @@ export const UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: UnifiedAiopsExecCardConfig[] = 
     payloadKeys: ['datacenter_and_iot', 'datacenterAndIot', 'datacenter_and_iots', 'datacenter_iot'],
     link: 'datacenter',
     subArrayKeys: ['datacenter_and_iot', 'datacenterAndIot', 'datacenter_and_iots', 'datacenter_iot'],
-    fallbackSubArrayKeys: ['network_and_other', 'networkAndOther'],
     dynamicSubCards: true
   }
 ];
@@ -332,6 +331,11 @@ export const UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG: Array<{ label: string; ton
   { label: 'Total Storage Capacity', tone: 'primary', keys: ['total_storage_capacity', 'totalStorageCapacity', 'storage_capacity', 'storageCapacity', 'total_storage', 'totalStorage'] }
 ];
 
+// A treemap only stays readable up to a limited number of tiles, so the Geo Distribution charts render
+// the largest N locations / sites only (cells arrive sorted largest-first). This caps the CHART and its
+// legend only - the KPI strip and the Cloud Type / Platform dropdowns always use the full filtered set.
+export const UNIFIED_AIOPS_GEO_DISTRIBUTION_MAX_TILES = 12;
+
 export const UNIFIED_AIOPS_GEO_DISTRIBUTION_COLORS = [
   '#2563eb',
   '#0f766e',
@@ -372,6 +376,21 @@ export const UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS = [
   '#f06a6a',
   '#46a3f3',
   '#9aa6b2'
+];
+
+// "Top N Devices by Network Utilization" horizontal bar widget. The limit must match the widget title
+// in the template. Colors are applied by rank (largest first) and cycle when there are more bars.
+export const UNIFIED_AIOPS_TOP_NETWORK_DEVICES_LIMIT = 10;
+
+export const UNIFIED_AIOPS_TOP_NETWORK_DEVICE_COLORS = [
+  '#2f80ed',
+  '#2f80ed',
+  '#2f80ed',
+  '#e68612',
+  '#e5232b',
+  '#617887',
+  '#00a0df',
+  '#4285f4'
 ];
 
 export const UNIFIED_AIOPS_IDLE_DURATION_COLORS = [
@@ -484,4 +503,5 @@ export const UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS: UnifiedAiopsFilte
 // Newly Provisioned VMs - a paginated table widget. The request carries the global top filters
 // (dc_uuids / cloud_uuids / time_range) plus these widget-local filters and page / page_size.
 export const UNIFIED_AIOPS_NEWLY_PROVISIONED_VMS_ENDPOINT = '/customer/aiops-dashboard/newly-provisioned-vms/';
-export const UNIFIED_AIOPS_NEWLY_PROVISIONED_VMS_DEFAULT_SORT = 'provisioned_date';
+// Leading '-' is descending, so the newest provisioned VMs land on the first page by default.
+export const UNIFIED_AIOPS_NEWLY_PROVISIONED_VMS_DEFAULT_SORT = '-provisioned_date';

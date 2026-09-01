@@ -12,6 +12,7 @@ import {
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
   PUBLIC_CLOUD_DATABASE_OVERVIEW_ENDPOINT,
   PUBLIC_CLOUD_DATABASE_OVERVIEW_KPI_CONFIG,
+  PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS,
   PUBLIC_CLOUD_DATABASE_WRITE_TREND_ENDPOINT,
   PUBLIC_CLOUD_DATABASE_READ_TREND_ENDPOINT,
   PUBLIC_CLOUD_DATABASE_CAPACITY_RESOURCES_ENDPOINT,
@@ -74,6 +75,7 @@ import {
 import {
   PublicCloudAccountOption,
   PublicCloudDatabaseKpi,
+  PublicCloudDatabaseOverviewColumn,
   PublicCloudDatabaseOverviewResponse,
   PublicCloudDatabaseOverviewRow,
   PublicCloudDatabaseCapacityResponse,
@@ -1012,9 +1014,15 @@ export class PublicCloudComputeDashboardService {
         cpuLabel: cpu === null ? 'NA' : `${this.formatNumber(cpu)}%`,
         memoryLabel: memory === null ? 'NA' : `${this.formatNumber(memory)} GB`,
         disk: this.convertToHotspotDisk(item.disk_utilization || item.disk_size),
-        dataDiskBytes: this.getHotspotReadWrite(item.data_disk_read_write_bytes?.read, item.data_disk_read_write_bytes?.write, 'Read: ', 'Write: ', ''),
-        dataDiskRates: this.getHotspotReadWrite(item.data_disk_read_write_rates?.read_ops, item.data_disk_read_write_rates?.write_ops, 'Read Ops: ', 'Write Ops: ', ' /s'),
-        networkTraffic: this.getFirstValue(item.avg_network_traffic, item.network_traffic)
+        dataDiskBytes: this.getHotspotReadWrite(
+          this.getFirstValue(item.data_disk_read_write_bytes?.read, item.disk_read_bytes_per_second),
+          this.getFirstValue(item.data_disk_read_write_bytes?.write, item.disk_write_bytes_per_second),
+          'Read: ', 'Write: ', ' B/s'),
+        dataDiskRates: this.getHotspotReadWrite(
+          this.getFirstValue(item.data_disk_read_write_rates?.read_ops, item.disk_read_operations_per_second),
+          this.getFirstValue(item.data_disk_read_write_rates?.write_ops, item.disk_write_operations_per_second),
+          'Read Ops: ', 'Write Ops: ', ' /s'),
+        networkTraffic: this.getFirstValue(item.avg_network_traffic, item.network_traffic) || 'NA'
       };
     }).filter(row => !!row.instanceName);
   }
@@ -1047,8 +1055,8 @@ export class PublicCloudComputeDashboardService {
       return null;
     }
     return {
-      readLabel: readValue ? `${readPrefix}${this.formatHotspotMetric(readValue)}${suffix}` : '',
-      writeLabel: writeValue ? `${writePrefix}${this.formatHotspotMetric(writeValue)}${suffix}` : ''
+      readLabel: readValue ? `${readPrefix}${this.formatHotspotMetric(readValue)}${this.getHotspotMetricSuffix(readValue, suffix)}` : '',
+      writeLabel: writeValue ? `${writePrefix}${this.formatHotspotMetric(writeValue)}${this.getHotspotMetricSuffix(writeValue, suffix)}` : ''
     };
   }
 
@@ -1056,6 +1064,12 @@ export class PublicCloudComputeDashboardService {
   private formatHotspotMetric(value: string | number): string {
     const numericValue = this.getFirstNumericValue(value);
     return numericValue !== null && !/[a-z%/]/i.test(String(value)) ? this.formatNumber(numericValue) : this.getFirstValue(value);
+  }
+
+  // Bare numbers get the column unit appended; a value that already carries its own unit
+  // (e.g. "1.2 MB/s" from the older response shape) is left alone so the unit is not doubled.
+  private getHotspotMetricSuffix(value: string, suffix: string): string {
+    return /[a-z%/]/i.test(String(value)) ? '' : suffix;
   }
 
   private getHotspotCloudLogo(cloud: string): string {
@@ -2043,17 +2057,33 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
+  // Header labels take their unit from the response, so the column always states the same unit as the
+  // KPI strip above it. Called with the response on load and with null before any data has arrived.
+  convertToDatabaseOverviewColumns(data: PublicCloudDatabaseOverviewResponse): PublicCloudDatabaseOverviewColumn[] {
+    const row = (data?.data || [])[0] as unknown as Record<string, string>;
+    return PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS.map(column => {
+      const unit = column.unitField ? this.getFirstValue(row?.[column.unitField]) : '';
+      return {
+        key: column.key,
+        label: unit ? `${column.label} (${unit})` : column.label,
+        numeric: column.numeric
+      };
+    });
+  }
+
+  // getFirstNumericValue (not getNumericValue) so a metric the response omits stays null and renders
+  // as NA, instead of being coerced to a 0 that reads as a real measurement.
   convertToDatabaseOverviewRows(data: PublicCloudDatabaseOverviewResponse): PublicCloudDatabaseOverviewRow[] {
     return (data?.data || []).map(item => ({
       instance: this.getFirstValue(item.database_instance),
       uuid: this.getFirstValue(item.uuid),
-      writeThroughput: this.getNumericValue(item.write_throughput),
-      writeLatency: this.getNumericValue(item.write_latency),
-      writeIops: this.getNumericValue(item.write_iops),
-      readThroughput: this.getNumericValue(item.read_throughput),
-      readLatency: this.getNumericValue(item.read_latency),
-      readIops: this.getNumericValue(item.read_iops),
-      queueDepth: this.getNumericValue(item.queue_depth)
+      writeThroughput: this.getFirstNumericValue(item.write_throughput),
+      writeLatency: this.getFirstNumericValue(item.write_latency),
+      writeIops: this.getFirstNumericValue(item.write_iops),
+      readThroughput: this.getFirstNumericValue(item.read_throughput),
+      readLatency: this.getFirstNumericValue(item.read_latency),
+      readIops: this.getFirstNumericValue(item.read_iops),
+      queueDepth: this.getFirstNumericValue(item.queue_depth)
     })).filter(row => !!row.instance);
   }
 
@@ -2071,18 +2101,18 @@ export class PublicCloudComputeDashboardService {
 
   convertToDatabaseWritePerformanceOptions(data: PublicCloudDatabaseTrendResponse): EChartsOption {
     return this.buildDatabaseTrendOptions(data, [
-      { key: 'write_throughput', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.throughput, axis: 0 },
-      { key: 'write_iops', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.iops, axis: 0 },
-      { key: 'write_latency', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.latency, axis: 1 }
+      { key: 'write_throughput', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.throughput },
+      { key: 'write_iops', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.iops },
+      { key: 'write_latency', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.latency }
     ]);
   }
 
   convertToDatabaseReadPerformanceOptions(data: PublicCloudDatabaseTrendResponse): EChartsOption {
     return this.buildDatabaseTrendOptions(data, [
-      { key: 'read_throughput', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.throughput, axis: 0 },
-      { key: 'read_iops', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.iops, axis: 0 },
-      { key: 'read_latency', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.latency, axis: 1 },
-      { key: 'queue_depth', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.queue_depth, axis: 1 }
+      { key: 'read_throughput', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.throughput },
+      { key: 'read_iops', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.iops },
+      { key: 'read_latency', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.latency },
+      { key: 'queue_depth', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.queue_depth }
     ]);
   }
 
@@ -2091,33 +2121,54 @@ export class PublicCloudComputeDashboardService {
     return Object.keys(series).some(key => !!(series[key]?.points || []).length);
   }
 
+  // The response reports one resource per entry; today both trend endpoints return a single entry.
+  // Surfaced so the widget title can name the instance it is charting.
+  getDatabaseTrendInstance(data: PublicCloudDatabaseTrendResponse): string {
+    return this.getFirstValue((data?.data || [])[0]?.database_instance);
+  }
+
   private getDatabaseTrendSeries(data: PublicCloudDatabaseTrendResponse): Record<string, PublicCloudDatabaseTrendSeriesItem> {
     return ((data?.data || [])[0]?.series || {}) as Record<string, PublicCloudDatabaseTrendSeriesItem>;
   }
 
-  private buildDatabaseTrendOptions(data: PublicCloudDatabaseTrendResponse, configs: Array<{ key: string, color: string, axis: number }>): EChartsOption {
+  // Every metric gets its own value axis scaled to its own range. Throughput and IOPS differ by 45x on
+  // the write chart and 280x on the read chart, so sharing one axis flattened IOPS onto the baseline.
+  // Only the first two axes are labelled; the rest stay hidden and their units ride in the tooltip.
+  private buildDatabaseTrendOptions(data: PublicCloudDatabaseTrendResponse, configs: Array<{ key: string, color: string }>): EChartsOption {
     const series = this.getDatabaseTrendSeries(data);
     const activeConfigs = configs.filter(config => !!(series[config.key]?.points || []).length);
-    const labels = this.getDatabaseTrendLabels(activeConfigs.length ? series[activeConfigs[0].key].points : []);
+    const labels = this.getDatabaseTrendLabels(activeConfigs.length ? series[activeConfigs[0].key].points : [], data);
     const chartSeries = activeConfigs.map(config => ({
       name: this.getFirstValue(series[config.key].label) || config.key,
       color: config.color,
       values: (series[config.key].points || []).map(point => this.getNumericValue(point?.value)),
-      axis: config.axis
+      unit: this.getFirstValue(series[config.key].unit)
     }));
-    const throughputUnit = this.getFirstValue(series[configs[0].key]?.unit) || 'Bps';
-    const iopsUnit = this.getFirstValue(series[configs.find(config => config.key.endsWith('iops'))?.key || '']?.unit) || 'RPS';
-    const latencyUnit = this.getFirstValue(series[configs.find(config => config.key.endsWith('latency'))?.key || '']?.unit) || 'ms';
-    const leftName = `Throughput (${throughputUnit}) / IOPS (${iopsUnit})`;
-    const rightName = configs.some(config => config.key === 'queue_depth') ? `Latency (${latencyUnit}) / Queue Depth` : `Latency (${latencyUnit})`;
-    return this.getDatabaseTrendOptions(labels, chartSeries, leftName, rightName);
+    return this.getDatabaseTrendOptions(labels, chartSeries);
   }
 
-  private getDatabaseTrendLabels(points?: Array<{ clock?: number; value?: number | string }>): string[] {
+  // Label granularity follows the window the response reports, so a range wider than a day does not
+  // collapse into repeated dateless HH:mm ticks.
+  private getDatabaseTrendLabels(points?: Array<{ clock?: number; value?: number | string }>, data?: PublicCloudDatabaseTrendResponse): string[] {
+    const format = this.getDatabaseTrendLabelFormat(points, data);
     return (points || []).map(point => {
       const clock = this.getNumericValue(point?.clock);
-      return clock ? moment.unix(clock).format('HH:mm') : '';
+      return clock ? moment.unix(clock).format(format) : '';
     });
+  }
+
+  private getDatabaseTrendLabelFormat(points?: Array<{ clock?: number }>, data?: PublicCloudDatabaseTrendResponse): string {
+    const hours = this.getFirstNumericValue(data?.hours) ?? this.getDatabaseTrendSpanHours(points);
+    if (hours === null || hours <= 24) {
+      return 'HH:mm';
+    }
+    return hours <= 24 * 7 ? 'DD MMM HH:mm' : 'DD MMM';
+  }
+
+  // Fallback when the response omits `hours`: measure the span between the first and last point.
+  private getDatabaseTrendSpanHours(points?: Array<{ clock?: number }>): number | null {
+    const clocks = (points || []).map(point => this.getNumericValue(point?.clock)).filter(clock => clock > 0);
+    return clocks.length < 2 ? null : (Math.max(...clocks) - Math.min(...clocks)) / 3600;
   }
 
   getDatabaseSpaceConsumption(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseSpaceConsumptionResponse> {
@@ -2170,7 +2221,7 @@ export class PublicCloudComputeDashboardService {
     return (Math.round(value * 100) / 100).toFixed(2);
   }
 
-  private getDatabaseTrendOptions(labels: string[], series: Array<{ name: string, color: string, values: number[], axis: number }>, leftName: string, rightName: string): EChartsOption {
+  private getDatabaseTrendOptions(labels: string[], series: Array<{ name: string, color: string, values: number[], unit: string }>): EChartsOption {
     const activeSeries = series.filter(item => !!(item.values || []).length);
     return this.chartConfigSvc.applyScrollableLegend({
       color: activeSeries.map(item => item.color),
@@ -2180,7 +2231,9 @@ export class PublicCloudComputeDashboardService {
         icon: 'circle',
         itemWidth: 10,
         itemHeight: 10,
-        textStyle: { color: '#555555', fontSize: 11 }
+        textStyle: { color: '#555555', fontSize: 11 },
+        // Hidden axes mean the legend is where the reader learns each metric's unit.
+        formatter: (name: string) => this.getDatabaseTrendLegendLabel(activeSeries, name)
       },
       grid: {
         left: 52,
@@ -2188,7 +2241,11 @@ export class PublicCloudComputeDashboardService {
         top: 34,
         bottom: 26
       },
-      tooltip: { trigger: 'axis' },
+      // Each series is on its own scale, so the tooltip carries the real value and unit per metric.
+      tooltip: {
+        trigger: 'axis',
+        formatter: (params: any) => this.getDatabaseTrendTooltip(activeSeries, params)
+      },
       xAxis: {
         type: 'category',
         boundaryGap: false,
@@ -2197,35 +2254,11 @@ export class PublicCloudComputeDashboardService {
         axisTick: { show: false },
         axisLabel: { color: '#6f7782', fontSize: 11 }
       },
-      yAxis: [
-        {
-          type: 'value',
-          name: leftName,
-          nameLocation: 'middle',
-          nameGap: 38,
-          nameTextStyle: { color: '#8a94a2', fontSize: 10 },
-          splitLine: { lineStyle: { color: '#eef1f5' } },
-          axisLine: { show: false },
-          axisTick: { show: false },
-          axisLabel: { color: '#6f7782', fontSize: 11 }
-        },
-        {
-          type: 'value',
-          name: rightName,
-          nameLocation: 'middle',
-          nameGap: 40,
-          nameTextStyle: { color: '#8a94a2', fontSize: 10 },
-          position: 'right',
-          splitLine: { show: false },
-          axisLine: { show: false },
-          axisTick: { show: false },
-          axisLabel: { color: '#6f7782', fontSize: 11 }
-        }
-      ],
-      series: activeSeries.map(item => ({
+      yAxis: activeSeries.map((item, index) => this.getDatabaseTrendAxis(item, index)),
+      series: activeSeries.map((item, index) => ({
         name: item.name,
         type: 'line',
-        yAxisIndex: item.axis,
+        yAxisIndex: index,
         smooth: true,
         showSymbol: false,
         lineStyle: { width: 2, color: item.color },
@@ -2233,6 +2266,45 @@ export class PublicCloudComputeDashboardService {
         data: item.values
       }))
     });
+  }
+
+  // One axis per metric so every line uses the full plot height. Only the first two are drawn
+  // (left and right); the remainder stay hidden because there is no room to label four axes.
+  private getDatabaseTrendAxis(item: { name: string, unit: string }, index: number): any {
+    const isVisible = index < 2;
+    return {
+      type: 'value',
+      show: isVisible,
+      name: isVisible ? this.getDatabaseTrendAxisName(item) : '',
+      nameLocation: 'middle',
+      nameGap: index === 0 ? 38 : 40,
+      nameTextStyle: { color: '#8a94a2', fontSize: 10 },
+      position: index === 0 ? 'left' : 'right',
+      splitLine: index === 0 ? { lineStyle: { color: '#eef1f5' } } : { show: false },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { color: '#6f7782', fontSize: 11 }
+    };
+  }
+
+  private getDatabaseTrendAxisName(item: { name: string, unit: string }): string {
+    return item.unit ? `${item.name} (${item.unit})` : item.name;
+  }
+
+  private getDatabaseTrendLegendLabel(series: Array<{ name: string, unit: string }>, name: string): string {
+    const item = series.find(entry => entry.name === name);
+    return item && item.unit ? `${name} (${item.unit})` : name;
+  }
+
+  private getDatabaseTrendTooltip(series: Array<{ name: string, unit: string }>, params: any): string {
+    const rows = Array.isArray(params) ? params : [params];
+    const header = this.getFirstValue(rows[0]?.axisValueLabel, rows[0]?.axisValue);
+    const lines = rows.map(row => {
+      const item = series.find(entry => entry.name === row?.seriesName);
+      const unit = item && item.unit ? ` ${item.unit}` : '';
+      return `${row?.marker || ''}${row?.seriesName}: ${this.getFirstValue(row?.value)}${unit}`;
+    });
+    return [header, ...lines].filter(line => !!line).join('<br/>');
   }
   /*
    * ******End ****** Cloud Database Performance (redesigned) Widget Related ********************
@@ -2306,12 +2378,14 @@ export class PublicCloudComputeDashboardService {
         type: this.getFirstValue(item.type),
         cloud,
         cloudRegion: this.getFirstValue(item.cloud_region) || [cloud, region].filter(value => !!value).join('/'),
+        // getFirstNumericValue (not getNumericValue) so a metric the response omits stays null and
+        // renders as NA. SF returns null latencies on every storage row, which previously showed 0.0ms.
         capacity: this.getFirstValue(item.capacity_display, item.capacity),
-        capacityValue: this.getNumericValue(item.capacity),
-        e2eLatency: this.getNumericValue(item.e2e_latency),
-        successServerLatency: this.getNumericValue(item.success_server_latency),
-        networkQueueDelay: this.getNumericValue(item.network_queue_delay),
-        latencyHealthScore: this.getNumericValue(item.latency_health_score),
+        capacityValue: this.getFirstNumericValue(item.capacity),
+        e2eLatency: this.getFirstNumericValue(item.e2e_latency),
+        successServerLatency: this.getFirstNumericValue(item.success_server_latency),
+        networkQueueDelay: this.getFirstNumericValue(item.network_queue_delay),
+        latencyHealthScore: this.getFirstNumericValue(item.latency_health_score),
         status: this.getFirstValue(item.status)
       };
     }).filter(row => !!row.deviceName);
@@ -2483,7 +2557,11 @@ export class PublicCloudComputeDashboardService {
       totalLabel: total !== null ? this.formatDecimalNumber(total) : this.getFirstValue(summary?.total_latency_display),
       unit,
       segments,
-      hasData: segments.length > 0
+      // A donut of all-zero segments draws nothing, so an all-zero breakdown is no data, not data.
+      // Checks the raw values too, in case a segment carries a value but no percentage.
+      hasData: segments.some(segment => segment.percent > 0) ||
+        breakdown.some(segment => (this.getFirstNumericValue(segment?.value) || 0) > 0) ||
+        (total !== null && total > 0)
     };
   }
 

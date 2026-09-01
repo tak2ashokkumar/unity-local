@@ -279,15 +279,17 @@ export const PUBLIC_CLOUD_DATABASE_SPACE_KPI_CONFIG: Array<{ key: string, label:
 ];
 
 // Top 10 Performance Summary sortable columns; key maps to the view-model row field.
-export const PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS: Array<{ key: string, label: string, numeric: boolean }> = [
+// The unit is NOT part of the label: convertToDatabaseOverviewColumns appends it from the matching
+// unitField on the response rows, so the header always states the same unit as the KPI strip.
+export const PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS: Array<{ key: string, label: string, numeric: boolean, unitField?: string }> = [
   { key: 'instance', label: 'DB Instance', numeric: false },
-  { key: 'writeThroughput', label: 'Write Throughput (kbps)', numeric: true },
-  { key: 'writeLatency', label: 'Write Latency (ms)', numeric: true },
-  { key: 'writeIops', label: 'Write IOPS (RPS)', numeric: true },
-  { key: 'readThroughput', label: 'Read Throughput (Bps)', numeric: true },
-  { key: 'readLatency', label: 'Read Latency (ms)', numeric: true },
-  { key: 'readIops', label: 'Read IOPS (RPS)', numeric: true },
-  { key: 'queueDepth', label: 'Queue Depth', numeric: true }
+  { key: 'writeThroughput', label: 'Write Throughput', numeric: true, unitField: 'write_throughput_unit' },
+  { key: 'writeLatency', label: 'Write Latency', numeric: true, unitField: 'write_latency_unit' },
+  { key: 'writeIops', label: 'Write IOPS', numeric: true, unitField: 'write_iops_unit' },
+  { key: 'readThroughput', label: 'Read Throughput', numeric: true, unitField: 'read_throughput_unit' },
+  { key: 'readLatency', label: 'Read Latency', numeric: true, unitField: 'read_latency_unit' },
+  { key: 'readIops', label: 'Read IOPS', numeric: true, unitField: 'read_iops_unit' },
+  { key: 'queueDepth', label: 'Queue Depth', numeric: true, unitField: 'queue_depth_unit' }
 ];
 
 // Top 10 Capacity Per Resource sortable columns; sortKey is the server-side `sort_by` value.

@@ -48,6 +48,7 @@ import {
   UnifiedAiopsExecutiveView,
   UnifiedAiopsPrivateCloudGeoLegendItem,
   UnifiedAiopsPrivateCloudGeoSite,
+  UnifiedAiopsPrivateCloudGeoSummary,
   UnifiedAiopsPrivateCloudGeoView,
   UnifiedAiopsNewVmRow,
   UnifiedAiopsNewVmsFilter,
@@ -290,6 +291,7 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   datacenterGeographyDcMap: WorldMapWidgetDCMap = {};
   privateCloudGeoSites: UnifiedAiopsPrivateCloudGeoSite[] = [];
   privateCloudGeoView: UnifiedAiopsPrivateCloudGeoView | null = null;
+  privateCloudGeoSummary: UnifiedAiopsPrivateCloudGeoSummary = { totalPrivateClouds: 0, totalResources: 0, totalAlerts: 0 };
   privateCloudGeoOptions: EChartsOption = {};
   privateCloudGeoLegends: UnifiedAiopsPrivateCloudGeoLegendItem[] = [];
   privateCloudGeoPlatformOptions = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS;
@@ -556,7 +558,6 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
   /** Loads datacenter options first, then creates the filter form and starts widget loading. */
   loadFilterOptionsAndDashboard() {
     this.resetFilterState();
-    this.refreshedText = this.getCurrentRefreshedText();
     this.spinnerService.start(this.loaderNames.filters);
     forkJoin({
       datacenters: this.svc.getDatacenters().pipe(catchError(() => of(this.svc.getFallbackDatacenters()))),
@@ -595,7 +596,9 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.selectedTimeRange = UNIFIED_AIOPS_TIME_RANGE_DEFAULT;
     this.selectedTimeRangeDates = null;
     this.orphanedDevicesPageNo = 1;
+    this.orphanedDevicesTotal = 0;
     this.idleDevicesPageNo = 1;
+    this.idleDevicesTotal = 0;
     this.datacenterOptions = [];
     this.cloudOptions = [];
     this.appliedFilterCriteria = {
@@ -612,6 +615,7 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.privateCloudGeoAllSites = [];
     this.privateCloudGeoSites = [];
     this.privateCloudGeoView = null;
+    this.privateCloudGeoSummary = { totalPrivateClouds: 0, totalResources: 0, totalAlerts: 0 };
     this.privateCloudGeoOptions = {};
     this.privateCloudGeoLegends = [];
     this.privateCloudGeoPlatformOptions = UNIFIED_AIOPS_PRIVATE_CLOUD_GEO_PLATFORM_OPTIONS;
@@ -923,6 +927,8 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     if (!this.hasFilterFormData()) {
       return;
     }
+    // Stamped here (not at filter-option load) so it tracks every widget reload - Apply included.
+    this.refreshedText = this.getCurrentRefreshedText();
     const filterFormOutput = this.appliedFilterCriteria;
     this.startWidgetLoadingState();
     this.setupAlertsFilters();
@@ -1085,7 +1091,6 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.geoDistributionLegends = [];
     this.loadWidget(this.loaderNames.geoDistribution, this.svc.getGeoHeatmap(filterFormOutput), res => {
       this.geoDistributionCells = res || [];
-      this.geoDistributionSummary = this.svc.convertToGeoDistributionSummary(this.geoDistributionCells);
       this.geoDistributionCloudOptions = this.svc.convertToGeoDistributionCloudOptions(this.geoDistributionCells);
       if (!this.geoDistributionCloudOptions.some(option => option.value === this.selectedGeoDistributionCloudType)) {
         this.selectedGeoDistributionCloudType = UNIFIED_AIOPS_ALL_SELECTED_VALUE;
@@ -1105,11 +1110,13 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.applyGeoDistributionCloudTypeFilter();
   }
 
+  /** Re-derives the KPI strip, the chart and the legend from the cells the selected Cloud Type leaves visible. */
   private applyGeoDistributionCloudTypeFilter() {
     const selectedCloudType = this.selectedGeoDistributionCloudType;
     const displayCells = selectedCloudType === UNIFIED_AIOPS_ALL_SELECTED_VALUE
       ? this.geoDistributionCells
       : (this.geoDistributionCells || []).filter(cell => this.getGeoDistributionCloudTypeKey(cell.cloudType) === selectedCloudType);
+    this.geoDistributionSummary = this.svc.convertToGeoDistributionSummary(displayCells);
     this.geoHeatmapOptions = this.svc.convertToGeoHeatmapOptions(displayCells);
     this.geoDistributionLegends = this.svc.convertToGeoDistributionLegends(displayCells);
   }
@@ -1541,6 +1548,7 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.privateCloudGeoView = null;
     this.privateCloudGeoAllSites = [];
     this.privateCloudGeoSites = [];
+    this.privateCloudGeoSummary = { totalPrivateClouds: 0, totalResources: 0, totalAlerts: 0 };
     this.privateCloudGeoOptions = {};
     this.privateCloudGeoLegends = [];
     this.loadWidget(this.loaderNames.privateCloudGeo, this.svc.getPrivateCloudGeoDistribution(filterFormOutput), res => {
@@ -1563,11 +1571,20 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.applyPrivateCloudGeoFilter();
   }
 
+  /**
+   * Re-derives the KPI strip, the chart and the legend from the sites the selected platform leaves
+   * visible. With no platform selected the API-provided totals are passed through unchanged.
+   */
   private applyPrivateCloudGeoFilter() {
     const platform = this.selectedPrivateCloudPlatform;
-    this.privateCloudGeoSites = platform === UNIFIED_AIOPS_ALL_SELECTED_VALUE
+    const isAllPlatforms = platform === UNIFIED_AIOPS_ALL_SELECTED_VALUE;
+    this.privateCloudGeoSites = isAllPlatforms
       ? this.privateCloudGeoAllSites
       : (this.privateCloudGeoAllSites || []).filter(site => site.platformKey === platform);
+    this.privateCloudGeoSummary = this.svc.convertToPrivateCloudGeoSummary(
+      this.privateCloudGeoSites,
+      isAllPlatforms ? this.privateCloudGeoView : null
+    );
     this.privateCloudGeoOptions = this.svc.convertToPrivateCloudGeoOptions(this.privateCloudGeoView, this.privateCloudGeoSites);
     this.privateCloudGeoLegends = this.svc.convertToPrivateCloudGeoLegends(this.privateCloudGeoSites);
   }
@@ -1595,6 +1612,8 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
 
   // Newly Provisioned VMs - paginated table; the request carries the applied global filters plus the
   // widget-local filters (search / cloud / status / vm state / lifecycle stage / lifecycle status) + page.
+  // The total is only ever set from a successful response - a failed page (e.g. an out-of-range page
+  // returning an error) keeps the last known total so the pager stays and the user can page back.
   getNewVms() {
     const filter = this.getNewVmsFilter();
     this.loadWidget(this.loaderNames.newVms, this.svc.getNewlyProvisionedVms(this.appliedFilterCriteria, filter, this.newVmsPageNo, this.newVmsPageSize), res => {
@@ -1604,7 +1623,6 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
       this.newVmsLoaded = true;
     }, () => {
       this.newVms = [];
-      this.newVmsTotal = 0;
       this.resetNewVmFilterOptions();
       this.newVmsLoaded = true;
     }, 'newVms');
@@ -1668,8 +1686,9 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     return this.getNewVmSortKey(this.newVmsSort) === sortKey;
   }
 
+  /** A leading '-' is descending, which reads as a down caret (ascending shows the up caret). */
   getNewVmSortIcon(sortKey: string): string {
-    return this.newVmsSort === `-${sortKey}` ? 'fas fa-caret-up' : 'fas fa-caret-down';
+    return this.newVmsSort === `-${sortKey}` ? 'fas fa-caret-down' : 'fas fa-caret-up';
   }
 
   private getNewVmSortKey(ordering: string): string {
@@ -1920,15 +1939,15 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     }, 'alertLifecycleSankey');
   }
 
+  // The total is only ever set from a successful response - a failed page (e.g. an out-of-range page
+  // returning an error) keeps the last known total so the pager stays and the user can page back.
   getOrphanedDevices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     this.orphanedDevices = [];
-    this.orphanedDevicesTotal = 0;
     this.loadWidget(this.loaderNames.orphanedDevices, this.svc.getOrphanedDevices(filterFormOutput, this.orphanedDevicesPageNo, this.orphanedDevicesPageSize), res => {
       this.orphanedDevices = this.svc.convertToOrphanedDevicesViewData(res);
       this.orphanedDevicesTotal = this.svc.convertToOrphanedDevicesTotal(res);
     }, () => {
       this.orphanedDevices = [];
-      this.orphanedDevicesTotal = 0;
     }, 'orphanedDevices');
   }
 
@@ -1963,15 +1982,15 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.openRouteInNewTab(this.getCategoryRoute(device?.resourceType, device?.provider) || this.linkRoutes.devices);
   }
 
+  // The total is only ever set from a successful response - a failed page (e.g. an out-of-range page
+  // returning an error) keeps the last known total so the pager stays and the user can page back.
   getIdleDevices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     this.idleDevices = [];
-    this.idleDevicesTotal = 0;
     this.loadWidget(this.loaderNames.idleDevices, this.svc.getIdleDevices(filterFormOutput, this.idleDevicesPageNo, this.idleDevicesPageSize), res => {
       this.idleDevices = this.svc.convertToIdleDevicesViewData(res);
       this.idleDevicesTotal = this.svc.convertToIdleDevicesTotal(res);
     }, () => {
       this.idleDevices = [];
-      this.idleDevicesTotal = 0;
     }, 'idleDevices');
   }
 
@@ -2284,16 +2303,18 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     return this.hasAlertMetrics || this.hasAlertSourceSankey || this.hasAlertLifecycleSankey;
   }
 
+  // Keeps the widget (and its pager) mounted when a page returns no rows, so the user can page back.
   get hasOrphanedDevices(): boolean {
-    return this.widgetLoading.orphanedDevices || !!this.orphanedDevices?.length;
+    return this.widgetLoading.orphanedDevices || this.orphanedDevicesTotal > 0 || !!this.orphanedDevices?.length;
   }
 
   get hasOrphanedByCategory(): boolean {
     return this.widgetLoading.orphanedByCategory || this.orphanedByCategoryHasData;
   }
 
+  // Keeps the widget (and its pager) mounted when a page returns no rows, so the user can page back.
   get hasIdleDevices(): boolean {
-    return this.widgetLoading.idleDevices || !!this.idleDevices?.length;
+    return this.widgetLoading.idleDevices || this.idleDevicesTotal > 0 || !!this.idleDevices?.length;
   }
 
   get hasIdleDuration(): boolean {
@@ -2341,6 +2362,7 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
       this.hasPrivateCloudCoverage ||
       this.hasPublicCloudCoverage ||
       this.hasDatacenterGeographies ||
+      this.hasPrivateCloudGeo ||
       this.hasNewVms ||
       this.hasApplicationRows ||
       this.hasServiceRows ||
@@ -2591,12 +2613,16 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     this.openRouteInNewTab(this.linkRoutes.datacenter);
   }
 
+  /** Section header link: opens the selected Cloud Type's page, or the public cloud listing when none is selected. */
   openPublicCloudGeoDistribution() {
-    this.openRouteInNewTab(this.linkRoutes.publicCloudProvider.aws);
+    this.openRouteInNewTab(this.getGeoDistributionCloudRoute(this.getSelectedGeoDistributionCloudLabel()));
   }
 
+  /** Each tile carries its own cloud type, so a tile click opens that provider's page. */
   onGeoDistributionChartInit(chartInstance: any) {
-    this.bindChartClick(chartInstance, () => this.openPublicCloudGeoDistribution());
+    this.bindChartClick(chartInstance, params => {
+      this.openRouteInNewTab(this.getGeoDistributionCloudRoute(params?.data?.cloudType));
+    });
   }
 
   openPrivateCloudCoverage(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }) {
@@ -2785,6 +2811,30 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
       return this.linkRoutes.hypervisors;
     }
     return this.getProviderRoute(normalizedValue, false);
+  }
+
+  /** Resolves the applied Cloud Type filter back to its raw API label (empty when Select All is active). */
+  private getSelectedGeoDistributionCloudLabel(): string {
+    if (this.selectedGeoDistributionCloudType === UNIFIED_AIOPS_ALL_SELECTED_VALUE) {
+      return '';
+    }
+    return (this.geoDistributionCloudOptions || [])
+      .find(option => option.value === this.selectedGeoDistributionCloudType)?.label || '';
+  }
+
+  /**
+   * Maps a Geo Distribution cloud type to its public cloud page. The API can return a combined cloud
+   * type for a region shared by providers (e.g. 'Azure, GCP'), which cannot resolve to a single
+   * provider page - those, and unrecognized types, open the public cloud listing instead.
+   */
+  private getGeoDistributionCloudRoute(cloudType: string | undefined): any[] {
+    const providerRoutes = String(cloudType || '')
+      .split(/[,/&]+/)
+      .map(cloudTypePart => this.getProviderRoute(cloudTypePart, false))
+      .filter((route): route is any[] => !!route);
+    const distinctRoutes = providerRoutes.filter((route, index) =>
+      providerRoutes.findIndex(item => item[0] === route[0]) === index);
+    return distinctRoutes.length === 1 ? distinctRoutes[0] : this.linkRoutes.publicCloud;
   }
 
   private getProviderRoute(value: string | undefined, withFallback = true): any[] | null {

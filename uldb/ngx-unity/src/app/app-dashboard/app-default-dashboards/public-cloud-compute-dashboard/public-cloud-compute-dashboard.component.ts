@@ -4,8 +4,8 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
-import { forkJoin, Observable, Subject } from 'rxjs';
-import { finalize, takeUntil } from 'rxjs/operators';
+import { forkJoin, of, Observable, Subject } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
@@ -14,7 +14,6 @@ import { PublicCloudComputeDashboardService } from './public-cloud-compute-dashb
 import {
   PUBLIC_CLOUD_DATABASE_CAPACITY_DEFAULT_SORT,
   PUBLIC_CLOUD_STORAGE_RESOURCE_DEFAULT_SORT,
-  PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS,
   PUBLIC_CLOUD_DATABASE_SPACE_SORT_COLUMNS,
   PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT,
   PUBLIC_CLOUD_STORAGE_RESOURCE_SORT_COLUMNS,
@@ -31,6 +30,7 @@ import {
   PublicCloudDashboardFilterCriteria,
   PublicCloudDashboardFilterOptions,
   PublicCloudDatabaseKpi,
+  PublicCloudDatabaseOverviewColumn,
   PublicCloudDatabaseOverviewRow,
   PublicCloudDatabaseSpaceRow,
   PublicCloudFilterOption,
@@ -177,9 +177,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   databaseOverviewKpis: PublicCloudDatabaseKpi[] = [];
   databaseOverviewRows: PublicCloudDatabaseOverviewRow[] = [];
   databaseOverviewSort: PublicCloudSortState = { key: 'writeThroughput', direction: 'desc' };
-  databaseOverviewSortColumns = PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS;
+  databaseOverviewSortColumns: PublicCloudDatabaseOverviewColumn[] = [];
   databaseWritePerformanceOptions: EChartsOption = {};
   databaseReadPerformanceOptions: EChartsOption = {};
+  databaseWriteTrendInstance = '';
+  databaseReadTrendInstance = '';
   databaseTrendHasData = false;
   databaseWriteTrendHasData = false;
   databaseReadTrendHasData = false;
@@ -270,6 +272,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     private alertDetailSvc: AimlAlertDetailsService) { }
 
   ngOnInit(): void {
+    // Header labels without units until the first response supplies them.
+    this.databaseOverviewSortColumns = this.svc.convertToDatabaseOverviewColumns(null);
     setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
   }
 
@@ -640,8 +644,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return this.getPerformanceHotspotSortKey(this.performanceHotspotsSort) === sortKey;
   }
 
+  /** A leading '-' is descending, which reads as a down caret (ascending shows the up caret). */
   getHotspotSortIcon(sortKey: string): string {
-    return this.performanceHotspotsSort === `-${sortKey}` ? 'fas fa-caret-up' : 'fas fa-caret-down';
+    return this.performanceHotspotsSort === `-${sortKey}` ? 'fas fa-caret-down' : 'fas fa-caret-up';
   }
 
   private getPerformanceHotspotSortKey(sortKey: string): string {
@@ -654,9 +659,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.widgetLoading.databaseOverview = true;
     this.loadWidget(this.loaderNames.databaseOverview, this.svc.getDatabaseOverview(filterFormOutput), res => {
       this.databaseOverviewKpis = this.svc.convertToDatabaseOverviewKpis(res);
+      this.databaseOverviewSortColumns = this.svc.convertToDatabaseOverviewColumns(res);
       this.databaseOverviewRows = this.sortRows(this.svc.convertToDatabaseOverviewRows(res), this.databaseOverviewSort);
     }, () => {
       this.databaseOverviewKpis = [];
+      this.databaseOverviewSortColumns = this.svc.convertToDatabaseOverviewColumns(null);
       this.databaseOverviewRows = [];
     }, () => this.widgetLoading.databaseOverview = false);
   }
@@ -667,14 +674,22 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.databaseTrendHasData = false;
     this.databaseWriteTrendHasData = false;
     this.databaseReadTrendHasData = false;
+    this.databaseWriteTrendInstance = '';
+    this.databaseReadTrendInstance = '';
     this.widgetLoading.databasePerformanceTrend = true;
-    const trend$ = forkJoin([this.svc.getDatabaseWriteTrend(filterFormOutput), this.svc.getDatabaseReadTrend(filterFormOutput)]);
+    // Each branch rescues itself so a failure on one endpoint cannot blank the other chart.
+    const trend$ = forkJoin([
+      this.svc.getDatabaseWriteTrend(filterFormOutput).pipe(catchError(() => of(null))),
+      this.svc.getDatabaseReadTrend(filterFormOutput).pipe(catchError(() => of(null)))
+    ]);
     this.loadWidget(this.loaderNames.databasePerformanceTrend, trend$, ([writeRes, readRes]) => {
       const hasWrite = this.svc.hasDatabaseTrendSeries(writeRes);
       const hasRead = this.svc.hasDatabaseTrendSeries(readRes);
       this.databaseTrendHasData = hasWrite || hasRead;
       this.databaseWriteTrendHasData = hasWrite;
       this.databaseReadTrendHasData = hasRead;
+      this.databaseWriteTrendInstance = hasWrite ? this.svc.getDatabaseTrendInstance(writeRes) : '';
+      this.databaseReadTrendInstance = hasRead ? this.svc.getDatabaseTrendInstance(readRes) : '';
       this.databaseWritePerformanceOptions = hasWrite ? this.svc.convertToDatabaseWritePerformanceOptions(writeRes) : {};
       this.databaseReadPerformanceOptions = hasRead ? this.svc.convertToDatabaseReadPerformanceOptions(readRes) : {};
     }, () => {
@@ -683,6 +698,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.databaseTrendHasData = false;
       this.databaseWriteTrendHasData = false;
       this.databaseReadTrendHasData = false;
+      this.databaseWriteTrendInstance = '';
+      this.databaseReadTrendInstance = '';
     }, () => this.widgetLoading.databasePerformanceTrend = false);
   }
 
@@ -709,8 +726,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   getStoragePerformance(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.storagePerformanceCards = [];
     this.widgetLoading.storagePerformance = true;
+    // Each metric rescues itself so one dead endpoint drops only its own card, not all six.
+    // Both card converters treat a null response as "no data", so the failed card is filtered out below.
     const cards$ = forkJoin(
-      PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS.map(metric => this.svc.getStoragePerformanceMetric(metric.endpoint, filterFormOutput))
+      PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS.map(metric =>
+        this.svc.getStoragePerformanceMetric(metric.endpoint, filterFormOutput).pipe(catchError(() => of(null))))
     );
     this.loadWidget(this.loaderNames.storagePerformance, cards$, results => {
       this.storagePerformanceCards = results.map((res, index) => {
@@ -953,9 +973,12 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   private clearCloudDatabasePerformanceViewData() {
     this.databaseOverviewKpis = [];
+    this.databaseOverviewSortColumns = this.svc.convertToDatabaseOverviewColumns(null);
     this.databaseOverviewRows = [];
     this.databaseWritePerformanceOptions = {};
     this.databaseReadPerformanceOptions = {};
+    this.databaseWriteTrendInstance = '';
+    this.databaseReadTrendInstance = '';
     this.databaseTrendHasData = false;
     this.databaseWriteTrendHasData = false;
     this.databaseReadTrendHasData = false;
@@ -1046,11 +1069,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   }
 
   get hasDatabaseOverviewData(): boolean {
-    return this.widgetLoading.databaseOverview || this.hasMetricValues(this.databaseOverviewKpis) || !!this.databaseOverviewRows?.length;
+    return this.widgetLoading.databaseOverview || this.hasMetricEntries(this.databaseOverviewKpis) || !!this.databaseOverviewRows?.length;
   }
 
   get hasDatabaseOverviewKpis(): boolean {
-    return this.widgetLoading.databaseOverview || this.hasMetricValues(this.databaseOverviewKpis);
+    return this.widgetLoading.databaseOverview || this.hasMetricEntries(this.databaseOverviewKpis);
   }
 
   get hasDatabaseTrendData(): boolean {
@@ -1132,6 +1155,13 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return (metrics || []).some(metric => this.getNumericValue(metric?.value) > 0);
   }
 
+  // A KPI counts as present once the service produced a value for it. An aggregate of 0.00 is a real
+  // reading from an idle estate, so it must not collapse the strip into the no-data state while the
+  // table below is showing rows.
+  private hasMetricEntries(metrics: Array<{ value?: string | number }>): boolean {
+    return (metrics || []).some(metric => metric?.value !== undefined && metric?.value !== null && String(metric.value).trim() !== '');
+  }
+
   private getNumericValue(value: string | number | undefined | null): number {
     return Number(String(value || '').replace(/[^0-9.-]/g, '')) || 0;
   }
@@ -1192,6 +1222,10 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   trackByIndex(index: number) {
     return index;
+  }
+
+  trackByUuid(index: number, row: { uuid?: string }) {
+    return row?.uuid || index;
   }
 
   goBack() {

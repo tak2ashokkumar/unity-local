@@ -273,7 +273,9 @@
                                     [tooltip]="'Open linked page'" container="body">{{row.instanceName}}</button>
                             </td>
                             <td>
-                                <img class="hotspot-cloud-logo" *ngIf="row.cloudLogo" [src]="row.cloudLogo" [alt]="row.cloud">
+                                <img class="hotspot-cloud-logo" *ngIf="row.cloudLogo; else hotspotCloudNa"
+                                    [src]="row.cloudLogo" [alt]="row.cloud">
+                                <ng-template #hotspotCloudNa>{{row.cloud || 'NA'}}</ng-template>
                             </td>
                             <td>{{row.cpuLabel}}</td>
                             <td>{{row.memoryLabel}}</td>
@@ -326,7 +328,7 @@
                 <ng-container *ngIf="hasDatabaseOverviewKpis; else databaseOverviewKpiNoData">
                     <div class="database-kpi" *ngFor="let kpi of databaseOverviewKpis; trackBy: trackByIndex">
                         <div class="database-kpi-label">{{kpi.label}}</div>
-                        <div class="database-kpi-value" [ngClass]="getStatusClass(kpi.tone)">
+                        <div class="database-kpi-value">
                             {{kpi.value}}<span class="database-kpi-unit" *ngIf="kpi.unit">{{kpi.unit}}</span>
                         </div>
                     </div>
@@ -353,18 +355,19 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of databaseOverviewRows; trackBy: trackByIndex">
-                                    <td>
+                                <tr *ngFor="let row of databaseOverviewRows; trackBy: trackByUuid" truncateText>
+                                    <td class="tdw-23">
                                         <button type="button" class="btn btn-link p-0 table-link"
+                                            [tooltip]="row.instance"
                                             (click)="openDatabaseInstance(row)">{{row.instance}}</button>
                                     </td>
-                                    <td class="text-right">{{row.writeThroughput | number:'1.2-2'}}</td>
-                                    <td class="text-right">{{row.writeLatency | number:'1.2-2'}}</td>
-                                    <td class="text-right">{{row.writeIops | number:'1.2-2'}}</td>
-                                    <td class="text-right">{{row.readThroughput | number:'1.2-2'}}</td>
-                                    <td class="text-right">{{row.readLatency | number:'1.2-2'}}</td>
-                                    <td class="text-right">{{row.readIops | number:'1.2-2'}}</td>
-                                    <td class="text-right">{{row.queueDepth | number:'1.3-3'}}</td>
+                                    <td class="tdw-12 text-right">{{row.writeThroughput === null ? 'NA' : (row.writeThroughput | number:'1.2-2')}}</td>
+                                    <td class="tdw-11 text-right">{{row.writeLatency === null ? 'NA' : (row.writeLatency | number:'1.2-2')}}</td>
+                                    <td class="tdw-11 text-right">{{row.writeIops === null ? 'NA' : (row.writeIops | number:'1.2-2')}}</td>
+                                    <td class="tdw-12 text-right">{{row.readThroughput === null ? 'NA' : (row.readThroughput | number:'1.2-2')}}</td>
+                                    <td class="tdw-11 text-right">{{row.readLatency === null ? 'NA' : (row.readLatency | number:'1.2-2')}}</td>
+                                    <td class="tdw-11 text-right">{{row.readIops === null ? 'NA' : (row.readIops | number:'1.2-2')}}</td>
+                                    <td class="tdw-9 text-right">{{row.queueDepth === null ? 'NA' : (row.queueDepth | number:'1.3-3')}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -381,7 +384,8 @@
             <div class="database-trend-grid">
                 <app-spinner [name]="loaderNames.databasePerformanceTrend" [width]="0"></app-spinner>
                 <div class="database-trend-widget">
-                    <div class="database-widget-title">Write Performance Trend</div>
+                    <div class="database-widget-title">Write Performance Trend<span
+                            *ngIf="databaseWriteTrendInstance"> - {{databaseWriteTrendInstance}}</span></div>
                     <ng-container *ngIf="hasDatabaseWriteTrend; else databaseWriteTrendNoData">
                         <div echarts [options]="databaseWritePerformanceOptions" class="database-trend-chart"></div>
                     </ng-container>
@@ -390,7 +394,8 @@
                     </ng-template>
                 </div>
                 <div class="database-trend-widget">
-                    <div class="database-widget-title">Read Performance Trend</div>
+                    <div class="database-widget-title">Read Performance Trend<span
+                            *ngIf="databaseReadTrendInstance"> - {{databaseReadTrendInstance}}</span></div>
                     <ng-container *ngIf="hasDatabaseReadTrend; else databaseReadTrendNoData">
                         <div echarts [options]="databaseReadPerformanceOptions" class="database-trend-chart"></div>
                     </ng-container>
@@ -519,11 +524,11 @@
                                     </td>
                                     <td>{{row.type}}</td>
                                     <td>{{row.cloudRegion}}</td>
-                                    <td class="text-right">{{row.capacity}}</td>
-                                    <td class="text-right">{{row.e2eLatency | number:'1.1-1'}}ms</td>
-                                    <td class="text-right">{{row.successServerLatency | number:'1.1-1'}}ms</td>
-                                    <td class="text-right">{{row.networkQueueDelay | number:'1.1-1'}}ms</td>
-                                    <td class="text-right">{{row.latencyHealthScore}}</td>
+                                    <td class="text-right">{{row.capacity || 'NA'}}</td>
+                                    <td class="text-right">{{row.e2eLatency === null ? 'NA' : (row.e2eLatency | number:'1.1-1') + 'ms'}}</td>
+                                    <td class="text-right">{{row.successServerLatency === null ? 'NA' : (row.successServerLatency | number:'1.1-1') + 'ms'}}</td>
+                                    <td class="text-right">{{row.networkQueueDelay === null ? 'NA' : (row.networkQueueDelay | number:'1.1-1') + 'ms'}}</td>
+                                    <td class="text-right">{{row.latencyHealthScore === null ? 'NA' : row.latencyHealthScore}}</td>
                                     <td class="text-center"><i [ngClass]="getStorageStatusIconClass(row.status)"></i></td>
                                 </tr>
                             </tbody>
@@ -817,7 +822,9 @@
         <div class="dashboard-card alert-card recent-alerts-card" *ngIf="hasRecentAlertSummary || hasRecentAlerts">
             <div class="alert-summary" *ngIf="hasRecentAlertSummary">
                 <app-spinner [name]="loaderNames.recentAlertSummary" [width]="0"></app-spinner>
-                <div class="alert-summary-metric" *ngFor="let metric of recentAlertSummaryMetrics; trackBy: trackByIndex">
+                <div class="alert-summary-metric pointer-link"
+                    *ngFor="let metric of recentAlertSummaryMetrics; trackBy: trackByIndex"
+                    (click)="openRecentAlerts()" [tooltip]="'Open linked page'" container="body">
                     <div>{{metric.label}}</div>
                     <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
                 </div>
