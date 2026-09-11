@@ -1,4 +1,5 @@
-<div class="card-header bg-white border-bottom-0 py-2 d-flex justify-content-between align-items-center">
+<div class="card-header bg-white border-bottom-0 py-2 d-flex  align-items-center"
+    [ngClass]="applications?.length>0 && dateDropdownOptions ? 'justify-content-between' : 'justify-content-end'">
     <ng-container *ngIf="applications?.length">
         <div class="d-flex align-items-center w-50">
             <a class="nav-link tabs-level1-link border-0 text-success">Application Dashboard - </a>

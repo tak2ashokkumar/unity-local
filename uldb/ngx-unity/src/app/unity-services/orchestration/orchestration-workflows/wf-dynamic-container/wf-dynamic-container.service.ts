@@ -31,6 +31,10 @@ export class WfDynamicContainerService {
     return this.http.get(endpoint);
   }
 
+  getSupportedLLMConfigs(): Observable<any> {
+    return this.http.get(`/mcp/get-supported-llm-configs/?is_user_owned=true`);
+  }
+
 
 
   // ********* Input Templates Supporting Code Start ************ //

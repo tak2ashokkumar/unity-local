@@ -5,6 +5,15 @@ export interface NetworkDashboardDatacenterOption {
     uuid?: string;
 }
 
+export interface NetworkDashboardHeaderScope {
+    datacenters: string;
+}
+
+export interface NetworkDashboardHeaderResponse {
+    scope: NetworkDashboardHeaderScope;
+    lastRefreshed: string;
+}
+
 export interface NetworkDashboardFiltersResponse {
     datacenters: NetworkDashboardDatacenterOption[];
     time_range: string[];

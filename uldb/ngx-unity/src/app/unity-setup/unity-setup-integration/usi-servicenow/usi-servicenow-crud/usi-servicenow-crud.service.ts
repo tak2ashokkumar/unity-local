@@ -90,11 +90,11 @@ export class UsiServicenowCrudService {
 
   buildIntegrationForm(instance?: ServicenowAccount): FormGroup {
     if (instance) {
+      const authType = instance.auth_type || 'BASIC';
       let form = this.builder.group({
         name: [instance ? instance.name : '', [Validators.required, NoWhitespaceValidator],],
+        auth_type: [authType, [Validators.required, NoWhitespaceValidator]],
         instance_url: [instance ? instance.instance_url : '', [Validators.required, RxwebValidators.url()],],
-        username: [instance ? instance.username : '', [Validators.required, NoWhitespaceValidator],],
-        password: ['', [Validators.required, NoWhitespaceValidator],],
         is_cmdb: [instance ? instance.is_cmdb : false],
         is_itsm: [instance ? instance.is_itsm : false],
         is_ire: [instance ? instance.is_ire : false],
@@ -108,6 +108,7 @@ export class UsiServicenowCrudService {
       }, {
         validators: AtLeastOneInputHasValue(['is_cmdb', 'is_itsm'])
       });
+      this.setIntegrationAuthControls(form, authType, instance);
       if (instance.is_cmdb) {
         form.addControl('is_inbound', new FormControl(instance.is_inbound));
         form.addControl('is_outbound', new FormControl(instance.is_outbound));
@@ -116,9 +117,8 @@ export class UsiServicenowCrudService {
     } else {
       let form = this.builder.group({
         name: ['', [Validators.required, NoWhitespaceValidator]],
+        auth_type: ['BASIC', [Validators.required, NoWhitespaceValidator]],
         instance_url: ['', [Validators.required, RxwebValidators.url()]],
-        username: ['', [Validators.required, NoWhitespaceValidator]],
-        password: ['', [Validators.required, NoWhitespaceValidator]],
         is_cmdb: [false],
         is_itsm: [false],
         is_ire: [false],
@@ -132,16 +132,35 @@ export class UsiServicenowCrudService {
       }, {
         validators: AtLeastOneInputHasValue(['is_cmdb', 'is_itsm'])
       });
+      this.setIntegrationAuthControls(form, 'BASIC');
       return form;
+    }
+  }
+
+  setIntegrationAuthControls(form: FormGroup, authType: string, instance?: ServicenowAccount): void {
+    form.removeControl('username');
+    form.removeControl('password');
+    form.removeControl('client_id');
+    form.removeControl('client_secret');
+
+    if (authType === 'OAUTH2') {
+      form.addControl('client_id', new FormControl(instance?.client_id || '', [Validators.required, NoWhitespaceValidator]));
+      form.addControl('client_secret', new FormControl('', [Validators.required, NoWhitespaceValidator]));
+    } else {
+      form.addControl('username', new FormControl(instance?.username || '', [Validators.required, NoWhitespaceValidator]));
+      form.addControl('password', new FormControl('', [Validators.required, NoWhitespaceValidator]));
     }
   }
 
   resetIntegrationFormErrors(): any {
     let formErrors = {
       name: '',
+      auth_type: '',
       instance_url: '',
       username: '',
       password: '',
+      client_id: '',
+      client_secret: '',
       account_for: '',
       is_default: '',
       url_type: '',
@@ -156,6 +175,9 @@ export class UsiServicenowCrudService {
     name: {
       required: 'Name is required',
     },
+    auth_type: {
+      required: 'Auth Method is required',
+    },
     instance_url: {
       required: 'Instance URL is required',
       url: 'Enter valid url'
@@ -165,6 +187,12 @@ export class UsiServicenowCrudService {
     },
     password: {
       required: 'Password is required',
+    },
+    client_id: {
+      required: 'Client ID is required',
+    },
+    client_secret: {
+      required: 'Client Secret/Key is required',
     },
     collector: {
       uuid: {
@@ -311,6 +339,11 @@ export class UsiServicenowCrudService {
   }
 }
 
+export const ServiceNowAuthTypeChoices: { label: string; value: string }[] = [
+  { label: 'Basic', value: 'BASIC' },
+  { label: 'OAuth 2.0', value: 'OAUTH2' },
+];
+
 export const UnityDeviceTypeList: ServicenowAccountUnityOneDeviceType[] = [
   {
     label: 'Firewall',
@@ -424,4 +457,3 @@ export const publicCloudServiceList: PublicCloudServiceType[] = [
     value: 'firewall'
   },
 ]
-

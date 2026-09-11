@@ -10,7 +10,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { ServiceNowAttribute, ServiceNowResourceType, ServicenowAccount, ServicenowAccountUnityOneDeviceType, UnityResourceType } from '../usi-servicenow.type';
-import { UnityDeviceTypeList, UsiServicenowCrudService } from './usi-servicenow-crud.service';
+import { ServiceNowAuthTypeChoices, UnityDeviceTypeList, UsiServicenowCrudService } from './usi-servicenow-crud.service';
 import { AWSAccountType, AwsResourceDetailsType } from 'src/app/shared/SharedEntityTypes/aws.type';
 import { AzureManageAccountsType, AzureResourceDetailsType } from 'src/app/shared/SharedEntityTypes/azure.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
@@ -40,6 +40,7 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
 
   unityDeviceTypes: ServicenowAccountUnityOneDeviceType[] = UnityDeviceTypeList;
   publicCloudServices: UnityResourceType[] = UnityDeviceTypeList;
+  authTypeChoices: { label: string; value: string }[] = ServiceNowAuthTypeChoices;
   serviceNowResources: ServiceNowResourceType[] = [];
   awsAccountData: AWSAccountType[] = [];
   AwsResourceTypeData: AwsResourceDetailsType[] = [];
@@ -182,6 +183,12 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
     this.integrationForm = this.svc.buildIntegrationForm(instance);
     this.integrationFormErrors = this.svc.resetIntegrationFormErrors();
     this.integrationFormValidationMessages = this.svc.integrationFormValidationMessages;
+    this.integrationForm.get('auth_type')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((authType: string) => {
+      this.nonFieldErr = '';
+      this.svc.setIntegrationAuthControls(this.integrationForm, authType);
+      this.integrationFormErrors = this.svc.resetIntegrationFormErrors();
+      this.integrationForm.markAsDirty();
+    });
     this.integrationForm.get('is_cmdb').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
       if (!val) {
         this.integrationForm.removeControl('is_inbound');
@@ -223,6 +230,13 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
     } else {
       this.spinner.start('main');
       let obj = Object.assign({}, <ServicenowAccount>this.integrationForm.getRawValue());
+      if (obj.auth_type === 'OAUTH2') {
+        delete obj.username;
+        delete obj.password;
+      } else {
+        delete obj.client_id;
+        delete obj.client_secret;
+      }
       if (this.instanceId) {
         this.crudSvc.saveIntegrationForm(obj, this.instanceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
           this.notification.success(new Notification('ServiceNow account updated successfully.'));

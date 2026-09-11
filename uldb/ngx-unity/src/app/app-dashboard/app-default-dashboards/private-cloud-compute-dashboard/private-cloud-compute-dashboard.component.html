@@ -296,7 +296,8 @@
                             <div class="distribution-row border-bottom"
                                 *ngFor="let row of densityHostVm?.desnityHostRows; let i = index">
                                 <div class="distribution-label text-truncate" style="max-width: 180px;"
-                                    [tooltip]="row.hostName">
+                                    [tooltip]="row.hostName" placement="right" container="body"
+                                    containerClass="private-cloud-host-tooltip">
 
                                     {{row.hostName}}
 

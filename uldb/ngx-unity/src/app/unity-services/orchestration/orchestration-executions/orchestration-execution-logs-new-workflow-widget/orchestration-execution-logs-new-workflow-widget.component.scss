@@ -16,6 +16,10 @@
   flex: 0 1 auto !important;
 }
 
+.wf-page-container #drawflow:not(.execution-workflow-ready) {
+  visibility: hidden !important;
+}
+
 .readonly-execution-node {
   .node-header,
   .icon-and-title {
@@ -44,6 +48,11 @@
   .model-select:disabled {
     cursor: default;
   }
+
+  .readonly-layout-spacer {
+    visibility: hidden;
+    pointer-events: none;
+  }
 }
 
 #drawflow {
@@ -59,9 +68,4 @@
     }
   }
 
-  // The LLM's 150px box is centered inside its 170px label wrapper. Keep the
-  // input on the box edge instead of the wrapper edge (which leaves a 10px gap).
-  .drawflow-node.agentic-default-node:has(.readonly-execution-node .node-box.llm) .input {
-    left: 7px !important;
-  }
 }

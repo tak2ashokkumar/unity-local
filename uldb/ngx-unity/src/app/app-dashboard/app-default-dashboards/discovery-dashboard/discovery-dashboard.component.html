@@ -328,16 +328,17 @@
                             <ng-container
                                 *ngIf="ciDistributionByDeviceTableRows?.length; else ciDistributionByDeviceNoData">
                                 <div class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
-                                    <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
-                                        (sorted)="onCiDistributionByDeviceTableSorted($event)">
+                                    <table
+                                        class="table table-sm text-left mb-0 discovery-dashboard-table discovery-device-type-table"
+                                        sortableTable (sorted)="onCiDistributionByDeviceTableSorted($event)">
                                         <thead class="bg-light">
                                             <tr>
-                                                <th class="tdw-18" [sortable-column]="'deploymentEnvironment'"
+                                                <th class="tdw-25" [sortable-column]="'deploymentEnvironment'"
                                                     [sort-direction]="getCiDistributionByDeviceSortDirection('deploymentEnvironment')"
                                                     [ngClass]="getCiDistributionByDeviceHeaderClass('deploymentEnvironment')">
                                                     Deployment Environment
                                                 </th>
-                                                <th class="tdw-34" [sortable-column]="'deviceType'"
+                                                <th class="tdw-27" [sortable-column]="'deviceType'"
                                                     [sort-direction]="getCiDistributionByDeviceSortDirection('deviceType')"
                                                     [ngClass]="getCiDistributionByDeviceHeaderClass('deviceType')">
                                                     Device Type
@@ -357,7 +358,7 @@
                                         <tbody>
                                             <tr *ngFor="let row of ciDistributionByDeviceTableRows; trackBy: trackByCiDistributionByDeviceRow"
                                                 truncateText>
-                                                <td class="tdw-18">
+                                                <td class="tdw-25">
                                                     <div [tooltip]="row.deploymentEnvironment">
                                                         <span
                                                             class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
@@ -366,7 +367,7 @@
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td class="tdw-34 text-primary font-500">
+                                                <td class="tdw-27 text-primary font-500">
                                                     <div [tooltip]="row.deviceType">{{ row.deviceType }}</div>
                                                 </td>
                                                 <td class="tdw-24">
@@ -439,27 +440,27 @@
                                         sortableTable (sorted)="onCiDistributionByDiscoveryTableSorted($event)">
                                         <thead class="bg-light">
                                             <tr>
-                                                <th class="tdw-14" [sortable-column]="'deploymentEnvironment'"
+                                                <th class="tdw-18" [sortable-column]="'deploymentEnvironment'"
                                                     [sort-direction]="getCiDistributionByDiscoverySortDirection('deploymentEnvironment')"
                                                     [ngClass]="getCiDistributionByDiscoveryHeaderClass('deploymentEnvironment')">
                                                     Deployment Environment
                                                 </th>
-                                                <th class="tdw-12" [sortable-column]="'infrastructureType'"
+                                                <th class="tdw-14" [sortable-column]="'infrastructureType'"
                                                     [sort-direction]="getCiDistributionByDiscoverySortDirection('infrastructureType')"
                                                     [ngClass]="getCiDistributionByDiscoveryHeaderClass('infrastructureType')">
                                                     Infrastructure Type
                                                 </th>
-                                                <th class="tdw-10" [sortable-column]="'discoveryMethod'"
+                                                <th class="tdw-12" [sortable-column]="'discoveryMethod'"
                                                     [sort-direction]="getCiDistributionByDiscoverySortDirection('discoveryMethod')"
                                                     [ngClass]="getCiDistributionByDiscoveryHeaderClass('discoveryMethod')">
                                                     Discovery Protocol
                                                 </th>
-                                                <th class="tdw-12" [sortable-column]="'vendorPlatform'"
+                                                <th class="tdw-14" [sortable-column]="'vendorPlatform'"
                                                     [sort-direction]="getCiDistributionByDiscoverySortDirection('vendorPlatform')"
                                                     [ngClass]="getCiDistributionByDiscoveryHeaderClass('vendorPlatform')">
                                                     Vendor / Platform
                                                 </th>
-                                                <th class="tdw-10" [sortable-column]="'resourcesDiscovered'"
+                                                <th class="tdw-12" [sortable-column]="'resourcesDiscovered'"
                                                     [sort-direction]="getCiDistributionByDiscoverySortDirection('resourcesDiscovered')"
                                                     [ngClass]="getCiDistributionByDiscoveryHeaderClass('resourcesDiscovered')">
                                                     Resources Discovered
@@ -484,7 +485,7 @@
                                                     [ngClass]="getCiDistributionByDiscoveryHeaderClass('unknown')">
                                                     UNKNOWN
                                                 </th>
-                                                <th class="tdw-8" [sortable-column]="'lastRun'"
+                                                <th class="tdw-10" [sortable-column]="'lastRun'"
                                                     [sort-direction]="getCiDistributionByDiscoverySortDirection('lastRun')"
                                                     [ngClass]="getCiDistributionByDiscoveryHeaderClass('lastRun')">
                                                     Last Discovered
@@ -494,7 +495,7 @@
                                         <tbody>
                                             <tr *ngFor="let row of ciDistributionByDiscoveryTableRows; trackBy: trackByCiDistributionByDiscoveryRow"
                                                 truncateText>
-                                                <td class="tdw-14">
+                                                <td class="tdw-25">
                                                     <div [tooltip]="row.deploymentEnvironment">
                                                         <span
                                                             class="d-inline-flex align-items-center justify-content-center discovery-distribution-env-pill"
@@ -503,17 +504,17 @@
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td class="tdw-12">
+                                                <td class="tdw-14">
                                                     <div [tooltip]="row.infrastructureType">{{ row.infrastructureType }}
                                                     </div>
                                                 </td>
-                                                <td class="tdw-10 text-primary font-500">
+                                                <td class="tdw-12 text-primary font-500">
                                                     <div [tooltip]="row.discoveryMethod">{{ row.discoveryMethod }}</div>
                                                 </td>
-                                                <td class="tdw-12">
+                                                <td class="tdw-14">
                                                     <div [tooltip]="row.vendorPlatform">{{ row.vendorPlatform }}</div>
                                                 </td>
-                                                <td class="tdw-10">
+                                                <td class="tdw-12">
                                                     <div [tooltip]="row.resourcesDiscovered">{{ row.resourcesDiscovered
                                                         }}</div>
                                                 </td>
@@ -534,7 +535,7 @@
                                                     <div [tooltip]="row.unknown | number:'1.0-0'">{{ row.unknown |
                                                         number:'1.0-0' }}</div>
                                                 </td>
-                                                <td class="tdw-8">
+                                                <td class="tdw-10">
                                                     <div [tooltip]="row.lastRun">{{ row.lastRun }}</div>
                                                 </td>
                                             </tr>
@@ -596,8 +597,9 @@
                         <ng-template #topDiscoveryFailuresTableView>
                             <ng-container *ngIf="topDiscoveryFailures.length; else topDiscoveryFailuresNoData">
                                 <div class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
-                                    <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
-                                        (sorted)="onTopDiscoveryFailuresTableSorted($event)">
+                                    <table
+                                        class="table table-sm text-left mb-0 discovery-dashboard-table discovery-top-failures-table"
+                                        sortableTable (sorted)="onTopDiscoveryFailuresTableSorted($event)">
                                         <thead class="bg-light">
                                             <tr>
                                                 <th class="tdw-24" [sortable-column]="'deploymentEnvironment'"
@@ -728,8 +730,9 @@
                         <ng-template #operatingSystemsTableView>
                             <div *ngIf="operatingSystems.length; else operatingSystemsNoData"
                                 class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
-                                <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
-                                    (sorted)="onOperatingSystemsTableSorted($event)">
+                                <table
+                                    class="table table-sm text-left mb-0 discovery-dashboard-table discovery-os-table"
+                                    sortableTable (sorted)="onOperatingSystemsTableSorted($event)">
                                     <thead class="bg-light">
                                         <tr>
                                             <th class="tdw-24" [sortable-column]="'deploymentEnvironment'"
@@ -1028,8 +1031,9 @@
                             <ng-container *ngIf="ciDistributionTableRows?.length; else ciDistributionNoData">
                                 <div
                                     class="table-responsive discovery-dashboard-table-wrap discovery-dashboard-table-wrap--tall p-3 flex-fill h-100">
-                                    <table class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
-                                        (sorted)="onCiDistributionTableSorted($event)">
+                                    <table
+                                        class="table table-sm text-left mb-0 discovery-dashboard-table discovery-ci-distribution-summary-table"
+                                        sortableTable (sorted)="onCiDistributionTableSorted($event)">
                                         <thead class="bg-light">
                                             <tr>
                                                 <th class="tdw-24" [sortable-column]="'deploymentEnvironment'"
@@ -1383,8 +1387,8 @@
 
                         <div class="table-responsive discovery-dashboard-table-wrap p-3 flex-fill">
                             <table *ngIf="orphanedDeviceByTypeRows.length; else orphanedDeviceByTypeNoData"
-                                class="table table-sm text-left mb-0 discovery-dashboard-table" sortableTable
-                                (sorted)="onOrphanedDeviceByTypeTableSorted($event)">
+                                class="table table-sm text-left mb-0 discovery-dashboard-table discovery-orphan-table"
+                                sortableTable (sorted)="onOrphanedDeviceByTypeTableSorted($event)">
                                 <thead class="bg-light">
                                     <tr>
                                         <th [sortable-column]="'deploymentEnvironment'"

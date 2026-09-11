@@ -57,6 +57,8 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
   page = 1;
   pageSize = 10;
   selectedItem: any;
+  aimlSearch = '';
+  private aimlRequestVersion = 0;
 
   cloudAccount: any[] = [];
   credentials: any[] = [];
@@ -181,6 +183,9 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
     this.aimlData = [];
     this.selectedItem = null;
     this.isDropdownOpen = false;
+    this.aimlSearch = '';
+    this.aimlRequestVersion++;
+    this.isLoading = false;
     this.page = 1;
     this.hasNextPage = true;
   }
@@ -248,14 +253,19 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
+    const requestVersion = this.aimlRequestVersion;
     const config = this.getResolvedConfig(this.triggerNode);
     const obj = {
       aiml_type: config?.aiml_type ?? config?.type,
       event_type: config?.event_type,
-      filter: config?.filter ?? config?.filter_conditions
+      filter: config?.filter ?? config?.condition ?? config?.filter_conditions
     };
 
-    this.svc.getAIMLData(this.page, this.pageSize, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.getAIMLData(this.page, this.pageSize, obj, this.aimlSearch).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      if (requestVersion !== this.aimlRequestVersion) {
+        return;
+      }
+
       const newData = (res?.results || []).map(item => ({
         ...item,
         status: item.status === 0 ? 'Open' : item.status === 1 ? 'Resolved' : item.status
@@ -266,6 +276,10 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
       this.page++;
       this.isLoading = false;
     }, () => {
+      if (requestVersion !== this.aimlRequestVersion) {
+        return;
+      }
+
       this.isLoading = false;
       this.notification.error(new Notification('Failed to load AIML Data'));
     });
@@ -281,10 +295,22 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
   }
 
   openDropdown(): void {
+    this.aimlRequestVersion++;
+    this.isLoading = false;
     this.page = 1;
     this.hasNextPage = true;
     this.aimlData = [];
     this.getAIMLData();
+  }
+
+  onAIMLSearch(search: string): void {
+    const normalizedSearch = (search || '').trim();
+    if (normalizedSearch === this.aimlSearch) {
+      return;
+    }
+
+    this.aimlSearch = normalizedSearch;
+    this.openDropdown();
   }
 
   toggleDropdown(): void {
@@ -399,15 +425,13 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
         return null;
       }
 
-      const config = this.getResolvedConfig(this.triggerNode);
-      const aimlData = {
-        ...this.aimlTriggerForm.getRawValue(),
-        aiml_type: config?.aiml_type ?? config?.type
+      const aimlConfig = this.getResolvedConfig(this.triggerNode);
+      return {
+        inputs: {
+          ...this.aimlTriggerForm.getRawValue(),
+          aiml_type: aimlConfig?.aiml_type ?? aimlConfig?.type
+        }
       };
-
-      return this.executionMode === 'dynamic'
-        ? { inputs: { aiml_data: aimlData } }
-        : { aiml_data: this.aimlTriggerForm.getRawValue() };
     }
 
     return null;

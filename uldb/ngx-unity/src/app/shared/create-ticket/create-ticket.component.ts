@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import { CreateTicketService, Priority, TicketInput, DeviceServiceCatalogTermView, ZENDESK_TICKET_PRIORITIES, DYNAMIC_CRM_TICKET_PRIORITIES, DYNAMIC_CRM_TICKET_TYPES, SERVICE_NOW_TICKET_TYPES, ZENDESK_TICKET_TYPES } from './create-ticket.service';
+import { CreateTicketEditContext, CreateTicketService, Priority, TicketInput, DeviceServiceCatalogTermView, ZENDESK_TICKET_PRIORITIES, DYNAMIC_CRM_TICKET_PRIORITIES, DYNAMIC_CRM_TICKET_TYPES, SERVICE_NOW_TICKET_TYPES, ZENDESK_TICKET_TYPES } from './create-ticket.service';
 import { Subscription, Subject } from 'rxjs';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { AppSpinnerService } from '../app-spinner/app-spinner.service';
@@ -11,6 +11,7 @@ import { takeUntil, take } from 'rxjs/operators';
 import { DeviceServiceCatalog } from './device-service-catalog.type';
 import { UserInfoService } from '../user-info.service';
 import { TicketMgmtList } from '../SharedEntityTypes/ticket-mgmt-list.type';
+import { ServiceNowTicketType } from '../shared-service-now-mgmt/service-now-ticket-type';
 
 @Component({
   selector: 'create-ticket',
@@ -43,6 +44,8 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
   ticketPriorityList: string[] = [];
   showTicketType: boolean;
   ticketTypeList: string[] = [];
+  isEditFlow: boolean = false;
+  editContext: CreateTicketEditContext = null;
   constructor(private ticketService: CreateTicketService,
     private modalService: BsModalService,
     private spinner: AppSpinnerService,
@@ -50,8 +53,11 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
     private notificationService: AppNotificationService,
     private user: UserInfoService) {
     this.ticketService.ticketAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(param => {
-      console.log('metadata : ', param.input);
       this.metadata = param.input;
+      this.instanceUUID = param.instanceUUID;
+      this.isFeedback = !!param.input.feedback;
+      this.isEditFlow = !!param.editContext;
+      this.editContext = param.editContext ? param.editContext : null;
       //Category dropdown should be shown only for service request.
       this.showSvcCategory = param.input.type == TICKET_TYPE.PROBLEM && !param.input.feedback && !param.input.webaccess && !param.input.aiops;
       this.deviceMapping = param.deviceMapping ? param.deviceMapping : null;
@@ -63,12 +69,8 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
         this.getServiceCatalog();
       }
 
-      if (param.input.feedback) {
-        this.isFeedback = true;
-      }
-      this.getTicketMgmtList();
       this.buildForm();
-      this.instanceUUID = param.instanceUUID;
+      this.getTicketMgmtList();
     });
   }
 
@@ -104,7 +106,7 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.showTicketType = (this.metadata && !this.metadata.type) ? true : false;
+    this.showTicketType = this.isEditFlow || !!(this.metadata && !this.metadata.type);
     if (this.showTicketType) {
       if (this.selectedTcktMgmt.type == 'DynamicsCrm') {
         this.ticketTypeList = DYNAMIC_CRM_TICKET_TYPES;
@@ -156,6 +158,9 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
         this.tcktMgmtSelected(JSON.stringify(this.ticketMgmtList.find(inst => inst.default == true)));
       }
       this.modalRef = this.modalService.show(this.elementView, Object.assign({}, { class: 'modal-lg', keyboard: true, ignoreBackdropClick: true }));
+      if (this.isServiceNowEditFlow()) {
+        this.getTicketDetails();
+      }
     }, err => {
     });
   }
@@ -209,6 +214,17 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
     return Object.keys(this.attachmentForm.controls);
   }
 
+  getTicketDetails() {
+    this.spinner.start('main');
+    this.ticketService.getServiceNowTicketData(this.instanceUUID, this.editContext.sysId, this.editContext.ticketType).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: ServiceNowTicketType) => {
+      this.patchEditTicketForm(res);
+      this.spinner.stop('main');
+    }, (err: Error) => {
+      this.notificationService.error(new Notification(err.message));
+      this.spinner.stop('main');
+    });
+  }
+
   detectFiles(files: FileList) {
     for (let index = 0; index < files.length; index++) {
       if (this.attachments.includes(files.item(index).name)) {
@@ -245,13 +261,13 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
         }
         data.set('metadata', metadata);
       }
-      this.ticketService.saveTicket(data, this.selectedTcktMgmt, create).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.ticketService.saveTicket(data, this.selectedTcktMgmt, create, this.editContext).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
         this.spinner.stop('main');
         this.modalRef.hide();
         if (data.has('weburl')) {
           this.notificationService.success(new Notification('Web access request has been submitted successfully. UNITYOneCloud Team will notify you once this is enabled.'));
         } else {
-          this.notificationService.success(new Notification('Ticket submitted successfully, it will be visible in Unity in few minutes. Our Support team will soon contact you.'));
+          this.notificationService.success(new Notification(this.isEditFlow ? 'Ticket updated successfully.' : 'Ticket submitted successfully, it will be visible in Unity in few minutes. Our Support team will soon contact you.'));
           if (this.showTicketType) {
             this.metadata.type = <string>data.get('type');
           }
@@ -263,9 +279,23 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
         if (data.has('weburl')) {
           this.notificationService.error(new Notification('Failed to request web access. Tryagain later.'));
         } else {
-          this.notificationService.error(new Notification('Error while creating ticket.'));
+          this.notificationService.error(new Notification(this.isEditFlow ? 'Error while updating ticket.' : 'Error while creating ticket.'));
         }
       });
     }
+  }
+
+  private isServiceNowEditFlow() {
+    return this.isEditFlow && this.selectedTcktMgmt && this.selectedTcktMgmt.type == 'ServiceNow' && this.editContext && !!this.editContext.sysId;
+  }
+
+  private patchEditTicketForm(ticket: ServiceNowTicketType) {
+    const collaborators = ticket.collaborators ? ticket.collaborators.display_value : ticket.watch_list ? ticket.watch_list.display_value : '';
+    this.ticketForm.patchValue({
+      subject: ticket.short_description ? ticket.short_description.display_value : '',
+      collaborators: collaborators,
+      description: ticket.description ? ticket.description.display_value : '',
+      type: this.editContext.ticketType
+    }, { emitEvent: false });
   }
 }

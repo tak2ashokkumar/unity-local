@@ -76,6 +76,8 @@ export class WfDynamicRightExecuteComponent implements OnInit {
   page = 1;
   pageSize = 10;
   selectedItem: any;
+  aimlSearch = '';
+  private aimlRequestVersion = 0;
 
   dynamicForm!: FormGroup;
   dynamicFields: any[] = [];
@@ -286,6 +288,7 @@ export class WfDynamicRightExecuteComponent implements OnInit {
       return;
     }
     this.isLoading = true;
+    const requestVersion = this.aimlRequestVersion;
     const values = this.rightExecuteData?.values || {};
     console.log(values, "values aiml")
     const obj = {
@@ -294,12 +297,15 @@ export class WfDynamicRightExecuteComponent implements OnInit {
       filter: values.condition
     };
 
-    this.svc.getAIMLData(this.page, this.pageSize, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+    this.svc.getAIMLData(this.page, this.pageSize, obj, this.aimlSearch).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       res => {
+        if (requestVersion !== this.aimlRequestVersion) {
+          return;
+        }
+
         const newData = res.results.map(item => ({
           ...item,
-          status:
-            values.status === 'Open' ? 0 : values.status === 'Resolved' ? 1 : values.status
+          status: item.status === 0 ? 'Open' : item.status === 1 ? 'Resolved' : item.status
         }));
 
         this.aimlData = [
@@ -312,6 +318,10 @@ export class WfDynamicRightExecuteComponent implements OnInit {
         this.isLoading = false;
       },
       () => {
+        if (requestVersion !== this.aimlRequestVersion) {
+          return;
+        }
+
         this.isLoading = false;
       }
     );
@@ -329,11 +339,23 @@ export class WfDynamicRightExecuteComponent implements OnInit {
   }
 
   openDropdown() {
+    this.aimlRequestVersion++;
+    this.isLoading = false;
     this.page = 1;
     this.hasNextPage = true;
     this.aimlData = [];
 
     this.getAIMLData();
+  }
+
+  onAIMLSearch(search: string) {
+    const normalizedSearch = (search || '').trim();
+    if (normalizedSearch === this.aimlSearch) {
+      return;
+    }
+
+    this.aimlSearch = normalizedSearch;
+    this.openDropdown();
   }
 
   toggleDropdown() {
@@ -439,7 +461,7 @@ export class WfDynamicRightExecuteComponent implements OnInit {
         this.aimlTriggerForm.valueChanges.subscribe((data: any) => { this.aimlTriggerFormErrors = this.utilService.validateForm(this.aimlTriggerForm, this.aimlTriggerFormValidationMessage, this.aimlTriggerFormErrors); });
         return;
       } else {
-        this.triggerData = { inputs: { ...this.aimlTriggerForm.getRawValue(), aiml_type: this.rightExecuteData.config.aiml_type } };
+        this.triggerData = { inputs: { ...this.aimlTriggerForm.getRawValue(), aiml_type: this.rightExecuteData?.values?.aiml_type } };
       }
     }
     this.triggerSubmit.emit(this.triggerData);
@@ -571,4 +593,3 @@ export class WfDynamicRightExecuteComponent implements OnInit {
     }
   }
 }
-

@@ -29,7 +29,7 @@ export class SharedServiceNowMgmtComponent implements OnInit, OnDestroy, OnChang
   poll: boolean = false;
   public instanceId: string;
 
-  constructor(private spinnerService: AppSpinnerService,
+  constructor(protected spinnerService: AppSpinnerService,
     public notification: AppNotificationService,
     public userInfo: UserInfoService,
     public router: Router,

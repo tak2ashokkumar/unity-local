@@ -289,9 +289,35 @@
   table-layout: fixed;
 }
 
+.discovery-device-type-table {
+  min-width: 760px;
+}
+
+.discovery-device-type-table thead th.tdw-25 {
+  width: 25%;
+}
+
+.discovery-device-type-table thead th.tdw-27 {
+  width: 27%;
+}
+
+.discovery-device-type-table thead th.tdw-24 {
+  width: 24%;
+}
+
 .discovery-distribution-table {
   min-width: 1540px;
   table-layout: auto;
+}
+
+.discovery-top-failures-table,
+.discovery-os-table,
+.discovery-ci-distribution-summary-table {
+  min-width: 760px;
+}
+
+.discovery-orphan-table {
+  min-width: 1040px;
 }
 
 .discovery-dashboard-table thead th {
@@ -324,6 +350,8 @@
 
 .discovery-distribution-env-pill {
   min-width: 92px;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 12px;
@@ -455,7 +483,31 @@
 }
 
 .discovery-new-ci-table {
-  min-width: 1840px;
+  min-width: 1960px;
+}
+
+.discovery-new-ci-table thead th.tdw-14 {
+  width: 14%;
+}
+
+.discovery-new-ci-table thead th.tdw-13 {
+  width: 13%;
+}
+
+.discovery-new-ci-table thead th.tdw-12 {
+  width: 12%;
+}
+
+.discovery-new-ci-table thead th.tdw-10 {
+  width: 10%;
+}
+
+.discovery-new-ci-table thead th.tdw-9 {
+  width: 9%;
+}
+
+.discovery-new-ci-table thead th.tdw-8 {
+  width: 8%;
 }
 
 .discovery-availability-pill {

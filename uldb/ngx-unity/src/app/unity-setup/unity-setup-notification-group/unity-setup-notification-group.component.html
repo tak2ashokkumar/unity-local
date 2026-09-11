@@ -143,7 +143,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-col-form-label">Users<em>*</em></label>
-                    <input id="users" class="form-control" autocomplete="off" placeholder="Type username or email"
+                    <input id="users" class="form-control" autocomplete="off" placeholder="Type Username or Email"
                         [class.is-invalid]="createFormErrors.users" formControlName="users" [typeahead]="userList"
                         typeaheadOptionField="full_name" (typeaheadOnSelect)="typeaheadOnSelect($event)"
                         (typeaheadNoResults)="typeaheadNoResults($event)">

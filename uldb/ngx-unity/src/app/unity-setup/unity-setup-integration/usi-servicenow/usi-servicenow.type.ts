@@ -5,7 +5,9 @@ export interface ServicenowAccounts {
   name: string;
   uuid: string;
   instance_url: string;
-  username: string;
+  auth_type?: string;
+  username?: string;
+  client_id?: string;
   is_default: boolean;
   is_itsm: boolean;
   is_cmdb: boolean;
@@ -49,7 +51,11 @@ export interface ServicenowAccount {
   name: string;
   uuid: string;
   instance_url: string;
-  username: string;
+  auth_type?: string;
+  username?: string;
+  password?: string;
+  client_id?: string;
+  client_secret?: string;
   is_default: boolean;
   is_itsm: boolean;
   is_cmdb: boolean;

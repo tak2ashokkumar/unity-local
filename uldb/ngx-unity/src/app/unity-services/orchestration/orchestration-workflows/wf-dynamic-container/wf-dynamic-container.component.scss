@@ -390,8 +390,9 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 .center-text-container {
     position: absolute;
     width: 240px;
-    top: 200px;
-    right: 630px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     flex-direction: column;
     gap: 6px;
     z-index: 10;

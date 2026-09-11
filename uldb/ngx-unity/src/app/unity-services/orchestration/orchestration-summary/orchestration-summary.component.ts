@@ -229,10 +229,8 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
   schedule(data: UpccomingExecutionViewModel): void {
     if (data.type === "Task") {
       this.router.navigate(['tasks', data.taskOrWorkflowId, data.targetType, 'scheduleTasks'], { relativeTo: this.route.parent });
-    } else if (data.triggerType) {
-      this.router.navigate(['workflows', data.taskOrWorkflowId, data.triggerType], { relativeTo: this.route.parent });
     } else {
-      this.router.navigate(['workflows', data.taskOrWorkflowId, data.targetType, 'scheduleWorkflow'], { relativeTo: this.route.parent });
+      this.router.navigate(['workflows', data.taskOrWorkflowId, 'trigger-execute', 'Schedule Trigger'], { relativeTo: this.route.parent });
     }
   }
 
@@ -240,7 +238,7 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
     if (data.type === "Task") {
       this.router.navigate(['tasks', data.taskOrWorkflowId, 'edit'], { relativeTo: this.route.parent });
     } else {
-      this.router.navigate(['workflows', data.taskOrWorkflowId, 'edit'], { relativeTo: this.route.parent });
+      this.router.navigate(['workflows', 'dynamic-workflow', data.taskOrWorkflowId, 'edit'], { relativeTo: this.route.parent });
     }
   }
 

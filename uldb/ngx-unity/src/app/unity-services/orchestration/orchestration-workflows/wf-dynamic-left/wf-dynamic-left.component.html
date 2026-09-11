@@ -1,6 +1,6 @@
 <div class="left-sidebar position-relative w-100 bg-white">
     <!-- SEARCH -->
-    <div class="p-2 mb-1">
+    <div *ngIf="hasTriggerNode" class="p-2 mb-1">
         <table-search-box [searchValue]="searchQuery" (searched)="onSearched($event)">
         </table-search-box>
     </div>
@@ -40,11 +40,12 @@
         ========================================== -->
         <ng-container *ngSwitchCase="'dynamic-submenu'">
             <!-- HEADER -->
-            <div (click)="backToMainMenu()" class="submenu-header p-2 mb-1 pointer-link">
+            <div (click)="backToMainMenu()" class="submenu-header p-2 mb-1"
+                [class.pointer-link]="hasTriggerNode" [class.empty-canvas]="!hasTriggerNode">
                 <div class="d-flex align-items-center">
-                    <i class="fas fa-arrow-left fa-sm p-2 text-muted"></i>
-                    <h5 class="mb-0 menu-title">
-                        {{ selectedGroup?.name }}
+                    <i *ngIf="hasTriggerNode" class="fas fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0 menu-title" [class.p-2]="!hasTriggerNode">
+                        {{ hasTriggerNode ? selectedGroup?.name : 'Select Trigger' }}
                     </h5>
                 </div>
                 <span class="text-muted mt-1 ml-2 d-block description">

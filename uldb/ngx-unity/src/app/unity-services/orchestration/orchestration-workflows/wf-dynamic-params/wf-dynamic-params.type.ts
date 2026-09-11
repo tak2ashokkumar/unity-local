@@ -167,7 +167,7 @@ interface ApiOptionsApi {
   query_param?: string;
   static_params?: Record<string, any>;
   label_key?: string;
-  value_key?: string;
+  value_key?: string | string[];
   data_path?: string;
 }
 
@@ -181,7 +181,7 @@ interface DynamicOptionsApi {
   query_param?: string;
   static_params?: Record<string, any>;
   label_key?: string;
-  value_key?: string;
+  value_key?: string | string[];
   data_path?: string;
 }
 

@@ -5,13 +5,21 @@ import * as pluginDataLabels from 'chartjs-plugin-datalabels';
 import { cloneDeep as _clone, merge as _merge } from 'lodash-es';
 import * as moment from 'moment';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
+import { AppNotificationService } from '../../app-notification/app-notification.service';
 import { Notification } from '../../app-notification/notification.type';
+import { AppSpinnerService } from '../../app-spinner/app-spinner.service';
+import { StorageType } from '../../app-storage/storage-type';
+import { StorageService } from '../../app-storage/storage.service';
+import { RandColorGeneratorService } from '../../rand-color-generator.service';
+import { SharedCreateTicketService } from '../../shared-create-ticket/shared-create-ticket.service';
+import { UserInfoService } from '../../user-info.service';
 import { ServiceNowChoices, ServiceNowClosedTicketsCountByResponseTime, ServiceNowGraphData, ServiceNowTicketsCountByPriority, ServiceNowTicketsCountByStatus } from '../service-now-ticket-type';
+import { CreateTicketService } from '../../create-ticket/create-ticket.service';
 import { SharedServiceNowMgmtComponent } from '../shared-service-now-mgmt.component';
 import { SERVICE_NOW_TICKET_TYPE } from '../../app-utility/app-utility.service';
-import { StorageType } from '../../app-storage/storage-type';
-import { ServiceNowTicketViewData } from '../shared-service-now-mgmt.service';
+import { ServiceNowTicketViewData, SharedServiceNowMgmtService } from '../shared-service-now-mgmt.service';
 
 export const MY_NATIVE_FORMATS = {
   parseInput: 'LL LT',
@@ -99,11 +107,28 @@ export class NowTcktMgmtComponent extends SharedServiceNowMgmtComponent implemen
   solvedByResponseChartOptions: ChartOptions;
   solvedByResponseChartLoading: boolean = false;
 
+  constructor(spinnerService: AppSpinnerService,
+    notification: AppNotificationService,
+    userInfo: UserInfoService,
+    router: Router,
+    route: ActivatedRoute,
+    colorSvc: RandColorGeneratorService,
+    ticketService: SharedServiceNowMgmtService,
+    createTicketService: SharedCreateTicketService,
+    storage: StorageService,
+    private modalTicketService: CreateTicketService) {
+    super(spinnerService, notification, userInfo, router, route, colorSvc, ticketService, createTicketService, storage);
+  }
+
   ngOnInit() {
     this.ticketType = _clone(this.currentCriteria.params[0]['ticket_type']);
     this.buildFilterForm(this.ticketType);
     this.updateParams();
     super.ngOnInit();
+    this.modalTicketService.ticketCreated$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+      this.currentCriteria.pageNo = 1;
+      this.getTickets();
+    });
     this.getStatePriorityGraphDataWithForkjoin();
   }
 
@@ -273,8 +298,33 @@ export class NowTcktMgmtComponent extends SharedServiceNowMgmtComponent implemen
     this.router.navigateByUrl(view.detailsUrl);
   }
 
+  editTicket(view: ServiceNowTicketViewData) {
+    this.modalTicketService.createTicket({ subject: '', metadata: '', type: view.ticketType }, null, this.instanceId, {
+      sysId: view.sysId,
+      ticketType: view.ticketType
+    });
+  }
+
   createTicket() {
-    this.createTicketService.createTicket({ subject: '', metadata: '', type: this.currentCriteria.params[0]['ticket_type'] }, null, this.instanceId);
+    this.modalTicketService.createTicket({ subject: '', metadata: '', type: this.currentCriteria.params[0]['ticket_type'] }, null, this.instanceId);
+  }
+
+  downloadReport() {
+    if (!this.viewData.length) {
+      return;
+    }
+
+    this.spinnerService.start('main');
+    this.ticketService.downloadReport(this.instanceId, this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      let ele = document.getElementById('file-downloader');
+      ele.setAttribute('href', this.ticketService.getReportUrl(this.instanceId, data.data));
+      ele.click();
+      this.spinnerService.stop('main');
+      this.notification.success(new Notification('Report downloaded successfully.'));
+    }, err => {
+      this.spinnerService.stop('main');
+      this.notification.error(new Notification('Failed to download report. Try again later.'));
+    });
   }
 
 }

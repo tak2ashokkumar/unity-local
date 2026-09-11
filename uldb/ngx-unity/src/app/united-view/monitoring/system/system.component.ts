@@ -202,8 +202,18 @@ export class SystemComponent implements OnInit, OnDestroy {
 
   getDeviceGraphNames(deviceType: SystemMonitoringWidgetDeviceTypeMapping, device: SystemMonitoringWidgetDevice) {
     this.viewService.getDeviceGraphNames(deviceType, device).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-      this.deviceGraphs = data;
+      this.deviceGraphs = this.filterExistingGraphs(data, deviceType, device);
     });
+  }
+
+  private filterExistingGraphs(graphs: SystemMonitoringWidgetGraphViewData[], deviceType: SystemMonitoringWidgetDeviceTypeMapping,
+    device: SystemMonitoringWidgetDevice): SystemMonitoringWidgetGraphViewData[] {
+    const existingGraphNames = this.widgets
+      .filter(widget => widget.widgetId !== this.selectedWidget?.widgetId &&
+        widget.deviceType.modelMapping === deviceType.modelMapping && widget.device.uuid === device.uuid)
+      .flatMap(widget => widget.graphs.map(graph => graph.name));
+
+    return graphs.filter(graph => !existingGraphNames.includes(graph.name));
   }
 
   buildAddEditForm(widget?: SystemMonitoringWidgetViewData) {
@@ -300,7 +310,7 @@ export class SystemComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.viewService.getDevicesAndGraphNames(view).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.devices = res[0];
-      this.deviceGraphs = res[1];
+      this.deviceGraphs = this.filterExistingGraphs(res[1], view.deviceType, view.device);
       this.spinner.stop('main');
       this.buildAddEditForm(view);
     }, err => {

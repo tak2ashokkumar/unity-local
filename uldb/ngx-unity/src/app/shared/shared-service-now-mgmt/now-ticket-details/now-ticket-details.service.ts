@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { GET_SERVICE_NOW_ATTACHMENTS_BY_TICKET_ID, GET_SERVICE_NOW_COMMENTS_BY_TICKET_ID, GET_SERVICE_NOW_TICKET_BY_ID, PUT_SERVICE_NOW_TICKET_BY_ID } from '../../api-endpoint.const';
+import { GET_SERVICE_NOW_ATTACHMENTS_BY_TICKET_ID, GET_SERVICE_NOW_COMMENTS_BY_TICKET_ID, GET_SERVICE_NOW_TICKET_BY_ID, GET_SERVICE_NOW_WORKLOGS_BY_TICKET_ID, PUT_SERVICE_NOW_TICKET_BY_ID, PUT_SERVICE_NOW_TICKET_WORKLOG } from '../../api-endpoint.const';
 import { AppUtilityService, NoWhitespaceValidator } from '../../app-utility/app-utility.service';
 import { TaskStatus } from '../../SharedEntityTypes/task-status.type';
-import { ServiceNowAttachmentsType, ServiceNowComments, ServiceNowTicketType } from '../service-now-ticket-type';
+import { ServiceNowAttachmentsType, ServiceNowComments, ServiceNowTicketType, ServiceNowWorklogs } from '../service-now-ticket-type';
 
 @Injectable()
 export class NowTicketDetailsService {
@@ -24,6 +24,10 @@ export class NowTicketDetailsService {
 
   getComments(instanceId: string, ticketId: string): Observable<ServiceNowComments[]> {
     return this.http.get<ServiceNowComments[]>(GET_SERVICE_NOW_COMMENTS_BY_TICKET_ID(instanceId, ticketId));
+  }
+
+  getWorklogs(instanceId: string, ticketId: string): Observable<ServiceNowWorklogs[]> {
+    return this.http.get<ServiceNowWorklogs[]>(GET_SERVICE_NOW_WORKLOGS_BY_TICKET_ID(instanceId, ticketId));
   }
 
   converToViewData(ticket: ServiceNowTicketType): ServiceNowTicketDetailsViewData {
@@ -69,6 +73,18 @@ export class NowTicketDetailsService {
     return viewData;
   }
 
+  convertToWorklogViewData(worklogs: ServiceNowWorklogs[]): ServiceNowWorklogViewdata[] {
+    let viewData: ServiceNowWorklogViewdata[] = [];
+    worklogs.map(worklog => {
+      let data = new ServiceNowWorklogViewdata();
+      data.createdBy = worklog.sys_created_by ? worklog.sys_created_by.display_value : 'N/A';
+      data.createdOn = worklog.sys_created_on && worklog.sys_created_on.value ? this.utilSvc.toUnityOneDateFormat(worklog.sys_created_on.value) : 'N/A';
+      data.value = worklog.value ? worklog.value.display_value.replace(/(?:\r\n|\r|\n)/g, '<br>') : 'N/A';
+      viewData.push(data);
+    });
+    return viewData;
+  }
+
   resetFormErrors(): any {
     let formErrors = {
       'comments': ''
@@ -91,6 +107,29 @@ export class NowTicketDetailsService {
 
   postComment(instanceId: string, ticketId: string, type: string, data: { comments: string }): Observable<TaskStatus> {
     return this.http.put<any>(PUT_SERVICE_NOW_TICKET_BY_ID(instanceId, type, ticketId), data);
+  }
+
+  resetWorklogFormErrors(): any {
+    return {
+      'work_notes': ''
+    };
+  }
+
+  worklogValidationMessages = {
+    'work_notes': {
+      'required': 'Work note is required'
+    }
+  };
+
+  buildWorklogForm(): FormGroup {
+    this.resetWorklogFormErrors();
+    return this.builder.group({
+      'work_notes': ['', [Validators.required, NoWhitespaceValidator]]
+    });
+  }
+
+  postWorklog(instanceId: string, ticketId: string, type: string, data: { work_notes: string }): Observable<TaskStatus> {
+    return this.http.put<any>(PUT_SERVICE_NOW_TICKET_WORKLOG(instanceId, type, ticketId), data);
   }
 }
 export class ServiceNowTicketDetailsViewData {
@@ -118,6 +157,12 @@ export class ServiceNowAttachmentViewdata {
 }
 
 export class ServiceNowCommentViewdata {
+  value: string;
+  createdOn: string;
+  createdBy: string;
+}
+
+export class ServiceNowWorklogViewdata {
   value: string;
   createdOn: string;
   createdBy: string;

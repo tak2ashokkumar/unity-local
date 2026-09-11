@@ -339,6 +339,7 @@ export class PcCrudService {
         let form = this.builder.group({
           'hostname': [vm.hostname, [Validators.required, NoWhitespaceValidator]],
           'username': [vm.username, [Validators.required, NoWhitespaceValidator]],
+          'password': [''],
           'project': [vm.project, [Validators.required, NoWhitespaceValidator]],
           'user_domain': [vm.user_domain, [Validators.required, NoWhitespaceValidator]],
           'project_domain': [vm.project_domain, [Validators.required, NoWhitespaceValidator]]
@@ -377,6 +378,7 @@ export class PcCrudService {
         let form = this.builder.group({
           'hostname': [vm.endpoint, [Validators.required, NoWhitespaceValidator]],
           'username': [vm.username, [Validators.required, NoWhitespaceValidator]],
+          'password': [''],
           'vcloud_org': [vm.vcloud_org, [Validators.required, NoWhitespaceValidator]]
         });
         if (this.userInfo.linkDeviceToCollector) {
@@ -412,6 +414,9 @@ export class PcCrudService {
           'host_address': [vm.host_address, [Validators.required, NoWhitespaceValidator]],
           'username': [vm.username, [Validators.required, NoWhitespaceValidator]],
         });
+        if (type == ServerSidePlatFormMapping.HYPER_V || type == ServerSidePlatFormMapping.PROXMOX || type == ServerSidePlatFormMapping.G3_KVM) {
+          form.addControl('password', new FormControl(''));
+        }
         if (type == ServerSidePlatFormMapping.HYPER_V) {
           form.addControl('domain', new FormControl(vm.domain ? vm.domain : '', [Validators.required, NoWhitespaceValidator]));
         }

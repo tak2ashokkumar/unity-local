@@ -2,10 +2,9 @@
     <div class="card-header bg-white d-flex flex-wrap align-items-start justify-content-between px-3 py-2">
         <div class="mr-3">
             <div class="network-dashboard-title text-success">Networks</div>
-            <div class="network-dashboard-meta d-flex align-items-center flex-wrap text-muted">
-                <span class="pr-2 mr-2 border-right text-nowrap">Refreshed: Today 10:00
-                    IST</span>
-                <span class="text-nowrap">Scope: All providers · All regions · All accounts</span>
+            <div *ngIf="headerData" class="network-dashboard-meta d-flex align-items-center flex-wrap text-muted">
+                <span class="pr-2 mr-2 border-right text-nowrap">Refreshed: {{ headerData?.lastRefreshed }}</span>
+                <span class="text-nowrap">Scope: {{ headerData?.scope?.datacenters }}</span>
             </div>
         </div>
 
@@ -1457,7 +1456,7 @@
                                     truncateText>
                                     <td class="tdw-10">
                                         <button type="button" class="btn btn-link p-0 text-primary font-weight-bold"
-                                            (click)="viewAlertEventDetails(row.uuid)">
+                                            (click)="viewAlertDetails(row.uuid)">
                                             {{ row.id }}
                                         </button>
                                     </td>

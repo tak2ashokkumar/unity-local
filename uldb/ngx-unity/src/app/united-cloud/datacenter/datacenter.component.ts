@@ -124,6 +124,6 @@ const tabData: TabData[] = [
   {
     name: 'Private Cloud',
     url: 'pccloud',
-    icon: 'fa-cloud'
+    icon: 'cfa-private-cloud'
   }
 ];

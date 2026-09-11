@@ -46,11 +46,15 @@ export class WfDynamicRightExecuteService {
     );
   }
 
-  getAIMLData(page: number, pageSize: number, obj: any): Observable<any> {
-    const params = {
+  getAIMLData(page: number, pageSize: number, obj: any, search: string = ''): Observable<any> {
+    const params: any = {
       page: page,
       page_size: pageSize
     };
+
+    if (search) {
+      params.search = search;
+    }
 
     return this.http.post<any>(`/api/orchestration/v1/aiml/search/`, obj, { params });
   }
@@ -169,4 +173,3 @@ export function JsonValidator(control: AbstractControl): ValidationErrors | null
     return { invalidJson: true };
   }
 }
-

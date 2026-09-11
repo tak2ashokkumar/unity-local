@@ -272,8 +272,13 @@ export class PcCrudComponent implements OnInit, OnDestroy {
     this.vCloudFormErrors = this.crudServie.resetVCloudFormErrors();
     this.openStackFormErrors = this.crudServie.resetOpenStackFormErrors();
     this.proxmoxFormErrors = this.crudServie.resetProxmoxFormErrors();
-    if (err.non_field_errors) {
-      this.nonFieldErr = err.non_field_errors[0];
+    if (!err) {
+      this.nonFieldErr = 'Something went wrong!! Please try again.';
+      this.notificationService.error(new Notification(this.nonFieldErr));
+    } else if (err.non_field_errors) {
+      this.nonFieldErr = this.getErrorMessage(err.non_field_errors);
+    } else if (err.detail) {
+      this.nonFieldErr = this.getErrorMessage(err.detail);
     } else if (err) {
       if (isString(err)) {
         this.nonFieldErr = err;
@@ -313,7 +318,8 @@ export class PcCrudComponent implements OnInit, OnDestroy {
     this.nonFieldErr = '';
     this.spinnerService.start('main');
     if (this.pcId) {
-      this.crudServie.updatePrivateCloud(this.pcId, data).pipe(takeUntil(this.ngUnsubscribe))
+      const payload = this.removeBlankPasswordFromEditPayload(data);
+      this.crudServie.updatePrivateCloud(this.pcId, payload).pipe(takeUntil(this.ngUnsubscribe))
         .subscribe((data: PrivateCloudType) => {
           // this.modalRef.hide();
           this.spinnerService.stop('main');
@@ -328,7 +334,7 @@ export class PcCrudComponent implements OnInit, OnDestroy {
           }
         }, (err: HttpErrorResponse) => {
           this.spinnerService.stop('main');
-          this.handleError(data, err.error);
+          this.handleError(payload, err.error);
         });
     } else {
       this.crudServie.addPrivateCloud(data).pipe(takeUntil(this.ngUnsubscribe))
@@ -539,5 +545,17 @@ export class PcCrudComponent implements OnInit, OnDestroy {
     } else {
       this.router.navigate(['../'], { relativeTo: this.route });
     }
+  }
+
+  private removeBlankPasswordFromEditPayload(data: Base | VMware | Vcloud | Openstack | Proxmox): Base | VMware | Vcloud | Openstack | Proxmox {
+    const payload: any = data;
+    if ('password' in payload && (!payload.password || !payload.password.trim())) {
+      delete payload.password;
+    }
+    return payload;
+  }
+
+  private getErrorMessage(error: any): string {
+    return Array.isArray(error) ? error[0] : error;
   }
 }

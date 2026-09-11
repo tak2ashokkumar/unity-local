@@ -555,6 +555,20 @@ export class UnitySetupCredentialsCrudComponent implements OnInit, OnDestroy {
     this.devicesToBeSelected = [];
   }
 
+  areAllDevicesChecked(): boolean {
+    const availableDevices = this.devices.filter(device => !this.isDeviceInSelectedList(device));
+    return availableDevices.length > 0 && availableDevices.every(device => this.devicesToBeSelected.some(selected => selected.uuid == device.uuid));
+  }
+
+  toggleAllDevices(checked: boolean): void {
+    if (!checked) {
+      this.devicesToBeSelected = [];
+      return;
+    }
+
+    this.devicesToBeSelected = this.devices.filter(device => !this.isDeviceInSelectedList(device)).map(device => _clone(device));
+  }
+
   removeDeviceFromSelection(device: DevicesFastByDeviceTypes) {
     if (device.toBeRemoved) {
       let deviceIndex = this.devicesToBeRemoved.findIndex(d => d.uuid == device.uuid);
@@ -571,6 +585,16 @@ export class UnitySetupCredentialsCrudComponent implements OnInit, OnDestroy {
   removeFromSelectedDevices() {
     this.selectedDevices = this.selectedDevices.filter(sd => !sd.toBeRemoved);
     this.devicesToBeRemoved = [];
+  }
+
+  areAllSelectedDevicesChecked(): boolean {
+    return this.selectedDevices.length > 0 && this.selectedDevices.every(device => device.toBeRemoved);
+  }
+
+  toggleAllSelectedDevices(): void {
+    const shouldCheckAll = !this.areAllSelectedDevicesChecked();
+    this.selectedDevices.forEach(device => device.toBeRemoved = shouldCheckAll);
+    this.devicesToBeRemoved = shouldCheckAll ? this.selectedDevices.map(device => _clone(device)) : [];
   }
 
   onSelectedSearch(event: string) { }

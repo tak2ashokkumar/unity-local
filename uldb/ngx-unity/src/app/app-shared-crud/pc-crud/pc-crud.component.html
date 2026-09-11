@@ -119,8 +119,8 @@
                       [ngClass]="{'is-invalid' : vCloudFormErrors.username}">
                     <div class="invalid-feedback" *ngIf="vCloudFormErrors.username">{{vCloudFormErrors.username}}</div>
                   </div>
-                  <div class="col-6 form-group" *ngIf="!pcId">
-                    <label class="form-col-form-label" for="password">Password<em>*</em></label>
+                  <div class="col-6 form-group" *ngIf="vCloudForm.controls.password">
+                    <label class="form-col-form-label" for="password">Password<em *ngIf="!pcId">*</em></label>
                     <input class="form-control" id="password" type="password" formControlName="password"
                       [ngClass]="{'is-invalid' : vCloudFormErrors.password}">
                     <div class="invalid-feedback" *ngIf="vCloudFormErrors.password">{{vCloudFormErrors.password}}</div>
@@ -162,8 +162,8 @@
                     <div class="invalid-feedback" *ngIf="openStackFormErrors.username">{{openStackFormErrors.username}}
                     </div>
                   </div>
-                  <div class="col-6 form-group" *ngIf="!pcId">
-                    <label class="form-col-form-label" for="password">Password<em>*</em></label>
+                  <div class="col-6 form-group" *ngIf="openStackForm.controls.password">
+                    <label class="form-col-form-label" for="password">Password<em *ngIf="!pcId">*</em></label>
                     <input class="form-control" id="password" type="password" formControlName="password"
                       [ngClass]="{'is-invalid' : openStackFormErrors.password}">
                     <div class="invalid-feedback" *ngIf="openStackFormErrors.password">{{openStackFormErrors.password}}
@@ -222,8 +222,8 @@
                     <div class="invalid-feedback" *ngIf="proxmoxFormErrors.username">{{proxmoxFormErrors.username}}
                     </div>
                   </div>
-                  <div class="col-6 form-group" *ngIf="!pcId">
-                    <label class="form-col-form-label" for="password">Password<em>*</em></label>
+                  <div class="col-6 form-group" *ngIf="proxmoxForm.controls.password">
+                    <label class="form-col-form-label" for="password">Password<em *ngIf="!pcId">*</em></label>
                     <input class="form-control" id="password" type="password" formControlName="password"
                       [ngClass]="{'is-invalid' : proxmoxFormErrors.password}">
                     <div class="invalid-feedback" *ngIf="proxmoxFormErrors.password">{{proxmoxFormErrors.password}}

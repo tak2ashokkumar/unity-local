@@ -53,6 +53,23 @@
     padding-right: 8px;
     padding-left: 8px;
     margin-bottom: 16px;
+
+    &.cdk-drag-placeholder {
+        opacity: 0.35;
+    }
+
+    &.cdk-drag-animating {
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    &.cdk-drag-preview {
+        box-sizing: border-box;
+
+        .collection-dashboard-card {
+            cursor: grabbing;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+        }
+    }
 }
 
 .collection-dashboard-card,
@@ -71,7 +88,17 @@
         repeating-linear-gradient(90deg, #eef3f7 0 48px, #dfe7ee 48px 50px);
     background-position: top center;
     background-size: cover;
-    cursor: pointer;
+    cursor: grab;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.collection-dashboard-grid.cdk-drop-list-dragging {
+    .collection-dashboard-col:not(.cdk-drag-placeholder) {
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
 }
 
 .collection-dashboard-card-overlay {

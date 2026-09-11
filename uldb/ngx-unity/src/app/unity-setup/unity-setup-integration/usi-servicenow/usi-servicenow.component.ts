@@ -208,6 +208,10 @@ export class UsiServicenowComponent implements OnInit, OnDestroy {
     this.router.navigate(['support/ticketmgmt', data.uuid]);
   }
 
+  trackByServiceNow(index: number, view: ServiceNowAccountsViewData): string {
+    return view.uuid;
+  }
+
   goBack() {
     this.router.navigate(['../../'], { relativeTo: this.route });
   }

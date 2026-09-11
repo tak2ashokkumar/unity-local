@@ -37,7 +37,8 @@ export class UsiServicenowService {
       data.name = account.name;
       data.uuid = account.uuid;
       data.instanceUrl = account.instance_url;
-      data.username = account.username;
+      data.username = account.username || '';
+      data.clientId = account.client_id || '';
       data.isDefault = account.is_default;
       data.isItsm = account.is_itsm;
       data.isCmdb = account.is_cmdb;
@@ -79,6 +80,7 @@ export class ServiceNowAccountsViewData {
   uuid: string;
   instanceUrl: string;
   username: string;
+  clientId: string;
   isDefault: boolean;
   isItsm: boolean;
   isCmdb: boolean;

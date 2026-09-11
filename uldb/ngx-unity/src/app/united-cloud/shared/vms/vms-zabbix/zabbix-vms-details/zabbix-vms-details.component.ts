@@ -43,7 +43,7 @@ export class ZabbixVmsDetailsComponent implements OnInit, OnDestroy {
 
   isEditable: boolean = false;
   isHypervVm: boolean = false;
-
+  isVmwareVm: boolean = false;
   detailForm: FormGroup;
   detailFormErrors: any;
   detailFormValidationMessages: any;
@@ -83,7 +83,7 @@ export class ZabbixVmsDetailsComponent implements OnInit, OnDestroy {
 
   lifeCycleStageOptions: string[] = LifeCycleStageOptions;
   lifeCycleStageStatusOptions: string[] = LifeCycleStageStatusOptions;
-  
+
   constructor(private detailService: ZabbixVmsDetailsService,
     private route: ActivatedRoute,
     private router: Router,
@@ -107,6 +107,7 @@ export class ZabbixVmsDetailsComponent implements OnInit, OnDestroy {
       this.device.uuid = this.deviceId;
       this.deviceType = this.device.deviceType;
       this.isEditable = this.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.deviceType == DeviceMapping.HYPER_V;
+      this.isVmwareVm = this.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE;
       this.isHypervVm = this.deviceType == DeviceMapping.HYPER_V;
       this.getOperatingSystems();
       this.getCollectors();
@@ -300,6 +301,7 @@ export class ZabbixVmsDetailsComponent implements OnInit, OnDestroy {
   manageMetaDataForm() {
     if (this.metaDataForm.disabled) {
       this.metaDataForm.enable({ emitEvent: false });
+      this.metaDataForm.get('memory_gb')?.disable({ emitEvent: false });
       this.metaDataForm.get('available_memory')?.disable({ emitEvent: false });
       this.metaDataForm.get('used_memory')?.disable({ emitEvent: false });
       this.metaDataForm.get('available_storage')?.disable({ emitEvent: false });

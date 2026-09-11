@@ -34,6 +34,15 @@ interface SelectedConnection {
   input_class: string;
 }
 
+interface LLMModelOption {
+  id: number | null;
+  name: string;
+  value: 'AUTO' | 'PRO';
+  modelName?: string;
+  multiplier?: string;
+  image: string;
+}
+
 
 @Component({
   selector: 'wf-dynamic-container',
@@ -86,6 +95,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   private ngUnsubscribe = new Subject();
   emptyCanvas = true;
+  hasTriggerNode = false;
   editor: Drawflow;
   currentCriteria: SearchCriteria;
   workFlowId: string;
@@ -167,6 +177,14 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   workflowDetailsFormErrors: any;
   workflowDetailsFormValidationMessages: any;
   editWorkflowFlag = false;
+  llmModelOptions: LLMModelOption[] = [
+    {
+      id: null,
+      name: 'UnityOne AI',
+      value: 'AUTO',
+      image: 'static/favicon.ico'
+    }
+  ];
 
   constructor(
     @Inject(DOCUMENT) private document,
@@ -191,6 +209,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.workflowDetailsLoadComplete = !this.workFlowId;
     this.manageWorkflowDetails();
+    this.loadLLMModelOptions();
     this.loadWorkflowGroups();
     this.minimizeLeftPanel();
     document.body.classList.add('wf-page');
@@ -212,6 +231,151 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     document.body.classList.remove('wf-page');
     this.pollingUnsubscribe$.next();
     this.pollingUnsubscribe$.complete();
+    this.document.removeEventListener('click', this.closeLLMModelDropdowns);
+  }
+
+  loadLLMModelOptions(): void {
+    this.svc.getSupportedLLMConfigs().pipe(
+      takeUntil(this.ngUnsubscribe),
+      map((response: any) => response?.supported_llms || []),
+      catchError(() => of([]))
+    ).subscribe((models: any[]) => {
+      const apiOptions = (models || [])
+        .filter(model => model?.model_name)
+        .map(model => ({
+          id: model.id ?? null,
+          name: String(model.model_name).toUpperCase(),
+          value: 'PRO' as const,
+          modelName: String(model.model_name),
+          multiplier: model.cost_multiplier ? String(model.cost_multiplier) : undefined,
+          image: this.getLLMProviderIcon(model.provider)
+        }));
+
+      this.llmModelOptions = [
+        {
+          id: null,
+          name: 'UnityOne AI',
+          value: 'AUTO',
+          image: 'static/favicon.ico'
+        },
+        ...apiOptions
+      ];
+      this.refreshLLMModelDropdowns();
+    });
+  }
+
+  private getLLMProviderIcon(provider: string): string {
+    const providerIcons: Record<string, string> = {
+      google: 'gemini.svg',
+      anthropic: 'claude-color.svg',
+      groq: 'grok.svg',
+      openai: 'openai.svg'
+    };
+    const icon = providerIcons[String(provider || '').toLowerCase()] || providerIcons.openai;
+    return `${environment.assetsUrl}external-brand/ai-models/${icon}`;
+  }
+
+  private refreshLLMModelDropdowns(): void {
+    if (!this.editor) {
+      return;
+    }
+
+    this.nodeDetailsArr
+      .filter(node => node?.node_type === nodeTypes.AIAgent || node?.node_type === nodeTypes.LLM)
+      .forEach(node => {
+        node.model = this.normalizeLLMModel(node?.model);
+        this.updateNodeDetails(node.node_id, node as any);
+      });
+  }
+
+  private getLLMModelId(modelValue: string): number | null {
+    const normalizedValue = String(modelValue || '').toLowerCase();
+    return this.llmModelOptions.find(option =>
+      option.modelName?.toLowerCase() === normalizedValue
+    )?.id ?? null;
+  }
+
+  private normalizeLLMModel(model: any): { llm_integ: 'AUTO' } | { llm_integ: 'PRO'; id: number } {
+    const rawId = model?.id ?? model?.model_id ?? this.getLLMModelId(model?.llm_integ);
+    const id = rawId === null || rawId === undefined || rawId === '' ? null : Number(rawId);
+    return id !== null && Number.isFinite(id)
+      ? { llm_integ: 'PRO', id }
+      : { llm_integ: 'AUTO' };
+  }
+
+  private getLLMModelSelectorHtml(nodeId: number, modelValue: string, modelId: number | null): string {
+    const selectedModel = this.llmModelOptions.find(option =>
+      modelValue === 'PRO' && modelId !== null ? option.id === modelId : option.value === 'AUTO'
+    ) || this.llmModelOptions[0];
+    const options = this.llmModelOptions.map((option, index) => {
+      const value = this.escapeHtml(option.value);
+      const optionModelId = option.id === null ? '' : String(option.id);
+      const name = this.escapeHtml(option.name);
+      const image = this.escapeHtml(option.image);
+      const isSelected = option.value === 'AUTO'
+        ? modelValue === 'AUTO'
+        : modelValue === 'PRO' && modelId !== null && option.id === modelId;
+      const isUnityModel = option.value === 'AUTO';
+      const multiplier = option.multiplier
+        ? `<span class="workflow-model-multiplier">${this.escapeHtml(option.multiplier)}</span>`
+        : option.value === 'AUTO' ? '' : '<span class="workflow-model-no-multiplier">No multiplier</span>';
+
+      const sectionSeparator = index === 1
+        ? '<div class="workflow-model-section-label">Pro models</div>'
+        : '';
+
+      return `${sectionSeparator}
+        <button type="button" class="workflow-model-option${isSelected ? ' active' : ''}${isUnityModel ? ' unity-model-option' : ''}"
+            data-value="${value}"
+            data-model-id="${optionModelId}"
+            role="option" aria-selected="${isSelected}"
+            onclick="window.selectWorkflowModel(${nodeId}, this, event)"
+            onmousedown="event.stopPropagation()">
+          <span class="workflow-model-icon-wrap">
+            <img class="workflow-model-icon" src="${image}" alt="" loading="eager"/>
+          </span>
+          <span class="workflow-model-option-content">
+            <span class="workflow-model-option-heading">
+              <span class="workflow-model-name">${name}</span>
+              ${multiplier}
+            </span>
+          </span>
+          <i class="fas fa-check workflow-model-check" aria-hidden="true"></i>
+        </button>`;
+    }).join('');
+    const noProModelsMessage = this.llmModelOptions.some(option => option.value === 'PRO')
+      ? ''
+      : `
+        <div class="workflow-model-section-label">Pro models</div>
+        <div class="workflow-model-empty-state">
+          No AI model has been configured yet. Configure a model to start using Pro Mode.
+        </div>`;
+
+    return `
+      <div class="workflow-model-selector">
+        <button type="button" class="workflow-model-trigger"
+            aria-haspopup="listbox" aria-expanded="false"
+            onclick="window.toggleWorkflowModelDropdown(${nodeId}, this, event)"
+            onmousedown="event.stopPropagation()">
+          <span class="workflow-model-icon-wrap">
+            <img class="workflow-model-icon" src="${this.escapeHtml(selectedModel.image)}" alt="" loading="eager"/>
+          </span>
+          <span class="workflow-model-trigger-name">${this.escapeHtml(selectedModel.name)}</span>
+          <i class="fas fa-chevron-down workflow-model-chevron" aria-hidden="true"></i>
+        </button>
+        <div class="workflow-model-dropdown" role="listbox" onmousedown="event.stopPropagation()">
+          ${options}
+          ${noProModelsMessage}
+        </div>
+      </div>`;
+  }
+
+  private escapeHtml(value: any): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   loadWorkflowGroups(): void {
@@ -331,6 +495,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.triggerNode = this.nodeDetailsArr.find(node =>
       this.svc.isTriggerNode(node.node_type)
     );
+    this.hasTriggerNode = !!this.triggerNode;
     this.rightExecuteData = this.prepareRightExecuteData(
       this.triggerNode,
       this.triggerNode?.config?.properties || {}
@@ -510,6 +675,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.document.removeEventListener('mouseup', this.stopResize);
   };
   addWindowEventsForNodes() {
+    this.document.addEventListener('click', this.closeLLMModelDropdowns);
+
     (window as any).handleAgentDrop = (event: DragEvent, agentNodeId: number) => {
       this.onAgentDrop(event, agentNodeId);
     };
@@ -526,15 +693,30 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       el.setAttribute('data-enabled', newState.toString());
     };
 
-    (window as any).onModelChange = (nodeId, el: HTMLSelectElement, ev?: Event) => {
-      const selectedValue = el.value;
+    (window as any).toggleWorkflowModelDropdown = (nodeId: number, el: HTMLButtonElement, event: Event) => {
+      event.stopPropagation();
+      const selector = el.closest('.workflow-model-selector');
+      const wasOpen = selector?.classList.contains('is-open');
+      this.closeLLMModelDropdowns();
+
+      if (!wasOpen) {
+        selector?.classList.add('is-open');
+        selector?.closest('.drawflow-node')?.classList.add('model-dropdown-open');
+        el.setAttribute('aria-expanded', 'true');
+      }
+    };
+
+    (window as any).selectWorkflowModel = (nodeId: number, el: HTMLElement, event: Event) => {
+      event.stopPropagation();
+      const selectedValue = el.getAttribute('data-value') === 'PRO' ? 'PRO' : 'AUTO';
+      const rawModelId = el.getAttribute('data-model-id');
+      const selectedModelId = rawModelId ? Number(rawModelId) : null;
 
       const node = this.nodeDetailsArr.find(n => n.node_id === nodeId);
       if (node) {
-        node.model = {
-          ...node.model,
-          llm_integ: selectedValue
-        };
+        node.model = selectedValue === 'PRO' && selectedModelId !== null
+          ? { llm_integ: 'PRO', id: selectedModelId }
+          : { llm_integ: 'AUTO' };
         if (!node.formErrors) node.formErrors = {};
         node.formErrors.model = selectedValue ? '' : 'Model is required';
         const hasErrors = this.hasAnyErrors(node.formErrors);
@@ -543,9 +725,20 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
           hasErrors,
           hasErrors ? 'Validation errors' : 'All required fields are filled up!'
         );
+        this.updateNodeDetails(nodeId, node as any);
       }
     };
   }
+
+  private closeLLMModelDropdowns = (): void => {
+    this.document.querySelectorAll('.workflow-model-selector.is-open').forEach(selector => {
+      selector.classList.remove('is-open');
+      selector.querySelector('.workflow-model-trigger')?.setAttribute('aria-expanded', 'false');
+    });
+    this.document.querySelectorAll('.drawflow-node.model-dropdown-open').forEach(node => {
+      node.classList.remove('model-dropdown-open');
+    });
+  };
 
   // onAgentDrop(event: DragEvent, agentNodeId: number) {
   //   event.preventDefault();
@@ -763,6 +956,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             this.getConnectedNodeDetails(Number(id));
           }
           this.setNodeDetails(this.latestDroppedNode, id);
+          this.updateTriggerNodePresence();
           this.loadNodeConfiguration(this.latestDroppedNode, id, false, isTool);
           this.latestDroppedNode = null;
         }
@@ -851,6 +1045,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
           this.emptyCanvas = true;
         }
         this.handleNodeRemove(id);
+        this.updateTriggerNodePresence();
       });
 
       this.editor.on('connectionCreated', (connection) => {
@@ -1554,6 +1749,12 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       || (this.workFlowData?.nodes?.length ?? 0) > 0;
   }
 
+  private updateTriggerNodePresence(): void {
+    this.hasTriggerNode = this.nodeDetailsArr.some(node =>
+      this.svc.isTriggerNode(node.node_type)
+    );
+  }
+
   updateNodeDetails(nodeId: number, node?: NodeDetails) {
     this.editor.updateNodeDataFromId(nodeId, {
       label: node,
@@ -1689,7 +1890,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     // ─── AI Agent ─────────────────────────────────────────────────────────────
     if (node.node_type === nodeTypes.AIAgent) {
-      const modelValue = node?.model?.llm_integ ?? node?.config?.model?.llm_integ ?? '';
+      const model = this.normalizeLLMModel(node?.model ?? node?.config?.model);
+      const modelValue = model.llm_integ;
+      const modelId = model.llm_integ === 'PRO' ? model.id : null;
       const memoryEnabled = (node?.enable_memory ?? node?.config?.enable_memory) === true;
 
       return `
@@ -1719,11 +1922,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             <div class="row m-0 p-0">
               <div class="col-8 p-0 pr-1">
                 <span class="config-label">Model</span>
-                <select class="form-control text-dark model-select"
-                    onchange="window.onModelChange(${nodeId}, this)">
-                  <option value="">Select Model</option>
-                  <option value="UnityOne AI" ${modelValue === 'UnityOne AI' ? 'selected' : ''}>UnityOne AI</option>
-                </select>
+                ${this.getLLMModelSelectorHtml(nodeId, modelValue, modelId)}
               </div>
 
               <div class="col-4 p-0 memory-col d-flex flex-column align-items-center">
@@ -1754,7 +1953,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     // ─── LLM ──────────────────────────────────────────────────────────────────
     if (node.node_type === nodeTypes.LLM) {
-      const modelValue = node?.model?.llm_integ ?? node?.config?.model?.llm_integ ?? '';
+      const model = this.normalizeLLMModel(node?.model ?? node?.config?.model);
+      const modelValue = model.llm_integ;
+      const modelId = model.llm_integ === 'PRO' ? model.id : null;
 
       return `
         <div class="agentic-custom-node" id="node-${nodeId}">
@@ -1780,11 +1981,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             <div class="row m-0 p-0 mt-2">
               <div class="col-12 p-2">
                 <span class="config-label">Model</span>
-                <select class="form-control text-dark model-select"
-                    onchange="window.onModelChange(${nodeId}, this)">
-                  <option value="">Select Model</option>
-                  <option value="UnityOne AI" ${modelValue === 'UnityOne AI' ? 'selected' : ''}>UnityOne AI</option>
-                </select>
+                ${this.getLLMModelSelectorHtml(nodeId, modelValue, modelId)}
               </div>
             </div>
           </div>
@@ -1859,10 +2056,24 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   handleNodeRemove(nodeId: number) {
-    const nodeIndex = this.nodeDetailsArr.findIndex(n => n.node_id === Number(nodeId));
+    const nodeIndex = this.nodeDetailsArr.findIndex(n => Number(n.node_id) === Number(nodeId));
     if (nodeIndex !== -1) {
       this.nodeDetailsArr.splice(nodeIndex, 1);
       this.existingFormData = {};
+
+      // A session cannot be resumed once its workflow has been emptied.
+      // Reset the launcher to a fresh Run state instead of keeping the
+      // terminal state from the previous execution.
+      if (this.nodeDetailsArr.length === 0) {
+        this.currentSessionId = '';
+        this.workflowStatus = '';
+        this.isWorkflowExecuting = false;
+        this.isRunning = false;
+        this.resumeBtn = false;
+        this.showRunHeading = true;
+        this.executionMode = '';
+        this.runNodeID = false;
+      }
     }
   }
 
@@ -1898,7 +2109,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     let config: any = {};
 
     const buildRow = (isTool: boolean = false) => {
-      return {
+      const row: any = {
         name: nodeDetails.name,
         [isTool ? 'tool_id' : 'node_id']: isTool ? `tool-${nodeId}` : nodeId,
         node_type: nodeDetails.node_type,
@@ -1915,6 +2126,12 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         hasErrors: nodeDetails.hasErrors ?? this.hasAnyErrors(nodeDetails.formErrors),
         ...(isTool ? { isTool: true } : {})
       };
+
+      if (!isTool && (nodeDetails.node_type === nodeTypes.AIAgent || nodeDetails.node_type === nodeTypes.LLM)) {
+        row.model = this.normalizeLLMModel((nodeDetails as any)?.model);
+      }
+
+      return row;
     };
 
     const row = buildRow();
@@ -2174,14 +2391,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     }
 
     //  MODEL
-    const selectEl = root.querySelector('.model-select') as HTMLSelectElement;
-    if (selectEl) {
-      const modelValue = node?.model?.llm_integ ?? config?.model?.llm_integ ?? '';
-      selectEl.value = modelValue;
-      node.model = {
-        ...node.model,
-        llm_integ: modelValue
-      };
+    if (node?.node_type === nodeTypes.AIAgent || node?.node_type === nodeTypes.LLM) {
+      node.model = this.normalizeLLMModel(node?.model ?? config?.model);
     }
   }
 
@@ -2812,12 +3023,47 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.isWorkflowExecuting = false;
     this.showBeginner = false;
     this.workflowStatus = 'Stopped';
+    this.clearRunningNodeStatuses();
   }
 
   stop(): void {
     this.ngUnsubscribe.next();
     this.isWorkflowExecuting = false;
     this.setExecutionState('Stopped');
+    this.clearRunningNodeStatuses();
+  }
+
+  private clearRunningNodeStatuses(): void {
+    const clearTransientStatus = (nodes: any[] = []) => {
+      nodes.forEach(node => {
+        if (node?.status === 'Running' || node?.status === 'Started') {
+          delete node.status;
+        }
+      });
+    };
+
+    clearTransientStatus(this.nodeDetailsArr);
+    clearTransientStatus(this.realTimeDetails?.nodes);
+    clearTransientStatus(this.realTimeNodeDetails?.nodes);
+
+    this.editor?.precanvas
+      ?.querySelectorAll('.status-icon .fa-spinner')
+      .forEach(icon => icon.closest('.status-icon')?.remove());
+
+    const drawflowNodes = this.editor?.drawflow?.drawflow?.Home?.data;
+    if (!drawflowNodes) return;
+
+    Object.values(drawflowNodes).forEach((drawflowNode: any) => {
+      const html = String(drawflowNode?.html || '');
+      if (!html.includes('fa-spinner')) return;
+
+      const container = this.document.createElement('div');
+      container.innerHTML = html;
+      container.querySelectorAll('.status-icon .fa-spinner').forEach(icon => {
+        icon.closest('.status-icon')?.remove();
+      });
+      drawflowNode.html = container.innerHTML;
+    });
   }
 
   // Single place all execution-state transitions go through
@@ -3466,6 +3712,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       normalizedNode.model = _clone(
         nodeMeta?.model ?? normalizedNode?.model ?? normalizedNode?.config?.model ?? {}
       );
+      normalizedNode.model = this.normalizeLLMModel(normalizedNode.model);
       normalizedNode.enable_memory =
         nodeMeta?.enable_memory ??
         normalizedNode?.enable_memory ??
@@ -3480,6 +3727,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       normalizedNode.model = _clone(
         nodeMeta?.model ?? normalizedNode?.model ?? normalizedNode?.config?.model ?? {}
       );
+      normalizedNode.model = this.normalizeLLMModel(normalizedNode.model);
     }
 
     return normalizedNode;
@@ -3725,7 +3973,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         }, 2000);
       }, (err: HttpErrorResponse) => {
         this.isSavingWorkflow = false;
-        this.notification.error(new Notification('Failed to update Workflow'));
+        this.notification.error(new Notification(
+          this.getWorkflowSaveErrorMessage(err, 'Failed to update Workflow')
+        ));
       });
     } else {
       this.svc.saveWorkFlow(workflowPayload).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
@@ -3746,9 +3996,18 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         });
       }, (err: HttpErrorResponse) => {
         this.isSavingWorkflow = false;
-        this.notification.error(new Notification('Failed to create Workflow'));
+        this.notification.error(new Notification(
+          this.getWorkflowSaveErrorMessage(err, 'Failed to create Workflow')
+        ));
       });
     }
+  }
+
+  private getWorkflowSaveErrorMessage(error: HttpErrorResponse, fallback: string): string {
+    const nameError = error?.error?.name;
+    const message = Array.isArray(nameError) ? nameError[0] : nameError;
+
+    return typeof message === 'string' && message.trim() ? message : fallback;
   }
 
   private hasNestedLoopConnectionOnSave(): boolean {

@@ -132,7 +132,7 @@ export interface NodeDetailsArrayModel {
   isTool?: boolean;
   human_approval?: boolean;
   formData?: any;
-  model?: { llm_integ?: string };
+  model?: { llm_integ?: 'AUTO' | 'PRO'; id?: number };
   enable_memory?: boolean;
   tools?: any[];
   node_meta?: { tools?: any[] };

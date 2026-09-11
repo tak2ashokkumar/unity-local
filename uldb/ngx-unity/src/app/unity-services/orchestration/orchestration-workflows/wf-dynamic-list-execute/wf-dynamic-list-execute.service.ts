@@ -65,13 +65,17 @@ export class WfDynamicListExecuteService {
     return this.http.get<any>(`/rest/unity_itsm/tables/${tableId}/records/${recordUuid}/activity/`, { params });
   }
 
-  getAIMLData(page: number, pageSize: number, data: any): Observable<any> {
-    const params = {
+  getAIMLData(page: number, pageSize: number, data: any, search: string = ''): Observable<any> {
+    const params: any = {
       page,
       page_size: pageSize
     };
 
-    return this.http.post<any>(`/rest/orchestration/aiml/search/`, data, { params });
+    if (search) {
+      params.search = search;
+    }
+
+    return this.http.post<any>(`/api/orchestration/v1/aiml/search/`, data, { params });
   }
 
   buildManualTriggerForm(param: any): FormGroup {

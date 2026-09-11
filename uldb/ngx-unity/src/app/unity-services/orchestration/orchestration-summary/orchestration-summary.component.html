@@ -345,7 +345,6 @@
           <thead class="bg-light font-sm-xs">
             <tr>
               <th>ID</th>
-              <th>Target</th>
               <th>Name</th>
               <th>Type</th>
               <th>Started On</th>
@@ -358,9 +357,6 @@
               <td class="text-primary pointer-link tdw-20 cursor">
                 <div class="text-truncate" (click)="redirectToExecutionPage(data)" [tooltip]="data.id">{{data.id}}
                 </div>
-              </td>
-              <td class="tdw-10">
-                <div class="text-truncate" [tooltip]="data.target">{{data.target}}</div>
               </td>
               <td class="tdw-20">
                 <div class="text-truncate" [tooltip]="data.name">{{data.name}}</div>
@@ -397,7 +393,6 @@
           <thead class="bg-light font-sm-xs">
             <tr>
               <th>Name</th>
-              <th>Target</th>
               <th>Category</th>
               <th>Next Execution</th>
               <th>Last Execution</th>
@@ -410,9 +405,6 @@
               <td class="text-primary pointer-link tdw-15 cursor">
                 <div class="text-truncate" [tooltip]="data.name" (click)="redirectToTaskOrWorkflowEdit(data)">
                   {{data.name}}</div>
-              </td>
-              <td class="tdw-15 pointer-link cursor">
-                <div class="text-truncate" [tooltip]="data.target">{{data.target}}</div>
               </td>
               <td class="tdw-18 pointer-link cursor">
                 <div class="text-truncate" [tooltip]="data.category">{{data.category}}</div>

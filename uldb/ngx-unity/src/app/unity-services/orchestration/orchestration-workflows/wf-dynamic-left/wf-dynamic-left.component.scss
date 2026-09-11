@@ -101,6 +101,10 @@ $transition-snap: cubic-bezier(0.4, 0, 0.2, 1);
     border-bottom: 1px solid $border-color;
     transition: background-color 0.15s ease;
 
+    &.empty-canvas {
+        pointer-events: none;
+    }
+
     &:hover {
         background-color: $surface-alt;
 

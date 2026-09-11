@@ -124,6 +124,60 @@
   </div>
 </div>
 
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-transparent">
+        <strong>Worklogs <span *ngIf="worklogs.length">- ({{worklogs.length}})</span></strong>
+        <button type="button" class="btn btn-sm btn-outline-primary float-right border" (click)="addWorklog()"
+          *ngIf="!worklogForm" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+          elementType="btn">
+          <i class="fas fa-plus mr-1"></i> Add Work Note
+        </button>
+      </div>
+      <div class="card-body py-2">
+        <div class="row border-bottom" *ngIf="worklogForm">
+          <div class="col-12 mb-2">
+            <form [formGroup]="worklogForm">
+              <div class="form-group">
+                <label for="work_notes">Post New Work Note<em>*</em></label>
+                <textarea class="form-control" id="work_notes" name="work_notes" rows="5"
+                  formControlName="work_notes" [ngClass]="{'is-invalid' : worklogFormErrors.work_notes}"
+                  placeholder="Add your work note here"></textarea>
+                <div class="invalid-feedback" *ngIf="worklogFormErrors.work_notes">{{worklogFormErrors.work_notes}}
+                </div>
+              </div>
+              <div class="form-group form-actions">
+                <button class="btn btn-sm btn-success float-right ml-1" type="button"
+                  (click)="onSubmitWorklog()">Post</button>
+                <button class="btn btn-sm btn-danger float-right" type="button"
+                  (click)="cancelWorklog()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 text-center mb-2" *ngIf="worklogPostedLoader">
+            <i class="fa fa-spinner fa-spin fa-2x"></i>
+          </div>
+          <div class="col-12" *ngIf="!worklogPostedLoader && !worklogs.length">
+            <div class="text-muted py-3">No worklogs available.</div>
+          </div>
+          <div class="col-12" *ngIf="worklogs.length">
+            <div class="row" *ngFor="let worklog of worklogs; let last = last" [ngClass]="{'border-bottom':!last}">
+              <div class="col-12">
+                <strong class="card-title mb-0">{{worklog.createdBy}} - </strong><small
+                  class="text-muted">{{worklog.createdOn}}</small>
+              </div>
+              <div class="col-12 mb-2" [innerHTML]="worklog.value"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <ng-template #confirm>
   <div class="card mb-0">
     <div class="card-header">

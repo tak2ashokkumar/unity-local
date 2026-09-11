@@ -661,7 +661,7 @@ export const PDU_GRAPH_WIDTH = () => 228;
 export const PDU_GRAPHS = (pduUUID: string, graphType: string) => `customer/observium/pdu/${pduUUID}/get_graph_by_type/?graph_type=${graphType}&height=${PDU_GRAPH_HEIGHT()}&width=${PDU_GRAPH_WIDTH()}`;
 
 // System Monitoring Constants
-export const GET_SYSTEM_MONITORING_DEVICES = () => `customer/monitor_widget`;
+export const GET_SYSTEM_MONITORING_DEVICES = () => `customer/monitor_widget/`;
 
 export const UPDATE_SYSTEM_MONITORING_GRAPH = () => `customer/monitor_widget/update_graph/`;
 
@@ -1911,6 +1911,8 @@ export const GET_SERVICE_NOW_TICKET_BY_TYPE = (uuid: string) => `customer/servic
 
 export const CREATE_SERVICE_NOW_TICKET = (uuid: string, type: string) => `customer/service_now/${uuid}/create_ticket/?ticket_type=${type}`;
 
+export const UPDATE_SERVICE_NOW_TICKET = (uuid: string, type: string, ticketId: string) => `customer/service_now/${uuid}/update_ticket/?ticket_type=${type}&ticket_id=${ticketId}`;
+
 export const DB_PRIVATE_CLOUD_FAST = () => `customer/cloud_fast/?page_size=0`;
 
 export const DB_BMS = () => `${BMS_FAST()}?page_size=0`;
@@ -1927,7 +1929,15 @@ export const GET_SERVICE_NOW_COMMENTS_BY_TICKET_ID = (uuid: string, ticketId: st
 
 export const PUT_SERVICE_NOW_TICKET_BY_ID = (uuid: string, type: string, ticketId: string) => `customer/service_now/${uuid}/add_comment/?ticket_type=${type}&ticket_id=${ticketId}`;
 
+export const GET_SERVICE_NOW_WORKLOGS_BY_TICKET_ID = (uuid: string, ticketId: string) => `customer/service_now/${uuid}/get_worklogs/?ticket_id=${ticketId}`;
+
+export const PUT_SERVICE_NOW_TICKET_WORKLOG = (uuid: string, type: string, ticketId: string) => `customer/service_now/${uuid}/add_worklog/?ticket_type=${type}&ticket_id=${ticketId}`;
+
 export const GET_SERVICE_NOW_GRAPH_DATA = (uuid: string) => `customer/service_now/${uuid}/get_graph_data/`;
+
+export const DOWNLOAD_SERVICE_NOW_REPORT = (uuid: string) => `customer/service_now/${uuid}/download_report/`;
+
+export const GET_SERVICE_NOW_REPORT = (uuid: string) => `customer/service_now/${uuid}/get_report/`;
 
 export const GET_TICKET_MGMT_LIST = () => `customer/ticket_accounts/`;
 
@@ -3568,6 +3578,7 @@ export const GET_USERS = () => `customer/organizationusers/`;
 export const GET_NETWORK_SUMMARY = () => `customer/network_summary/`;
 export const GET_NETWORK_DASHBOARD_OVERVIEW = () => `customer/network-dashboard/network_overview`;
 export const GET_NETWORK_DASHBOARD_FILTERS = () => `customer/network-dashboard/network_filters/`;
+export const GET_NETWORK_DASHBOARD_HEADER = () => `customer/network-dashboard/network_dashboard_header/`;
 export const GET_NETWORK_DASHBOARD_TOP_10_CONVERSATIONS = () => `customer/network-dashboard/top_10_conversations`;
 export const GET_NETWORK_DASHBOARD_TOP_BITS_RECEIVED = () => `customer/network-dashboard/top_bits_received`;
 export const GET_NETWORK_DASHBOARD_TOP_BITS_SENT = () => `customer/network-dashboard/top_bits_sent`;

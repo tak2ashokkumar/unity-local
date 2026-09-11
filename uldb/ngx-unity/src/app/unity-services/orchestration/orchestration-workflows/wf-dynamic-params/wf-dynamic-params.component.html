@@ -19,6 +19,7 @@
     </div>
 
     <div class="row d-flex flex-nowrap align-items-stretch h-100 overflow-hidden m-0 p-0 params-layout"
+        [class.input-panel-collapsed]="inputPanelCollapsed"
         *ngIf="!isSchemaLoading && !schemaLoadError">
         <div class="side-panel position-relative h-100 overflow-hidden m-0 p-0"
             [class.is-collapsed]="inputPanelCollapsed"
@@ -79,6 +80,9 @@
                                             [class.open]="isExpanded(variable)">&#9654;</span>
                                         <span *ngIf="!getAttributesForInput(variable).length" class="chev-space"></span>
                                         <span class="node-key">{{ variable.param_name }}</span>
+                                        <span *ngIf="getTypeLabel(variable)" class="badge badge-light ml-2">
+                                            {{ getTypeLabel(variable) }}
+                                        </span>
                                     </div>
                                     <div class="tree-children"
                                         *ngIf="getAttributesForInput(variable).length && isExpanded(variable)">
@@ -364,7 +368,7 @@
 
                             <div *ngSwitchCase="'radio'" class="mb-3">
                                 <ng-container
-                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form, showLabel: getFieldMode(field, form) === 'expression' }">
+                                    *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
                                 </ng-container>
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
@@ -372,7 +376,8 @@
                                         <div *ngFor="let option of field.options" class="form-check dynamic-radio-option">
                                             <input class="form-check-input" type="radio"
                                                 [id]="field.control_name + '_' + option.value" [value]="option.value"
-                                                formControlName="{{ field.control_name }}" />
+                                                formControlName="{{ field.control_name }}"
+                                                (change)="onDynamicFieldChange(field, form)" />
                                             <label class="form-check-label"
                                                 [for]="field.control_name + '_' + option.value">
                                                 {{ option.label || option.value }}
@@ -564,7 +569,8 @@
                                     </ng-container>
                                 </ng-container>
 
-                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                <div class="invalid-feedback d-block"
+                                    *ngIf="getFieldMode(field, form) === 'expression' && getDynamicError(errors, field)">
                                     {{ getDynamicError(errors, field) }}
                                 </div>
                             </div>
@@ -576,7 +582,7 @@
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
                                     <app-auto-complete-multi formControlName="{{ field.control_name }}"
-                                        [apiFn]="getDynamicSearchFn(field)"
+                                        [apiFn]="getDynamicSearchFn(field, form)"
                                         [placeholder]="field.placeholder || 'Search'"
                                         [class.is-invalid]="getDynamicError(errors, field)">
                                     </app-auto-complete-multi>
@@ -1086,6 +1092,8 @@
         <div class="side-panel output-panel rightbarParam position-relative h-100 overflow-hidden p-0"
             *ngIf="!isPromptExpanded"
             [class.is-collapsed]="outputPanelCollapsed"
+            [class.input-panel-collapsed]="inputPanelCollapsed"
+            [style.max-width.%]="inputPanelCollapsed && !outputPanelCollapsed ? 75 : null"
             [style.flex-basis.px]="outputPanelCollapsed ? collapsedPanelWidth : outputPanelWidth">
 
             <button type="button"
@@ -1103,9 +1111,15 @@
                     <div>
                         <h6 class="font-weight-bold mb-3">O U T P U T</h6>
                     </div>
-                    <div *ngIf="realTimeData?.duration" class="mb-3">
+                    <div class="d-flex align-items-center mb-3">
+                        <span *ngIf="realTimeData?.duration">
                         <i class="fas fa-clock text-muted pr-1"></i>
                         <span>{{realTimeData?.duration}}</span>
+                        </span>
+                        <button type="button" class="output-copy-btn btn btn-link text-muted p-1 ml-2"
+                            *ngIf="nodeOutput" (click)="copyOutput()" title="Copy output" aria-label="Copy output">
+                            <i class="far fa-copy"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -1119,6 +1133,10 @@
 
                     <ul class="nav nav-tabs output-tabs">
                         <li class="nav-item">
+                            <a class="nav-link" [class.active]="outputView === 'table'"
+                                (click)="outputView = 'table'">{{ outputTabLabel }}</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" [class.active]="outputView === 'tree'"
                                 (click)="outputView = 'tree'">Tree</a>
                         </li>
@@ -1128,21 +1146,29 @@
                         </li>
                     </ul>
 
-                    <!-- String fallback used by tree when raw_output is plain text -->
-                    <ng-template #stringFallback>
-                        <div class="output-string bg-light border rounded">{{ outputStringValue }}</div>
-                    </ng-template>
+                    <!-- Rendered output: table, text or empty state -->
+                    <div class="output-scroll-container w-100 overflow-auto p-2" *ngIf="outputView === 'table'">
+                        <ng-container [ngSwitch]="outputKind">
+                            <div *ngSwitchCase="'empty'" class="output-empty-state text-center">
+                                <div class="output-empty-mark">{{ '{ }' }}</div>
+                                <div class="font-weight-bold mt-2">No output</div>
+                                <small class="text-muted">{{ outputError ? 'This node returned no data. Check the error below.' : 'This node ran without returning data.' }}</small>
+                            </div>
+                            <pre *ngSwitchCase="'text'" class="output-string">{{ outputStringValue }}</pre>
+                            <table *ngSwitchCase="'object'" class="table table-sm table-bordered table-hover mb-0 bg-white output-table output-kv">
+                                <tbody><tr *ngFor="let col of outputTableCols"><th>{{ col }}</th><td [ngClass]="'v-' + getType(outputTableRows[0][col])" [title]="tableValue(outputTableRows[0][col])">{{ tableValue(outputTableRows[0][col]) }}</td></tr></tbody>
+                            </table>
+                            <table *ngSwitchCase="'array'" class="table table-sm table-bordered table-hover mb-0 bg-white text-nowrap output-table">
+                                <thead><tr><th>#</th><th *ngFor="let col of outputTableCols"><span>{{ col }}</span><small>{{ tableColumnType(col) }}</small></th></tr></thead>
+                                <tbody><tr *ngFor="let row of outputTableRows; index as i"><th>{{ i }}</th><td *ngFor="let col of outputTableCols" [ngClass]="'v-' + getType(row[col])" [title]="tableValue(row[col])">{{ tableValue(row[col]) }}</td></tr></tbody>
+                            </table>
+                        </ng-container>
+                    </div>
 
                     <!-- TREE -->
                     <div class="output-scroll-container output-tree w-100 overflow-auto"
                         *ngIf="outputView === 'tree'">
-                        <ng-container *ngIf="outputIsString; else treeView">
-                            <ng-container *ngTemplateOutlet="stringFallback"></ng-container>
-                        </ng-container>
-                        <ng-template #treeView>
-                            <ng-container *ngTemplateOutlet="treeList; context: { nodes: outputTreeNodes }">
-                            </ng-container>
-                        </ng-template>
+                        <ng-container *ngTemplateOutlet="treeList; context: { nodes: outputTreeNodes }"></ng-container>
                     </div>
 
                     <!-- JSON — original <pre> preserved here -->
@@ -1150,6 +1176,12 @@
                         <pre class="output-json">{{ nodeOutput | json }}</pre>
                     </div>
 
+                </div>
+                <div class="output-error alert alert-danger rounded-0 border-left-0 border-right-0 border-bottom-0 d-flex align-items-start p-2 mb-0" *ngIf="outputError">
+                    <strong class="text-uppercase mr-2">Error</strong>
+                    <span class="output-error-message flex-grow-1 text-monospace">{{ outputErrorText }}</span>
+                    <button type="button" class="output-copy-btn btn btn-link text-danger p-1 ml-2"
+                        (click)="copyError()" title="Copy error message" aria-label="Copy error message"><i class="far fa-copy"></i></button>
                 </div>
                 <!-- ↑ END NEW BLOCK -->
 

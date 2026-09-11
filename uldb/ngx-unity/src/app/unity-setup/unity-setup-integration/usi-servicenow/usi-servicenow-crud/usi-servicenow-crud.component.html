@@ -72,6 +72,19 @@
                                         {{integrationFormErrors.name}}</div>
                                 </div>
                             </div>
+                            <div class="col-6 form-group row mb-4">
+                                <div class="col">
+                                    <label class="form-col-form-label" for="auth_type">Auth Method<em>* </em></label>
+                                    <select id="auth_type" class="form-control" formControlName="auth_type"
+                                        [ngClass]="{'is-invalid' : integrationFormErrors.auth_type}">
+                                        <option *ngFor="let authType of authTypeChoices" [value]="authType.value">
+                                            {{authType.label}}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="integrationFormErrors.auth_type">
+                                        {{integrationFormErrors.auth_type}}</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-6 form-group row mb-4">
@@ -114,7 +127,7 @@
                                         {{integrationFormErrors.instance_url}}</div>
                                 </div>
                             </div>
-                            <div class="col-6 form-group row mb-4">
+                            <div class="col-6 form-group row mb-4" *ngIf="integrationForm.get('username')">
                                 <div class="col">
                                     <label class="form-col-form-label">Username<em>* </em></label>
                                     <input class="form-control" id="username" formControlName="username" type="text"
@@ -124,13 +137,33 @@
                                         {{integrationFormErrors.username}}</div>
                                 </div>
                             </div>
-                            <div class="col-6 form-group row mb-4">
+                            <div class="col-6 form-group row mb-4" *ngIf="integrationForm.get('password')">
                                 <div class="col">
                                     <label class="form-col-form-label">Password<em>* </em></label>
                                     <custom-password-field formControlName="password"
                                         [options]="{id:'password', placeholder:'Enter Password', errors:integrationFormErrors.password}"></custom-password-field>
                                     <div class="invalid-feedback" *ngIf="integrationFormErrors.password">
                                         {{integrationFormErrors.password}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 form-group row mb-4" *ngIf="integrationForm.get('client_id')">
+                                <div class="col">
+                                    <label class="form-col-form-label">Client ID<em>* </em></label>
+                                    <input class="form-control" id="client_id" formControlName="client_id" type="text"
+                                        placeholder="Client ID"
+                                        [ngClass]="{'is-invalid' : integrationFormErrors.client_id}">
+                                    <div class="invalid-feedback" *ngIf="integrationFormErrors.client_id">
+                                        {{integrationFormErrors.client_id}}</div>
+                                </div>
+                            </div>
+                            <div class="col-6 form-group row mb-4" *ngIf="integrationForm.get('client_secret')">
+                                <div class="col">
+                                    <label class="form-col-form-label">Client Secret/Key<em>* </em></label>
+                                    <custom-password-field formControlName="client_secret"
+                                        [options]="{id:'client_secret', placeholder:'Enter Client Secret/Key', errors:integrationFormErrors.client_secret}"></custom-password-field>
+                                    <div class="invalid-feedback" *ngIf="integrationFormErrors.client_secret">
+                                        {{integrationFormErrors.client_secret}}
                                     </div>
                                 </div>
                             </div>

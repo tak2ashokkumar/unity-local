@@ -146,13 +146,15 @@
           </div>
           <div class="col-4">
             <div class="row">
-              <div class="col-12">
-                <span class="mr-2 pull-right">&nbsp;</span>
-                <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
-                <!-- <a class="btn btn-pill btn-warning btn-sm text-white pull-right mr-4" *ngIf="viewData.length" (click)="downloadReport()">
-                  <i class="fa fa-download mr-2"></i>Download
-                </a> -->
-              </div>
+                              <div class="col-12">
+                                <span class="mr-2 pull-right">&nbsp;</span>
+                                <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+                                <a class="btn btn-pill btn-warning btn-sm text-white pull-right mr-4"
+                                  *ngIf="viewData.length" (click)="downloadReport()" accessControl
+                                  moduleName="Ticket Management" accessType="Manage Tickets" elementType="btn">
+                                  <i class="fa fa-download mr-2"></i>Download
+                                </a>
+                              </div>
               <div class="col-12 mt-3">
                 <span class="text-muted ml-2 mt-1 font-sm float-right align-middle"><span
                     class="badge badge-pill badge-secondary">{{count}}</span>&nbsp;Tickets</span>
@@ -180,6 +182,7 @@
               <th sortable-column="opened_at">Created On</th>
               <th sortable-column="sys_updated_on">Updated On</th>
               <th>Resolution</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -211,6 +214,11 @@
               </td>
               <td>
                 <div [tooltip]="ticket.resolvedAt">{{ticket.resolvedAt}}</div>
+              </td>
+              <td class="action-icons-column text-center">
+                <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit Ticket"
+                  (click)="editTicket(ticket)" accessControl moduleName="Ticket Management"
+                  accessType="Manage Tickets" elementType="actionbtn"></button>
               </td>
             </tr>
           </tbody>

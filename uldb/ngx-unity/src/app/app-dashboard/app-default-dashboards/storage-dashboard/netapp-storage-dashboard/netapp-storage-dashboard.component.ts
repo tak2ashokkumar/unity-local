@@ -113,6 +113,8 @@ interface NetappStorageWidgetLoadingState {
 export class NetappStorageDashboardComponent implements OnInit, OnChanges, OnDestroy {
   private reloadCancel = new Subject<void>();
   private ngUnsubscribe = new Subject<void>();
+  private deferredLoadTimeouts: Array<ReturnType<typeof setTimeout>> = [];
+  private spinnerTimeouts: Array<ReturnType<typeof setTimeout>> = [];
   private initialized = false;
   dashboardReady = false;
   dashboardLoading = false;
@@ -300,6 +302,9 @@ export class NetappStorageDashboardComponent implements OnInit, OnChanges, OnDes
 
   ngOnDestroy(): void {
     this.reloadCancel.next();
+    this.clearDeferredLoadTimeouts();
+    this.clearSpinnerTimeouts();
+    this.stopAllLoaders();
     this.reloadCancel.complete();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -471,6 +476,9 @@ export class NetappStorageDashboardComponent implements OnInit, OnChanges, OnDes
 
   private loadDashboard(): void {
     this.reloadCancel.next();
+    this.clearDeferredLoadTimeouts();
+    this.clearSpinnerTimeouts();
+    this.stopAllLoaders();
     if (this.filtersUnavailable) {
       this.showDashboardNoData();
       return;
@@ -539,6 +547,8 @@ export class NetappStorageDashboardComponent implements OnInit, OnChanges, OnDes
 
   private showDashboardNoData(): void {
     this.reloadCancel.next();
+    this.clearDeferredLoadTimeouts();
+    this.clearSpinnerTimeouts();
     this.stopAllLoaders();
     this.startDashboardLoader();
     this.resetSummaryOnlySectionVisibility(this.clusterOverviewWidgetViewData);
@@ -602,11 +612,45 @@ export class NetappStorageDashboardComponent implements OnInit, OnChanges, OnDes
     );
   }
 
-  nodeInfoAndMetricsViewData: NodeInfoAndMetricsViewData = new NodeInfoAndMetricsViewData();
 
   private deferViewLoad(loadFn: () => void): void {
-    setTimeout(() => loadFn(), 0);
+    this.scheduleTimeout(loadFn, this.deferredLoadTimeouts);
   }
+
+  private scheduleSpinnerAction(spinnerAction: () => void): void {
+    this.scheduleTimeout(spinnerAction, this.spinnerTimeouts);
+  }
+
+  private scheduleTimeout(callback: () => void, timeoutIds: Array<ReturnType<typeof setTimeout>>): void {
+    const timeoutId = setTimeout(() => {
+      this.removeTimeout(timeoutIds, timeoutId);
+      callback();
+    }, 0);
+    timeoutIds.push(timeoutId);
+  }
+
+  private removeTimeout(timeoutIds: Array<ReturnType<typeof setTimeout>>, timeoutId: ReturnType<typeof setTimeout>): void {
+    const timeoutIndex = timeoutIds.indexOf(timeoutId);
+    if (timeoutIndex !== -1) {
+      timeoutIds.splice(timeoutIndex, 1);
+    }
+  }
+
+  private clearDeferredLoadTimeouts(): void {
+    this.clearTimeouts(this.deferredLoadTimeouts);
+  }
+
+  private clearSpinnerTimeouts(): void {
+    this.clearTimeouts(this.spinnerTimeouts);
+  }
+
+  private clearTimeouts(timeoutIds: Array<ReturnType<typeof setTimeout>>): void {
+    timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
+    timeoutIds.length = 0;
+  }
+
+
+  nodeInfoAndMetricsViewData: NodeInfoAndMetricsViewData = new NodeInfoAndMetricsViewData();
 
   setNodeInfoAndMetricsViewType(viewType: 'table' | 'chart'): void {
     this.nodeInfoAndMetricsViewData.viewType = viewType;
@@ -1331,9 +1375,7 @@ export class NetappStorageDashboardComponent implements OnInit, OnChanges, OnDes
     const keys = Array.isArray(loadingKeys) ? loadingKeys : [loadingKeys];
     keys.forEach(key => {
       this.widgetLoading[key] = true;
-      setTimeout(() => {
-        this.spinner.start(this.loaderNames[key]);
-      }, 0);
+      this.scheduleSpinnerAction(() => { this.spinner.start(this.loaderNames[key]); });
     });
     if (onBeforeLoad) {
       onBeforeLoad();
@@ -1344,7 +1386,7 @@ export class NetappStorageDashboardComponent implements OnInit, OnChanges, OnDes
       finalize(() => {
         keys.forEach(key => {
           this.widgetLoading[key] = false;
-          setTimeout(() => this.spinner.stop(this.loaderNames[key]), 0);
+          this.scheduleSpinnerAction(() => this.spinner.stop(this.loaderNames[key]));
         });
         this.completeDashboardLoad();
       })

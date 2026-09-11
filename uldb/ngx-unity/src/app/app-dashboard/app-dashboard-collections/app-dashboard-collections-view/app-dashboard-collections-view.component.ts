@@ -1,9 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, forkJoin, of } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -35,6 +36,10 @@ export class AppDashboardCollectionsViewComponent implements OnInit, OnDestroy {
   dashboardImageError = '';
   selectedDashboard: DashboardItem | null = null;
   selectedDashboardImage: File | null = null;
+  dashboardOrderSaving = false;
+  private dashboardDragActive = false;
+  private dashboardDragClickBlocked = false;
+  private dashboardDragClickTimeout: ReturnType<typeof setTimeout> | null = null;
 
   modalRef: BsModalRef;
   @ViewChild('dashboardPickerRef') dashboardPickerRef: TemplateRef<any>;
@@ -101,6 +106,9 @@ export class AppDashboardCollectionsViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.modalRef?.hide();
+    if (this.dashboardDragClickTimeout) {
+      clearTimeout(this.dashboardDragClickTimeout);
+    }
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -256,7 +264,50 @@ export class AppDashboardCollectionsViewComponent implements OnInit, OnDestroy {
     return this.modalSelectedDashboards.some(dashboard => dashboard.uuid === item.uuid);
   }
 
+  trackByDashboard(index: number, dashboard: DashboardItem) {
+    return dashboard?.uuid || dashboard?.id || index;
+  }
+
+  onDashboardDragStarted() {
+    this.dashboardDragActive = true;
+  }
+
+  onDashboardDragEnded() {
+    this.dashboardDragActive = false;
+    this.dashboardDragClickBlocked = true;
+    if (this.dashboardDragClickTimeout) {
+      clearTimeout(this.dashboardDragClickTimeout);
+    }
+    this.dashboardDragClickTimeout = setTimeout(() => {
+      this.dashboardDragClickBlocked = false;
+      this.dashboardDragClickTimeout = null;
+    }, 150);
+  }
+
+  dropDashboard(event: CdkDragDrop<DashboardItem[]>) {
+    if (event.previousIndex === event.currentIndex || this.dashboardOrderSaving) {
+      return;
+    }
+
+    const previousDashboards = this.cloneDashboards(this.selectedDashboards);
+    moveItemInArray(this.selectedDashboards, event.previousIndex, event.currentIndex);
+
+    this.dashboardOrderSaving = true;
+    this.svc.updateCollectionDashboards(this.collectionId, this.selectedDashboards)
+      .pipe(
+        takeUntil(this.ngUnsubscribe),
+        finalize(() => this.dashboardOrderSaving = false)
+      )
+      .subscribe(() => { }, () => {
+        this.selectedDashboards = previousDashboards;
+        this.notification.error(new Notification('Failed to update Dashboard order. Try again later.'));
+      });
+  }
+
   openDashboard(dashboard: DashboardItem) {
+    if (this.dashboardDragActive || this.dashboardDragClickBlocked) {
+      return;
+    }
     this.router.navigate(['collections', this.collectionId, 'dashboard', dashboard.uuid], { relativeTo: this.route.parent });
   }
 

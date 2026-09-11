@@ -13,6 +13,8 @@ export interface ServiceNowTicketType {
     severity: ServiceNowDisplayValueType;
     impact: ServiceNowDisplayValueType;
     sys_id: ServiceNowDisplayValueType;
+    collaborators?: ServiceNowDisplayValueType;
+    watch_list?: ServiceNowDisplayValueType;
     ticket_type: string;
 }
 
@@ -29,6 +31,12 @@ export interface ServiceNowAttachmentsType {
 }
 
 export interface ServiceNowComments {
+    value: ServiceNowDisplayValueType;
+    sys_created_on: ServiceNowDisplayValueType;
+    sys_created_by: ServiceNowDisplayValueType;
+}
+
+export interface ServiceNowWorklogs {
     value: ServiceNowDisplayValueType;
     sys_created_on: ServiceNowDisplayValueType;
     sys_created_by: ServiceNowDisplayValueType;

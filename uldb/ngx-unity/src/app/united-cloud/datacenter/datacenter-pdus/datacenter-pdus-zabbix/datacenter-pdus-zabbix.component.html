@@ -5,13 +5,17 @@
                 <ul class="nav">
                     <li class="nav-item">
                         <a class="nav-link py-0 border-right">
-                            <span *ngIf="deviceStatusIcon" class="fas font-xl" [ngClass]="deviceStatusIcon"></span>
-                            <span class="pl-1 font-xl">{{device?.name}}</span>
-                            <span class="pl-1 font-md text-muted">({{device?.deviceType}})</span>
+                            <span *ngIf="deviceStatusIcon" class="fas font-xl align-middle"
+                                [ngClass]="deviceStatusIcon"></span>
+                            <span class="pl-1 font-xl text-truncate d-inline-block align-middle"
+                                [tooltip]="device?.name" style="max-width: 150px;">{{device?.name}}</span>
+                            <span
+                                class="pl-1 font-md text-muted d-inline-block align-middle pt-2">({{device?.deviceType}})</span>
                         </a>
                     </li>
                     <li class="nav-item pt-1" *ngFor="let tab of tabData">
-                        <a class="nav-link py-0" [ngClass]="isActive(tab)" (click)="goTo(tab.url)" *ngIf="tab.enabled">{{tab.name}}</a>
+                        <a class="nav-link py-0" [ngClass]="isActive(tab)" (click)="goTo(tab.url)"
+                            *ngIf="tab.enabled">{{tab.name}}</a>
                         <a class="nav-link py-0 disabled text-muted" *ngIf="!tab.enabled">{{tab.name}}</a>
                     </li>
                     <li class="nav-item ml-auto">

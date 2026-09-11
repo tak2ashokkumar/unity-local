@@ -1,10 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import * as moment from 'moment';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { GET_SERVICE_NOW_GRAPH_DATA, GET_SERVICE_NOW_PRIORITIES, GET_SERVICE_NOW_STATES, GET_SERVICE_NOW_TICKET_BY_TYPE } from '../api-endpoint.const';
+import { DOWNLOAD_SERVICE_NOW_REPORT, GET_SERVICE_NOW_GRAPH_DATA, GET_SERVICE_NOW_PRIORITIES, GET_SERVICE_NOW_REPORT, GET_SERVICE_NOW_STATES, GET_SERVICE_NOW_TICKET_BY_TYPE } from '../api-endpoint.const';
 import { AppUtilityService, SERVICE_NOW_TICKET_TYPE } from '../app-utility/app-utility.service';
 import { PaginatedResult } from '../SharedEntityTypes/paginated.type';
 import { SearchCriteria } from '../table-functionality/search-criteria';
@@ -34,6 +34,45 @@ export class SharedServiceNowMgmtService {
 
   getTicketsGraphData(instanceId: string, criteria: SearchCriteria): Observable<ServiceNowGraphData> {
     return this.http.get<ServiceNowGraphData>(GET_SERVICE_NOW_GRAPH_DATA(instanceId), { params: this.tableService.getWithParam(criteria) });
+  }
+
+  downloadReport(instanceId: string, criteria: SearchCriteria) {
+    let params: HttpParams = new HttpParams().set('file_type', 'csv');
+    const filterParams = criteria && criteria.params && criteria.params.length ? criteria.params[0] : {};
+
+    if (filterParams['ticket_type']) {
+      params = params.set('ticket_type', filterParams['ticket_type']);
+    }
+
+    if (filterParams['search']) {
+      params = params.set('search', filterParams['search']);
+    }
+
+    if (filterParams['state']) {
+      params = params.set('state', Array.isArray(filterParams['state']) ? filterParams['state'].join(',') : filterParams['state']);
+    }
+
+    if (filterParams['priority']) {
+      params = params.set('priority', Array.isArray(filterParams['priority']) ? filterParams['priority'].join(',') : filterParams['priority']);
+    }
+
+    if (filterParams['start_date']) {
+      params = params.set('start_date', filterParams['start_date']);
+    }
+
+    if (filterParams['end_date']) {
+      params = params.set('end_date', filterParams['end_date']);
+    }
+
+    if (criteria && criteria.sortColumn) {
+      params = params.set('ordering', criteria.sortDirection == 'desc' ? `-${criteria.sortColumn}` : criteria.sortColumn);
+    }
+
+    return this.http.get<{ data: string }>(DOWNLOAD_SERVICE_NOW_REPORT(instanceId), { params: params });
+  }
+
+  getReportUrl(instanceId: string, fileName: string, fileType: string = 'csv') {
+    return `${GET_SERVICE_NOW_REPORT(instanceId)}?file_name=${fileName}&file_type=${fileType}`;
   }
 
   getStatePriorityGraphDataWithForkjoin(instanceId: string, criteria: SearchCriteria) {
@@ -102,6 +141,7 @@ export class SharedServiceNowMgmtService {
     tickets.map((ticket: ServiceNowTicketType) => {
       let a: ServiceNowTicketViewData = new ServiceNowTicketViewData();
       a.ticketId = ticket.number ? ticket.number.display_value : '';
+      a.ticketType = ticket.ticket_type ? ticket.ticket_type : type;
       a.enhacedDetailsTicketId = ticket.number ? ticket.number.value : '';
       a.isEnhanceDetailsPage = ticket.ticket_type == SERVICE_NOW_TICKET_TYPE.INCIDENT || ticket.ticket_type == SERVICE_NOW_TICKET_TYPE.PROBLEM;
       a.shortDescription = ticket.short_description ? ticket.short_description.display_value : '';
@@ -114,7 +154,7 @@ export class SharedServiceNowMgmtService {
       a.openedAt = ticket.opened_at && ticket.opened_at.value ? this.utilSvc.toUnityOneDateFormat(ticket.opened_at.value) : '';
       a.resolvedAt = ticket.resolved_at && ticket.resolved_at.value ? this.utilSvc.toUnityOneDateFormat(ticket.resolved_at.value) : a.state;
       a.updatedOn = ticket.sys_updated_on && ticket.sys_updated_on.value ? this.utilSvc.toUnityOneDateFormat(ticket.sys_updated_on.value) : '';
-      a.detailsUrl = this.getDetailsUrl(instanceId, type, a.sysId, a.enhacedDetailsTicketId, a.isEnhanceDetailsPage);
+      a.detailsUrl = this.getDetailsUrl(instanceId, a.ticketType as SERVICE_NOW_TICKET_TYPE, a.sysId, a.enhacedDetailsTicketId, a.isEnhanceDetailsPage);
       viewData.push(a);
     });
     return viewData;
@@ -122,6 +162,7 @@ export class SharedServiceNowMgmtService {
 }
 export class ServiceNowTicketViewData {
   ticketId: string;
+  ticketType: string;
   enhacedDetailsTicketId: string;
   isEnhanceDetailsPage: boolean;
   sysId: string;

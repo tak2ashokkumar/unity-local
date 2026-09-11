@@ -61,13 +61,20 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 360px;
 }
 
-// Browser zoom reduces the CSS viewport width. Keep the three panels in their
-// 30 / 40 / 30 layout instead of allowing the fixed side widths to crush the
-// middle panel when the available width drops below their combined minimums.
+.params-layout.input-panel-collapsed .middle-panel {
+  min-width: 0;
+}
+
+// Browser zoom reduces the CSS viewport width. Let the panels shrink without
+// overriding their draggable flex-basis values.
 @media (max-width: 1120px) {
   .side-panel {
-    flex: 0 1 30% !important;
+    flex-shrink: 1;
     min-width: 0 !important;
+  }
+
+  .side-panel.output-panel.input-panel-collapsed:not(.is-collapsed) {
+    flex-shrink: 0;
   }
 
   .middle-panel {
@@ -147,6 +154,10 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 :host(.panel-resizing) * {
   cursor: ew-resize !important;
   user-select: none;
+}
+
+:host(.panel-resizing) .side-panel {
+  transition: none;
 }
 
 // ─── Round close button ───────────────────────────────────────────────────────
@@ -303,7 +314,7 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 500;
     font-size: 13px;
     padding: 7px 14px;
-    border-radius: 6px 6px 0 0;
+    border-radius: 0;
     transition: color 0.15s ease, background 0.15s ease;
 
     &:hover {
@@ -322,8 +333,7 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
 .output-tabs {
   .nav-item {
-    flex: 1 1 50%;
-    width: 50%;
+    flex: 1;
     text-align: center;
   }
 
@@ -430,6 +440,69 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 6px;
   color: $text-dark;
   font-size: 12px;
+}
+
+.output-table {
+  width: auto;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-color: #d7dbe4;
+  border-radius: 6px;
+  overflow: hidden;
+
+  th, td { padding: 5px 11px; border-color: #e2e5ec; font-size: 12px; }
+  thead th { position: sticky; top: 0; z-index: 1; background: #f2f4f8; color: #1f2430; }
+  thead th:first-child { left: 0; z-index: 2; }
+  thead small { display: block; color: $blue; font: 9.5px monospace; letter-spacing: .08em; }
+  tbody th { position: sticky; left: 0; background: #f2f4f8; color: #8b93a1; font: 11px monospace; }
+  tbody td { color: #4a5261; font-family: monospace; }
+  tbody tr:hover td { background: #f7f9fd; }
+  .v-string { color: #b4682e; }
+  .v-number { color: #1f6f6b; }
+  .v-boolean { color: #7a3fa8; }
+  .v-null { color: #8b93a1; }
+}
+
+.output-kv {
+  tbody th { width: 40%; color: #1f2430; font: 600 12px sans-serif; text-align: left; }
+}
+
+.output-string {
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 10px;
+  color: #4a5261;
+  font: 12px/1.65 monospace;
+  white-space: pre;
+}
+
+.output-empty-state { padding: 44px 12px; }
+.output-empty-mark { color: #c3c9d6; font: 20px monospace; letter-spacing: .08em; }
+
+.output-error {
+  max-height: 160px;
+  min-width: 0;
+}
+
+.output-error-message {
+  max-height: 140px;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  @extend %thin-scroll;
+}
+
+.output-copy-btn {
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+
+  &:hover { box-shadow: none; transform: none; }
 }
 
 // ─── Cursor / badge ───────────────────────────────────────────────────────────

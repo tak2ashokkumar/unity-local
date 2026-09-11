@@ -22,10 +22,7 @@ import {
   NodeDetailsArrayModel,
   nodeTypes,
 } from '../orchestration-agentic-workflow-container/orchestration-agentic-workflow-container.type';
-import {
-  cloudAttributes,
-  WfDynamicParamsService,
-} from './wf-dynamic-params.service';
+import { WfDynamicParamsService } from './wf-dynamic-params.service';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { Observable, of, Subject, Subscription } from 'rxjs';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -59,9 +56,6 @@ export class WfDynamicParamsComponent implements OnInit {
   onClose!: (data: any, modalState?: { action?: 'save' | 'test' }) => void;
   updatedFormDatas: any;
 
-  cloudAccount: any;
-  credentials: any;
-
   createTicketForm!: FormGroup;
 
   updateTicketForm!: FormGroup;
@@ -75,7 +69,7 @@ export class WfDynamicParamsComponent implements OnInit {
     { key: 'workflow_name', value: '{{ sys.workflow_name }}' },
     { key: 'execution_id', value: '{{ sys.execution_id }}' },
     { key: 'execution_user', value: '{{ sys.execution_user }}' },
-    { key: 'now', value: "{{ now | strftime('%Y-%m-%d %H:%M:%S') }}" },
+    { key: 'now', value: "{{ now | strftime('%Y-%m-%dT%H:%M:%SZ') }}" },
     { key: 'today', value: "{{ today | strftime('%Y-%m-%d') }}" },
     {
       key: 'yesterday',
@@ -127,6 +121,7 @@ export class WfDynamicParamsComponent implements OnInit {
   private resizingSidePanel: 'input' | 'output' | null = null;
   private resizeStartX = 0;
   private resizeStartWidth = 0;
+  private outputPanelWidthBeforeInputCollapse: number | null = null;
 
   nodeForm: FormGroup = this.fb.group({});
   dynamicSchema: DynamicSchema = { tabs: [] };
@@ -172,13 +167,15 @@ export class WfDynamicParamsComponent implements OnInit {
   //
 
 
-  outputView: 'tree' | 'json' = 'tree';
-  outputIsString = false;
+  outputView: 'table' | 'tree' | 'json' = 'table';
+  outputKind: 'empty' | 'text' | 'array' | 'object' = 'empty';
+  outputValue: any;
   outputStringValue = '';
+  outputError: any = '';
   outputTreeNodes: any[] = [];
   outputSchemaFields: any[] = [];
   outputTableCols: string[] = [];
-  outputTableRows: any[] = [];
+  outputTableRows: Record<string, any>[] = [];
 
   multiselectProperties: IMultiSelectSettings = {
     "isSimpleArray": false,
@@ -215,8 +212,6 @@ export class WfDynamicParamsComponent implements OnInit {
     const initialValues = Object.keys(this.initialValues || {}).length > 0 ? this.initialValues : this.extractInitialValues(this.nodeData?.config ?? {});
     console.log('INITIAL VALUES', initialValues);
     this.loadDynamicSchema(apiSchema, initialValues);
-    this.getCloudAccount();
-    this.getCredentials();
     this.nodeId = this.nodeData?.isTool ? this.nodeData?.tool_id.split('-')[1] : this.nodeData?.node_id;
     console.log(this.workflowVarsData)
     this.getConnectedNodes();
@@ -294,6 +289,14 @@ export class WfDynamicParamsComponent implements OnInit {
 
   toggleInputPanel(): void {
     this.inputPanelCollapsed = !this.inputPanelCollapsed;
+
+    if (this.inputPanelCollapsed) {
+      this.outputPanelWidthBeforeInputCollapse = this.outputPanelWidth;
+      this.outputPanelWidth = this.getSidePanelMaxWidth('output');
+    } else if (this.outputPanelWidthBeforeInputCollapse !== null) {
+      this.outputPanelWidth = this.outputPanelWidthBeforeInputCollapse;
+      this.outputPanelWidthBeforeInputCollapse = null;
+    }
   }
 
   toggleOutputPanel(): void {
@@ -347,14 +350,26 @@ export class WfDynamicParamsComponent implements OnInit {
   };
 
   private clampSidePanelWidth(width: number): number {
+    if (!this.resizingSidePanel) return width;
+
+    const maxWidth = this.getSidePanelMaxWidth(this.resizingSidePanel);
+
+    return Math.max(this.minSidePanelWidth, Math.min(width, maxWidth));
+  }
+
+  private getSidePanelMaxWidth(panel: 'input' | 'output'): number {
     const hostWidth = this.el.nativeElement.getBoundingClientRect().width || 750;
-    const otherPanelWidth = this.resizingSidePanel === 'input'
+
+    if (panel === 'output' && this.inputPanelCollapsed) {
+      return Math.max(this.minSidePanelWidth, hostWidth * 0.75);
+    }
+
+    const otherPanelWidth = panel === 'input'
       ? (this.isPromptExpanded ? 0 : this.outputPanelCollapsed ? this.collapsedPanelWidth : this.outputPanelWidth)
       : (this.inputPanelCollapsed ? this.collapsedPanelWidth : this.inputPanelWidth);
     const maxFromLayout = hostWidth - otherPanelWidth - this.minMiddlePanelWidth;
-    const maxWidth = Math.max(this.minSidePanelWidth, Math.min(this.maxSidePanelWidth, maxFromLayout));
 
-    return Math.max(this.minSidePanelWidth, Math.min(width, maxWidth));
+    return Math.max(this.minSidePanelWidth, Math.min(this.maxSidePanelWidth, maxFromLayout));
   }
 
   ngAfterViewInit() {
@@ -1035,9 +1050,9 @@ export class WfDynamicParamsComponent implements OnInit {
       const varKey = variable?.param_name;
       if (childData) {
         const childKey = typeof childData === 'string' ? childData : childData?.param_name;
-        return `{{ vars.${varKey}.${childKey} }}`;
+        return `{{ vars.['${varKey}.${childKey}'] }}`;
       }
-      return `{{ vars.${varKey} }}`;
+      return `{{ vars.['${varKey}'] }}`;
     }
 
     // Connected node case: variable.path starts with the root key and uses
@@ -1169,12 +1184,12 @@ export class WfDynamicParamsComponent implements OnInit {
       const tabData = formDataByTabs[tab.id];
       if (!tabData) return;
       (tab.fields || []).forEach(field => {
-        this.applyConditionPayloadsForField(field, tabData);
+        this.applyConditionPayloadsForField(field, tabData, this.nodeForm);
       });
     });
   }
 
-  private applyConditionPayloadsForField(field: any, containerData: any) {
+  private applyConditionPayloadsForField(field: any, containerData: any, form: FormGroup) {
     const fieldKey = field.control_name || field.key;
     if (!fieldKey || !containerData || !Object.prototype.hasOwnProperty.call(containerData, fieldKey)) return;
 
@@ -1188,14 +1203,14 @@ export class WfDynamicParamsComponent implements OnInit {
       const rows: any[] = containerData[fieldKey];
       if (!Array.isArray(rows)) return;
 
-      const array = this.getDynamicFormArray(this.nodeForm, fieldKey) // adjust if array can be nested deeper than top-level form
+      const array = this.getDynamicFormArray(form, fieldKey);
 
       rows.forEach((rowData: any, i: number) => {
-        const rowGroup = array?.at ? array.at(i) : array?.controls?.[i];
+        const rowGroup = (array?.at ? array.at(i) : array?.controls?.[i]) as FormGroup;
         const rowFields: any[] = (rowGroup as any)?._rowFields || field.fields || [];
 
         rowFields.forEach((childField: any) => {
-          this.applyConditionPayloadsForField(childField, rowData);
+          this.applyConditionPayloadsForField(childField, rowData, rowGroup);
         });
       });
       return;
@@ -1203,8 +1218,9 @@ export class WfDynamicParamsComponent implements OnInit {
 
     // nested plain field group (non-array), if your schema supports it
     if (field.fields?.length && containerData[fieldKey]) {
+      const nestedForm = form.get(fieldKey) as FormGroup;
       field.fields.forEach((childField: any) => {
-        this.applyConditionPayloadsForField(childField, containerData[fieldKey]);
+        this.applyConditionPayloadsForField(childField, containerData[fieldKey], nestedForm || form);
       });
     }
   }
@@ -1229,9 +1245,10 @@ export class WfDynamicParamsComponent implements OnInit {
       const control = form.get(controlName);
       if (this.getDynamicFieldType(field) === 'array') {
         const formArray = control as FormArray;
-        values[controlName] = (formArray?.controls || []).map(row =>
-          this.getVisibleFieldValues(row as FormGroup, field.fields || [])
-        );
+        values[controlName] = (formArray?.controls || []).map(row => {
+          const rowFields = (row as any)?._rowFields || field.fields || [];
+          return this.getVisibleFieldValues(row as FormGroup, rowFields);
+        });
         return;
       }
 
@@ -1243,7 +1260,7 @@ export class WfDynamicParamsComponent implements OnInit {
         return;
       }
 
-      values[controlName] = control?.value;
+      values[controlName] = this.normalizeDynamicFieldStoredValue(field, control?.value);
     });
 
     return values;
@@ -1276,65 +1293,19 @@ export class WfDynamicParamsComponent implements OnInit {
     }
   }
 
-  getCredentials(): void {
-    this.svc.getCredentials().pipe(takeUntil(this.ngUnsubscribe)).subscribe(credentials => {
-      this.credentials = Array.isArray(credentials) ? credentials : (credentials as any)?.results ?? [];
-    });
-  }
-
-  getCloudAccount() {
-    this.svc.getAllCloud().pipe(takeUntil(this.ngUnsubscribe)).subscribe((accounts) => {
-      this.cloudAccount = Array.isArray(accounts) ? accounts : accounts?.results ?? [];
-    });
-  }
-
   getAttributesForInput(input: any): string[] {
     const paramType = this.normalizeContextParamType(input?.param_type);
 
     if (paramType === 'CLOUD_ACCOUNT') {
-      const defaultValue = input?.default_value;
-      const accountId = typeof defaultValue === 'object'
-        ? defaultValue?.uuid ?? defaultValue?.value
-        : defaultValue;
-      if (!accountId) {
-        return [];
-      }
-
-      const account = this.cloudAccount?.find(
-        (item) => String(item?.uuid) === String(accountId)
-      );
-      if (!account) {
-        return [];
-      }
-
-      const cloudType = String(account.cloud_type ?? '').trim().toLowerCase();
-      const resolvedCloudType = cloudType === 'united private cloud vcenter'
-        ? 'vmware'
-        : cloudType;
-      const attrConfig = cloudAttributes.find(
-        (config) => config.cloudType.toLowerCase() === resolvedCloudType
-      );
-      return attrConfig ? attrConfig.attributes : [];
+      return ['uuid', 'name', 'cloud_type'];
     }
 
     if (paramType === 'CREDENTIAL') {
-      const defaultValue = input?.default_value;
-      const credentialId = typeof defaultValue === 'object'
-        ? defaultValue?.uuid ?? defaultValue?.value
-        : defaultValue;
-      const credential = this.credentials?.find(
-        (item) => String(item?.uuid) === String(credentialId)
-      );
-      return credential ? ['username', 'password', 'sudo_password'] : [];
+      return [];
     }
 
     if (paramType === 'TARGET') {
-      const selectedTarget = Array.isArray(input?.default_value)
-        ? input.default_value[0]
-        : input?.default_value;
-      return selectedTarget && typeof selectedTarget === 'object'
-        ? ['uuid', 'name', 'ip_address', 'os']
-        : [];
+      return ['uuid', 'name', 'ip_address', 'os', 'device_type'];
     }
 
     return [];
@@ -1366,13 +1337,7 @@ export class WfDynamicParamsComponent implements OnInit {
   getTypeLabel(node: any): string {
     const paramType = this.normalizeContextParamType(node?.param_type);
     if (paramType === 'CLOUD_ACCOUNT') {
-      const accountId = typeof node.default_value === 'string'
-        ? node.default_value
-        : node.default_value?.uuid;
-      const account = this.cloudAccount?.find(
-        (item) => String(item?.uuid) === String(accountId)
-      );
-      return account?.cloud_type || 'Cloud Account';
+      return 'Cloud Account';
     }
     if (paramType === 'CREDENTIAL') {
       return 'Credential';
@@ -1383,9 +1348,9 @@ export class WfDynamicParamsComponent implements OnInit {
     return '';
   }
 
-  getDynamicSearchFn(field: DynamicField): (query: string) => Observable<any[]> {
+  getDynamicSearchFn(field: DynamicField, form: FormGroup): (query: string) => Observable<any[]> {
     return (query: string): Observable<any[]> => {
-      const endpoint = field.options_api?.endpoint;
+      const endpoint = this.resolveDynamicEndpoint(field, form);
       if (!endpoint) {
         return of([]);
       }
@@ -1727,40 +1692,57 @@ export class WfDynamicParamsComponent implements OnInit {
 
   private createInitialArray(field: DynamicField): FormArray {
     const existingItems = Array.isArray(this.initialValues?.[field.control_name]) ? this.initialValues[field.control_name] : Array.isArray(this.initialValues?.properties?.[field.control_name]) ? this.initialValues.properties[field.control_name] : [];
-    const groups = existingItems.map((item: any) => {
-      const clonedFields = JSON.parse(JSON.stringify(field.fields || []));
-      clonedFields.forEach((childField: any) => {
-        if (childField.type === 'condition') {
-          const key = childField.control_name || childField.key;
-          const savedCondition = item?.[key];
-          if (savedCondition) {
-            childField._conditionTree = this.parseConditionPayload(savedCondition);
-          }
-        }
-      });
-      const newGroup = this.createArrayItemGroup(clonedFields, item);
-      (newGroup as any)._rowFields = clonedFields;
-      return newGroup;
-    });
-    // Pad up to min_items with empty groups
-    const minItems = field.min_items || 0;
-    while (groups.length < minItems) {
-      const clonedFields = JSON.parse(JSON.stringify(field.fields || []));
-      const newGroup = this.createArrayItemGroup(clonedFields);
-      (newGroup as any)._rowFields = clonedFields;
-      groups.push(newGroup);
-    }
-    return this.fb.array(groups, this.getArrayValidatorsFromField(field));
+    return this.createArrayForField(field, existingItems);
   }
 
   private createNestedArray(field: DynamicField, existingValue: any): FormArray {
-    const items = Array.isArray(existingValue) ? existingValue : [];
+    return this.createArrayForField(field, existingValue);
+  }
 
-    const groups = items.map((item: any) =>
-      this.createArrayItemGroup(field.fields || [], item)
-    );
+  private createArrayForField(field: DynamicField, existingValue: any): FormArray {
+    const items = Array.isArray(existingValue) ? existingValue : [];
+    const groups = items.map((item: any) => this.createArrayRow(field, item));
+
+    const minItems = field.min_items || 0;
+    while (groups.length < minItems) {
+      groups.push(this.createArrayRow(field));
+    }
 
     return this.fb.array(groups, this.getArrayValidatorsFromField(field));
+  }
+
+  private createArrayRow(field: DynamicField, itemValue: any = {}): FormGroup {
+    const clonedFields = this.getFreshRowFields(field.fields || []);
+    this.restoreConditionTrees(clonedFields, itemValue);
+
+    const group = this.createArrayItemGroup(clonedFields, itemValue);
+    (group as any)._rowFields = clonedFields;
+    return group;
+  }
+
+  private restoreConditionTrees(fields: DynamicField[], itemValue: any): void {
+    const values = itemValue && typeof itemValue === 'object' && !Array.isArray(itemValue)
+      ? itemValue
+      : {};
+
+    (fields || []).forEach((childField: any) => {
+      if (childField.type !== 'condition') return;
+
+      const key = childField.control_name || childField.key;
+      const savedCondition = values[key];
+      if (savedCondition) {
+        const parsed = this.parseConditionPayload(savedCondition);
+        const tree: ConditionGroup = parsed.type === 'group'
+          ? parsed as ConditionGroup
+          : { type: 'group', condition: 'AND', children: [parsed] };
+
+        const minConditions = this.getMinConditions(childField);
+        while (this.countRules(tree) < minConditions) {
+          tree.children.push(this.createRule());
+        }
+        childField._conditionTree = tree;
+      }
+    });
   }
 
   // addDynamicArrayItem(field: DynamicField, form: FormGroup): void {
@@ -1778,10 +1760,7 @@ export class WfDynamicParamsComponent implements OnInit {
     if (!array) {
       return;
     }
-    const clonedFields = this.getFreshRowFields(field.fields || []);
-    const newGroup = this.createArrayItemGroup(clonedFields);
-    (newGroup as any)._rowFields = clonedFields;
-    array.push(newGroup);
+    array.push(this.createArrayRow(field));
     this.refreshFormErrors();
   }
 
@@ -1877,11 +1856,11 @@ export class WfDynamicParamsComponent implements OnInit {
 
   private getInitialFieldValue(field: DynamicField, explicitValue: any): any {
     if (explicitValue !== undefined) {
-      return explicitValue;
+      return this.normalizeDynamicFieldStoredValue(field, explicitValue);
     }
 
     if (field.default !== undefined) {
-      return field.default;
+      return this.normalizeDynamicFieldStoredValue(field, field.default);
     }
 
     switch (field.type) {
@@ -1892,6 +1871,27 @@ export class WfDynamicParamsComponent implements OnInit {
       default:
         return '';
     }
+  }
+
+  private normalizeDynamicFieldStoredValue(field: DynamicField, value: any): any {
+    const configuredValueKey = field.options_api?.value_key;
+    if (!Array.isArray(configuredValueKey)) {
+      return value;
+    }
+
+    const valueKeys = this.normalizeDynamicValueKeys(configuredValueKey);
+    if (!valueKeys.length) {
+      return value;
+    }
+
+    const projectValue = (item: any): any =>
+      item && typeof item === 'object'
+        ? this.projectDynamicOptionValue(item, valueKeys)
+        : item;
+
+    return Array.isArray(value)
+      ? value.map(projectValue)
+      : projectValue(value);
   }
 
   private getValidatorsFromField(field: DynamicField): ValidatorFn[] {
@@ -2115,7 +2115,20 @@ export class WfDynamicParamsComponent implements OnInit {
     }
 
     if (field?.options_api) {
-      const valueKey = field.options_api.value_key?.trim();
+      const configuredValueKey = field.options_api.value_key;
+      if (Array.isArray(configuredValueKey)) {
+        const valueKeys = this.normalizeDynamicValueKeys(configuredValueKey);
+        if (!valueKeys.length) {
+          return option;
+        }
+
+        const source = option.value && typeof option.value === 'object'
+          ? option.value
+          : option;
+        return this.projectDynamicOptionValue(source, valueKeys);
+      }
+
+      const valueKey = configuredValueKey?.trim();
       if (!valueKey) {
         return option;
       }
@@ -2377,29 +2390,37 @@ export class WfDynamicParamsComponent implements OnInit {
       : undefined;
     const endpointByValue = config.endpoint_by_value;
 
+    let endpoint = config.endpoint || '';
+
     if (endpointByValue && dependsValue !== undefined && dependsValue !== null) {
       const exactEndpoint = endpointByValue[String(dependsValue)];
       if (exactEndpoint) {
-        return exactEndpoint;
+        endpoint = exactEndpoint;
       }
 
-      const normalizedDependency = String(dependsValue).trim().toUpperCase();
-      const matchingKey = Object.keys(endpointByValue).find(
-        key => key.trim().toUpperCase() === normalizedDependency
-      );
-      if (matchingKey) {
-        return endpointByValue[matchingKey];
+      if (!exactEndpoint) {
+        const normalizedDependency = String(dependsValue).trim().toUpperCase();
+        const matchingKey = Object.keys(endpointByValue).find(
+          key => key.trim().toUpperCase() === normalizedDependency
+        );
+        if (matchingKey) {
+          endpoint = endpointByValue[matchingKey];
+        }
       }
     }
 
     if (endpointByValue && !config.depends_on?.trim()) {
       const endpoints = Object.values(endpointByValue).filter(Boolean);
       if (endpoints.length === 1) {
-        return endpoints[0];
+        endpoint = endpoints[0];
       }
     }
 
-    return config.endpoint || '';
+    const context = {
+      ...(this.nodeForm?.getRawValue() || {}),
+      ...(form?.getRawValue() || {})
+    };
+    return resolveEndpointTemplate(endpoint, context);
   }
 
   private reconcileDynamicOptionValue(
@@ -2413,10 +2434,9 @@ export class WfDynamicParamsComponent implements OnInit {
       return;
     }
 
-    const storesObject = !field.options_api.value_key?.trim();
     const optionValues = (options || []).map(option => ({
       identity: this.getDynamicOptionIdentity(option, field),
-      value: storesObject ? option : this.getDynamicOptionValue(option, field)
+      value: this.getDynamicOptionValue(option, field)
     }));
     const findOptionValue = (value: any): any => {
       const comparableValue = this.getDynamicOptionIdentity(value, field);
@@ -2463,7 +2483,20 @@ export class WfDynamicParamsComponent implements OnInit {
       return value;
     }
 
-    const valueKey = field?.options_api?.value_key?.trim();
+    const configuredValueKey = field?.options_api?.value_key;
+    if (Array.isArray(configuredValueKey)) {
+      const valueKeys = this.normalizeDynamicValueKeys(configuredValueKey);
+      if (valueKeys.length) {
+        const source = value.value && typeof value.value === 'object'
+          ? value.value
+          : value;
+        return JSON.stringify(valueKeys.map(key => this.readPath(source, key)));
+      }
+    }
+
+    const valueKey = typeof configuredValueKey === 'string'
+      ? configuredValueKey.trim()
+      : '';
     if (valueKey) {
       const configuredValue = this.readPath(value, valueKey);
       if (configuredValue !== undefined) {
@@ -2532,30 +2565,86 @@ export class WfDynamicParamsComponent implements OnInit {
 
   private mapDynamicOptions(items: any[], field: DynamicField): any[] {
     const labelKey = field.options_api?.label_key || 'label';
-    const valueKey = field.options_api?.value_key?.trim();
+    const configuredValueKey = field.options_api?.value_key;
+    const valueKeys = Array.isArray(configuredValueKey)
+      ? this.normalizeDynamicValueKeys(configuredValueKey)
+      : [];
+    const valueKey = typeof configuredValueKey === 'string'
+      ? configuredValueKey.trim()
+      : '';
 
     // An empty value_key means the form value must be the complete API object.
     // Keep the raw items so the select's ngValue receives that object directly.
-    if (!valueKey) {
+    if (!valueKey && !valueKeys.length) {
       return items || [];
     }
 
-    return (items || []).map(item => ({
-      label:
+    return (items || []).map(item => {
+      const label =
         this.readPath(item, labelKey) ??
         item.label ??
         item.name ??
         item.account_name ??
         item.display_name ??
-        String(item),
-      value:
+        String(item);
+
+      if (valueKeys.length) {
+        const source = item.value && typeof item.value === 'object'
+          ? item.value
+          : item;
+        const value = this.projectDynamicOptionValue(source, valueKeys);
+
+        // Autocomplete controls store the returned option itself, whereas
+        // select-like controls store the option's value through ngValue.
+        return this.getDynamicFieldType(field) === 'target_search'
+          ? value
+          : { label, value };
+      }
+
+      return {
+        label,
+        value:
         this.readPath(item, valueKey) ??
         item.value ??
         item.uuid ??
         item.id ??
         item.name ??
         item
-    }));
+      };
+    });
+  }
+
+  private normalizeDynamicValueKeys(valueKeys: string[]): string[] {
+    return (valueKeys || [])
+      .filter(key => typeof key === 'string')
+      .map(key => key.trim())
+      .filter(Boolean);
+  }
+
+  private projectDynamicOptionValue(item: any, valueKeys: string[]): Record<string, any> {
+    return valueKeys.reduce((result, key) => {
+      const value = this.readPath(item, key);
+      if (value !== undefined) {
+        this.writePath(result, key, value);
+      }
+      return result;
+    }, {} as Record<string, any>);
+  }
+
+  private writePath(target: Record<string, any>, path: string, value: any): void {
+    const keys = path.split('.').filter(Boolean);
+    if (!keys.length) {
+      return;
+    }
+
+    let current = target;
+    keys.slice(0, -1).forEach(key => {
+      if (!current[key] || typeof current[key] !== 'object' || Array.isArray(current[key])) {
+        current[key] = {};
+      }
+      current = current[key];
+    });
+    current[keys[keys.length - 1]] = value;
   }
 
   private readPath(obj: any, path: string): any {
@@ -3402,21 +3491,18 @@ export class WfDynamicParamsComponent implements OnInit {
   // e.g. ngOnInit() { this.nodeOutput = this.MOCK_ARRAY; this.buildOutputViews(this.nodeOutput); }
   buildOutputViews(nodeOutput: any) {
     console.log(nodeOutput, "nodeoutput")
-    const ro = nodeOutput?.raw_output ?? nodeOutput;
-    if (typeof ro === 'string') {
-      this.outputIsString = true;
-      this.outputStringValue = ro;
-      this.outputTreeNodes = [];
-      return;
-    }
-    this.outputIsString = false;
-    // const arr: any[] = Array.isArray(ro) ? ro
-    //   : ro && typeof ro === 'object' ? [ro]
-    //     : [];
-    // this.outputTreeNodes = this.buildTree(arr, 'root');
-
-    if (ro && typeof ro === 'object') {
-      this.outputTreeNodes = this.buildTree(ro, 'root');
+    const ro = nodeOutput && typeof nodeOutput === 'object' && 'raw_output' in nodeOutput ? nodeOutput.raw_output
+      : nodeOutput && typeof nodeOutput === 'object' && 'output' in nodeOutput ? nodeOutput.output : nodeOutput;
+    this.outputValue = ro;
+    this.outputError = nodeOutput?.error ?? this.realTimeData?.error ?? '';
+    this.outputKind = ro == null || typeof ro === 'string' && !ro.trim() || typeof ro === 'object' && !Object.keys(ro).length
+      ? 'empty' : typeof ro === 'string' ? 'text' : Array.isArray(ro) ? 'array' : typeof ro === 'object' ? 'object' : 'text';
+    this.outputStringValue = this.outputKind === 'text' ? String(ro) : '';
+    this.outputTableRows = Array.isArray(ro) ? ro : ro && typeof ro === 'object' ? [ro] : [];
+    this.outputTableRows = this.outputTableRows.map(row => row && typeof row === 'object' && !Array.isArray(row) ? row : { value: row });
+    this.outputTableCols = [...new Set<string>(this.outputTableRows.reduce<string[]>((cols, row) => cols.concat(Object.keys(row)), []))];
+    if (nodeOutput && typeof nodeOutput === 'object') {
+      this.outputTreeNodes = this.buildTree(nodeOutput, 'root');
     } else {
       this.outputTreeNodes = [];
     }
@@ -3475,9 +3561,47 @@ export class WfDynamicParamsComponent implements OnInit {
 
   // ── Shared ────────────────────────────────────────────────
   getType(v: any): string {
-    if (v === null) return 'null';
+    if (v == null) return 'null';
     if (Array.isArray(v)) return 'array';
     return typeof v;
+  }
+
+  tableValue(value: any): string {
+    if (typeof value === 'string') return value.trim() ? value : '';
+    return value == null ? 'null' : typeof value === 'object' ? JSON.stringify(value) : this.previewValue(value);
+  }
+
+  tableColumnType(column: string): string {
+    const types = [...new Set<string>(this.outputTableRows.map(row => row[column]).filter(value => value != null).map(value => this.getType(value)))];
+    return types.length > 1 ? 'mixed' : types[0] || 'null';
+  }
+
+  get outputTabLabel(): string {
+    return this.outputKind === 'empty' ? 'Output' : this.outputKind === 'text' ? 'Text' : 'Table';
+  }
+
+  get outputErrorText(): string {
+    return typeof this.outputError === 'string' ? this.outputError : JSON.stringify(this.outputError, null, 2);
+  }
+
+  copyOutput(): void {
+    this.copyText(this.outputView === 'table' ? this.outputValue : this.nodeOutput);
+  }
+
+  copyError(): void {
+    this.copyText(this.outputError);
+  }
+
+  private copyText(value: any): void {
+    const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).catch(() => this.fallbackCopy(text));
+    else this.fallbackCopy(text);
+  }
+
+  private fallbackCopy(text: string): void {
+    const textarea = document.createElement('textarea');
+    textarea.value = text; textarea.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(textarea); textarea.select();
+    try { document.execCommand('copy'); } catch { return; } finally { textarea.remove(); }
   }
 
   setChildFieldValue(child: any, value: any): void {

@@ -55,6 +55,7 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
   showSwitchConditionDetails: boolean = false;
   formattedTask = [];
   isAgentic = false;
+  workflowCanvasReady = false;
   nodeDetailsArr = [];
   dummyJson = {
     "uuid": "476cfa56-8e76-4e37-967c-d1d15db111bf",
@@ -174,6 +175,14 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     ) {
       const offsetX = 120;
       const clearanceY = 80;
+      const straightLineTolerance = 6;
+
+      // Read-only node content can leave otherwise aligned ports a fraction
+      // of a pixel apart. A direct segment avoids a visible midpoint kink,
+      // while connections with real vertical separation keep their routing.
+      if (Math.abs(end_pos_y - start_pos_y) <= straightLineTolerance) {
+        return `M ${start_pos_x} ${start_pos_y} L ${end_pos_x} ${end_pos_y}`;
+      }
 
       // adaptive radius (prevents sharp breaks on short segments)
       const getRadius = (len: number) => Math.min(12, Math.abs(len) / 2);
@@ -242,6 +251,8 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
   getWorkflowDetails() {
     if (this.isAgentic) {
       const drawflowContainer = this.document.getElementById('drawflow');
+      this.workflowCanvasReady = false;
+      drawflowContainer?.classList.remove('execution-workflow-ready');
       if (drawflowContainer) drawflowContainer.style.visibility = 'hidden';
 
       // this.workflowDetails.nodes_execution.forEach(val => {
@@ -331,6 +342,15 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
           this.editor.clear();
           this.editor.on('import', () => {
             Object.keys(drawflowData.drawflow.Home.data).forEach(nodeId => {
+              const executionNodes = (this.workflowDetails?.nodes_execution || []) as any[];
+              const workflowNode = executionNodes.find(
+                (node: any) => Number(
+                  String(node?.node_id ?? '').replace(/^node-/, '')
+                ) === Number(nodeId)
+              );
+              if (workflowNode?.node_type === nodeTypes.Loop) {
+                this.adjustNodeInputs(Number(nodeId));
+              }
               this.adjustNodeOutputs(Number(nodeId));
               this.editor.updateConnectionNodes(`node-${Number(nodeId)}`);
             });
@@ -339,7 +359,7 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
           console.log('Successfully imported into Drawflow');
         } catch (err) {
           this.editor.precanvas.style.visibility = 'visible';
-          container.style.visibility = 'visible';
+          this.revealExecutionWorkflow(container);
           console.error('Error during editor.import():', err);
         }
       } else {
@@ -363,6 +383,24 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
       this.renderer.setStyle(output, 'top', `${spacing * (index + 1)}%`);
       this.renderer.setStyle(output, 'right', '-6px');
       this.renderer.setStyle(output, 'transform', 'translateY(-50%)');
+    });
+  }
+
+  private adjustNodeInputs(nodeId: number): void {
+    const nodeEl = this.document.getElementById(`node-${nodeId}`);
+    if (!nodeEl) return;
+
+    const inputs = nodeEl.querySelectorAll('.input') as NodeListOf<HTMLElement>;
+    const spacing = 70 / (inputs.length + 1);
+    inputs.forEach((input, index) => {
+      const hasInput1 = input.classList.contains('input_1');
+      this.renderer.setStyle(input, 'top', `${spacing * (index + 1)}%`);
+      this.renderer.setStyle(input, 'right', '-6px');
+      this.renderer.setStyle(
+        input,
+        'transform',
+        hasInput1 ? 'translateY(-50%)' : 'translateY(55%)'
+      );
     });
   }
 
@@ -395,12 +433,12 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     const drawflowNodes = this.editor?.drawflow?.drawflow?.Home?.data || {};
     const nodeIds = Object.keys(drawflowNodes);
     if (!precanvas) {
-      if (container) container.style.visibility = 'visible';
+      this.revealExecutionWorkflow(container);
       return;
     }
     if (!container || !nodeIds.length) {
       precanvas.style.visibility = 'visible';
-      if (container) container.style.visibility = 'visible';
+      this.revealExecutionWorkflow(container);
       return;
     }
 
@@ -423,7 +461,7 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     });
     if (!Number.isFinite(bounds.minX) || !Number.isFinite(bounds.minY)) {
       precanvas.style.visibility = 'visible';
-      container.style.visibility = 'visible';
+      this.revealExecutionWorkflow(container);
       return;
     }
 
@@ -464,7 +502,14 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     precanvas.style.transform =
       `translate(${translateX}px, ${translateY}px) scale(${zoom})`;
     precanvas.style.visibility = 'visible';
-    container.style.visibility = 'visible';
+    this.revealExecutionWorkflow(container);
+  }
+
+  private revealExecutionWorkflow(container?: HTMLElement | null): void {
+    this.workflowCanvasReady = true;
+    const drawflowContainer = container || this.document.getElementById('drawflow');
+    drawflowContainer?.classList.add('execution-workflow-ready');
+    if (drawflowContainer) drawflowContainer.style.visibility = 'visible';
   }
 
   mapConnectionsForEditApi(connectionList: any[]) {
@@ -647,7 +692,6 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
               ${statusHtml}
             </div>
 
-            ${hasNodeMeta ? `
             <!-- Read-only execution configuration -->
             <div class="row m-0 p-0">
 
@@ -673,7 +717,13 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
 
             <!-- Tools Section -->
             <div class="tools-container"></div>
-            ` : ''}
+
+            <!-- Preserve the editable AI Agent's layout height without
+                 exposing an interactive drop target in execution view. -->
+            <div class="drop-zone readonly-layout-spacer" aria-hidden="true">
+              <i class="fas fa-plus-circle mr-1" style="font-size:11px;opacity:0.5;"></i>
+              Drop tools here
+            </div>
           </div>
         </div>`;
       }
@@ -689,7 +739,6 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
               <span class="node-title">LLM</span>
               ${statusHtml}
             </div>
-            ${hasNodeMeta ? `
             <div class="row m-0 p-0 mt-2">
               <div class="col-12 p-2">
                 <span class="config-label">Model</span>
@@ -700,9 +749,7 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
                 </select>
               </div>
             </div>
-            ` : ''}
           </div>
-          <div class="node-label">${node.name}</div>
         </div>
       `;
       }

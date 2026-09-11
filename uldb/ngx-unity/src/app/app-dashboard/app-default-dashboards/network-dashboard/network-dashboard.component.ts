@@ -4,7 +4,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, of, Subject } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { AimlEventDetailsService } from 'src/app/shared/aiml-event-details/aiml-event-details.service';
+import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -20,6 +20,7 @@ import {
   NetworkAlertsBySeverityResponse,
   NetworkDashboardDatacenterOption,
   NetworkDashboardFilterCriteria,
+  NetworkDashboardHeaderResponse,
   NetworkDeviceAvailabilityTableResponse,
   NetworkEnvironmentalHealthSummaryTableResponse,
   NetworkLoadBalancerHealthTableResponse,
@@ -28,6 +29,7 @@ import {
   NetworkTopCriticalAlertsResponse
 } from './network-dashboard.type';
 import {
+  NETWORK_DASHBOARD_HEADER_RESPONSE,
   NETWORK_DASHBOARD_TIME_RANGE_DEFAULT,
   NETWORK_DASHBOARD_TIME_RANGE_OPTIONS
 } from './network-dashboard.const';
@@ -96,6 +98,7 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   isPduHealthLoading = false;
   isAlertEventsLoading = false;
   isAutoRemediationSummaryLoading = false;
+  headerData: NetworkDashboardHeaderResponse = NETWORK_DASHBOARD_HEADER_RESPONSE;
   networkOverviewViewData: NetworkOverviewViewData;
   topConversationsWidgetViewData: TopConversationsWidgetViewData;
   performanceWorkloadInsightsViewData: PerformanceWorkloadInsightsWidgetViewData;
@@ -106,21 +109,21 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   pduHealthViewData: PduHealthWidgetViewData;
   alertEventsViewData: AlertEventsViewWidgetViewData;
   autoRemediationSummaryViewData: AutoRemediationSummaryWidgetViewData;
-  topConversationsViewMode: 'table' | 'chart' = 'table';
+  topConversationsViewMode: 'table' | 'chart' = 'chart';
   topConversationsSearch: string = '';
-  performanceWorkloadInsightsViewMode: 'table' | 'chart' = 'table';
+  performanceWorkloadInsightsViewMode: 'table' | 'chart' = 'chart';
   performanceWorkloadSearch: string = '';
-  interfaceHealthMetricsViewMode: 'table' | 'chart' = 'table';
+  interfaceHealthMetricsViewMode: 'table' | 'chart' = 'chart';
   interfaceHealthMetricsSearch: string = '';
   interfaceHealthMetricsPageNo: number = 1;
   interfaceHealthMetricsPageSize: number = PAGE_SIZES.DEFAULT_PAGE_SIZE;
-  networkDeviceAvailabilityViewMode: 'table' | 'chart' = 'table';
+  networkDeviceAvailabilityViewMode: 'table' | 'chart' = 'chart';
   networkDeviceAvailabilitySearch: string = '';
-  environmentalHealthSummaryViewMode: 'table' | 'chart' = 'table';
+  environmentalHealthSummaryViewMode: 'table' | 'chart' = 'chart';
   environmentalHealthSummarySearch: string = '';
-  loadBalancerHealthViewMode: 'table' | 'chart' = 'table';
+  loadBalancerHealthViewMode: 'table' | 'chart' = 'chart';
   loadBalancerHealthSearch: string = '';
-  pduHealthViewMode: 'table' | 'chart' = 'table';
+  pduHealthViewMode: 'table' | 'chart' = 'chart';
   pduHealthSearch: string = '';
   alertEventsSearch: string = '';
   networkDeviceAvailabilityPageNo: number = 1;
@@ -169,19 +172,30 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     private svc: NetworkDashboardService,
     private router: Router,
     private route: ActivatedRoute,
-    private alertDetailSvc: AimlEventDetailsService,
+    private alertDetailSvc: AimlAlertDetailsService,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
     public mapSvc: MapService
   ) { }
 
   ngOnInit(): void {
+    this.getHeaderInfo();
     setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
   }
 
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+  }
+
+  getHeaderInfo() {
+    this.svc.getHeaderInfo().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      if (res) {
+        this.headerData = res;
+      }
+    }, (_err: HttpErrorResponse) => {
+      this.notification.error(new Notification('Failed to get header scope data. Try again later.'));
+    });
   }
 
   loadFilterOptionsAndDashboard() {
@@ -942,11 +956,11 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     return row.id;
   }
 
-  viewAlertEventDetails(uuid: string) {
+  viewAlertDetails(uuid: string) {
     if (!uuid) {
       return;
     }
-    this.alertDetailSvc.showEventDetails(uuid);
+    this.alertDetailSvc.showAlertDetails(uuid);
   }
 
   private handleWidgetApiError<T>(message: string, fallback: T) {
@@ -1084,21 +1098,21 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.pduHealthViewData = null;
     this.alertEventsViewData = null;
     this.autoRemediationSummaryViewData = null;
-    this.topConversationsViewMode = 'table';
+    this.topConversationsViewMode = 'chart';
     this.topConversationsSearch = '';
-    this.performanceWorkloadInsightsViewMode = 'table';
+    this.performanceWorkloadInsightsViewMode = 'chart';
     this.performanceWorkloadSearch = '';
-    this.interfaceHealthMetricsViewMode = 'table';
+    this.interfaceHealthMetricsViewMode = 'chart';
     this.interfaceHealthMetricsSearch = '';
     this.interfaceHealthMetricsPageNo = 1;
     this.interfaceHealthMetricsPageSize = PAGE_SIZES.DEFAULT_PAGE_SIZE;
-    this.networkDeviceAvailabilityViewMode = 'table';
+    this.networkDeviceAvailabilityViewMode = 'chart';
     this.networkDeviceAvailabilitySearch = '';
-    this.environmentalHealthSummaryViewMode = 'table';
+    this.environmentalHealthSummaryViewMode = 'chart';
     this.environmentalHealthSummarySearch = '';
-    this.loadBalancerHealthViewMode = 'table';
+    this.loadBalancerHealthViewMode = 'chart';
     this.loadBalancerHealthSearch = '';
-    this.pduHealthViewMode = 'table';
+    this.pduHealthViewMode = 'chart';
     this.pduHealthSearch = '';
     this.alertEventsSearch = '';
     this.networkDeviceAvailabilityPageNo = 1;

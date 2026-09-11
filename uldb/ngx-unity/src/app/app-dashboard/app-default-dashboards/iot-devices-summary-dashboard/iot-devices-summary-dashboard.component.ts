@@ -364,7 +364,7 @@ export class IotDevicesSummaryDashboardComponent implements OnInit {
     this.temperatureWidgetTrendChartCabinetSubscr = this.temperatureWidgetViewData?.trendChartDeviceSelectionForm?.get('cabinet')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(value => {
       this.temperatureWidgetViewData.trendChartData = null;
       this.temperatureWidgetViewData.devicesList = [];
-      this.temperatureWidgetViewData.trendChartDeviceSelectionForm.get('device').setValue(null, { emitEvent: false });
+      this.temperatureWidgetViewData.trendChartDeviceSelectionForm.get('device').setValue('', { emitEvent: false });
       this.getIotDevicesByCabinetAndUpdateTemperatureWidgetTrendChartDevicesList(value);
     })
   }

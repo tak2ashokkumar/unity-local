@@ -72,7 +72,7 @@ export class WfDynamicFormTestComponent implements OnInit {
     { key: 'workflow_name', value: '{{ workflow_name }}' },
     { key: 'execution_id', value: '{{ execution_id }}' },
     { key: 'execution_user', value: '{{ execution_user }}' },
-    { key: 'now', value: "{{ now | strftime('%Y-%m-%d %H:%M:%S') }}" },
+    { key: 'now', value: "{{ now | strftime('%Y-%m-%dT%H:%M:%SZ') }}" },
     { key: 'today', value: "{{ today | strftime('%Y-%m-%d') }}" },
     {
       key: 'yesterday',
@@ -772,9 +772,17 @@ export class WfDynamicFormTestComponent implements OnInit {
       return option;
     }
 
-    // Use value_key from options_api if available
-    if (field?.options_api?.value_key) {
-      const val = this.readPath(option, field.options_api.value_key);
+    const configuredValueKey = field?.options_api?.value_key;
+    if (Array.isArray(configuredValueKey)) {
+      const valueKeys = this.normalizeDynamicValueKeys(configuredValueKey);
+      return valueKeys.length
+        ? this.projectDynamicOptionValue(option, valueKeys)
+        : option;
+    }
+
+    // Use a scalar value_key from options_api if available.
+    if (configuredValueKey) {
+      const val = this.readPath(option, configuredValueKey);
       if (val !== undefined) return val;
     }
 
@@ -977,7 +985,13 @@ export class WfDynamicFormTestComponent implements OnInit {
 
   private mapDynamicOptions(items: any[], field: DynamicField): Array<{ label: string; value: any }> {
     const labelKey = field.options_api?.label_key || 'label';
-    const valueKey = field.options_api?.value_key || 'value';
+    const configuredValueKey = field.options_api?.value_key;
+    const valueKeys = Array.isArray(configuredValueKey)
+      ? this.normalizeDynamicValueKeys(configuredValueKey)
+      : [];
+    const valueKey = typeof configuredValueKey === 'string' && configuredValueKey.trim()
+      ? configuredValueKey.trim()
+      : 'value';
 
     return (items || []).map(item => ({
       label:
@@ -988,13 +1002,48 @@ export class WfDynamicFormTestComponent implements OnInit {
         item.display_name ??
         String(item),
       value:
-        this.readPath(item, valueKey) ??
+        (valueKeys.length
+          ? this.projectDynamicOptionValue(item, valueKeys)
+          : this.readPath(item, valueKey)) ??
         item.value ??
         item.uuid ??
         item.id ??
         item.name ??
         item
     }));
+  }
+
+  private normalizeDynamicValueKeys(valueKeys: string[]): string[] {
+    return (valueKeys || [])
+      .filter(key => typeof key === 'string')
+      .map(key => key.trim())
+      .filter(Boolean);
+  }
+
+  private projectDynamicOptionValue(item: any, valueKeys: string[]): Record<string, any> {
+    return valueKeys.reduce((result, key) => {
+      const value = this.readPath(item, key);
+      if (value !== undefined) {
+        this.writePath(result, key, value);
+      }
+      return result;
+    }, {} as Record<string, any>);
+  }
+
+  private writePath(target: Record<string, any>, path: string, value: any): void {
+    const keys = path.split('.').filter(Boolean);
+    if (!keys.length) {
+      return;
+    }
+
+    let current = target;
+    keys.slice(0, -1).forEach(key => {
+      if (!current[key] || typeof current[key] !== 'object' || Array.isArray(current[key])) {
+        current[key] = {};
+      }
+      current = current[key];
+    });
+    current[keys[keys.length - 1]] = value;
   }
 
   private readPath(obj: any, path: string): any {

@@ -137,16 +137,16 @@ export class EventAnalyticsDashboardComponent implements OnInit, OnDestroy {
     isSimpleArray: false,
     lableToDisplay: 'label',
     keyToSelect: 'value',
-    enableSearch: false,
+    // enableSearch: false,
     checkedStyle: 'fontawesome',
     buttonClasses: 'btn btn-default btn-sm btn-block shadow-none',
-    dynamicTitleMaxItems: 1,
+    // dynamicTitleMaxItems: 1,
     displayAllSelectedText: true,
-    showCheckAll: true,
-    showUncheckAll: false,
-    selectAsObject: false,
+    // showCheckAll: true,
+    // showUncheckAll: false,
+    // selectAsObject: false,
     mandatoryLimit: 1,
-    maxHeight: '180px'
+    maxHeight: '190px'
   };
 
   trendAlertTypeMultiselectTexts: IMultiSelectTexts = {

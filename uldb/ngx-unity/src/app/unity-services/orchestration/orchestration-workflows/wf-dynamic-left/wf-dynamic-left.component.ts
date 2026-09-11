@@ -35,7 +35,7 @@ export class WfDynamicLeftComponent
   implements OnInit, OnChanges, OnDestroy {
 
   @Output() dragStart = new EventEmitter<any>();
-  @Input() emptyCanvas = false;
+  @Input() hasTriggerNode = false;
 
   private ngUnsubscribe = new Subject<void>();
 
@@ -82,11 +82,7 @@ export class WfDynamicLeftComponent
 
   ngOnChanges(changes: SimpleChanges): void {
 
-    if (
-      changes.emptyCanvas?.previousValue === true &&
-      changes.emptyCanvas.currentValue === false &&
-      this.selectedGroup?.key === 'trigger'
-    ) {
+    if (changes.hasTriggerNode?.currentValue === true && this.selectedGroup?.key === 'trigger') {
       this.backToMainMenu();
     }
 
@@ -98,7 +94,15 @@ export class WfDynamicLeftComponent
         group => group.key === 'trigger'
       );
 
-      if (triggerGroup && this.emptyCanvas) {
+      if (triggerGroup && !this.hasTriggerNode) {
+        this.selectedGroup = triggerGroup;
+        this.menuType = 'dynamic-submenu';
+      }
+    }
+
+    if (changes.hasTriggerNode?.currentValue === false && this.workflowGroups.length) {
+      const triggerGroup = this.workflowGroups.find(group => group.key === 'trigger');
+      if (triggerGroup) {
         this.selectedGroup = triggerGroup;
         this.menuType = 'dynamic-submenu';
       }
@@ -121,7 +125,7 @@ export class WfDynamicLeftComponent
 
       const triggerGroup = this.workflowGroups.find(group => group.key === 'trigger');
 
-      if (triggerGroup && this.emptyCanvas) {
+      if (triggerGroup && !this.hasTriggerNode) {
         this.selectedGroup = triggerGroup;
         this.menuType = 'dynamic-submenu';
       }
@@ -162,7 +166,7 @@ export class WfDynamicLeftComponent
           this.mainMenu = [...this.workflowGroups];
           const triggerGroup = this.workflowGroups.find(group => group.key === 'trigger'
           );
-          if (triggerGroup && this.emptyCanvas) {
+          if (triggerGroup && !this.hasTriggerNode) {
             this.selectedGroup = triggerGroup;
             this.menuType = 'dynamic-submenu';
           }
@@ -191,11 +195,17 @@ export class WfDynamicLeftComponent
      MENU NAVIGATION
   ------------------------------ */
   goToSubMenu(menu: any): void {
+    if (!this.hasTriggerNode && menu?.key !== 'trigger') {
+      return;
+    }
     this.selectedGroup = menu;
     this.menuType = 'dynamic-submenu';
   }
 
   backToMainMenu(): void {
+    if (!this.hasTriggerNode) {
+      return;
+    }
     this.selectedGroup = null;
     this.menuType = 'main';
   }
@@ -229,6 +239,10 @@ export class WfDynamicLeftComponent
   ------------------------------ */
 
   onSearched(event: string): void {
+    if (!this.hasTriggerNode) {
+      this.searchQuery = '';
+      return;
+    }
     this.searchQuery = event?.trim() || '';
     this.menuType = this.searchQuery ? 'Search' : 'main';
     this.filterAllItems();

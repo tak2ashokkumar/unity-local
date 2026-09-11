@@ -104,7 +104,8 @@
                                 <select id="os" class="form-control" formControlName="os"
                                     [class.is-invalid]="detailFormErrors.os">
                                     <option value="" disabled>Select Operating System</option>
-                                    <option *ngIf="detailForm.get('os').value && !hasOperatingSystemOption(detailForm.get('os').value)"
+                                    <option
+                                        *ngIf="detailForm.get('os').value && !hasOperatingSystemOption(detailForm.get('os').value)"
                                         [value]="detailForm.get('os').value">{{detailForm.get('os').value}}</option>
                                     <option *ngFor="let os of operatingSystems" [value]="os.full_name">
                                         {{os.full_name}}</option>
@@ -116,8 +117,10 @@
                                 <select id="os_name" class="form-control" formControlName="os_name"
                                     [class.is-invalid]="detailFormErrors.os_name">
                                     <option value="" disabled>Select Operating System</option>
-                                    <option *ngIf="detailForm.get('os_name').value && !hasOperatingSystemOption(detailForm.get('os_name').value)"
-                                        [value]="detailForm.get('os_name').value">{{detailForm.get('os_name').value}}</option>
+                                    <option
+                                        *ngIf="detailForm.get('os_name').value && !hasOperatingSystemOption(detailForm.get('os_name').value)"
+                                        [value]="detailForm.get('os_name').value">{{detailForm.get('os_name').value}}
+                                    </option>
                                     <option *ngFor="let os of operatingSystems" [value]="os.full_name">
                                         {{os.full_name}}</option>
                                 </select>
@@ -451,6 +454,14 @@
                             </div>
                         </div>
 
+                        <div class="form-group row" *ngIf="metaDataForm.get('memory_gb') && isVmwareVm">
+                            <label for="memory_gb" class="col-3 col-form-label">Memory(GB)</label>
+                            <div class="col-9">
+                                <input id="memory_gb" class="form-control" type="number" formControlName="memory_gb"
+                                    readonly>
+                            </div>
+                        </div>
+
                         <div class="form-group row" *ngIf="metaDataForm.get('available_memory')">
                             <label for="available_memory" class="col-3 col-form-label">Available Memory</label>
                             <div class=" col-9">
@@ -462,26 +473,52 @@
                             </div>
                         </div>
 
-                        <div class="form-group row" *ngIf="metaDataForm.get('used_memory')">
-                            <label for="used_memory" class="col-3 col-form-label">Used Memory</label>
-                            <div class=" col-9">
-                                <input id="used_memory" class="form-control" type="text" formControlName="used_memory"
-                                    [class.is-invalid]="metaDataFormErrors.used_memory">
-                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.used_memory">
-                                    {{metaDataFormErrors.used_memory}}</div>
+                        <div formArrayName="hard_disks" *ngIf="metaDataForm.get('hard_disks')">
+                            <div
+                                *ngFor="let control of metaDataForm.get('hard_disks').controls; let i=index;let first=first;let last=last;">
+                                <div [formGroupName]="i">
+                                    <div class="form-group row">
+                                        <div class="col-12"
+                                            *ngIf="metaDataForm.get('hard_disks').controls[i].get('disk_label')">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">Disk
+                                                    Label</label>
+                                                <div class="col-9">
+                                                    <input id="disk_label" class="form-control" type="text"
+                                                        formControlName="disk_label" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3"
+                                            *ngIf="metaDataForm.get('hard_disks').controls[i].get('disk_size')">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">Disk
+                                                    Size</label>
+                                                <div class="col-9">
+                                                    <input id="disk_size" class="form-control" type="text"
+                                                        formControlName="disk_size" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group row" *ngIf="!isHypervVm">
-                            <label for="firmware_version" class="col-3 col-form-label">Firmware Version</label>
+                        <div class="form-group row">
+                            <label for="last_updated" class="col-3 col-form-label">Last Updated</label>
                             <div class="col-9">
-                                <input id="firmware_version" class="form-control" type="text"
-                                    formControlName="firmware_version"
-                                    [class.is-invalid]="metaDataFormErrors.firmware_version">
-                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.firmware_version">
-                                    {{metaDataFormErrors.firmware_version}}</div>
+                                <owl-date-time #last_updated [hour12Timer]="true"
+                                    [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                <input class="form-control rounded-left" formControlName="last_updated"
+                                    [owlDateTimeTrigger]="last_updated" [owlDateTime]="last_updated" type="text"
+                                    name="last_updated" [max]="now"
+                                    [class.is-invalid]="metaDataFormErrors.last_updated">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.last_updated">
+                                    {{metaDataFormErrors.last_updated}}</div>
                             </div>
                         </div>
+
                     </div>
                     <div class="col-6">
 
@@ -523,22 +560,42 @@
                             </div>
                         </div>
 
+                        <div class="form-group row">
+                            <label for="firmware_version" class="col-3 col-form-label">Firmware Version</label>
+                            <div class="col-9">
+                                <input id="firmware_version" class="form-control" type="text"
+                                    formControlName="firmware_version"
+                                    [class.is-invalid]="metaDataFormErrors.firmware_version">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.firmware_version">
+                                    {{metaDataFormErrors.firmware_version}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="metaDataForm.get('memory_gb') && !isVmwareVm">
+                            <label for="memory_gb" class="col-3 col-form-label">Memory(GB)</label>
+                            <div class="col-9">
+                                <input id="memory_gb" class="form-control" type="number" formControlName="memory_gb"
+                                    readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="metaDataForm.get('used_memory')">
+                            <label for="used_memory" class="col-3 col-form-label">Used Memory</label>
+                            <div class=" col-9">
+                                <input id="used_memory" class="form-control" type="text" formControlName="used_memory"
+                                    [class.is-invalid]="metaDataFormErrors.used_memory">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.used_memory">
+                                    {{metaDataFormErrors.used_memory}}</div>
+                            </div>
+                        </div>
+
                         <div formArrayName="hard_disks" *ngIf="metaDataForm.get('hard_disks')">
                             <div
                                 *ngFor="let control of metaDataForm.get('hard_disks').controls; let i=index;let first=first;let last=last;">
                                 <div [formGroupName]="i">
                                     <div class="form-group row">
-                                        <div class="col-12">
-                                            <div class="row">
-                                                <label class="col-form-label col-3">Disk
-                                                    Label</label>
-                                                <div class="col-9">
-                                                    <input id="disk_label" class="form-control" type="text"
-                                                        formControlName="disk_label" readonly>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 mt-3">
+                                        <div class="col-12"
+                                            *ngIf="metaDataForm.get('hard_disks').controls[i].get('disk_file_name')">
                                             <div class="row">
                                                 <label class="col-form-label col-3">Disk
                                                     File Name</label>
@@ -548,17 +605,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-12 mt-3">
-                                            <div class="row">
-                                                <label class="col-form-label col-3">Disk
-                                                    Size</label>
-                                                <div class="col-9">
-                                                    <input id="disk_size" class="form-control" type="text"
-                                                        formControlName="disk_size" readonly>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 mt-3">
+                                        <div class="col-12 mt-3"
+                                            *ngIf="metaDataForm.get('hard_disks').controls[i].get('disk_size_unit')">
                                             <div class="row">
                                                 <label class="col-form-label col-3">Disk
                                                     Size Unit</label>
@@ -570,31 +618,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row" *ngIf="isHypervVm">
-                            <label for="firmware_version" class="col-3 col-form-label">Firmware Version</label>
-                            <div class="col-9">
-                                <input id="firmware_version" class="form-control" type="text"
-                                    formControlName="firmware_version"
-                                    [class.is-invalid]="metaDataFormErrors.firmware_version">
-                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.firmware_version">
-                                    {{metaDataFormErrors.firmware_version}}</div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="last_updated" class="col-3 col-form-label">Last Updated</label>
-                            <div class="col-9">
-                                <owl-date-time #last_updated [hour12Timer]="true"
-                                    [scrollStrategy]="scrollStrategy"></owl-date-time>
-                                <input class="form-control rounded-left" formControlName="last_updated"
-                                    [owlDateTimeTrigger]="last_updated" [owlDateTime]="last_updated" type="text"
-                                    name="last_updated" [max]="now"
-                                    [class.is-invalid]="metaDataFormErrors.last_updated">
-                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.last_updated">
-                                    {{metaDataFormErrors.last_updated}}</div>
                             </div>
                         </div>
 

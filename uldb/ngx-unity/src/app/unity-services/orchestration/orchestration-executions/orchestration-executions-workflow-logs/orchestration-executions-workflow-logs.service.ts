@@ -184,12 +184,14 @@ export class OrchestrationExecutionsWorkflowLogsService {
       view.taskName = d.name;
       view.type = d.node_type;
       view.id = d.node_id;
+      const output = d.output?.output === null ? {} : d?.output?.output;
 
       if (this.isChartNode(view.type)) {
-        view.output = this.getChartOutput(d.output);
+        view.output = this.getChartOutput(output);
         view.chartType = String(view.output?.chart_type || '').toUpperCase();
       } else {
-        view.output = d.output;
+        view.output = output;
+        view.isJsonOutput = output !== null && typeof output === 'object';
       }
 
       viewData.push(view);
@@ -526,6 +528,7 @@ export class WorkflowOutputViewData {
   type: string;
   id: number;
   chartType?: string;
+  isJsonOutput?: boolean;
 }
 
 export class WorkflowTaskViewData {

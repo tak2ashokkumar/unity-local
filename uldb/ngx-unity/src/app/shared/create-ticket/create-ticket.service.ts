@@ -3,11 +3,12 @@ import { Injectable, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { AppLevelService } from 'src/app/app-level.service';
-import { CREATE_REPORT_AN_ISSUE, CREATE_SERVICE_NOW_TICKET, CREATE_TICKET, DYNAMICCRM_TICKETS_BY_TYPE, GET_SERVICE_CATEGORY, GET_TERMS_BY_SERVICE_CATALOGUE, GET_TICKET_MGMT_LIST, SERVICE_CATALOG_BY_DEVICE_TYPE } from '../api-endpoint.const';
+import { CREATE_REPORT_AN_ISSUE, CREATE_SERVICE_NOW_TICKET, CREATE_TICKET, DYNAMICCRM_TICKETS_BY_TYPE, GET_SERVICE_CATEGORY, GET_SERVICE_NOW_TICKET_BY_ID, GET_TERMS_BY_SERVICE_CATALOGUE, GET_TICKET_MGMT_LIST, SERVICE_CATALOG_BY_DEVICE_TYPE, UPDATE_SERVICE_NOW_TICKET } from '../api-endpoint.const';
 import { DeviceMapping, NoWhitespaceValidator, SERVICE_NOW_TICKET_TYPE, MS_DYNAMICS_TICKET_TYPE, TICKET_TYPE } from '../app-utility/app-utility.service';
 import { TicketMgmtList } from '../SharedEntityTypes/ticket-mgmt-list.type';
 import { UserInfoService } from '../user-info.service';
 import { DeviceServiceCatalog, DeviceServiceCatalogTerms } from './device-service-catalog.type';
+import { ServiceNowTicketType } from '../shared-service-now-mgmt/service-now-ticket-type';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ import { DeviceServiceCatalog, DeviceServiceCatalogTerms } from './device-servic
 export class CreateTicketService {
   @Output() ticketCreated$ = new EventEmitter<string>();
 
-  private ticketAnnouncedSource = new Subject<{ input: TicketInput, deviceMapping: DeviceMapping, instanceUUID: string }>();
+  private ticketAnnouncedSource = new Subject<{ input: TicketInput, deviceMapping: DeviceMapping, instanceUUID: string, editContext?: CreateTicketEditContext }>();
   // Observable string streams
   ticketAnnounced$ = this.ticketAnnouncedSource.asObservable();
 
@@ -24,8 +25,8 @@ export class CreateTicketService {
     private user: UserInfoService,
     private http: HttpClient) { }
 
-  createTicket(input: TicketInput, deviceMapping?: DeviceMapping, instanceUUID?: string) {
-    this.ticketAnnouncedSource.next({ input: input, deviceMapping: deviceMapping, instanceUUID: instanceUUID });
+  createTicket(input: TicketInput, deviceMapping?: DeviceMapping, instanceUUID?: string, editContext?: CreateTicketEditContext) {
+    this.ticketAnnouncedSource.next({ input: input, deviceMapping: deviceMapping, instanceUUID: instanceUUID, editContext: editContext });
   }
 
   getServiceCategory(): Observable<Array<string>> {
@@ -107,6 +108,10 @@ export class CreateTicketService {
     return this.http.get<TicketMgmtList[]>(GET_TICKET_MGMT_LIST());
   }
 
+  getServiceNowTicketData(instanceId: string, ticketId: string, type: string): Observable<ServiceNowTicketType> {
+    return this.http.get<ServiceNowTicketType>(GET_SERVICE_NOW_TICKET_BY_ID(instanceId, ticketId, type));
+  }
+
   /**
    * Header, Report an Issue, Feedback & Service Req(Problem) is PROBLEM
    * Manage by support ticket & change mgmt is CHANGE(task in zendesk)
@@ -118,7 +123,7 @@ export class CreateTicketService {
    * `servicenow`. Rest remains same.
    * When `create` is `false` then ticket should be created in unity as type `problem`
    */
-  saveTicket(data: FormData, selected: TicketMgmtList, create?: boolean) {
+  saveTicket(data: FormData, selected: TicketMgmtList, create?: boolean, editContext?: CreateTicketEditContext) {
     if (!create) {
       data.append('type', MS_DYNAMICS_TICKET_TYPE.PROBLEM);
     }
@@ -135,6 +140,9 @@ export class CreateTicketService {
       return this.http.post(create ? CREATE_TICKET() : CREATE_REPORT_AN_ISSUE(), data);
     } else if (selected.type == 'ServiceNow') {
       const type = data.get('type').toString() == 'task' ? SERVICE_NOW_TICKET_TYPE.CHANGE_REQUEST : data.get('type').toString();
+      if (editContext && editContext.sysId) {
+        return this.http.put(UPDATE_SERVICE_NOW_TICKET(selected.uuid, type, editContext.sysId), data);
+      }
       return this.http.post(create ? CREATE_SERVICE_NOW_TICKET(selected.uuid, type) : CREATE_REPORT_AN_ISSUE(), data);
     } else if (selected.type == 'DynamicsCrm') {
       if (data.get('type').toString() == 'task') {
@@ -185,6 +193,11 @@ export interface TicketInput {
   aiops?: boolean;
   feedback?: boolean;
   webaccess?: boolean;
+}
+
+export interface CreateTicketEditContext {
+  sysId: string;
+  ticketType: string;
 }
 
 export class DeviceServiceCatalogTermView {

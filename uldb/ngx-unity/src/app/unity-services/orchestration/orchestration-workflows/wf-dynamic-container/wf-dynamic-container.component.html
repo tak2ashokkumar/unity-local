@@ -119,7 +119,7 @@
 
               <div class="left-panel-content w-100">
                 <wf-dynamic-left [workflowGroups]="workflowGroups" (dragStart)="onDragStart($event)"
-                  [emptyCanvas]="emptyCanvas">
+                  [hasTriggerNode]="hasTriggerNode">
                 </wf-dynamic-left>
               </div>
 
@@ -218,16 +218,16 @@
                 <!-- Toolbar -->
                 <div class="toolbar-container">
                   <div class="toolbar-actions d-flex">
-                    <button class="icon-btn btn btn-null tb" (click)="changeZoom(-1, $event)">
+                    <button class="icon-btn btn btn-null shadow-none tb" (click)="changeZoom(-1, $event)">
                       <i class="fa fa-search-minus text-muted"></i>
                     </button>
-                    <button class="icon-btn btn btn-null tb" (click)="resetZoom($event)">
+                    <button class="icon-btn btn btn-null shadow-none tb" (click)="resetZoom($event)">
                       <i class="fa fa-expand text-muted"></i>
                     </button>
-                    <button class="icon-btn btn btn-null tb" (click)="changeZoom(1, $event)">
+                    <button class="icon-btn btn btn-null shadow-none tb" (click)="changeZoom(1, $event)">
                       <i class="fa fa-search-plus text-muted"></i>
                     </button>
-                    <button class="icon-btn btn btn-null tb" type="button" title="Auto arrange and fit workflow"
+                    <button class="icon-btn btn btn-null shadow-none tb" type="button" title="Auto arrange and fit workflow"
                       aria-label="Auto arrange and fit workflow" (click)="autoLayoutAndFit($event)">
                       <i class="fas fa-project-diagram text-muted"></i>
                     </button>
@@ -237,18 +237,18 @@
                 <div class="bottom-panel-actions d-flex align-items-center ml-auto">
                   <!-- Collapsed tabs — clicking opens the panel on that tab -->
                   <div class="bottom-collapsed-tabs d-flex align-items-center">
-                    <button class="bottom-tab-pill d-inline-flex align-items-center"
+                    <button class="btn shadow-none bottom-tab-pill d-inline-flex align-items-center"
                       [class.active]="bottomActiveTab === 'variables'" (click)="openBottomPanel('variables', $event)">
                       <span class="fx-icon"><i>f</i>(x)</span> Variables
                     </button>
-                    <button class="bottom-tab-pill d-inline-flex align-items-center"
+                    <button class="btn shadow-none bottom-tab-pill d-inline-flex align-items-center"
                       [class.active]="bottomActiveTab === 'logs'" (click)="openBottomPanel('logs', $event)">
                       <i class="fas fa-list-alt mr-1" style="opacity:0.7;"></i>Logs
                     </button>
                   </div>
 
                   <!-- Expand chevron -->
-                  <button class="icon-btn btn btn-null tb" (click)="toggleBottomPanel($event)">
+                  <button class="icon-btn btn btn-null shadow-none tb" (click)="toggleBottomPanel($event)">
                     <i class="fas fa-chevron-up text-muted"></i>
                   </button>
                 </div>
@@ -267,7 +267,7 @@
                     {{ bottomActiveTab === 'variables' ? 'Workflow Variables' : 'Execution Logs' }}
                   </div>
                   <button *ngIf="bottomActiveTab === 'logs'" type="button"
-                    class="btn btn-sm btn-link text-muted ml-auto p-1" title="Refresh execution logs"
+                    class="btn btn-sm btn-link shadow-none text-muted ml-auto p-1" title="Refresh execution logs"
                     aria-label="Refresh execution logs" [disabled]="isLoadingExecutionLogs || !currentSessionId"
                     (click)="getWorkflowExecutionLogs()">
                     <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingExecutionLogs" aria-hidden="true"></i>
@@ -312,16 +312,16 @@
               <div class="bottom-expanded-bar d-flex align-items-center">
                 <div class="toolbar-container">
                   <div class="toolbar-actions d-flex">
-                    <button class="icon-btn btn btn-null tb" (click)="changeZoom(-1, $event)">
+                    <button class="icon-btn btn btn-null shadow-none tb" (click)="changeZoom(-1, $event)">
                       <i class="fa fa-search-minus text-muted"></i>
                     </button>
-                    <button class="icon-btn btn btn-null tb" (click)="resetZoom($event)">
+                    <button class="icon-btn btn btn-null shadow-none tb" (click)="resetZoom($event)">
                       <i class="fa fa-expand text-muted"></i>
                     </button>
-                    <button class="icon-btn btn btn-null tb" (click)="changeZoom(1, $event)">
+                    <button class="icon-btn btn btn-null shadow-none tb" (click)="changeZoom(1, $event)">
                       <i class="fa fa-search-plus text-muted"></i>
                     </button>
-                    <button class="icon-btn btn btn-null tb" type="button" title="Auto arrange and fit workflow"
+                    <button class="icon-btn btn btn-null shadow-none tb" type="button" title="Auto arrange and fit workflow"
                       aria-label="Auto arrange and fit workflow" (click)="autoLayoutAndFit($event)">
                       <i class="fas fa-project-diagram text-muted"></i>
                     </button>
@@ -329,18 +329,18 @@
                 </div>
 
                 <div class="bottom-collapsed-tabs d-flex align-items-center ml-auto">
-                  <button class="bottom-tab-pill d-inline-flex align-items-center"
+                  <button class="btn shadow-none bottom-tab-pill d-inline-flex align-items-center"
                     [class.active]="bottomActiveTab === 'variables'" (click)="setBottomTab('variables', $event)">
                     <span class="fx-icon"><i>f</i>(x)</span> Variables
                   </button>
-                  <button class="bottom-tab-pill d-inline-flex align-items-center"
+                  <button class="btn shadow-none bottom-tab-pill d-inline-flex align-items-center"
                     [class.active]="bottomActiveTab === 'logs'" (click)="setBottomTab('logs', $event)">
                     <i class="fas fa-list-alt mr-1" style="opacity:0.7;"></i>Logs
                   </button>
                 </div>
 
                 <!-- Keep the expanded panel collapse control fixed at the bottom-right -->
-                <button class="icon-btn btn btn-null tb bottom-collapse-toggle" type="button"
+                <button class="icon-btn btn btn-null shadow-none tb bottom-collapse-toggle" type="button"
                   title="Collapse bottom panel" aria-label="Collapse bottom panel" (click)="toggleBottomPanel($event)">
                   <i class="fas fa-chevron-down text-muted"></i>
                 </button>

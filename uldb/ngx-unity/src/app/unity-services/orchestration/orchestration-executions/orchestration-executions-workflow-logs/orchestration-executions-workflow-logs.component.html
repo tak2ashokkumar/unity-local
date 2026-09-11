@@ -222,7 +222,7 @@
                                                         </button>
                                                         <div class="workflow-output-scroll">
                                                             <pre class="workflow-output-json mb-0 pr-4"
-                                                                #copyContent>{{ output?.output | json }}</pre>
+                                                                #copyContent>{{ output?.isJsonOutput ? (output?.output | json) : output?.output }}</pre>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -30,6 +30,7 @@ export interface Hypervisor extends SNMPCrudType {
     num_cores: number;
     num_cpus: number;
     memory_mb: number;
+    memory_gb?: number;
     capacity_gb: number;
     observium_status: number;
     position: number;

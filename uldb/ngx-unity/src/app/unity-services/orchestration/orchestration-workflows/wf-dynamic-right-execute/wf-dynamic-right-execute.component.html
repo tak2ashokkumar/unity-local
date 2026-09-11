@@ -202,13 +202,21 @@
                     <div class="dropdown-menu show event-dropdown-menu w-100 overflow-auto" *ngIf="isDropdownOpen"
                         (scroll)="onScroll($event)"
                         (click)="$event.stopPropagation()">
+                        <div class="sticky-top bg-white p-2">
+                            <search-box [searchValue]="aimlSearch"
+                                (searched)="onAIMLSearch($event)"></search-box>
+                        </div>
                         <div *ngFor="let i of aimlData" class="dropdown-item" (click)="selectItem(i)">
                             {{i.id}} - {{ i.status }} - {{ i.description }}
                         </div>
                         <div *ngIf="isLoading" class="p-2 text-center small text-muted">
                             Loading...
                         </div>
-                        <div *ngIf="!hasNextPage && !isLoading" class="p-2 text-center small text-muted">
+                        <div *ngIf="!isLoading && aimlData.length === 0" class="p-2 text-center small text-muted">
+                            No results
+                        </div>
+                        <div *ngIf="aimlData.length > 0 && !hasNextPage && !isLoading"
+                            class="p-2 text-center small text-muted">
                             No more results
                         </div>
                     </div>

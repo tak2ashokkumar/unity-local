@@ -129,7 +129,7 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
     { key: 'workflow_name', value: '{{ workflow_name }}' },
     { key: 'execution_id', value: '{{ execution_id }}' },
     { key: 'execution_user', value: '{{ execution_user }}' },
-    { key: 'now', value: "{{ now | strftime('%Y-%m-%d %H:%M:%S') }}" },
+    { key: 'now', value: "{{ now | strftime('%Y-%m-%dT%H:%M:%SZ') }}" },
     { key: 'today', value: "{{ today | strftime('%Y-%m-%d') }}" },
     {
       key: 'yesterday',

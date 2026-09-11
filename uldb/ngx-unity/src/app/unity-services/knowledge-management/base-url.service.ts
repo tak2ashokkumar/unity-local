@@ -23,9 +23,9 @@ export class BaseUrlService {
     //   return "https://knowledge-stage.unitedlayer.com/";
     // }
 
-    // //  Prod (UUID subdomain or unity-ams)
-    // if (/unity\.unitedlayer\.com/.test(origin)) {
-    //   return "https://knowledge.unitedlayer.com/"; // will match both <uuid>.unity.unitedlayer.com and unity-ams.unitedlayer.com
+    // //  Prod
+    // if (/cerne\.unityone\.ai/.test(origin)) {
+    //   return "https://knowledge.unitedlayer.com/";
     // }
 
     // fallback (optional)

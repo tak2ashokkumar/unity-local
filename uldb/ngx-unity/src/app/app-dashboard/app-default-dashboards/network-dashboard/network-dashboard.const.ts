@@ -3,8 +3,10 @@ import {
     NetworkAverageTemperatureBySensorTypeResponse,
     NetworkAutoRemediationSummary,
     NetworkDashboardFiltersResponse,
+    NetworkDashboardHeaderResponse,
     NetworkDeviceAvailabilityItem,
     NetworkEnvironmentalHealthSummaryItem,
+    NetworkEnvironmentalHealthSummaryTableResponse,
     NetworkFanHealthByDeviceResponse,
     NetworkInterfaceHealthMetricsTableResponse,
     NetworkOverview,
@@ -62,6 +64,13 @@ export const NETWORK_DASHBOARD_FILTERS_RESPONSE: NetworkDashboardFiltersResponse
         }
     ],
     time_range: ['last_month', 'last_week', 'last_24_hours', 'last_90_days']
+};
+
+export const NETWORK_DASHBOARD_HEADER_RESPONSE: NetworkDashboardHeaderResponse = {
+    scope: {
+        datacenters: 'All datacenters (2)'
+    },
+    lastRefreshed: 'Today 13:50 IST'
 };
 
 export const NETWORK_OVERVIEW: NetworkOverview = {
@@ -1084,6 +1093,493 @@ export const NETWORK_ENVIRONMENTAL_HEALTH_SUMMARY: NetworkEnvironmentalHealthSum
 ];
 
 
+export const NETWORK_ENVIRONMENTAL_HEALTH_SUMMARY_TABLE_RESPONSE: NetworkEnvironmentalHealthSummaryTableResponse = {
+    count: 10,
+    time_range: '30_days',
+    data: [
+        {
+            device_id: 'c6a2f449-f7e5-4fdc-958d-cd1916e1a450',
+            device_name: 'Border-SDX-SJP2-Edge-01',
+            device_type: 'Core Switch',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 4,
+                healthy: 4,
+                warning: 0,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            inlet_temperature: {
+                value: 31,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            },
+            outlet_temperature: {
+                value: 42,
+                unit: 'C',
+                status: {
+                    code: 'critical',
+                    label: 'Critical'
+                }
+            },
+            hotspot_temperature: {
+                value: 52,
+                unit: 'C',
+                status: {
+                    code: 'critical',
+                    label: 'Critical'
+                }
+            }
+        },
+        {
+            device_id: 'a40d7c8f-cc3a-4b50-a44e-f9fb814f8726',
+            device_name: 'CP_B_Node2-sdx-west-fw01',
+            device_type: 'Firewall',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'warning',
+                label: 'Warning'
+            },
+            fan_status: {
+                total: 4,
+                healthy: 3,
+                warning: 1,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            },
+            inlet_temperature: {
+                value: 30,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            },
+            outlet_temperature: {
+                value: 41,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            },
+            hotspot_temperature: {
+                value: 50,
+                unit: 'C',
+                status: {
+                    code: 'critical',
+                    label: 'Critical'
+                }
+            }
+        },
+        {
+            device_id: 'f5b2441b-0674-47bf-b1c0-f3a6e89be405',
+            device_name: 'DR-Arista-L2-SW-03',
+            device_type: 'Distribution Switch',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 3,
+                healthy: 2,
+                warning: 0,
+                failed: 1,
+                unknown: 0,
+                status: {
+                    code: 'critical',
+                    label: 'Critical'
+                }
+            },
+            inlet_temperature: {
+                value: 29,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            },
+            outlet_temperature: {
+                value: 39,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            },
+            hotspot_temperature: {
+                value: 48,
+                unit: 'C',
+                status: {
+                    code: 'critical',
+                    label: 'Critical'
+                }
+            }
+        },
+        {
+            device_id: '1a6f3535-7a64-4bb2-8a2b-5f2a68fc74cb',
+            device_name: 'Kodathi-Branch-Core-SW-01',
+            device_type: 'Core Switch',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 4,
+                healthy: 4,
+                warning: 0,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            inlet_temperature: {
+                value: 28,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            outlet_temperature: {
+                value: 38,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            },
+            hotspot_temperature: {
+                value: 47,
+                unit: 'C',
+                status: {
+                    code: 'critical',
+                    label: 'Critical'
+                }
+            }
+        },
+        {
+            device_id: 'b46c4221-e345-44d5-84ee-f9c03f4944c8',
+            device_name: 'SDX-SJP2-Edge-SW-11',
+            device_type: 'Edge Switch',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 3,
+                healthy: 3,
+                warning: 0,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            inlet_temperature: {
+                value: 27,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            outlet_temperature: {
+                value: 37,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            },
+            hotspot_temperature: {
+                value: 46,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            }
+        },
+        {
+            device_id: '8f5296e8-1748-465c-bb45-cab8dc205ba5',
+            device_name: 'TOR-SW-Rack12-02',
+            device_type: 'Top of Rack Switch',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 3,
+                healthy: 3,
+                warning: 0,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            inlet_temperature: {
+                value: 26,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            outlet_temperature: {
+                value: 35,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            hotspot_temperature: {
+                value: 44,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            }
+        },
+        {
+            device_id: '6720d076-33bf-4b35-9f99-c1a34febae3f',
+            device_name: 'LB-Cluster-East-01',
+            device_type: 'Load Balancer',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 4,
+                healthy: 4,
+                warning: 0,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            inlet_temperature: {
+                value: 25,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            outlet_temperature: {
+                value: 34,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            hotspot_temperature: {
+                value: 41,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            }
+        },
+        {
+            device_id: '19120e1f-60f7-433f-bcf2-9a3cf13ab8e2',
+            device_name: 'PDU-Aisle-07-A',
+            device_type: 'PDU',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 2,
+                healthy: 2,
+                warning: 0,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            inlet_temperature: {
+                value: 24,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            outlet_temperature: {
+                value: 33,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            hotspot_temperature: {
+                value: 40,
+                unit: 'C',
+                status: {
+                    code: 'warning',
+                    label: 'Warning'
+                }
+            }
+        },
+        {
+            device_id: 'c88d8a9e-fc62-409f-9c1a-cac9fe08e950',
+            device_name: 'Access-SW-Floor3-05',
+            device_type: 'Access Switch',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 2,
+                healthy: 2,
+                warning: 0,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            inlet_temperature: {
+                value: 23,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            outlet_temperature: {
+                value: 32,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            hotspot_temperature: {
+                value: 39,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            }
+        },
+        {
+            device_id: 'd37d6e27-0845-42da-96f4-32778cf32154',
+            device_name: 'Lab-SW-Cold-Aisle-01',
+            device_type: 'Access Switch',
+            power_supply_a: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            power_supply_b: {
+                code: 'healthy',
+                label: 'Healthy'
+            },
+            fan_status: {
+                total: 2,
+                healthy: 2,
+                warning: 0,
+                failed: 0,
+                unknown: 0,
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            inlet_temperature: {
+                value: 22,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            outlet_temperature: {
+                value: 30,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            },
+            hotspot_temperature: {
+                value: 36,
+                unit: 'C',
+                status: {
+                    code: 'healthy',
+                    label: 'Healthy'
+                }
+            }
+        }
+    ]
+};
+
 export const NETWORK_TOP_DEVICES_BY_HOTSPOT_TEMPERATURE_RESPONSE: NetworkTopDevicesByHotspotTemperatureResponse = {
     count: 10,
     time_range: '30_days',
@@ -1095,9 +1591,9 @@ export const NETWORK_TOP_DEVICES_BY_HOTSPOT_TEMPERATURE_RESPONSE: NetworkTopDevi
     data: [
         {
             device_id: 'ca12de99-08cb-4e52-a42d-05923acc38cf',
-            device_name: 'CORE-SW-07',
+            device_name: 'Border-SDX-SJP2-Edge-01',
             device_type: 'Core Switch',
-            temperature: 48,
+            temperature: 52,
             unit: 'C',
             status: {
                 code: 'critical',
@@ -1106,13 +1602,101 @@ export const NETWORK_TOP_DEVICES_BY_HOTSPOT_TEMPERATURE_RESPONSE: NetworkTopDevi
         },
         {
             device_id: '431703be-94a1-4bd5-ae44-2fa90b9608df',
-            device_name: 'FIREWALL-01',
+            device_name: 'CP_B_Node2-sdx-west-fw01',
             device_type: 'Firewall',
+            temperature: 50,
+            unit: 'C',
+            status: {
+                code: 'critical',
+                label: 'Critical'
+            }
+        },
+        {
+            device_id: 'ea141fa2-970b-491a-b12f-9f3fe7b0dfcc',
+            device_name: 'DR-Arista-L2-SW-03',
+            device_type: 'Distribution Switch',
+            temperature: 48,
+            unit: 'C',
+            status: {
+                code: 'critical',
+                label: 'Critical'
+            }
+        },
+        {
+            device_id: '82d25312-8268-4fe6-85bb-7f575bcf5f5c',
+            device_name: 'Kodathi-Branch-Core-SW-01',
+            device_type: 'Core Switch',
             temperature: 47,
             unit: 'C',
             status: {
                 code: 'critical',
                 label: 'Critical'
+            }
+        },
+        {
+            device_id: 'b46c4221-e345-44d5-84ee-f9c03f4944c8',
+            device_name: 'SDX-SJP2-Edge-SW-11',
+            device_type: 'Edge Switch',
+            temperature: 46,
+            unit: 'C',
+            status: {
+                code: 'warning',
+                label: 'Warning'
+            }
+        },
+        {
+            device_id: '8f5296e8-1748-465c-bb45-cab8dc205ba5',
+            device_name: 'TOR-SW-Rack12-02',
+            device_type: 'Top of Rack Switch',
+            temperature: 44,
+            unit: 'C',
+            status: {
+                code: 'warning',
+                label: 'Warning'
+            }
+        },
+        {
+            device_id: '6720d076-33bf-4b35-9f99-c1a34febae3f',
+            device_name: 'LB-Cluster-East-01',
+            device_type: 'Load Balancer',
+            temperature: 41,
+            unit: 'C',
+            status: {
+                code: 'warning',
+                label: 'Warning'
+            }
+        },
+        {
+            device_id: '19120e1f-60f7-433f-bcf2-9a3cf13ab8e2',
+            device_name: 'PDU-Aisle-07-A',
+            device_type: 'PDU',
+            temperature: 40,
+            unit: 'C',
+            status: {
+                code: 'warning',
+                label: 'Warning'
+            }
+        },
+        {
+            device_id: 'c88d8a9e-fc62-409f-9c1a-cac9fe08e950',
+            device_name: 'Access-SW-Floor3-05',
+            device_type: 'Access Switch',
+            temperature: 39,
+            unit: 'C',
+            status: {
+                code: 'healthy',
+                label: 'Healthy'
+            }
+        },
+        {
+            device_id: 'd37d6e27-0845-42da-96f4-32778cf32154',
+            device_name: 'Lab-SW-Cold-Aisle-01',
+            device_type: 'Access Switch',
+            temperature: 36,
+            unit: 'C',
+            status: {
+                code: 'healthy',
+                label: 'Healthy'
             }
         }
     ]

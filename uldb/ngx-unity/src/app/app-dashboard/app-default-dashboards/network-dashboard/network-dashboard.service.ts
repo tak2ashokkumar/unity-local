@@ -1,8 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
   GET_NETWORK_DASHBOARD_FILTERS,
+  GET_NETWORK_DASHBOARD_HEADER,
   GET_NETWORK_DASHBOARD_OVERVIEW,
   GET_NETWORK_DASHBOARD_TOP_10_CONVERSATIONS,
   GET_NETWORK_DASHBOARD_TOP_BANDWIDTH_USAGE,
@@ -60,6 +61,7 @@ import {
   NetworkConversationMetricItem,
   NetworkDashboardFilterCriteria,
   NetworkDashboardFiltersResponse,
+  NetworkDashboardHeaderResponse,
   NetworkDeviceAvailabilityItem,
   NetworkDeviceAvailabilityStatus,
   NetworkDeviceAvailabilityTableApiItem,
@@ -137,6 +139,10 @@ export class NetworkDashboardService {
     private http: HttpClient,
     private chartConfigSvc: UnityChartConfigService
   ) { }
+
+  getHeaderInfo(): Observable<NetworkDashboardHeaderResponse> {
+    return this.http.get<NetworkDashboardHeaderResponse>(GET_NETWORK_DASHBOARD_HEADER());
+  }
 
   getFilterOptions(): Observable<NetworkDashboardFiltersResponse> {
     return this.http.get<NetworkDashboardFiltersResponse>(GET_NETWORK_DASHBOARD_FILTERS());
@@ -4453,6 +4459,10 @@ export class NetworkDashboardService {
               {
                 xAxis: warningThreshold,
                 name: `${warningThreshold}${unit} Warning`,
+                label: {
+                  align: 'right',
+                  padding: [0, 4, 0, 0]
+                },
                 lineStyle: {
                   color: '#ffba08'
                 }
@@ -4460,6 +4470,10 @@ export class NetworkDashboardService {
               {
                 xAxis: criticalThreshold,
                 name: `${criticalThreshold}${unit} Critical`,
+                label: {
+                  align: 'left',
+                  padding: [0, 0, 0, 4]
+                },
                 lineStyle: {
                   color: '#df3b4a'
                 }
@@ -4591,6 +4605,10 @@ export class NetworkDashboardService {
               {
                 yAxis: warningThreshold,
                 name: `Warning ${warningThreshold}`,
+                label: {
+                  position: 'insideEndTop',
+                  distance: 4
+                },
                 lineStyle: {
                   color: '#ffba08',
                   width: 1.5,
@@ -4600,6 +4618,10 @@ export class NetworkDashboardService {
               {
                 yAxis: criticalThreshold,
                 name: `Critical ${criticalThreshold}`,
+                label: {
+                  position: 'insideEndBottom',
+                  distance: 4
+                },
                 lineStyle: {
                   color: '#df3b4a',
                   width: 1.5,
@@ -6709,7 +6731,7 @@ export class NetworkDashboardService {
   ): 'healthy' | 'warning' | 'critical' | 'unknown' {
     return tones.reduce((highest, tone) =>
       this.getInterfaceHealthToneRank(tone) > this.getInterfaceHealthToneRank(highest) ? tone : highest
-    , 'healthy');
+      , 'healthy');
   }
 
   private getInterfaceHealthMetricTone(
@@ -6854,24 +6876,39 @@ export class NetworkDashboardService {
   }
 
   private getAlertEventsBarAxisScale(values: number[]): { max: number; interval: number } {
-    const maxValue = Math.max(...values, 0);
-    let interval = 1;
+    const minSections = 5;
+    const maxValue = Math.max(...(values || []), 0);
 
-    if (maxValue > 250) {
-      interval = 100;
-    } else if (maxValue > 100) {
-      interval = 50;
-    } else if (maxValue > 50) {
-      interval = 20;
-    } else if (maxValue > 20) {
-      interval = 10;
-    } else if (maxValue > 5) {
-      interval = 5;
+    if (maxValue <= 0) {
+      return {
+        interval: 1,
+        max: minSections
+      };
+    }
+
+    const roughInterval = maxValue / minSections;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(roughInterval)));
+    const normalized = roughInterval / magnitude;
+    let niceStep = 1;
+
+    if (normalized > 5) {
+      niceStep = 10;
+    } else if (normalized > 2) {
+      niceStep = 5;
+    } else if (normalized > 1) {
+      niceStep = 2;
+    }
+
+    const interval = Math.max(1, niceStep * magnitude);
+    let max = Math.max(interval * minSections, Math.ceil(maxValue / interval) * interval);
+
+    if (max - maxValue < interval * 0.15) {
+      max += interval;
     }
 
     return {
       interval,
-      max: Math.max(interval * 4, this.getRoundedAxisMax([maxValue], interval, interval))
+      max
     };
   }
 

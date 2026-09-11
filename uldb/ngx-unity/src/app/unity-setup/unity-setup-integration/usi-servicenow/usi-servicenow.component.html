@@ -35,6 +35,7 @@
                 <tr>
                   <th> Account Name</th>
                   <th>User Name</th>
+                  <th>Client Id</th>
                   <th>Instance URL</th>
                   <th class="text-center">ITSM</th>
                   <th class="text-center">CMDB</th>
@@ -45,33 +46,36 @@
                 </tr>
               </thead>
               <tbody>
-                <tr setTableColumnWidth *ngFor="let view of viewData">
-                  <td class="text-primary pointer-link">
+                <tr *ngFor="let view of viewData; trackBy: trackByServiceNow" truncateText>
+                  <td class="text-primary pointer-link tdw-18">
                     <div [tooltip]="view.name">{{view.name}}</div>
                   </td>
-                  <td>
-                    <div class="text-capitalize" [tooltip]="view.username">{{view.username}}</div>
+                  <td class="tdw-12">
+                    <div class="text-capitalize" [tooltip]="view.username">{{view.username || 'NA'}}</div>
                   </td>
-                  <td>
+                  <td class="tdw-15">
+                    <div [tooltip]="view.clientId">{{view.clientId || 'NA'}}</div>
+                  </td>
+                  <td class="tdw-25">
                     <div [tooltip]="view.instanceUrl">{{view.instanceUrl}}</div>
                   </td>
-                  <td class="text-center">
+                  <td class="text-center tdw-5">
                     <div *ngIf="view.isItsm" class="fas fa-check"></div>
                   </td>
 
-                  <td class="text-center">
+                  <td class="text-center tdw-5">
                     <div *ngIf="view.isCmdb" class="fas fa-check"></div>
                   </td>
 
-                  <td class="text-center">
+                  <td class="text-center tdw-5">
                     <div *ngIf="view.isIRE" class="fas fa-check"></div>
                   </td>
 
-                  <td class="text-center">
+                  <td class="text-center tdw-8">
                     <div *ngIf="view.allowDelete" class="fas fa-check"></div>
                   </td>
 
-                  <td class="text-center">
+                  <td class="text-center tdw-7">
                     <div *ngIf="view.isDefault" class="fas fa-check"></div>
                   </td>
 

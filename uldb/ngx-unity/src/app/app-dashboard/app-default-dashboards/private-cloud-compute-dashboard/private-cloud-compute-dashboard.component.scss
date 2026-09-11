@@ -655,6 +655,14 @@
   color: #444;
 }
 
+:host ::ng-deep .private-cloud-host-tooltip .tooltip-inner {
+  max-width: 320px;
+  overflow-wrap: anywhere;
+  text-align: left;
+  white-space: normal;
+  word-break: normal;
+}
+
 .distribution-progress {
   flex: 1;
   padding: 0 12px;

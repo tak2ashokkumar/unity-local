@@ -302,6 +302,39 @@ export class PrivateCloudComputeDashboardService {
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getDefaultPieChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
+    const colors = [
+      '#1f66ad',
+      '#20a77a',
+      '#f5a623',
+      '#e54b4b',
+      '#3a8dde',
+      '#8b7cf6',
+      '#14b8a6',
+      '#f97316',
+      '#84cc16',
+      '#ec4899',
+      '#06b6d4',
+      '#eab308',
+      '#22c55e',
+      '#a855f7',
+      '#f43f5e',
+      '#0ea5e9',
+      '#f59e0b',
+      '#10b981',
+      '#8b5cf6',
+      '#d946ef',
+      '#2dd4bf',
+      '#fb7185',
+      '#4f46e5',
+      '#65a30d',
+      '#5b4bb7',
+      '#0891b2',
+      '#ef4444',
+      '#7c3aed',
+      '#16a34a',
+      '#dc2626'
+    ];
+    const getColor = (index: number) => colors[index] || `hsl(${(index * 137.508) % 360}, 70%, 48%)`;
 
     view.options = {
       ...view.options,
@@ -359,8 +392,9 @@ export class PrivateCloudComputeDashboardService {
             value: item.percentage,
             name: item.os,
             count: item.count,
+            color: getColor(index),
             itemStyle: {
-              color: index === 0 ? '#1f66ad' : '#5b4bb7'
+              color: getColor(index)
             }
           })),
 

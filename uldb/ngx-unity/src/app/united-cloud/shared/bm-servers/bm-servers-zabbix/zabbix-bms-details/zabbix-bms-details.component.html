@@ -437,6 +437,20 @@
                                         formControlName="end_of_life" readonly formControlNameDateFormatter>
                                 </div>
                             </div>
+
+                            <div class="form-group row">
+                                <label for="last_updated" class="col-3 col-form-label">Last Updated</label>
+                                <div class="col-9">
+                                    <owl-date-time #last_updated [hour12Timer]="true"
+                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                    <input class="form-control rounded-left" formControlName="last_updated"
+                                        [owlDateTimeTrigger]="last_updated" [owlDateTime]="last_updated" type="text"
+                                        name="last_updated" [max]="now"
+                                        [class.is-invalid]="metaDataFormErrors.last_updated">
+                                    <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.last_updated">
+                                        {{metaDataFormErrors.last_updated}}</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group row">
@@ -459,6 +473,14 @@
                             </div>
 
                             <div class="form-group row">
+                                <label for="memory_gb" class="col-3 col-form-label">Memory(GB)</label>
+                                <div class="col-9">
+                                    <input id="memory_gb" class="form-control" type="number" formControlName="memory_gb"
+                                        readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
                                 <label for="fan" class="col-3 col-form-label">Fan</label>
                                 <div class="col-9">
                                     <input id="fan" class="form-control" type="number" formControlName="fan"
@@ -467,8 +489,6 @@
                                         {{metaDataFormErrors.fan}}</div>
                                 </div>
                             </div>
-
-
 
                             <div class="form-group row">
                                 <label for="available_storage" class="col-3 col-form-label">Available
@@ -483,19 +503,6 @@
                                 </div>
                             </div>
 
-                            <div class="form-group row">
-                                <label for="last_updated" class="col-3 col-form-label">Last Updated</label>
-                                <div class="col-9">
-                                    <owl-date-time #last_updated [hour12Timer]="true"
-                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
-                                    <input class="form-control rounded-left" formControlName="last_updated"
-                                        [owlDateTimeTrigger]="last_updated" [owlDateTime]="last_updated" type="text"
-                                        name="last_updated" [max]="now"
-                                        [class.is-invalid]="metaDataFormErrors.last_updated">
-                                    <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.last_updated">
-                                        {{metaDataFormErrors.last_updated}}</div>
-                                </div>
-                            </div>
                             <div class="form-group row">
                                 <label for="end_of_service" class="col-3 col-form-label">E-O-S</label>
                                 <div class="col-9">

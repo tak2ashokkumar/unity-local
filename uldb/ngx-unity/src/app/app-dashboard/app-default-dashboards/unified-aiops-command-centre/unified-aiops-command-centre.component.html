@@ -511,7 +511,7 @@
                         <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
                             (click)="openDatabaseMonitoring()" [tooltip]="'Open linked page'" placement="top"
                             container="body">
-                            Database Monitoring <i class="fa fa-link"></i>
+                            Databases <i class="fa fa-link"></i>
                         </button>
                     </div>
                     <div class="dashboard-card table-card monitoring-table-card database-monitoring-card">
@@ -545,7 +545,7 @@
                     </div>
                 </div>
                 <div class="orphaned-widget-col" *ngIf="hasOsRows">
-                    <div class="subsection-title orphaned-widget-title">OS Monitoring</div>
+                    <div class="subsection-title orphaned-widget-title">Operating Systems</div>
                     <div class="dashboard-card table-card monitoring-table-card os-monitoring-card">
                         <app-spinner [name]="loaderNames.os" [width]="0"></app-spinner>
                         <div class="monitoring-table-scroll">

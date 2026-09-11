@@ -150,6 +150,7 @@ export interface VirtualMachineDetails {
     last_rebooted: string;
     vcpu_count: number;
     memory: number;
+    memory_gb?: number | string;
     storage: number;
     firmware_version: string;
     last_updated: string;

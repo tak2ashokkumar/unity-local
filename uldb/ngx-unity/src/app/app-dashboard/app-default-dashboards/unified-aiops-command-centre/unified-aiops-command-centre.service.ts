@@ -1507,7 +1507,7 @@ export class UnifiedAiopsCommandCentreService {
    */
 
   /*
-   * -----Start----- Database and OS Monitoring Widgets Related -------------------
+   * -----Start----- Database and Operating Systems Widgets Related -------------------
    */
   getDatabaseRows(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsTableRow[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_DATABASE_MONITORING_ENDPOINT, criteria).pipe(map(res => this.getDatabaseMonitoringRows(res)));
@@ -1606,7 +1606,7 @@ export class UnifiedAiopsCommandCentreService {
     return Array.isArray(payload?.results) && !payload.results.length;
   }
   /*
-   * ******End ****** Database and OS Monitoring Widgets Related ********************
+   * ******End ****** Database and Operating Systems Widgets Related ********************
    */
 
   /*

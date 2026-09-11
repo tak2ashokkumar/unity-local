@@ -355,6 +355,7 @@ export class ZabbixBmsDetailsComponent implements OnInit, OnDestroy {
   manageMetaDataForm() {
     if (this.metaDataForm.disabled) {
       this.metaDataForm.enable({ emitEvent: false });
+      this.metaDataForm.get('memory_gb')?.disable({ emitEvent: false });
     } else {
       this.metaDataForm.disable({ emitEvent: false });
     }

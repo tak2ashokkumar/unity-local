@@ -216,6 +216,7 @@ export class ZabbixVmsDetailsService {
     let form = this.builder.group({
       // 'cpu': [d.vcpus, d.vcpus ? [Validators.required, Validators.pattern("^[0-9]*$"), Validators.min(1), NoWhitespaceValidator] : [Validators.pattern("^[0-9]*$"), Validators.min(1), NoWhitespaceValidator]],
       'cpu_core': [d.cpu_core, d.cpu_core ? [Validators.required, Validators.pattern("^[0-9]*$"), Validators.min(1), NoWhitespaceValidator] : [Validators.pattern("^[0-9]*$"), Validators.min(1), NoWhitespaceValidator]],
+      'memory_gb': [d.memory_gb],
       // 'memory': [d.memory, d.memory ? [Validators.required, Validators.pattern("^[0-9]*$"), Validators.min(1), NoWhitespaceValidator] : [Validators.pattern("^[0-9]*$"), Validators.min(1), NoWhitespaceValidator]],
       // 'storage': [d.storage, d.storage ? [Validators.required, Validators.pattern("^[0-9]*$"), Validators.min(1), NoWhitespaceValidator] : [Validators.pattern("^[0-9]*$"), Validators.min(1), NoWhitespaceValidator]],
       'firmware_version': [d.firmware_version, [NoWhitespaceValidator]],
@@ -308,6 +309,7 @@ export class ZabbixVmsDetailsService {
       'vcpus': '',
       'cpu_core': '',
       'memory': '',
+      'memory_gb': '',
       'guest_memory': '',
       'available_memory': '',
       'used_memory': '',

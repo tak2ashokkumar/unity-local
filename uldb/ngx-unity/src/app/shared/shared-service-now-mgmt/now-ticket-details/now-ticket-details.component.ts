@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import { NowTicketDetailsService, ServiceNowTicketDetailsViewData, ServiceNowAttachmentViewdata, ServiceNowCommentViewdata } from './now-ticket-details.service';
+import { NowTicketDetailsService, ServiceNowTicketDetailsViewData, ServiceNowAttachmentViewdata, ServiceNowCommentViewdata, ServiceNowWorklogViewdata } from './now-ticket-details.service';
 import { AppUtilityService } from '../../app-utility/app-utility.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { AppNotificationService } from '../../app-notification/app-notification.service';
@@ -24,11 +24,16 @@ export class NowTicketDetailsComponent implements OnInit {
   details: ServiceNowTicketDetailsViewData = new ServiceNowTicketDetailsViewData();
   attachments: ServiceNowAttachmentViewdata[] = [];
   comments: ServiceNowCommentViewdata[] = [];
+  worklogs: ServiceNowWorklogViewdata[] = [];
   instanceId: string;
   commentPostedLoader: boolean = true;
+  worklogPostedLoader: boolean = true;
   commentForm: FormGroup;
+  worklogForm: FormGroup;
   formErrors: any;
   validationMessages: any;
+  worklogFormErrors: any;
+  worklogValidationMessages: any;
   constructor(private detailsService: NowTicketDetailsService,
     private router: Router,
     private utilService: AppUtilityService,
@@ -50,6 +55,7 @@ export class NowTicketDetailsComponent implements OnInit {
     this.getTicketDetails();
     this.getAttachments();
     this.getComments();
+    this.getWorklogs();
   }
 
   ngOnDestroy() {
@@ -88,6 +94,18 @@ export class NowTicketDetailsComponent implements OnInit {
     });
   }
 
+  getWorklogs() {
+    this.detailsService.getWorklogs(this.instanceId, this.ticketId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.worklogs = this.detailsService.convertToWorklogViewData(res);
+      if (this.worklogPostedLoader) {
+        this.worklogPostedLoader = false;
+      }
+    }, (err: Error) => {
+      this.worklogPostedLoader = false;
+      this.notificationService.error(new Notification('Error while loading worklogs'));
+    });
+  }
+
   goBack() {
     this.router.navigate(['../../'], { relativeTo: this.route });
   }
@@ -102,6 +120,18 @@ export class NowTicketDetailsComponent implements OnInit {
     this.commentForm = null;
     this.formErrors = null;
     this.validationMessages = null;
+  }
+
+  addWorklog() {
+    this.worklogForm = this.detailsService.buildWorklogForm();
+    this.worklogFormErrors = this.detailsService.resetWorklogFormErrors();
+    this.worklogValidationMessages = this.detailsService.worklogValidationMessages;
+  }
+
+  cancelWorklog() {
+    this.worklogForm = null;
+    this.worklogFormErrors = null;
+    this.worklogValidationMessages = null;
   }
 
   onSubmit() {
@@ -121,6 +151,28 @@ export class NowTicketDetailsComponent implements OnInit {
       }, err => {
         this.cancelComment();
         this.notificationService.error(new Notification('Error while posting ticket comment.'));
+        this.spinner.stop('main');
+      });
+    }
+  }
+
+  onSubmitWorklog() {
+    if (this.worklogForm.invalid) {
+      this.worklogFormErrors = this.utilService.validateForm(this.worklogForm, this.worklogValidationMessages, this.worklogFormErrors);
+      this.worklogForm.valueChanges
+        .subscribe((data: any) => { this.worklogFormErrors = this.utilService.validateForm(this.worklogForm, this.worklogValidationMessages, this.worklogFormErrors); });
+      return;
+    } else {
+      this.spinner.start('main');
+      this.worklogFormErrors = this.detailsService.resetWorklogFormErrors();
+      this.detailsService.postWorklog(this.instanceId, this.ticketId, this.details.type, this.worklogForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+        this.worklogPostedLoader = true;
+        this.cancelWorklog();
+        this.getWorklogs();
+        this.spinner.stop('main');
+      }, err => {
+        this.cancelWorklog();
+        this.notificationService.error(new Notification('Error while posting ticket worklog.'));
         this.spinner.stop('main');
       });
     }
