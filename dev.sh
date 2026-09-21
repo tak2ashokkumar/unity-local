@@ -162,7 +162,7 @@ mock-mtp() {
 
 
 # =====================================================================
-#  SF     ->  https://unity.unitedlayer.com
+#  SF     ->  https://cerne.unityone.ai
 # ---------------------------------------------------------------------
 #  LIVE data. Reads AND writes hit the real system.
 #  Requires a session in tools/proxy/.cookie-sf

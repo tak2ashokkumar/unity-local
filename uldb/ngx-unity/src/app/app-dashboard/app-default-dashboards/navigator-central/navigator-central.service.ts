@@ -34,6 +34,7 @@ import {
   UNIFIED_AIOPS_IDLE_DURATION_COLORS,
   UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT,
   UNIFIED_AIOPS_LIFECYCLE_SANKEY_NODE_ORDER,
+  UNIFIED_AIOPS_SOURCE_SANKEY_SEVERITY_ORDER,
   UNIFIED_AIOPS_OS_MONITORING_ENDPOINT,
   UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS,
   UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
@@ -392,6 +393,9 @@ export class NavigatorCentralService {
 
   private buildExecGroup(response: any, summary: any, group: UnifiedAiopsExecGroupConfig): UnifiedAiopsExecGroup {
     const container = this.resolveExecObject(response, summary, group.containerKeys);
+    if (group.dynamicCards) {
+      return this.buildExecDynamicGroup(response, summary, group, container);
+    }
     let cards: UnifiedAiopsExecStatusCard[] = (group.cards || []).map(cardConfig => {
       let payload = this.getExecPayloadByKeys(container, cardConfig.payloadKeys);
       if (payload === undefined || payload === null) {
@@ -435,6 +439,61 @@ export class NavigatorCentralService {
       cards,
       tiles
     };
+  }
+
+  // Builds a group whose cards come straight from the API payload (e.g. Datacenter and IoTs
+  // datacenter_and_iot -> by_type -> PDU, Sensors), reusing the hero dynamic sub-card builder so the
+  // group renders whatever entries the response contains. Tiles follow the normal group tile config.
+  private buildExecDynamicGroup(response: any, summary: any, group: UnifiedAiopsExecGroupConfig, container: any): UnifiedAiopsExecGroup {
+    // Array-shaped payloads (e.g. by_type: [...]) resolve via cardArrayKeys; an object-map payload
+    // (the live datacenter_and_iot: { pdu: {...}, sensors: {...} }) is flattened straight from the
+    // container so each child key becomes one card - the group renders whatever the API returns.
+    let entries = this.getExecSubCardEntries(container, group.cardArrayKeys, response, summary);
+    if (!entries.length) {
+      entries = this.getExecEntries(container);
+    }
+    if (group.dynamicExcludeKeys && group.dynamicExcludeKeys.length) {
+      entries = entries.filter(entry => !this.matchesExecExcludeKey(entry, group.dynamicExcludeKeys));
+    }
+    if (group.dynamicLabelStrip) {
+      entries = entries.map(entry => ({ ...entry, label: this.stripExecLabelToken(entry, group.dynamicLabelStrip) }));
+    }
+    const cards = this.getExecDynamicSubCardsFromEntries(entries, group.unit, group.dynamicCardLink)
+      .filter(card => this.hasExecStatusCardData(card))
+      .sort((first, second) => first.label.localeCompare(second.label));
+    const tiles: UnifiedAiopsExecTile[] = (group.tiles || [])
+      .map(tileConfig => this.buildExecTile(container, tileConfig))
+      .filter(tile => this.hasExecTileData(tile));
+    return {
+      key: group.key,
+      title: group.title,
+      iconClass: group.iconClass,
+      iconColor: group.iconColor,
+      cards,
+      tiles
+    };
+  }
+
+  // True when a dynamic-group entry is an aggregate/total rollup that should not render as its own card
+  // (its key/name starts with one of the excludeKeys, e.g. total_storage_devices under Storage).
+  private matchesExecExcludeKey(entry: any, excludeKeys: string[]): boolean {
+    const normalized = this.normalizeKey(String(this.getFirstDefinedValue(entry?.key, entry?.name, entry?.label) || ''));
+    return (excludeKeys || []).some(key => {
+      const normalizedKey = this.normalizeKey(key);
+      return !!normalizedKey && (normalized === normalizedKey || normalized.indexOf(normalizedKey) === 0);
+    });
+  }
+
+  // Removes a redundant token from a dynamic-group entry label so the card reads cleanly - e.g. stripping
+  // 'storage' turns netapp_storage into "NetApp" and pure_storage_storage into "Pure". The caller title-cases.
+  private stripExecLabelToken(entry: any, token: string): string {
+    const source = String(this.getFirstDefinedValue(entry?.label, entry?.name, entry?.key) || '');
+    const normalizedToken = String(token || '').toLowerCase();
+    if (!source || !normalizedToken) {
+      return source;
+    }
+    const words = source.split(/[^a-z0-9]+/i).filter(word => !!word && word.toLowerCase() !== normalizedToken);
+    return words.length ? words.join(' ') : source;
   }
 
   private buildExecStatusCard(payload: any, config: { key: string; label: string; iconClass?: string; iconColor?: string; unit?: string; link?: string; badgeText?: string; badgeClass?: string }): UnifiedAiopsExecStatusCard {
@@ -4040,10 +4099,13 @@ export class NavigatorCentralService {
     type SankeyLink = { source: string; target: string; value: number; count?: number; lineStyle?: { color: string; opacity: number } };
     const links: SankeyLink[] = [];
     const nodeTotals: { [name: string]: number } = {};
-    // Seed downstream node colors from the curated palette; severity tiles add their own colors below.
-    const nodeColors: { [name: string]: string } = { ...UNIFIED_AIOPS_SANKEY_NODE_COLORS };
+    // Seed downstream node colors from the curated palette; source tiles add their own colour (a severity
+    // gradient object) below, so the map holds either a colour string or an ECharts gradient descriptor.
+    const nodeColors: { [name: string]: any } = { ...UNIFIED_AIOPS_SANKEY_NODE_COLORS };
     // Severity tiles render the source name only on the topmost existing tile; others stay blank
     const nodeLabels: { [name: string]: string } = {};
+    // Per-source severity split, surfaced in the tooltip for that source node / its flow into Events.
+    const nodeSeverities: { [name: string]: { critical: number; warning: number; info: number } } = {};
 
     const totals = this.flattenPayload(this.getPayloadByKeys(response, ['totals']) || {});
     const conditions = this.flattenPayload(this.getPayloadByKeys(response, ['conditions']) || {});
@@ -4086,31 +4148,19 @@ export class NavigatorCentralService {
       const hasSeverity = criticalCount > 0 || warningCount > 0 || infoCount > 0;
 
       if (hasSeverity) {
-        // Scenario A: severity data present - one tile per non-zero severity (Critical / Warning / Info).
-        const severityTotal = Math.max(criticalCount + warningCount + infoCount, 1);
-        const clampedGroup = Math.min(Math.max(severityTotal, minGroupValue), maxGroupValue);
-
-        const severities = [
-          { suffix: 'Critical', count: criticalCount },
-          { suffix: 'Warning',  count: warningCount },
-          { suffix: 'Info',     count: infoCount }
-        ].filter(severity => severity.count > 0);
-
-        // One label per source, carrying the source's total, placed on the MIDDLE tile so it reads as a
-        // label for the whole group instead of sitting against the topmost severity. Tiles are only a few
-        // pixels tall next to the 30px nodeGap, so the group's visual centre is the middle tile by index.
-        const sourceTotal = severities.reduce((total, severity) => total + severity.count, 0);
-        const labelIndex = Math.floor((severities.length - 1) / 2);
-
-        severities.forEach(({ suffix, count }, index) => {
-          const nodeName = `${sourceName} :: ${suffix}`;
-          const color = SEVERITY_COLORS[suffix];
-          const tileValue = (count / severityTotal) * clampedGroup;
-          nodeColors[nodeName] = color;
-          nodeTotals[nodeName] = count;
-          nodeLabels[nodeName] = index === labelIndex ? `${sourceName}\n(${this.formatNumber(sourceTotal)})` : '';
-          links.push({ source: nodeName, target: 'Events', value: tileValue, count, lineStyle: { color, opacity: 0.35 } });
-        });
+        // Scenario A: severity data present - render ONE tile per source, filled with a vertical gradient
+        // split into Critical / Warning / Info bands (sized to their counts, hard colour stops). A single
+        // source reads as one 3-colour tile, and the normal nodeGap keeps the distance between sources.
+        // The tile's headline number is the source's EVENTS count (this column feeds the Events node).
+        const clampedValue = Math.min(Math.max(totalSourceEvents, minGroupValue), maxGroupValue);
+        nodeTotals[sourceName] = totalSourceEvents;
+        nodeSeverities[sourceName] = { critical: criticalCount, warning: warningCount, info: infoCount };
+        nodeColors[sourceName] = this.buildSeveritySankeyGradient(criticalCount, warningCount, infoCount, SEVERITY_COLORS);
+        // The single flow ribbon is tinted by the source's dominant severity so it still hints at the makeup.
+        const dominantColor = criticalCount >= warningCount && criticalCount >= infoCount
+          ? SEVERITY_COLORS.Critical
+          : (warningCount >= infoCount ? SEVERITY_COLORS.Warning : SEVERITY_COLORS.Info);
+        links.push({ source: sourceName, target: 'Events', value: clampedValue, count: totalSourceEvents, lineStyle: { color: dominantColor, opacity: 0.3 } });
       } else {
         // Scenario B: no severity data  single node per source, gradient flow
         // Skip zero-count entries (the view_by breakdown lists every known source, even with no events).
@@ -4143,7 +4193,7 @@ export class NavigatorCentralService {
     this.addSankeyLink(links, 'Conditions', 'Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_generated', 'ticketGenerated']));
     this.addSankeyLink(links, 'Conditions', 'No Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_not_generated', 'ticketNotGenerated']));
 
-    return this.getSankeyOptions(links, nodeTotals, nodeColors, nodeLabels);
+    return this.getSankeyOptions(links, nodeTotals, nodeColors, nodeLabels, 0, UNIFIED_AIOPS_SOURCE_SANKEY_SEVERITY_ORDER, nodeSeverities);
   }
 
   private getAlertLifecycleSankeyOptionsFromPayload(response: any): EChartsOption {
@@ -4203,13 +4253,53 @@ export class NavigatorCentralService {
     links.push({ source, target, value });
   }
 
+  // Builds a vertical (top -> bottom) ECharts linear-gradient with HARD colour stops for the Critical /
+  // Warning / Info bands, sized to their counts, so one source node reads as a single tile split into three
+  // solid colour segments. Zero-count severities are skipped; an all-zero source falls back to a flat colour.
+  private buildSeveritySankeyGradient(critical: number, warning: number, info: number, colors: { [key: string]: string }): any {
+    const total = critical + warning + info;
+    if (total <= 0) {
+      return colors.Info;
+    }
+    const colorStops: Array<{ offset: number; color: string }> = [];
+    let offset = 0;
+    const addBand = (value: number, color: string) => {
+      if (value <= 0) {
+        return;
+      }
+      colorStops.push({ offset, color });
+      offset = Math.min(offset + value / total, 1);
+      colorStops.push({ offset, color });
+    };
+    addBand(critical, colors.Critical);
+    addBand(warning, colors.Warning);
+    addBand(info, colors.Info);
+    return { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops };
+  }
+
+  // Renders the Critical / Warning / Info rows (with matching colour dots) appended under a source tile's
+  // tooltip. Returns an empty string for nodes / edges that carry no severity split.
+  private buildSankeySeverityTooltip(severity?: { critical: number; warning: number; info: number }): string {
+    if (!severity) {
+      return '';
+    }
+    const row = (label: string, value: number, color: string) =>
+      `<div style="display:flex;align-items:center;gap:6px;margin-top:3px;">` +
+      `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${color};"></span>` +
+      `<span>${label}: <strong>${this.formatNumber(Math.round(this.getNumberValue(value)))}</strong></span></div>`;
+    return row('Critical', severity.critical, UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical) +
+      row('Warning', severity.warning, UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.warning) +
+      row('Info', severity.info, UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.info);
+  }
+
   private getSankeyOptions(
     links: Array<{ source: string; target: string; value: number; count?: number; lineStyle?: { color: string; opacity: number } }>,
     nodeTotals: { [name: string]: number } = {},
-    nodeColors: { [name: string]: string } = {},
+    nodeColors: { [name: string]: any } = {},
     nodeLabels: { [name: string]: string } = {},
     layoutIterations: number = 0,
-    nodeOrder: string[] = []
+    nodeOrder: string[] = [],
+    nodeSeverities: { [name: string]: { critical: number; warning: number; info: number } } = {}
   ): EChartsOption {
     if (!links.length) {
       return {};
@@ -4305,10 +4395,14 @@ export class NavigatorCentralService {
         formatter: (params: any) => {
           const data = params?.data || {};
           const count = this.formatNumber(Math.round(this.getNumberValue(data.count)));
-          if (params?.dataType === 'edge') {
-            return `${this.escapeTooltipText(data.source)} &rarr; ${this.escapeTooltipText(data.target)}: <strong>${count}</strong>`;
+          const isEdge = params?.dataType === 'edge';
+          // A source tile (and its flow into Events) carries a severity split - append it below the headline.
+          const severity = isEdge ? nodeSeverities[data.source] : nodeSeverities[data.name];
+          const severityHtml = this.buildSankeySeverityTooltip(severity);
+          if (isEdge) {
+            return `${this.escapeTooltipText(data.source)} &rarr; ${this.escapeTooltipText(data.target)}: <strong>${count}</strong>${severityHtml}`;
           }
-          return `${this.escapeTooltipText(data.name)}: <strong>${count}</strong>`;
+          return `${this.escapeTooltipText(data.name)}: <strong>${count}</strong>${severityHtml}`;
         }
       },
       series: [{

@@ -116,7 +116,8 @@
                         </ng-container>
                     </div>
 
-                    <div class="exec-group" *ngFor="let group of view.groups; trackBy: trackByIndex">
+                    <div class="exec-group" [ngClass]="'exec-group-' + group.key"
+                        *ngFor="let group of view.groups; trackBy: trackByIndex">
                         <div class="exec-group-title">
                             <i [ngClass]="group.iconClass" [style.color]="group.iconColor"></i>
                             <span>{{group.title}}</span>
@@ -1255,15 +1256,16 @@
                     </div>
                 </div>
                 <div class="sankey-grid" *ngIf="hasAlertSourceSankey || hasAlertLifecycleSankey">
-                    <div class="sankey-panel">
+                    <div class="sankey-panel sankey-source-panel">
                         <div echarts [options]="alertSourceSankeyOptions" (chartInit)="onAlertSankeyChartInit($event)"
-                            class="sankey-chart linked-chart" *ngIf="hasChartData(alertSourceSankeyOptions)"></div>
+                            class="sankey-chart linked-chart" [style.height.px]="alertSourceSankeyHeight"
+                            *ngIf="hasChartData(alertSourceSankeyOptions)"></div>
                         <div class="dashboard-empty-state sankey-empty"
                             *ngIf="!widgetLoading.alertSourceSankey && !hasChartData(alertSourceSankeyOptions)">
                             No data available
                         </div>
                     </div>
-                    <div class="sankey-panel">
+                    <div class="sankey-panel sankey-lifecycle-panel">
                         <div echarts [options]="alertLifecycleSankeyOptions"
                             (chartInit)="onAlertSankeyChartInit($event)" class="sankey-chart linked-chart"
                             *ngIf="hasChartData(alertLifecycleSankeyOptions)"></div>

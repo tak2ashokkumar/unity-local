@@ -58,7 +58,7 @@
   tools/proxy/server.js. Do not set it by hand; use the dev.sh group for that
   environment (see Command Execution Rules).
       mock   local mock API on :3001   (tools/mock-api JSON files)   [default, safe]
-      sf     https://unity.unitedlayer.com        (named after the site; was "prod")
+      sf     https://cerne.unityone.ai        (named after the site; was "prod")
       ams    http://unity-ams.unitedlayer.com
       play   https://play.unityone.ai
       alpha  https://alpha.unityone.ai

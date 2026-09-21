@@ -12,7 +12,7 @@ const app = express();
  *  Pick an environment with API_ENV (default "mock"):
  *
  *      API_ENV=mock    local mock API on :3001      (tools/mock-api JSON files)
- *      API_ENV=sf      https://unity.unitedlayer.com      (was "prod"; still accepted)
+ *      API_ENV=sf      https://cerne.unityone.ai      (was "prod"; still accepted)
  *      API_ENV=ams     http://unity-ams.unitedlayer.com
  *      API_ENV=play    https://play.unityone.ai
  *      API_ENV=alpha   https://alpha.unityone.ai
@@ -38,7 +38,7 @@ const app = express();
  * ===================================================================== */
 const API_ENVIRONMENTS = {
   mock:  { label: "Local Mock", url: "http://localhost:3001",            live: false },
-  sf:    { label: "SF",         url: "https://unity.unitedlayer.com",    live: true  },
+  sf:    { label: "SF",         url: "https://cerne.unityone.ai",    live: true  },
   ams:   { label: "AMS",        url: "http://unity-ams.unitedlayer.com", live: true  },
   play:  { label: "Play",       url: "https://play.unityone.ai",         live: true  },
   alpha: { label: "Alpha",      url: "https://alpha.unityone.ai",        live: true  },

@@ -663,6 +663,15 @@ export interface UnifiedAiopsExecGroupConfig {
   cardArrayContainerKeys?: string[];
   cardArrayKeys?: string[];
   cardItems?: UnifiedAiopsExecItemConfig[];
+  // When true, the group's cards are built from whatever entries the API returns under the container
+  // (via cardArrayKeys), like the hero dynamic sub-cards, instead of the fixed cards / cardItems config.
+  dynamicCards?: boolean;
+  // dynamicCards tuning: skip entries whose key/name starts with one of these (aggregate/total rollups),
+  // strip a redundant token from derived labels (e.g. 'storage' -> netapp_storage becomes NetApp), and a
+  // fallback drill-down link applied to every generated card.
+  dynamicExcludeKeys?: string[];
+  dynamicLabelStrip?: string;
+  dynamicCardLink?: string;
   tiles?: UnifiedAiopsExecTileConfig[];
 }
 // -----End----- Navigator Central Executive Summary (redesign) view-model + config -------------------

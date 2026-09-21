@@ -2119,14 +2119,15 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
         firstItem.index - secondItem.index
       );
 
-    while (remaining > 0 && priorities.some(item => spans[item.index] < item.weight)) {
-      priorities.forEach(item => {
-        if (remaining > 0 && spans[item.index] < item.weight) {
-          spans[item.index] += 1;
-          remaining -= 1;
-        }
-      });
-    }
+    // Fill each section up to its target width in priority order (widest-need first) before moving on,
+    // so two equally heavy sections (e.g. Private Cloud and Bare Metal, both 5 sub-cards) get the SAME
+    // width - a lighter section yields the spare column instead of one heavy section staying narrow.
+    priorities.forEach(item => {
+      while (remaining > 0 && spans[item.index] < item.weight) {
+        spans[item.index] += 1;
+        remaining -= 1;
+      }
+    });
 
     while (remaining > 0) {
       priorities.forEach(item => {
@@ -2301,6 +2302,16 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
 
   get hasAlertsSection(): boolean {
     return this.hasAlertMetrics || this.hasAlertSourceSankey || this.hasAlertLifecycleSankey;
+  }
+
+  // The Source Sankey's first column lists every event source, so its height grows with the source count -
+  // the panel then scrolls vertically instead of squashing many sources into a fixed height.
+  get alertSourceSankeyHeight(): number {
+    const series: any = this.alertSourceSankeyOptions?.series;
+    const firstSeries: any = Array.isArray(series) ? series[0] : series;
+    const nodes: any[] = (firstSeries && firstSeries.data) || [];
+    const sourceNodeCount = nodes.filter(node => node?.label?.position === 'left').length;
+    return Math.max(300, sourceNodeCount * 46 + 48);
   }
 
   // Keeps the widget (and its pager) mounted when a page returns no rows, so the user can page back.

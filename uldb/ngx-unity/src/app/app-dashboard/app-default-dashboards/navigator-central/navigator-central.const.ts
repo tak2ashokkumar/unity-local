@@ -46,6 +46,11 @@ export const UNIFIED_AIOPS_SANKEY_NODE_COLORS: { [name: string]: string } = {
 // keeps the ribbons from crossing (Open -> Acknowledged stays above Resolved -> Auto Healed), and holds
 // the duration buckets at 5 / 30 / >30 instead of letting the optimizer sort them by tile height.
 // Names not listed here keep their first-appearance order after the listed ones.
+// Fixed top-to-bottom order for the Source Sankey's first column in the Severity view (where the source
+// nodes ARE the severities): Critical, then Warning, then Information. Applied via getSankeyOptions node
+// order; harmless in the Source view because no source node carries these names.
+export const UNIFIED_AIOPS_SOURCE_SANKEY_SEVERITY_ORDER = ['Critical', 'Warning', 'Information', 'Info'];
+
 export const UNIFIED_AIOPS_LIFECYCLE_SANKEY_NODE_ORDER = [
   'Condition',
   'Open',
@@ -164,12 +169,14 @@ export const UNIFIED_AIOPS_DATACENTER_OPTIONS: UnifiedAiopsFilterOption[] = [
 ];
 
 // Executive Summary redesign (Navigator Central). Two config groups drive the widget:
-//  - UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: the top hero row (Private / Public / Bare Metal / Datacenter
-//    and IoTs). Each hero card reads a status object from the executive-monitoring-summary response
+//  - UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: the top hero row (Private / Public / Bare Metal). Each hero
+//    card reads a status object from the executive-monitoring-summary response
 //    (monitored / discovered + up / down / unknown), optional chips (Orphaned/Retired, Idle VMs), and
 //    fixed or dynamic sub-cards pulled from a by_type / by_provider / by_vendor object on that object.
 //  - UNIFIED_AIOPS_EXECUTIVE_GROUPS: the category rows (Network, Storage, SD-WAN, Database,
-//    Applications, Kubernetes, AI / GPU / LLM). Each group has status cards and/or scalar tiles.
+//    Applications, Kubernetes, AI / GPU / LLM, Datacenter and IoTs). Each group has status cards and/or
+//    scalar tiles. Datacenter and IoTs uses dynamicCards so its cards (PDU, Sensors, ...) come straight
+//    from whatever the API returns under datacenter_and_iot.
 // Status object shape: { discovered, monitored, total, up, down, unknown }. All keys are matched
 // case / separator-insensitively at any depth, so the API may use any of the candidate spellings.
 export const UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: UnifiedAiopsExecCardConfig[] = [
@@ -223,16 +230,6 @@ export const UNIFIED_AIOPS_EXECUTIVE_HERO_CARDS: UnifiedAiopsExecCardConfig[] = 
     link: 'bmservers',
     subArrayKeys: ['baremetal_servers_by_manufacturer', 'baremetalServersByManufacturer', 'by_manufacturer', 'byManufacturer'],
     dynamicSubCards: true
-  },
-  {
-    key: 'datacenter_iot',
-    label: 'Datacenter and IoTs',
-    iconClass: 'fa fa-building-o',
-    iconColor: '#8a6d1b',
-    payloadKeys: ['datacenter_and_iot', 'datacenterAndIot', 'datacenter_and_iots', 'datacenter_iot'],
-    link: 'datacenter',
-    subArrayKeys: ['datacenter_and_iot', 'datacenterAndIot', 'datacenter_and_iots', 'datacenter_iot'],
-    dynamicSubCards: true
   }
 ];
 
@@ -257,11 +254,14 @@ export const UNIFIED_AIOPS_EXECUTIVE_GROUPS: UnifiedAiopsExecGroupConfig[] = [
     iconClass: 'fa fa-hdd-o',
     iconColor: '#3032b4',
     containerKeys: ['storage'],
-    cards: [
-      { key: 'netapp', label: 'NetApp', payloadKeys: ['netapp_storage', 'netapp'], link: 'storage' },
-      { key: 'pure', label: 'Pure', payloadKeys: ['pure_storage', 'pure'], link: 'storage' },
-      { key: 'other_storage', label: 'Other Storage', payloadKeys: ['other_storage', 'otherStorage', 'other'], link: 'storage' }
-    ]
+    // The API returns one entry per storage vendor (netapp_storage, nimble_storage, pure_storage_storage,
+    // unknown_storage, ...) plus a total_storage_devices rollup. Render one card per vendor dynamically so
+    // any vendor the backend adds shows automatically; strip the redundant "storage" token from labels and
+    // drop the total_* rollup (it duplicates the sum of the vendor cards).
+    dynamicCards: true,
+    dynamicExcludeKeys: ['total'],
+    dynamicLabelStrip: 'storage',
+    dynamicCardLink: 'storage'
   },
   {
     key: 'sdwan',
@@ -338,6 +338,19 @@ export const UNIFIED_AIOPS_EXECUTIVE_GROUPS: UnifiedAiopsExecGroupConfig[] = [
       { key: 'vector_dbs', label: 'Vector DBs', keys: ['vector_db_count', 'vectorDbCount', 'vectordb_count'], link: 'vectorDb' },
       { key: 'vdb_query_latency', label: 'VDB Query Lat.', keys: ['vector_db_query_latency', 'vectorDbQueryLatency', 'vdb_query_latency', 'vector_db_latency'], suffix: 'ms', link: 'vectorDb' }
     ]
+  },
+  {
+    // Datacenter and IoTs used to sit in the hero row; it now renders as the last full-width group.
+    // dynamicCards builds one card per entry the API returns under datacenter_and_iot. The live payload
+    // is an object map ({ pdu: {...}, sensors: {...} }) flattened straight from the container; cardArrayKeys
+    // additionally handle an array-shaped payload (by_type: [...]) if the backend ever sends one.
+    key: 'datacenter_iot',
+    title: 'Datacenter and IoTs',
+    iconClass: 'fa fa-building-o',
+    iconColor: '#8a6d1b',
+    containerKeys: ['datacenter_and_iot', 'datacenterAndIot', 'datacenter_and_iots', 'datacenter_iot'],
+    dynamicCards: true,
+    cardArrayKeys: ['by_type', 'byType', 'by_category', 'byCategory']
   }
 ];
 

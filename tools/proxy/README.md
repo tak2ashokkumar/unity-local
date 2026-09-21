@@ -5,7 +5,7 @@
 | Environment | Backend                              | Session file            |
 |-------------|--------------------------------------|-------------------------|
 | `mock`      | http://localhost:3001 (local mock)   | none needed             |
-| `sf`        | https://unity.unitedlayer.com        | `.cookie-sf`            |
+| `sf`        | https://cerne.unityone.ai        | `.cookie-sf`            |
 | `ams`       | http://unity-ams.unitedlayer.com     | `.cookie-ams`           |
 | `play`      | https://play.unityone.ai             | `.cookie-play`          |
 | `alpha`     | https://alpha.unityone.ai            | `.cookie-alpha`         |

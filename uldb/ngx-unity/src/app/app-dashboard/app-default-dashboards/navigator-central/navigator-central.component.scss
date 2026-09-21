@@ -2244,15 +2244,21 @@
   flex: 1 1 auto;
 }
 
+// Both charts get a generous minimum width so they are never compressed; when the widget is narrower than
+// the two of them the grid overflows and scrolls horizontally instead of squeezing the flows.
 .sankey-grid {
   display: grid;
-  grid-template-columns: 1.45fr 1fr;
+  grid-template-columns: minmax(760px, 1.45fr) minmax(620px, 1fr);
   gap: 16px;
   padding: 0 10px 8px 12px;
+  overflow-x: auto;
 }
 
+// A tall Source chart (many event sources) is capped and scrolls vertically within its panel.
 .sankey-panel {
   min-height: 300px;
+  max-height: 520px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
@@ -2985,7 +2991,6 @@
   .performance-chart-grid.adaptive-widget-grid,
   .analytics-health-layout,
   .availability-category-body,
-  .sankey-grid,
   .orphaned-widgets-grid,
   .idle-widgets-grid,
   .remediation-card,
@@ -3537,6 +3542,30 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 8px;
+}
+
+// AI / GPU / LLM: keep the whole group on one row. A no-wrap flex row holds the GPU Hosts card and the
+// tiles on a single line and lets them share the width; the GPU Hosts card grows a bit more so its
+// Up / Down / Unknown status also stays on one line.
+.exec-group-ai_gpu_llm .exec-group-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+
+  > .exec-card,
+  > .exec-tile {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  > .exec-card {
+    flex-grow: 2;
+  }
+
+  .exec-card .exec-status-line {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
 }
 
 .exec-tile {
