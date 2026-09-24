@@ -5,7 +5,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { ChartDataSets } from 'chart.js';
 import * as moment from 'moment';
 import { Observable, forkJoin, of } from 'rxjs';
-import { AIMLAlertCountByDeviceType, AIMLAnalyticsSummary, AIMLCorrelationRule, AIMLEventCountByDeviceType, AIMLNoisyHosts, AIMLSuppressionRule, AIMLTendsByTimeline } from 'src/app/shared/SharedEntityTypes/aiml.type';
+import { AIMLAlertCountByDeviceType, AIMLAnalyticsSummary, AIMLCorrelationRule, AIMLEventCountByDeviceType, AIMLNoisyHosts, AIMLSuppressionRule, AIMLTendsByTimeline, AIMLTendsByTimelineData } from 'src/app/shared/SharedEntityTypes/aiml.type';
 import { DatacenterFast } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import {
@@ -13,8 +13,10 @@ import {
   GET_AIOPS_CONDITION_ANALYTICS_SUMMARY, GET_AIOPS_ALERT_ANALYTICS_COUNT, AIOPS_EVENT_ANALYTICS_TRENDS_BY_TIMELINE,
   GET_AIOPS_EVENT_ANALYTICS_COUNT_BY_TYPE, GET_AIOPS_EVENT_ANALYTICS_NOISY_HOSTS,
 } from 'src/app/shared/api-endpoint.const';
-import { AppUtilityService, DeviceMapping, UnityDeviceType, UnityTimeDuration } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, DeviceMapping, UnityDeviceType } from 'src/app/shared/app-utility/app-utility.service';
 import { ChartConfigService, UnityChartData } from 'src/app/shared/chart-config.service';
+import { DateRangePeriod } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
+import { CUSTOM_DATE_FILTER_DATE_FORMAT } from 'src/app/shared/custom-date-filter/custom-date-filter.type';
 import { UnityChartConfigService, UnityChartDataType, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
@@ -22,6 +24,7 @@ import { AIOPS_DEVICE_TYPES } from '../aiml.component';
 
 @Injectable()
 export class AimlAnalyticsService {
+  private readonly dateFormat = CUSTOM_DATE_FILTER_DATE_FORMAT;
 
   constructor(private http: HttpClient,
     private builder: FormBuilder,
@@ -40,9 +43,9 @@ export class AimlAnalyticsService {
     return this.http.get<DeviceCRUDPrivateCloudFast[]>(PRIVATE_CLOUD_FAST_BY_DC_ID(dcId));
   }
 
-  getForm(timeline: string, type?: string,): FormGroup {
+  getForm(timeline?: string | null, type?: string): FormGroup {
     let form = this.builder.group({
-      'timeline': [timeline, [Validators.required]]
+      'timeline': [timeline || DateRangePeriod.LAST_MONTH, [Validators.required]]
     });
     if (type) {
       form.addControl('type', new FormControl(type, [Validators.required]));
@@ -59,7 +62,9 @@ export class AimlAnalyticsService {
       'datacenters': [[], [Validators.required]],
       'private_clouds': [[], [Validators.required]],
       'device_types': [[], [Validators.required]],
-      'timeline': [UnityTimeDuration.LAST_MONTH, [Validators.required]]
+      'timeline': [DateRangePeriod.LAST_MONTH, [Validators.required]],
+      'start_date': [null],
+      'end_date': [null]
     })
   }
 
@@ -88,7 +93,7 @@ export class AimlAnalyticsService {
   }
 
   getAnalyticsSummary(formData: any) {
-    return this.http.post<AIMLAnalyticsSummary>(GET_AIOPS_CONDITION_ANALYTICS_SUMMARY(), formData);
+    return this.http.post<AIMLAnalyticsSummary>(GET_AIOPS_CONDITION_ANALYTICS_SUMMARY(), this.getDateRangePayload(formData));
   }
 
   convertToSummaryViewdata(summary: AIMLAnalyticsSummary): AIMLAnalyticsSummaryViewData {
@@ -103,7 +108,7 @@ export class AimlAnalyticsService {
   }
 
   getAlertsCountByDeviceType(formData: any) {
-    return this.http.post<AIMLAlertCountByDeviceType[]>(GET_AIOPS_ALERT_ANALYTICS_COUNT(), formData);
+    return this.http.post<AIMLAlertCountByDeviceType[]>(GET_AIOPS_ALERT_ANALYTICS_COUNT(), this.getDateRangePayload(formData));
   }
 
   convertToAlertsCountViewdata(alertData: AIMLAlertCountByDeviceType[]): AIMLAlertsCountByDeviceTypeViewData {
@@ -125,7 +130,7 @@ export class AimlAnalyticsService {
   }
 
   getTrendsByTimeline(formData: any) {
-    return this.http.post<AIMLTendsByTimeline>(AIOPS_EVENT_ANALYTICS_TRENDS_BY_TIMELINE(), formData);
+    return this.http.post<AIMLTendsByTimeline>(AIOPS_EVENT_ANALYTICS_TRENDS_BY_TIMELINE(), this.getDateRangePayload(formData));
   }
 
   getLastNHours(numberOfhours: number): any[] {
@@ -151,8 +156,18 @@ export class AimlAnalyticsService {
     view.type = 'line';
     view.legend = true;
     switch (timeline) {
-      case UnityTimeDuration.LAST_WEEK: view.lables = this.getLastNDays(7); break;
-      case UnityTimeDuration.LAST_MONTH: view.lables = this.getLastNDays(30); break;
+      case DateRangePeriod.LAST_WEEK:
+      case DateRangePeriod.LAST_7_DAYS:
+        view.lables = this.getLastNDays(7);
+        break;
+      case DateRangePeriod.LAST_MONTH:
+      case DateRangePeriod.LAST_30_DAYS:
+        view.lables = this.getLastNDays(30);
+        break;
+      case DateRangePeriod.ALLTIME:
+      case DateRangePeriod.CUSTOM:
+        view.lables = this.getTimelineLabelsFromData(tilimelineData);
+        break;
       default: view.lables = this.getLastNHours(24); break;
     }
     let datalables: string[] = ['condition', 'alerts', 'events'];
@@ -184,7 +199,7 @@ export class AimlAnalyticsService {
   }
 
   getEventsCountByDeviceType(formData: any) {
-    return this.http.post<AIMLEventCountByDeviceType[]>(GET_AIOPS_EVENT_ANALYTICS_COUNT_BY_TYPE(), formData);
+    return this.http.post<AIMLEventCountByDeviceType[]>(GET_AIOPS_EVENT_ANALYTICS_COUNT_BY_TYPE(), this.getDateRangePayload(formData));
   }
 
   convertToEventsCountByDeviceTypeChartData(eventData: AIMLEventCountByDeviceType[]): UnityChartDetails {
@@ -202,7 +217,7 @@ export class AimlAnalyticsService {
   }
 
   getNoisyHosts(formData: any) {
-    return this.http.post<AIMLNoisyHosts[]>(GET_AIOPS_EVENT_ANALYTICS_NOISY_HOSTS(), formData);
+    return this.http.post<AIMLNoisyHosts[]>(GET_AIOPS_EVENT_ANALYTICS_NOISY_HOSTS(), this.getDateRangePayload(formData));
   }
 
   convertToNoisyHostsListData(hosts: AIMLNoisyHosts[]): AIMLNoisyHostsData[] {
@@ -258,9 +273,9 @@ export class AimlAnalyticsService {
     return view;
   }
 
-  getRules(ruleType: string, formData: string) {
+  getRules(ruleType: string, formData: any) {
     let url = ruleType == AIMLRulesViewTypes.SUPPRESSION ? AIOPS_ANALYTICS_SUPPRESSION_RULES() : AIOPS_ANALYTICS_CORRELATION_RULES();
-    return this.http.post<AIMLSuppressionRule[] | AIMLCorrelationRule[]>(url, formData);
+    return this.http.post<AIMLSuppressionRule[] | AIMLCorrelationRule[]>(url, this.getDateRangePayload(formData));
   }
 
   convertToAIMLRulesViewData(rules: AIMLSuppressionRule[] | AIMLCorrelationRule[]): AIMLRuleData[] {
@@ -297,16 +312,93 @@ export class AimlAnalyticsService {
     })
     return viewData;
   }
+
+  getDateRangeParamsByTimeline(timeline?: string | null, from?: string | Date | null, to?: string | Date | null): AIMLAnalyticsDateRangeParams {
+    const now = moment();
+    let startDate: moment.Moment;
+    let endDate: moment.Moment;
+
+    switch (timeline) {
+      case DateRangePeriod.LAST_24_HOURS:
+        startDate = now.clone().subtract(1, 'd');
+        endDate = now.clone().subtract(1, 'm');
+        break;
+      case DateRangePeriod.LAST_WEEK:
+      case DateRangePeriod.LAST_1_WEEK:
+      case DateRangePeriod.LAST_7_DAYS:
+        startDate = now.clone().subtract(7, 'days').startOf('day');
+        endDate = now.clone().endOf('day');
+        break;
+      case DateRangePeriod.LAST_MONTH:
+      case DateRangePeriod.LAST_30_DAYS:
+        startDate = now.clone().subtract(30, 'days').startOf('day');
+        endDate = now.clone().endOf('day');
+        break;
+      case DateRangePeriod.ALLTIME:
+        return { start_date: null, end_date: null };
+      case DateRangePeriod.CUSTOM:
+        startDate = moment(from);
+        endDate = moment(to);
+        break;
+      default:
+        return { start_date: null, end_date: null };
+    }
+
+    if (!startDate.isValid() || !endDate.isValid()) {
+      return { start_date: null, end_date: null };
+    }
+
+    return {
+      start_date: this.formatDateParam(startDate),
+      end_date: this.formatDateParam(endDate)
+    };
+  }
+
+  private getDateRangePayload(formData: any): any {
+    const payload = Object.assign({}, formData);
+    const dateRange = this.getDateRangeParamsByTimeline(payload?.timeline, payload?.start_date, payload?.end_date);
+    payload.timeline = null;
+    payload.start_date = dateRange.start_date;
+    payload.end_date = dateRange.end_date;
+    return payload;
+  }
+
+  private formatDateParam(value: moment.Moment): string {
+    return value.clone().format(this.dateFormat);
+  }
+
+  private getTimelineLabelsFromData(timelineData: AIMLTendsByTimeline): string[] {
+    const labelPoints = ['condition', 'alerts', 'events']
+      .map(key => timelineData?.[key] || [])
+      .find(points => points.length);
+
+    return labelPoints?.length
+      ? labelPoints.map(point => this.formatTimelineLabel(point))
+      : this.getLastNHours(24);
+  }
+
+  private formatTimelineLabel(point: AIMLTendsByTimelineData): string {
+    const rawDate = point?.start_time || point?.end_time;
+    const date = moment(rawDate);
+    return date.isValid() ? date.format('DD-MMM HH:mm') : String(rawDate || '');
+  }
 }
 
 export class AnalyticsFilterFormData {
   datacenters: string[];
   private_clouds: string[];
   device_types: string[];
-  timeline: string;
+  timeline: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
   type?: string;
   count?: number;
   search?: string;
+}
+
+export interface AIMLAnalyticsDateRangeParams {
+  start_date: string | null;
+  end_date: string | null;
 }
 
 export class AIMLAnalyticsSummaryViewData {

@@ -11,6 +11,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { UnityDeviceType, UnityTimeDuration } from 'src/app/shared/app-utility/app-utility.service';
+import { DateRangeOption, DateRangePeriod, DateRangeSubmitPayload } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
 import { AIMLSummaryAlertsCountViewData } from '../../aiml-summary/aiml-summary.service';
 import { AimlAnalyticsEventsService } from '../aiml-analytics-events/aiml-analytics-events.service';
@@ -71,7 +72,13 @@ export class AimlAnalyticsComponent implements OnInit, OnDestroy {
     showCheckAll: true,
     showUncheckAll: true
   };
+  readonly timelineDropdownOptions: DateRangeOption[] = [
+    { label: 'Last 24 Hours', value: UnityTimeDuration.LAST_24_HOURS },
+    { label: 'Last Week', value: UnityTimeDuration.LAST_WEEK },
+    { label: 'Last Month', value: UnityTimeDuration.LAST_MONTH }
+  ];
   duration = UnityTimeDuration;
+  timelineDropdownDefault: string | DateRangeOption = UnityTimeDuration.LAST_MONTH;
 
   summaryData: AIMLAnalyticsSummaryViewData = new AIMLAnalyticsSummaryViewData();
   alertsData: AIMLSummaryAlertsCountViewData = new AIMLSummaryAlertsCountViewData();
@@ -132,6 +139,7 @@ export class AimlAnalyticsComponent implements OnInit, OnDestroy {
     this.filterForm = this.svc.buildFilterForm(this.datacenters, this.deviceTypes);
     this.filterFormErrors = this.svc.resetFilterFormErrors();
     this.filterFormData = this.filterForm.getRawValue();
+    this.timelineDropdownDefault = this.getTimelineDropdownDefault(this.filterFormData);
     this.getPrivateCloudsByDC();
 
     this.handleFormSubscriptions();
@@ -139,17 +147,22 @@ export class AimlAnalyticsComponent implements OnInit, OnDestroy {
   }
 
   handleWidgetForms() {
+    this.filterFormData = this.filterForm.getRawValue();
     if (this.trendByTimelineViewData) {
-      this.trendByTimelineViewData.form = _clone(this.svc.getForm(this.filterFormData.timeline, 'all'));
+      const timeline = this.getWidgetTimeline(this.filterFormData.timeline, this.trendByTimelineViewData.form?.get('timeline')?.value);
+      this.trendByTimelineViewData.form = _clone(this.svc.getForm(timeline, 'all'));
     }
     if (this.eventCountByDeviceTypeViewData) {
-      this.eventCountByDeviceTypeViewData.form = _clone(this.svc.getForm(this.filterFormData.timeline));
+      const timeline = this.getWidgetTimeline(this.filterFormData.timeline, this.eventCountByDeviceTypeViewData.form?.get('timeline')?.value);
+      this.eventCountByDeviceTypeViewData.form = _clone(this.svc.getForm(timeline));
     }
     if (this.noisyHostsViewData) {
-      this.noisyHostsViewData.form = _clone(this.svc.getForm(this.filterFormData.timeline));
+      const timeline = this.getWidgetTimeline(this.filterFormData.timeline, this.noisyHostsViewData.form?.get('timeline')?.value);
+      this.noisyHostsViewData.form = _clone(this.svc.getForm(timeline));
     }
     if (this.rulesViewData) {
-      this.rulesViewData.form = _clone(this.svc.getForm(this.filterFormData.timeline));
+      const timeline = this.getWidgetTimeline(this.filterFormData.timeline, this.rulesViewData.form?.get('timeline')?.value);
+      this.rulesViewData.form = _clone(this.svc.getForm(timeline));
     }
   }
 
@@ -168,7 +181,14 @@ export class AimlAnalyticsComponent implements OnInit, OnDestroy {
     })
   }
 
+  onGlobalTimelineSubmit(event: DateRangeSubmitPayload): void {
+    this.patchTimelineRange(this.filterForm, event);
+    this.filterFormData = this.filterForm.getRawValue();
+    this.timelineDropdownDefault = this.getTimelineDropdownDefault(this.filterFormData);
+  }
+
   filterData() {
+    this.filterFormData = this.filterForm.getRawValue();
     this.handleWidgetForms();
     this.getAnalyticsSummary();
     this.getAlertsCountByDeviceType();
@@ -207,7 +227,7 @@ export class AimlAnalyticsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getEventsCountByDeviceType() {
+  getEventsCountByDeviceType(_timeline?: string) {
     this.spinner.start(this.eventCountByDeviceTypeViewData.loader);
     this.eventCountByDeviceTypeViewData.chartData = null;
     let obj = Object.assign({}, this.filterForm.getRawValue(), this.eventCountByDeviceTypeViewData.form.getRawValue());
@@ -241,15 +261,17 @@ export class AimlAnalyticsComponent implements OnInit, OnDestroy {
 
   changeRuleView(ruleType: string) {
     this.rulesViewData.data = [];
-    this.rulesViewData.form = this.svc.getForm(this.filterFormData.timeline);
+    this.rulesViewData.form = this.svc.getForm(
+      this.getWidgetTimeline(this.filterFormData.timeline, this.rulesViewData.form?.get('timeline')?.value)
+    );
     this.getRules(ruleType);
   }
 
-  getRules(ruleType: string) {
+  getRules(ruleType: string, _timeline?: string) {
     this.selectedRuleType = ruleType;
     this.spinner.start(this.rulesViewData.loader);
     this.rulesViewData.data = [];
-    let obj = Object.assign({}, this.filterForm.getRawValue(), this.noisyHostsViewData.form.getRawValue());
+    let obj = Object.assign({}, this.filterForm.getRawValue(), this.rulesViewData.form.getRawValue());
     this.svc.getRules(ruleType, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.spinner.stop(this.rulesViewData.loader);
       this.rulesViewData.data = this.svc.convertToAIMLRulesViewData(res);
@@ -269,5 +291,39 @@ export class AimlAnalyticsComponent implements OnInit, OnDestroy {
         break;
       default: this.router.navigate(['../../', 'aiml-event-mgmt', target], { relativeTo: this.route });
     }
+  }
+
+  private patchTimelineRange(form: FormGroup, event: DateRangeSubmitPayload): void {
+    if (!form) {
+      return;
+    }
+
+    const timeline = event?.period || UnityTimeDuration.LAST_MONTH;
+    const dateRange = this.svc.getDateRangeParamsByTimeline(timeline, event?.from || null, event?.to || null);
+    form.patchValue({
+      timeline: timeline,
+      start_date: dateRange.start_date,
+      end_date: dateRange.end_date
+    }, { emitEvent: false });
+  }
+
+  private getTimelineDropdownDefault(formData?: Partial<AnalyticsFilterFormData>): string | DateRangeOption {
+    const timeline = formData?.timeline || UnityTimeDuration.LAST_MONTH;
+    if (timeline === DateRangePeriod.CUSTOM) {
+      return {
+        label: 'Custom',
+        value: DateRangePeriod.CUSTOM,
+        from: formData?.start_date || '',
+        to: formData?.end_date || ''
+      };
+    }
+
+    return timeline;
+  }
+
+  private getWidgetTimeline(timeline?: string | null, fallback?: string | null): string {
+    return timeline === DateRangePeriod.CUSTOM
+      ? (fallback || UnityTimeDuration.LAST_MONTH)
+      : (timeline || UnityTimeDuration.LAST_MONTH);
   }
 }

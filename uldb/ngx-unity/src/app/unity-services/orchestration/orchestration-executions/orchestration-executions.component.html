@@ -183,7 +183,10 @@
             <tr *ngFor="let data of tableData" truncateText>
               <td class="text-primary pointer-link tdw-15 cursor" (click)="navigateToLogs(data)">{{data.id}}</td>
               <td class="tdw-20">
-                <div class="text-truncate" [tooltip]="data.templateName">{{data.templateName}}</div>
+                <div class="text-truncate" [class.text-primary]="data.type === 'Workflow' || data.type === 'Agentic'"
+                  [class.pointer-link]="data.type === 'Workflow' || data.type === 'Agentic'"
+                  [class.cursor]="data.type === 'Workflow' || data.type === 'Agentic'" [tooltip]="data.templateName"
+                  (click)="navigateToWorkflow(data)">{{data.templateName}}</div>
               </td>
               <td>{{data.type}}</td>
               <td>{{data.category}}</td>

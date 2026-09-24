@@ -99,7 +99,7 @@ export class AppMainComponent implements OnInit, OnDestroy {
     this.restoreSidebarAfterChatbot();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
-    this.changes.disconnect();
+    this.changes?.disconnect();
   }
 
   reportAnIssue(): void {

@@ -4,8 +4,9 @@
             <div class="col-11">
                 <div class="row mb-1">
                     <div class="col">
-                        <h5>{{workflowDetailsViewData?.templateName}}<span
-                                class="text-muted">({{workflowDetailsViewData?.id}})</span></h5>
+                        <h5>{{workflowDetailsViewData?.templateName}}<a *ngIf="isAgentic; else executionId" class="pointer-link cursor"
+                                (click)="openExecution()">({{workflowDetailsViewData?.id}})</a>
+                            <ng-template #executionId><span class="text-muted">({{workflowDetailsViewData?.id}})</span></ng-template></h5>
                     </div>
                 </div>
                 <div class="row">

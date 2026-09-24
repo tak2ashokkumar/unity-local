@@ -155,8 +155,9 @@ export class WfDynamicRightExecuteComponent implements OnInit {
   buildManualForm(values: any) {
 
     this.manualForm = this.svc.buildManualTriggerForm({
-      inputs: values?.['input_params'] || []
+      inputs: this.rightExecuteData?.executionInputs ?? values?.['input_params'] ?? []
     });
+    this.applySavedExecutionInputs(this.manualForm);
     this.manualFormErrors = this.svc.formErrors().manual;
     this.manualFormValidationMessage = this.svc.validationMessages;
 
@@ -167,13 +168,23 @@ export class WfDynamicRightExecuteComponent implements OnInit {
   buildScheduleForm(values: any) {
 
     this.scheduleForm = this.svc.buildScheduleTriggerForm({
-      inputs: values?.['input_params'] || []
+      inputs: this.rightExecuteData?.executionInputs ?? values?.['input_params'] ?? []
     });
+    this.applySavedExecutionInputs(this.scheduleForm);
     this.scheduleFormErrors = this.svc.formErrors().schedule;
     this.scheduleFormValidationMessage = this.svc.validationMessages;
 
     this.getCloudAccount();
     this.getCredentials();
+  }
+
+  private applySavedExecutionInputs(form: FormGroup): void {
+    const inputs = this.rightExecuteData?.executionInputs;
+    if (!Array.isArray(inputs)) return;
+
+    // Preserve saved values (including zero/false) and submit them via getRawValue().
+    form.get('inputs')?.patchValue(inputs);
+    form.get('inputs')?.disable({ emitEvent: false });
   }
 
   buildWebhookForm(values: any) {
@@ -196,6 +207,7 @@ export class WfDynamicRightExecuteComponent implements OnInit {
 
   buildChatTrigger(node: any) {
     this.welcomeMessage = this.rightExecuteData?.values?.welcome_message || 'Hi, How can I assist you today?';
+    this.sessionId = this.generateUUID();
     this.chatHistoryData = [];
     this.newMessage = '';
     this.firstMessage = '';
@@ -556,6 +568,7 @@ export class WfDynamicRightExecuteComponent implements OnInit {
     const req = {
       inputs: {
         query: text,
+        session_id: this.sessionId,
       }
     };
 

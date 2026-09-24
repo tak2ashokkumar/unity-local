@@ -154,7 +154,7 @@
             <!-- Container Start -->
             <div class="card-body row m-0 p-0 d-flex font-sm">
                 <!-- *************************************** Left side panel code Start *************************************** -->
-                <div class="toolbox left-sidebar">
+                <div class="toolbox left-sidebar position-relative overflow-auto bg-white">
                     <!-- Tasks Section start-->
                     <div class="accordion">
                         <div class="accordion-header" (click)="toggleAccordion()">
@@ -322,7 +322,7 @@
                 <!-- *************************************** Right side panel code Start *************************************** -->
                 <!-- Task Right Panel Start  -->
                 <form [formGroup]="selectedTask.inputForm" *ngIf="selectedTask" class="form-position">
-                    <div class="toolbox right-sidebar pb-2" *ngIf="showTaskDetails">
+                    <div class="toolbox right-sidebar position-relative overflow-auto bg-white pb-2" *ngIf="showTaskDetails">
                         <div class="accordion">
                             <div class="accordion-header" (click)="toggleTaskNameAccordion()">
                                 Name
@@ -461,7 +461,7 @@
                     <!-- If Form Start -->
                     <form [formGroup]="selectedCondition.ifConditionForm" class="form-position"
                         *ngIf="selectedCondition.ifConditionForm">
-                        <div class="toolbox right-sidebar" *ngIf="showIfConditionDetails">
+                        <div class="toolbox right-sidebar position-relative overflow-auto bg-white" *ngIf="showIfConditionDetails">
                             <div class="accordion">
                                 <div class="accordion-header" (click)="toggleIfConditionNameAccordion()">
                                     Name
@@ -544,7 +544,7 @@
                     <!-- Switch Form Start -->
                     <form [formGroup]="selectedCondition.switchConditionForm" class="form-position"
                         *ngIf="selectedCondition.switchConditionForm">
-                        <div class="toolbox right-sidebar" *ngIf="showSwitchConditionDetails">
+                        <div class="toolbox right-sidebar position-relative overflow-auto bg-white" *ngIf="showSwitchConditionDetails">
                             <div class="accordion">
                                 <div class="accordion-header" (click)="toggleSwitchConditionNameAccordion()">
                                     Name
@@ -636,7 +636,7 @@
                 <form [formGroup]="selectedOutput.outputForm"
                     *ngIf="selectedOutput?.type === 'Notification Task' || selectedOutput?.type === 'Email'"
                     class="form-position">
-                    <div class="toolbox right-sidebar" *ngIf="showEmailOutputDetails">
+                    <div class="toolbox right-sidebar position-relative overflow-auto bg-white" *ngIf="showEmailOutputDetails">
                         <div class="accordion">
                             <div class="accordion-header" (click)="toggleEmailNameAccordion()">
                                 Name
@@ -753,7 +753,7 @@
                 <form [formGroup]="selectedOutput.outputForm"
                     *ngIf="selectedOutput?.type === 'Chart Task' || selectedOutput?.type === 'Chart'"
                     class="form-position">
-                    <div class="toolbox right-sidebar" *ngIf="showChartOutputDetails">
+                    <div class="toolbox right-sidebar position-relative overflow-auto bg-white" *ngIf="showChartOutputDetails">
                         <div class="accordion">
                             <div class="accordion-header" (click)="toggleChartNameAccordion()">
                                 Name
@@ -929,7 +929,7 @@
 
                 <!-- Source Task Right Panel Start  -->
                 <form [formGroup]="selectedSourceTask.sourceTaskForm" *ngIf="selectedSourceTask" class="form-position">
-                    <div class="toolbox right-sidebar pb-2" *ngIf="showSourceTaskDetails">
+                    <div class="toolbox right-sidebar position-relative overflow-auto bg-white pb-2" *ngIf="showSourceTaskDetails">
                         <div class="accordion">
                             <div class="accordion-header" (click)="toggleSourceTaskNameAccordion()">
                                 Name
@@ -1063,7 +1063,7 @@
 
                 <!-- LLM Form Start -->
                 <form [formGroup]="selectedLLM.llmForm" *ngIf="selectedLLM" class="form-position">
-                    <div class="toolbox right-sidebar" *ngIf="showLLMDetails">
+                    <div class="toolbox right-sidebar position-relative overflow-auto bg-white" *ngIf="showLLMDetails">
                         <div class="accordion">
                             <div class="accordion-header" (click)="toggleLLMNameAccordion()">
                                 Name
@@ -1159,7 +1159,7 @@
 
                 <!-- WorkFLow Param form Start -->
                 <form [formGroup]="workflowParamsForm" *ngIf="workflowParamsForm" class="form-position">
-                    <div class="toolbox right-sidebar" *ngIf="showWorkFlowParams">
+                    <div class="toolbox right-sidebar position-relative overflow-auto bg-white" *ngIf="showWorkFlowParams">
                         <div class="accordion">
                             <div class="accordion-header" (click)="toggleWorkflowParamDetails()">
                                 Workflow Properties
@@ -1333,15 +1333,16 @@
                 <!-- Workflow Param form End -->
 
                 <!-- WorkFLow Assistant form Start -->
-                <div class="toolbox right-sidebar" *ngIf="showWorkflowAssistant">
+                <div class="toolbox right-sidebar position-relative overflow-auto bg-white" *ngIf="showWorkflowAssistant">
                     <div class="custom-gradient-bg d-flex flex-column h-85 pb-0 pt-1 px-1 border-top">
-                        <div #messagesContainer class="messages-container d-flex flex-column justify-content-between">
+                        <div #messagesContainer
+                            class="messages-container d-flex flex-column flex-grow-1 justify-content-between p-2">
                             <div class="d-flex flex-column mb-2">
                                 <div class="d-flex flex-column align-items-center justify-content-center">
                                     <div class="text-muted text-center font-500">Welcome to Workflow Assistant</div>
                                     <div class="text-muted text-center font-500">How can I assist you today?</div>
                                 </div>
-                                <div id="defaultQueries" class="d-flex flex-column mt-2 queries-container">
+                                <div id="defaultQueries" class="d-flex flex-column mt-2 queries-container overflow-hidden">
                                     <div *ngFor="let query of queries" class="card round-edge mb-2">
                                         <div class="card-body p-2 default-query" style="cursor: pointer"
                                             (click)="sumbitQuery(query)">
@@ -1363,20 +1364,20 @@
                                     style="max-width: 100%;">
                                     <div *ngIf="chat.user == 'user'" class="d-flex justify-content-end mb-1"
                                         style="max-width: 100%;">
-                                        <div class="message-box user-message">
+                                        <div class="message-box user-message d-inline-block py-2 px-2">
                                             {{ chat.message }}
                                         </div>
                                     </div>
                                     <div *ngIf="chat.user == 'bot'" class="d-flex justify-content-end mb-1"
                                         style="max-width: 100%;">
-                                        <div class="message-box bot-message">
+                                        <div class="message-box bot-message d-inline-block py-2 px-1">
                                             {{ chat.message }}
                                         </div>
                                     </div>
                                 </div>
                                 <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
-                                    <div class="message-box bot-message">
-                                        <div class="pulse-loader m-1">
+                                    <div class="message-box bot-message d-inline-block py-2 px-1">
+                                        <div class="pulse-loader d-flex align-items-center m-1">
                                             <div></div>
                                             <div></div>
                                             <div></div>

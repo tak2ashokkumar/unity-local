@@ -18,15 +18,34 @@
         <div>
           <span class="font-lg-xl font-500">{{workFlowViewData?.name}}</span>
         </div>
-        <div *ngIf="workFlowViewData?.name">
+        <div *ngIf="workFlowViewData?.name && !isViewMode">
           <button class="btn btn-null text-muted fas fa-pencil-alt" title="Edit Workflow"
             (click)="openWorkflowModal('edit')">
           </button>
         </div>
       </div>
+
+      <nav *ngIf="isViewMode" class="workflow-mode-toggle d-flex p-0" aria-label="Workflow sections">
+        <button type="button" class="workflow-mode-toggle-button d-inline-flex align-items-center justify-content-center py-1 px-2" [class.active]="!isExecutionMode"
+          [attr.aria-pressed]="!isExecutionMode" [disabled]="!designerAvailable" (click)="setWorkspaceMode('workflow')">
+          <i class="fas fa-pencil-ruler" aria-hidden="true"></i>
+          <span>Designer</span>
+        </button>
+        <button type="button" class="workflow-mode-toggle-button d-inline-flex align-items-center justify-content-center py-1 px-2" [class.active]="isExecutionMode"
+          [attr.aria-pressed]="isExecutionMode" [disabled]="!workFlowId || loadingExecutions" (click)="setWorkspaceMode('execution')">
+          <i class="fas fa-play-circle" aria-hidden="true"></i>
+          <span>Executions</span>
+        </button>
+      </nav>
+
       <div class="d-flex align-items-center justify-content-start gap-2 pr-3">
 
-        <button class="btn btn-sm btn-success font-500" type="button" [disabled]="isSavingWorkflow || isWorkflowSaved"
+        <button *ngIf="workFlowId && designerAvailable" class="btn btn-sm btn-primary font-500 mr-2" type="button"
+          (click)="toggleWorkflowMode()">
+          <i class="fas mr-1" [ngClass]="isViewMode ? 'fa-edit' : 'fa-eye'" aria-hidden="true"></i>
+          <span class="font-xs-sm mx-1">{{ isViewMode ? 'Edit' : 'View' }}</span>
+        </button>
+        <button *ngIf="!isViewMode" class="btn btn-sm btn-success font-500" type="button" [disabled]="isSavingWorkflow || isWorkflowSaved"
           (click)="saveWorkFlow()">
           <i class="fas mr-1"
             [ngClass]="isSavingWorkflow ? 'fa-spinner fa-spin' : isWorkflowSaved ? 'fa-check' : 'fa-save'"
@@ -52,8 +71,8 @@
           <div class="workspace-shell position-relative w-100 overflow-hidden">
 
             <!-- MAIN CANVAS -->
-            <div class="drawflow-canvas">
-              <div class="flex-grow-1 drawflow-canvas">
+            <div class="drawflow-canvas position-absolute">
+              <div class="flex-grow-1 drawflow-canvas position-absolute">
                 <div #drawflowContainer id="dynamic-drawflow" (dragover)="allowDrop($event)" (drop)="drop($event)">
                   <div class="center-text-container text-center" *ngIf="emptyCanvas">
                     <i class="fas fa-bolt mb-2 d-block" style="font-size: 1.4rem; opacity: 0.4;"></i>
@@ -99,31 +118,52 @@
 ========================= -->
 
             <!-- OUTSIDE BUTTON (VISIBLE WHEN CLOSED) -->
-            <div *ngIf="isLeftCollapsed"
-              class="panel-launcher left-launcher d-flex align-items-center justify-content-between"
+            <div *ngIf="isLeftCollapsed && (!isViewMode || isExecutionMode)"
+              class="panel-launcher left-launcher position-absolute d-flex align-items-center justify-content-between bg-white"
               (click)="toggleLeftPanel()">
-              <span class="pl-2">Nodes Library</span>
+              <span class="pl-2">{{isExecutionMode ? 'Executions' : 'Nodes Library'}}</span>
               <i class="fas fa-chevron-right pr-2"></i>
             </div>
 
             <!-- PANEL -->
-            <div *ngIf="!isLeftCollapsed" class="left-overlay h-100" [style.width.px]="leftWidth">
+            <div *ngIf="!isLeftCollapsed && (!isViewMode || isExecutionMode)"
+              class="left-overlay position-absolute h-100 overflow-hidden bg-white" [style.width.px]="leftWidth">
               <!-- HEADER -->
-              <div class="panel-header d-flex align-items-center position-relative">
-                <div class="panel-toggle w-100 d-flex justify-content-between align-items-center"
+              <div class="panel-header d-flex align-items-center position-relative bg-white">
+                <div class="panel-toggle w-100 d-flex justify-content-between align-items-center bg-transparent border-0 p-0"
                   (click)="toggleLeftPanel()">
-                  <span class="pl-2">Nodes Library</span>
+                  <span class="pl-2">{{isExecutionMode ? 'Executions' : 'Nodes Library'}}</span>
                   <i class="fas fa-chevron-left pr-2"></i>
                 </div>
               </div>
 
               <div class="left-panel-content w-100">
-                <wf-dynamic-left [workflowGroups]="workflowGroups" (dragStart)="onDragStart($event)"
+                <wf-dynamic-left *ngIf="!isExecutionMode" [workflowGroups]="workflowGroups" (dragStart)="onDragStart($event)"
                   [hasTriggerNode]="hasTriggerNode">
                 </wf-dynamic-left>
+                <div *ngIf="isExecutionMode" class="list-group list-group-flush">
+                  <div *ngIf="loadingExecutions" class="p-3 text-center text-muted">
+                    <i class="fas fa-spinner fa-spin mr-1"></i> Loading executions...
+                  </div>
+                  <div *ngIf="!loadingExecutions && !workflowExecutions.length" class="p-3 text-center text-muted">
+                    No executions found
+                  </div>
+                  <button *ngFor="let execution of workflowExecutions" type="button"
+                    class="execution-list-item list-group-item list-group-item-action"
+                    [class.active]="selectedExecution?.uuid === execution.uuid"
+                    (click)="selectExecution(execution)">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="font-weight-bold text-truncate">{{execution.run_id}}</span>
+                      <i [ngClass]="getStatusFaClass(execution.execution_status)"></i>
+                    </div>
+                    <small [class.text-muted]="selectedExecution?.uuid !== execution.uuid">
+                      {{execution.start_time | date:'medium'}}
+                    </small>
+                  </button>
+                </div>
               </div>
 
-              <div class="left-resizer" (mousedown)="startLeftResize($event)"></div>
+              <div class="left-resizer position-absolute h-100" (mousedown)="startLeftResize($event)"></div>
             </div>
 
 
@@ -131,43 +171,50 @@
      RIGHT PANEL
 ========================= -->
 
-            <div *ngIf="isRightCollapsed" class="wf-launcher-btns d-flex align-items-center">
-              <div class="polling-loader mr-1" *ngIf="isRunning || resumeBtn" [title]="getStatusLabel(workflowStatus)">
+            <div *ngIf="isRightCollapsed" class="wf-launcher-btns position-absolute d-flex align-items-center">
+              <div class="polling-loader mr-1" *ngIf="!isExecutionMode && (isRunning || resumeBtn)" [title]="getStatusLabel(workflowStatus)">
                 <i [ngClass]="getStatusFaClass(workflowStatus)"></i>
               </div>
 
-              <div *ngIf="erroredNodesCount > 0" class="workflow-error-badge mr-1" [title]="erroredNodesTooltip">
+              <div *ngIf="!isExecutionMode && erroredNodesCount > 0" class="workflow-error-badge mr-1" [title]="erroredNodesTooltip">
                 <i class="fas fa-exclamation-triangle text-warning"></i>
               </div>
 
-              <button *ngIf="isRunning" class="btn btn-sm btn-outline-danger font-500" type="button"
+              <button *ngIf="!isExecutionMode && isRunning" class="btn btn-sm btn-outline-danger font-500" type="button"
                 (click)="stop($event)">
                 <i class="fas fa-stop mr-1"></i>
                 <span class="font-xs-sm mx-1">Stop</span>
               </button>
 
-              <button *ngIf="currentSessionId && resumeBtn && !isRunning" class="btn btn-sm btn-outline-info font-500"
+              <button *ngIf="!isExecutionMode && currentSessionId && resumeBtn && !isRunning" class="btn btn-sm btn-primary font-500"
                 type="button" (click)="onResume()" [disabled]="erroredNodesCount > 0">
                 <span class="font-xs-sm mx-1">Resume</span>
               </button>
 
-              <button *ngIf="hasNode && !isRunning && !resumeBtn" class="btn btn-sm btn-outline-primary font-500"
+              <button *ngIf="!isExecutionMode && hasNode && !isRunning && !resumeBtn" class="btn btn-sm btn-primary font-500"
                 type="button" (click)="toggleRightPanel();run()" [disabled]="erroredNodesCount > 0">
                 <i class="fas fa-play mr-1"></i>
-                <span class="font-xs-sm mx-1">Run</span>
+                <span class="font-xs-sm mx-1">{{ isViewMode ? 'Run' : 'Test' }}</span>
               </button>
 
-              <button *ngIf="(hasNode && resumeBtn && !isRunning) || (hasNode && isRunning)"
-                class="btn btn-sm btn-outline-primary font-500" type="button"
+              <button *ngIf="!isExecutionMode && ((hasNode && resumeBtn && !isRunning) || (hasNode && isRunning))"
+                class="btn btn-sm btn-primary font-500" type="button"
                 (click)="toggleRightPanel();viewExecution()" [disabled]="erroredNodesCount > 0">
                 <i class="fas fa-play mr-1"></i>
-                <span class="font-xs-sm mx-1">Run</span>
+                <span class="font-xs-sm mx-1">{{ isViewMode ? 'Run' : 'Test' }}</span>
+              </button>
+
+              <button *ngIf="isExecutionMode && hasNode" class="btn btn-sm btn-primary font-500"
+                type="button" (click)="run()" [disabled]="!designerAvailable || erroredNodesCount > 0 || selectedExecutionInputs === undefined">
+                <i class="fas fa-redo mr-1"></i>
+                <span class="font-xs-sm mx-1">Re-Run</span>
               </button>
             </div>
 
             <!-- PANEL -->
-            <div *ngIf="!isRightCollapsed" class="right-overlay h-100" [style.width.px]="rightWidth">
-              <div class="panel-header d-flex justify-content-between align-items-center position-relative">
+            <div *ngIf="!isRightCollapsed" class="right-overlay position-absolute h-100 overflow-hidden bg-white"
+              [style.width.px]="rightWidth">
+              <div class="panel-header d-flex justify-content-between align-items-center position-relative bg-white">
 
                 <div class="panel-heading font-500" *ngIf="showRunHeading">Run Workflow</div>
 
@@ -183,19 +230,19 @@
                     </button>
 
                     <button *ngIf="currentSessionId && resumeBtn && !isRunning"
-                      class="btn btn-sm btn-outline-info font-500" type="button" (click)="onResume()">
+                      class="btn btn-sm btn-primary font-500" type="button" (click)="onResume()">
                       <span class="font-xs-sm mx-1">Resume</span>
                     </button>
 
                   </div>
                 </ng-container>
 
-                <div class="panel-toggle" (click)="closeRightPanel()">
+                <div class="panel-toggle bg-transparent border-0 p-0" (click)="closeRightPanel()">
                   <i class="fas fa-chevron-right"></i>
                 </div>
               </div>
 
-              <div class="right-resizer" (mousedown)="startRightResize($event)"></div>
+              <div class="right-resizer position-absolute h-100" (mousedown)="startRightResize($event)"></div>
               <div class="right-panel-content w-100">
                 <wf-dynamic-help-panel *ngIf="showHelpPanel && !showBeginner"
                   (closeSidebar)="showBeginner = false; isRightCollapsed = !isRightCollapsed"></wf-dynamic-help-panel>
@@ -211,9 +258,10 @@
 ========================= -->
 
             <!-- COLLAPSED HEADER BAR -->
-            <div *ngIf="isBottomCollapsed" class="bottom-collapsed-bar d-flex align-items-center border-top"
+            <div *ngIf="isBottomCollapsed"
+              class="bottom-collapsed-bar position-absolute d-flex align-items-center border-top bg-white"
               [style.left.px]="isLeftCollapsed ? 0 : leftWidth" [style.right.px]="isRightCollapsed ? 0 : rightWidth">
-              <div class="panel-toggle d-flex align-items-center justify-content-between w-100">
+              <div class="panel-toggle d-flex align-items-center justify-content-between w-100 bg-transparent border-0 p-0">
 
                 <!-- Toolbar -->
                 <div class="toolbar-container">
@@ -256,26 +304,28 @@
             </div>
 
             <!-- EXPANDED PANEL -->
-            <div *ngIf="!isBottomCollapsed" class="bottom-overlay d-flex flex-column"
+            <div *ngIf="!isBottomCollapsed"
+              class="bottom-overlay position-absolute d-flex flex-column overflow-hidden bg-white"
               [style.left.px]="isLeftCollapsed ? 0 : leftWidth" [style.right.px]="isRightCollapsed ? 0 : rightWidth"
               [style.height.px]="bottomHeight">
 
               <!-- TITLE HEADER -->
-              <div class="bottom-panel-header d-flex flex-column flex-shrink-0 border-top">
+              <div class="bottom-panel-header d-flex flex-column flex-shrink-0 border-top bg-white">
                 <div class="d-flex align-items-center w-100 px-3">
                   <div class="bottom-panel-title">
                     {{ bottomActiveTab === 'variables' ? 'Workflow Variables' : 'Execution Logs' }}
                   </div>
                   <button *ngIf="bottomActiveTab === 'logs'" type="button"
                     class="btn btn-sm btn-link shadow-none text-muted ml-auto p-1" title="Refresh execution logs"
-                    aria-label="Refresh execution logs" [disabled]="isLoadingExecutionLogs || !currentSessionId"
-                    (click)="getWorkflowExecutionLogs()">
+                    aria-label="Refresh execution logs"
+                    [disabled]="isLoadingExecutionLogs || (isExecutionMode ? !selectedExecution : !currentSessionId)"
+                    (click)="isExecutionMode ? loadSelectedExecutionLogs() : getWorkflowExecutionLogs()">
                     <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingExecutionLogs" aria-hidden="true"></i>
                   </button>
                 </div>
 
                 <!-- RESIZER -->
-                <div class="bottom-resizer" (mousedown)="startBottomResize($event)"></div>
+                <div class="bottom-resizer position-absolute w-100" (mousedown)="startBottomResize($event)"></div>
               </div>
 
               <!-- CONTENT -->
@@ -284,6 +334,7 @@
                 <!-- Variables tab content -->
                 <div [hidden]="bottomActiveTab !== 'variables'" class="bottom-tab-content h-100 overflow-auto">
                   <orchestration-agentic-workflow-variables [isDynamicWorkflow]="true"
+                    [isReadOnly]="isViewMode"
                     [stackFields]="!isLeftCollapsed && !isRightCollapsed"
                     (formDataChange)="onWorkflowVarsChange($event)"
                     [initialData]="savedWorkflowVarsData"></orchestration-agentic-workflow-variables>
@@ -293,15 +344,21 @@
                 <div *ngIf="bottomActiveTab === 'logs'" class="bottom-tab-content h-100 overflow-auto">
                   <!-- Your logs content goes here -->
                   <div class="p-3">
-                    <ng-container *ngIf="workflowLogsViewData?.executionLog; else noLogs">
-                      <pre class="mb-0">{{ workflowLogsViewData.executionLog }}</pre>
+                    <ng-container *ngIf="hasDisplayedExecutionLog; else noLogs">
+                      <pre class="mb-0">{{ displayedExecutionLog }}</pre>
                     </ng-container>
 
                     <!-- Show placeholder if no logs -->
                     <ng-template #noLogs>
-                      <p class="text-muted small mb-0">
-                        Execution logs will appear here.
+                      <p *ngIf="isWorkflowExecuting; else executionNotStarted" class="text-muted small mb-0">
+                        <i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>
+                        Execution started. Waiting for logs...
                       </p>
+                      <ng-template #executionNotStarted>
+                        <p class="text-muted small mb-0">
+                          Execution logs will appear here.
+                        </p>
+                      </ng-template>
                     </ng-template>
                   </div>
                 </div>
@@ -309,7 +366,7 @@
               </div>
 
               <!-- Controls remain at the bottom in both collapsed and expanded states -->
-              <div class="bottom-expanded-bar d-flex align-items-center">
+              <div class="bottom-expanded-bar d-flex align-items-center bg-white">
                 <div class="toolbar-container">
                   <div class="toolbar-actions d-flex">
                     <button class="icon-btn btn btn-null shadow-none tb" (click)="changeZoom(-1, $event)">

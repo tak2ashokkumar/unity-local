@@ -96,14 +96,26 @@
                                         {{createFormErrors.alert_type}}</div>
                                 </div>
                             </div>
+                            <div class="col-12 form-group d-flex"
+                                *ngIf="createForm?.get('module')?.value === 'collector'">
+                                <label class="col-2 col-form-label text-right">Alert Type<em>*</em></label>
+                                <div class="col-4">
+                                    <multiselect-dropdown [options]="colletorOptions" [settings]="alertTypeSettings"
+                                        class="form-control p-0" style="height:auto;" formControlName="alert_type"
+                                        [ngClass]="{'is-invalid' : createFormErrors.alert_type}">
+                                    </multiselect-dropdown>
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.alert_type">
+                                        {{createFormErrors.alert_type}}</div>
+                                </div>
+                            </div>
 
                             <div class="col-12 form-group d-flex"
-                                *ngIf="createForm?.get('module')?.value === 'deprecation'">
+                                *ngIf="createForm?.get('module')?.value === 'deprecation' || createForm?.get('module')?.value === 'collector'">
                                 <label class="col-2 col-form-label text-right" for="notify">Notify<em>*</em></label>
                                 <!-- placeholder="Type Days" -->
                                 <div class="col-2">
                                     <input id="notify" type="number" class="form-control" min="1" max="999"
-                                        placeholder="Type range (0 - 999)" formControlName="notify"
+                                        placeholder="Type range (1 - 999)" formControlName="notify"
                                         [ngClass]="{'is-invalid' : createFormErrors.notify}">
                                     <div class="invalid-feedback d-block" *ngIf="createFormErrors.notify">
                                         {{createFormErrors.notify}}</div>
@@ -144,7 +156,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 form-group d-flex" *ngIf="createForm?.get('module')?.value">
+                            <div class="col-12 form-group d-flex"
+                                *ngIf="createForm?.get('module')?.value && ['aiml','deprecation','devops_automation'].includes(createForm?.get('module')?.value)">
                                 <label class="col-2 col-form-label text-right"
                                     *ngIf="['aiml','deprecation'].includes(createForm?.get('module')?.value)">Select
                                     Device<em>*</em></label>
@@ -173,7 +186,7 @@
                                 </div>
                             </div>
                             <ng-container
-                                *ngIf="createForm.controls.filter_type.value == 'custom' && ['aiml','deprecation'].includes(createForm?.get('module')?.value)">
+                                *ngIf="createForm.controls.filter_type?.value == 'custom' && ['aiml','deprecation'].includes(createForm?.get('module')?.value)">
                                 <div class="col-12 form-group d-flex">
                                     <label class="col-2 col-form-label text-right"></label>
                                     <div formGroupName="custom_filter_meta" class="col-8 pt-2">
@@ -215,7 +228,7 @@
                                 </div>
                             </ng-container>
                             <ng-container
-                                *ngIf="createForm.controls.filter_type.value == 'filters' && createForm?.get('module')?.value === 'aiml'">
+                                *ngIf="createForm.controls.filter_type?.value == 'filters' && createForm?.get('module')?.value === 'aiml'">
                                 <div class="col-12 form-group d-flex">
                                     <label class="col-2 col-form-label text-right"></label>
                                     <div class="col-8 pt-2">
@@ -262,7 +275,7 @@
                                 </div>
                             </ng-container>
                             <ng-container
-                                *ngIf="createForm.controls.filter_type.value == 'custom' && createForm?.get('module')?.value === 'devops_automation'  && customMeta">
+                                *ngIf="createForm.controls.filter_type?.value == 'custom' && createForm?.get('module')?.value === 'devops_automation'  && customMeta">
                                 <div class="col-12 form-group d-flex">
                                     <label class="col-2 col-form-label text-right"></label>
                                     <div formGroupName="custom_filter_meta" class="col-8 pt-2">

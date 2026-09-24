@@ -186,9 +186,6 @@
                             </ng-template>
                         </div>
                     </div>
-                    <div class="mt-2 mb-4 px-5">
-                        <unity-schedule></unity-schedule>
-                    </div>
                 </form>
 
                 <form *ngIf="webhookTriggerForm" [formGroup]="webhookTriggerForm">
@@ -301,7 +298,9 @@
             <div class="d-flex justify-content-center mb-3">
                 <button class="btn btn-md btn-outline-danger mr-2" type="button" (click)="goBack()">Cancel</button>
                 <button class="btn btn-md btn-success" type="button" (click)="onSubmit()" [disabled]="isSubmitting">
-                    {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+                    {{ nodeType === 'Schedule Trigger'
+                        ? (isSubmitting ? 'Running...' : 'Run now')
+                        : (isSubmitting ? 'Submitting...' : 'Submit') }}
                 </button>
             </div>
         </div>

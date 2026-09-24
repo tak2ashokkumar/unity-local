@@ -143,7 +143,6 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
       this.scheduleForm = this.svc.buildScheduleTriggerForm(node);
       this.scheduleFormErrors = this.svc.resetInputFormErrors();
       this.scheduleFormValidationMessage = this.svc.inputFormValidationMessages;
-      this.scheduleSvc.addOrEdit(this.getScheduleMeta(node));
       this.getCloudAccount();
       this.getCredentials();
       return;
@@ -374,18 +373,7 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
         return null;
       }
 
-      const rawValue = this.scheduleForm.getRawValue();
-      const scheduleValue = this.scheduleSvc.getFormValue(false);
-
-      return {
-        ...rawValue,
-        config: {
-          schedule_meta: {
-            ...scheduleValue.schedule_meta,
-            run_now: false
-          }
-        }
-      };
+      return this.scheduleForm.getRawValue();
     }
 
     if (this.nodeType === 'Webhook Trigger') {

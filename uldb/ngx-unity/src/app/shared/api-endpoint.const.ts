@@ -608,6 +608,10 @@ export const EDIT_DATA_CENTERS = (dcId: string) => `customer/colo_cloud/${dcId}/
 
 export const GET_OFFLINE_LOCATION_DATA = () => `${environment.staticData}locations/offline-locations.json`;
 
+export const DATACENTER_DEVICE_TABS = (dcId: string) => `customer/colo_cloud/${dcId}/dc_devices/`;
+
+export const DATACENTER_DEVICE_LIST = (dcId: string, deviceEndpoint: string) => `customer/colo_cloud/${dcId}/${deviceEndpoint}/`;
+
 export const PRIVATE_CLOUDS_BY_DATACENTER_ID = (dcId: string) => `customer/colo_cloud/${dcId}/private_clouds`;
 
 export const PUDS_BY_DATACENTER_ID = (dcId: string) => `customer/colo_cloud/${dcId}/pdus/`;

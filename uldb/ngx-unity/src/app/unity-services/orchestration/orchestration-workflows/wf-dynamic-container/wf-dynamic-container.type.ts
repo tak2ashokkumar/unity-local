@@ -201,3 +201,24 @@ export class WorkflowLogsViewData {
   constructor() { }
   executionLog: string;
 }
+
+export interface WorkflowExecution {
+  uuid: string;
+  workflow_name: string;
+  run_id: string;
+  start_time: string;
+  end_time: string;
+  duration: string;
+  user: string;
+  execution_status: string;
+  nodes_execution?: Array<{ node_id: number; status: string }>;
+  inputs?: Array<{ default_value: any; param_name: string; param_type: string }>;
+}
+
+export interface WorkflowNodeOutput {
+  status: string;
+  output: any;
+  name: string;
+  node_type: string;
+  node_id: number;
+}

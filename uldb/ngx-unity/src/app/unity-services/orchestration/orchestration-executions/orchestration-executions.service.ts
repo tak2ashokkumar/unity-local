@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
-import { ORCHESTRATION_EXECUTION_FULL_LIST, ORCHESTRATION_EXECUTION_LIST_SUMMARY } from 'src/app/shared/api-endpoint.const';
+import { ORCHESTRATION_AGENTIC_EXECUTION_WORKFLOWS, ORCHESTRATION_EXECUTION_FULL_LIST, ORCHESTRATION_EXECUTION_LIST_SUMMARY, ORCHESTRATION_EXECUTION_WORKFLOWS } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
@@ -23,6 +23,13 @@ export class OrchestrationExecutionsService {
 
   getFullList(criteria: SearchCriteria): Observable<PaginatedResult<ResultsModel>> {
     return this.tableService.getData<PaginatedResult<ResultsModel>>(ORCHESTRATION_EXECUTION_FULL_LIST(), criteria);
+  }
+
+  getExecutionWorkflow(executionId: string, isAgentic: boolean): Observable<ExecutionWorkflowModel> {
+    const endpoint = isAgentic
+      ? ORCHESTRATION_AGENTIC_EXECUTION_WORKFLOWS(executionId)
+      : ORCHESTRATION_EXECUTION_WORKFLOWS(executionId);
+    return this.http.get<ExecutionWorkflowModel>(endpoint);
   }
 
   convertToListSummaryViewData(data: SummaryResultsModel) {
@@ -210,6 +217,10 @@ interface ResultsModel {
   e_created_by: string;
   e_is_advanced: boolean;
   e_is_agentic: boolean;
+}
+
+interface ExecutionWorkflowModel {
+  workflow: string;
 }
 
 export class TableViewModel {

@@ -19,15 +19,13 @@
     </div>
 
     <div class="row d-flex flex-nowrap align-items-stretch h-100 overflow-hidden m-0 p-0 params-layout"
-        [class.input-panel-collapsed]="inputPanelCollapsed"
-        *ngIf="!isSchemaLoading && !schemaLoadError">
-        <div class="side-panel position-relative h-100 overflow-hidden m-0 p-0"
+        [class.input-panel-collapsed]="inputPanelCollapsed" *ngIf="!isSchemaLoading && !schemaLoadError">
+        <div class="side-panel position-relative h-100 overflow-hidden m-0 p-0" *ngIf="!isPromptExpanded"
             [class.is-collapsed]="inputPanelCollapsed"
             [style.flex-basis.px]="inputPanelCollapsed ? collapsedPanelWidth : inputPanelWidth">
             <button type="button"
                 class="panel-collapse-toggle input-toggle btn btn-null d-inline-flex align-items-center justify-content-center rounded-circle border"
-                (click)="toggleInputPanel()"
-                [title]="inputPanelCollapsed ? 'Expand input' : 'Collapse input'">
+                (click)="toggleInputPanel()" [title]="inputPanelCollapsed ? 'Expand input' : 'Collapse input'">
                 <i [ngClass]="inputPanelCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'"></i>
             </button>
             <div class="collapsed-panel-label d-flex align-items-center justify-content-center h-100 font-weight-bold px-2"
@@ -158,8 +156,7 @@
                             </div>
 
                             <!-- typed workflow/trigger attribute children -->
-                            <div class="tree-children"
-                                *ngIf="getAttributesForInput(node).length && isExpanded(node)">
+                            <div class="tree-children" *ngIf="getAttributesForInput(node).length && isExpanded(node)">
                                 <div class="drop-list">
                                     <div *ngFor="let attr of getAttributesForInput(node)" class="tree-node">
                                         <div class="tree-row d-flex align-items-center" draggable="true"
@@ -186,42 +183,63 @@
             <div class="form-section d-flex flex-column h-100 flex-fill pl-0">
                 <div class="d-flex bg-header justify-content-between align-items-center p-2">
                     <h5 *ngIf="!isNameEditing"
-                        class="editable-node-name d-inline-flex align-items-center text-dark mb-0" (click)="startEdit()">
+                        class="editable-node-name d-inline-flex align-items-center text-dark mb-0"
+                        (click)="!isViewMode && startEdit()">
                         {{ nodeData?.name }}
-                        <i class="fas fa-pencil-alt ml-2 edit-name-icon" aria-hidden="true"></i>
+                        <i *ngIf="!isViewMode" class="fas fa-pencil-alt ml-2 edit-name-icon" aria-hidden="true"></i>
                     </h5>
 
                     <input *ngIf="isNameEditing" class="form-control form-control-sm node-name-input text-dark"
                         [(ngModel)]="editName" (blur)="saveName()" (keydown.enter)="saveName()"
                         (keydown.escape)="cancelEdit()" #nameInput />
 
-                    <div class="d-flex align-items-center flex-shrink-0 ml-auto"
-                        *ngIf="!nodeData?.isTool">
+                    <div class="d-flex align-items-center flex-shrink-0 ml-auto" *ngIf="!nodeData?.isTool">
                         <i [ngClass]="getStatusFaClass(realTimeData?.status) + ' pr-2'"></i>
-                        <button class="btn btn-primary btn-sm" (click)="save('test')" [disabled]="isViewMode || isSchemaLoading"><i
-                                class="fas fa-play mr-1"></i>Run
+                        <button class="btn btn-primary btn-sm" (click)="save('test')"
+                            [disabled]="isViewMode || isSchemaLoading"><i class="fas fa-play mr-1"></i>Run
                             Node</button>
                     </div>
                 </div>
                 <ul class="nav nav-tabs custom-tabs bg-header" *ngIf="visibleTabs.length !== 0">
-                    <li class="nav-item" *ngFor="let tab of visibleTabs">
+                    <li class="nav-item" *ngFor="let tab of visibleTabs"
+                        [hidden]="isPromptExpanded && activeTab !== tab.id">
                         <a class="nav-link" [class.active]="activeTab === tab.id" (click)="activeTab = tab.id">
                             {{ tab.label }}
                         </a>
                     </li>
                 </ul>
-                <div class="mt-3 px-3 properties">
+                <div class="mt-3 px-3 properties" *ngIf="!isPromptExpanded">
                     <form [formGroup]="nodeForm" class="w-100" *ngIf="dynamicSchema?.tabs?.length">
-                        <ng-container *ngFor="let field of activeFields">
-                            <ng-container
-                                *ngTemplateOutlet="dynamicField; context: { field: field, form: nodeForm, errors: formErrors }">
+                        <fieldset class="border-0 m-0 p-0" [disabled]="isViewMode">
+                            <ng-container *ngFor="let field of activeFields">
+                                <ng-container
+                                    *ngTemplateOutlet="dynamicField; context: { field: field, form: nodeForm, errors: formErrors }">
+                                </ng-container>
                             </ng-container>
-                        </ng-container>
+                        </fieldset>
                     </form>
                     <p class="text-muted text-center mb-0" *ngIf="hasNoConfigurableFields">
                         This node has no additional properties to configure.
                     </p>
                 </div>
+
+                <div class="mt-3 px-3 properties expanded-field-editor"
+                    *ngIf="isPromptExpanded && expandedField && expandedForm">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label text-muted mb-1">{{ expandedLabel }}</label>
+                        <button type="button" class="btn btn-sm field-icon-button bg-transparent shadow-none border-secondary"
+                            (click)="collapsePrompt()" title="Collapse" aria-label="Collapse expanded field">
+                            <i class="fas fa-compress"></i>
+                        </button>
+                    </div>
+                    <textarea class="form-control text-dark" rows="18"
+                        [value]="getDisplayValue(expandedField, expandedForm)" (input)="onExpandedInput($event)"
+                        [attr.disabled]="isFieldControlDisabled(expandedField, expandedForm) ? true : null"></textarea>
+                    <div class="invalid-feedback d-block" *ngIf="getDynamicError(formErrors, expandedField)">
+                        {{ getDynamicError(formErrors, expandedField) }}
+                    </div>
+                </div>
+
                 <ng-template #fieldModeHeader let-field="field" let-form="form" let-showLabel="showLabel">
                     <div class="d-flex align-items-center justify-content-between mb-1">
                         <label *ngIf="showLabel !== false" class="form-label text-muted mb-0">
@@ -290,15 +308,27 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- Value mode -->
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
-                                    <input type="text" class="form-control text-dark"
-                                        [value]="getDisplayValue(field, form)"
-                                        (input)="onNormalInput($event, field, form)"
-                                        [attr.maxlength]="field.maxlength || null"
-                                        [attr.placeholder]="field.placeholder || ''"
-                                        [attr.disabled]="field.disabled ? true : null"
-                                        [class.is-invalid]="getDynamicError(errors, field)" />
+                                    <div class="input-group">
+                                        <input type="text" class="form-control text-dark"
+                                            [value]="getDisplayValue(field, form)"
+                                            (input)="onNormalInput($event, field, form)"
+                                            [attr.maxlength]="field.maxlength || null"
+                                            [attr.placeholder]="field.placeholder || ''"
+                                            [attr.disabled]="field.disabled || isFieldControlDisabled(field, form) ? true : null"
+                                            [class.is-invalid]="getDynamicError(errors, field)" />
+
+                                        <div class="input-group-append" *ngIf="nodeData?.isTool">
+                                            <button type="button" class="btn field-icon-button bg-transparent shadow-none border-secondary d-flex align-items-center"
+                                                style="height: 100%; border-radius: 0 .25rem .25rem 0;"
+                                                (click)="onAIiconClick(field, form)"
+                                                title="AI will generate this input">
+                                                <span class="ai-input-icon d-inline-block" [style.--ai-icon]="'url(' + aiIcon + ')'" aria-hidden="true"></span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </ng-container>
 
                                 <!-- Expression mode -->
@@ -324,8 +354,7 @@
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
                                     <input type="number" class="form-control text-dark"
-                                        formControlName="{{ field.control_name }}"
-                                        (dragover)="onNumberDragOver($event)"
+                                        formControlName="{{ field.control_name }}" (dragover)="onNumberDragOver($event)"
                                         (drop)="onNumberDrop($event, field, form)"
                                         [attr.placeholder]="field.placeholder || ''"
                                         [class.is-invalid]="getDynamicError(errors, field)"
@@ -373,7 +402,8 @@
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
                                     <div class="ml-1 dynamic-radio-options">
-                                        <div *ngFor="let option of field.options" class="form-check dynamic-radio-option">
+                                        <div *ngFor="let option of field.options"
+                                            class="form-check dynamic-radio-option">
                                             <input class="form-check-input" type="radio"
                                                 [id]="field.control_name + '_' + option.value" [value]="option.value"
                                                 formControlName="{{ field.control_name }}"
@@ -423,13 +453,28 @@
 
                                 <!-- Value mode -->
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
-                                    <textarea class="form-control text-dark" [value]="getDisplayValue(field, form)"
-                                        (input)="onNormalInput($event, field, form)" [rows]="field.rows || 3"
-                                        [attr.placeholder]="field.placeholder || ''"
-                                        [attr.disabled]="field.disabled ? true : null"
-                                        [class.is-invalid]="getDynamicError(errors, field)"
-                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'">
-                                    </textarea>
+                                    <div class="input-group">
+                                        <textarea class="form-control text-dark" [value]="getDisplayValue(field, form)"
+                                            (input)="onNormalInput($event, field, form)" [rows]="field.rows || 3"
+                                            [attr.placeholder]="field.placeholder || ''"
+                                            [attr.disabled]="field.disabled || isFieldControlDisabled(field, form) ? true : null"
+                                            [class.is-invalid]="getDynamicError(errors, field)"></textarea>
+
+                                        <div class="input-group-append d-flex flex-column">
+                                            <button type="button"
+                                                class="btn field-icon-button bg-transparent shadow-none border-secondary flex-fill d-flex align-items-center justify-content-center"
+                                                (click)="expandPrompt(field, form)" title="Expand">
+                                                <i class="fas fa-expand"></i>
+                                            </button>
+                                            <button type="button"
+                                                class="btn field-icon-button bg-transparent shadow-none border-secondary flex-fill d-flex align-items-center justify-content-center"
+                                                *ngIf="nodeData?.isTool && isInputParamField(field)"
+                                                (click)="onAIiconClick(field, form)"
+                                                title="AI will generate this input">
+                                                <span class="ai-input-icon d-inline-block" [style.--ai-icon]="'url(' + aiIcon + ')'" aria-hidden="true"></span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </ng-container>
 
                                 <!-- Expression mode -->
@@ -439,10 +484,9 @@
                                         (input)="onExprInput($event, field, form)" [rows]="field.rows || 3"
                                         placeholder="Drop expression here"
                                         [attr.disabled]="field.disabled ? true : null"
-                                        [class.is-invalid]="getDynamicError(errors, field)"
-                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'">
-                                    </textarea>
+                                        [class.is-invalid]="getDynamicError(errors, field)"></textarea>
                                 </ng-container>
+
                                 <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
                                     {{ getDynamicError(errors, field) }}
                                 </div>
@@ -605,8 +649,7 @@
                                 </ng-container>
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
-                                    <multiselect-dropdown
-                                        *ngIf="field.multiselect_properties || multiselectProperties"
+                                    <multiselect-dropdown *ngIf="field.multiselect_properties || multiselectProperties"
                                         [settings]="(field.multiselect_properties || multiselectProperties)"
                                         [options]="getDynamicOptions(field, form)" class="form-control h-auto p-0"
                                         formControlName="{{ field.control_name }}"
@@ -1090,16 +1133,14 @@
         <!-- ///////////////////////////////// OUTPUTS ////////////////////////////////////////////////////////////// -->
 
         <div class="side-panel output-panel rightbarParam position-relative h-100 overflow-hidden p-0"
-            *ngIf="!isPromptExpanded"
-            [class.is-collapsed]="outputPanelCollapsed"
+            *ngIf="!isPromptExpanded" [class.is-collapsed]="outputPanelCollapsed"
             [class.input-panel-collapsed]="inputPanelCollapsed"
             [style.max-width.%]="inputPanelCollapsed && !outputPanelCollapsed ? 75 : null"
             [style.flex-basis.px]="outputPanelCollapsed ? collapsedPanelWidth : outputPanelWidth">
 
             <button type="button"
                 class="panel-collapse-toggle output-toggle btn btn-null d-inline-flex align-items-center justify-content-center rounded-circle border"
-                (click)="toggleOutputPanel()"
-                [title]="outputPanelCollapsed ? 'Expand output' : 'Collapse output'">
+                (click)="toggleOutputPanel()" [title]="outputPanelCollapsed ? 'Expand output' : 'Collapse output'">
                 <i [ngClass]="outputPanelCollapsed ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"></i>
             </button>
 
@@ -1113,8 +1154,8 @@
                     </div>
                     <div class="d-flex align-items-center mb-3">
                         <span *ngIf="realTimeData?.duration">
-                        <i class="fas fa-clock text-muted pr-1"></i>
-                        <span>{{realTimeData?.duration}}</span>
+                            <i class="fas fa-clock text-muted pr-1"></i>
+                            <span>{{realTimeData?.duration}}</span>
                         </span>
                         <button type="button" class="output-copy-btn btn btn-link text-muted p-1 ml-2"
                             *ngIf="nodeOutput" (click)="copyOutput()" title="Copy output" aria-label="Copy output">
@@ -1152,22 +1193,43 @@
                             <div *ngSwitchCase="'empty'" class="output-empty-state text-center">
                                 <div class="output-empty-mark">{{ '{ }' }}</div>
                                 <div class="font-weight-bold mt-2">No output</div>
-                                <small class="text-muted">{{ outputError ? 'This node returned no data. Check the error below.' : 'This node ran without returning data.' }}</small>
+                                <small class="text-muted">{{ outputError ? 'This node returned no data. Check the error
+                                    below.' : 'This node ran without returning data.' }}</small>
                             </div>
                             <pre *ngSwitchCase="'text'" class="output-string">{{ outputStringValue }}</pre>
-                            <table *ngSwitchCase="'object'" class="table table-sm table-bordered table-hover mb-0 bg-white output-table output-kv">
-                                <tbody><tr *ngFor="let col of outputTableCols"><th>{{ col }}</th><td [ngClass]="'v-' + getType(outputTableRows[0][col])" [title]="tableValue(outputTableRows[0][col])">{{ tableValue(outputTableRows[0][col]) }}</td></tr></tbody>
+                            <table *ngSwitchCase="'object'"
+                                class="table table-sm table-bordered table-hover mb-0 bg-white output-table output-kv">
+                                <tbody>
+                                    <tr *ngFor="let col of outputTableCols">
+                                        <th>{{ col }}</th>
+                                        <td [ngClass]="'v-' + getType(outputTableRows[0][col])"
+                                            [title]="tableValue(outputTableRows[0][col])">{{
+                                            tableValue(outputTableRows[0][col]) }}</td>
+                                    </tr>
+                                </tbody>
                             </table>
-                            <table *ngSwitchCase="'array'" class="table table-sm table-bordered table-hover mb-0 bg-white text-nowrap output-table">
-                                <thead><tr><th>#</th><th *ngFor="let col of outputTableCols"><span>{{ col }}</span><small>{{ tableColumnType(col) }}</small></th></tr></thead>
-                                <tbody><tr *ngFor="let row of outputTableRows; index as i"><th>{{ i }}</th><td *ngFor="let col of outputTableCols" [ngClass]="'v-' + getType(row[col])" [title]="tableValue(row[col])">{{ tableValue(row[col]) }}</td></tr></tbody>
+                            <table *ngSwitchCase="'array'"
+                                class="table table-sm table-bordered table-hover mb-0 bg-white text-nowrap output-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th *ngFor="let col of outputTableCols"><span>{{ col }}</span><small>{{
+                                                tableColumnType(col) }}</small></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of outputTableRows; index as i">
+                                        <th>{{ i }}</th>
+                                        <td *ngFor="let col of outputTableCols" [ngClass]="'v-' + getType(row[col])"
+                                            [title]="tableValue(row[col])">{{ tableValue(row[col]) }}</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </ng-container>
                     </div>
 
                     <!-- TREE -->
-                    <div class="output-scroll-container output-tree w-100 overflow-auto"
-                        *ngIf="outputView === 'tree'">
+                    <div class="output-scroll-container output-tree w-100 overflow-auto" *ngIf="outputView === 'tree'">
                         <ng-container *ngTemplateOutlet="treeList; context: { nodes: outputTreeNodes }"></ng-container>
                     </div>
 
@@ -1177,11 +1239,13 @@
                     </div>
 
                 </div>
-                <div class="output-error alert alert-danger rounded-0 border-left-0 border-right-0 border-bottom-0 d-flex align-items-start p-2 mb-0" *ngIf="outputError">
+                <div class="output-error alert alert-danger rounded-0 border-left-0 border-right-0 border-bottom-0 d-flex align-items-start p-2 mb-0"
+                    *ngIf="outputError">
                     <strong class="text-uppercase mr-2">Error</strong>
                     <span class="output-error-message flex-grow-1 text-monospace">{{ outputErrorText }}</span>
                     <button type="button" class="output-copy-btn btn btn-link text-danger p-1 ml-2"
-                        (click)="copyError()" title="Copy error message" aria-label="Copy error message"><i class="far fa-copy"></i></button>
+                        (click)="copyError()" title="Copy error message" aria-label="Copy error message"><i
+                            class="far fa-copy"></i></button>
                 </div>
                 <!-- ↑ END NEW BLOCK -->
 

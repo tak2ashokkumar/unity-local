@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { DataCenter, DataCenterTabs } from './tabs';
 import { map } from 'rxjs/operators';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { DATA_CENTERS, ADD_DATA_CENTERS, EDIT_DATA_CENTERS } from 'src/app/shared/api-endpoint.const';
+import { DATA_CENTERS, ADD_DATA_CENTERS, DATACENTER_DEVICE_TABS, EDIT_DATA_CENTERS } from 'src/app/shared/api-endpoint.const';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
+import { DatacenterDeviceTabResponse } from './entities/datacenter-device-tab.type';
 
 @Injectable()
 export class DatacenterService {
@@ -26,6 +27,10 @@ export class DatacenterService {
         });
         return pcTabs;
       }));
+  }
+
+  getDatacenterDeviceTabs(dcId: string): Observable<DatacenterDeviceTabResponse[]> {
+    return this.http.get<DatacenterDeviceTabResponse[]>(DATACENTER_DEVICE_TABS(dcId));
   }
 
   resetFormErrors(): any {

@@ -225,7 +225,7 @@
                             </td>
                             <td class="action-icons-column tdw-15 text-center">
                                 <button class="action-icons mb-0 fa fa-eye font-sm ml-1" tooltip="View"
-                                    *ngIf="globalReadOnlyUser" (click)="goToviewDetails(view)" accessControl
+                                    *ngIf="view.isCreated" (click)="goToviewDetails(view)" accessControl
                                     moduleName="DevOps Automation" accessType="View Workflow"
                                     elementType="actionbtn"></button>
                                 <button class="action-icons mb-0 fas fa-play font-sm ml-1" tooltip="Execute Workflow"
@@ -254,7 +254,7 @@
                                     accessType="Execute Workflow" elementType="actionbtn"
                                     [ngClass]="view.taskId || !view.isCreated || view.workflowStatus === 'Disabled'  ? 'action-icons-disabled' : 'action-icons'"
                                     [disabled]="view.taskId || !view.isCreated || view.workflowStatus === 'Disabled' ? true : false"></button>
-                                <button class="action-icons mb-0 fas fa-calendar-alt font-sm ml-1"
+                                <button class="action-icons mb-0 fas fa-play font-sm ml-1"
                                     tooltip="Execute Workflow"
                                     *ngIf="view.isCreated && view.is_agentic && view.trigger_type === 'Schedule Trigger'"
                                     (click)="executeWorkflow(view)" accessControl moduleName="DevOps Automation"

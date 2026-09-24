@@ -716,6 +716,12 @@ export const MY_NATIVE_FORMATS = {
     SwitchesZabbixComponent,
     FirewallsZabbixComponent,
     LoadbalancersZabbixComponent,
+    SwitchesCrudComponent,
+    FirewallsCrudComponent,
+    LoadbalancersCrudComponent,
+    HypervisorsCrudComponent,
+    BmServersCrudComponent,
+    StorageCrudComponent,
     DeviceDetailsComponentsComponent,
     SharedContainerControllersModule
   ],

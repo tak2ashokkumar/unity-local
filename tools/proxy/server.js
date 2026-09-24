@@ -45,7 +45,7 @@ const API_ENVIRONMENTS = {
 };
 
 // Older name for the SF environment, still accepted so nothing breaks.
-const ENV_ALIASES = { prod: "alpha" };
+const ENV_ALIASES = { prod: "sf" };
 
 /* ---------------------------------------------------------------------
  *  WHICH ENVIRONMENT IS ACTIVE?

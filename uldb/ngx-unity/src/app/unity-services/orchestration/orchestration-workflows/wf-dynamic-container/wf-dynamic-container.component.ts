@@ -3,17 +3,17 @@ import { AfterViewInit, Component, ElementRef, Inject, OnInit, Renderer2, ViewCh
 import Drawflow from 'drawflow';
 import * as dagre from 'dagre';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { DrawflowNode, NodeDataModel, NodeDetails, NodeDetailsArrayModel, nodeTypes, WorkflowLogsViewData } from './wf-dynamic-container.type';
+import { DrawflowNode, NodeDataModel, NodeDetails, NodeDetailsArrayModel, nodeTypes, WorkflowExecution, WorkflowLogsViewData, WorkflowNodeOutput } from './wf-dynamic-container.type';
 import { OnChatExecution, WfDynamicContainerService } from './wf-dynamic-container.service';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { catchError, delay, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError, delay, exhaustMap, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { environment } from 'src/environments/environment';
-import { forkJoin, of, Subject } from 'rxjs';
+import { forkJoin, of, Subject, timer } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { cloneDeep as _clone, has } from 'lodash-es';
@@ -72,7 +72,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   leftWidth = 340;
   rightWidth = 340;
-  bottomHeight = 350;
+  bottomHeight = 250;
 
   /* Saved sizes before collapse */
   previousLeftWidth = 340;
@@ -121,6 +121,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   clickedNodeId: number;
   triggerNode: NodeDetailsArrayModel;
   currentSessionId: string;
+  private isPersistedExecution = false;
   workflowLogsViewData: WorkflowLogsViewData = new WorkflowLogsViewData();
   showExecutionLogsFlag = false;
   isLoadingExecutionLogs = false;
@@ -166,6 +167,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   showRunHeading: boolean = true;   // controls "Run Workflow" heading vs status+stop
   private pollingUnsubscribe$ = new Subject<void>();
+  private executionLogPollingUnsubscribe$ = new Subject<void>();
   // isRunning: boolean = false;
   // resumeBtn: boolean = false;
   @ViewChild(WfDynamicRightExecuteComponent) chatbotRef!: WfDynamicRightExecuteComponent;
@@ -186,6 +188,25 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     }
   ];
 
+  // Execution library mode (kept separate from the workflow editor state).
+  workspaceMode: 'workflow' | 'execution' = 'workflow';
+  designerAvailable = false;
+  workflowExecutions: WorkflowExecution[] = [];
+  selectedExecution?: WorkflowExecution;
+  selectedExecutionInputs: WorkflowExecution['inputs'];
+  selectedExecutionLogs: WorkflowLogsViewData = new WorkflowLogsViewData();
+  selectedExecutionOutputs: WorkflowNodeOutput[] = [];
+  selectedExecutionNodes: any[] = [];
+  loadingExecutions = false;
+
+  get isExecutionMode(): boolean { return this.workspaceMode === 'execution'; }
+  get displayedExecutionLog(): string {
+    return this.isExecutionMode ? this.selectedExecutionLogs.executionLog : this.workflowLogsViewData.executionLog;
+  }
+  get hasDisplayedExecutionLog(): boolean {
+    return !!this.displayedExecutionLog?.trim();
+  }
+
   constructor(
     @Inject(DOCUMENT) private document,
     private renderer: Renderer2,
@@ -203,11 +224,13 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.workFlowId = params.get('id');
     });
-    this.isViewMode = this.router.url.includes('view');
+    this.workspaceMode = this.route.snapshot.routeConfig?.path?.endsWith('/execute') ? 'execution' : 'workflow';
+    this.isViewMode = this.isExecutionMode || this.route.snapshot.routeConfig?.path?.endsWith('/view');
   }
 
   ngOnInit(): void {
-    this.workflowDetailsLoadComplete = !this.workFlowId;
+    this.workflowDetailsLoadComplete = !this.workFlowId && !this.isExecutionMode;
+    this.designerAvailable = !this.isExecutionMode;
     this.manageWorkflowDetails();
     this.loadLLMModelOptions();
     this.loadWorkflowGroups();
@@ -218,9 +241,240 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initializeDrawflow();
-    if (this.workFlowId) {
+    if (this.isExecutionMode) {
+      this.isLeftCollapsed = false;
+      this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
+        this.designerAvailable = false;
+        this.selectExecution({ uuid: params.get('executionId') } as WorkflowExecution);
+      });
+    } else if (this.workFlowId) {
       this.getWorkflowDetails();
     }
+  }
+
+  setWorkspaceMode(mode: 'workflow' | 'execution'): void {
+    if (this.workspaceMode === mode) return;
+    if (mode === 'workflow') {
+      if (this.designerAvailable) {
+        this.router.navigate(['/services/orchestration/workflows/dynamic-workflow', this.workFlowId, 'view']);
+      }
+    } else {
+      this.loadWorkflowExecutions(true);
+    }
+  }
+
+  toggleWorkflowMode(): void {
+    if (!this.workFlowId || !this.designerAvailable) return;
+    this.router.navigate(['/services/orchestration/workflows/dynamic-workflow', this.workFlowId, this.isViewMode ? 'edit' : 'view']);
+  }
+
+  loadWorkflowExecutions(openLatest = false): void {
+    if (!this.workFlowId) return;
+    this.loadingExecutions = true;
+    const executionId = this.selectedExecution?.uuid;
+    this.svc.getWorkflowExecutions(this.workFlowId).pipe(
+      takeUntil(this.ngUnsubscribe), finalize(() => this.loadingExecutions = false)
+    ).subscribe({
+      next: (data: any) => {
+        if (executionId !== this.selectedExecution?.uuid) return;
+        this.designerAvailable = true;
+        this.workflowExecutions = Array.isArray(data) ? data : data?.results || [];
+        if (openLatest) {
+          if (this.workflowExecutions.length) {
+            this.router.navigate(
+              ['/services/orchestration/workflows/dynamic-workflow', this.workflowExecutions[0].uuid, 'execute'],
+              { queryParamsHandling: 'preserve' }
+            );
+          } else {
+            this.notification.error(new Notification('No workflow executions available'));
+          }
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        if (executionId !== this.selectedExecution?.uuid) return;
+        if (error.status === 404) {
+          this.designerAvailable = false;
+          this.workflowExecutions = this.selectedExecution ? [this.selectedExecution] : [];
+        } else {
+          this.notification.error(new Notification('Failed to load workflow executions'));
+        }
+      }
+    });
+  }
+
+  selectExecution(execution: WorkflowExecution): void {
+    if (execution.uuid !== this.route.snapshot.paramMap.get('executionId')) {
+      this.router.navigate(
+        ['/services/orchestration/workflows/dynamic-workflow', execution.uuid, 'execute'],
+        { queryParamsHandling: 'preserve' }
+      );
+      return;
+    }
+    this.selectedExecution = execution;
+    this.selectedExecutionInputs = undefined;
+    this.selectedExecutionLogs = new WorkflowLogsViewData();
+    this.selectedExecutionOutputs = [];
+    this.selectedExecutionNodes = [];
+    this.loadSelectedExecutionLogs();
+    this.svc.getWorkflowExecution(execution.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: (data: any) => {
+        if (this.selectedExecution?.uuid === data.uuid) {
+          this.selectedExecution = { ...data, execution_status: data.status, user: data.executed_by };
+          this.workFlowId = data.workflow;
+          this.workflowExecutions = [this.selectedExecution];
+          this.loadWorkflowExecutions();
+          this.selectedExecutionNodes = data.nodes_execution || [];
+          this.workflowDrawflowRendered = false;
+          this.getWorkflowDetails({
+            ...data,
+            name: data.workflow_name,
+            nodes: data.nodes_execution || []
+          });
+          this.selectedExecutionInputs = data.inputs || [];
+          this.applyExecutionStatuses(this.selectedExecutionNodes);
+        }
+      },
+      error: () => {
+        this.workflowDetailsLoadComplete = true;
+        this.updateInitialLoadingState();
+        this.notification.error(new Notification('Failed to load execution details'));
+      }
+    });
+    this.svc.getSavedExecutionOutputs(execution.uuid)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe({
+        next: (data: any) => {
+          if (this.selectedExecution?.uuid !== execution.uuid) return;
+          const outputNodes = Array.isArray(data)
+            ? data
+            : Array.isArray(data?.nodes)
+              ? data.nodes
+              : data?.node_type
+                ? [data]
+                : [];
+          this.selectedExecutionOutputs = outputNodes;
+          this.refreshOpenNodeExecutionData();
+        },
+        error: () => this.notification.error(new Notification('Failed to load output details for this execution'))
+      });
+  }
+
+  private getNodeExecutionData(nodeId: number): any {
+    if (this.isExecutionMode && this.selectedExecution) {
+      const nodeDetails = this.selectedExecutionNodes.find(
+        node => Number(node.node_id) === Number(nodeId)
+      );
+      const nodeOutput = this.selectedExecutionOutputs.find(
+        output => Number(output.node_id) === Number(nodeId)
+      );
+
+      return {
+        ...(nodeDetails || {}),
+        duration: nodeDetails?.duration
+          ? this.svc.formatDuration(
+            String(nodeDetails.duration).includes(':')
+              ? nodeDetails.duration
+              : `00:00:${nodeDetails.duration}`
+          )
+          : '',
+        ...(nodeOutput ? { output_data: nodeOutput.output } : {})
+      };
+    }
+
+    return this.realTimeNodeDetails?.nodes?.find(
+      node => Number(node.node_id) === Number(nodeId)
+    ) || {};
+  }
+
+  private refreshOpenNodeExecutionData(): void {
+    const paramsComponent = this.modalRef?.content as WfDynamicParamsComponent;
+    if (paramsComponent?.nodeId === undefined || paramsComponent?.nodeId === null) return;
+
+    paramsComponent.realTimeData = this.getNodeExecutionData(paramsComponent.nodeId);
+    paramsComponent.getOutputOfNode();
+  }
+
+  loadSelectedExecutionLogs(): void {
+    const executionId = this.selectedExecution?.uuid;
+    if (!executionId) return;
+    this.isLoadingExecutionLogs = true;
+    this.bottomActiveTab = 'logs';
+    this.expandBottomPanel();
+    this.svc.getSavedExecutionLogs(executionId).pipe(
+      takeUntil(this.ngUnsubscribe),
+      finalize(() => {
+        if (this.selectedExecution?.uuid === executionId) this.isLoadingExecutionLogs = false;
+      })
+    ).subscribe({
+      next: data => {
+        if (this.selectedExecution?.uuid === executionId) {
+          this.selectedExecutionLogs = this.svc.convertToExecutionLogViewData(data);
+        }
+      },
+      error: () => {
+        if (this.selectedExecution?.uuid === executionId) {
+          this.notification.error(new Notification('Failed to get logs for this execution'));
+        }
+      }
+    });
+  }
+
+  private applyExecutionStatuses(nodes: Array<{ node_id: number; status: string }>): void {
+    const statuses = new Map(nodes.map(node => [Number(node.node_id), node.status]));
+    Object.keys(this.editor?.drawflow?.drawflow?.Home?.data || {}).forEach(id => {
+      const update = (root: ParentNode) => {
+        root.querySelectorAll('.execution-node-status, .status-icon')
+          .forEach(marker => marker.remove());
+        const status = statuses.get(Number(id));
+        const holder = root.querySelector('.node-status-right');
+        if (!status || !holder) return;
+        const icon = document.createElement('span');
+        icon.className = 'execution-node-status ml-1';
+        icon.title = status;
+        icon.innerHTML = `<i class="${this.getStatusFaClass(status)}"></i>`;
+        holder.appendChild(icon);
+      };
+      const node = document.getElementById(`node-${id}`);
+      if (node) update(node);
+      const drawflowNode = this.editor.drawflow.drawflow.Home.data[id];
+      const stored = document.createElement('div');
+      stored.innerHTML = drawflowNode.html || '';
+      update(stored);
+      drawflowNode.html = stored.innerHTML;
+    });
+  }
+
+  private applyDesignerExecutionStatuses(): void {
+    const statuses = new Map(
+      (this.realTimeNodeDetails?.nodes || []).map(node => [Number(node.node_id), node.status])
+    );
+
+    Object.keys(this.editor?.drawflow?.drawflow?.Home?.data || {}).forEach(id => {
+      const update = (root: ParentNode) => {
+        root.querySelectorAll('.execution-node-status, .status-icon')
+          .forEach(marker => marker.remove());
+
+        const status = statuses.get(Number(id));
+        const holder = root.querySelector('.node-status-right');
+        if (!status || !holder || !holder.parentNode) return;
+
+        const icon = document.createElement('span');
+        icon.className = 'status-icon mt-1 mr-1';
+        icon.setAttribute('style', 'float:right;');
+        icon.title = String(status);
+        icon.innerHTML = `<i class="${this.getStatusFaClass(String(status))}"></i>`;
+        holder.parentNode.insertBefore(icon, holder);
+      };
+
+      const node = document.getElementById(`node-${id}`);
+      if (node) update(node);
+
+      const drawflowNode = this.editor.drawflow.drawflow.Home.data[id];
+      const stored = document.createElement('div');
+      stored.innerHTML = drawflowNode.html || '';
+      update(stored);
+      drawflowNode.html = stored.innerHTML;
+    });
   }
 
   ngOnDestroy() {
@@ -231,6 +485,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     document.body.classList.remove('wf-page');
     this.pollingUnsubscribe$.next();
     this.pollingUnsubscribe$.complete();
+    this.executionLogPollingUnsubscribe$.next();
+    this.executionLogPollingUnsubscribe$.complete();
     this.document.removeEventListener('click', this.closeLLMModelDropdowns);
   }
 
@@ -329,7 +585,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             data-value="${value}"
             data-model-id="${optionModelId}"
             role="option" aria-selected="${isSelected}"
-            onclick="window.selectWorkflowModel(${nodeId}, this, event)"
+            ${this.isViewMode
+              ? 'disabled aria-disabled="true"'
+              : `onclick="window.selectWorkflowModel(${nodeId}, this, event)"`}
             onmousedown="event.stopPropagation()">
           <span class="workflow-model-icon-wrap">
             <img class="workflow-model-icon" src="${image}" alt="" loading="eager"/>
@@ -355,7 +613,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       <div class="workflow-model-selector">
         <button type="button" class="workflow-model-trigger"
             aria-haspopup="listbox" aria-expanded="false"
-            onclick="window.toggleWorkflowModelDropdown(${nodeId}, this, event)"
+            ${this.isViewMode
+              ? 'disabled aria-disabled="true" title="Model is read-only in view mode"'
+              : `onclick="window.toggleWorkflowModelDropdown(${nodeId}, this, event)"`}
             onmousedown="event.stopPropagation()">
           <span class="workflow-model-icon-wrap">
             <img class="workflow-model-icon" src="${this.escapeHtml(selectedModel.image)}" alt="" loading="eager"/>
@@ -458,7 +718,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     if (!this.isLoadingWorkflow && this.workFlowId) {
       this.renderLoadedWorkflow();
-      this.validateAgentToolConfigurations();
+      if (!this.isExecutionMode) this.validateAgentToolConfigurations();
     }
   }
 
@@ -586,13 +846,20 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   /* BOTTOM PANEL */
   toggleBottomPanel(): void {
     if (this.isBottomCollapsed) {
-      this.bottomHeight = this.previousBottomHeight || 250;
-    } else {
-      this.previousBottomHeight = this.bottomHeight;
-      this.bottomHeight = 0;
+      this.expandBottomPanel();
+      return;
     }
 
-    this.isBottomCollapsed = !this.isBottomCollapsed;
+    this.previousBottomHeight = this.bottomHeight;
+    this.bottomHeight = 0;
+    this.isBottomCollapsed = true;
+  }
+
+  private expandBottomPanel(): void {
+    if (!this.isBottomCollapsed) return;
+
+    this.bottomHeight = this.previousBottomHeight || 250;
+    this.isBottomCollapsed = false;
   }
 
   /* =========================
@@ -682,6 +949,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     };
 
     (window as any).toggleMemoryIcon = (nodeId, el: HTMLImageElement) => {
+      if (this.isViewMode) return;
+
       const isEnabled = el.getAttribute('data-enabled') === 'true';
       const newState = !isEnabled;
 
@@ -695,6 +964,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     (window as any).toggleWorkflowModelDropdown = (nodeId: number, el: HTMLButtonElement, event: Event) => {
       event.stopPropagation();
+      if (this.isViewMode) return;
+
       const selector = el.closest('.workflow-model-selector');
       const wasOpen = selector?.classList.contains('is-open');
       this.closeLLMModelDropdowns();
@@ -708,6 +979,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     (window as any).selectWorkflowModel = (nodeId: number, el: HTMLElement, event: Event) => {
       event.stopPropagation();
+      if (this.isViewMode) return;
+
       const selectedValue = el.getAttribute('data-value') === 'PRO' ? 'PRO' : 'AUTO';
       const rawModelId = el.getAttribute('data-model-id');
       const selectedModelId = rawModelId ? Number(rawModelId) : null;
@@ -825,6 +1098,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       this.dispatch('nodeRemoved', nodeId);
     };
     this.editor.start();
+    this.editor.editor_mode = this.isViewMode ? 'view' : 'edit';
     this.editor.curvature = 0.5;
     this.editor.zoom_min = 0.1;
 
@@ -1778,6 +2052,10 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         label: node,
         nodeId,
       };
+
+      if (node?.node_type === nodeTypes.AIAgent) {
+        this.updateAgentTools(nodeId, _clone(this.getToolsForAgent(nodeId)));
+      }
     }
 
   }
@@ -1901,9 +2179,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
                onclick="event.stopPropagation();"
                onmousedown="event.stopPropagation();"
                onmouseup="event.stopPropagation();">
-            ${!this.isViewMode ? `<i class="fas fa-play action test" title="Test"></i>` : ''}
-            <i class="fas fa-pen action edit"    title="Edit"></i>
-            <i class="fas fa-trash action delete" title="Delete"></i>
+            ${this.isViewMode
+          ? ''
+          : `<i class="fas fa-play action test" title="Test"></i>
+             <i class="fas fa-pen action edit" title="Edit"></i>
+             <i class="fas fa-trash action delete" title="Delete"></i>`}
           </div>
 
           <div class="node-box ainode">
@@ -1929,7 +2209,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
                 <span class="config-label">Memory</span>
                 <img class="memory-icon memory-brain-icon"
                     data-enabled="${memoryEnabled}"
-                    onclick="window.toggleMemoryIcon(${nodeId}, this)"
+                    ${this.isViewMode
+                      ? 'aria-disabled="true" title="Memory is read-only in view mode"'
+                      : `onclick="window.toggleMemoryIcon(${nodeId}, this)"`}
                     src="${environment.assetsUrl}external-brand/workflow/dynamic/Brain.svg"
                     loading="eager"/>
               </div>
@@ -1963,9 +2245,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
               onclick="event.stopPropagation();"
               onmousedown="event.stopPropagation();"
               onmouseup="event.stopPropagation();">
-            ${!this.isViewMode ? `<i class="fas fa-play action test" title="Test"></i>` : ''}
-            <i class="fas fa-pen action edit"     title="Edit"></i>
-            <i class="fas fa-trash action delete" title="Delete"></i>
+            ${this.isViewMode
+          ? ''
+          : `<i class="fas fa-play action test" title="Test"></i>
+             <i class="fas fa-pen action edit" title="Edit"></i>
+             <i class="fas fa-trash action delete" title="Delete"></i>`}
           </div>
 
           <div class="node-box llm">
@@ -1996,9 +2280,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             onclick="event.stopPropagation();"
             onmousedown="event.stopPropagation();"
             onmouseup="event.stopPropagation();">
-          ${!this.isViewMode ? `<i class="fas fa-play action test" title="Test"></i>` : ''}
-          <i class="fas fa-pen action edit"     title="Edit"></i>
-          <i class="fas fa-trash action delete" title="Delete"></i>
+          ${this.isViewMode
+        ? ''
+        : `<i class="fas fa-play action test" title="Test"></i>
+           <i class="fas fa-pen action edit" title="Edit"></i>
+           <i class="fas fa-trash action delete" title="Delete"></i>`}
         </div>
 
         <div class="node-wrapper">
@@ -2024,13 +2310,16 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   getStatusFaClass(status?: string): string {
     switch (status) {
+      case 'Completed':
       case 'Success': return 'fas fa-check-circle text-success';
       case 'Failed': return 'fas fa-exclamation-circle text-danger';
       case 'Stopped': return 'fas fa-exclamation-circle text-danger';
       case 'Skipped': return 'fas fa-clock text-warning';
       case 'Queued': return 'fas fa-clock text-muted';
+      case 'Pending': return 'fas fa-clock text-muted';
       // case 'Started': return 'fas fa-check-circle text-success';
       case 'Canceled': return 'fas fa-exclamation-circle text-danger';
+      case 'Cancelled': return 'fas fa-exclamation-circle text-danger';
       case 'Running': return 'fas fa-spinner fa-spin text-primary';
       case 'Started': return 'fas fa-spinner fa-spin text-primary';
       default: return ''; // neutral dot
@@ -2206,12 +2495,13 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       val?.includes?.('-') ? val.split('-')[1] : val;
 
     const safeTools = (tools || []).filter(t => t && (t?.node_id || t?.tool_id));
+    const deleteIconHtml = this.isViewMode ? '' : '<div class="tool-delete-icon">×</div>';
 
     const toolsHTML = safeTools.map(tool => {
       const id = Number(getId(tool?.node_id || tool?.tool_id));
 
       return `<div class="tool-chip" data-node-id="${id}"  title="${tool?.name}">
-            <div class="tool-delete-icon">×</div>
+            ${deleteIconHtml}
   
             <div class="tool-icon">
               <img src="${this.getNodeIconUrl(tool)}" loading="eager" />
@@ -2274,6 +2564,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       };
 
       toolEl.oncontextmenu = (event: any) => {
+        if (this.isViewMode) return;
+
         event.preventDefault();
         event.stopPropagation();
 
@@ -2309,6 +2601,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   removeTool(toolId: number, agentNodeId: number) {
+    if (this.isViewMode) return;
+
     const normalizedAgentId = this.normalizeAgentNodeId(agentNodeId);
     const toolKey = this.normalizeToolId(toolId);
 
@@ -2544,9 +2838,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         keyboard: false,
         initialState: {
           nodeData: this.selectedNode || {},
-          realTimeData: this.realTimeNodeDetails
-            ? this.realTimeNodeDetails.nodes.find(n => n.node_id === numericNodeId)
-            : {},
+          realTimeData: this.getNodeExecutionData(numericNodeId),
           connectedNodes: _clone(this.connectedNodeDetails),
           modalName: modalName,
           workflowId: this.workFlowId,
@@ -2970,6 +3262,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   run() {
+    if (this.isExecutionMode && !this.designerAvailable) return;
     const hasErrors = this.nodeDetailsArr?.some(node => this.hasAnyErrors(node.formErrors)) ?? false;
     const hasToolErrors = this.toolsArr?.some(group =>
       group?.data?.some(tool => tool?.hasErrors === true || this.hasAnyErrors(tool?.formErrors))
@@ -2979,13 +3272,20 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       this.notification.error(new Notification('Workflow cannot be executed due to configuration errors in one or more nodes.'));
       return;
     }
+    const executionInputs = this.isViewMode && this.isExecutionMode
+      ? this.selectedExecutionInputs
+      : undefined;
+    if (this.isViewMode && this.isExecutionMode && executionInputs === undefined) return;
+    if (this.isExecutionMode) {
+      this.setWorkspaceMode('workflow');
+    }
     this.executionMode = 'from_start';
     this.workflowStatus = '';
     this.isRunning = false;
     this.resumeBtn = false;
     this.showRunHeading = true;   // fresh panel open -> show heading, not status
     this.triggerNode = this.nodeDetailsArr.find(n => this.svc.isTriggerNode(n.node_type));
-    this.openExecutionPanel();
+    this.openExecutionPanel(executionInputs);
   }
 
   viewExecution() {
@@ -3023,6 +3323,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.isWorkflowExecuting = false;
     this.showBeginner = false;
     this.workflowStatus = 'Stopped';
+    if (this.isPersistedExecution) this.resumeBtn = false;
     this.clearRunningNodeStatuses();
   }
 
@@ -3030,6 +3331,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.ngUnsubscribe.next();
     this.isWorkflowExecuting = false;
     this.setExecutionState('Stopped');
+    if (this.isPersistedExecution) this.resumeBtn = false;
     this.clearRunningNodeStatuses();
   }
 
@@ -3096,7 +3398,14 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   pollForRealTimeExecution() {
+    this.isPersistedExecution = false;
     this.isWorkflowExecuting = true;
+    if (this.executionMode !== 'resume') {
+      this.workflowLogsViewData = new WorkflowLogsViewData();
+      this.showExecutionLogsFlag = false;
+    }
+    this.bottomActiveTab = 'logs';
+    this.expandBottomPanel();
     this.setExecutionState('Started');
     this.pollingUnsubscribe$ = new Subject<void>();
 
@@ -3203,14 +3512,23 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     };
   }
 
-  callPollingApi(uuid) {
+  callPollingApi(uuid: string, persistedExecution = false) {
     const getId = (val: any) =>
       val?.includes?.('-') ? Number(val.split('-')[1]) : Number(val);
 
     this.currentSessionId = uuid || this.currentSessionId;
     console.log(this.currentSessionId, "current session id")
 
-    this.svc.pollRealTimeWorkflow(uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+    const polling$ = persistedExecution
+      ? this.svc.pollSavedWorkflow(uuid)
+      : this.svc.pollRealTimeWorkflow(uuid);
+
+    this.startExecutionLogPolling();
+
+    polling$.pipe(
+      takeUntil(this.ngUnsubscribe),
+      takeUntil(this.pollingUnsubscribe$)
+    ).subscribe(data => {
       console.log(data, "data")
       if (data) {
         const chatUpdate: OnChatExecution = {
@@ -3224,6 +3542,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
         if (data?.status === 'Success' || data?.status === 'Failed') {
           this.isWorkflowExecuting = false;
+          if (persistedExecution && data?.status === 'Failed') {
+            // Saved executions cannot be resumed through the preview endpoint.
+            this.resumeBtn = false;
+          }
+          this.stopExecutionLogPolling();
           this.getWorkflowExecutionLogs();
         } else {
           this.showExecutionLogsFlag = false;
@@ -3256,7 +3579,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         console.log('realTime>>>', ...finalNodes);
         const drawflowData = this.generateDrawflowStructureEdit(this.realTimeNodeDetails);
 
-        if (this.editor) {
+        // Keep collecting the live result for Designer, but do not repaint its
+        // status markers over the execution currently selected in the library.
+        if (this.editor && !this.isExecutionMode) {
           this.waitForEditorAndImport(drawflowData);
 
           this.editor.on('import', () => {
@@ -3278,10 +3603,41 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     }, (error) => {
       this.isWorkflowExecuting = false;
       this.setExecutionState('Failed');
+      if (persistedExecution) this.resumeBtn = false;
+      this.stopExecutionLogPolling();
       this.notification.error(
         new Notification('Failed to Execute. Please try again.')
       );
     });
+  }
+
+  private startExecutionLogPolling(): void {
+    this.stopExecutionLogPolling();
+    this.executionLogPollingUnsubscribe$ = new Subject<void>();
+
+    timer(0, 5000).pipe(
+      takeUntil(this.ngUnsubscribe),
+      takeUntil(this.executionLogPollingUnsubscribe$),
+      exhaustMap(() => {
+        const logs$ = this.isPersistedExecution
+          ? this.svc.getSavedExecutionLogs(this.currentSessionId)
+          : this.svc.getExecutionLogs(this.currentSessionId);
+        return logs$.pipe(catchError(() => of(null)));
+      })
+    ).subscribe((data: any) => {
+      if (!data) return;
+
+      const logs = this.svc.convertToExecutionLogViewData(data);
+      if (logs.executionLog?.trim() || !this.workflowLogsViewData.executionLog?.trim()) {
+        this.workflowLogsViewData = logs;
+      }
+      this.showExecutionLogsFlag = true;
+    });
+  }
+
+  private stopExecutionLogPolling(): void {
+    this.executionLogPollingUnsubscribe$.next();
+    this.executionLogPollingUnsubscribe$.complete();
   }
 
   getTriggerNode() {
@@ -3319,7 +3675,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     }
 
     this.isLoadingExecutionLogs = true;
-    this.svc.getExecutionLogs(this.currentSessionId).pipe(
+    const logs$ = this.isPersistedExecution
+      ? this.svc.getSavedExecutionLogs(this.currentSessionId)
+      : this.svc.getExecutionLogs(this.currentSessionId);
+
+    logs$.pipe(
       takeUntil(this.ngUnsubscribe),
       finalize(() => {
         this.isLoadingExecutionLogs = false;
@@ -3328,10 +3688,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     ).subscribe((data: any) => {
       this.workflowLogsViewData = this.svc.convertToExecutionLogViewData(data);
       this.showExecutionLogsFlag = true;
-      if (this.isBottomCollapsed) {
-        this.bottomHeight = this.previousBottomHeight || 250;
-      }
-      this.isBottomCollapsed = false;
+      this.expandBottomPanel();
       if (this.workflowLogsViewData?.executionLog?.trim()) {
         this.bottomActiveTab = 'logs';
       }
@@ -3564,6 +3921,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             });
           });
           this.editor.import(drawflowData);
+          if (this.isExecutionMode) this.applyExecutionStatuses(this.selectedExecutionNodes);
           const importedNodeIds = Object.keys(drawflowData.drawflow.Home.data);
           importedNodeIds.forEach(id => {
             const nodeEl = document.getElementById(`node-${id}`);
@@ -3733,8 +4091,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     return normalizedNode;
   }
 
-  getWorkflowDetails() {
-    this.svc.getWorkflowDetails(this.workFlowId).pipe(
+  getWorkflowDetails(executionSnapshot?: any) {
+    const details$ = executionSnapshot ? of(executionSnapshot) : this.svc.getWorkflowDetails(this.workFlowId);
+    details$.pipe(
       takeUntil(this.ngUnsubscribe),
       finalize(() => {
         this.workflowDetailsLoadComplete = true;
@@ -3750,7 +4109,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         ...res,
         nodes: (res?.nodes || []).map(node => this.normalizeNodeForEdit(node))
       };
-      this.emptyCanvas = false;
+      this.emptyCanvas = !this.workFlowData.nodes.length;
       this.nodeDetailsArr = [];
       this.toolsArr = [];
 
@@ -3758,7 +4117,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         const nodeClone = _clone(n);
 
         if (n?.node_type === nodeTypes.AIAgent) {
-          // Tools are kept separately so they can be edited inside the agent node.
+          // Tool chips are rendered from toolsArr in every workspace mode.
+          // Execution snapshots still carry the tools on the agent node, so
+          // hydrate the separate collection before the execution-mode return.
           const tools = _clone(n?.tools);
           if (Array.isArray(tools) && tools.length > 0) {
             const updatedTools = tools.map(tool => this.mapToolToNode(tool));
@@ -3775,12 +4136,19 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
           }
 
           this.nodeDetailsArr.push(nodeClone);
+          if (this.isExecutionMode) return;
+
           this.loadNodeConfiguration(
             nodeClone,
             Number(nodeClone.node_id),
             false
           );
           this.syncNodeUI(Number(String(n?.node_id ?? '').replace(/^node-/, '')));
+          return;
+        }
+
+        if (this.isExecutionMode) {
+          this.nodeDetailsArr.push(nodeClone);
           return;
         }
 
@@ -3990,7 +4358,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         this.workFlowId = savedWorkflowId;
         this.isWorkflowSaved = true;
 
-        this.router.navigate([savedWorkflowId, 'edit'], { relativeTo: this.route }).catch(() => {
+        this.router.navigate([savedWorkflowId, 'view'], { relativeTo: this.route }).catch(() => {
           this.isWorkflowSaved = false;
           this.notification.error(new Notification('Workflow was created, but the edit view could not be loaded.'));
         });
@@ -4669,8 +5037,57 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   onTriggerSubmit(data: any) {
     this.triggerData = data;
     if (this.triggerData) {
-      this.pollForRealTimeExecution();
+      if (this.isViewMode) {
+        this.executeSavedWorkflow();
+      } else {
+        this.pollForRealTimeExecution();
+      }
     }
+  }
+
+  private executeSavedWorkflow(): void {
+    if (!this.designerAvailable) return;
+    const nodeType = this.triggerNode?.node_type;
+    if (!this.workFlowId || !nodeType) {
+      this.notification.error(new Notification('Workflow trigger details are unavailable.'));
+      return;
+    }
+
+    this.isPersistedExecution = true;
+    this.isWorkflowExecuting = true;
+    this.currentSessionId = '';
+    this.workflowLogsViewData = new WorkflowLogsViewData();
+    this.showExecutionLogsFlag = false;
+    this.bottomActiveTab = 'logs';
+    this.expandBottomPanel();
+    this.setExecutionState('Started');
+    this.pollingUnsubscribe$ = new Subject<void>();
+
+    this.svc.executeSavedWorkflow(this.workFlowId, nodeType, this.triggerData)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe({
+        next: response => {
+          const executionId = response?.execution_id ?? response?.execution_uuid;
+          if (!executionId) {
+            this.isWorkflowExecuting = false;
+            this.setExecutionState('Failed');
+            this.resumeBtn = false;
+            this.notification.error(new Notification('Execution started without an execution ID.'));
+            this.chatbotRef?.handleExecutionStartFailure();
+            return;
+          }
+
+          this.currentSessionId = String(executionId);
+          this.callPollingApi(this.currentSessionId, true);
+        },
+        error: () => {
+          this.isWorkflowExecuting = false;
+          this.setExecutionState('Failed');
+          this.resumeBtn = false;
+          this.notification.error(new Notification('Failed to start execution.'));
+          this.chatbotRef?.handleExecutionStartFailure();
+        }
+      });
   }
 
   openHelpPanel(): void {
@@ -4680,12 +5097,15 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.showBeginner = false;
   }
 
-  openExecutionPanel(): void {
+  openExecutionPanel(executionInputs?: WorkflowExecution['inputs']): void {
     if (this.triggerNode) {
       this.rightExecuteData = this.prepareRightExecuteData(
         this.triggerNode,
         this.getNodeInitialValues(this.triggerNode)
       );
+      if (executionInputs !== undefined) {
+        this.rightExecuteData = { ...this.rightExecuteData, executionInputs };
+      }
     }
 
     this.isRightCollapsed = false;
@@ -4717,10 +5137,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   openBottomPanel(tab: 'variables' | 'logs', event?: MouseEvent): void {
     event?.stopPropagation();
     this.bottomActiveTab = tab;
-    if (this.isBottomCollapsed) {
-      this.bottomHeight = this.previousBottomHeight || 250;
-      this.isBottomCollapsed = false;  // expand
-    }
+    this.expandBottomPanel();
   }
 
   onWorkflowVarsChange(data: any) {
@@ -4738,7 +5155,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.workflowDetailsForm = this.svc.buildWorkflowDetailsForm(this.workFlowViewData);
     this.workflowDetailsFormErrors = this.svc.resetWorkflowDetailsFormErrors();
     this.workflowDetailsFormValidationMessages = this.svc.workflowDetailsFormValidationMessages;
-    if (!this.workFlowId) {
+    if (!this.workFlowId && !this.isExecutionMode) {
       this.openWorkflowModal();
     }
   }
@@ -4789,7 +5206,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   backWorkflow() {
     const canvasNodes = this.editor?.drawflow?.drawflow?.Home?.data || {};
-    if (Object.keys(canvasNodes).length === 0) {
+    if (this.isViewMode || Object.keys(canvasNodes).length === 0) {
       this.navigateToWorkflowList();
       return;
     }
@@ -4803,6 +5220,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   private navigateToWorkflowList(): void {
+    if (this.isExecutionMode && this.route.snapshot.queryParamMap.get('from') === 'executions') {
+      this.router.navigate(['/services/orchestration/executions']);
+      return;
+    }
+
     if (this.workFlowId) {
       this.router.navigate(['../../../'], { relativeTo: this.route });
     } else if (this.isViewMode) {

@@ -78,6 +78,13 @@ export class OrchestrationExecutionsWorkflowLogsComponent implements OnInit, OnD
     this.ngUnsubscribe.complete();
   }
 
+  openExecution(): void {
+    this.router.navigate(
+      ['/services/orchestration/workflows/dynamic-workflow', this.workflowId, 'execute'],
+      { queryParams: { from: 'executions' } }
+    );
+  }
+
   refreshData(pageNo) {
     this.spinner.start('main');
     this.showWorkflowWidget = false;

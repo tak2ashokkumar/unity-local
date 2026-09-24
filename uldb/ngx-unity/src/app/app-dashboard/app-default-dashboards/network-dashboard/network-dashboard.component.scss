@@ -275,6 +275,7 @@
   height: 12px;
   border-radius: 3px;
   flex-shrink: 0;
+  margin-right: 6px;
 }
 
 :host ::ng-deep .network-dashboard-search-box .input-group,
@@ -382,8 +383,61 @@
   min-height: 236px;
 }
 
+.network-dashboard-device-availability-lowest-table-wrap {
+  max-height: 278px;
+  overflow-y: auto;
+}
+
+.network-dashboard-device-availability-lowest-table-wrap th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
 .network-dashboard-device-availability-legend {
   padding: 0 8px 6px;
+}
+
+:host ::ng-deep .network-dashboard-pdu-health-popover {
+  max-width: 450px;
+  border: 0;
+  border-radius: 6px;
+  background: #1f2736;
+  box-shadow: 0 10px 24px rgba(19, 30, 44, 0.28);
+
+  .popover-body {
+    padding: 10px 14px;
+    color: #ffffff;
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  .arrow::after {
+    border-top-color: #1f2736;
+    border-bottom-color: #1f2736;
+  }
+}
+
+.network-dashboard-pdu-health-popover-content {
+  width: 420px;
+}
+
+.network-dashboard-pdu-health-popover-dot {
+  width: 14px;
+  min-width: 14px;
+  height: 14px;
+}
+
+.network-dashboard-pdu-health-popover-dot--info {
+  background: #42d991;
+}
+
+.network-dashboard-pdu-health-popover-dot--warning {
+  background: #ff944d;
+}
+
+.network-dashboard-pdu-health-popover-dot--critical {
+  background: #ee3d5a;
 }
 
 .network-dashboard-device-availability-legend-item {

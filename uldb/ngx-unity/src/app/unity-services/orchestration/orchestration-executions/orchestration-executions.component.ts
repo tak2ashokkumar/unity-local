@@ -17,7 +17,7 @@ import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/s
 export class OrchestrationExecutionsComponent implements OnInit {
 
   private ngUnsubscribe = new Subject();
-  listSummaryViewData: ListSummaryViewModel;J
+  listSummaryViewData: ListSummaryViewModel; J
   tableData: TableViewModel[] = [];
   currentCriteria: SearchCriteria
   count: number;
@@ -104,13 +104,33 @@ export class OrchestrationExecutionsComponent implements OnInit {
   navigateToLogs(tableData: TableViewModel) {
     if (tableData.type === 'Task') {
       this.router.navigate([tableData.uuid, tableData.id, 'tasklogs'], { relativeTo: this.route });
-    } else if (tableData.type === 'Workflow' || tableData.type === 'Agentic') {
-      console.log('>>>>>>>>>', tableData)
-      if (tableData.is_agentic) {
-        this.router.navigate([tableData.uuid, 'workflow-logs'], { queryParams: { isAgentic: tableData.is_agentic }, relativeTo: this.route });
-      } else {
-        this.router.navigate([tableData.uuid, 'workflow-logs'], { queryParams: { isAdvanced: tableData.is_advanced }, relativeTo: this.route });
-      }
+      return;
     }
+
+    this.navigateToWorkflow(tableData, true);
+  }
+
+  navigateToWorkflow(tableData: TableViewModel, execution = false) {
+    if (tableData.type !== 'Workflow' && tableData.type !== 'Agentic') return;
+    if (tableData.is_agentic && execution) {
+      this.router.navigate(
+        ['/services/orchestration/workflows/dynamic-workflow', tableData.uuid, 'execute'],
+        { queryParams: { from: 'executions' } }
+      );
+      return;
+    }
+
+    this.orchestrationExecutionService.getExecutionWorkflow(tableData.uuid, tableData.is_agentic)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(data => {
+        this.router.navigate([
+          '../workflows',
+          tableData.is_agentic ? 'dynamic-workflow' : 'agentic-workflow',
+          data.workflow,
+          'view'
+        ], { relativeTo: this.route });
+      }, (err: HttpErrorResponse) => {
+        this.notification.error(new Notification('Failed to get workflow details'));
+      });
   }
 }

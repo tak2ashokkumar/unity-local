@@ -13,6 +13,7 @@ import { DatacenterCabinetViewDeviceStatusComponent } from './datacenter-cabinet
 import { DatacenterCabinetViewMonitoringGraphsComponent } from './datacenter-cabinet-view/datacenter-cabinet-view-monitoring-graphs/datacenter-cabinet-view-monitoring-graphs.component';
 import { DatacenterCabinetViewComponent } from './datacenter-cabinet-view/datacenter-cabinet-view.component';
 import { DatacenterCabinetsComponent } from './datacenter-cabinets/datacenter-cabinets.component';
+import { DatacenterDevicesComponent } from './datacenter-devices/datacenter-devices.component';
 import { DatacenterPdusAlertComponent } from './datacenter-pdus/datacenter-pdus-observium/datacenter-pdus-alert/datacenter-pdus-alert.component';
 import { DatacenterPdusGraphNetstatsComponent } from './datacenter-pdus/datacenter-pdus-observium/datacenter-pdus-graph/datacenter-pdus-graph-netstats/datacenter-pdus-graph-netstats.component';
 import { DatacenterPdusGraphPollerComponent } from './datacenter-pdus/datacenter-pdus-observium/datacenter-pdus-graph/datacenter-pdus-graph-poller/datacenter-pdus-graph-poller.component';
@@ -60,6 +61,7 @@ import { DatacenterService } from './datacenter.service';
     DatacenterCabinetViewMonitoringGraphsComponent,
     DatacenterPduPortGraphsComponent,
     DatacenterPduPortUsageGraphsComponent,
+    DatacenterDevicesComponent,
     ZabbixDcPduGraphCrudComponent,
     ZabbixDcPduGraphsComponent,
     DatacenterPdusZabbixComponent,

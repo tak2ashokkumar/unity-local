@@ -204,6 +204,7 @@ export class NetworkDashboardService {
     return this.http.get<NetworkPerformanceInsightsTableResponse>(GET_NETWORK_DASHBOARD_PERFORMANCE_INSIGHTS(), {
       params
     });
+
   }
 
   getCpuVsMemoryPerformance(filters?: NetworkDashboardFilterCriteria): Observable<NetworkCpuVsMemoryPerformanceResponse> {
@@ -263,7 +264,8 @@ export class NetworkDashboardService {
     filters?: NetworkDashboardFilterCriteria,
     page?: number,
     pageSize?: number,
-    searchValue: string = ''
+    searchValue: string = '',
+    ordering: string = ''
   ): Observable<NetworkDeviceAvailabilityTableResponse> {
     let params = this.buildFilterParams(filters);
     if (page) {
@@ -274,6 +276,9 @@ export class NetworkDashboardService {
     }
     if (searchValue?.trim()) {
       params = params.set('search', searchValue.trim());
+    }
+    if (ordering?.trim()) {
+      params = params.set('ordering', ordering.trim());
     }
     return this.http.get<NetworkDeviceAvailabilityTableResponse>(GET_NETWORK_DASHBOARD_NETWORK_DEVICE_AVAILIBILITY(), {
       params
@@ -652,7 +657,8 @@ export class NetworkDashboardService {
         50,
         0,
         this.getRoundedAxisMax(trafficItems.map(item => item.interface_traffic_in_mbps), 10, 10),
-        50
+        50,
+        true
       )
     ];
     return view;
@@ -697,7 +703,8 @@ export class NetworkDashboardService {
         50,
         0,
         this.getRoundedAxisMax(chartItems.map(item => item.interface_traffic_in_mbps), 10, 10),
-        50
+        50,
+        true
       )
     ];
 
@@ -858,7 +865,7 @@ export class NetworkDashboardService {
         'Interfaces in warning state ranked by combined errors and discards. Donut groups warning interfaces by interface type.'
       ),
       this.buildInterfaceHealthMetricSplitChartCard(
-        'critical-interfaces',
+        'warning-interfaces',
         'Top 10 Critical Interfaces',
         this.getInterfaceHealthTopStatusItems(chartItems, 'critical'),
         item => Number(item.total_issue_value || 0),
@@ -1012,7 +1019,8 @@ export class NetworkDashboardService {
   }
 
   convertToNetworkDeviceAvailabilityViewDataFromTable(
-    data: NetworkDeviceAvailabilityTableResponse
+    data: NetworkDeviceAvailabilityTableResponse,
+    lowestAvailabilityResponse?: NetworkLowestAvailabilityResponse
   ): NetworkDeviceAvailabilityWidgetViewData {
     const items = data?.data || [];
     const view = new NetworkDeviceAvailabilityWidgetViewData();
@@ -1022,7 +1030,9 @@ export class NetworkDashboardService {
     const manufacturerModelBreakdown = this.aggregateManufacturerModelBreakdown(items);
     const devicesByLocation = this.aggregateDevicesByLocation(items);
     const averageUptimeByDeviceType = this.aggregateAverageUptimeByDeviceType(items);
-    const lowestAvailability = this.aggregateLowestAvailability(items);
+    const lowestAvailability = lowestAvailabilityResponse?.data?.length
+      ? lowestAvailabilityResponse.data
+      : this.aggregateLowestAvailability(items);
 
     view.cards = [
       this.buildNetworkDeviceAvailabilityChartCard(
@@ -2384,7 +2394,7 @@ export class NetworkDashboardService {
         'Fan Health by Device',
         this.convertToFanHealthByDeviceChartData(fanHealthByDevice?.data || []),
         248,
-        'Healthy fan count out of total fans for each device.',
+        'Displays the Top 10 devices ranked by fan health, prioritizing devices with Critical (fan off/failed) conditions, followed by Warning (fan degraded) conditions. Devices are sorted by severity and the number of affected fans to highlight hardware requiring immediate attention.',
         this.buildFanHealthLegendItems()
       )
     ];
@@ -2650,12 +2660,17 @@ export class NetworkDashboardService {
     items: NetworkTopConversationMetricApiItem[],
     metric: 'received' | 'sent'
   ): NetworkConversationMetricItem[] {
+    const values = (items || []).map(item => metric === 'received'
+      ? Number(item.bits_received_bps || 0)
+      : Number(item.bits_sent_bps || 0));
+    const thresholds = this.getTopBitsThresholds(values, metric);
+
     return (items || []).map(item => {
       const value = metric === 'received'
         ? Number(item.bits_received_bps || 0)
         : Number(item.bits_sent_bps || 0);
       const displayValue = this.formatValueWithUnit(metric === 'received' ? item.bits_received : item.bits_sent);
-      const category = this.getTopBitsCategory(value, metric);
+      const category = this.getTopBitsCategory(value, thresholds);
 
       return {
         conversation_name: item.name,
@@ -2671,29 +2686,34 @@ export class NetworkDashboardService {
     items: NetworkTopConversationTableApiItem[],
     metric: 'received' | 'sent'
   ): NetworkConversationMetricItem[] {
-    return (items || [])
+    const rankedItems = (items || [])
       .slice()
       .sort((left, right) => {
         const leftValue = metric === 'received' ? Number(left.bits_received_bps || 0) : Number(left.bits_sent_bps || 0);
         const rightValue = metric === 'received' ? Number(right.bits_received_bps || 0) : Number(right.bits_sent_bps || 0);
         return rightValue - leftValue;
       })
-      .slice(0, 10)
-      .map(item => {
-        const value = metric === 'received'
-          ? Number(item.bits_received_bps || 0)
-          : Number(item.bits_sent_bps || 0);
-        const displayValue = this.formatValueWithUnit(metric === 'received' ? item.bits_received : item.bits_sent);
-        const category = this.getTopBitsCategory(value, metric);
+      .slice(0, 10);
+    const values = rankedItems.map(item => metric === 'received'
+      ? Number(item.bits_received_bps || 0)
+      : Number(item.bits_sent_bps || 0));
+    const thresholds = this.getTopBitsThresholds(values, metric);
 
-        return {
-          conversation_name: item.name,
-          value,
-          display_value: displayValue,
-          category,
-          color: this.getTopBitsColor(category, metric)
-        };
-      });
+    return rankedItems.map(item => {
+      const value = metric === 'received'
+        ? Number(item.bits_received_bps || 0)
+        : Number(item.bits_sent_bps || 0);
+      const displayValue = this.formatValueWithUnit(metric === 'received' ? item.bits_received : item.bits_sent);
+      const category = this.getTopBitsCategory(value, thresholds);
+
+      return {
+        conversation_name: item.name,
+        value,
+        display_value: displayValue,
+        category,
+        color: this.getTopBitsColor(category, metric)
+      };
+    });
   }
 
   private convertTopBandwidthUsageItems(items: NetworkTopBandwidthUsageApiItem[]): NetworkBandwidthUsageItem[] {
@@ -2737,12 +2757,11 @@ export class NetworkDashboardService {
   }
 
   private buildTopBitsLegends(values: number[], metric: 'received' | 'sent'): NetworkMetricLegendItem[] {
-    const highThreshold = metric === 'received' ? 300000 : 250000;
-    const mediumThreshold = metric === 'received' ? 220000 : 180000;
+    const thresholds = this.getTopBitsThresholds(values, metric);
     return [
-      { label: `High (>${this.formatLegendValue(highThreshold)})`, category: 'high', color: this.getTopBitsColor('high', metric) },
-      { label: `Medium (${this.formatLegendValue(mediumThreshold)}-${this.formatLegendValue(highThreshold)})`, category: 'medium', color: this.getTopBitsColor('medium', metric) },
-      { label: `Low (<${this.formatLegendValue(mediumThreshold)})`, category: 'low', color: this.getTopBitsColor('low', metric) }
+      { label: `High (>=${this.formatLegendValue(thresholds.high)})`, category: 'high', color: this.getTopBitsColor('high', metric) },
+      { label: `Medium (${this.formatLegendValue(thresholds.medium)}-${this.formatLegendValue(thresholds.high)})`, category: 'medium', color: this.getTopBitsColor('medium', metric) },
+      { label: `Low (<${this.formatLegendValue(thresholds.medium)})`, category: 'low', color: this.getTopBitsColor('low', metric) }
     ];
   }
 
@@ -2750,9 +2769,17 @@ export class NetworkDashboardService {
     items: NetworkTopConversationTableApiItem[],
     metric: 'received' | 'sent'
   ): NetworkMetricLegendItem[] {
-    const values = (items || []).map(item => metric === 'received'
-      ? Number(item.bits_received_bps || 0)
-      : Number(item.bits_sent_bps || 0));
+    const values = (items || [])
+      .slice()
+      .sort((left, right) => {
+        const leftValue = metric === 'received' ? Number(left.bits_received_bps || 0) : Number(left.bits_sent_bps || 0);
+        const rightValue = metric === 'received' ? Number(right.bits_received_bps || 0) : Number(right.bits_sent_bps || 0);
+        return rightValue - leftValue;
+      })
+      .slice(0, 10)
+      .map(item => metric === 'received'
+        ? Number(item.bits_received_bps || 0)
+        : Number(item.bits_sent_bps || 0));
     return this.buildTopBitsLegends(values, metric);
   }
 
@@ -2811,15 +2838,36 @@ export class NetworkDashboardService {
     return Number(percentValue.toFixed(2));
   }
 
-  private getTopBitsCategory(value: number, metric: 'received' | 'sent'): string {
-    const highThreshold = metric === 'received' ? 300000 : 250000;
-    const mediumThreshold = metric === 'received' ? 220000 : 180000;
+  private getTopBitsThresholds(values: number[], metric: 'received' | 'sent'): { high: number; medium: number } {
+    const fallbackHigh = metric === 'received' ? 300000 : 250000;
+    const fallbackMedium = metric === 'received' ? 220000 : 180000;
+    const sortedValues = (values || [])
+      .map(value => Number(value || 0))
+      .filter(value => value > 0)
+      .sort((left, right) => right - left);
 
-    if (value > highThreshold) {
+    if (sortedValues.length < 3) {
+      return {
+        high: fallbackHigh,
+        medium: fallbackMedium
+      };
+    }
+
+    const highIndex = Math.max(0, Math.ceil(sortedValues.length / 3) - 1);
+    const mediumIndex = Math.max(highIndex + 1, Math.ceil((sortedValues.length * 2) / 3) - 1);
+
+    return {
+      high: sortedValues[highIndex] || fallbackHigh,
+      medium: sortedValues[mediumIndex] || fallbackMedium
+    };
+  }
+
+  private getTopBitsCategory(value: number, thresholds: { high: number; medium: number }): string {
+    if (value >= thresholds.high) {
       return 'high';
     }
 
-    if (value >= mediumThreshold) {
+    if (value >= thresholds.medium) {
       return 'medium';
     }
 
@@ -3149,7 +3197,6 @@ export class NetworkDashboardService {
     card.lowestAvailabilityRows = data
       .slice()
       .sort((left, right) => Number(left.availability || 0) - Number(right.availability || 0))
-      .slice(0, 5)
       .map(item => this.buildLowestAvailabilityRow(item));
     if (card.lowestAvailabilityRows.length) {
       card.badgeLabel = 'Low Availability';
@@ -3164,7 +3211,7 @@ export class NetworkDashboardService {
       device: item.name,
       device_type: item.type,
       availability: Number(item.availability || 0),
-      status: item.status,
+      status: item.status || item.health_state,
       location: item.location,
       datacenter: item.datacenter
     }));
@@ -3172,7 +3219,7 @@ export class NetworkDashboardService {
 
   private buildLowestAvailabilityRow(item: NetworkLowestAvailabilityApiItem): NetworkDeviceAvailabilityLowestAvailabilityRowViewData {
     const row = new NetworkDeviceAvailabilityLowestAvailabilityRowViewData();
-    row.name = item.device;
+    row.name = item.device || item.id || '';
     row.availabilityValue = Number(item.availability || 0);
     row.availabilityDisplay = this.formatAvailabilityPercent(row.availabilityValue);
     row.statusLabel = this.getDeviceAvailabilityStatusLabel(item.status);
@@ -3220,28 +3267,28 @@ export class NetworkDashboardService {
       {
         key: 'uptimeDisplay',
         label: 'Uptime',
-        sortKey: 'uptimeValue',
+        sortKey: 'uptime',
         type: 'text',
         align: 'left'
       },
       {
         key: 'availabilityDisplay',
         label: 'Availability',
-        sortKey: 'availabilityValue',
+        sortKey: 'availability',
         type: 'availability',
         align: 'left'
       },
       {
         key: 'statusLabel',
         label: 'Status',
-        sortKey: 'statusRank',
+        sortKey: 'health_state',
         type: 'status',
         align: 'left'
       },
       {
         key: 'lastDiscovered',
         label: 'Last Discovered',
-        sortKey: 'lastDiscovered',
+        sortKey: 'last_discovered',
         type: 'text',
         align: 'left'
       }
@@ -5867,7 +5914,8 @@ export class NetworkDashboardService {
     xInterval: number,
     yMin: number,
     yMax: number,
-    yInterval: number
+    yInterval: number,
+    useLogScale: boolean = false
   ): PerformanceWorkloadChartViewData {
     const chart = new PerformanceWorkloadChartViewData();
     chart.key = key;
@@ -5885,7 +5933,8 @@ export class NetworkDashboardService {
       xInterval,
       yMin,
       yMax,
-      yInterval
+      yInterval,
+      useLogScale
     );
     return chart;
   }
@@ -6111,7 +6160,8 @@ export class NetworkDashboardService {
     xInterval: number,
     yMin: number,
     yMax: number,
-    yInterval: number
+    yInterval: number,
+    useLogScale: boolean = false
   ): UnityChartDetails {
     if (!items?.length) {
       return null;
@@ -6126,17 +6176,17 @@ export class NetworkDashboardService {
       show: false
     };
     view.options.grid = {
-      left: 46,
-      right: 18,
+      left: useLogScale ? 54 : 46,
+      right: useLogScale ? 44 : 18,
       top: 10,
-      bottom: 52,
+      bottom: useLogScale ? 68 : 52,
       containLabel: false
     };
     view.options.xAxis = {
-      type: 'value',
-      min: xMin,
+      type: useLogScale ? 'log' : 'value',
+      min: useLogScale ? 1 : xMin,
       max: xMax,
-      interval: xInterval,
+      ...(useLogScale ? { logBase: 10 } : { interval: xInterval }),
       name: xAxisTitle,
       nameLocation: 'middle',
       nameGap: 30,
@@ -6156,7 +6206,8 @@ export class NetworkDashboardService {
       axisLabel: {
         color: '#7f8995',
         fontSize: 10,
-        hideOverlap: true
+        hideOverlap: true,
+        ...(useLogScale ? { formatter: (value: number) => this.formatPerformanceTrafficAxisValue(value) } : {})
       },
       splitLine: {
         show: true,
@@ -6164,13 +6215,16 @@ export class NetworkDashboardService {
           color: '#e8edf3'
         }
       },
-      scale: false
-    };
+      minorTick: {
+        show: useLogScale
+      },
+      scale: useLogScale
+    } as any;
     view.options.yAxis = {
-      type: 'value',
-      min: yMin,
+      type: useLogScale ? 'log' : 'value',
+      min: useLogScale ? 1 : yMin,
       max: yMax,
-      interval: yInterval,
+      ...(useLogScale ? { logBase: 10 } : { interval: yInterval }),
       axisLine: {
         lineStyle: {
           color: '#97a3b3'
@@ -6182,7 +6236,8 @@ export class NetworkDashboardService {
       axisLabel: {
         color: '#7f8995',
         fontSize: 10,
-        hideOverlap: true
+        hideOverlap: true,
+        ...(useLogScale ? { formatter: (value: number) => this.formatPerformanceTrafficAxisValue(value) } : {})
       },
       splitLine: {
         show: true,
@@ -6190,8 +6245,28 @@ export class NetworkDashboardService {
           color: '#e8edf3'
         }
       },
-      scale: false
-    };
+      minorTick: {
+        show: useLogScale
+      },
+      scale: useLogScale
+    } as any;
+    if (useLogScale) {
+      view.options.dataZoom = this.chartConfigSvc.setDataZoom('both', 'right');
+      view.options.dataZoom[0] = {
+        ...view.options.dataZoom[0],
+        height: 14,
+        bottom: 8,
+        showDataShadow: false
+      };
+      view.options.dataZoom[1] = {
+        ...view.options.dataZoom[1],
+        width: 14,
+        right: 6,
+        top: 28,
+        bottom: 76,
+        showDataShadow: false
+      };
+    }
     view.options.tooltip = {
       trigger: 'item',
       backgroundColor: 'rgba(33, 41, 52, 0.94)',
@@ -6204,26 +6279,60 @@ export class NetworkDashboardService {
     view.options.series = [
       {
         type: 'scatter',
-        symbolSize: 12,
+        symbolSize: useLogScale ? 13 : 12,
         emphasis: {
           scale: true
         },
         label: {
           show: false
         },
-        data: items.map(item => ({
+        data: items.map((item, index) => ({
           name: item.device_name,
-          value: [getXValue(item), getYValue(item)],
+          value: [
+            this.getPerformanceScatterAxisValue(getXValue(item), useLogScale),
+            this.getPerformanceScatterAxisValue(getYValue(item), useLogScale)
+          ],
+          symbolOffset: useLogScale ? this.getPerformanceTrafficSymbolOffset(index) : [0, 0],
           item,
           itemStyle: {
             color: this.getPerformanceWorkloadColor(item),
             borderColor: '#ffffff',
-            borderWidth: 1.5
+            borderWidth: 1.5,
+            opacity: useLogScale ? 0.88 : 1
           }
         }))
       }
     ];
     return view;
+  }
+
+  private getPerformanceScatterAxisValue(value: number, useLogScale: boolean): number {
+    const numericValue = Number(value || 0);
+    return useLogScale ? Math.max(numericValue, 1) : numericValue;
+  }
+
+  private getPerformanceTrafficSymbolOffset(index: number): number[] {
+    const offsets = [
+      [0, 0],
+      [6, 0],
+      [-6, 0],
+      [0, 6],
+      [0, -6],
+      [5, 5],
+      [-5, 5],
+      [5, -5],
+      [-5, -5],
+      [8, 2]
+    ];
+    return offsets[index % offsets.length];
+  }
+
+  private formatPerformanceTrafficAxisValue(value: number): string {
+    const numericValue = Number(value || 0);
+    if (numericValue >= 1000) {
+      return `${Number((numericValue / 1000).toFixed(numericValue >= 10000 ? 0 : 1))}K`;
+    }
+    return `${Math.round(numericValue)}`;
   }
 
   private convertToInterfaceHealthBarChartData(

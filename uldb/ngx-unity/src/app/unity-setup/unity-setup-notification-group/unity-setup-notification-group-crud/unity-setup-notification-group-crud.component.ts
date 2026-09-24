@@ -115,6 +115,10 @@ export class UnitySetupNotificationGroupCrudComponent implements OnInit, OnDestr
     label: 'Devops Automation',
     value: 'devops_automation'
   },
+  {
+    label: 'Collector',
+    value: 'collector'
+  },
   ]
 
   depricationOptions = [
@@ -132,6 +136,9 @@ export class UnitySetupNotificationGroupCrudComponent implements OnInit, OnDestr
     }
   ];
 
+  colletorOptions = [
+    { label: 'Certificate Expiring Soon', value: 'cert_expiring_soon' },
+  ]
 
 
   // typeOptions: AlertTypeListDataType[] = [];
@@ -385,17 +392,29 @@ export class UnitySetupNotificationGroupCrudComponent implements OnInit, OnDestr
     // })
 
     this.createForm.get('module').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
-      this.createForm.get('filter_type').setValue('all');
+      if (['aiml', 'deprecation', 'devops_automation'].includes(val)) {
+        // this.createForm.get('filter_type').setValue('all');
+        this.createForm.get('filter_type') ? this.createForm.get('filter_type').setValue('all') : this.createForm.addControl('filter_type', new FormControl('all', [Validators.required]));
+      }
       if (val === 'deprecation') {
         this.isLifeCycleRelatedAlertTypeSelected = true;
         this.hasAlertTypeSelected = true;
         this.createForm.get('alert_type')?.setValue([]);
-        this.createForm.addControl('notify', new FormControl('', [Validators.required, Validators.min(1), Validators.max(999)]))
+        this.createForm.get('notify') ? this.createForm.get('notify').setValue('') : this.createForm.addControl('notify', new FormControl('', [Validators.required, Validators.min(1), Validators.max(999)]))
       } else if (val === 'aiml') {
         this.isLifeCycleRelatedAlertTypeSelected = false;
         this.hasAlertTypeSelected = true;
         this.createForm.get('alert_type')?.setValue([]);
         this.createForm.removeControl('notify');
+      } else if (val === 'collector') {
+        this.createForm.get('filter_type') ? this.createForm.removeControl('filter_type') : null;
+        this.createForm.get('custom_filter_meta') ? this.createForm.removeControl('custom_filter_meta') : null;
+        this.createForm.get('filter_rule_meta') ? this.createForm.removeControl('filter_rule_meta') : null;
+        this.createForm.get('description') ? this.createForm.removeControl('description') : null;
+        this.isLifeCycleRelatedAlertTypeSelected = false;
+        this.hasAlertTypeSelected = true;
+        this.createForm.get('alert_type')?.setValue([]);
+        this.createForm.get('notify') ? this.createForm.get('notify').setValue('') : this.createForm.addControl('notify', new FormControl('', [Validators.required, Validators.min(1), Validators.max(999)]));
       }
     })
 
@@ -408,16 +427,16 @@ export class UnitySetupNotificationGroupCrudComponent implements OnInit, OnDestr
     });
 
     this.createForm.get('module')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((moduleValue) => {
-      this.createForm.get('alert_type')?.setValue([]);
+      this.createForm.get('alert_type') ? this.createForm.get('alert_type')?.setValue([]) : this.createForm.addControl('alert_type', new FormControl([], [Validators.required]));
       this.createForm.get('filter_type')?.setValue('all');
 
       if (moduleValue === 'devops_automation') {
         this.hasAlertTypeSelected = true;
-        this.createForm.addControl('alert_type', new FormControl([], [Validators.required]));
+        // this.createForm.addControl('alert_type', new FormControl([], [Validators.required]));
         this.createForm.removeControl('notify');
         this.devopsFilter();
-      } else {
-        this.createForm.addControl('alert_type', new FormControl([], [Validators.required]));
+      } else if (moduleValue === 'aiml' || moduleValue === 'deprecation') {
+        // this.createForm.addControl('alert_type', new FormControl([], [Validators.required]));
         // this.createForm.removeControl('devops_type');
         this.aimlFilter();
       }
@@ -436,7 +455,7 @@ export class UnitySetupNotificationGroupCrudComponent implements OnInit, OnDestr
   }
 
   aimlFilter() {
-    this.createForm.get('filter_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
+    this.createForm.get('filter_type')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
       this.createForm.removeControl('custom_filter_meta');
       this.createForm.removeControl('filter_rule_meta');
       this.createForm.removeControl('description');
@@ -653,7 +672,7 @@ export class UnitySetupNotificationGroupCrudComponent implements OnInit, OnDestr
         .subscribe((data: any) => { this.createFormErrors = this.utilService.validateForm(this.createForm, this.createValidationMessages, this.createFormErrors); });
     } else {
       this.spinner.start('main');
-      if (this.createForm.get('filter_type').value === 'filters') {
+      if (this.createForm.get('filter_type')?.value === 'filters') {
         this.queryBuilder.submit();
       }
       const data = this.createForm.getRawValue();

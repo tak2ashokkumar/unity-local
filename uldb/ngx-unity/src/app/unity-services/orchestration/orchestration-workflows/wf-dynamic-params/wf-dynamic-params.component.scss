@@ -93,14 +93,11 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
   background: $bg;
   color: $blue;
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.14);
   transition: background 0.14s ease, color 0.14s ease;
 
   &:hover {
     background: $surface;
     color: $blue-dark;
-    box-shadow: 0 4px 14px $blue-dark;
-    transform: translateY(-1px);
   }
 
   &.input-toggle {
@@ -109,13 +106,6 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
   &.output-toggle {
     left: 8px;
-  }
-}
-
-.btn {
-  &:hover {
-    box-shadow: 0 4px 14px $blue-dark;
-    transform: translateY(-1px);
   }
 }
 
@@ -168,7 +158,6 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
   background: $bg;
   font-size: 11px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   transition: background 0.14s ease, color 0.14s ease;
   right: 0;
   z-index: 5;
@@ -765,4 +754,21 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
 .dynamic-radio-option {
   margin-bottom: 0;
+}
+
+.field-icon-button {
+  color: var(--secondary, #6c757d);
+
+  &:hover,
+  &:focus-visible {
+    color: #000;
+  }
+}
+
+.ai-input-icon {
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  -webkit-mask: var(--ai-icon) center / contain no-repeat;
+  mask: var(--ai-icon) center / contain no-repeat;
 }

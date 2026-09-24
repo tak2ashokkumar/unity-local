@@ -362,15 +362,11 @@ export class VmsListVmwareComponent implements OnInit, OnDestroy {
     if (!view.isNewTabEnabled) {
       return;
     }
-    if (view.isCollectorZtc) {
-      window.open(view.newTabConsoleAccessUrl);
-    } else {
-      let obj: ConsoleAccessInput = this.vmwareService.getConsoleAccessInput(view);
-      obj.managementIp = view.managementIp;
-      obj.newTab = true;
-      this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
-      window.open(view.newTabConsoleAccessUrl);
-    }
+    let obj: ConsoleAccessInput = this.vmwareService.getConsoleAccessInput(view);
+    obj.managementIp = view.managementIp;
+    obj.newTab = true;
+    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+    window.open(view.newTabConsoleAccessUrl);
   }
 
   newWebConsole(view: VMwareViewData) {

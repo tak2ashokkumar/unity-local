@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, timer } from 'rxjs';
 import { OrchestrationWorkflowMetadata } from '../../orchestration.type';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { UnityWorkflowViewData } from '../orchestration-workflow-crud/orchestration-workflow-crud.service';
-import { nodeTypes, TaskDetailsModel, unityWorkflowTaskTypes } from './wf-dynamic-container.type';
+import { nodeTypes, TaskDetailsModel, unityWorkflowTaskTypes, WorkflowExecution, WorkflowNodeOutput } from './wf-dynamic-container.type';
 import { environment } from 'src/environments/environment';
 import { playbookTypes } from '../../orchestration-tasks/orchestration-tasks.service';
 import { CeleryTask, EntityTaskRelation } from 'src/app/shared/SharedEntityTypes/celery-task.type';
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap, take, takeWhile } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { WorkflowLogs } from '../../orchestration-executions/orchestration-executions-workflow-logs/orchestration-executions-workflow-logs.type';
 import { WorkflowLogsViewData } from '../../orchestration-executions/orchestration-executions-workflow-logs/orchestration-executions-workflow-logs.service';
+import { ORCHESTRATION_EXECUTION_AGENTIC_WORKFLOW_OUTPUT } from 'src/app/shared/api-endpoint.const';
 
 @Injectable({
   providedIn: 'root'
@@ -62,6 +63,16 @@ export class WfDynamicContainerService {
     return this.http.get<any>(`api/orchestration/v1/dynamic_workflows/${workflowId}/`);
   }
 
+  getWorkflowExecutions(workflowId: string): Observable<WorkflowExecution[]> {
+    return this.http.get<WorkflowExecution[]>(`/rest/orchestration/agentic_workflow/${workflowId}/history/`, {
+      params: new HttpParams().set('page_size', '0')
+    });
+  }
+
+  getWorkflowExecution(executionId: string): Observable<WorkflowExecution> {
+    return this.http.get<WorkflowExecution>(`/api/orchestration/v1/workflow_execution/${executionId}/`);
+  }
+
 
   saveWorkFlow(obj: any, workflowId?: string): Observable<CeleryTask> | any {
     let url = '';
@@ -84,6 +95,12 @@ export class WfDynamicContainerService {
     return this.http.post<any>(url, obj);
   }
 
+  executeSavedWorkflow(workflowUuid: string, nodeType: string, data: any): Observable<any> {
+    return this.http.post<any>(`api/orchestration/v1/dynamic_workflows/${workflowUuid}/execute/`, data, {
+      params: { node_type: nodeType }
+    });
+  }
+
   // pollRealTimeWorkflow(uuid: string): any {
   //   let url = `rest/orchestration/agentic_workflow_preview/${uuid}`;
   //   return this.http.get<any>(url);
@@ -95,12 +112,27 @@ export class WfDynamicContainerService {
     );
   }
 
+  pollSavedWorkflow(executionId: string): Observable<any> {
+    return timer(0, 2000).pipe(
+      switchMap(() => this.http.get<any>(ORCHESTRATION_EXECUTION_AGENTIC_WORKFLOW_OUTPUT(executionId))),
+      takeWhile(result => result?.status !== 'Success' && result?.status !== 'Failed', true)
+    );
+  }
+
   convertToEntityTaskRelation(workflowId: string, workflowName: string, taskId: string): EntityTaskRelation {
     return { entityId: workflowId, entityName: workflowName, taskId: taskId };
   }
 
   getExecutionLogs(workflowId: string): Observable<WorkflowLogs> {
     return this.http.get<WorkflowLogs>(`api/orchestration/v1/dynamic_workflow_preview/${workflowId}/execution_log/`);
+  }
+
+  getSavedExecutionLogs(executionId: string): Observable<WorkflowLogs> {
+    return this.http.get<WorkflowLogs>(`api/orchestration/v1/workflow_execution/${executionId}/execution_log/`);
+  }
+
+  getSavedExecutionOutputs(executionId: string): Observable<WorkflowNodeOutput[]> {
+    return this.http.get<WorkflowNodeOutput[]>(ORCHESTRATION_EXECUTION_AGENTIC_WORKFLOW_OUTPUT(executionId));
   }
 
   getOptionCache(key: string): any[] | null {

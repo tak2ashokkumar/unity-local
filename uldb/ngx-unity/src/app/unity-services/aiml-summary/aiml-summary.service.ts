@@ -9,6 +9,7 @@ import { Color, Label } from 'ng2-charts';
 import { GET_AIOPS_ALERTS_COUNT, GET_AIOPS_CONDITIONS_SUMMARY, GET_AIOPS_EVENT_COUNT_BY_TYPE, GET_AIOPS_EVENT_NOISY_HOSTS, GET_AIOPS_NOISY_EVENTS } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { CUSTOM_DATE_FILTER_DATE_FORMAT } from 'src/app/shared/custom-date-filter/custom-date-filter.type';
+import { cloneHttpParamsWithPlusEncoder } from 'src/app/shared/http-param-plus-encoder';
 import { UnityChartConfigService, UnityChartDataType, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment.prod';
@@ -25,7 +26,7 @@ export class AimlSummaryService {
     private userInfo: UserInfoService) { }
 
   getConditionsSummary(dateRangeParams?: AIMLSummaryDateRangeParams) {
-    let params: HttpParams = new HttpParams();
+    let params: HttpParams = cloneHttpParamsWithPlusEncoder();
     params = params.append('last_n_days', 7);
     params = params.append('last_n_days', 14);
     params = this.appendDateRangeParams(params, dateRangeParams);
@@ -33,7 +34,7 @@ export class AimlSummaryService {
   }
 
   appendDateRangeParams(params?: HttpParams | null, dateRangeParams?: AIMLSummaryDateRangeParams): HttpParams {
-    let requestParams = params || new HttpParams();
+    let requestParams = cloneHttpParamsWithPlusEncoder(params);
     const startDate = dateRangeParams?.startDate;
     const endDate = dateRangeParams?.endDate;
     if (this.isValidDateParam(startDate) && this.isValidDateParam(endDate)) {

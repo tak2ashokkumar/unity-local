@@ -42,6 +42,7 @@ import { QueryBuilderConfig, QueryBuilderClassNames, RuleSet } from 'src/app/sha
 import { queryBuilderClassNames } from 'src/app/unity-setup/unity-setup-notification-group/unity-setup-notification-group-crud/unity-setup-notification-group-crud.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CONDITION_SUB_FIELDS_CONFIG, CONDITION_VALIDATION_MESSAGES, DATA_TYPE_OPTIONS, DataType, DynamicFieldMeta, getDefaultOperator, getValueInputKind, isGroupComplete, normalizeDataType, OPERATORS_BY_DATA_TYPE, resolveEndpointTemplate, SelectOption } from './condition-builder.constants';
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'wf-dynamic-params',
   templateUrl: './wf-dynamic-params.component.html',
@@ -191,6 +192,12 @@ export class WfDynamicParamsComponent implements OnInit {
     "keyToSelect": 'value',
   }
 
+  aiIcon = `${environment.assetsUrl}external-brand/workflow/LLM.svg`;
+
+  // Track which field/form is currently expanded to full-modal view
+  expandedField: DynamicField | null = null;
+  expandedForm: FormGroup | null = null;
+
   constructor(
     public bsModalRef: BsModalRef,
     private fb: FormBuilder,
@@ -257,6 +264,10 @@ export class WfDynamicParamsComponent implements OnInit {
   }
 
   closeOrSaveModal(): void {
+    if (this.isViewMode) {
+      this.bsModalRef.hide();
+      return;
+    }
     if (this.isSchemaLoading || this.schemaLoadError) {
       this.bsModalRef.hide();
       return;
@@ -541,8 +552,8 @@ export class WfDynamicParamsComponent implements OnInit {
           };
         }
 
-        if(node.node_type === nodeTypes.Loop){
-           return {
+        if (node.node_type === nodeTypes.Loop) {
+          return {
             ...node,
             outputTree: [
               { param_name: 'item', path: "item", children: [] },
@@ -665,7 +676,8 @@ export class WfDynamicParamsComponent implements OnInit {
    * - Skips keys whose value is null, undefined, or '' (per spec: don't show
    *   empty/null fields like error:null on a successful run).
    * - path starts with the root key and brackets nested keys, e.g.
-   *   output['nested_key'].
+   *   output['nested_key']. Array positions use numeric indexes, e.g.
+   *   output['items'][0].
    */
   buildOutputTree(value: any, path: string): any[] {
     if (value === null || value === undefined || value === '') return [];
@@ -674,8 +686,11 @@ export class WfDynamicParamsComponent implements OnInit {
       return value
         .map((item: any, idx: number) => {
           if (item === null || item === undefined || item === '') return null;
-          const key = item?.param_name ?? String(idx);
-          const childPath = path ? `${path}['${key}']` : key;
+          const isNamedParameter = item?.param_name !== undefined && item?.param_name !== null;
+          const key = isNamedParameter ? item.param_name : String(idx);
+          const childPath = isNamedParameter
+            ? (path ? `${path}['${key}']` : key)
+            : `${path}[${idx}]`;
           const children = (item && typeof item === 'object')
             ? this.buildOutputTree(item.children ?? item, childPath)
             : [];
@@ -1050,9 +1065,9 @@ export class WfDynamicParamsComponent implements OnInit {
       const varKey = variable?.param_name;
       if (childData) {
         const childKey = typeof childData === 'string' ? childData : childData?.param_name;
-        return `{{ vars.['${varKey}.${childKey}'] }}`;
+        return `{{ vars['${varKey}']['${childKey}'] }}`;
       }
-      return `{{ vars.['${varKey}'] }}`;
+      return `{{ vars['${varKey}'] }}`;
     }
 
     // Connected node case: variable.path starts with the root key and uses
@@ -1062,7 +1077,8 @@ export class WfDynamicParamsComponent implements OnInit {
       const childKey = typeof childData === 'string' ? childData : childData?.param_name;
       path = `${path}['${childKey}']`;
     }
-    return `{{ tasks.node_${nodeData.node_id}.${path} }}`;
+    const pathAccessor = path.startsWith('[') ? path : `.${path}`;
+    return `{{ tasks.node_${nodeData.node_id}${pathAccessor} }}`;
   }
 
   onDrop(event: DragEvent, control: FormControl, key?: string) {
@@ -1238,7 +1254,7 @@ export class WfDynamicParamsComponent implements OnInit {
 
     (fields || []).forEach(field => {
       const controlName = field.control_name;
-      if (!controlName || !form.contains(controlName) || !this.evaluateVisibleWhen(field.visible_when, form)) {
+      if (!controlName || !form.get(controlName) || !this.evaluateVisibleWhen(field.visible_when, form)) {
         return;
       }
 
@@ -1401,8 +1417,18 @@ export class WfDynamicParamsComponent implements OnInit {
     return a && b ? a.uuid === b.uuid : a === b;
   }
 
+  isInputParamField(field: DynamicField): boolean {
+    return !!this.nodeData?.inputs?.some((i: any) => i.param_name === field.control_name);
+  }
 
-  onAIiconClick(control) {
+  isFieldControlDisabled(field: DynamicField, form: FormGroup): boolean {
+    return !!form.get(field.control_name)?.disabled;
+  }
+
+  onAIiconClick(field: DynamicField, form: FormGroup): void {
+    const control = form.get(field.control_name);
+    if (!control) return;
+
     if (control.disabled) {
       control.enable();
       control.setValue('');
@@ -1410,19 +1436,32 @@ export class WfDynamicParamsComponent implements OnInit {
       control.setValue('AI INPUT');
       control.disable();
     }
+    this.refreshFormErrors();
   }
 
-  expandPrompt(formControlName: string): void {
-    this.expandedFormControlName = formControlName;
+  expandPrompt(field: DynamicField, form: FormGroup): void {
+    this.expandedField = field;
+    this.expandedForm = form;
     this.expandedLabel =
-      this.titleCasePipe.transform(formControlName.includes('_') ? formControlName.split('_').join(' ') : formControlName) || '';
+      field.label ||
+      this.titleCasePipe.transform(
+        field.control_name?.includes('_') ? field.control_name.split('_').join(' ') : field.control_name
+      ) || '';
     this.isPromptExpanded = true;
   }
 
   collapsePrompt(): void {
     this.isPromptExpanded = false;
+    this.expandedField = null;
+    this.expandedForm = null;
   }
 
+  onExpandedInput(event: Event): void {
+    if (!this.expandedField || !this.expandedForm) return;
+    const value = (event.target as HTMLTextAreaElement).value;
+    this.expandedForm.get(this.expandedField.control_name)?.setValue(value, { emitEvent: true });
+    this.refreshFormErrors();
+  }
 
   loadDynamicSchema(apiSchema: ApiSchema, values: Record<string, any> = {}): void {
     this.dynamicOptionStore = {};
@@ -1451,6 +1490,7 @@ export class WfDynamicParamsComponent implements OnInit {
     this.bindFormErrorRefresh();
     const allFields = (this.dynamicSchema?.tabs || []).flatMap(tab => tab.fields || []);
     this.restoreFieldModes(this.nodeForm, allFields);
+    if (this.isViewMode) this.nodeForm.disable({ emitEvent: false });
     this.markAllTouched(this.nodeForm);
     this.refreshFormErrors();
   }
@@ -1662,7 +1702,7 @@ export class WfDynamicParamsComponent implements OnInit {
         field,
         this.initialValues?.[field.control_name]
       );
-      const disabled = field.disabled === true;
+      const disabled = field.disabled === true || initialValue === 'AI INPUT';
 
       form.addControl(
         field.control_name,
@@ -1813,12 +1853,13 @@ export class WfDynamicParamsComponent implements OnInit {
       }
 
       if (!group.get(field.control_name)) {
+        const initialValue = this.getInitialFieldValue(field, values[field.control_name]);
         group.addControl(
           field.control_name,
           this.fb.control(
             {
-              value: this.getInitialFieldValue(field, values[field.control_name]),
-              disabled: field.disabled === true
+              value: initialValue,
+              disabled: field.disabled === true || initialValue === 'AI INPUT'
             },
             this.getValidatorsFromField(field)
           )
@@ -2604,12 +2645,12 @@ export class WfDynamicParamsComponent implements OnInit {
       return {
         label,
         value:
-        this.readPath(item, valueKey) ??
-        item.value ??
-        item.uuid ??
-        item.id ??
-        item.name ??
-        item
+          this.readPath(item, valueKey) ??
+          item.value ??
+          item.uuid ??
+          item.id ??
+          item.name ??
+          item
       };
     });
   }
@@ -2896,6 +2937,11 @@ export class WfDynamicParamsComponent implements OnInit {
       : '';
     this.fieldValues[key][mode] = restoreValue;
     control?.setValue(restoreValue);
+    if (mode === 'normal' && restoreValue === 'AI INPUT') {
+      control?.disable();
+    } else if (currentMode === 'normal' && currentVal === 'AI INPUT' && !field.disabled) {
+      control?.enable();
+    }
     this.refreshFormErrors();
   }
 

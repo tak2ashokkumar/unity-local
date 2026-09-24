@@ -22,6 +22,7 @@ import { SwitchesZabbixComponent } from '../shared/switches/switches-zabbix/swit
 import { CabinetViewGuard } from './cabinet-view.guard';
 import { DatacenterCabinetViewComponent } from './datacenter-cabinet-view/datacenter-cabinet-view.component';
 import { DatacenterCabinetsComponent } from './datacenter-cabinets/datacenter-cabinets.component';
+import { DatacenterDevicesComponent } from './datacenter-devices/datacenter-devices.component';
 import { OBSERVIUM_PDU_ROUTES } from './datacenter-pdus/datacenter-pdus-observium/datacenter-pdus-obs-routing.const';
 import { DC_PDU_ROUTES } from './datacenter-pdus/datacenter-pdus-routing.const';
 import { DatacenterPdusZabbixComponent } from './datacenter-pdus/datacenter-pdus-zabbix/datacenter-pdus-zabbix.component';
@@ -69,6 +70,148 @@ const routes: Routes = [
         }
       },
       ...DC_PDU_ROUTES,
+      {
+        path: 'devices/switches/:deviceid/obs',
+        component: DeviceTabComponent,
+        data: {
+          breadcrumb: {
+            title: 'Switches',
+            stepbackCount: 1
+          }
+        },
+        children: OBSERVIUM_SWITCH_ROUTES
+      },
+      {
+        path: 'devices/switches/:deviceid/zbx',
+        component: SwitchesZabbixComponent,
+        data: {
+          breadcrumb: {
+            title: 'Switches',
+            stepbackCount: 1
+          }
+        },
+        children: ZABBIX_SWITCH_ROUTES
+      },
+      {
+        path: 'devices/firewalls/:deviceid/obs',
+        component: DeviceTabComponent,
+        data: {
+          breadcrumb: {
+            title: 'Firewalls',
+            stepbackCount: 1
+          }
+        },
+        children: OBSERVIUM_FIREWALL_ROUTES
+      },
+      {
+        path: 'devices/firewalls/:deviceid/zbx',
+        component: FirewallsZabbixComponent,
+        data: {
+          breadcrumb: {
+            title: 'Firewalls',
+            stepbackCount: 1
+          }
+        },
+        children: ZABBIX_FIREWALLS_ROUTES
+      },
+      {
+        path: 'devices/loadbalancers/:deviceid/obs',
+        component: DeviceTabComponent,
+        data: {
+          breadcrumb: {
+            title: 'Load Balancers',
+            stepbackCount: 1
+          }
+        },
+        children: OBSERVIUM_LOADBALANCER_ROUTES
+      },
+      {
+        path: 'devices/loadbalancers/:deviceid/zbx',
+        component: LoadbalancersZabbixComponent,
+        data: {
+          breadcrumb: {
+            title: 'Load Balancers',
+            stepbackCount: 1
+          }
+        },
+        children: ZABBIX_LOADBALANCERS_ROUTES
+      },
+      {
+        path: 'devices/hypervisors/:deviceid/obs',
+        component: DeviceTabComponent,
+        data: {
+          breadcrumb: {
+            title: 'Hypervisors',
+            stepbackCount: 1
+          }
+        },
+        children: OBSERVIUM_HYPERVISOR_ROUTES
+      },
+      {
+        path: 'devices/hypervisors/:deviceid/zbx',
+        component: HypervisorsZabbixComponent,
+        data: {
+          breadcrumb: {
+            title: 'Hypervisors',
+            stepbackCount: 1
+          }
+        },
+        children: ZABBIX_HYPERVISOR_ROUTES
+      },
+      {
+        path: 'devices/bmservers/:deviceid/obs',
+        component: DeviceTabComponent,
+        data: {
+          breadcrumb: {
+            title: 'Bare Metal Servers',
+            stepbackCount: 1
+          }
+        },
+        children: OBSERVIUM_BMS_ROUTES
+      },
+      {
+        path: 'devices/bmservers/:deviceid/zbx',
+        component: BmServersZabbixComponent,
+        data: {
+          breadcrumb: {
+            title: 'Bare Metal Servers',
+            stepbackCount: 1
+          }
+        },
+        children: ZABBIX_BMS_ROUTES
+      },
+      {
+        path: 'devices/storagedevices/:deviceid/obs',
+        component: DeviceTabComponent,
+        data: {
+          breadcrumb: {
+            title: 'Storage Devices',
+            stepbackCount: 1
+          }
+        },
+        children: OBSERVIUM_STORAGE_ROUTES
+      },
+      {
+        path: 'devices/storagedevices/:deviceid/zbx',
+        component: StorageZabbixComponent,
+        data: {
+          breadcrumb: {
+            title: 'Storage Devices',
+            stepbackCount: 1
+          }
+        },
+        children: ZABBIX_STORAGE_ROUTES
+      },
+      {
+        path: 'devices/:deviceType',
+        component: DatacenterDevicesComponent,
+        data: {
+          breadcrumb: {
+            title: 'Devices',
+            stepbackCount: 0
+          }
+        }
+      },
       {
         path: 'pccloud/summary/add',
         component: PcCrudComponent

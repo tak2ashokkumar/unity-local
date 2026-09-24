@@ -4,10 +4,11 @@ import { Router, ActivatedRoute, ParamMap, NavigationEnd } from '@angular/router
 import { DataCenterTabs } from './tabs';
 import { Subscription, Subject } from 'rxjs';
 import { TabData } from 'src/app/shared/tabdata';
-import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
+import { CRUDActionTypes, FaIconMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { DcCrudService } from 'src/app/app-shared-crud/dc-crud/dc-crud.service';
+import { DatacenterDeviceTabDefinition, DatacenterDeviceTabIcon, DatacenterDeviceTabResponse } from './entities/datacenter-device-tab.type';
 
 @Component({
   selector: 'datacenter',
@@ -37,7 +38,7 @@ export class DatacenterComponent implements OnInit, OnDestroy {
       if (event instanceof NavigationEnd) {
         this.isResourceDetailView = /\/containercontrollers\/(kubernetes|docker)\//.test(event.url);
         if (event.url === '/unitycloud/datacenter' || event.url === '/unitycloud/datacenter/' + this.dcId) {
-          this.route.data.subscribe((data: { tabItems: DataCenterTabs[] }) => {
+          this.route.data.pipe(take(1)).subscribe((data: { tabItems: DataCenterTabs[] }) => {
             this.tabItems = data.tabItems;
             if (this.tabItems.length) {
               if (this.dcId === null) {
@@ -48,10 +49,10 @@ export class DatacenterComponent implements OnInit, OnDestroy {
             }
           });
         } else {
-          this.tabData = [];
-          this.route.data.subscribe((data: { tabItems: DataCenterTabs[] }) => {
+          this.tabData = [...tabData];
+          this.route.data.pipe(take(1)).subscribe((data: { tabItems: DataCenterTabs[] }) => {
             this.tabItems = data.tabItems;
-            this.tabData = tabData;
+            this.loadDatacenterDeviceTabs();
           });
         }
       }
@@ -70,11 +71,13 @@ export class DatacenterComponent implements OnInit, OnDestroy {
   }
 
   goTo(tab: TabData) {
-    this.router.navigate(['/unitycloud/datacenter/', this.dcId, tab.url]);
+    if (tab.url) {
+      this.router.navigate(['/unitycloud/datacenter/', this.dcId, ...tab.url.split('/')]);
+    }
   }
 
   isActive(tab: TabData) {
-    if (this.router.url.match('/unitycloud/datacenter/' + this.dcId + '/' + tab.url)) {
+    if (tab.url && this.router.url.match('/unitycloud/datacenter/' + this.dcId + '/' + tab.url)) {
       return 'active text-success';
     }
   }
@@ -105,8 +108,46 @@ export class DatacenterComponent implements OnInit, OnDestroy {
 
   reloadDatacenter() {
     this.dcService.getDataCenters().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.tabItems = res
+      this.tabItems = res;
+      this.loadDatacenterDeviceTabs();
     });
+  }
+
+  private loadDatacenterDeviceTabs() {
+    this.tabData = [...tabData];
+    if (!this.dcId) {
+      return;
+    }
+    this.dcService.getDatacenterDeviceTabs(this.dcId).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: DatacenterDeviceTabResponse[]) => {
+      this.tabData = this.buildTabData(data);
+    }, err => {
+      this.tabData = [...tabData];
+    });
+  }
+
+  private buildTabData(data: DatacenterDeviceTabResponse[]): TabData[] {
+    const deviceTabs = data
+      .filter((item: DatacenterDeviceTabResponse) => item.count > 0)
+      .map((item: DatacenterDeviceTabResponse) => this.mapDeviceTab(item))
+      .filter((item: TabData | null): item is TabData => item !== null);
+    return [...tabData, ...deviceTabs];
+  }
+
+  private mapDeviceTab(item: DatacenterDeviceTabResponse): TabData | null {
+    const tab = datacenterDeviceTabDefinitions.find((definition: DatacenterDeviceTabDefinition) => definition.apiDeviceName === item.device);
+    if (!tab) {
+      return null;
+    }
+    return {
+      name: tab.name,
+      url: tab.url,
+      icon: this.getTabIcon(item.device)
+    };
+  }
+
+  private getTabIcon(deviceName: string): string | undefined {
+    const tab = tabIcons.find((item: DatacenterDeviceTabIcon) => item.name === deviceName);
+    return tab ? tab.icon : undefined;
   }
 }
 
@@ -125,5 +166,109 @@ const tabData: TabData[] = [
     name: 'Private Cloud',
     url: 'pccloud',
     icon: 'cfa-private-cloud'
+  }
+];
+
+const datacenterDeviceTabDefinitions: DatacenterDeviceTabDefinition[] = [
+  {
+    apiDeviceName: 'Switch',
+    name: 'Switches',
+    url: 'devices/switches'
+  },
+  {
+    apiDeviceName: 'Firewall',
+    name: 'Firewalls',
+    url: 'devices/firewalls'
+  },
+  {
+    apiDeviceName: 'Load Balancer',
+    name: 'Load Balancers',
+    url: 'devices/loadbalancers'
+  },
+  {
+    apiDeviceName: 'Hypervisor',
+    name: 'Hypervisors',
+    url: 'devices/hypervisors'
+  },
+  {
+    apiDeviceName: 'Bare Metal Server',
+    name: 'Bare Metal Servers',
+    url: 'devices/bmservers'
+  },
+  {
+    apiDeviceName: 'Storage Device',
+    name: 'Storage Devices',
+    url: 'devices/storagedevices'
+  }
+];
+
+const tabIcons: DatacenterDeviceTabIcon[] = [
+  {
+    name: 'Switch',
+    icon: FaIconMapping.SWITCH
+  },
+  {
+    name: 'Firewall',
+    icon: FaIconMapping.FIREWALL
+  },
+  {
+    name: 'Load Balancer',
+    icon: FaIconMapping.LOAD_BALANCER
+  },
+  {
+    name: 'SD WAN',
+    icon: FaIconMapping.SDWAN
+  },
+  {
+    name: 'Hypervisor',
+    icon: FaIconMapping.HYPERVISOR
+  },
+  {
+    name: 'Bare Metal Server',
+    icon: FaIconMapping.BARE_METAL_SERVER
+  },
+  {
+    name: 'MAC Mini',
+    icon: FaIconMapping.MAC_MINI
+  },
+  {
+    name: 'Virtual Machine',
+    icon: FaIconMapping.VIRTUAL_MACHINE
+  },
+  {
+    name: 'Container',
+    icon: FaIconMapping.KUBERNETES
+  },
+  {
+    name: 'Storage',
+    icon: FaIconMapping.SAN
+  },
+  {
+    name: 'Storage Device',
+    icon: FaIconMapping.SAN
+  },
+  // {
+  //   name: 'S3',
+  //   icon: FaIconMapping.S3_BUCKET
+  // },
+  {
+    name: 'Cloud Controller',
+    icon: FaIconMapping.CLOUD_CONTROLLER
+  },
+  {
+    name: 'Mobile Device',
+    icon: FaIconMapping.MOBILE_DEVICE
+  },
+  {
+    name: 'Database',
+    icon: FaIconMapping.DATABASE
+  },
+  {
+    name: 'IOT Device',
+    icon: FaIconMapping.IOT_DEVICES
+  },
+  {
+    name: 'Other Device',
+    icon: FaIconMapping.OTHER_DEVICES
   }
 ];

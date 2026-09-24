@@ -219,6 +219,24 @@ export const ORCHESTRATION_WORKFLOW_CRUD_ROUTES: Routes = [
         },
     },
     {
+        path: 'orchestration/workflows/dynamic-workflow/:id/view',
+        component: WfDynamicContainerComponent,
+        data: {
+            breadcrumb: {
+                title: 'Workflow',
+            },
+        },
+    },
+    {
+        path: 'orchestration/workflows/dynamic-workflow/:executionId/execute',
+        component: WfDynamicContainerComponent,
+        data: {
+            breadcrumb: {
+                title: 'Workflow',
+            },
+        },
+    },
+    {
         path: 'orchestration/workflows/dynamic-workflow/form-test',
         component: WfDynamicFormTestComponent,
         data: {

@@ -12,7 +12,8 @@
             <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
         </div>
 
-        <form class="d-flex flex-wrap align-items-end justify-content-end mb-0" *ngIf="filterForm" [formGroup]="filterForm">
+        <form class="d-flex flex-wrap align-items-end justify-content-end mb-0" *ngIf="filterForm"
+            [formGroup]="filterForm">
             <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
             <div class="form-group mb-0 mr-2 network-dashboard-filter-group">
                 <label class="d-block mb-1 small text-dark font-weight-normal">Datacenter</label>
@@ -32,16 +33,18 @@
             </div>
 
             <div class="d-inline-flex align-items-center ml-2">
-                <button class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center network-dashboard-action-btn"
-                    type="button" (click)="applyFilters(); loadData()"
-                    [tooltip]="'Apply Filters'" container="body">
+                <button
+                    class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center network-dashboard-action-btn"
+                    type="button" (click)="applyFilters(); loadData()" [tooltip]="'Apply Filters'" container="body">
                     <i class="fas fa-filter"></i>
                 </button>
-                <button class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center ml-1 network-dashboard-action-btn"
+                <button
+                    class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center ml-1 network-dashboard-action-btn"
                     type="button" (click)="refreshFilters()" [tooltip]="'Refresh'" container="body">
                     <i class="fas fa-sync-alt"></i>
                 </button>
-                <button class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center ml-1 network-dashboard-action-btn"
+                <button
+                    class="btn btn-warning btn-sm rounded-circle d-inline-flex align-items-center justify-content-center ml-1 network-dashboard-action-btn"
                     type="button" (click)="goBack()" [tooltip]="'Go Back'" container="body">
                     <i class="fa fa-arrow-left"></i>
                 </button>
@@ -49,13 +52,286 @@
         </form>
     </div>
 
+    <ng-template #pduHealthInfoPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Power Status = On, Load ≤ 70%, all outlets On,
+                    and temperature/humidity within normal range.</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Power Status = On, but Load is 71–90%,
+                    temperature/humidity is elevated, or one or more outlets are reporting issues.</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> Power Status = Off, Load > 90%, multiple outlets are
+                    off, or temperature/humidity is beyond critical threshold.</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #pduHealthByLocationPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">Number of PDUs per data center location, broken down by health status.
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Normal operation</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Elevated load, temperature, or minor outlet issues
+                </div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> Power down, overload, or multiple outlet failures
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #pduTopLoadPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">PDU's ranked by load percentage, bar color reflects health status.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Load ≤ 70%</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Load 71–90%</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> Load > 90%, or PDU is Off</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #pduTopPowerPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">PDUs ranked by power draw (kW), bar color reflects health status.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Normal power draw</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Elevated power draw approaching capacity</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> Power draw at/near capacity, or PDU is Off</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #pduTopTemperaturePopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">PDUs ranked by temperature, bar color reflects health status.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Normal temperature range</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Elevated temperature</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> Temperature beyond critical threshold</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #pduLoadVsTemperaturePopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">Correlates load percentage with temperature per PDU, dot color reflects
+                health status.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Low load and normal temperature</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Elevated load or temperature</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> High load with high temperature, or PDU is Off</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #pduLoadVsPowerPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">Correlates load percentage with power draw per PDU, dot color reflects
+                health status.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Low load and normal power draw</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Elevated load or power draw</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> High load with high power draw, or PDU is Off</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #loadBalancerActiveConnectionsPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">Load balancers ranked by active connections, bar color reflects health
+                status.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Normal connection load</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> One or more pool members unhealthy, or elevated
+                    response time</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> VIP is Down, or most pool members unavailable</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #loadBalancerHealthInfoPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> VIP is Up, all backend pool members are healthy,
+                    response time is within SLA, SSL certificate is valid, and no performance issues are detected.</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> VIP is Up, but one or more backend pool members are
+                    unhealthy, response time exceeds the warning threshold, or the SSL certificate is approaching
+                    expiry.</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> VIP is Down, most backend pool members are
+                    unavailable, response time is beyond the critical threshold, or the SSL certificate has expired.
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #loadBalancerResponseTimePopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">Load balancers ranked by average response time, bar color reflects health
+                status.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Response time within SLA</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Response time exceeds warning threshold</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> Response time beyond critical threshold, or VIP is
+                    Down</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #loadBalancerResponseVsConnectionsPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">Correlates response time with active connections per load balancer, dot
+                color reflects health status.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Low connections with response time in SLA</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Elevated connections or response time</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> High response time, or VIP is Down</div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #interfaceWarningInterfacesPopoverTmpl>
+        <div class="network-dashboard-pdu-health-popover-content">
+            <div class="font-weight-bold mb-2">Interfaces ranked by health status, total errors + discards, and
+                interface type breakdown.</div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--info d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Information</span> Interfaces operating normally with low or no
+                    errors and discards</div>
+            </div>
+            <div class="d-flex align-items-start mb-2">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--warning d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Warning</span> Interfaces currently in warning status, ranked by
+                    total errors + discards</div>
+            </div>
+            <div class="d-flex align-items-start">
+                <span
+                    class="network-dashboard-pdu-health-popover-dot network-dashboard-pdu-health-popover-dot--critical d-inline-block rounded-circle mr-2 mt-1"></span>
+                <div><span class="font-weight-bold">Critical</span> Interfaces with severe errors, discards, or critical
+                    degradation requiring attention</div>
+            </div>
+        </div>
+    </ng-template>
+
     <div class="container-fluid px-3 pt-3 pb-2"
         *ngIf="networkOverviewViewData || topConversationsWidgetViewData || performanceWorkloadInsightsViewData || interfaceHealthMetricsViewData || networkDeviceAvailabilityViewData || environmentalHealthSummaryViewData || loadBalancerHealthViewData || pduHealthViewData || alertEventsViewData || autoRemediationSummaryViewData || isNetworkOverviewLoading || isTopConversationsLoading || isPerformanceWorkloadLoading || isInterfaceHealthMetricsLoading || isNetworkDeviceAvailabilityLoading || isEnvironmentalHealthSummaryLoading || isLoadBalancerHealthLoading || isPduHealthLoading || isAlertEventsLoading || isAutoRemediationSummaryLoading">
         <ng-container *ngIf="networkOverviewViewData || isNetworkOverviewLoading">
             <div class="d-flex flex-column flex-md-row align-items-start justify-content-between mb-2">
                 <div class="network-dashboard-section-title">Network Overview</div>
                 <div class="network-dashboard-section-note mt-1 mt-md-0 text-left text-md-right text-muted">
-                    *The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring Within
+                    *The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring
+                    Within
                     The Selected Time Range
                 </div>
             </div>
@@ -64,7 +340,8 @@
                 <div class="card-body p-0 position-relative">
                     <app-spinner [name]="loaderNames.networkOverview" [width]="0"></app-spinner>
                     <div class="row no-gutters flex-lg-nowrap">
-                        <div class="col-6 col-md-3 col-lg d-flex flex-column align-items-center justify-content-center text-center px-4 py-3 network-dashboard-overview-cell network-dashboard-overview-cell--divider">
+                        <div
+                            class="col-6 col-md-3 col-lg d-flex flex-column align-items-center justify-content-center text-center px-4 py-3 network-dashboard-overview-cell network-dashboard-overview-cell--divider">
                             <div class="text-muted text-nowrap">
                                 Device Availability
                             </div>
@@ -78,7 +355,8 @@
                             </div>
                         </div>
 
-                        <div class="col-6 col-md-3 col-lg d-flex flex-column align-items-center justify-content-center text-center px-4 py-3 network-dashboard-overview-cell network-dashboard-overview-cell--divider">
+                        <div
+                            class="col-6 col-md-3 col-lg d-flex flex-column align-items-center justify-content-center text-center px-4 py-3 network-dashboard-overview-cell network-dashboard-overview-cell--divider">
                             <div class="text-muted text-nowrap">Discovered Devices</div>
                             <div class="h5 font-weight-bold text-primary mb-0 mt-1">
                                 {{ networkOverviewViewData.discoveredDevices | number:'1.0-0' }}
@@ -101,15 +379,18 @@
                                 {{ item.count | number:'1.0-0' }}
                             </div>
                             <div class="d-inline-flex align-items-center mt-1">
-                                <span class="d-inline-flex align-items-center small font-weight-bold text-success text-nowrap mr-3">
+                                <span
+                                    class="d-inline-flex align-items-center small font-weight-bold text-success text-nowrap mr-3">
                                     <i [ngClass]="item.normalIconClass" class="mr-1"></i>
                                     <span>{{ item.normal | number:'1.0-0' }}</span>
                                 </span>
-                                <span class="d-inline-flex align-items-center small font-weight-bold text-danger text-nowrap mr-3">
+                                <span
+                                    class="d-inline-flex align-items-center small font-weight-bold text-danger text-nowrap mr-3">
                                     <i [ngClass]="item.criticalIconClass" class="mr-1"></i>
                                     <span>{{ item.critical | number:'1.0-0' }}</span>
                                 </span>
-                                <span class="d-inline-flex align-items-center small font-weight-bold text-muted text-nowrap">
+                                <span
+                                    class="d-inline-flex align-items-center small font-weight-bold text-muted text-nowrap">
                                     <i [ngClass]="item.unknownIconClass" class="mr-1"></i>
                                     <span>{{ item.unknown | number:'1.0-0' }}</span>
                                 </span>
@@ -123,7 +404,8 @@
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between flex-wrap mt-3 mb-2"
             *ngIf="topConversationsWidgetViewData || isTopConversationsLoading">
             <div class="network-dashboard-section-title">Top 10 Conversations</div>
-            <div class="network-dashboard-view-toggle d-inline-flex align-items-center" role="group" aria-label="Top conversations view toggle">
+            <div class="network-dashboard-view-toggle d-inline-flex align-items-center" role="group"
+                aria-label="Top conversations view toggle">
                 <button type="button" class="network-dashboard-view-toggle-btn"
                     [class.network-dashboard-view-toggle-btn--active]="topConversationsViewMode === 'table'"
                     (click)="setTopConversationsViewMode('table')">
@@ -137,7 +419,8 @@
             </div>
         </div>
 
-        <div class="card rounded shadow-none border network-dashboard-top-conversations-shell" *ngIf="topConversationsWidgetViewData || isTopConversationsLoading">
+        <div class="card rounded shadow-none border network-dashboard-top-conversations-shell"
+            *ngIf="topConversationsWidgetViewData || isTopConversationsLoading">
             <div class="card-body p-0 position-relative">
                 <app-spinner [name]="loaderNames.topConversations" [width]="0"></app-spinner>
                 <ng-container *ngIf="topConversationsViewMode === 'chart'; else topConversationsTableView">
@@ -190,13 +473,25 @@
                             (sorted)="onTopConversationTableSorted($event)">
                             <thead class="bg-light">
                                 <tr>
-                                    <th sortable-column="name" [sort-direction]="getTopConversationSortDirection('name')">Name</th>
-                                    <th sortable-column="bitsReceiveValue" [sort-direction]="getTopConversationSortDirection('bitsReceiveValue')">Bits Receive</th>
-                                    <th sortable-column="bitsSentValue" [sort-direction]="getTopConversationSortDirection('bitsSentValue')">Bits Sent</th>
-                                    <th sortable-column="interfaceType" [sort-direction]="getTopConversationSortDirection('interfaceType')">Interface Type</th>
-                                    <th sortable-column="operationalStatus" [sort-direction]="getTopConversationSortDirection('operationalStatus')">Operational Status</th>
-                                    <th sortable-column="speedValue" [sort-direction]="getTopConversationSortDirection('speedValue')">Speed</th>
-                                    <th sortable-column="bandwidthUsagePercent" [sort-direction]="getTopConversationSortDirection('bandwidthUsagePercent')">Bandwidth Usage</th>
+                                    <th sortable-column="name"
+                                        [sort-direction]="getTopConversationSortDirection('name')">Name</th>
+                                    <th sortable-column="bitsReceiveValue"
+                                        [sort-direction]="getTopConversationSortDirection('bitsReceiveValue')">Bits
+                                        Receive</th>
+                                    <th sortable-column="bitsSentValue"
+                                        [sort-direction]="getTopConversationSortDirection('bitsSentValue')">Bits Sent
+                                    </th>
+                                    <th sortable-column="interfaceType"
+                                        [sort-direction]="getTopConversationSortDirection('interfaceType')">Interface
+                                        Type</th>
+                                    <th sortable-column="operationalStatus"
+                                        [sort-direction]="getTopConversationSortDirection('operationalStatus')">
+                                        Operational Status</th>
+                                    <th sortable-column="speedValue"
+                                        [sort-direction]="getTopConversationSortDirection('speedValue')">Speed</th>
+                                    <th sortable-column="bandwidthUsagePercent"
+                                        [sort-direction]="getTopConversationSortDirection('bandwidthUsagePercent')">
+                                        Bandwidth Usage</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -206,16 +501,20 @@
                                         <div [tooltip]="row.name" container="body">{{ row.name }}</div>
                                     </td>
                                     <td class="tdw-12">
-                                        <div [tooltip]="row.bitsReceiveDisplay" container="body">{{ row.bitsReceiveDisplay }}</div>
+                                        <div [tooltip]="row.bitsReceiveDisplay" container="body">{{
+                                            row.bitsReceiveDisplay }}</div>
                                     </td>
                                     <td class="tdw-12">
-                                        <div [tooltip]="row.bitsSentDisplay" container="body">{{ row.bitsSentDisplay }}</div>
+                                        <div [tooltip]="row.bitsSentDisplay" container="body">{{ row.bitsSentDisplay }}
+                                        </div>
                                     </td>
                                     <td class="tdw-14">
-                                        <div [tooltip]="row.interfaceType" container="body">{{ row.interfaceType }}</div>
+                                        <div [tooltip]="row.interfaceType" container="body">{{ row.interfaceType }}
+                                        </div>
                                     </td>
                                     <td class="tdw-14">
-                                        <div [tooltip]="row.operationalStatus" container="body">{{ row.operationalStatus }}</div>
+                                        <div [tooltip]="row.operationalStatus" container="body">{{ row.operationalStatus
+                                            }}</div>
                                     </td>
                                     <td class="tdw-10">
                                         <div [tooltip]="row.speedDisplay" container="body">{{ row.speedDisplay }}</div>
@@ -223,17 +522,17 @@
                                     <td class="tdw-18">
                                         <div class="network-dashboard-bandwidth-cell">
                                             <div class="progress-track">
-                                                <div class="progress-fill"
-                                                    [ngClass]="{
+                                                <div class="progress-fill" [ngClass]="{
                                                         'bg-success': row.bandwidthUsageTone === 'success',
                                                         'bg-warning': row.bandwidthUsageTone === 'warning',
                                                         'bg-danger': row.bandwidthUsageTone === 'danger'
-                                                    }"
-                                                    [style.width.%]="row.bandwidthUsagePercent"></div>
+                                                    }" [style.width.%]="row.bandwidthUsagePercent"></div>
                                             </div>
-                                            <div class="network-dashboard-bandwidth-meta d-flex align-items-center justify-content-between">
+                                            <div
+                                                class="network-dashboard-bandwidth-meta d-flex align-items-center justify-content-between">
                                                 <span>Used: {{ row.bandwidthUsageLabel }}</span>
-                                                <span>Free: {{ (100 - row.bandwidthUsagePercent) | number:'1.0-0' }}%</span>
+                                                <span>Free: {{ (100 - row.bandwidthUsagePercent) | number:'1.0-0'
+                                                    }}%</span>
                                             </div>
                                         </div>
                                     </td>
@@ -268,10 +567,12 @@
             </div>
         </div>
 
-        <div class="card rounded shadow-none border network-dashboard-performance-shell" *ngIf="performanceWorkloadInsightsViewData || isPerformanceWorkloadLoading">
+        <div class="card rounded shadow-none border network-dashboard-performance-shell"
+            *ngIf="performanceWorkloadInsightsViewData || isPerformanceWorkloadLoading">
             <div class="card-body p-0 position-relative">
                 <app-spinner [name]="loaderNames.performanceWorkload" [width]="0"></app-spinner>
-                <ng-container *ngIf="performanceWorkloadInsightsViewMode === 'chart'; else performanceWorkloadTableView">
+                <ng-container
+                    *ngIf="performanceWorkloadInsightsViewMode === 'chart'; else performanceWorkloadTableView">
                     <div class="row no-gutters px-3 pt-3 pb-2">
                         <div class="col-lg-6 col-12 px-2 pb-2"
                             *ngFor="let chart of performanceWorkloadInsightsViewData.charts; trackBy: trackByPerformanceWorkloadChart">
@@ -280,7 +581,8 @@
                                     <div class="font-weight-bold">{{ chart.title }}</div>
                                 </div>
                                 <div class="card-body p-3">
-                                    <div class="small text-muted mb-2">{{ chart.chartData ? chart.yAxisTitle : '' }}</div>
+                                    <div class="small text-muted mb-2">{{ chart.chartData ? chart.yAxisTitle : '' }}
+                                    </div>
                                     <div echarts *ngIf="chart.chartData" [options]="chart.chartData.options"
                                         [extentions]="chart.chartData.extensions" [defaultHeight]="chart.chartHeight"
                                         class="w-100">
@@ -309,11 +611,21 @@
                             (sorted)="onPerformanceWorkloadTableSorted($event)">
                             <thead class="bg-light">
                                 <tr>
-                                    <th sortable-column="deviceName" [sort-direction]="getPerformanceWorkloadSortDirection('deviceName')">Device Name</th>
-                                    <th sortable-column="cpuPercent" [sort-direction]="getPerformanceWorkloadSortDirection('cpuPercent')">CPU Utilization (%)</th>
-                                    <th sortable-column="memoryPercent" [sort-direction]="getPerformanceWorkloadSortDirection('memoryPercent')">Memory Utilization (%)</th>
-                                    <th sortable-column="interfaceTrafficInMbps" [sort-direction]="getPerformanceWorkloadSortDirection('interfaceTrafficInMbps')">Interface Traffic In (Mbps)</th>
-                                    <th sortable-column="interfaceTrafficOutMbps" [sort-direction]="getPerformanceWorkloadSortDirection('interfaceTrafficOutMbps')">Interface Traffic Out (Mbps)</th>
+                                    <th sortable-column="deviceName"
+                                        [sort-direction]="getPerformanceWorkloadSortDirection('deviceName')">Device Name
+                                    </th>
+                                    <th sortable-column="cpuPercent"
+                                        [sort-direction]="getPerformanceWorkloadSortDirection('cpuPercent')">CPU
+                                        Utilization (%)</th>
+                                    <th sortable-column="memoryPercent"
+                                        [sort-direction]="getPerformanceWorkloadSortDirection('memoryPercent')">Memory
+                                        Utilization (%)</th>
+                                    <th sortable-column="interfaceTrafficInMbps"
+                                        [sort-direction]="getPerformanceWorkloadSortDirection('interfaceTrafficInMbps')">
+                                        Interface Traffic In (Mbps)</th>
+                                    <th sortable-column="interfaceTrafficOutMbps"
+                                        [sort-direction]="getPerformanceWorkloadSortDirection('interfaceTrafficOutMbps')">
+                                        Interface Traffic Out (Mbps)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -325,15 +637,14 @@
                                     <td class="tdw-20">
                                         <div class="network-dashboard-utilization-cell">
                                             <div class="progress-track">
-                                                <div class="progress-fill"
-                                                    [ngClass]="{
+                                                <div class="progress-fill" [ngClass]="{
                                                         'bg-success': row.cpuTone === 'success',
                                                         'bg-warning': row.cpuTone === 'warning',
                                                         'bg-danger': row.cpuTone === 'danger'
-                                                    }"
-                                                    [style.width.%]="row.cpuPercent"></div>
+                                                    }" [style.width.%]="row.cpuPercent"></div>
                                             </div>
-                                            <div class="network-dashboard-bandwidth-meta d-flex align-items-center justify-content-between">
+                                            <div
+                                                class="network-dashboard-bandwidth-meta d-flex align-items-center justify-content-between">
                                                 <span>Used: {{ row.cpuDisplay }}</span>
                                                 <span>Free: {{ (100 - row.cpuPercent) | number:'1.0-0' }}%</span>
                                             </div>
@@ -342,25 +653,26 @@
                                     <td class="tdw-20">
                                         <div class="network-dashboard-utilization-cell">
                                             <div class="progress-track">
-                                                <div class="progress-fill"
-                                                    [ngClass]="{
+                                                <div class="progress-fill" [ngClass]="{
                                                         'bg-success': row.memoryTone === 'success',
                                                         'bg-warning': row.memoryTone === 'warning',
                                                         'bg-danger': row.memoryTone === 'danger'
-                                                    }"
-                                                    [style.width.%]="row.memoryPercent"></div>
+                                                    }" [style.width.%]="row.memoryPercent"></div>
                                             </div>
-                                            <div class="network-dashboard-bandwidth-meta d-flex align-items-center justify-content-between">
+                                            <div
+                                                class="network-dashboard-bandwidth-meta d-flex align-items-center justify-content-between">
                                                 <span>Used: {{ row.memoryDisplay }}</span>
                                                 <span>Free: {{ (100 - row.memoryPercent) | number:'1.0-0' }}%</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="tdw-20">
-                                        <div [tooltip]="row.interfaceTrafficInDisplay" container="body">{{ row.interfaceTrafficInDisplay }}</div>
+                                        <div [tooltip]="row.interfaceTrafficInDisplay" container="body">{{
+                                            row.interfaceTrafficInDisplay }}</div>
                                     </td>
                                     <td class="tdw-20">
-                                        <div [tooltip]="row.interfaceTrafficOutDisplay" container="body">{{ row.interfaceTrafficOutDisplay }}</div>
+                                        <div [tooltip]="row.interfaceTrafficOutDisplay" container="body">{{
+                                            row.interfaceTrafficOutDisplay }}</div>
                                     </td>
                                 </tr>
                                 <tr *ngIf="!getVisiblePerformanceWorkloadRows().length">
@@ -380,7 +692,8 @@
             <div class="d-inline-flex align-items-center">
                 <div class="network-dashboard-section-title mb-0">Interface Health &amp; Metrics</div>
                 <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn ml-2"
-                    [tooltip]="'Interface health across bandwidth, errors, discards, duplex status, and operational state.'" container="body">
+                    [tooltip]="'Interface health across bandwidth, errors, discards, duplex status, and operational state.'"
+                    container="body">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                 </button>
             </div>
@@ -399,7 +712,8 @@
             </div>
         </div>
 
-        <div class="card rounded shadow-none border" *ngIf="interfaceHealthMetricsViewData || isInterfaceHealthMetricsLoading">
+        <div class="card rounded shadow-none border"
+            *ngIf="interfaceHealthMetricsViewData || isInterfaceHealthMetricsLoading">
             <div class="card-body p-0 position-relative">
                 <app-spinner [name]="loaderNames.interfaceHealthMetrics" [width]="0"></app-spinner>
 
@@ -408,36 +722,55 @@
                         <div *ngFor="let chart of interfaceHealthMetricsViewData.charts; trackBy: trackByInterfaceHealthMetricChart"
                             [ngClass]="chart.columnClass + ' px-2 pb-2'">
                             <div class="card border rounded shadow-none h-100 mb-0">
-                                <div class="card-header bg-light py-2 px-3 d-flex align-items-center justify-content-between">
+                                <div
+                                    class="card-header bg-light py-2 px-3 d-flex align-items-center justify-content-between">
                                     <div class="font-weight-bold">{{ chart.title }}</div>
-                                    <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
-                                        [tooltip]="chart.infoTooltip" container="body">
-                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                    </button>
+                                    <ng-container
+                                        *ngIf="chart.key === 'warning-interfaces'; else interfaceHealthDefaultChartTooltip">
+                                        <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                            [popover]="interfaceWarningInterfacesPopoverTmpl"
+                                            triggers="mouseenter:mouseleave" placement="bottom" container="body"
+                                            containerClass="network-dashboard-pdu-health-popover"
+                                            (click)="$event.stopPropagation()"
+                                            (keydown.enter)="$event.stopPropagation()"
+                                            (keydown.space)="$event.stopPropagation()">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </button>
+                                    </ng-container>
+                                    <ng-template #interfaceHealthDefaultChartTooltip>
+                                        <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                            [tooltip]="chart.infoTooltip" container="body">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </button>
+                                    </ng-template>
                                 </div>
                                 <div class="card-body p-2">
                                     <ng-container [ngSwitch]="chart.layout">
                                         <div *ngSwitchCase="'split'" class="row no-gutters align-items-start">
                                             <div class="col-lg-7 col-12">
-                                                <div echarts *ngIf="chart.chartData; else interfaceHealthPrimaryEmptyState"
+                                                <div echarts
+                                                    *ngIf="chart.chartData; else interfaceHealthPrimaryEmptyState"
                                                     [options]="chart.chartData.options"
                                                     [extentions]="chart.chartData.extensions"
-                                                    [defaultHeight]="chart.chartHeight"
-                                                    class="w-100">
+                                                    [defaultHeight]="chart.chartHeight" class="w-100">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-5 col-12 pt-2 pt-lg-0 d-flex flex-column align-items-center">
-                                                <div class="text-center small font-weight-bold text-muted mb-2">{{ chart.secondaryTitle }}</div>
-                                                <div echarts *ngIf="chart.secondaryChartData; else interfaceHealthSecondaryEmptyState"
+                                            <div
+                                                class="col-lg-5 col-12 pt-2 pt-lg-0 d-flex flex-column align-items-center">
+                                                <div class="text-center small font-weight-bold text-muted mb-2">{{
+                                                    chart.secondaryTitle }}</div>
+                                                <div echarts
+                                                    *ngIf="chart.secondaryChartData; else interfaceHealthSecondaryEmptyState"
                                                     [options]="chart.secondaryChartData.options"
                                                     [extentions]="chart.secondaryChartData.extensions"
-                                                    [defaultHeight]="chart.secondaryChartHeight"
-                                                    class="w-100">
+                                                    [defaultHeight]="chart.secondaryChartHeight" class="w-100">
                                                 </div>
-                                                <div class="d-flex flex-column align-items-start mt-2" *ngIf="chart.secondaryLegendItems?.length">
+                                                <div class="d-flex flex-column align-items-start mt-2"
+                                                    *ngIf="chart.secondaryLegendItems?.length">
                                                     <div class="d-inline-flex align-items-center mb-1 small"
                                                         *ngFor="let legend of chart.secondaryLegendItems">
-                                                        <i class="fa fa-circle fa-xs mr-2" [style.color]="legend.color" aria-hidden="true"></i>
+                                                        <i class="fa fa-circle fa-xs mr-2" [style.color]="legend.color"
+                                                            aria-hidden="true"></i>
                                                         <span>{{ legend.label }}</span>
                                                     </div>
                                                 </div>
@@ -448,20 +781,21 @@
                                             <div echarts *ngIf="chart.chartData; else interfaceHealthPrimaryEmptyState"
                                                 [options]="chart.chartData.options"
                                                 [extentions]="chart.chartData.extensions"
-                                                [defaultHeight]="chart.chartHeight"
-                                                class="w-100">
+                                                [defaultHeight]="chart.chartHeight" class="w-100">
                                             </div>
                                         </ng-container>
                                     </ng-container>
 
                                     <ng-template #interfaceHealthPrimaryEmptyState>
-                                        <div class="d-flex justify-content-center align-items-center w-100 text-muted network-dashboard-alert-events-empty-state">
+                                        <div
+                                            class="d-flex justify-content-center align-items-center w-100 text-muted network-dashboard-alert-events-empty-state">
                                             No data available.
                                         </div>
                                     </ng-template>
 
                                     <ng-template #interfaceHealthSecondaryEmptyState>
-                                        <div class="d-flex justify-content-center align-items-center w-100 text-muted network-dashboard-alert-events-empty-state">
+                                        <div
+                                            class="d-flex justify-content-center align-items-center w-100 text-muted network-dashboard-alert-events-empty-state">
                                             No data available.
                                         </div>
                                     </ng-template>
@@ -485,40 +819,96 @@
                             (sorted)="onInterfaceHealthMetricsTableSorted($event)">
                             <thead class="bg-light">
                                 <tr>
-                                    <th sortable-column="interface_type" [sort-direction]="getInterfaceHealthMetricsSortDirection('interface_type')">Interface Type</th>
-                                    <th sortable-column="interface" [sort-direction]="getInterfaceHealthMetricsSortDirection('interface')">Interface</th>
-                                    <th sortable-column="device" [sort-direction]="getInterfaceHealthMetricsSortDirection('device')">Device</th>
-                                    <th sortable-column="duplex_type" [sort-direction]="getInterfaceHealthMetricsSortDirection('duplex_type')">Duplex Status</th>
-                                    <th sortable-column="discards_inbound" [sort-direction]="getInterfaceHealthMetricsSortDirection('discards_inbound')">Inbound Discards</th>
-                                    <th sortable-column="errors_inbound" [sort-direction]="getInterfaceHealthMetricsSortDirection('errors_inbound')">Inbound Errors</th>
-                                    <th sortable-column="bits_received" [sort-direction]="getInterfaceHealthMetricsSortDirection('bits_received')">Bits Received</th>
-                                    <th sortable-column="discards_outbound" [sort-direction]="getInterfaceHealthMetricsSortDirection('discards_outbound')">Outbound Discards</th>
-                                    <th sortable-column="errors_outbound" [sort-direction]="getInterfaceHealthMetricsSortDirection('errors_outbound')">Outbound Errors</th>
-                                    <th sortable-column="bits_sent" [sort-direction]="getInterfaceHealthMetricsSortDirection('bits_sent')">Bits Sent</th>
-                                    <th sortable-column="speed" [sort-direction]="getInterfaceHealthMetricsSortDirection('speed')">Speed</th>
-                                    <th sortable-column="operational_status" [sort-direction]="getInterfaceHealthMetricsSortDirection('operational_status')">Operational Status</th>
-                                    <th sortable-column="health" [sort-direction]="getInterfaceHealthMetricsSortDirection('health')">Health</th>
+                                    <th sortable-column="interface_type"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('interface_type')">
+                                        Interface Type</th>
+                                    <th sortable-column="interface"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('interface')">Interface
+                                    </th>
+                                    <th sortable-column="device"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('device')">Device</th>
+                                    <th sortable-column="duplex_type"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('duplex_type')">Duplex
+                                        Status</th>
+                                    <th sortable-column="discards_inbound"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('discards_inbound')">
+                                        Inbound Discards</th>
+                                    <th sortable-column="errors_inbound"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('errors_inbound')">
+                                        Inbound Errors</th>
+                                    <th sortable-column="bits_received"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('bits_received')">Bits
+                                        Received</th>
+                                    <th sortable-column="discards_outbound"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('discards_outbound')">
+                                        Outbound Discards</th>
+                                    <th sortable-column="errors_outbound"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('errors_outbound')">
+                                        Outbound Errors</th>
+                                    <th sortable-column="bits_sent"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('bits_sent')">Bits Sent
+                                    </th>
+                                    <th sortable-column="speed"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('speed')">Speed</th>
+                                    <th sortable-column="operational_status"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('operational_status')">
+                                        Operational Status</th>
+                                    <th sortable-column="health"
+                                        [sort-direction]="getInterfaceHealthMetricsSortDirection('health')">Health</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of getVisibleInterfaceHealthMetricsRows(); trackBy: trackByInterfaceHealthMetricRow"
                                     truncateText>
-                                    <td class="tdw-12"><div [tooltip]="row.interfaceTypeTooltip" container="body">{{ row.interfaceType }}</div></td>
                                     <td class="tdw-12">
-                                        <div [tooltip]="row.interfaceName" container="body" class="text-primary font-weight-bold text-nowrap">
+                                        <div [tooltip]="row.interfaceTypeTooltip" container="body">{{ row.interfaceType
+                                            }}</div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.interfaceName" container="body"
+                                            class="text-primary font-weight-bold text-nowrap">
                                             {{ row.interfaceName }}
                                         </div>
                                     </td>
-                                    <td class="tdw-12"><div [tooltip]="row.deviceName" container="body">{{ row.deviceName }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.duplexStatus" container="body" class="text-nowrap">{{ row.duplexStatus }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.inboundDiscardsDisplay" container="body" class="text-nowrap">{{ row.inboundDiscardsDisplay }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.inboundErrorsDisplay" container="body" class="text-nowrap">{{ row.inboundErrorsDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.bitsReceivedDisplay" container="body" class="text-nowrap">{{ row.bitsReceivedDisplay }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.outboundDiscardsDisplay" container="body" class="text-nowrap">{{ row.outboundDiscardsDisplay }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.outboundErrorsDisplay" container="body" class="text-nowrap">{{ row.outboundErrorsDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.bitsSentDisplay" container="body" class="text-nowrap">{{ row.bitsSentDisplay }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.speedDisplay" container="body" class="text-nowrap">{{ row.speedDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.operationalStatus" container="body" class="text-nowrap">{{ row.operationalStatus }}</div></td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.deviceName" container="body">{{ row.deviceName }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.duplexStatus" container="body" class="text-nowrap">{{
+                                            row.duplexStatus }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.inboundDiscardsDisplay" container="body"
+                                            class="text-nowrap">{{ row.inboundDiscardsDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.inboundErrorsDisplay" container="body" class="text-nowrap">
+                                            {{ row.inboundErrorsDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.bitsReceivedDisplay" container="body" class="text-nowrap">{{
+                                            row.bitsReceivedDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.outboundDiscardsDisplay" container="body"
+                                            class="text-nowrap">{{ row.outboundDiscardsDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.outboundErrorsDisplay" container="body" class="text-nowrap">
+                                            {{ row.outboundErrorsDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.bitsSentDisplay" container="body" class="text-nowrap">{{
+                                            row.bitsSentDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.speedDisplay" container="body" class="text-nowrap">{{
+                                            row.speedDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.operationalStatus" container="body" class="text-nowrap">{{
+                                            row.operationalStatus }}</div>
+                                    </td>
                                     <td class="tdw-10">
                                         <div [tooltip]="row.healthLabel" container="body">
                                             <span class="d-inline-flex align-items-center text-nowrap"
@@ -541,7 +931,8 @@
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between px-3 pb-3"
                         *ngIf="interfaceHealthMetricsViewData?.totalCount">
                         <div class="d-flex flex-wrap align-items-center mb-2 mb-md-0">
-                            <table-page-size class="mr-3 mb-2 mb-sm-0" [currentPageSize]="interfaceHealthMetricsPageSize"
+                            <table-page-size class="mr-3 mb-2 mb-sm-0"
+                                [currentPageSize]="interfaceHealthMetricsPageSize"
                                 [totalCount]="interfaceHealthMetricsViewData.totalCount"
                                 (pageSizeChange)="onInterfaceHealthMetricsPageSizeChanged($event)"></table-page-size>
                             <table-entries class="mb-2 mb-sm-0" [pageNo]="interfaceHealthMetricsPageNo"
@@ -580,12 +971,14 @@
             *ngIf="networkDeviceAvailabilityViewData || isNetworkDeviceAvailabilityLoading">
             <div class="card-body p-0">
                 <app-spinner [name]="loaderNames.networkDeviceAvailability" [width]="0"></app-spinner>
-                <ng-container *ngIf="networkDeviceAvailabilityViewMode === 'chart'; else networkDeviceAvailabilityTableView">
+                <ng-container
+                    *ngIf="networkDeviceAvailabilityViewMode === 'chart'; else networkDeviceAvailabilityTableView">
                     <div class="row no-gutters network-dashboard-device-availability-grid">
                         <div class="col-xl-4 col-lg-6 col-md-6 col-12"
                             *ngFor="let card of networkDeviceAvailabilityViewData.cards; trackBy: trackByNetworkDeviceAvailabilityCard">
                             <div class="network-dashboard-device-availability-card">
-                                <div class="network-dashboard-device-availability-card-header d-flex align-items-center justify-content-between">
+                                <div
+                                    class="network-dashboard-device-availability-card-header d-flex align-items-center justify-content-between">
                                     <div class="network-dashboard-device-availability-card-title">{{ card.title }}</div>
                                     <div class="d-flex align-items-center">
                                         <span *ngIf="card.badgeLabel"
@@ -606,41 +999,40 @@
 
                                 <ng-container [ngSwitch]="card.cardKind">
                                     <div *ngSwitchCase="'lowest-availability'" class="pb-2">
-                                        <table *ngIf="card.lowestAvailabilityRows?.length; else networkDeviceAvailabilityLowestNoRows"
-                                            class="table table-sm text-left mb-0">
-                                            <thead class="bg-light">
-                                                <tr>
-                                                    <th>Device</th>
-                                                    <th>Availability</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr *ngFor="let row of card.lowestAvailabilityRows" truncateText>
-                                                    <td class="font-weight-bold tdw-20">
-                                                        <div [tooltip]="row.name" container="body">{{ row.name }}</div>
-                                                    </td>
-                                                    <td class="tdw-10">
-                                                        <span [ngClass]="{
-                                                            'font-weight-bold': true,
-                                                            'text-danger': row.statusTone === 'critical',
-                                                            'text-warning': row.statusTone === 'warning'
-                                                        }">
-                                                            {{ row.availabilityDisplay }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="tdw-10">
-                                                        <span class="network-dashboard-device-availability-badge"
-                                                            [ngClass]="[
-                                                                'network-dashboard-device-availability-badge--' + row.statusTone,
-                                                                row.statusTone === 'critical' ? 'text-danger' : row.statusTone === 'warning' ? 'text-warning' : 'text-success'
-                                                            ]">
-                                                            {{ row.statusLabel }}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div *ngIf="card.lowestAvailabilityRows?.length; else networkDeviceAvailabilityLowestNoRows"
+                                            class="network-dashboard-device-availability-lowest-table-wrap">
+                                            <table class="table table-sm text-left mb-0">
+                                                <thead class="bg-light">
+                                                    <tr>
+                                                        <th>Device</th>
+                                                        <th>Availability</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let row of card.lowestAvailabilityRows" truncateText>
+                                                        <td class="font-weight-bold tdw-20">
+                                                            <div [tooltip]="row.name" container="body">{{ row.name }}
+                                                            </div>
+                                                        </td>
+                                                        <td class="tdw-10">
+                                                            <span class="font-weight-bold text-dark">
+                                                                {{ row.availabilityDisplay }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="tdw-10">
+                                                            <span class="network-dashboard-device-availability-badge"
+                                                                [ngClass]="[
+                                                                    'network-dashboard-device-availability-badge--' + row.statusTone,
+                                                                    row.statusTone === 'critical' ? 'text-danger' : row.statusTone === 'warning' ? 'text-warning' : 'text-success'
+                                                                ]">
+                                                                {{ row.statusLabel }}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                         <ng-template #networkDeviceAvailabilityLowestNoRows>
                                             <div
                                                 class="d-flex justify-content-center align-items-center text-muted network-dashboard-device-availability-empty-state">
@@ -661,12 +1053,16 @@
                                         <div class="network-dashboard-device-availability-legend d-flex flex-wrap align-items-center justify-content-start justify-content-md-center"
                                             [ngClass]="card.key === 'manufacturer-model-breakdown' ? 'network-dashboard-device-availability-legend--manufacturer' : ''"
                                             *ngIf="card.legendItems?.length">
-                                            <ng-container *ngIf="card.key === 'manufacturer-model-breakdown'; else networkDeviceAvailabilityDeviceTypeLegendBlock">
-                                                <div class="network-dashboard-device-availability-legend-row d-flex align-items-end justify-content-between">
-                                                    <div class="network-dashboard-device-availability-legend-track d-flex">
+                                            <ng-container
+                                                *ngIf="card.key === 'manufacturer-model-breakdown'; else networkDeviceAvailabilityDeviceTypeLegendBlock">
+                                                <div
+                                                    class="network-dashboard-device-availability-legend-row d-flex align-items-end justify-content-between">
+                                                    <div
+                                                        class="network-dashboard-device-availability-legend-track d-flex">
                                                         <div class="d-inline-flex align-items-center network-dashboard-device-availability-legend-item network-dashboard-device-availability-legend-item--manufacturer mr-3 mb-1"
                                                             *ngFor="let legend of getVisibleManufacturerModelLegendItems()">
-                                                            <span class="network-dashboard-device-availability-legend-dot network-dashboard-device-availability-legend-dot--square"
+                                                            <span
+                                                                class="network-dashboard-device-availability-legend-dot network-dashboard-device-availability-legend-dot--square"
                                                                 [style.backgroundColor]="legend.color"></span>
                                                             <span>{{ legend.label }}</span>
                                                         </div>
@@ -681,7 +1077,8 @@
                                                             <i class="fas fa-caret-left"></i>
                                                         </button>
                                                         <span class="network-dashboard-device-availability-legend-page">
-                                                            {{ manufacturerModelLegendPage + 1 }}/{{ getManufacturerModelLegendPageCount() }}
+                                                            {{ manufacturerModelLegendPage + 1 }}/{{
+                                                            getManufacturerModelLegendPageCount() }}
                                                         </span>
                                                         <button type="button"
                                                             class="btn btn-link p-0 network-dashboard-device-availability-legend-arrow"
@@ -694,12 +1091,16 @@
                                                 </div>
                                             </ng-container>
                                             <ng-template #networkDeviceAvailabilityDeviceTypeLegendBlock>
-                                                <ng-container *ngIf="card.key === 'device-type-distribution'; else networkDeviceAvailabilityDefaultLegend">
-                                                <div class="network-dashboard-device-availability-legend-row d-flex align-items-end justify-content-between">
-                                                        <div class="network-dashboard-device-availability-legend-track d-flex">
+                                                <ng-container
+                                                    *ngIf="card.key === 'device-type-distribution'; else networkDeviceAvailabilityDefaultLegend">
+                                                    <div
+                                                        class="network-dashboard-device-availability-legend-row d-flex align-items-end justify-content-between">
+                                                        <div
+                                                            class="network-dashboard-device-availability-legend-track d-flex">
                                                             <div class="d-inline-flex align-items-center network-dashboard-device-availability-legend-item network-dashboard-device-availability-legend-item--manufacturer mr-3 mb-1"
                                                                 *ngFor="let legend of getVisibleDeviceTypeLegendItems()">
-                                                                <span class="network-dashboard-device-availability-legend-dot network-dashboard-device-availability-legend-dot--square"
+                                                                <span
+                                                                    class="network-dashboard-device-availability-legend-dot network-dashboard-device-availability-legend-dot--square"
                                                                     [style.backgroundColor]="legend.color"></span>
                                                                 <span>{{ legend.label }}</span>
                                                             </div>
@@ -713,8 +1114,10 @@
                                                                 aria-label="Previous legends">
                                                                 <i class="fas fa-caret-left"></i>
                                                             </button>
-                                                            <span class="network-dashboard-device-availability-legend-page">
-                                                                {{ deviceTypeLegendPage + 1 }}/{{ getDeviceTypeLegendPageCount() }}
+                                                            <span
+                                                                class="network-dashboard-device-availability-legend-page">
+                                                                {{ deviceTypeLegendPage + 1 }}/{{
+                                                                getDeviceTypeLegendPageCount() }}
                                                             </span>
                                                             <button type="button"
                                                                 class="btn btn-link p-0 network-dashboard-device-availability-legend-arrow"
@@ -753,36 +1156,61 @@
                     </div>
 
                     <div class="table-responsive network-dashboard-table-wrap px-3 pb-3">
-                        <table class="table table-sm text-left mb-0">
+                        <table class="table table-sm text-left mb-0" sortableTable
+                            (sorted)="onNetworkDeviceAvailabilityTableSorted($event)">
                             <thead class="bg-light">
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Manufacturer</th>
-                                    <th>Model</th>
-                                    <th>Location</th>
-                                    <th>Uptime</th>
-                                    <th>Availability</th>
-                                    <th class="text-center">Status</th>
-                                    <th>Last Discovered</th>
+                                    <th sortable-column="name"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('name')">Name</th>
+                                    <th sortable-column="type"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('type')">Type</th>
+                                    <th sortable-column="manufacturer"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('manufacturer')">
+                                        Manufacturer</th>
+                                    <th sortable-column="model"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('model')">Model</th>
+                                    <th sortable-column="location"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('location')">
+                                        Location</th>
+                                    <th sortable-column="uptime"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('uptime')">Uptime
+                                    </th>
+                                    <th sortable-column="availability"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('availability')">
+                                        Availability</th>
+                                    <th class="text-center" sortable-column="health_state"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('health_state')">
+                                        Status</th>
+                                    <th sortable-column="last_discovered"
+                                        [sort-direction]="getNetworkDeviceAvailabilitySortDirection('last_discovered')">
+                                        Last Discovered</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of getVisibleNetworkDeviceAvailabilityRows(); trackBy: trackByNetworkDeviceAvailabilityRow"
                                     truncateText>
-                                    <td class="tdw-14"><div [tooltip]="row.name" container="body">{{ row.name }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.type" container="body">{{ row.type }}</div></td>
-                                    <td class="tdw-12"><div [tooltip]="row.manufacturer" container="body">{{ row.manufacturer }}</div></td>
-                                    <td class="tdw-12"><div [tooltip]="row.model" container="body">{{ row.model }}</div></td>
-                                    <td class="tdw-12"><div [tooltip]="row.location" container="body">{{ row.location }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.uptimeDisplay" container="body">{{ row.uptimeDisplay }}</div></td>
+                                    <td class="tdw-14">
+                                        <div [tooltip]="row.name" container="body">{{ row.name }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.type" container="body">{{ row.type }}</div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.manufacturer" container="body">{{ row.manufacturer }}</div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.model" container="body">{{ row.model }}</div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.location" container="body">{{ row.location }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.uptimeDisplay" container="body">{{ row.uptimeDisplay }}
+                                        </div>
+                                    </td>
                                     <td class="tdw-10">
                                         <div [tooltip]="row.availabilityDisplay" container="body">
-                                            <span [ngClass]="{
-                                                'font-weight-bold': true,
-                                                'text-danger': row.statusTone === 'critical',
-                                                'text-warning': row.statusTone === 'warning'
-                                            }">
+                                            <span class="font-weight-bold text-dark">
                                                 {{ row.availabilityDisplay }}
                                             </span>
                                         </div>
@@ -795,7 +1223,10 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="tdw-10"><div [tooltip]="row.lastDiscovered" container="body">{{ row.lastDiscovered }}</div></td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.lastDiscovered" container="body">{{ row.lastDiscovered }}
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr *ngIf="!getVisibleNetworkDeviceAvailabilityRows().length">
                                     <td colspan="9" class="text-center text-muted py-5">
@@ -808,7 +1239,8 @@
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between px-3 pb-3"
                         *ngIf="networkDeviceAvailabilityViewData?.totalCount">
                         <div class="d-flex flex-wrap align-items-center mb-2 mb-md-0">
-                            <table-page-size class="mr-3 mb-2 mb-sm-0" [currentPageSize]="networkDeviceAvailabilityPageSize"
+                            <table-page-size class="mr-3 mb-2 mb-sm-0"
+                                [currentPageSize]="networkDeviceAvailabilityPageSize"
                                 [totalCount]="networkDeviceAvailabilityViewData.totalCount"
                                 (pageSizeChange)="onNetworkDeviceAvailabilityPageSizeChanged($event)"></table-page-size>
                             <table-entries class="mb-2 mb-sm-0" [pageNo]="networkDeviceAvailabilityPageNo"
@@ -842,7 +1274,8 @@
             <dashboard-map-widget *ngIf="mapSvc.shouldShowMapWidgets(); else networkGeoMapUnavailable">
             </dashboard-map-widget>
             <ng-template #networkGeoMapUnavailable>
-                <div class="network-dashboard-geo-map-empty d-flex align-items-center justify-content-center text-center">
+                <div
+                    class="network-dashboard-geo-map-empty d-flex align-items-center justify-content-center text-center">
                     Data is unavailable.
                 </div>
             </ng-template>
@@ -853,7 +1286,8 @@
             <div class="d-inline-flex align-items-center">
                 <div class="network-dashboard-section-title mb-0">Environmental Health Summary</div>
                 <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn ml-2"
-                    [tooltip]="'Environmental status across power supplies, fans, and temperature sensors.'" container="body">
+                    [tooltip]="'Environmental status across power supplies, fans, and temperature sensors.'"
+                    container="body">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                 </button>
             </div>
@@ -872,16 +1306,19 @@
             </div>
         </div>
 
-        <div class="card rounded shadow-none border" *ngIf="environmentalHealthSummaryViewData || isEnvironmentalHealthSummaryLoading">
+        <div class="card rounded shadow-none border"
+            *ngIf="environmentalHealthSummaryViewData || isEnvironmentalHealthSummaryLoading">
             <div class="card-body p-0 position-relative">
                 <app-spinner [name]="loaderNames.environmentalHealthSummary" [width]="0"></app-spinner>
 
-                <ng-container *ngIf="environmentalHealthSummaryViewMode === 'chart'; else environmentalHealthSummaryTableView">
+                <ng-container
+                    *ngIf="environmentalHealthSummaryViewMode === 'chart'; else environmentalHealthSummaryTableView">
                     <div class="row no-gutters px-3 pt-3 pb-1">
                         <div class="col-xl-6 col-12 px-2 pb-2"
                             *ngFor="let chart of environmentalHealthSummaryViewData.charts; trackBy: trackByEnvironmentalHealthChart">
                             <div class="card border rounded shadow-none h-100 mb-0">
-                                <div class="card-header bg-light py-2 px-3 d-flex align-items-center justify-content-between">
+                                <div
+                                    class="card-header bg-light py-2 px-3 d-flex align-items-center justify-content-between">
                                     <div class="font-weight-bold">{{ chart.title }}</div>
                                     <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
                                         [tooltip]="chart.infoTooltip" container="body">
@@ -926,24 +1363,44 @@
                             (sorted)="onEnvironmentalHealthSummaryTableSorted($event)">
                             <thead class="bg-light">
                                 <tr>
-                                    <th sortable-column="device_name" [sort-direction]="getEnvironmentalHealthSummarySortDirection('device_name')">Device Name</th>
-                                    <th sortable-column="device_type" [sort-direction]="getEnvironmentalHealthSummarySortDirection('device_type')">Device Type</th>
-                                    <th sortable-column="power_supply_a" [sort-direction]="getEnvironmentalHealthSummarySortDirection('power_supply_a')">Power Supply A</th>
-                                    <th sortable-column="power_supply_b" [sort-direction]="getEnvironmentalHealthSummarySortDirection('power_supply_b')">Power Supply B</th>
-                                    <th sortable-column="fan_status" [sort-direction]="getEnvironmentalHealthSummarySortDirection('fan_status')">Fan Status</th>
-                                    <th sortable-column="inlet_temperature" [sort-direction]="getEnvironmentalHealthSummarySortDirection('inlet_temperature')">Inlet Temp</th>
-                                    <th sortable-column="outlet_temperature" [sort-direction]="getEnvironmentalHealthSummarySortDirection('outlet_temperature')">Outlet Temp</th>
-                                    <th sortable-column="hotspot_temperature" [sort-direction]="getEnvironmentalHealthSummarySortDirection('hotspot_temperature')">HotSpot Temp</th>
+                                    <th sortable-column="device_name"
+                                        [sort-direction]="getEnvironmentalHealthSummarySortDirection('device_name')">
+                                        Device Name</th>
+                                    <th sortable-column="device_type"
+                                        [sort-direction]="getEnvironmentalHealthSummarySortDirection('device_type')">
+                                        Device Type</th>
+                                    <th sortable-column="power_supply_a"
+                                        [sort-direction]="getEnvironmentalHealthSummarySortDirection('power_supply_a')">
+                                        Power Supply A</th>
+                                    <th sortable-column="power_supply_b"
+                                        [sort-direction]="getEnvironmentalHealthSummarySortDirection('power_supply_b')">
+                                        Power Supply B</th>
+                                    <th sortable-column="fan_status"
+                                        [sort-direction]="getEnvironmentalHealthSummarySortDirection('fan_status')">Fan
+                                        Status</th>
+                                    <th sortable-column="inlet_temperature"
+                                        [sort-direction]="getEnvironmentalHealthSummarySortDirection('inlet_temperature')">
+                                        Inlet Temp</th>
+                                    <th sortable-column="outlet_temperature"
+                                        [sort-direction]="getEnvironmentalHealthSummarySortDirection('outlet_temperature')">
+                                        Outlet Temp</th>
+                                    <th sortable-column="hotspot_temperature"
+                                        [sort-direction]="getEnvironmentalHealthSummarySortDirection('hotspot_temperature')">
+                                        HotSpot Temp</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of getVisibleEnvironmentalHealthSummaryRows(); trackBy: trackByEnvironmentalHealthRow" truncateText>
+                                <tr *ngFor="let row of getVisibleEnvironmentalHealthSummaryRows(); trackBy: trackByEnvironmentalHealthRow"
+                                    truncateText>
                                     <td class="tdw-16">
-                                        <div [tooltip]="row.deviceName" container="body" class="text-primary font-weight-bold">
+                                        <div [tooltip]="row.deviceName" container="body"
+                                            class="text-primary font-weight-bold">
                                             {{ row.deviceName }}
                                         </div>
                                     </td>
-                                    <td class="tdw-14"><div [tooltip]="row.deviceType" container="body">{{ row.deviceType }}</div></td>
+                                    <td class="tdw-14">
+                                        <div [tooltip]="row.deviceType" container="body">{{ row.deviceType }}</div>
+                                    </td>
                                     <td class="tdw-12">
                                         <div [tooltip]="row.powerSupplyADisplay" container="body">
                                             <span class="badge badge-pill px-2 py-1 text-nowrap"
@@ -961,10 +1418,12 @@
                                         </div>
                                     </td>
                                     <td class="tdw-14">
-                                        <div [tooltip]="row.fanStatusMeta ? row.fanStatusDisplay + ' ' + row.fanStatusMeta : row.fanStatusDisplay" container="body">
+                                        <div [tooltip]="row.fanStatusMeta ? row.fanStatusDisplay + ' ' + row.fanStatusMeta : row.fanStatusDisplay"
+                                            container="body">
                                             <span class="badge badge-pill px-2 py-1 text-nowrap"
                                                 [ngClass]="row.fanStatusTone === 'critical' ? 'badge-danger' : row.fanStatusTone === 'warning' ? 'badge-warning' : row.fanStatusTone === 'unknown' ? 'badge-light text-muted border' : 'badge-success'">
-                                                {{ row.fanStatusDisplay }}<span *ngIf="row.fanStatusMeta"> {{ row.fanStatusMeta }}</span>
+                                                {{ row.fanStatusDisplay }}<span *ngIf="row.fanStatusMeta"> {{
+                                                    row.fanStatusMeta }}</span>
                                             </span>
                                         </div>
                                     </td>
@@ -1008,7 +1467,8 @@
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between px-3 pb-3"
                         *ngIf="environmentalHealthSummaryViewData?.totalCount">
                         <div class="d-flex flex-wrap align-items-center mb-2 mb-md-0">
-                            <table-page-size class="mr-3 mb-2 mb-sm-0" [currentPageSize]="environmentalHealthSummaryPageSize"
+                            <table-page-size class="mr-3 mb-2 mb-sm-0"
+                                [currentPageSize]="environmentalHealthSummaryPageSize"
                                 [totalCount]="environmentalHealthSummaryViewData.totalCount"
                                 (pageSizeChange)="onEnvironmentalHealthSummaryPageSizeChanged($event)"></table-page-size>
                             <table-entries class="mb-2 mb-sm-0" [pageNo]="environmentalHealthSummaryPageNo"
@@ -1029,7 +1489,10 @@
             <div class="d-inline-flex align-items-center">
                 <div class="network-dashboard-section-title mb-0">Load Balancer Health</div>
                 <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn ml-2"
-                    [tooltip]="'Load balancer health across VIP status, pool health, connections, throughput, SSL certificates, and overall health state.'" container="body">
+                    [popover]="loadBalancerHealthInfoPopoverTmpl" triggers="mouseenter:mouseleave" placement="bottom"
+                    container="body" containerClass="network-dashboard-pdu-health-popover"
+                    (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+                    (keydown.space)="$event.stopPropagation()">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                 </button>
             </div>
@@ -1057,12 +1520,57 @@
                         <div *ngFor="let chart of loadBalancerHealthViewData.charts; let isLast = last; trackBy: trackByLoadBalancerHealthChart"
                             [ngClass]="isLast ? 'col-12 px-2 pb-2' : 'col-xl-6 col-12 px-2 pb-2'">
                             <div class="card border rounded shadow-none h-100 mb-0">
-                                <div class="card-header bg-light py-2 px-3 d-flex align-items-center justify-content-between">
+                                <div
+                                    class="card-header bg-light py-2 px-3 d-flex align-items-center justify-content-between">
                                     <div class="font-weight-bold">{{ chart.title }}</div>
-                                    <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
-                                        [tooltip]="chart.infoTooltip" container="body">
-                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                    </button>
+                                    <ng-container
+                                        *ngIf="chart.key === 'top-active-connections'; else loadBalancerResponseTimeTooltip">
+                                        <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                            [popover]="loadBalancerActiveConnectionsPopoverTmpl"
+                                            triggers="mouseenter:mouseleave" placement="bottom" container="body"
+                                            containerClass="network-dashboard-pdu-health-popover"
+                                            (click)="$event.stopPropagation()"
+                                            (keydown.enter)="$event.stopPropagation()"
+                                            (keydown.space)="$event.stopPropagation()">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </button>
+                                    </ng-container>
+                                    <ng-template #loadBalancerResponseTimeTooltip>
+                                        <ng-container
+                                            *ngIf="chart.key === 'top-slowest-response-time'; else loadBalancerResponseVsConnectionsTooltip">
+                                            <button type="button"
+                                                class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                                [popover]="loadBalancerResponseTimePopoverTmpl"
+                                                triggers="mouseenter:mouseleave" placement="bottom" container="body"
+                                                containerClass="network-dashboard-pdu-health-popover"
+                                                (click)="$event.stopPropagation()"
+                                                (keydown.enter)="$event.stopPropagation()"
+                                                (keydown.space)="$event.stopPropagation()">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </ng-container>
+                                    </ng-template>
+                                    <ng-template #loadBalancerResponseVsConnectionsTooltip>
+                                        <ng-container
+                                            *ngIf="chart.key === 'response-time-vs-active-connections'; else loadBalancerDefaultChartTooltip">
+                                            <button type="button"
+                                                class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                                [popover]="loadBalancerResponseVsConnectionsPopoverTmpl"
+                                                triggers="mouseenter:mouseleave" placement="bottom" container="body"
+                                                containerClass="network-dashboard-pdu-health-popover"
+                                                (click)="$event.stopPropagation()"
+                                                (keydown.enter)="$event.stopPropagation()"
+                                                (keydown.space)="$event.stopPropagation()">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </ng-container>
+                                    </ng-template>
+                                    <ng-template #loadBalancerDefaultChartTooltip>
+                                        <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                            [tooltip]="chart.infoTooltip" container="body">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </button>
+                                    </ng-template>
                                 </div>
                                 <div class="card-body p-2">
                                     <div echarts *ngIf="chart.chartData" [options]="chart.chartData.options"
@@ -1093,39 +1601,96 @@
                             (sorted)="onLoadBalancerHealthTableSorted($event)">
                             <thead class="bg-light">
                                 <tr>
-                                    <th sortable-column="load_balancer_name" [sort-direction]="getLoadBalancerHealthSortDirection('load_balancer_name')">Load Balancer</th>
-                                    <th sortable-column="vendor" [sort-direction]="getLoadBalancerHealthSortDirection('vendor')">Vendor</th>
-                                    <th sortable-column="virtual_server" [sort-direction]="getLoadBalancerHealthSortDirection('virtual_server')">Virtual Server</th>
-                                    <th sortable-column="backend_pool" [sort-direction]="getLoadBalancerHealthSortDirection('backend_pool')">Backend Pool</th>
-                                    <th sortable-column="vip_status" [sort-direction]="getLoadBalancerHealthSortDirection('vip_status')">VIP Status</th>
-                                    <th sortable-column="pool_member_health" [sort-direction]="getLoadBalancerHealthSortDirection('pool_member_health')">Pool Member Health</th>
-                                    <th sortable-column="active_connections" [sort-direction]="getLoadBalancerHealthSortDirection('active_connections')">Active Connections</th>
-                                    <th sortable-column="new_connections" [sort-direction]="getLoadBalancerHealthSortDirection('new_connections')">New Connections/s</th>
-                                    <th sortable-column="throughput" [sort-direction]="getLoadBalancerHealthSortDirection('throughput')">Throughput (Mbps)</th>
-                                    <th sortable-column="requests" [sort-direction]="getLoadBalancerHealthSortDirection('requests')">Requests/s</th>
-                                    <th sortable-column="avg_response_time" [sort-direction]="getLoadBalancerHealthSortDirection('avg_response_time')">Avg Response Time (ms)</th>
-                                    <th sortable-column="ssl_cert_status" [sort-direction]="getLoadBalancerHealthSortDirection('ssl_cert_status')">SSL Certificate Status</th>
-                                    <th sortable-column="health" [sort-direction]="getLoadBalancerHealthSortDirection('health')">Health</th>
+                                    <th sortable-column="load_balancer_name"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('load_balancer_name')">Load
+                                        Balancer</th>
+                                    <th sortable-column="vendor"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('vendor')">Vendor</th>
+                                    <th sortable-column="virtual_server"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('virtual_server')">Virtual
+                                        Server</th>
+                                    <th sortable-column="backend_pool"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('backend_pool')">Backend
+                                        Pool</th>
+                                    <th sortable-column="vip_status"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('vip_status')">VIP Status
+                                    </th>
+                                    <th sortable-column="pool_member_health"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('pool_member_health')">Pool
+                                        Member Health</th>
+                                    <th sortable-column="active_connections"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('active_connections')">
+                                        Active Connections</th>
+                                    <th sortable-column="new_connections"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('new_connections')">New
+                                        Connections/s</th>
+                                    <th sortable-column="throughput"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('throughput')">Throughput
+                                        (Mbps)</th>
+                                    <th sortable-column="requests"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('requests')">Requests/s
+                                    </th>
+                                    <th sortable-column="avg_response_time"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('avg_response_time')">Avg
+                                        Response Time (ms)</th>
+                                    <th sortable-column="ssl_cert_status"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('ssl_cert_status')">SSL
+                                        Certificate Status</th>
+                                    <th sortable-column="health"
+                                        [sort-direction]="getLoadBalancerHealthSortDirection('health')">Health</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of getVisibleLoadBalancerHealthRows(); trackBy: trackByLoadBalancerHealthRow" truncateText>
+                                <tr *ngFor="let row of getVisibleLoadBalancerHealthRows(); trackBy: trackByLoadBalancerHealthRow"
+                                    truncateText>
                                     <td class="tdw-14">
-                                        <div [tooltip]="row.loadBalancerName" container="body" class="text-primary font-weight-bold">
+                                        <div [tooltip]="row.loadBalancerName" container="body"
+                                            class="text-primary font-weight-bold">
                                             {{ row.loadBalancerName }}
                                         </div>
                                     </td>
-                                    <td class="tdw-10"><div [tooltip]="row.vendor" container="body">{{ row.vendor }}</div></td>
-                                    <td class="tdw-12"><div [tooltip]="row.virtualServer" container="body">{{ row.virtualServer }}</div></td>
-                                    <td class="tdw-12"><div [tooltip]="row.backendPool" container="body">{{ row.backendPool }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.vipStatusLabel" container="body" class="text-nowrap">{{ row.vipStatusLabel }}</div></td>
-                                    <td class="tdw-12"><div [tooltip]="row.poolMemberHealthLabel" container="body" class="text-nowrap">{{ row.poolMemberHealthLabel }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.activeConnectionsDisplay" container="body" class="text-nowrap">{{ row.activeConnectionsDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.newConnectionsDisplay" container="body" class="text-nowrap">{{ row.newConnectionsDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.throughputDisplay" container="body" class="text-nowrap">{{ row.throughputDisplay }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.requestsDisplay" container="body" class="text-nowrap">{{ row.requestsDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.avgResponseTimeDisplay" container="body" class="text-nowrap">{{ row.avgResponseTimeDisplay }}</div></td>
-                                    <td class="tdw-12"><div [tooltip]="row.sslCertificateStatusLabel" container="body" class="text-nowrap">{{ row.sslCertificateStatusLabel }}</div></td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.vendor" container="body">{{ row.vendor }}</div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.virtualServer" container="body">{{ row.virtualServer }}
+                                        </div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.backendPool" container="body">{{ row.backendPool }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.vipStatusLabel" container="body" class="text-nowrap">{{
+                                            row.vipStatusLabel }}</div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.poolMemberHealthLabel" container="body" class="text-nowrap">
+                                            {{ row.poolMemberHealthLabel }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.activeConnectionsDisplay" container="body"
+                                            class="text-nowrap">{{ row.activeConnectionsDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.newConnectionsDisplay" container="body" class="text-nowrap">
+                                            {{ row.newConnectionsDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.throughputDisplay" container="body" class="text-nowrap">{{
+                                            row.throughputDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.requestsDisplay" container="body" class="text-nowrap">{{
+                                            row.requestsDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.avgResponseTimeDisplay" container="body"
+                                            class="text-nowrap">{{ row.avgResponseTimeDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.sslCertificateStatusLabel" container="body"
+                                            class="text-nowrap">{{ row.sslCertificateStatusLabel }}</div>
+                                    </td>
                                     <td class="tdw-12">
                                         <div [tooltip]="row.healthLabel" container="body">
                                             <span class="d-inline-flex align-items-center text-nowrap"
@@ -1156,8 +1721,7 @@
                                 [totalCount]="loadBalancerHealthViewData.totalCount"></table-entries>
                         </div>
                         <table-pager [compact]="true" [pageNo]="loadBalancerHealthPageNo"
-                            [pageSize]="loadBalancerHealthPageSize"
-                            [totalCount]="loadBalancerHealthViewData.totalCount"
+                            [pageSize]="loadBalancerHealthPageSize" [totalCount]="loadBalancerHealthViewData.totalCount"
                             (pageChange)="onLoadBalancerHealthPageChanged($event)"></table-pager>
                     </div>
                 </ng-template>
@@ -1169,7 +1733,10 @@
             <div class="d-inline-flex align-items-center">
                 <div class="network-dashboard-section-title mb-0">PDU Health</div>
                 <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn ml-2"
-                    [tooltip]="'PDU health across load, power, temperature, humidity, and overall health state.'" container="body">
+                    [popover]="pduHealthInfoPopoverTmpl" triggers="mouseenter:mouseleave" placement="bottom"
+                    container="body" containerClass="network-dashboard-pdu-health-popover"
+                    (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+                    (keydown.space)="$event.stopPropagation()">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                 </button>
             </div>
@@ -1197,12 +1764,101 @@
                         <div class="col-xl-4 col-lg-6 col-12 px-2 pb-2"
                             *ngFor="let chart of pduHealthViewData.charts; trackBy: trackByPduHealthChart">
                             <div class="card border rounded shadow-none h-100 mb-0">
-                                <div class="card-header bg-light py-2 px-3 d-flex align-items-center justify-content-between">
+                                <div
+                                    class="card-header bg-light py-2 px-3 d-flex align-items-center justify-content-between">
                                     <div class="font-weight-bold">{{ chart.title }}</div>
-                                    <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
-                                        [tooltip]="chart.infoTooltip" container="body">
-                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                    </button>
+                                    <ng-container
+                                        *ngIf="chart.key === 'health-by-location'; else pduHealthTopLoadTooltip">
+                                        <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                            [popover]="pduHealthByLocationPopoverTmpl" triggers="mouseenter:mouseleave"
+                                            placement="bottom" container="body"
+                                            containerClass="network-dashboard-pdu-health-popover"
+                                            (click)="$event.stopPropagation()"
+                                            (keydown.enter)="$event.stopPropagation()"
+                                            (keydown.space)="$event.stopPropagation()">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </button>
+                                    </ng-container>
+                                    <ng-template #pduHealthTopLoadTooltip>
+                                        <ng-container *ngIf="chart.key === 'top-load'; else pduHealthTopPowerTooltip">
+                                            <button type="button"
+                                                class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                                [popover]="pduTopLoadPopoverTmpl" triggers="mouseenter:mouseleave"
+                                                placement="bottom" container="body"
+                                                containerClass="network-dashboard-pdu-health-popover"
+                                                (click)="$event.stopPropagation()"
+                                                (keydown.enter)="$event.stopPropagation()"
+                                                (keydown.space)="$event.stopPropagation()">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </ng-container>
+                                    </ng-template>
+                                    <ng-template #pduHealthTopPowerTooltip>
+                                        <ng-container
+                                            *ngIf="chart.key === 'top-power'; else pduHealthTopTemperatureTooltip">
+                                            <button type="button"
+                                                class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                                [popover]="pduTopPowerPopoverTmpl" triggers="mouseenter:mouseleave"
+                                                placement="bottom" container="body"
+                                                containerClass="network-dashboard-pdu-health-popover"
+                                                (click)="$event.stopPropagation()"
+                                                (keydown.enter)="$event.stopPropagation()"
+                                                (keydown.space)="$event.stopPropagation()">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </ng-container>
+                                    </ng-template>
+                                    <ng-template #pduHealthTopTemperatureTooltip>
+                                        <ng-container
+                                            *ngIf="chart.key === 'top-temperature'; else pduHealthLoadVsTemperatureTooltip">
+                                            <button type="button"
+                                                class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                                [popover]="pduTopTemperaturePopoverTmpl"
+                                                triggers="mouseenter:mouseleave" placement="bottom" container="body"
+                                                containerClass="network-dashboard-pdu-health-popover"
+                                                (click)="$event.stopPropagation()"
+                                                (keydown.enter)="$event.stopPropagation()"
+                                                (keydown.space)="$event.stopPropagation()">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </ng-container>
+                                    </ng-template>
+                                    <ng-template #pduHealthLoadVsTemperatureTooltip>
+                                        <ng-container
+                                            *ngIf="chart.key === 'load-vs-temperature'; else pduHealthLoadVsPowerTooltip">
+                                            <button type="button"
+                                                class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                                [popover]="pduLoadVsTemperaturePopoverTmpl"
+                                                triggers="mouseenter:mouseleave" placement="bottom" container="body"
+                                                containerClass="network-dashboard-pdu-health-popover"
+                                                (click)="$event.stopPropagation()"
+                                                (keydown.enter)="$event.stopPropagation()"
+                                                (keydown.space)="$event.stopPropagation()">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </ng-container>
+                                    </ng-template>
+                                    <ng-template #pduHealthLoadVsPowerTooltip>
+                                        <ng-container
+                                            *ngIf="chart.key === 'load-vs-power'; else pduHealthDefaultChartTooltip">
+                                            <button type="button"
+                                                class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                                [popover]="pduLoadVsPowerPopoverTmpl" triggers="mouseenter:mouseleave"
+                                                placement="bottom" container="body"
+                                                containerClass="network-dashboard-pdu-health-popover"
+                                                (click)="$event.stopPropagation()"
+                                                (keydown.enter)="$event.stopPropagation()"
+                                                (keydown.space)="$event.stopPropagation()">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </ng-container>
+                                    </ng-template>
+                                    <ng-template #pduHealthDefaultChartTooltip>
+                                        <button type="button" class="btn btn-link p-0 network-dashboard-chart-info-btn"
+                                            [tooltip]="chart.infoTooltip" container="body">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </button>
+                                    </ng-template>
                                 </div>
                                 <div class="card-body p-2">
                                     <div echarts *ngIf="chart.chartData" [options]="chart.chartData.options"
@@ -1233,39 +1889,83 @@
                             (sorted)="onPduHealthTableSorted($event)">
                             <thead class="bg-light">
                                 <tr>
-                                    <th sortable-column="pdu_name" [sort-direction]="getPduHealthSortDirection('pdu_name')">PDU Name</th>
-                                    <th sortable-column="vendor" [sort-direction]="getPduHealthSortDirection('vendor')">Vendor</th>
-                                    <th sortable-column="location" [sort-direction]="getPduHealthSortDirection('location')">Location</th>
-                                    <th sortable-column="rack" [sort-direction]="getPduHealthSortDirection('rack')">Rack</th>
-                                    <th sortable-column="power_status" [sort-direction]="getPduHealthSortDirection('power_status')">Power Status</th>
-                                    <th sortable-column="load" [sort-direction]="getPduHealthSortDirection('load')">Load (%)</th>
-                                    <th sortable-column="input_voltage" [sort-direction]="getPduHealthSortDirection('input_voltage')">Input Voltage (V)</th>
-                                    <th sortable-column="current" [sort-direction]="getPduHealthSortDirection('current')">Current (A)</th>
-                                    <th sortable-column="power" [sort-direction]="getPduHealthSortDirection('power')">Power (kW)</th>
-                                    <th sortable-column="temperature" [sort-direction]="getPduHealthSortDirection('temperature')">Temperature (°C)</th>
-                                    <th sortable-column="humidity" [sort-direction]="getPduHealthSortDirection('humidity')">Humidity (%)</th>
-                                    <th sortable-column="outlet_status" [sort-direction]="getPduHealthSortDirection('outlet_status')">Outlet Status</th>
-                                    <th sortable-column="health" [sort-direction]="getPduHealthSortDirection('health')">Health</th>
+                                    <th sortable-column="pdu_name"
+                                        [sort-direction]="getPduHealthSortDirection('pdu_name')">PDU Name</th>
+                                    <th sortable-column="vendor" [sort-direction]="getPduHealthSortDirection('vendor')">
+                                        Vendor</th>
+                                    <th sortable-column="location"
+                                        [sort-direction]="getPduHealthSortDirection('location')">Location</th>
+                                    <th sortable-column="rack" [sort-direction]="getPduHealthSortDirection('rack')">Rack
+                                    </th>
+                                    <th sortable-column="power_status"
+                                        [sort-direction]="getPduHealthSortDirection('power_status')">Power Status</th>
+                                    <th sortable-column="load" [sort-direction]="getPduHealthSortDirection('load')">Load
+                                        (%)</th>
+                                    <th sortable-column="input_voltage"
+                                        [sort-direction]="getPduHealthSortDirection('input_voltage')">Input Voltage (V)
+                                    </th>
+                                    <th sortable-column="current"
+                                        [sort-direction]="getPduHealthSortDirection('current')">Current (A)</th>
+                                    <th sortable-column="power" [sort-direction]="getPduHealthSortDirection('power')">
+                                        Power (kW)</th>
+                                    <th sortable-column="temperature"
+                                        [sort-direction]="getPduHealthSortDirection('temperature')">Temperature (°C)
+                                    </th>
+                                    <th sortable-column="humidity"
+                                        [sort-direction]="getPduHealthSortDirection('humidity')">Humidity (%)</th>
+                                    <th sortable-column="outlet_status"
+                                        [sort-direction]="getPduHealthSortDirection('outlet_status')">Outlet Status</th>
+                                    <th sortable-column="health" [sort-direction]="getPduHealthSortDirection('health')">
+                                        Health</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of getVisiblePduHealthRows(); trackBy: trackByPduHealthRow" truncateText>
+                                <tr *ngFor="let row of getVisiblePduHealthRows(); trackBy: trackByPduHealthRow"
+                                    truncateText>
                                     <td class="tdw-14">
-                                        <div [tooltip]="row.pduName" container="body" class="text-primary font-weight-bold">
+                                        <div [tooltip]="row.pduName" container="body"
+                                            class="text-primary font-weight-bold">
                                             {{ row.pduName }}
                                         </div>
                                     </td>
-                                    <td class="tdw-10"><div [tooltip]="row.vendor" container="body">{{ row.vendor }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.location" container="body">{{ row.location }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.rack" container="body">{{ row.rack }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.powerStatusLabel" container="body" class="text-nowrap">{{ row.powerStatusLabel }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.loadDisplay" container="body">{{ row.loadDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.inputVoltageDisplay" container="body">{{ row.inputVoltageDisplay }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.currentDisplay" container="body">{{ row.currentDisplay }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.powerDisplay" container="body">{{ row.powerDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.temperatureDisplay" container="body">{{ row.temperatureDisplay }}</div></td>
-                                    <td class="tdw-8"><div [tooltip]="row.humidityDisplay" container="body">{{ row.humidityDisplay }}</div></td>
-                                    <td class="tdw-10"><div [tooltip]="row.outletStatus" container="body">{{ row.outletStatus }}</div></td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.vendor" container="body">{{ row.vendor }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.location" container="body">{{ row.location }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.rack" container="body">{{ row.rack }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.powerStatusLabel" container="body" class="text-nowrap">{{
+                                            row.powerStatusLabel }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.loadDisplay" container="body">{{ row.loadDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.inputVoltageDisplay" container="body">{{
+                                            row.inputVoltageDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.currentDisplay" container="body">{{ row.currentDisplay }}
+                                        </div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.powerDisplay" container="body">{{ row.powerDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.temperatureDisplay" container="body">{{
+                                            row.temperatureDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-8">
+                                        <div [tooltip]="row.humidityDisplay" container="body">{{ row.humidityDisplay }}
+                                        </div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.outletStatus" container="body">{{ row.outletStatus }}</div>
+                                    </td>
                                     <td class="tdw-12">
                                         <div [tooltip]="row.healthLabel" container="body">
                                             <span class="d-inline-flex align-items-center text-nowrap"
@@ -1295,8 +1995,7 @@
                                 [pageSize]="pduHealthPageSize"
                                 [totalCount]="pduHealthViewData.totalCount"></table-entries>
                         </div>
-                        <table-pager [compact]="true" [pageNo]="pduHealthPageNo"
-                            [pageSize]="pduHealthPageSize"
+                        <table-pager [compact]="true" [pageNo]="pduHealthPageNo" [pageSize]="pduHealthPageSize"
                             [totalCount]="pduHealthViewData.totalCount"
                             (pageChange)="onPduHealthPageChanged($event)"></table-pager>
                     </div>
@@ -1315,7 +2014,8 @@
                     <div class="col-lg-4 col-md-4 col-12 px-2 pb-2"
                         *ngFor="let metric of alertEventsViewData.summaryMetrics">
                         <div class="card border rounded shadow-none h-100 mb-0">
-                            <div class="card-body d-flex flex-column align-items-center justify-content-center py-3 px-3 text-center">
+                            <div
+                                class="card-body d-flex flex-column align-items-center justify-content-center py-3 px-3 text-center">
                                 <div class="text-muted font-sm-xs mb-1">{{ metric.label }}</div>
                                 <div class="font-2x"
                                     [ngClass]="metric.tone === 'critical' ? 'text-danger' : metric.tone === 'warning' ? 'text-warning' : 'text-primary'">
@@ -1336,8 +2036,7 @@
                                 <div echarts *ngIf="alertEventsViewData.severityChart?.chartData"
                                     [options]="alertEventsViewData.severityChart.chartData.options"
                                     [extentions]="alertEventsViewData.severityChart.chartData.extensions"
-                                    [defaultHeight]="alertEventsViewData.severityChart.chartHeight"
-                                    class="w-100">
+                                    [defaultHeight]="alertEventsViewData.severityChart.chartHeight" class="w-100">
                                 </div>
                                 <div *ngIf="!alertEventsViewData.severityChart?.chartData"
                                     class="d-flex justify-content-center align-items-center w-100 text-muted network-dashboard-alert-events-empty-state">
@@ -1365,8 +2064,7 @@
                                 <div echarts *ngIf="alertEventsViewData.deviceTypeChart?.chartData"
                                     [options]="alertEventsViewData.deviceTypeChart.chartData.options"
                                     [extentions]="alertEventsViewData.deviceTypeChart.chartData.extensions"
-                                    [defaultHeight]="alertEventsViewData.deviceTypeChart.chartHeight"
-                                    class="w-100">
+                                    [defaultHeight]="alertEventsViewData.deviceTypeChart.chartHeight" class="w-100">
                                 </div>
                                 <div *ngIf="!alertEventsViewData.deviceTypeChart?.chartData"
                                     class="d-flex justify-content-center align-items-center w-100 text-muted network-dashboard-alert-events-empty-state">
@@ -1394,8 +2092,7 @@
                                 <div echarts *ngIf="alertEventsViewData.itsmTicketsChart?.chartData"
                                     [options]="alertEventsViewData.itsmTicketsChart.chartData.options"
                                     [extentions]="alertEventsViewData.itsmTicketsChart.chartData.extensions"
-                                    [defaultHeight]="alertEventsViewData.itsmTicketsChart.chartHeight"
-                                    class="w-100">
+                                    [defaultHeight]="alertEventsViewData.itsmTicketsChart.chartHeight" class="w-100">
                                 </div>
                                 <div *ngIf="!alertEventsViewData.itsmTicketsChart?.chartData"
                                     class="d-flex justify-content-center align-items-center w-100 text-muted network-dashboard-alert-events-empty-state">
@@ -1442,13 +2139,21 @@
                             (sorted)="onAlertEventsTableSorted($event)">
                             <thead class="bg-light">
                                 <tr>
-                                    <th sortable-column="idValue" [sort-direction]="getAlertEventsSortDirection('idValue')">ID</th>
-                                    <th sortable-column="deviceName" [sort-direction]="getAlertEventsSortDirection('deviceName')">Device Name</th>
-                                    <th class="text-center" sortable-column="severityRank" [sort-direction]="getAlertEventsSortDirection('severityRank')">Severity</th>
-                                    <th sortable-column="description" [sort-direction]="getAlertEventsSortDirection('description')">Description</th>
-                                    <th sortable-column="source" [sort-direction]="getAlertEventsSortDirection('source')">Source</th>
-                                    <th sortable-column="acknowledgedRank" [sort-direction]="getAlertEventsSortDirection('acknowledgedRank')">Acknowledged</th>
-                                    <th sortable-column="durationSeconds" [sort-direction]="getAlertEventsSortDirection('durationSeconds')">Duration</th>
+                                    <th sortable-column="idValue"
+                                        [sort-direction]="getAlertEventsSortDirection('idValue')">ID</th>
+                                    <th sortable-column="deviceName"
+                                        [sort-direction]="getAlertEventsSortDirection('deviceName')">Device Name</th>
+                                    <th class="text-center" sortable-column="severityRank"
+                                        [sort-direction]="getAlertEventsSortDirection('severityRank')">Severity</th>
+                                    <th sortable-column="description"
+                                        [sort-direction]="getAlertEventsSortDirection('description')">Description</th>
+                                    <th sortable-column="source"
+                                        [sort-direction]="getAlertEventsSortDirection('source')">Source</th>
+                                    <th sortable-column="acknowledgedRank"
+                                        [sort-direction]="getAlertEventsSortDirection('acknowledgedRank')">Acknowledged
+                                    </th>
+                                    <th sortable-column="durationSeconds"
+                                        [sort-direction]="getAlertEventsSortDirection('durationSeconds')">Duration</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1460,7 +2165,9 @@
                                             {{ row.id }}
                                         </button>
                                     </td>
-                                    <td class="tdw-15"><div [tooltip]="row.deviceName" container="body">{{ row.deviceName }}</div></td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="row.deviceName" container="body">{{ row.deviceName }}</div>
+                                    </td>
                                     <td class="text-center tdw-10">
                                         <div [tooltip]="row.severityLabel" container="body">
                                             <span class="d-inline-flex align-items-center justify-content-center">
@@ -1469,10 +2176,20 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="tdw-25"><div [tooltip]="row.description" container="body">{{ row.description }}</div></td>
-                                    <td class="tdw-12"><div [tooltip]="row.source" container="body">{{ row.source }}</div></td>
-                                    <td class="tdw-13"><div [tooltip]="row.acknowledgedDisplay" container="body">{{ row.acknowledgedDisplay }}</div></td>
-                                    <td class="tdw-15"><div [tooltip]="row.durationDisplay" container="body">{{ row.durationDisplay }}</div></td>
+                                    <td class="tdw-25">
+                                        <div [tooltip]="row.description" container="body">{{ row.description }}</div>
+                                    </td>
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.source" container="body">{{ row.source }}</div>
+                                    </td>
+                                    <td class="tdw-13">
+                                        <div [tooltip]="row.acknowledgedDisplay" container="body">{{
+                                            row.acknowledgedDisplay }}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="row.durationDisplay" container="body">{{ row.durationDisplay }}
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1491,12 +2208,14 @@
             <div class="network-dashboard-section-title">Auto-Remediation Summary</div>
         </div>
 
-        <div class="card rounded shadow-none border" *ngIf="autoRemediationSummaryViewData || isAutoRemediationSummaryLoading">
+        <div class="card rounded shadow-none border"
+            *ngIf="autoRemediationSummaryViewData || isAutoRemediationSummaryLoading">
             <div class="card-body p-0 position-relative">
                 <app-spinner [name]="loaderNames.autoRemediationSummary" [width]="0"></app-spinner>
                 <div class="row no-gutters align-items-stretch">
                     <div class="col-xl-4 col-lg-5 col-md-12 col-12">
-                        <div class="h-100 d-flex flex-column align-items-center justify-content-center px-xl-4 px-3 py-4">
+                        <div
+                            class="h-100 d-flex flex-column align-items-center justify-content-center px-xl-4 px-3 py-4">
                             <div class="d-flex justify-content-center w-100">
                                 <div echarts *ngIf="autoRemediationSummaryViewData.successFailureChart?.chartData"
                                     [options]="autoRemediationSummaryViewData.successFailureChart.chartData.options"

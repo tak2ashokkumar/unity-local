@@ -92,7 +92,8 @@
           </div>
 
           <button type="button" class="variable-remove action-icons fas fa-minus"
-            (click)="removeVariable(i)" [attr.aria-label]="'Remove variable ' + (i + 1)"></button>
+            (click)="removeVariable(i)" [disabled]="isReadOnly"
+            [attr.aria-label]="'Remove variable ' + (i + 1)"></button>
         </div>
       </ng-container>
       <div class="variables-actions d-flex justify-content-between align-items-center">
@@ -102,7 +103,8 @@
           </ng-container>
         </div>
         <div>
-          <button type="button" class="btn text-primary border-primary" (click)="addVariable()">
+          <button type="button" class="btn text-primary border-primary" (click)="addVariable()"
+            [disabled]="isReadOnly">
             <i class="fas fa-plus mr-1"></i> Variable
           </button>
         </div>

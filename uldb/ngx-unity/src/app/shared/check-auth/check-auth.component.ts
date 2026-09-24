@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AppUtilityService, NoWhitespaceValidator } from '../app-utility/app-utility.service';
 import { AppSpinnerService } from '../app-spinner/app-spinner.service';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -15,7 +15,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class CheckAuthComponent implements OnInit, OnDestroy {
   input: ConsoleAccessInput;
-  @ViewChild('checkAuthForm') elementView: ElementRef;
+  @ViewChild('checkAuthForm', { static: true }) elementView: ElementRef;
   modalRef: BsModalRef;
   authForm: FormGroup;
   formErrors: any;
@@ -34,9 +34,16 @@ export class CheckAuthComponent implements OnInit, OnDestroy {
     this.authService.authAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((input) => {
       this.input = input;
       this.privateKeyForm = null;
-      this.onHidden();
+      this.authData = null;
       this.buildForm();
       this.modalRef = this.modalService.show(this.elementView, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+      this.modalService.onHidden.pipe(take(1), takeUntil(this.ngUnsubscribe)).subscribe((reason: string) => {
+        if (reason == 'backdrop-click' || reason == 'esc') {
+          this.authService.authConfirmed(null);
+        } else {
+          this.authService.authConfirmed(this.authData);
+        }
+      });
     });
   }
 
@@ -47,16 +54,6 @@ export class CheckAuthComponent implements OnInit, OnDestroy {
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
-  }
-
-  onHidden() {
-    this.modalService.onHidden.pipe(takeUntil(this.ngUnsubscribe)).subscribe((reason: string) => {
-      if (reason == 'backdrop-click' || reason == 'esc') {
-        this.authService.authConfirmed(null);
-      } else {
-        this.authService.authConfirmed(this.authData);
-      }
-    });
   }
 
   buildForm() {

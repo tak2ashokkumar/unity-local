@@ -23,6 +23,7 @@ import {
   NetworkDashboardHeaderResponse,
   NetworkDeviceAvailabilityTableResponse,
   NetworkEnvironmentalHealthSummaryTableResponse,
+  NetworkLowestAvailabilityResponse,
   NetworkLoadBalancerHealthTableResponse,
   NetworkOpenItsmTicketsByDeviceTypeResponse,
   NetworkPduHealthTableResponse,
@@ -141,6 +142,7 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   topConversationSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   performanceWorkloadSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   interfaceHealthMetricsSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
+  networkDeviceAvailabilitySortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   environmentalHealthSummarySortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   loadBalancerHealthSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
   pduHealthSortState: { sortColumn: string; sortDirection: string } = { sortColumn: '', sortDirection: '' };
@@ -319,22 +321,31 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.networkDeviceAvailabilityViewData = this.networkDeviceAvailabilityViewData || new NetworkDeviceAvailabilityWidgetViewData();
     this.startLoader(this.loaderNames.networkDeviceAvailability);
     const emptyNetworkDeviceAvailabilityTable: NetworkDeviceAvailabilityTableResponse = { count: 0, data: [] };
+    const emptyLowestAvailability: NetworkLowestAvailabilityResponse = { data: [] };
     forkJoin({
       chartData: this.svc.getNetworkDeviceAvailabilityTable(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError(
         'Failed to load Network Device Availability chart data. Showing available table data.',
         emptyNetworkDeviceAvailabilityTable
       ))),
+      lowestAvailability: this.svc.getLowestAvailability(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError(
+        'Failed to load Lowest Availability data. Showing available table data.',
+        emptyLowestAvailability
+      ))),
       tableData: this.svc.getNetworkDeviceAvailabilityTable(
         this.appliedFilters,
         this.networkDeviceAvailabilityPageNo,
         this.networkDeviceAvailabilityPageSize,
-        this.networkDeviceAvailabilitySearch
+        this.networkDeviceAvailabilitySearch,
+        this.getNetworkDeviceAvailabilityOrdering()
       ).pipe(catchError(() => this.handleWidgetApiError(
         'Failed to load Network Device Availability table data. Showing available chart data.',
         emptyNetworkDeviceAvailabilityTable
       )))
     }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.networkDeviceAvailabilityViewData = this.svc.convertToNetworkDeviceAvailabilityViewDataFromTable(res.chartData);
+      this.networkDeviceAvailabilityViewData = this.svc.convertToNetworkDeviceAvailabilityViewDataFromTable(
+        res.chartData,
+        res.lowestAvailability
+      );
       this.networkDeviceAvailabilityViewData = this.svc.applyNetworkDeviceAvailabilityTableData(
         this.networkDeviceAvailabilityViewData,
         res.tableData
@@ -561,6 +572,26 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.networkDeviceAvailabilityPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
     this.networkDeviceAvailabilityPageNo = 1;
     this.getNetworkDeviceAvailability();
+  }
+
+  onNetworkDeviceAvailabilityTableSorted(event: ColumnSortedEvent) {
+    if (!event?.sortColumn || !event?.sortDirection) {
+      return;
+    }
+
+    this.networkDeviceAvailabilitySortState = {
+      sortColumn: event.sortColumn,
+      sortDirection: event.sortDirection
+    };
+    this.networkDeviceAvailabilityPageNo = 1;
+    this.getNetworkDeviceAvailability();
+  }
+
+  getNetworkDeviceAvailabilitySortDirection(sortColumn: string): string {
+    if (this.networkDeviceAvailabilitySortState.sortColumn !== sortColumn) {
+      return '';
+    }
+    return this.networkDeviceAvailabilitySortState.sortDirection;
   }
 
   getVisibleNetworkDeviceAvailabilityRows() {
@@ -1128,6 +1159,7 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     this.topConversationSortState = { sortColumn: '', sortDirection: '' };
     this.performanceWorkloadSortState = { sortColumn: '', sortDirection: '' };
     this.interfaceHealthMetricsSortState = { sortColumn: '', sortDirection: '' };
+    this.networkDeviceAvailabilitySortState = { sortColumn: '', sortDirection: '' };
     this.environmentalHealthSummarySortState = { sortColumn: '', sortDirection: '' };
     this.loadBalancerHealthSortState = { sortColumn: '', sortDirection: '' };
     this.pduHealthSortState = { sortColumn: '', sortDirection: '' };
@@ -1223,6 +1255,15 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   private getInterfaceHealthMetricsOrdering(): string {
     const sortColumn = this.interfaceHealthMetricsSortState.sortColumn || 'interface';
     const sortDirection = this.interfaceHealthMetricsSortState.sortDirection || 'asc';
+    return sortDirection === 'desc' ? `-${sortColumn}` : sortColumn;
+  }
+
+  private getNetworkDeviceAvailabilityOrdering(): string {
+    const sortColumn = this.networkDeviceAvailabilitySortState.sortColumn;
+    const sortDirection = this.networkDeviceAvailabilitySortState.sortDirection;
+    if (!sortColumn || !sortDirection) {
+      return '';
+    }
     return sortDirection === 'desc' ? `-${sortColumn}` : sortColumn;
   }
 

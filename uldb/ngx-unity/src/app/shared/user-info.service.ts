@@ -63,7 +63,8 @@ export class UserInfoService {
   }
 
   get logo() {
-    return (<User>this.storage.getByKey('user', StorageType.SESSIONSTORAGE)).org._logo;
+    const user = <User>this.storage.getByKey('user', StorageType.SESSIONSTORAGE);
+    return user ? user.org._logo : null;
   }
 
   get userName() {

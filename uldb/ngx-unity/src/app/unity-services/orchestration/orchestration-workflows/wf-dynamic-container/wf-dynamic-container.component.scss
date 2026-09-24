@@ -1,5 +1,3 @@
-@import "../../../../unity-chatbot/unity-chatbot.component.scss";
-
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 $background-color: #ffffff;
 $surface-alt: #f7f8f9;
@@ -78,6 +76,19 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 0;
 }
 
+.execution-list-item:focus:not(:focus-visible) {
+    outline: 0;
+    box-shadow: none;
+}
+
+.execution-list-item.active,
+.execution-list-item.active:hover,
+.execution-list-item.active:focus {
+    color: $color-dark;
+    background-color: $accent-glow;
+    border-color: rgba(74, 144, 164, 0.28);
+}
+
 :host {
     display: flex;
     flex-direction: column;
@@ -87,6 +98,7 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
 // ─── Card Header ─────────────────────────────────────────────────────────────
 .card-header.wf-header {
+    height: 44px;
     border-bottom-color: $border-color !important;
     padding: 0.25rem 0.75rem !important;
     box-shadow: 0 1px 4px rgba(60, 72, 82, 0.07);
@@ -123,6 +135,55 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
+// ─── Header Mode Toggle ─────────────────────────────────────────────────────
+.workflow-mode-toggle {
+    gap: 0.3rem;
+    background: $surface-alt;
+    border: 1px solid $border-color;
+    border-radius: 0.55rem;
+}
+
+.workflow-mode-toggle-button {
+    position: relative;
+    gap: 0.4rem;
+    color: $color-light;
+    background: transparent;
+    border: 0;
+    border-radius: 0.55rem;
+    cursor: pointer;
+    font-size: 0.76rem;
+    font-weight: 600;
+    transition: color 0.15s ease, background 0.15s ease;
+
+    &:focus {
+        outline: none;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        color: $tab-active-color;
+        background: $tab-active-bg;
+        outline: none;
+    }
+
+    &.active {
+        color: $background-color;
+        background: $tab-active-color;
+        box-shadow: 0 3px 8px rgba(55, 138, 216, 0.18);
+    }
+
+    &.active:hover:not(:disabled),
+    &.active:focus-visible {
+        color: $background-color;
+        background: $tab-active-color;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+    }
+}
+
 // ─── Main Layout ─────────────────────────────────────────────────────────────
 .main-layout {
     min-height: 0;
@@ -139,7 +200,6 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .drawflow-canvas {
-    position: absolute;
     inset: 0;
     z-index: 1;
 }
@@ -148,11 +208,8 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 .left-overlay,
 .right-overlay,
 .bottom-overlay {
-    position: absolute;
-    background: $background-color;
     box-shadow: $shadow-panel;
     z-index: 10;
-    overflow: hidden;
     border: 1px solid $border-color;
     transition: transform $transition-panel, box-shadow 0.2s ease;
 }
@@ -205,7 +262,6 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 .bottom-panel-content {
     height: 100%;
     overflow: auto;
-    background: $background-color;
 }
 
 // Slim scrollbar
@@ -241,11 +297,9 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
 // ─── Resizers ─────────────────────────────────────────────────────────────────
 .left-resizer {
-    position: absolute;
     top: 0;
     right: 0;
     width: 3px;
-    height: 100%;
     cursor: ew-resize;
     transition: background 0.15s ease;
 
@@ -255,11 +309,9 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .right-resizer {
-    position: absolute;
     top: 0;
     left: 0;
     width: 3px;
-    height: 100%;
     cursor: ew-resize;
     transition: background 0.15s ease;
 
@@ -269,10 +321,8 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bottom-resizer {
-    position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
     height: 4px;
     cursor: ns-resize;
     z-index: 9999;
@@ -288,7 +338,6 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     height: 46px;
     gap: 10px;
     padding: 0 14px;
-    background: $background-color;
     color: $color;
     font-weight: 600;
     font-size: 0.82rem;
@@ -300,13 +349,10 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .panel-toggle {
-    background: transparent;
-    border: none;
     color: $color;
     cursor: pointer;
     font-size: 14px;
     transition: color 0.15s ease;
-    padding: 0;
 
     &:hover {
         color: $accent;
@@ -331,9 +377,7 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
 // ─── Outside Launcher Buttons ─────────────────────────────────────────────────
 .panel-launcher {
-    position: absolute;
     z-index: 30;
-    background: $background-color;
     color: $color;
     border: 1px solid $border-color;
     cursor: pointer;
@@ -362,10 +406,8 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
 // ─── Bottom Collapsed Bar ─────────────────────────────────────────────────────
 .bottom-collapsed-bar {
-    position: absolute;
     bottom: 0;
     height: 40px;
-    background: $background-color;
     color: $color;
     z-index: 30;
     padding: 0 10px;
@@ -464,7 +506,6 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 // ── Expanded panel header ─────────────────────────────────────────────────────
 .bottom-panel-header {
     height: 32px;
-    background: $background-color;
     border-bottom: 1px solid $border-color;
 
     >.d-flex {
@@ -496,7 +537,6 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     height: 40px;
     flex: 0 0 40px;
     padding: 0 10px;
-    background: $background-color;
     border-top: 1px solid $border-color;
     box-shadow: 0 -2px 8px rgba(60, 72, 82, 0.08);
     user-select: none;
@@ -508,7 +548,6 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .wf-launcher-btns {
-    position: absolute;
     top: 20px;
     right: 0;
     z-index: 30;

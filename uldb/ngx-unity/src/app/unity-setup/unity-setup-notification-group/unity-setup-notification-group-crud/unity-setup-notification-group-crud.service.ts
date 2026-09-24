@@ -140,7 +140,7 @@ export class UnitySetupNotificationGroupCrudService {
             'group_name': [data.group_name, [Validators.required, NoWhitespaceValidator]],
             'mode': [[data.mode], [Validators.required]],
             // 'alert_type': [data.alert_type, [Validators.required]],
-            'filter_type': [data.filter_type, [Validators.required]],
+            // 'filter_type': [data.filter_type, [Validators.required]],
             'is_enabled': [data.is_enabled],
             'module': [data.module, [Validators.required]]
           });
@@ -156,6 +156,9 @@ export class UnitySetupNotificationGroupCrudService {
           // if (data.alert_type?.includes('end_of_support') || data.alert_type?.includes('end_of_life')) {
           //   form.addControl('notify', new FormControl(data.notify, [Validators.required, Validators.min(1), Validators.max(999)]));
           // }
+          if (['aiml', 'deprecation', 'devops_automation'].includes(data.module)) {
+            form.addControl('filter_type', new FormControl(data.filter_type, [Validators.required]));
+          }
           if (data.module === 'deprecation') {
             form.addControl('alert_type', new FormControl(data?.alert_type, [Validators.required]));
             form.addControl('notify', new FormControl(data.notify, [Validators.required, Validators.min(1), Validators.max(999)]));
@@ -172,7 +175,7 @@ export class UnitySetupNotificationGroupCrudService {
             form.addControl('description', new FormControl({ value: data.description, disabled: true }));
           }
 
-          if (data.module === 'aiml') {
+          if (data.module === 'aiml' || data.module === 'collector') {
             form.addControl('alert_type', new FormControl(data?.alert_type, [Validators.required]));
           }
 
@@ -182,6 +185,9 @@ export class UnitySetupNotificationGroupCrudService {
               form.addControl('custom_filter_meta', this.getCustomFormGroup('devops_automation', data.custom_filter_meta));
             }
           }
+          if (data.module === 'collector') {
+            form.addControl('notify', new FormControl(data.notify, [Validators.required, Validators.min(1), Validators.max(999)]));
+          }
           return form;
         }));
     } else {
@@ -190,7 +196,7 @@ export class UnitySetupNotificationGroupCrudService {
         'mode': [['email'], [Validators.required]],
         'users': ['', [Validators.required, EmailValidator]],
         // 'alert_type': [['information'], []],
-        'filter_type': ['all', [Validators.required]],
+        // 'filter_type': ['all', [Validators.required]],
         'is_enabled': [false],
         'module': ['', [Validators.required]]
       }));

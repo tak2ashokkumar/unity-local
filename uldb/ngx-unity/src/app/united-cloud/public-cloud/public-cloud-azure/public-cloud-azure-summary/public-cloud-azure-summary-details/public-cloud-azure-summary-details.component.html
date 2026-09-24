@@ -130,7 +130,8 @@
                             <th *ngIf="selectedResourceName == 'Virtual Machines'">Management Ip</th>
                             <th>Tags</th>
                             <th>Location</th>
-                            <th *ngIf="allowedStatsResources.includes(selectedResourceName)" class="text-center"> Actions</th>                              
+                            <th *ngIf="allowedStatsResources.includes(selectedResourceName)" class="text-center">
+                                Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -146,7 +147,7 @@
                                 <div class="text-truncate" [tooltip]="view.resourceGroup">{{view.resourceGroup}}</div>
                             </td>
                             <td class="tdw-10">
-                                <div class="text-truncate">{{view.accountName}}</div>
+                                <div class="text-truncate" [tooltip]="view.accountName">{{view.accountName}}</div>
                             </td>
                             <td class="tdw-10">
                                 <div class="text-truncate" [tooltip]="view.subscriptionId">{{view.subscriptionId}}</div>
@@ -166,7 +167,8 @@
                             <td class="tdw-10">
                                 <div [tooltip]="view.location" class="text-truncate">{{view.location}}</div>
                             </td>
-                            <td class="action-icons-column text-right text-truncate p-1 tdw-10" *ngIf="allowedStatsResources.includes(selectedResourceName)">
+                            <td class="action-icons-column text-right text-truncate p-1 tdw-10"
+                                *ngIf="allowedStatsResources.includes(selectedResourceName)">
                                 <button *ngIf="selectedResourceName == 'Virtual Machines'"
                                     class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerStatusIcon"
                                     [ngClass]="{'action-icons-on':view.powerStatusOn, 'action-icons-disabled':!view.isPowerIconEnabled}"
@@ -185,7 +187,12 @@
                                 (click)="consoleNewTab(view)"></button> -->
 
                                 <button *ngIf="allowedStatsResources.includes(selectedResourceName)"
-                                    class="action-icons mb-0 font-sm ml-1" [ngClass]="{'action-icons-disabled': (selectedResourceName !== 'Virtual Machines') && !view.isStatsEnabled}" (click)="(selectedResourceName !== 'Virtual Machines' && !view.isStatsEnabled) ? null : goToStats(view)" [tooltip]="view.isStatsEnabled ? view.statsTooltipMessage : ''" container="body" accessControl moduleName="Monitoring" accessType="View Monitoring" elementType="actionbtn">
+                                    class="action-icons mb-0 font-sm ml-1"
+                                    [ngClass]="{'action-icons-disabled': (selectedResourceName !== 'Virtual Machines') && !view.isStatsEnabled}"
+                                    (click)="(selectedResourceName !== 'Virtual Machines' && !view.isStatsEnabled) ? null : goToStats(view)"
+                                    [tooltip]="view.isStatsEnabled ? view.statsTooltipMessage : ''" container="body"
+                                    accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                    elementType="actionbtn">
                                     <i class="fas fa-chart-line"></i>
                                 </button>
 

@@ -1,3 +1,28 @@
 .welcome-card-body {
   padding-top: 3rem;
 }
+
+.collector-expiry-alert {
+  position: relative;
+  min-height: 104px;
+  background-color: #fffaf0;
+  border-color: #f0cf86;
+}
+
+.collector-expiry-alert__icon {
+  width: 62px;
+  height: 62px;
+  background-color: #fff4d6;
+  color: #dfa400;
+  font-size: 1.875rem;
+}
+
+.collector-count {
+  font-size: 90%;
+}
+
+.collector-expiry-alert app-spinner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}

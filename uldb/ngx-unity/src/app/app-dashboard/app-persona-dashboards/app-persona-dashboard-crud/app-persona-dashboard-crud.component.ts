@@ -657,7 +657,7 @@ export class AppPersonaDashboardCrudComponent implements OnInit, OnDestroy {
         } else if (val == 'public_cloud') {
           this.getSupportedPublicCloudTypes();
         }
-        this.widgetForm.addControl('group_by', new FormControl('', [Validators.required, NoWhitespaceValidator]));
+        this.widgetForm.get('group_by') ? this.widgetForm.get('group_by').setValue('', { emitEvent: false }) : this.widgetForm.addControl('group_by', new FormControl('', [Validators.required, NoWhitespaceValidator]));
         this.widgetForm.get('group_by')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(grpByVal => {
           this.showWidgetGroupByFilter = false;
           this.widgetGroupByFilterOptions = [];

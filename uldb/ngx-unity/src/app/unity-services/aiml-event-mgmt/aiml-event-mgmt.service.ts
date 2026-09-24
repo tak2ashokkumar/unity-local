@@ -4,6 +4,7 @@ import moment from 'moment';
 import { Subject } from 'rxjs';
 import { GET_AIOPS_CONDITIONS_SUMMARY } from 'src/app/shared/api-endpoint.const';
 import { CUSTOM_DATE_FILTER_DATE_FORMAT, CustomDateFilterPeriod, getCustomDateFilterRange } from 'src/app/shared/custom-date-filter/custom-date-filter.type';
+import { cloneHttpParamsWithPlusEncoder } from 'src/app/shared/http-param-plus-encoder';
 import { AIMLConditionsSummary } from './aiml-conditions/aiml-conditions.type';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class AimlEventMgmtService {
   constructor(private http: HttpClient) { }
 
   getConditionsSummary(dateRangeParams?: AIMLEventMgmtDateRangeParams) {
-    const params = this.appendDateRangeParams(new HttpParams(), dateRangeParams);
+    const params = this.appendDateRangeParams(cloneHttpParamsWithPlusEncoder(), dateRangeParams);
     return this.http.get<AIMLConditionsSummary>(GET_AIOPS_CONDITIONS_SUMMARY(), { params: params });
   }
 
@@ -33,7 +34,7 @@ export class AimlEventMgmtService {
   }
 
   appendDateRangeParams(params?: HttpParams | null, dateRangeParams?: AIMLEventMgmtDateRangeParams): HttpParams {
-    let requestParams = params || new HttpParams();
+    let requestParams = cloneHttpParamsWithPlusEncoder(params);
     const selectedDateRangeParams = dateRangeParams || this.dateRangeParams;
     const startDate = selectedDateRangeParams?.startDate;
     const endDate = selectedDateRangeParams?.endDate;

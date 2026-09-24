@@ -32,10 +32,6 @@ export class WfDynamicListExecuteService {
   }
 
   sendTriggerDetails(workflowUuid: string, nodeType: string, data: any): Observable<any> {
-    if (nodeType === 'Schedule Trigger') {
-      return this.http.post<any>(`rest/orchestration/agentic_workflow/${workflowUuid}/schedule/`, data);
-    }
-
     return this.http.post<any>(`api/orchestration/v1/dynamic_workflows/${workflowUuid}/execute/`, data, {
       params: { node_type: nodeType }
     });

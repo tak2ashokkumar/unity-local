@@ -346,7 +346,9 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   goToviewDetails(task: WorkflowViewData) {
-    this.router.navigate(['agentic-workflow', task.uuid, 'view'], { relativeTo: this.route });
+    this.router.navigate([
+      task.is_agentic ? 'dynamic-workflow' : 'agentic-workflow', task.uuid, 'view'
+    ], { relativeTo: this.route });
   }
 
   scheduleWorkflow(view: WorkflowViewData) {

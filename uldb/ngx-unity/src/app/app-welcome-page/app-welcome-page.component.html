@@ -16,6 +16,38 @@
 
 <div class="container-fluid">
   <div class="animated fadeIn">
+
+    <div *ngIf="showCertificateExpiryNotification && unityCollectorPermisssionSet.view"
+      class="collector-expiry-alert alert alert-warning d-flex flex-wrap align-items-center p-3 pr-4 mb-4" role="alert">
+      <app-spinner [name]="collectorCertificateViewData.loader"></app-spinner>
+      <div
+        class="collector-expiry-alert__icon d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle mr-3"
+        aria-hidden="true">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+
+      <div class="flex-grow-1" style="min-width: 0;">
+        <div class="text-dark font-weight-bold mb-0">Collector Certificate Expiry</div>
+        <div class="text-dark">
+          {{collectorCertificateViewData.collectorMessage}}
+          <span *ngIf="collectorCertificateViewData.collectorMessageBadgeCount"
+            class="badge badge-primary collector-count rounded w-auto mx-1 pointer-link"
+            [popover]="popCollectorsMessageTemplate" container="body"
+            [outsideClick]="true">+{{collectorCertificateViewData.collectorMessageBadgeCount}}</span>
+        </div>
+      </div>
+
+      <button class="btn btn-outline-primary text-nowrap flex-shrink-0 ml-4" (click)="goToCollectors()" accessControl
+        moduleName="UnityCollector" accessType="View UnityCollector" elementType="btn">
+        View Collectors
+      </button>
+
+      <button type="button" class="btn btn-sm close flex-shrink-0 p-0 ml-4"
+        aria-label="Dismiss collector certificate expiry" (click)="dismissCertificateExpiryNotification()">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
     <div class="row">
       <div class="col">
         <div class="card">
@@ -26,11 +58,14 @@
                   Welcome to {{brandName}}
                 </span>
                 <p class="font-weight-normal text-center p-3">
-                  {{brandName}} is a SaaS product<span *ngIf="!userSvc.selfBrandedOrgName"> from UnityOne</span>. A Cloud Management, Monitoring and Orchestration platform.
-                  With help of {{brandName}} you can increase the utilization efficiency of your Private Cloud and as well
+                  {{brandName}} is a SaaS product<span *ngIf="!userSvc.selfBrandedOrgName"> from UnityOne</span>. A
+                  Cloud Management, Monitoring and Orchestration platform.
+                  With help of {{brandName}} you can increase the utilization efficiency of your Private Cloud and as
+                  well
                   Public Cloud instances.
                 </p>
-                <a *ngIf="!userSvc.selfBrandedOrgName" class="btn btn-outline-primary btn-pill" routerLink="/support/documentation/releases/current">Release
+                <a *ngIf="!userSvc.selfBrandedOrgName" class="btn btn-outline-primary btn-pill"
+                  routerLink="/support/documentation/releases/current">Release
                   Notes</a>
               </div>
             </div>
@@ -43,3 +78,9 @@
     </div>
   </div>
 </div>
+
+<ng-template #popCollectorsMessageTemplate>
+  <div *ngFor="let collectorMessage of collectorCertificateViewData.collectorsMessagesList">
+    {{collectorMessage}}
+  </div>
+</ng-template>

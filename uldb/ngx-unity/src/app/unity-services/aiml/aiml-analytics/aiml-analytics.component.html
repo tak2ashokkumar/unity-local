@@ -16,12 +16,11 @@
                 [ngClass]="{'is-invalid' : filterFormErrors.device_types}"></multiselect-dropdown>
         </div>
         <div class="form-group px-1 w-20">
-            <select class="form-control form-control-sm w-100" formControlName="timeline"
-                [class.is-invalid]="filterFormErrors.timeline">
-                <option [value]="duration.LAST_24_HOURS">Last 24 Hours</option>
-                <option [value]="duration.LAST_WEEK">Last Week</option>
-                <option [value]="duration.LAST_MONTH">Last Month</option>
-            </select>
+            <custom-date-dropdown [options]="timelineDropdownOptions" [enableCustomDateRange]="true"
+                [default]="timelineDropdownDefault" [customClass]="'form-control-sm w-100'"
+                [emitOnInit]="false" [emitOnExternalChanges]="false" [viewportSafePopup]="true"
+                (onSubmit)="onGlobalTimelineSubmit($event)">
+            </custom-date-dropdown>
         </div>
         <div class="w-7 px-1">
             <button class="btn btn-sm btn-pill btn-warning" [tooltip]="'Filter'" container="body"

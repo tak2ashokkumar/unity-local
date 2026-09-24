@@ -31,6 +31,7 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
 
   @Input() isDynamicWorkflow = false;
   @Input() stackFields = true;
+  @Input() isReadOnly = false;
   @Output() formDataChange = new EventEmitter<any>();
   @Input() initialData: any;
 
@@ -97,6 +98,10 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
       });
     });
 
+    if (this.isReadOnly) {
+      this.workflowVarsForm.disable({ emitEvent: false });
+    }
+
     // Ensure at least one row exists
     // if (!array.length) {
     //   array.push(this.svc.createWorkflowVarGroup());
@@ -157,6 +162,8 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
   }
 
   addVariable(): void {
+    if (this.isReadOnly) return;
+
     const variablesArray = this.variables;
 
     if (variablesArray.length > 0) {
@@ -209,6 +216,8 @@ export class OrchestrationAgenticWorkflowVariablesComponent implements OnInit {
   }
 
   removeVariable(index: number): void {
+    if (this.isReadOnly) return;
+
     this.variables.removeAt(index);
     if (this.workflowVarsFormErrors?.variables?.length > index) {
       this.workflowVarsFormErrors.variables.splice(index, 1);

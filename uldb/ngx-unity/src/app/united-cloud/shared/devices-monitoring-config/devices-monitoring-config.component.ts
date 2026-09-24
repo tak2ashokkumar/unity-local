@@ -424,7 +424,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       }
       let arr = [DeviceMapping.AZURE_VIRTUAL_MACHINE, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.VCLOUD, DeviceMapping.HYPER_V,
       DeviceMapping.ESXI, DeviceMapping.OPENSTACK_VIRTUAL_MACHINE, DeviceMapping.CUSTOM_VIRTUAL_MACHINE, DeviceMapping.HYPERVISOR,
-      DeviceMapping.STORAGE_DEVICES, DeviceMapping.CONTAINER_CONTROLLER]
+      DeviceMapping.STORAGE_DEVICES, DeviceMapping.CONTAINER_CONTROLLER, DeviceMapping.MAC_MINI]
       if (this.form.get('connection_type').value == 'Agent' && !arr.includes(this.device.deviceType)) {
         return;
       }

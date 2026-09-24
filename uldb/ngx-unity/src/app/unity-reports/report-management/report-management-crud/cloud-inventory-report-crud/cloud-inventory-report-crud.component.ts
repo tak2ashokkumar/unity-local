@@ -596,11 +596,13 @@ export class ReportManagementCloudInventoryCrudComponent
                 .getCategoryOptions()
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((res) => {
-                  let categories = [];
-                  if (
-                    (this.executionType === 'Task' && res.Task) ||
-                    (this.executionType === 'Task and Workflow' && res.Task)
-                  ) {
+                  let categories: string[] = [];
+                  if (this.executionType === 'Task and Workflow') {
+                    categories = [
+                      ...(res.Task || []).map((m) => m.category),
+                      ...(res.Worklfow || []).map((m) => m.category),
+                    ];
+                  } else if (this.executionType === 'Task' && res.Task) {
                     categories = res.Task.map((m) => m.category);
                   } else if (
                     this.executionType === 'Workflow' &&
