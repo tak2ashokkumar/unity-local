@@ -12,45 +12,47 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import { PublicCloudComputeDashboardService } from './public-cloud-compute-dashboard.service';
 import {
-  PUBLIC_CLOUD_DATABASE_CAPACITY_DEFAULT_SORT,
-  PUBLIC_CLOUD_STORAGE_RESOURCE_DEFAULT_SORT,
-  PUBLIC_CLOUD_DATABASE_SPACE_SORT_COLUMNS,
-  PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT,
-  PUBLIC_CLOUD_STORAGE_RESOURCE_SORT_COLUMNS,
-  PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS,
-  PUBLIC_CLOUD_STORAGE_STATUS_LEGEND,
+  PUBLIC_CLOUD_ALL_SELECTED_VALUE,
   PUBLIC_CLOUD_TIME_RANGE_DEFAULT,
   PUBLIC_CLOUD_TIME_RANGE_OPTIONS
 } from './public-cloud-compute-dashboard.const';
 import {
   PublicCloudAccountOption,
-  PublicCloudAlertSummaryMetric,
+  PublicCloudAccountSubscriptionMetricRow,
+  PublicCloudCapacityPerformanceRow,
+  PublicCloudStorageVolumeRow,
+  PublicCloudStorageTierLegendItem,
+  PublicCloudProvisioningRow,
+  PublicCloudProvisioningSummaryMetric,
+  PublicCloudProvisioningReachabilityLegendItem,
+  PublicCloudDatabaseSummaryMetric,
+  PublicCloudDatabaseMonitoredCard,
+  PublicCloudDbWorkloadRow,
+  PublicCloudAlertSeverityLegendItem,
+  PublicCloudCostRow,
+  PublicCloudSpendSavingsLegendItem,
+  PublicCloudCostSummaryMetric,
+  PublicCloudAutoRemediationSummaryViewData,
   PublicCloudCoverageCard,
   PublicCloudCoverageGroup,
   PublicCloudDashboardFilterCriteria,
   PublicCloudDashboardFilterOptions,
-  PublicCloudDatabaseKpi,
-  PublicCloudDatabaseOverviewColumn,
-  PublicCloudDatabaseOverviewRow,
-  PublicCloudDatabaseSpaceRow,
   PublicCloudFilterOption,
-  PublicCloudIdleDeviceRow,
-  PublicCloudIdleDurationItem,
+  PublicCloudGeoCell,
+  PublicCloudGeoDistributionLegendItem,
+  PublicCloudGeoDistributionSummary,
   PublicCloudInventorySummaryKey,
   PublicCloudOrphanedCategoryItem,
   PublicCloudOrphanedDeviceRow,
-  PublicCloudPerformanceHotspotRow,
   PublicCloudProviderDistributionKey,
   PublicCloudProviderDistributionItem,
-  PublicCloudRecentAlert,
+  PublicCloudRecentAlertRow,
   PublicCloudRegionOption,
   PublicCloudSortState,
-  PublicCloudStoragePerformanceCard,
-  PublicCloudStorageResourceRow,
-  PublicCloudWritePerformanceViewData,
-  PublicCloudLatencyBreakdownViewData,
   PublicCloudSummaryMetric,
-  PublicCloudTagItem
+  PublicCloudComputeMonitoredCard,
+  PublicCloudOsTypeItem,
+  PublicCloudAlertsSeverityItem
 } from './public-cloud-compute-dashboard.type';
 
 interface PublicCloudFilterScopeSummary {
@@ -62,20 +64,17 @@ interface PublicCloudWidgetLoadingState {
   inventorySummary: boolean;
   geoDistribution: boolean;
   publicCloudCoverage: boolean;
-  performanceHotspots: boolean;
+  accountSubscriptionProjectMetrics: boolean;
+  capacityPerformance: boolean;
+  storageVolumesDisks: boolean;
+  publicCloudDatabase: boolean;
+  databasePerformance: boolean;
+  costOptimization: boolean;
   orphanedDevices: boolean;
   orphanedByCategory: boolean;
-  idleDevices: boolean;
-  idleDuration: boolean;
   recentAlerts: boolean;
-  databaseOverview: boolean;
-  databasePerformanceTrend: boolean;
-  databaseSpaceConsumption: boolean;
-  databaseCapacityResources: boolean;
-  storagePerformance: boolean;
-  storageResources: boolean;
-  writePerformanceTrend: boolean;
-  latencyBreakdown: boolean;
+  autoRemediationSummary: boolean;
+  instanceProvisioning: boolean;
 }
 
 @Component({
@@ -92,20 +91,17 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     'inventorySummary',
     'geoDistribution',
     'publicCloudCoverage',
-    'performanceHotspots',
+    'accountSubscriptionProjectMetrics',
+    'capacityPerformance',
+    'storageVolumesDisks',
+    'publicCloudDatabase',
+    'databasePerformance',
     'orphanedDevices',
     'orphanedByCategory',
-    'idleDevices',
-    'idleDuration',
     'recentAlerts',
-    'databaseOverview',
-    'databasePerformanceTrend',
-    'databaseSpaceConsumption',
-    'databaseCapacityResources',
-    'storagePerformance',
-    'storageResources',
-    'writePerformanceTrend',
-    'latencyBreakdown'
+    'autoRemediationSummary',
+    'instanceProvisioning',
+    'costOptimization'
   ];
   private readonly linkRoutes = {
     publicCloud: ['/unitycloud/publiccloud'],
@@ -114,7 +110,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     alerts: ['/services/aiml-event-mgmt/alerts'],
     gpu: ['/services/ai-observability/gpu'],
     storage: ['/unitycloud/devices/storagedevices'],
-    databases: ['/unitycloud/devices/databases'],
     bmservers: ['/unitycloud/devices/bmservers'],
     provider: {
       aws: ['/unitycloud/publiccloud/aws'],
@@ -122,12 +117,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       gcp: ['/unitycloud/publiccloud/gcp'],
       oci: ['/unitycloud/publiccloud/oracle'],
       oracle: ['/unitycloud/publiccloud/oracle']
-    },
-    providerVm: {
-      aws: ['/unitycloud/devices/vms/aws'],
-      azure: ['/unitycloud/devices/vms/azure'],
-      gcp: ['/unitycloud/devices/vms/gcp'],
-      oracle: ['/unitycloud/devices/vms/oracle']
     }
   };
 
@@ -149,17 +138,72 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   };
 
   summaryMetrics: PublicCloudSummaryMetric[] = [];
+  monitoredProviders: PublicCloudComputeMonitoredCard[] = [];
   providerDistribution: PublicCloudProviderDistributionItem[] = [];
   providerDistributionOptions: EChartsOption = {};
-  tags: PublicCloudTagItem[] = [];
+  providerDistributionTotalLabel = '';
+  utilizationByProviderOptions: EChartsOption = {};
+  utilizationByProviderHasData = false;
+  osTypeDistribution: PublicCloudOsTypeItem[] = [];
+  osTypeOptions: EChartsOption = {};
+  osTypeTotalLabel = '';
+  alertsSeverity: PublicCloudAlertsSeverityItem[] = [];
+  geoDistributionCells: PublicCloudGeoCell[] = [];
   geoHeatmapOptions: EChartsOption = {};
+  geoDistributionSummary: PublicCloudGeoDistributionSummary = { totalLocations: 0, totalResources: 0, totalAlerts: 0 };
+  geoDistributionCloudOptions: PublicCloudFilterOption[] = [{ value: PUBLIC_CLOUD_ALL_SELECTED_VALUE, label: 'Select All' }];
+  geoDistributionLegends: PublicCloudGeoDistributionLegendItem[] = [];
+  selectedGeoDistributionCloudType = PUBLIC_CLOUD_ALL_SELECTED_VALUE;
   publicCloudCoverageGroups: PublicCloudCoverageGroup[] = [];
   publicCloudCoverageGroupsSource: PublicCloudCoverageGroup[] = [];
   publicCloudCoverageTotal = '0';
   publicCloudCoverageSortOrder: 'asc' | 'desc' = 'asc';
-  performanceHotspots: PublicCloudPerformanceHotspotRow[] = [];
-  performanceHotspotsSort = PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_DEFAULT_SORT;
-  performanceHotspotsLoaded = false;
+  accountSubscriptionProjectMetricRows: PublicCloudAccountSubscriptionMetricRow[] = [];
+  accountSubscriptionProjectMetricsTotal = 0;
+  accountSubscriptionProjectMetricsPageNo = 1;
+  accountSubscriptionProjectMetricsPageSize = 10;
+  accountSubscriptionProjectMetricsSearch = '';
+  accountSubscriptionProjectMetricsView: 'table' | 'chart' = 'table';
+  accountSubscriptionProjectInstanceOptions: EChartsOption = {};
+  accountSubscriptionProjectCostOptions: EChartsOption = {};
+  accountSubscriptionProjectVcpuOptions: EChartsOption = {};
+  accountSubscriptionProjectEfficiencyOptions: EChartsOption = {};
+  capacityPerformanceRows: PublicCloudCapacityPerformanceRow[] = [];
+  capacityPerformanceTotal = 0;
+  capacityPerformancePageNo = 1;
+  capacityPerformancePageSize = 10;
+  capacityPerformanceSearch = '';
+  capacityPerformanceView: 'table' | 'chart' = 'table';
+  capacityFleetStatusOptions: EChartsOption = {};
+  capacityCpuDistributionOptions: EChartsOption = {};
+  capacityTop10CpuOptions: EChartsOption = {};
+  capacityTop10DiskIopsOptions: EChartsOption = {};
+  capacityTop10NetworkOptions: EChartsOption = {};
+  capacityGrowthInsightsOptions: EChartsOption = {};
+  storageVolumesRows: PublicCloudStorageVolumeRow[] = [];
+  storageVolumesTotal = 0;
+  storageVolumesPageNo = 1;
+  storageVolumesPageSize = 10;
+  storageVolumesSearch = '';
+  storageVolumesView: 'table' | 'chart' = 'table';
+  storageProvisionedByProviderOptions: EChartsOption = {};
+  storageTopVolumesOptions: EChartsOption = {};
+  storageIopsTierOptions: EChartsOption = {};
+  storageIopsTierLegend: PublicCloudStorageTierLegendItem[] = [];
+  databaseSummaryMetrics: PublicCloudDatabaseSummaryMetric[] = [];
+  databaseMonitoredCards: PublicCloudDatabaseMonitoredCard[] = [];
+  databasePerformanceRows: PublicCloudDbWorkloadRow[] = [];
+  databasePerformanceTotal = 0;
+  databasePerformancePageNo = 1;
+  databasePerformancePageSize = 10;
+  databasePerformanceSearch = '';
+  databasePerformanceView: 'table' | 'chart' = 'table';
+  dbCacheHitOptions: EChartsOption = {};
+  dbLatencyOptions: EChartsOption = {};
+  dbResponseTimeOptions: EChartsOption = {};
+  dbConnectionsOptions: EChartsOption = {};
+  dbDeadlocksOptions: EChartsOption = {};
+  dbThroughputTrendOptions: EChartsOption = {};
   orphanedDevices: PublicCloudOrphanedDeviceRow[] = [];
   orphanedDevicesTotal = 0;
   orphanedDevicesPageNo = 1;
@@ -167,77 +211,73 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   orphanedByCategory: PublicCloudOrphanedCategoryItem[] = [];
   orphanedByCategoryOptions: EChartsOption = {};
   orphanedByCategoryHasData = false;
-  idleDevices: PublicCloudIdleDeviceRow[] = [];
-  idleDevicesTotal = 0;
-  idleDevicesPageNo = 1;
-  idleDevicesPageSize = 10;
-  idleDurationRows: PublicCloudIdleDurationItem[] = [];
-  idleDurationOptions: EChartsOption = {};
-  idleDurationHasData = false;
-  databaseOverviewKpis: PublicCloudDatabaseKpi[] = [];
-  databaseOverviewRows: PublicCloudDatabaseOverviewRow[] = [];
-  databaseOverviewSort: PublicCloudSortState = { key: 'writeThroughput', direction: 'desc' };
-  databaseOverviewSortColumns: PublicCloudDatabaseOverviewColumn[] = [];
-  databaseWritePerformanceOptions: EChartsOption = {};
-  databaseReadPerformanceOptions: EChartsOption = {};
-  databaseWriteTrendInstance = '';
-  databaseReadTrendInstance = '';
-  databaseTrendHasData = false;
-  databaseWriteTrendHasData = false;
-  databaseReadTrendHasData = false;
-  databaseSpaceKpis: PublicCloudDatabaseKpi[] = [];
-  databaseSpaceRows: PublicCloudDatabaseSpaceRow[] = [];
-  databaseSpaceSortColumns = PUBLIC_CLOUD_DATABASE_SPACE_SORT_COLUMNS;
-  databaseCapacitySort = PUBLIC_CLOUD_DATABASE_CAPACITY_DEFAULT_SORT;
-  storagePerformanceCards: PublicCloudStoragePerformanceCard[] = [];
-  storageResources: PublicCloudStorageResourceRow[] = [];
-  storageResourceSortColumns = PUBLIC_CLOUD_STORAGE_RESOURCE_SORT_COLUMNS;
-  storageResourcesSort = PUBLIC_CLOUD_STORAGE_RESOURCE_DEFAULT_SORT;
-  storageStatusLegend = PUBLIC_CLOUD_STORAGE_STATUS_LEGEND;
-  writePerformanceTrend: PublicCloudWritePerformanceViewData = { labels: [], rows: [] };
-  latencyBreakdown: PublicCloudLatencyBreakdownViewData = null;
-  latencyBreakdownOptions: EChartsOption = {};
-  recentAlertSummaryMetrics: PublicCloudAlertSummaryMetric[] = [];
-  recentAlerts: PublicCloudRecentAlert[] = [];
+  recentAlertsView: 'table' | 'chart' = 'table';
+  recentAlertsSearch = '';
+  recentAlertsSort: PublicCloudSortState = { key: 'raisedHours', direction: 'asc' };
+  recentAlertsPageNo = 1;
+  recentAlertsPageSize = 10;
+  recentAlerts: PublicCloudRecentAlertRow[] = [];
+  recentAlertsTotal = 0;
+  alertsBySeverityOptions: EChartsOption = {};
+  alertsBySeverityLegend: PublicCloudAlertSeverityLegendItem[] = [];
+  alertsByProviderOptions: EChartsOption = {};
+  alertsByAgeOptions: EChartsOption = {};
+  private recentAlertsAllRows: PublicCloudRecentAlertRow[] = [];
+  costOptimizationView: 'table' | 'chart' = 'table';
+  costOptimizationSearch = '';
+  costOptimizationSort: PublicCloudSortState = { key: '', direction: 'desc' };
+  costOptimizationPageNo = 1;
+  costOptimizationPageSize = 10;
+  costOptimizationRows: PublicCloudCostRow[] = [];
+  costOptimizationTotal = 0;
+  spendVsSavingsOptions: EChartsOption = {};
+  spendVsSavingsLegend: PublicCloudSpendSavingsLegendItem[] = [];
+  recommendedActionsOptions: EChartsOption = {};
+  potentialSavingsByProviderOptions: EChartsOption = {};
+  costSummaryMetrics: PublicCloudCostSummaryMetric[] = [];
+  autoRemediationSummary: PublicCloudAutoRemediationSummaryViewData = null;
+  provisioningRows: PublicCloudProvisioningRow[] = [];
+  provisioningSort: PublicCloudSortState = { key: 'daysSinceProvisioned', direction: 'asc' };
+  provisioningView: 'table' | 'chart' = 'table';
+  provisioningSummaryMetrics: PublicCloudProvisioningSummaryMetric[] = [];
+  provisioningReachabilityOptions: EChartsOption = {};
+  provisioningReachabilityLegend: PublicCloudProvisioningReachabilityLegendItem[] = [];
+  provisionedByProviderOptions: EChartsOption = {};
+  recentlyProvisionedOptions: EChartsOption = {};
   widgetLoading: PublicCloudWidgetLoadingState = {
     inventorySummary: false,
     geoDistribution: false,
     publicCloudCoverage: false,
-    performanceHotspots: false,
+    accountSubscriptionProjectMetrics: false,
+    capacityPerformance: false,
+    storageVolumesDisks: false,
+    publicCloudDatabase: false,
+    databasePerformance: false,
+    costOptimization: false,
     orphanedDevices: false,
     orphanedByCategory: false,
-    idleDevices: false,
-    idleDuration: false,
     recentAlerts: false,
-    databaseOverview: false,
-    databasePerformanceTrend: false,
-    databaseSpaceConsumption: false,
-    databaseCapacityResources: false,
-    storagePerformance: false,
-    storageResources: false,
-    writePerformanceTrend: false,
-    latencyBreakdown: false
+    autoRemediationSummary: false,
+    instanceProvisioning: false
   };
 
   loaderNames = {
     filters: 'publicCloudFiltersLoader',
     inventoryCard: 'publicCloudInventoryCardLoader',
+    geoDistribution: 'publicCloudGeoDistributionLoader',
     publicCloudCoverage: 'publicCloudInfraCoverageLoader',
-    performanceHotspots: 'publicCloudPerformanceHotspotsLoader',
+    accountSubscriptionProjectMetrics: 'publicCloudAccountSubscriptionProjectMetricsLoader',
+    capacityPerformance: 'publicCloudCapacityPerformanceLoader',
+    storageVolumesDisks: 'publicCloudStorageVolumesDisksLoader',
+    publicCloudDatabase: 'publicCloudDatabaseLoader',
+    databasePerformance: 'publicCloudDatabasePerformanceLoader',
+    costOptimization: 'publicCloudCostOptimizationLoader',
     orphanedDevices: 'publicCloudOrphanedDevicesLoader',
     orphanedDevicesByCategory: 'publicCloudOrphanedDevicesByCategoryLoader',
-    idleDevices: 'publicCloudIdleDevicesLoader',
-    idleDuration: 'publicCloudIdleDurationLoader',
-    databaseOverview: 'publicCloudDatabaseOverviewLoader',
-    databasePerformanceTrend: 'publicCloudDatabasePerformanceTrendLoader',
-    databaseSpaceConsumption: 'publicCloudDatabaseSpaceConsumptionLoader',
-    databaseCapacityResources: 'publicCloudDatabaseCapacityResourcesLoader',
-    storagePerformance: 'publicCloudStoragePerformanceLoader',
-    storageResources: 'publicCloudStorageResourcesLoader',
-    writePerformanceTrend: 'publicCloudWritePerformanceTrendLoader',
-    latencyBreakdown: 'publicCloudLatencyBreakdownLoader',
     recentAlertSummary: 'publicCloudRecentAlertSummaryLoader',
-    recentAlerts: 'publicCloudRecentAlertsLoader'
+    recentAlerts: 'publicCloudRecentAlertsLoader',
+    autoRemediationSummary: 'publicCloudAutoRemediationSummaryLoader',
+    instanceProvisioning: 'publicCloudInstanceProvisioningLoader'
   };
 
   multiselectSettings: IMultiSelectSettings = {
@@ -272,8 +312,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     private alertDetailSvc: AimlAlertDetailsService) { }
 
   ngOnInit(): void {
-    // Header labels without units until the first response supplies them.
-    this.databaseOverviewSortColumns = this.svc.convertToDatabaseOverviewColumns(null);
     setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
   }
 
@@ -287,7 +325,12 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   /** Applies the current filter form output to every widget request. */
   applyFilters() {
     this.orphanedDevicesPageNo = 1;
-    this.idleDevicesPageNo = 1;
+    this.accountSubscriptionProjectMetricsPageNo = 1;
+    this.capacityPerformancePageNo = 1;
+    this.storageVolumesPageNo = 1;
+    this.databasePerformancePageNo = 1;
+    this.recentAlertsPageNo = 1;
+    this.costOptimizationPageNo = 1;
     this.updateAppliedFilterCriteria();
     this.loadData();
   }
@@ -414,7 +457,13 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.filterFormUnsubscribe.next();
     this.filterForm = null;
     this.orphanedDevicesPageNo = 1;
-    this.idleDevicesPageNo = 1;
+    this.accountSubscriptionProjectMetricsPageNo = 1;
+    this.capacityPerformancePageNo = 1;
+    this.storageVolumesPageNo = 1;
+    this.databasePerformancePageNo = 1;
+    this.recentAlertsPageNo = 1;
+    this.costOptimizationPageNo = 1;
+    this.accountSubscriptionProjectMetricsSearch = '';
     this.platformOptions = [];
     this.regionOptions = [];
     this.accountOptions = [];
@@ -533,33 +582,43 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.getInventorySummary(filterFormOutput);
       this.getGeoDistribution(filterFormOutput);
       this.getPublicCloudCoverage(filterFormOutput);
-      this.getPerformanceHotspots(filterFormOutput);
-      this.getDatabaseOverview(filterFormOutput);
-      this.getDatabasePerformanceTrend(filterFormOutput);
-      this.getDatabaseSpaceConsumption(filterFormOutput);
-      this.getDatabaseCapacityResources(filterFormOutput);
-      this.getStoragePerformance(filterFormOutput);
-      this.getStorageResources(filterFormOutput);
-      this.getWritePerformanceTrend(filterFormOutput);
-      this.getLatencyBreakdown(filterFormOutput);
+      this.getAccountSubscriptionProjectMetrics(filterFormOutput);
+      this.getCapacityPerformance(filterFormOutput);
+      this.getStorageVolumesDisks(filterFormOutput);
+      this.getPublicCloudDatabase(filterFormOutput);
+      this.getDatabasePerformance(filterFormOutput);
+      this.getCostOptimization(filterFormOutput);
       this.getOrphanedDevices(filterFormOutput);
       this.getOrphanedDevicesByCategory(filterFormOutput);
-      this.getIdleDevices(filterFormOutput);
-      this.getIdleDevicesByDuration(filterFormOutput);
       this.getRecentAlerts(filterFormOutput);
+      this.getAutoRemediationSummary(filterFormOutput);
+      this.getInstanceProvisioning(filterFormOutput);
     }, 0);
   }
 
-  // The inventory card shares one loader with getGeoDistribution: the spinner service is
-  // reference-counted, so the single overlay hides only after BOTH requests finish.
   getInventorySummary(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.clearInventorySummaryViewData();
     this.widgetLoading.inventorySummary = true;
-    this.loadWidget(this.loaderNames.inventoryCard, this.svc.getInventorySummary(filterFormOutput), res => {
-      this.summaryMetrics = this.svc.convertToSummaryMetricsViewData(res);
-      this.providerDistribution = this.svc.convertToProviderDistributionViewData(res);
-      this.providerDistributionOptions = this.svc.convertToProviderDistributionOptions(this.providerDistribution);
-      this.tags = this.svc.convertToTagsViewData(res);
+    // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
+    this.loadWidget(this.loaderNames.inventoryCard, forkJoin({
+      summary: this.svc.getInventorySummary(filterFormOutput).pipe(catchError(() => of(null))),
+      monitored: this.svc.getComputeMonitored(filterFormOutput).pipe(catchError(() => of(null))),
+      distribution: this.svc.getCloudProviderDistribution(filterFormOutput).pipe(catchError(() => of(null))),
+      utilization: this.svc.getUtilizationByProvider(filterFormOutput).pipe(catchError(() => of(null))),
+      osType: this.svc.getComputeInstanceByOsType(filterFormOutput).pipe(catchError(() => of(null))),
+      alerts: this.svc.getAlertsSeverity(filterFormOutput).pipe(catchError(() => of(null)))
+    }), data => {
+      this.summaryMetrics = this.svc.convertToSummaryMetricsViewData(data.summary);
+      this.monitoredProviders = this.svc.convertToComputeMonitoredViewData(data.monitored);
+      this.providerDistribution = this.svc.convertToProviderDistributionViewData(data.distribution);
+      this.providerDistributionTotalLabel = this.svc.getProviderDistributionTotalLabel(data.distribution);
+      this.providerDistributionOptions = this.svc.convertToProviderDistributionOptions(this.providerDistribution, this.providerDistributionTotalLabel);
+      this.utilizationByProviderOptions = this.svc.convertToUtilizationByProviderOptions(data.utilization);
+      this.utilizationByProviderHasData = this.svc.hasUtilizationByProviderData(data.utilization);
+      this.osTypeDistribution = this.svc.convertToOsTypeViewData(data.osType);
+      this.osTypeTotalLabel = this.svc.getOsTypeTotalLabel(data.osType);
+      this.osTypeOptions = this.svc.convertToOsTypeOptions(this.osTypeDistribution, this.osTypeTotalLabel);
+      this.alertsSeverity = this.svc.convertToAlertsSeverityViewData(data.alerts);
     }, () => {
       this.clearInventorySummaryViewData();
     }, () => this.widgetLoading.inventorySummary = false);
@@ -567,19 +626,60 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   private clearInventorySummaryViewData() {
     this.summaryMetrics = [];
+    this.monitoredProviders = [];
     this.providerDistribution = [];
     this.providerDistributionOptions = {};
-    this.tags = [];
+    this.providerDistributionTotalLabel = '';
+    this.utilizationByProviderOptions = {};
+    this.utilizationByProviderHasData = false;
+    this.osTypeDistribution = [];
+    this.osTypeOptions = {};
+    this.osTypeTotalLabel = '';
+    this.alertsSeverity = [];
   }
 
   getGeoDistribution(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.geoHeatmapOptions = {};
+    this.clearGeoDistributionViewData();
+    this.clearAccountSubscriptionProjectMetricsViewData();
     this.widgetLoading.geoDistribution = true;
-    this.loadWidget(this.loaderNames.inventoryCard, this.svc.getGeoDistribution(filterFormOutput), res => {
-      this.geoHeatmapOptions = this.svc.convertToGeoHeatmapOptions(res);
+    this.loadWidget(this.loaderNames.geoDistribution, this.svc.getGeoDistribution(filterFormOutput), res => {
+      this.geoDistributionCells = res || [];
+      this.geoDistributionCloudOptions = this.svc.convertToGeoDistributionCloudOptions(this.geoDistributionCells);
+      if (!this.geoDistributionCloudOptions.some(option => option.value === this.selectedGeoDistributionCloudType)) {
+        this.selectedGeoDistributionCloudType = PUBLIC_CLOUD_ALL_SELECTED_VALUE;
+      }
+      this.applyGeoDistributionCloudTypeFilter();
     }, () => {
-      this.geoHeatmapOptions = {};
+      this.clearGeoDistributionViewData();
     }, () => this.widgetLoading.geoDistribution = false);
+  }
+
+  onGeoDistributionCloudTypeChange(event: Event) {
+    this.selectedGeoDistributionCloudType = String((event.target as HTMLSelectElement)?.value || PUBLIC_CLOUD_ALL_SELECTED_VALUE);
+    this.applyGeoDistributionCloudTypeFilter();
+  }
+
+  /** Re-derives the KPI strip, the chart and the legend from the cells the selected Cloud Type leaves visible. */
+  private applyGeoDistributionCloudTypeFilter() {
+    const selectedCloudType = this.selectedGeoDistributionCloudType;
+    const displayCells = selectedCloudType === PUBLIC_CLOUD_ALL_SELECTED_VALUE
+      ? this.geoDistributionCells
+      : (this.geoDistributionCells || []).filter(cell => this.getGeoDistributionCloudTypeKey(cell.cloudType) === selectedCloudType);
+    this.geoDistributionSummary = this.svc.convertToGeoDistributionSummary(displayCells);
+    this.geoHeatmapOptions = this.svc.convertToGeoHeatmapOptions(displayCells);
+    this.geoDistributionLegends = this.svc.convertToGeoDistributionLegends(displayCells);
+  }
+
+  private getGeoDistributionCloudTypeKey(cloudType: string): string {
+    return String(cloudType || 'Unknown').replace(/[^a-z0-9]/gi, '').toLowerCase() || 'unknown';
+  }
+
+  private clearGeoDistributionViewData() {
+    this.geoDistributionCells = [];
+    this.geoHeatmapOptions = {};
+    this.geoDistributionSummary = { totalLocations: 0, totalResources: 0, totalAlerts: 0 };
+    this.geoDistributionCloudOptions = [{ value: PUBLIC_CLOUD_ALL_SELECTED_VALUE, label: 'Select All' }];
+    this.geoDistributionLegends = [];
   }
 
   getPublicCloudCoverage(filterFormOutput: PublicCloudDashboardFilterCriteria) {
@@ -620,190 +720,270 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     }));
   }
 
-  getPerformanceHotspots(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.performanceHotspots = [];
-    this.widgetLoading.performanceHotspots = true;
-    this.loadWidget(this.loaderNames.performanceHotspots, this.svc.getPerformanceHotspots(filterFormOutput, this.performanceHotspotsSort), res => {
-      this.performanceHotspots = res;
+  getAccountSubscriptionProjectMetrics(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.clearAccountSubscriptionProjectMetricsViewData();
+    this.widgetLoading.accountSubscriptionProjectMetrics = true;
+    // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
+    this.loadWidget(this.loaderNames.accountSubscriptionProjectMetrics, forkJoin({
+      table: this.svc.getAccountSubscriptionProjectMetrics(filterFormOutput, this.accountSubscriptionProjectMetricsSearch, this.accountSubscriptionProjectMetricsPageNo, this.accountSubscriptionProjectMetricsPageSize).pipe(catchError(() => of(null))),
+      instance: this.svc.getComputeInstanceByAccount(filterFormOutput).pipe(catchError(() => of(null))),
+      cost: this.svc.getEstimatedMonthlyCostByAccount(filterFormOutput).pipe(catchError(() => of(null))),
+      vcpu: this.svc.getVcpuUtilizationByAccount(filterFormOutput).pipe(catchError(() => of(null))),
+      efficiency: this.svc.getCostEfficiencyByAccount(filterFormOutput).pipe(catchError(() => of(null)))
+    }), data => {
+      this.accountSubscriptionProjectMetricRows = this.svc.convertToAccountSubscriptionMetricRows(data.table);
+      this.accountSubscriptionProjectMetricsTotal = this.svc.getAccountSubscriptionProjectMetricsTotal(data.table);
+      this.accountSubscriptionProjectInstanceOptions = this.svc.convertToAccountSubscriptionInstanceChartOptions(data.instance);
+      this.accountSubscriptionProjectCostOptions = this.svc.convertToAccountSubscriptionCostChartOptions(data.cost);
+      this.accountSubscriptionProjectVcpuOptions = this.svc.convertToAccountSubscriptionVcpuChartOptions(data.vcpu);
+      this.accountSubscriptionProjectEfficiencyOptions = this.svc.convertToAccountSubscriptionEfficiencyChartOptions(data.efficiency);
     }, () => {
-      this.performanceHotspots = [];
-    }, () => {
-      this.widgetLoading.performanceHotspots = false;
-      this.performanceHotspotsLoaded = true;
-    });
+      this.clearAccountSubscriptionProjectMetricsViewData();
+    }, () => this.widgetLoading.accountSubscriptionProjectMetrics = false);
   }
 
-  sortPerformanceHotspots(sortKey: string) {
-    this.performanceHotspotsSort = this.getPerformanceHotspotSortKey(this.performanceHotspotsSort) === sortKey && this.performanceHotspotsSort === sortKey
-      ? `-${sortKey}`
-      : sortKey;
-    this.getPerformanceHotspots(this.appliedFilterCriteria);
+  setAccountSubscriptionProjectMetricsView(view: 'table' | 'chart') {
+    this.accountSubscriptionProjectMetricsView = view;
   }
 
-  isHotspotSortActive(sortKey: string): boolean {
-    return this.getPerformanceHotspotSortKey(this.performanceHotspotsSort) === sortKey;
+  onAccountSubscriptionProjectMetricsSearch(event: Event) {
+    this.accountSubscriptionProjectMetricsSearch = String((event.target as HTMLInputElement)?.value || '');
+    this.accountSubscriptionProjectMetricsPageNo = 1;
+    this.getAccountSubscriptionProjectMetricsTableRows(this.appliedFilterCriteria);
   }
 
-  /** A leading '-' is descending, which reads as a down caret (ascending shows the up caret). */
-  getHotspotSortIcon(sortKey: string): string {
-    return this.performanceHotspotsSort === `-${sortKey}` ? 'fas fa-caret-down' : 'fas fa-caret-up';
-  }
-
-  private getPerformanceHotspotSortKey(sortKey: string): string {
-    return String(sortKey || '').replace(/^-/, '');
-  }
-
-  getDatabaseOverview(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.databaseOverviewKpis = [];
-    this.databaseOverviewRows = [];
-    this.widgetLoading.databaseOverview = true;
-    this.loadWidget(this.loaderNames.databaseOverview, this.svc.getDatabaseOverview(filterFormOutput), res => {
-      this.databaseOverviewKpis = this.svc.convertToDatabaseOverviewKpis(res);
-      this.databaseOverviewSortColumns = this.svc.convertToDatabaseOverviewColumns(res);
-      this.databaseOverviewRows = this.sortRows(this.svc.convertToDatabaseOverviewRows(res), this.databaseOverviewSort);
-    }, () => {
-      this.databaseOverviewKpis = [];
-      this.databaseOverviewSortColumns = this.svc.convertToDatabaseOverviewColumns(null);
-      this.databaseOverviewRows = [];
-    }, () => this.widgetLoading.databaseOverview = false);
-  }
-
-  getDatabasePerformanceTrend(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.databaseWritePerformanceOptions = {};
-    this.databaseReadPerformanceOptions = {};
-    this.databaseTrendHasData = false;
-    this.databaseWriteTrendHasData = false;
-    this.databaseReadTrendHasData = false;
-    this.databaseWriteTrendInstance = '';
-    this.databaseReadTrendInstance = '';
-    this.widgetLoading.databasePerformanceTrend = true;
-    // Each branch rescues itself so a failure on one endpoint cannot blank the other chart.
-    const trend$ = forkJoin([
-      this.svc.getDatabaseWriteTrend(filterFormOutput).pipe(catchError(() => of(null))),
-      this.svc.getDatabaseReadTrend(filterFormOutput).pipe(catchError(() => of(null)))
-    ]);
-    this.loadWidget(this.loaderNames.databasePerformanceTrend, trend$, ([writeRes, readRes]) => {
-      const hasWrite = this.svc.hasDatabaseTrendSeries(writeRes);
-      const hasRead = this.svc.hasDatabaseTrendSeries(readRes);
-      this.databaseTrendHasData = hasWrite || hasRead;
-      this.databaseWriteTrendHasData = hasWrite;
-      this.databaseReadTrendHasData = hasRead;
-      this.databaseWriteTrendInstance = hasWrite ? this.svc.getDatabaseTrendInstance(writeRes) : '';
-      this.databaseReadTrendInstance = hasRead ? this.svc.getDatabaseTrendInstance(readRes) : '';
-      this.databaseWritePerformanceOptions = hasWrite ? this.svc.convertToDatabaseWritePerformanceOptions(writeRes) : {};
-      this.databaseReadPerformanceOptions = hasRead ? this.svc.convertToDatabaseReadPerformanceOptions(readRes) : {};
-    }, () => {
-      this.databaseWritePerformanceOptions = {};
-      this.databaseReadPerformanceOptions = {};
-      this.databaseTrendHasData = false;
-      this.databaseWriteTrendHasData = false;
-      this.databaseReadTrendHasData = false;
-      this.databaseWriteTrendInstance = '';
-      this.databaseReadTrendInstance = '';
-    }, () => this.widgetLoading.databasePerformanceTrend = false);
-  }
-
-  getDatabaseSpaceConsumption(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.databaseSpaceKpis = [];
-    this.widgetLoading.databaseSpaceConsumption = true;
-    this.loadWidget(this.loaderNames.databaseSpaceConsumption, this.svc.getDatabaseSpaceConsumption(filterFormOutput), res => {
-      this.databaseSpaceKpis = this.svc.convertToDatabaseSpaceKpis(res);
-    }, () => {
-      this.databaseSpaceKpis = [];
-    }, () => this.widgetLoading.databaseSpaceConsumption = false);
-  }
-
-  getDatabaseCapacityResources(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.databaseSpaceRows = [];
-    this.widgetLoading.databaseCapacityResources = true;
-    this.loadWidget(this.loaderNames.databaseCapacityResources, this.svc.getDatabaseCapacityResources(filterFormOutput, this.databaseCapacitySort), res => {
-      this.databaseSpaceRows = this.svc.convertToDatabaseCapacityRows(res);
-    }, () => {
-      this.databaseSpaceRows = [];
-    }, () => this.widgetLoading.databaseCapacityResources = false);
-  }
-
-  getStoragePerformance(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.storagePerformanceCards = [];
-    this.widgetLoading.storagePerformance = true;
-    // Each metric rescues itself so one dead endpoint drops only its own card, not all six.
-    // Both card converters treat a null response as "no data", so the failed card is filtered out below.
-    const cards$ = forkJoin(
-      PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS.map(metric =>
-        this.svc.getStoragePerformanceMetric(metric.endpoint, filterFormOutput).pipe(catchError(() => of(null))))
-    );
-    this.loadWidget(this.loaderNames.storagePerformance, cards$, results => {
-      this.storagePerformanceCards = results.map((res, index) => {
-        const metric = PUBLIC_CLOUD_STORAGE_PERFORMANCE_METRICS[index];
-        return metric.kind === 'highLatency'
-          ? this.svc.convertToStorageHighLatencyCard(res, metric.color, metric.title)
-          : this.svc.convertToStorageTrendCard(res, metric.color, metric.title);
-      }).filter(card => card.hasData);
-    }, () => {
-      this.storagePerformanceCards = [];
-    }, () => this.widgetLoading.storagePerformance = false);
-  }
-
-  getStorageResources(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.storageResources = [];
-    this.widgetLoading.storageResources = true;
-    this.loadWidget(this.loaderNames.storageResources, this.svc.getStorageResources(filterFormOutput, this.storageResourcesSort), res => {
-      this.storageResources = this.svc.convertToStorageResourceRows(res);
-    }, () => {
-      this.storageResources = [];
-    }, () => this.widgetLoading.storageResources = false);
-  }
-
-  getWritePerformanceTrend(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.writePerformanceTrend = { labels: [], rows: [] };
-    this.widgetLoading.writePerformanceTrend = true;
-    this.loadWidget(this.loaderNames.writePerformanceTrend, this.svc.getWritePerformanceTrend(filterFormOutput), res => {
-      this.writePerformanceTrend = this.svc.convertToWritePerformanceViewData(res);
-    }, () => {
-      this.writePerformanceTrend = { labels: [], rows: [] };
-    }, () => this.widgetLoading.writePerformanceTrend = false);
-  }
-
-  getLatencyBreakdown(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.latencyBreakdown = null;
-    this.latencyBreakdownOptions = {};
-    this.widgetLoading.latencyBreakdown = true;
-    this.loadWidget(this.loaderNames.latencyBreakdown, this.svc.getLatencyBreakdown(filterFormOutput), res => {
-      this.latencyBreakdown = this.svc.convertToLatencyBreakdownViewData(res);
-      this.latencyBreakdownOptions = this.latencyBreakdown.hasData ? this.svc.convertToLatencyBreakdownOptions(this.latencyBreakdown) : {};
-    }, () => {
-      this.latencyBreakdown = null;
-      this.latencyBreakdownOptions = {};
-    }, () => this.widgetLoading.latencyBreakdown = false);
-  }
-
-  sortDatabaseOverview(key: string) {
-    this.databaseOverviewSort = this.nextSortState(this.databaseOverviewSort, key);
-    this.databaseOverviewRows = this.sortRows(this.databaseOverviewRows, this.databaseOverviewSort);
-  }
-
-  sortDatabaseCapacity(sortBy?: string) {
-    if (!sortBy || this.databaseCapacitySort === sortBy) {
+  accountSubscriptionProjectMetricsPageChange(pageNo: number) {
+    if (this.accountSubscriptionProjectMetricsPageNo === pageNo) {
       return;
     }
-    this.databaseCapacitySort = sortBy;
-    this.getDatabaseCapacityResources(this.appliedFilterCriteria);
+    this.accountSubscriptionProjectMetricsPageNo = pageNo;
+    this.getAccountSubscriptionProjectMetricsTableRows(this.appliedFilterCriteria);
   }
 
-  isCapacitySortActive(sortBy?: string): boolean {
-    return !!sortBy && this.databaseCapacitySort === sortBy;
+  // Re-fetches ONLY the paginated table endpoint (search / page change); the chart endpoints are
+  // filter-scoped, not page-scoped, so they are left untouched here.
+  private getAccountSubscriptionProjectMetricsTableRows(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.widgetLoading.accountSubscriptionProjectMetrics = true;
+    this.loadWidget(this.loaderNames.accountSubscriptionProjectMetrics,
+      this.svc.getAccountSubscriptionProjectMetrics(filterFormOutput, this.accountSubscriptionProjectMetricsSearch, this.accountSubscriptionProjectMetricsPageNo, this.accountSubscriptionProjectMetricsPageSize),
+      data => {
+        this.accountSubscriptionProjectMetricRows = this.svc.convertToAccountSubscriptionMetricRows(data);
+        this.accountSubscriptionProjectMetricsTotal = this.svc.getAccountSubscriptionProjectMetricsTotal(data);
+      }, () => {
+        this.accountSubscriptionProjectMetricRows = [];
+        this.accountSubscriptionProjectMetricsTotal = 0;
+      }, () => this.widgetLoading.accountSubscriptionProjectMetrics = false);
   }
 
-  sortStorageResources(sortBy?: string) {
-    if (!sortBy || this.storageResourcesSort === sortBy) {
+  private clearAccountSubscriptionProjectMetricsViewData() {
+    this.accountSubscriptionProjectMetricRows = [];
+    this.accountSubscriptionProjectMetricsTotal = 0;
+    this.accountSubscriptionProjectInstanceOptions = {};
+    this.accountSubscriptionProjectCostOptions = {};
+    this.accountSubscriptionProjectVcpuOptions = {};
+    this.accountSubscriptionProjectEfficiencyOptions = {};
+  }
+
+  getCapacityPerformance(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.clearCapacityPerformanceViewData();
+    this.widgetLoading.capacityPerformance = true;
+    // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
+    this.loadWidget(this.loaderNames.capacityPerformance, forkJoin({
+      table: this.svc.getCapacityPerformanceTable(filterFormOutput, this.capacityPerformanceSearch, this.capacityPerformancePageNo, this.capacityPerformancePageSize).pipe(catchError(() => of(null))),
+      charts: this.svc.getCapacityPerformanceCharts(filterFormOutput).pipe(catchError(() => of(null)))
+    }), data => {
+      this.capacityPerformanceRows = this.svc.convertToCapacityPerformanceRows(data.table);
+      this.capacityPerformanceTotal = this.svc.getCapacityPerformanceTotal(data.table);
+      this.capacityFleetStatusOptions = this.svc.convertToCapacityFleetStatusOptions(data.charts?.fleetStatusByProvider);
+      this.capacityCpuDistributionOptions = this.svc.convertToCapacityCpuDistributionOptions(data.charts?.cpuDistribution);
+      this.capacityTop10CpuOptions = this.svc.convertToCapacityTopOptions(data.charts?.top10Cpu, '%');
+      this.capacityTop10DiskIopsOptions = this.svc.convertToCapacityTopOptions(data.charts?.top10DiskIops, 'IOPS');
+      this.capacityTop10NetworkOptions = this.svc.convertToCapacityTopOptions(data.charts?.top10NetworkThroughput, 'Mbps');
+      this.capacityGrowthInsightsOptions = this.svc.convertToCapacityGrowthOptions(data.charts?.capacityAndGrowthInsights);
+    }, () => {
+      this.clearCapacityPerformanceViewData();
+    }, () => this.widgetLoading.capacityPerformance = false);
+  }
+
+  setCapacityPerformanceView(view: 'table' | 'chart') {
+    this.capacityPerformanceView = view;
+  }
+
+  onCapacityPerformanceSearch(event: Event) {
+    this.capacityPerformanceSearch = String((event.target as HTMLInputElement)?.value || '');
+    this.capacityPerformancePageNo = 1;
+    this.getCapacityPerformanceTableRows(this.appliedFilterCriteria);
+  }
+
+  capacityPerformancePageChange(pageNo: number) {
+    if (this.capacityPerformancePageNo === pageNo) {
       return;
     }
-    this.storageResourcesSort = sortBy;
-    this.getStorageResources(this.appliedFilterCriteria);
+    this.capacityPerformancePageNo = pageNo;
+    this.getCapacityPerformanceTableRows(this.appliedFilterCriteria);
   }
 
-  isStorageSortActive(sortBy?: string): boolean {
-    return !!sortBy && this.storageResourcesSort === sortBy;
+  // Re-fetches ONLY the paginated table endpoint (search / page change); the chart endpoints are
+  // filter-scoped, not page-scoped, so they are left untouched here.
+  private getCapacityPerformanceTableRows(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.widgetLoading.capacityPerformance = true;
+    this.loadWidget(this.loaderNames.capacityPerformance,
+      this.svc.getCapacityPerformanceTable(filterFormOutput, this.capacityPerformanceSearch, this.capacityPerformancePageNo, this.capacityPerformancePageSize),
+      data => {
+        this.capacityPerformanceRows = this.svc.convertToCapacityPerformanceRows(data);
+        this.capacityPerformanceTotal = this.svc.getCapacityPerformanceTotal(data);
+      }, () => {
+        this.capacityPerformanceRows = [];
+        this.capacityPerformanceTotal = 0;
+      }, () => this.widgetLoading.capacityPerformance = false);
+  }
+
+  private clearCapacityPerformanceViewData() {
+    this.capacityPerformanceRows = [];
+    this.capacityPerformanceTotal = 0;
+    this.capacityFleetStatusOptions = {};
+    this.capacityCpuDistributionOptions = {};
+    this.capacityTop10CpuOptions = {};
+    this.capacityTop10DiskIopsOptions = {};
+    this.capacityTop10NetworkOptions = {};
+    this.capacityGrowthInsightsOptions = {};
+  }
+
+  getStorageVolumesDisks(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.clearStorageVolumesViewData();
+    this.widgetLoading.storageVolumesDisks = true;
+    // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
+    this.loadWidget(this.loaderNames.storageVolumesDisks, forkJoin({
+      table: this.svc.getStorageVolumesTable(filterFormOutput, this.storageVolumesSearch, this.storageVolumesPageNo, this.storageVolumesPageSize).pipe(catchError(() => of(null))),
+      provisionedByProvider: this.svc.getStorageProvisionedByProvider(filterFormOutput).pipe(catchError(() => of(null))),
+      topVolumes: this.svc.getStorageTopVolumesByDiskIops(filterFormOutput).pipe(catchError(() => of(null))),
+      tierDistribution: this.svc.getStorageIopsTierDistribution(filterFormOutput).pipe(catchError(() => of(null)))
+    }), data => {
+      this.storageVolumesRows = this.svc.convertToStorageVolumeRows(data.table);
+      this.storageVolumesTotal = this.svc.getStorageVolumesTotal(data.table);
+      this.storageProvisionedByProviderOptions = this.svc.convertToStorageProvisionedByProviderOptions(data.provisionedByProvider);
+      this.storageTopVolumesOptions = this.svc.convertToStorageTopVolumesOptions(data.topVolumes);
+      this.storageIopsTierOptions = this.svc.convertToStorageIopsTierOptions(data.tierDistribution);
+      this.storageIopsTierLegend = this.svc.convertToStorageTierLegend(data.tierDistribution);
+    }, () => {
+      this.clearStorageVolumesViewData();
+    }, () => this.widgetLoading.storageVolumesDisks = false);
+  }
+
+  setStorageVolumesView(view: 'table' | 'chart') {
+    this.storageVolumesView = view;
+  }
+
+  onStorageVolumesSearch(event: Event) {
+    this.storageVolumesSearch = String((event.target as HTMLInputElement)?.value || '');
+    this.storageVolumesPageNo = 1;
+    this.getStorageVolumesTableRows(this.appliedFilterCriteria);
+  }
+
+  storageVolumesPageChange(pageNo: number) {
+    if (this.storageVolumesPageNo === pageNo) {
+      return;
+    }
+    this.storageVolumesPageNo = pageNo;
+    this.getStorageVolumesTableRows(this.appliedFilterCriteria);
+  }
+
+  // Re-fetches ONLY the paginated table endpoint (search / page change); the chart endpoints are
+  // filter-scoped, not page-scoped, so they are left untouched here.
+  private getStorageVolumesTableRows(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.widgetLoading.storageVolumesDisks = true;
+    this.loadWidget(this.loaderNames.storageVolumesDisks,
+      this.svc.getStorageVolumesTable(filterFormOutput, this.storageVolumesSearch, this.storageVolumesPageNo, this.storageVolumesPageSize),
+      data => {
+        this.storageVolumesRows = this.svc.convertToStorageVolumeRows(data);
+        this.storageVolumesTotal = this.svc.getStorageVolumesTotal(data);
+      }, () => {
+        this.storageVolumesRows = [];
+        this.storageVolumesTotal = 0;
+      }, () => this.widgetLoading.storageVolumesDisks = false);
+  }
+
+  private clearStorageVolumesViewData() {
+    this.storageVolumesRows = [];
+    this.storageVolumesTotal = 0;
+    this.storageProvisionedByProviderOptions = {};
+    this.storageTopVolumesOptions = {};
+    this.storageIopsTierOptions = {};
+    this.storageIopsTierLegend = [];
+  }
+
+  getPublicCloudDatabase(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.clearPublicCloudDatabaseViewData();
+    this.widgetLoading.publicCloudDatabase = true;
+    this.loadWidget(this.loaderNames.publicCloudDatabase, this.svc.getPublicCloudDatabase(filterFormOutput), data => {
+      this.databaseSummaryMetrics = this.svc.convertToDatabaseSummaryMetrics(data);
+      this.databaseMonitoredCards = this.svc.convertToDatabaseMonitoredCards(data);
+    }, () => {
+      this.clearPublicCloudDatabaseViewData();
+    }, () => this.widgetLoading.publicCloudDatabase = false);
+  }
+
+  private clearPublicCloudDatabaseViewData() {
+    this.databaseSummaryMetrics = [];
+    this.databaseMonitoredCards = [];
+  }
+
+  getDatabasePerformance(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.clearDatabasePerformanceViewData();
+    this.widgetLoading.databasePerformance = true;
+    // The workload endpoint returns the full list; search + pagination are applied client-side here.
+    // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
+    this.loadWidget(this.loaderNames.databasePerformance, forkJoin({
+      workload: this.svc.getDbWorkload(filterFormOutput).pipe(catchError(() => of([]))),
+      queryPerf: this.svc.getDbQueryPerformance(filterFormOutput).pipe(catchError(() => of(null)))
+    }), data => {
+      const queryPerf: any = data.queryPerf || {};
+      const search = this.databasePerformanceSearch.toLowerCase().trim();
+      const filtered = search
+        ? (data.workload || []).filter(row => String(row?.name || '').toLowerCase().indexOf(search) > -1)
+        : (data.workload || []);
+      this.databasePerformanceTotal = filtered.length;
+      const startIndex = (this.databasePerformancePageNo - 1) * this.databasePerformancePageSize;
+      const pageRows = filtered.slice(startIndex, startIndex + this.databasePerformancePageSize);
+      this.databasePerformanceRows = this.svc.convertToDbWorkloadRows(pageRows, queryPerf);
+      this.dbCacheHitOptions = this.svc.convertToDbCacheHitOptions(queryPerf.top_cache_hit_ratio);
+      this.dbLatencyOptions = this.svc.convertToDbLatencyOptions(queryPerf.top_latency);
+      this.dbResponseTimeOptions = this.svc.convertToDbResponseTimeOptions(queryPerf.top_response_time);
+      this.dbConnectionsOptions = this.svc.convertToDbConnectionsOptions(queryPerf.top_connections);
+      this.dbDeadlocksOptions = this.svc.convertToDbDeadlocksOptions(queryPerf.top_errors_deadlocks);
+      this.dbThroughputTrendOptions = this.svc.convertToDbThroughputTrendOptions(queryPerf.top_throughput);
+    }, () => {
+      this.clearDatabasePerformanceViewData();
+    }, () => this.widgetLoading.databasePerformance = false);
+  }
+
+  setDatabasePerformanceView(view: 'table' | 'chart') {
+    this.databasePerformanceView = view;
+  }
+
+  onDatabasePerformanceSearch(event: Event) {
+    this.databasePerformanceSearch = String((event.target as HTMLInputElement)?.value || '');
+    this.databasePerformancePageNo = 1;
+    this.getDatabasePerformance(this.appliedFilterCriteria);
+  }
+
+  databasePerformancePageChange(pageNo: number) {
+    if (this.databasePerformancePageNo === pageNo) {
+      return;
+    }
+    this.databasePerformancePageNo = pageNo;
+    this.getDatabasePerformance(this.appliedFilterCriteria);
+  }
+
+  private clearDatabasePerformanceViewData() {
+    this.databasePerformanceRows = [];
+    this.databasePerformanceTotal = 0;
+    this.dbCacheHitOptions = {};
+    this.dbLatencyOptions = {};
+    this.dbResponseTimeOptions = {};
+    this.dbConnectionsOptions = {};
+    this.dbDeadlocksOptions = {};
+    this.dbThroughputTrendOptions = {};
   }
 
   getSortIconClass(sort: PublicCloudSortState, key: string): string {
@@ -871,127 +1051,222 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.getOrphanedDevices(this.appliedFilterCriteria);
   }
 
-  getIdleDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.idleDevices = [];
-    this.idleDevicesTotal = 0;
-    this.widgetLoading.idleDevices = true;
-    this.loadWidget(this.loaderNames.idleDevices, this.svc.getIdleDevices(filterFormOutput, this.idleDevicesPageNo, this.idleDevicesPageSize), res => {
-      this.idleDevices = this.svc.convertToIdleDevicesViewData(res);
-      this.idleDevicesTotal = this.svc.convertToIdleDevicesTotal(res);
-    }, () => {
-      this.idleDevices = [];
-      this.idleDevicesTotal = 0;
-    }, () => this.widgetLoading.idleDevices = false);
-  }
-
-  getIdleDevicesByDuration(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.idleDurationRows = [];
-    this.idleDurationOptions = {};
-    this.idleDurationHasData = false;
-    this.widgetLoading.idleDuration = true;
-    this.loadWidget(this.loaderNames.idleDuration, this.svc.getIdleDevicesByDuration(filterFormOutput), res => {
-      this.idleDurationRows = this.svc.convertToIdleDurationViewData(res);
-      this.idleDurationHasData = this.svc.hasIdleDurationData(this.idleDurationRows);
-      this.idleDurationOptions = this.idleDurationHasData ? this.svc.convertToIdleDurationOptions(this.idleDurationRows) : {};
-    }, () => {
-      this.idleDurationRows = [];
-      this.idleDurationOptions = {};
-      this.idleDurationHasData = false;
-    }, () => this.widgetLoading.idleDuration = false);
-  }
-
-  idleDevicesPageChange(pageNo: number) {
-    if (this.idleDevicesPageNo === pageNo) {
-      return;
-    }
-    this.idleDevicesPageNo = pageNo;
-    this.getIdleDevices(this.appliedFilterCriteria);
-  }
-
   getRecentAlerts(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.recentAlertSummaryMetrics = [];
-    this.recentAlerts = [];
+    this.clearRecentAlertsViewData();
     this.widgetLoading.recentAlerts = true;
-    this.startRecentAlertsLoaders();
-    this.svc.getRecentAlerts(filterFormOutput).pipe(
-      takeUntil(this.ngUnsubscribe),
-      finalize(() => {
-        this.widgetLoading.recentAlerts = false;
-        this.stopRecentAlertsLoaders();
-      })
-    ).subscribe(res => {
-      this.recentAlertSummaryMetrics = this.svc.convertToRecentAlertSummaryMetricsViewData(res);
-      this.recentAlerts = this.svc.convertToRecentAlertsViewData(res);
+    // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
+    this.loadWidget(this.loaderNames.recentAlerts, forkJoin({
+      table: this.svc.getRecentAlerts(filterFormOutput).pipe(catchError(() => of(null))),
+      severity: this.svc.getAlertsBySeverity(filterFormOutput).pipe(catchError(() => of(null))),
+      byProvider: this.svc.getAlertsByProvider(filterFormOutput).pipe(catchError(() => of(null))),
+      byAge: this.svc.getAlertsByAge(filterFormOutput).pipe(catchError(() => of(null)))
+    }), data => {
+      this.recentAlertsAllRows = this.svc.convertToRecentAlertRows(data.table);
+      this.applyRecentAlertsTable();
+      this.alertsBySeverityOptions = this.svc.convertToAlertsBySeverityOptions(data.severity);
+      this.alertsBySeverityLegend = this.svc.convertToAlertsBySeverityLegend(data.severity);
+      this.alertsByProviderOptions = this.svc.convertToAlertsByProviderOptions(data.byProvider);
+      this.alertsByAgeOptions = this.svc.convertToAlertsByAgeOptions(data.byAge);
     }, () => {
       this.clearRecentAlertsViewData();
-    });
+    }, () => this.widgetLoading.recentAlerts = false);
   }
 
-  private startRecentAlertsLoaders() {
-    [
-      this.loaderNames.recentAlertSummary,
-      this.loaderNames.recentAlerts
-    ].forEach(loaderName => this.spinnerService.start(loaderName));
+  setRecentAlertsView(view: 'table' | 'chart') {
+    this.recentAlertsView = view;
   }
 
-  private stopRecentAlertsLoaders() {
-    setTimeout(() => {
-      [
-        this.loaderNames.recentAlertSummary,
-        this.loaderNames.recentAlerts
-      ].forEach(loaderName => this.spinnerService.stop(loaderName));
-    }, 0);
+  onRecentAlertsSearch(event: Event) {
+    this.recentAlertsSearch = String((event.target as HTMLInputElement)?.value || '');
+    this.recentAlertsPageNo = 1;
+    this.applyRecentAlertsTable();
+  }
+
+  sortRecentAlerts(key: string) {
+    this.recentAlertsSort = this.nextSortState(this.recentAlertsSort, key);
+    this.recentAlertsPageNo = 1;
+    this.applyRecentAlertsTable();
+  }
+
+  recentAlertsPageChange(pageNo: number) {
+    if (this.recentAlertsPageNo === pageNo) {
+      return;
+    }
+    this.recentAlertsPageNo = pageNo;
+    this.applyRecentAlertsTable();
+  }
+
+  // Search + sort + paginate the full alert list client-side (the recent_alerts response is a single
+  // unpaginated payload, so the same view logic serves the static and live data).
+  private applyRecentAlertsTable() {
+    const search = this.recentAlertsSearch.toLowerCase().trim();
+    const filtered = search
+      ? this.recentAlertsAllRows.filter(row => [row.instanceName, row.alert, row.provider, row.severityLabel]
+        .some(value => String(value || '').toLowerCase().indexOf(search) > -1))
+      : this.recentAlertsAllRows;
+    const sorted = this.sortRows(filtered, this.recentAlertsSort);
+    this.recentAlertsTotal = sorted.length;
+    const startIndex = (this.recentAlertsPageNo - 1) * this.recentAlertsPageSize;
+    this.recentAlerts = sorted.slice(startIndex, startIndex + this.recentAlertsPageSize);
   }
 
   private clearRecentAlertsViewData() {
-    this.recentAlertSummaryMetrics = [];
+    this.recentAlertsAllRows = [];
     this.recentAlerts = [];
+    this.recentAlertsTotal = 0;
+    this.alertsBySeverityOptions = {};
+    this.alertsBySeverityLegend = [];
+    this.alertsByProviderOptions = {};
+    this.alertsByAgeOptions = {};
+  }
+
+  getCostOptimization(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.clearCostOptimizationViewData();
+    this.widgetLoading.costOptimization = true;
+    // The table endpoint is server-paginated ({ count, results }); search + page are sent to it.
+    // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
+    this.loadWidget(this.loaderNames.costOptimization, forkJoin({
+      table: this.svc.getCostOptimization(filterFormOutput, this.costOptimizationSearch, this.costOptimizationPageNo, this.costOptimizationPageSize).pipe(catchError(() => of(null))),
+      spend: this.svc.getSpendVsSavings(filterFormOutput).pipe(catchError(() => of(null))),
+      actions: this.svc.getRecommendedActions(filterFormOutput).pipe(catchError(() => of(null))),
+      savingsByProvider: this.svc.getPotentialSavingsByProvider(filterFormOutput).pipe(catchError(() => of(null)))
+    }), data => {
+      this.costOptimizationTotal = this.svc.getCostOptimizationTotal(data.table);
+      this.applyCostOptimizationTable(this.svc.convertToCostRows(data.table));
+      this.spendVsSavingsOptions = this.svc.convertToSpendVsSavingsOptions(data.spend);
+      this.spendVsSavingsLegend = this.svc.convertToSpendVsSavingsLegend(data.spend);
+      this.recommendedActionsOptions = this.svc.convertToRecommendedActionsOptions(data.actions);
+      this.potentialSavingsByProviderOptions = this.svc.convertToPotentialSavingsByProviderOptions(data.savingsByProvider);
+      this.costSummaryMetrics = this.svc.convertToCostSummaryMetrics(data.spend, data.actions);
+    }, () => {
+      this.clearCostOptimizationViewData();
+    }, () => this.widgetLoading.costOptimization = false);
+  }
+
+  setCostOptimizationView(view: 'table' | 'chart') {
+    this.costOptimizationView = view;
+  }
+
+  onCostOptimizationSearch(event: Event) {
+    this.costOptimizationSearch = String((event.target as HTMLInputElement)?.value || '');
+    this.costOptimizationPageNo = 1;
+    this.getCostOptimizationTableRows(this.appliedFilterCriteria);
+  }
+
+  sortCostOptimization(key: string) {
+    this.costOptimizationSort = this.nextSortState(this.costOptimizationSort, key);
+    this.applyCostOptimizationTable(this.costOptimizationRows);
+  }
+
+  costOptimizationPageChange(pageNo: number) {
+    if (this.costOptimizationPageNo === pageNo) {
+      return;
+    }
+    this.costOptimizationPageNo = pageNo;
+    this.getCostOptimizationTableRows(this.appliedFilterCriteria);
+  }
+
+  // Re-fetches ONLY the paginated table endpoint (search / page change); the chart endpoints are
+  // filter-scoped, not page-scoped, so they are left untouched here.
+  private getCostOptimizationTableRows(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.widgetLoading.costOptimization = true;
+    this.loadWidget(this.loaderNames.costOptimization,
+      this.svc.getCostOptimization(filterFormOutput, this.costOptimizationSearch, this.costOptimizationPageNo, this.costOptimizationPageSize),
+      data => {
+        this.costOptimizationTotal = this.svc.getCostOptimizationTotal(data);
+        this.applyCostOptimizationTable(this.svc.convertToCostRows(data));
+      }, () => {
+        this.costOptimizationRows = [];
+        this.costOptimizationTotal = 0;
+      }, () => this.widgetLoading.costOptimization = false);
+  }
+
+  // Search + pagination are server-side (the endpoint returns { count, results } per page).
+  // A header click sorts the rows on the currently visible page only.
+  private applyCostOptimizationTable(rows: PublicCloudCostRow[]) {
+    this.costOptimizationRows = this.costOptimizationSort.key
+      ? this.sortRows(rows, this.costOptimizationSort)
+      : rows;
+  }
+
+  private clearCostOptimizationViewData() {
+    this.costOptimizationRows = [];
+    this.costOptimizationTotal = 0;
+    this.spendVsSavingsOptions = {};
+    this.spendVsSavingsLegend = [];
+    this.recommendedActionsOptions = {};
+    this.potentialSavingsByProviderOptions = {};
+    this.costSummaryMetrics = [];
+  }
+
+  getAutoRemediationSummary(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.autoRemediationSummary = null;
+    this.widgetLoading.autoRemediationSummary = true;
+    this.loadWidget(this.loaderNames.autoRemediationSummary, this.svc.getAutoRemediationSummary(filterFormOutput), res => {
+      this.autoRemediationSummary = this.svc.convertToAutoRemediationSummaryViewData(res);
+    }, () => {
+      this.autoRemediationSummary = null;
+    }, () => this.widgetLoading.autoRemediationSummary = false);
+  }
+
+  private clearAutoRemediationSummaryViewData() {
+    this.autoRemediationSummary = null;
+  }
+
+  getInstanceProvisioning(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.clearProvisioningViewData();
+    this.widgetLoading.instanceProvisioning = true;
+    // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
+    this.loadWidget(this.loaderNames.instanceProvisioning, forkJoin({
+      table: this.svc.getInstanceProvisioningTable(filterFormOutput).pipe(catchError(() => of(null))),
+      reachability: this.svc.getProvisioningReachability(filterFormOutput).pipe(catchError(() => of(null))),
+      byProvider: this.svc.getProvisionedByProvider(filterFormOutput).pipe(catchError(() => of(null))),
+      recently: this.svc.getRecentlyProvisioned(filterFormOutput).pipe(catchError(() => of(null))),
+      metrics: this.svc.getProvisioningSummaryMetrics(filterFormOutput).pipe(catchError(() => of(null)))
+    }), data => {
+      this.provisioningRows = this.sortRows(this.svc.convertToProvisioningRows(data.table), this.provisioningSort);
+      this.provisioningSummaryMetrics = this.svc.convertToProvisioningSummaryMetrics(data.metrics);
+      this.provisioningReachabilityOptions = this.svc.convertToProvisioningReachabilityOptions(data.reachability);
+      this.provisioningReachabilityLegend = this.svc.convertToProvisioningReachabilityLegend(data.reachability);
+      this.provisionedByProviderOptions = this.svc.convertToProvisioningByProviderOptions(data.byProvider);
+      this.recentlyProvisionedOptions = this.svc.convertToRecentlyProvisionedOptions(data.recently);
+    }, () => {
+      this.clearProvisioningViewData();
+    }, () => this.widgetLoading.instanceProvisioning = false);
+  }
+
+  setProvisioningView(view: 'table' | 'chart') {
+    this.provisioningView = view;
+  }
+
+  sortProvisioning(key: string) {
+    this.provisioningSort = this.nextSortState(this.provisioningSort, key);
+    this.provisioningRows = this.sortRows(this.provisioningRows, this.provisioningSort);
+  }
+
+  private clearProvisioningViewData() {
+    this.provisioningRows = [];
+    this.provisioningSummaryMetrics = [];
+    this.provisioningReachabilityOptions = {};
+    this.provisioningReachabilityLegend = [];
+    this.provisionedByProviderOptions = {};
+    this.recentlyProvisionedOptions = {};
   }
 
   private clearDashboardViewData() {
     this.clearInventorySummaryViewData();
-    this.geoHeatmapOptions = {};
+    this.clearGeoDistributionViewData();
     this.publicCloudCoverageGroups = [];
     this.publicCloudCoverageGroupsSource = [];
     this.publicCloudCoverageTotal = '0';
-    this.performanceHotspots = [];
-    this.performanceHotspotsLoaded = false;
     this.orphanedDevices = [];
     this.orphanedDevicesTotal = 0;
     this.orphanedByCategory = [];
     this.orphanedByCategoryOptions = {};
     this.orphanedByCategoryHasData = false;
-    this.idleDevices = [];
-    this.idleDevicesTotal = 0;
-    this.idleDurationRows = [];
-    this.idleDurationOptions = {};
-    this.idleDurationHasData = false;
-    this.clearCloudDatabasePerformanceViewData();
-    this.clearCloudStorageHealthViewData();
     this.clearRecentAlertsViewData();
-  }
-
-  private clearCloudDatabasePerformanceViewData() {
-    this.databaseOverviewKpis = [];
-    this.databaseOverviewSortColumns = this.svc.convertToDatabaseOverviewColumns(null);
-    this.databaseOverviewRows = [];
-    this.databaseWritePerformanceOptions = {};
-    this.databaseReadPerformanceOptions = {};
-    this.databaseWriteTrendInstance = '';
-    this.databaseReadTrendInstance = '';
-    this.databaseTrendHasData = false;
-    this.databaseWriteTrendHasData = false;
-    this.databaseReadTrendHasData = false;
-    this.databaseSpaceKpis = [];
-    this.databaseSpaceRows = [];
-  }
-
-  private clearCloudStorageHealthViewData() {
-    this.storagePerformanceCards = [];
-    this.storageResources = [];
-    this.writePerformanceTrend = { labels: [], rows: [] };
-    this.latencyBreakdown = null;
-    this.latencyBreakdownOptions = {};
+    this.clearAccountSubscriptionProjectMetricsViewData();
+    this.clearAutoRemediationSummaryViewData();
   }
 
   private startWidgetLoadingState() {
@@ -1006,6 +1281,10 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return this.widgetLoading.inventorySummary || this.hasMetricValues(this.summaryMetrics);
   }
 
+  get hasMonitoredProviders(): boolean {
+    return this.widgetLoading.inventorySummary || !!this.monitoredProviders.length;
+  }
+
   get hasProviderDistribution(): boolean {
     return this.widgetLoading.inventorySummary || this.hasProviderDistributionData;
   }
@@ -1014,16 +1293,28 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return (this.providerDistribution || []).some(provider => Number(provider?.count || 0) > 0 || Number(provider?.value || 0) > 0);
   }
 
-  get hasTags(): boolean {
-    return this.widgetLoading.inventorySummary || !!this.tags?.length;
+  get hasUtilizationByProvider(): boolean {
+    return this.widgetLoading.inventorySummary || this.utilizationByProviderHasData;
   }
 
-  get hasGeoDistributionData(): boolean {
-    return !!Object.keys(this.geoHeatmapOptions || {}).length;
+  get hasOsTypeData(): boolean {
+    return this.svc.hasOsTypeData(this.osTypeDistribution);
+  }
+
+  get hasOsType(): boolean {
+    return this.widgetLoading.inventorySummary || this.hasOsTypeData;
+  }
+
+  get hasAlertsSeverity(): boolean {
+    return this.widgetLoading.inventorySummary || this.hasMetricValues(this.alertsSeverity);
   }
 
   get hasGeoDistribution(): boolean {
-    return this.widgetLoading.geoDistribution || this.hasGeoDistributionData;
+    return this.widgetLoading.geoDistribution || this.hasGeoDistributionSourceData();
+  }
+
+  private hasGeoDistributionSourceData(): boolean {
+    return (this.geoDistributionCells || []).some(cell => cell.totalResources > 0);
   }
 
   get hasPublicCloudCoverage(): boolean {
@@ -1031,13 +1322,47 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       (this.publicCloudCoverageGroups || []).some(group => this.hasCoverageValues(group.cards));
   }
 
-  get hasPerformanceHotspots(): boolean {
-    return this.widgetLoading.performanceHotspots || !!this.performanceHotspots?.length;
+  get hasAccountSubscriptionProjectMetrics(): boolean {
+    return this.widgetLoading.accountSubscriptionProjectMetrics ||
+      !!this.accountSubscriptionProjectMetricRows?.length ||
+      this.hasChartData(this.accountSubscriptionProjectInstanceOptions);
   }
 
-  /** Keeps the widget visible after a load attempt so empty / failed responses show a message instead of vanishing. */
-  get showPerformanceHotspots(): boolean {
-    return this.widgetLoading.performanceHotspots || this.performanceHotspotsLoaded;
+  get hasCapacityPerformance(): boolean {
+    return this.widgetLoading.capacityPerformance ||
+      !!this.capacityPerformanceRows?.length ||
+      this.hasChartData(this.capacityFleetStatusOptions);
+  }
+
+  get hasStorageVolumesDisks(): boolean {
+    return this.widgetLoading.storageVolumesDisks ||
+      !!this.storageVolumesRows?.length ||
+      this.hasChartData(this.storageProvisionedByProviderOptions);
+  }
+
+  get hasDatabaseSummary(): boolean {
+    return this.widgetLoading.publicCloudDatabase || this.hasMetricValues(this.databaseSummaryMetrics);
+  }
+
+  get hasPublicCloudDatabase(): boolean {
+    return this.hasDatabaseSummary || !!this.databaseMonitoredCards?.length;
+  }
+
+  get hasDatabasePerformance(): boolean {
+    return this.widgetLoading.databasePerformance ||
+      !!this.databasePerformanceRows?.length ||
+      this.hasChartData(this.dbCacheHitOptions);
+  }
+
+  get hasCostSummary(): boolean {
+    return this.widgetLoading.costOptimization || this.hasMetricValues(this.costSummaryMetrics);
+  }
+
+  get hasCostOptimization(): boolean {
+    return this.widgetLoading.costOptimization ||
+      !!this.costOptimizationRows?.length ||
+      this.hasCostSummary ||
+      this.hasChartData(this.spendVsSavingsOptions);
   }
 
   private hasCoverageValues(cards: PublicCloudCoverageCard[]): boolean {
@@ -1052,114 +1377,60 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return this.widgetLoading.orphanedByCategory || this.orphanedByCategoryHasData;
   }
 
-  get hasIdleDevices(): boolean {
-    return this.widgetLoading.idleDevices || !!this.idleDevices?.length;
-  }
-
-  get hasIdleDuration(): boolean {
-    return this.widgetLoading.idleDuration || this.idleDurationHasData;
-  }
-
   get hasRecentAlerts(): boolean {
-    return this.widgetLoading.recentAlerts || !!this.recentAlerts?.length;
+    return this.widgetLoading.recentAlerts ||
+      !!this.recentAlertsAllRows?.length ||
+      this.hasChartData(this.alertsBySeverityOptions);
   }
 
-  get hasRecentAlertSummary(): boolean {
-    return this.widgetLoading.recentAlerts || this.hasMetricValues(this.recentAlertSummaryMetrics);
+  get hasAutoRemediationSummary(): boolean {
+    return this.widgetLoading.autoRemediationSummary || !!this.autoRemediationSummary?.hasData;
   }
 
-  get hasDatabaseOverviewData(): boolean {
-    return this.widgetLoading.databaseOverview || this.hasMetricEntries(this.databaseOverviewKpis) || !!this.databaseOverviewRows?.length;
+  get hasProvisioningSummary(): boolean {
+    return this.widgetLoading.instanceProvisioning || this.hasMetricValues(this.provisioningSummaryMetrics);
   }
 
-  get hasDatabaseOverviewKpis(): boolean {
-    return this.widgetLoading.databaseOverview || this.hasMetricEntries(this.databaseOverviewKpis);
-  }
-
-  get hasDatabaseTrendData(): boolean {
-    return this.widgetLoading.databasePerformanceTrend || this.databaseTrendHasData;
-  }
-
-  get hasDatabaseWriteTrend(): boolean {
-    return this.widgetLoading.databasePerformanceTrend || this.databaseWriteTrendHasData;
-  }
-
-  get hasDatabaseReadTrend(): boolean {
-    return this.widgetLoading.databasePerformanceTrend || this.databaseReadTrendHasData;
-  }
-
-  get hasDatabaseSpaceData(): boolean {
-    return this.widgetLoading.databaseSpaceConsumption || this.hasMetricValues(this.databaseSpaceKpis);
-  }
-
-  get hasDatabaseCapacityData(): boolean {
-    return this.widgetLoading.databaseCapacityResources || !!this.databaseSpaceRows?.length;
-  }
-
-  get hasDatabaseSpaceSection(): boolean {
-    return this.hasDatabaseSpaceData || this.hasDatabaseCapacityData;
-  }
-
-  get hasCloudDatabasePerformanceSection(): boolean {
-    return this.hasDatabaseOverviewData || this.hasDatabaseTrendData;
-  }
-
-  get hasStoragePerformanceData(): boolean {
-    return this.widgetLoading.storagePerformance || !!this.storagePerformanceCards?.length;
-  }
-
-  get hasStorageResourcesData(): boolean {
-    return this.widgetLoading.storageResources || !!this.storageResources?.length;
-  }
-
-  get hasWritePerformanceTrendData(): boolean {
-    return this.widgetLoading.writePerformanceTrend || !!this.writePerformanceTrend?.rows?.length;
-  }
-
-  get hasLatencyBreakdownData(): boolean {
-    return this.widgetLoading.latencyBreakdown || !!this.latencyBreakdown?.hasData;
-  }
-
-  get hasLatencyMetricSection(): boolean {
-    return this.hasWritePerformanceTrendData || this.hasLatencyBreakdownData;
-  }
-
-  get hasCloudStorageHealthSection(): boolean {
-    return this.hasStoragePerformanceData || this.hasStorageResourcesData;
+  get hasInstanceProvisioning(): boolean {
+    return this.widgetLoading.instanceProvisioning ||
+      !!this.provisioningRows?.length ||
+      this.hasProvisioningSummary ||
+      this.hasChartData(this.provisioningReachabilityOptions);
   }
 
   get hasAnyDashboardWidget(): boolean {
     return this.hasSummaryMetrics ||
+      this.hasMonitoredProviders ||
       this.hasProviderDistribution ||
-      this.hasTags ||
+      this.hasUtilizationByProvider ||
+      this.hasOsType ||
+      this.hasAlertsSeverity ||
       this.hasGeoDistribution ||
       this.hasPublicCloudCoverage ||
-      this.hasPerformanceHotspots ||
-      this.hasCloudDatabasePerformanceSection ||
-      this.hasDatabaseSpaceSection ||
-      this.hasCloudStorageHealthSection ||
-      this.hasLatencyMetricSection ||
+      this.hasAccountSubscriptionProjectMetrics ||
+      this.hasCapacityPerformance ||
+      this.hasStorageVolumesDisks ||
+      this.hasPublicCloudDatabase ||
+      this.hasDatabasePerformance ||
+      this.hasCostOptimization ||
       this.hasOrphanedDevices ||
       this.hasOrphanedByCategory ||
-      this.hasIdleDevices ||
-      this.hasIdleDuration ||
       this.hasRecentAlerts ||
-      this.hasRecentAlertSummary;
+      this.hasAutoRemediationSummary ||
+      this.hasInstanceProvisioning;
   }
 
   get hasInventoryWidgets(): boolean {
-    return this.hasSummaryMetrics || this.hasProviderDistribution || this.hasTags || this.hasGeoDistribution;
+    return this.hasSummaryMetrics ||
+      this.hasMonitoredProviders ||
+      this.hasProviderDistribution ||
+      this.hasUtilizationByProvider ||
+      this.hasOsType ||
+      this.hasAlertsSeverity;
   }
 
   private hasMetricValues(metrics: Array<{ value?: string | number }>): boolean {
     return (metrics || []).some(metric => this.getNumericValue(metric?.value) > 0);
-  }
-
-  // A KPI counts as present once the service produced a value for it. An aggregate of 0.00 is a real
-  // reading from an idle estate, so it must not collapse the strip into the no-data state while the
-  // table below is showing rows.
-  private hasMetricEntries(metrics: Array<{ value?: string | number }>): boolean {
-    return (metrics || []).some(metric => metric?.value !== undefined && metric?.value !== null && String(metric.value).trim() !== '');
   }
 
   private getNumericValue(value: string | number | undefined | null): number {
@@ -1168,31 +1439,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   getStatusClass(tone?: string): string {
     return `tone-${tone || 'muted'}`;
-  }
-
-  getDeltaIconClass(direction: string): string {
-    return direction === 'down' ? 'fas fa-caret-down' : 'fas fa-caret-up';
-  }
-
-  getStorageStatusIconClass(status: string): string {
-    switch ((status || '').toLowerCase()) {
-      case 'healthy':
-      case 'up':
-      case 'ok':
-      case 'success':
-        return 'fas fa-check-circle text-success font-xs-sm';
-      case 'warning':
-      case 'degraded':
-      case 'warn':
-        return 'fas fa-exclamation-circle text-warning font-xs-sm';
-      case 'critical':
-      case 'down':
-      case 'error':
-      case 'failed':
-        return 'fas fa-exclamation-triangle text-danger font-xs-sm';
-      default:
-        return 'fas fa-circle text-muted font-xs-sm';
-    }
   }
 
   getOrphanedStatusIconClass(status: string): string {
@@ -1224,10 +1470,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return index;
   }
 
-  trackByUuid(index: number, row: { uuid?: string }) {
-    return row?.uuid || index;
-  }
-
   goBack() {
     goBackFromDefaultDashboard(this.router, this.route);
   }
@@ -1236,12 +1478,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     const routes: Record<PublicCloudInventorySummaryKey, any[]> = {
       cloud_accounts: this.linkRoutes.publicCloud,
       active_regions: this.linkRoutes.publicCloud,
-      vms: this.linkRoutes.vmAll,
-      services: this.linkRoutes.publicCloud,
-      running_resources: this.linkRoutes.publicCloud,
-      stopped_resources: this.linkRoutes.publicCloud,
-      orphaned_vms: this.linkRoutes.vmAll,
-      idle_vms: this.linkRoutes.vmAll
+      compute_vm: this.linkRoutes.vmAll,
+      platform_services_count: this.linkRoutes.publicCloud,
+      other_services_count: this.linkRoutes.publicCloud,
+      running_compute_instances: this.linkRoutes.vmAll,
+      stopped_compute_instances: this.linkRoutes.vmAll
     };
     this.openRouteInNewTab(routes[metric.key] || this.linkRoutes.publicCloud);
   }
@@ -1256,8 +1497,16 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Section header link: opens the selected Cloud Type's page, or the public cloud listing when none is selected. */
+  openPublicCloudGeoDistribution() {
+    this.openRouteInNewTab(this.getGeoDistributionCloudRoute(this.getSelectedGeoDistributionCloudLabel()));
+  }
+
+  /** Each tile carries its own cloud type, so a tile click opens that provider's page. */
   onGeoDistributionChartInit(chartInstance: any) {
-    this.bindChartClick(chartInstance, () => this.openRouteInNewTab(this.linkRoutes.publicCloud));
+    this.bindChartClick(chartInstance, params => {
+      this.openRouteInNewTab(this.getGeoDistributionCloudRoute(params?.data?.cloudType));
+    });
   }
 
   /** Public Cloud coverage links the provider total and each service count to that provider's public cloud page. */
@@ -1271,22 +1520,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   hasChartData(options?: EChartsOption): boolean {
     return !!options && !!Object.keys(options).length;
-  }
-
-  openHotspotInstance(row: PublicCloudPerformanceHotspotRow) {
-    this.openRouteInNewTab(this.getProviderVmRoute(row?.cloud || ''));
-  }
-
-  openDatabaseInstance(row: PublicCloudDatabaseOverviewRow | PublicCloudDatabaseSpaceRow) {
-    if (row?.instance) {
-      this.openRouteInNewTab(this.linkRoutes.databases);
-    }
-  }
-
-  openStorageResource(row: PublicCloudStorageResourceRow) {
-    if (row?.deviceName) {
-      this.openRouteInNewTab(this.linkRoutes.storage);
-    }
   }
 
   openOrphanedDevices() {
@@ -1303,15 +1536,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  openIdleDevice(device: PublicCloudIdleDeviceRow) {
-    this.openRouteInNewTab(this.getIdleDeviceRoute(device));
-  }
-
   openRecentAlerts() {
     this.openRouteInNewTab(this.linkRoutes.alerts);
   }
 
-  showAlertDetails(alert: PublicCloudRecentAlert) {
+  showAlertDetails(alert: PublicCloudRecentAlertRow) {
     const alertId = alert?.uuid || alert?.id;
     if (alertId) {
       this.alertDetailSvc.showAlertDetails(alertId);
@@ -1338,7 +1567,33 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.openRouteInNewTab(this.getProviderRoute(key));
   }
 
-  private getProviderRoute(value: string): any[] {
+  /**
+   * Maps a Geo Distribution cloud type to its public cloud page. The API can return a combined cloud
+   * type for a region shared by providers (e.g. 'Azure, GCP'), which cannot resolve to a single
+   * provider page - those, and unrecognized types, open the public cloud listing instead.
+   */
+  private getGeoDistributionCloudRoute(cloudType: string | undefined): any[] {
+    const providerRoutes = String(cloudType || '')
+      .split(/[,/&]+/)
+      .map(cloudTypePart => this.getProviderRoute(cloudTypePart, false))
+      .filter((route): route is any[] => !!route);
+    const distinctRoutes = providerRoutes.filter((route, index) =>
+      providerRoutes.findIndex(item => item[0] === route[0]) === index);
+    return distinctRoutes.length === 1 ? distinctRoutes[0] : this.linkRoutes.publicCloud;
+  }
+
+  /** Resolves the applied Cloud Type filter back to its raw API label (empty when Select All is active). */
+  private getSelectedGeoDistributionCloudLabel(): string {
+    if (this.selectedGeoDistributionCloudType === PUBLIC_CLOUD_ALL_SELECTED_VALUE) {
+      return '';
+    }
+    return (this.geoDistributionCloudOptions || [])
+      .find(option => option.value === this.selectedGeoDistributionCloudType)?.label || '';
+  }
+
+  private getProviderRoute(value: string): any[];
+  private getProviderRoute(value: string, withFallback: boolean): any[] | null;
+  private getProviderRoute(value: string, withFallback = true): any[] | null {
     switch (this.getProviderKey(value)) {
       case 'aws':
         return this.linkRoutes.provider.aws;
@@ -1350,23 +1605,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       case 'oracle':
         return this.linkRoutes.provider.oracle;
       default:
-        return this.linkRoutes.publicCloud;
-    }
-  }
-
-  private getProviderVmRoute(value: string): any[] {
-    switch (this.getProviderKey(value)) {
-      case 'aws':
-        return this.linkRoutes.providerVm.aws;
-      case 'azure':
-        return this.linkRoutes.providerVm.azure;
-      case 'gcp':
-        return this.linkRoutes.providerVm.gcp;
-      case 'oci':
-      case 'oracle':
-        return this.linkRoutes.providerVm.oracle;
-      default:
-        return this.linkRoutes.vmAll;
+        return withFallback ? this.linkRoutes.publicCloud : null;
     }
   }
 
@@ -1410,74 +1649,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       return this.linkRoutes.storage;
     }
     return this.linkRoutes.devices;
-  }
-
-  private getIdleDeviceRoute(device: PublicCloudIdleDeviceRow): any[] {
-    const resourceType = this.normalizeLinkText(device?.resourceType);
-    if (this.isStorageResource(resourceType)) {
-      return this.getStorageDetailRoute(device) || this.linkRoutes.storage;
-    }
-    if (this.isGpuResource(resourceType)) {
-      return this.linkRoutes.gpu;
-    }
-    if (this.isVmResource(resourceType)) {
-      return this.getVmDetailRoute(device) || this.getProviderVmRoute(this.getIdleDeviceProvider(device));
-    }
-    return this.linkRoutes.devices;
-  }
-
-  private getStorageDetailRoute(device: PublicCloudIdleDeviceRow): any[] | null {
-    const deviceId = this.getIdleDeviceId(device);
-    const monitoringRoute = this.getMonitoringRouteSegment(device);
-    if (!deviceId || !monitoringRoute) {
-      return null;
-    }
-    return monitoringRoute === 'zbx' ?
-      ['/unitycloud/devices/storagedevices', deviceId, 'zbx', 'details'] :
-      ['/unitycloud/devices/storagedevices', deviceId, 'obs', 'overview'];
-  }
-
-  private getVmDetailRoute(device: PublicCloudIdleDeviceRow): any[] | null {
-    const provider = this.getIdleDeviceProvider(device);
-    const deviceId = this.getIdleDeviceId(device);
-    const monitoringRoute = this.getMonitoringRouteSegment(device);
-    if (!deviceId || !monitoringRoute || provider !== 'custom') {
-      return null;
-    }
-    return monitoringRoute === 'zbx' ?
-      ['/unitycloud/devices/vms/custom', deviceId, 'zbx', 'details'] :
-      ['/unitycloud/devices/vms/custom', deviceId, 'obs', 'overview'];
-  }
-
-  private getIdleDeviceId(device: PublicCloudIdleDeviceRow): string {
-    return device?.deviceId || device?.resourceId || device?.uuid || device?.id || '';
-  }
-
-  private getIdleDeviceProvider(device: PublicCloudIdleDeviceRow): string {
-    return this.getProviderKey([device?.provider, device?.cloudType, device?.resourceType].filter(value => !!value).join(' '));
-  }
-
-  private getMonitoringRouteSegment(device: PublicCloudIdleDeviceRow): 'obs' | 'zbx' | null {
-    const monitoringType = this.normalizeLinkText(device?.monitoringType);
-    if (device?.monitoring?.zabbix || monitoringType.includes('zabbix') || monitoringType.includes('zbx')) {
-      return 'zbx';
-    }
-    if (device?.monitoring?.observium || monitoringType.includes('observium') || monitoringType.includes('obs')) {
-      return 'obs';
-    }
-    return null;
-  }
-
-  private isVmResource(value: string): boolean {
-    return value.includes('vm') || value.includes('virtual_machine') || value.includes('instance');
-  }
-
-  private isStorageResource(value: string): boolean {
-    return value.includes('storage') || value.includes('volume') || value.includes('disk');
-  }
-
-  private isGpuResource(value: string): boolean {
-    return value.includes('gpu');
   }
 
   private normalizeLinkText(value: string): string {

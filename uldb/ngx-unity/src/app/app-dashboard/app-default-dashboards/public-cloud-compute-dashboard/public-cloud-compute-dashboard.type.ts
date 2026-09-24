@@ -52,24 +52,51 @@ export interface PublicCloudSummaryMetric {
   tone?: PublicCloudStatusTone;
 }
 
-export type PublicCloudInventorySummaryKey = 'cloud_accounts' | 'active_regions' | 'vms' | 'services' | 'running_resources' | 'stopped_resources' | 'orphaned_vms' | 'idle_vms';
+export type PublicCloudInventorySummaryKey = 'cloud_accounts' | 'active_regions' | 'compute_vm' | 'platform_services_count' | 'other_services_count' | 'running_compute_instances' | 'stopped_compute_instances';
 export type PublicCloudProviderDistributionKey = 'aws' | 'azure' | 'gcp' | 'oci';
 
-export interface PublicCloudInventorySummaryResponse {
-  summary: Record<PublicCloudInventorySummaryKey, number>;
-  distribution: Record<PublicCloudProviderDistributionKey, number>;
-  distribution_percentages?: Record<PublicCloudProviderDistributionKey, string>;
-  tags: PublicCloudInventoryTags;
+// inventory_summary response is a flat map of KPI key -> value.
+export type PublicCloudInventorySummaryResponse = Partial<Record<PublicCloudInventorySummaryKey, number>>;
+
+// compute_monitored response: one row per provider that has data.
+export interface PublicCloudComputeMonitoredResponseItem {
+  provider?: string;
+  monitored?: number;
+  total_compute?: number;
+  unknown?: number;
+  monitored_percentage?: number;
+  running?: number;
+  stopped?: number;
 }
 
-export interface PublicCloudInventoryTagResponse {
-  label: string;
-  count: number;
+export type PublicCloudComputeMonitoredResponse = PublicCloudComputeMonitoredResponseItem[];
+
+export interface PublicCloudComputeMonitoredCard {
+  key: PublicCloudProviderDistributionKey | string;
+  provider: string;
+  iconClass: string;
+  color: string;
+  totalCompute: number;
+  monitored: number;
+  running: number;
+  stopped: number;
+  unknown: number;
+  runningPercent: number;
+  stoppedPercent: number;
+  unknownPercent: number;
 }
 
-// Inventory tags arrive as a keyed map ({ tagName: count }) from the current inventory_summary
-// response, or as an array ([{ label, count }]) from older responses.
-export type PublicCloudInventoryTags = PublicCloudInventoryTagResponse[] | Record<string, number>;
+// cloud_provider_distribution response (drives the provider donut).
+export interface PublicCloudProviderDistributionResponseItem {
+  provider?: string;
+  count?: number;
+  percentage?: number;
+}
+
+export interface PublicCloudProviderDistributionResponse {
+  distribution?: PublicCloudProviderDistributionResponseItem[];
+  total_compute_instances?: number;
+}
 
 export interface PublicCloudProviderDistributionItem {
   key: PublicCloudProviderDistributionKey;
@@ -79,15 +106,416 @@ export interface PublicCloudProviderDistributionItem {
   color: string;
 }
 
-export interface PublicCloudTagItem {
+// utilization_by_provider response: { <provider>: { storage, compute, database } }.
+export interface PublicCloudUtilizationProviderValue {
+  storage?: number;
+  compute?: number;
+  database?: number;
+}
+
+export type PublicCloudUtilizationByProviderResponse = Record<string, PublicCloudUtilizationProviderValue>;
+
+// compute_instance_by_os_type response (drives the OS type donut).
+export interface PublicCloudOsTypeResponse {
+  linux?: number;
+  windows?: number;
+  other?: number;
+  total?: number;
+}
+
+export interface PublicCloudOsTypeItem {
+  key: string;
+  label: string;
+  value: number;
+  percent: number;
+  color: string;
+}
+
+// alerts_severity_details response (drives the severity pills).
+export interface PublicCloudAlertsSeverityResponse {
+  critical?: number;
+  warning?: number;
+  info?: number;
+}
+
+export interface PublicCloudAlertsSeverityItem {
+  key: string;
+  label: string;
+  value: number;
+  toneClass: string;
+}
+
+// ----- Capacity and Performance widget -----
+export interface PublicCloudCapacityPerformanceRowResponse {
+  id?: string;
+  name?: string;
+  provider?: string;
+  region?: string;
+  account?: string;
+  type?: string;
+  os?: string;
+  state?: string;
+  status?: string;
+  cpuPct?: number;
+  cpuStatus?: string;
+  memPct?: number;
+  memStatus?: string;
+  availableMemory?: string;
+  availableMemoryBytes?: number;
+  storPct?: number;
+  storStatus?: string;
+  diskIOPS?: number;
+  diskThroughputMBs?: number;
+  netThroughputMbps?: number;
+  netStatus?: string;
+  cpuTrend?: number[];
+  cpuForecast90d?: number;
+  forecastStatus?: string;
+  monitored?: boolean;
+}
+
+export interface PublicCloudCapacityPerformanceTableResponse {
+  count?: string | number;
+  next?: string | null;
+  previous?: string | null;
+  results?: PublicCloudCapacityPerformanceRowResponse[];
+  data?: PublicCloudCapacityPerformanceRowResponse[];
+  items?: PublicCloudCapacityPerformanceRowResponse[];
+}
+
+export interface PublicCloudCapacityPerformanceRow {
+  id: string;
   name: string;
-  count: string;
-  textColor: string;
-  backgroundColor: string;
+  providerKey: string;
+  provider: string;
+  region: string;
+  type: string;
+  os: string;
+  statusLabel: string;
+  statusIconClass: string;
+  cpuPct: number;
+  cpuLabel: string;
+  cpuTone: PublicCloudStatusTone;
+  memoryPct: number;
+  memoryLabel: string;
+  memoryTone: PublicCloudStatusTone;
+  availableMemory: string;
+  diskIops: string;
+  diskThroughput: string;
+  networkThroughput: string;
+  networkColor: string;
+  cpuTrendPoints: string;
+  cpuTrendColor: string;
+  hasCpuTrend: boolean;
+  forecastLabel: string;
+  forecastDirection: 'up' | 'down' | '';
+  forecastColor: string;
+}
+
+export interface PublicCloudCapacityChartSeries {
+  label?: string;
+  status?: string;
+  data?: number[];
+}
+
+export interface PublicCloudCapacityFleetStatus {
+  labels?: string[];
+  series?: PublicCloudCapacityChartSeries[];
+}
+
+export interface PublicCloudCapacityCpuBand {
+  label?: string;
+  min?: number;
+  max?: number;
+  status?: string;
+  count?: number;
+}
+
+export interface PublicCloudCapacityCpuDistribution {
+  labels?: string[];
+  statuses?: string[];
+  counts?: number[];
+  bands?: PublicCloudCapacityCpuBand[];
+}
+
+export interface PublicCloudCapacityTopItem {
+  name?: string;
+  provider?: string;
+  status?: string;
+  value?: number;
+}
+
+export interface PublicCloudCapacityGrowthInsights {
+  months?: string[];
+  forecastMonths?: string[];
+  cpuHistory?: number[];
+  memHistory?: number[];
+  cpuForecast?: number[];
+  memForecast?: number[];
+}
+
+export interface PublicCloudCapacityPerformanceChartsResponse {
+  fleetStatusByProvider?: PublicCloudCapacityFleetStatus;
+  cpuDistribution?: PublicCloudCapacityCpuDistribution;
+  top10Cpu?: PublicCloudCapacityTopItem[];
+  top10DiskIops?: PublicCloudCapacityTopItem[];
+  top10NetworkThroughput?: PublicCloudCapacityTopItem[];
+  capacityAndGrowthInsights?: PublicCloudCapacityGrowthInsights;
+}
+
+// ----- Storage - Volumes / Disks widget -----
+export interface PublicCloudStorageVolumeRowResponse {
+  volume_name?: string;
+  attached_instance?: string;
+  provider?: string;
+  volume_type?: string;
+  size_gb?: number | null;
+  disk_iops_throughput?: string;
+  iops_tier?: string;
+}
+
+export interface PublicCloudStorageVolumesTableResponse {
+  count?: string | number;
+  next?: string | null;
+  previous?: string | null;
+  results?: PublicCloudStorageVolumeRowResponse[];
+  data?: PublicCloudStorageVolumeRowResponse[];
+  items?: PublicCloudStorageVolumeRowResponse[];
+}
+
+export interface PublicCloudStorageVolumeRow {
+  volumeName: string;
+  attachedInstance: string;
+  providerKey: string;
+  provider: string;
+  volumeType: string;
+  sizeLabel: string;
+  diskIops: string;
+  diskThroughput: string;
+  iopsTier: string;
+}
+
+export interface PublicCloudStorageProvisionedByProvider {
+  provider?: string;
+  total_provisioned_storage_gb?: number;
+  volume_count?: number;
+  volumes_with_size?: number;
+}
+
+export interface PublicCloudStorageTopVolumeResponse {
+  volume_name?: string;
+  attached_instance?: string;
+  provider?: string;
+  volume_type?: string;
+  size_gb?: number | null;
+  disk_iops?: number;
+  throughput_mbps?: number;
+  disk_iops_throughput?: string;
+  iops_tier?: string;
+}
+
+export interface PublicCloudStorageIopsTier {
+  performance_tier?: string;
+  volume_count?: number;
+  total_disk_iops?: number;
+}
+
+export interface PublicCloudStorageTierLegendItem {
+  label: string;
+  count: number;
+  color: string;
+}
+
+// ----- Instance Provisioning Summary widget -----
+export interface PublicCloudProvisioningRowResponse {
+  instance_name?: string;
+  provider?: string;
+  region?: string;
+  account?: string;
+  type?: string;
+  environment?: string;
+  status?: string;
+  provisioned_date?: string;
+  days_since_provisioned?: number;
+}
+
+export interface PublicCloudProvisioningTableResponse {
+  count?: string | number;
+  next?: string | null;
+  previous?: string | null;
+  results?: PublicCloudProvisioningRowResponse[];
+  data?: PublicCloudProvisioningRowResponse[];
+  items?: PublicCloudProvisioningRowResponse[];
+}
+
+export interface PublicCloudProvisioningRow {
+  instanceName: string;
+  providerKey: string;
+  provider: string;
+  region: string;
+  account: string;
+  type: string;
+  environment: string;
+  environmentClass: string;
+  statusLabel: string;
+  statusIconClass: string;
+  provisionedDate: string;
+  daysSinceProvisioned: number;
+}
+
+export interface PublicCloudProvisioningReachability {
+  reachable?: number;
+  unreachable?: number;
+  reachable_percentage?: number;
+}
+
+export interface PublicCloudProvisionedByProvider {
+  provider?: string;
+  count?: number;
+}
+
+export interface PublicCloudRecentlyProvisioned {
+  instance_name?: string;
+  provider?: string;
+  provisioned_date?: string;
+}
+
+export interface PublicCloudProvisioningSummaryMetricsResponse {
+  reachable_rate?: number;
+  unreachable?: number;
+  average_provisioning_time_minutes?: number;
+  instances_provisioned?: number;
+}
+
+export interface PublicCloudProvisioningSummaryMetric {
+  label: string;
+  value: string;
+  tone: PublicCloudStatusTone;
+}
+
+export interface PublicCloudProvisioningReachabilityLegendItem {
+  label: string;
+  percent: string;
+  color: string;
+}
+
+// ----- Public Cloud Database widget -----
+export interface PublicCloudDatabaseSummaryResponse {
+  databasesMonitored?: number;
+  queriesPerSec?: number;
+  avgLatencyMs?: number;
+  availabilityPct?: number;
+  activeConnections?: number;
+}
+
+export interface PublicCloudDatabaseDiscoveryItem {
+  discovered?: number;
+  monitored?: number;
+  healthy?: number;
+  degraded?: number;
+  unknown?: number;
+}
+
+export interface PublicCloudDatabaseInventoryResponse {
+  summary?: PublicCloudDatabaseSummaryResponse;
+  discovery?: Record<string, PublicCloudDatabaseDiscoveryItem>;
+}
+
+export interface PublicCloudDatabaseSummaryMetric {
+  label: string;
+  value: string;
+  tone?: PublicCloudStatusTone;
+  info: string;
+}
+
+export interface PublicCloudDatabaseMonitoredCard {
+  key: PublicCloudProviderDistributionKey | string;
+  provider: string;
+  iconClass: string;
+  color: string;
+  discovered: number;
+  monitored: number;
+  healthy: number;
+  degraded: number;
+  unknown: number;
+  healthyPercent: number;
+  degradedPercent: number;
+  unknownPercent: number;
+}
+
+// ----- Database - Performance and Utilization widget -----
+export interface PublicCloudDbWorkloadRowResponse {
+  name?: string;
+  db_uuid?: string;
+  host_uuid?: string;
+  host_id?: number;
+  cpu_usage_system_percent?: number;
+  memory_used_percent?: number;
+  disk_used_gb?: number;
+  disk_capacity_gb?: number;
+  disk_utilization_percent?: number;
+  disk_iops?: number;
+  disk_iops_max?: number;
+  disk_read_ops_per_sec?: number;
+  disk_write_ops_per_sec?: number;
+  system_uptime_seconds?: number;
+}
+
+export type PublicCloudDbWorkloadResponse = PublicCloudDbWorkloadRowResponse[];
+
+export interface PublicCloudDbWorkloadRow {
+  name: string;
+  engine: string;
+  cpuPct: number;
+  cpuLabel: string;
+  cpuTone: PublicCloudStatusTone;
+  memoryPct: number;
+  memoryLabel: string;
+  memoryTone: PublicCloudStatusTone;
+  storagePct: number;
+  storageTone: PublicCloudStatusTone;
+  storageTotalLabel: string;
+  storageUsedLabel: string;
+  diskUtilizationPct: number;
+  diskUtilizationLabel: string;
+  diskUtilizationTone: PublicCloudStatusTone;
+  diskIops: string;
+  uptimeLabel: string;
+}
+
+export interface PublicCloudDbTrendPoint {
+  date?: string;
+  transactions_per_sec?: number;
+}
+
+export interface PublicCloudDbQueryItem {
+  status?: string;
+  name?: string;
+  db_type?: string;
+  host_id?: number;
+  db_uuid?: string;
+  host_uuid?: string;
+  hit_ratio_pct?: number;
+  response_time_ms?: number;
+  deadlock_count?: number;
+  active_connections?: number;
+  transactions_per_sec?: number;
+  trend?: PublicCloudDbTrendPoint[];
+}
+
+export interface PublicCloudDbQueryPerformanceResponse {
+  top_cache_hit_ratio?: PublicCloudDbQueryItem[];
+  top_latency?: PublicCloudDbQueryItem[];
+  top_errors_deadlocks?: PublicCloudDbQueryItem[];
+  top_throughput?: PublicCloudDbQueryItem[];
+  top_response_time?: PublicCloudDbQueryItem[];
+  top_connections?: PublicCloudDbQueryItem[];
+  duration?: string;
 }
 
 export interface PublicCloudGeoCell {
   name: string;
+  cloudType: string;
   color: string;
   value: number[];
   totalResources: number;
@@ -98,6 +526,19 @@ export interface PublicCloudGeoCell {
   computeCount: number;
   platformServices: number;
   otherServices: number;
+}
+
+export interface PublicCloudGeoDistributionSummary {
+  totalLocations: number;
+  totalResources: number;
+  totalAlerts: number;
+}
+
+export interface PublicCloudGeoDistributionLegendItem {
+  key: string;
+  label: string;
+  count: number;
+  color: string;
 }
 
 export interface PublicCloudCoverageRow {
@@ -120,71 +561,6 @@ export interface PublicCloudCoverageGroup {
   totalLabel: string;
   cards: PublicCloudCoverageCard[];
   showChart: boolean;
-}
-
-export interface PublicCloudPerformanceHotspotReadWrite {
-  readLabel: string;
-  writeLabel: string;
-}
-
-export interface PublicCloudPerformanceHotspotDisk {
-  capacityLabel: string;
-  usedLabel: string;
-  freeLabel: string;
-  usedPercent: number;
-  tone: PublicCloudStatusTone;
-}
-
-export interface PublicCloudPerformanceHotspotRow {
-  instanceName: string;
-  cloud: string;
-  cloudLogo: string;
-  cpuLabel: string;
-  memoryLabel: string;
-  disk: PublicCloudPerformanceHotspotDisk | null;
-  dataDiskBytes: PublicCloudPerformanceHotspotReadWrite | null;
-  dataDiskRates: PublicCloudPerformanceHotspotReadWrite | null;
-  networkTraffic: string;
-}
-
-export interface PublicCloudPerformanceHotspotDiskResponse {
-  capacity?: string | number;
-  used?: string | number;
-  free?: string | number;
-}
-
-export interface PublicCloudPerformanceHotspotResponseItem {
-  name?: string;
-  instance_name?: string;
-  instanceName?: string;
-  cloud?: string;
-  cloud_key?: string;
-  provider?: string;
-  cloud_type?: string;
-  cpu_utilization_percent?: string | number;
-  cpu_utilization?: string | number;
-  cpu_vcpus?: string | number;
-  available_memory?: string | number;
-  available_memory_gb?: string | number;
-  disk_utilization?: PublicCloudPerformanceHotspotDiskResponse;
-  disk_size?: PublicCloudPerformanceHotspotDiskResponse;
-  data_disk_read_write_bytes?: { read?: string | number; write?: string | number };
-  data_disk_read_write_rates?: { read_ops?: string | number; write_ops?: string | number };
-  // Current response carries the read/write metrics as flat per-second fields; the nested
-  // data_disk_read_write_* objects above come from the older response shape.
-  disk_read_bytes_per_second?: string | number;
-  disk_write_bytes_per_second?: string | number;
-  disk_read_operations_per_second?: string | number;
-  disk_write_operations_per_second?: string | number;
-  avg_network_traffic?: string | number;
-  network_traffic?: string | number;
-}
-
-export interface PublicCloudPerformanceHotspotsResponse {
-  data?: PublicCloudPerformanceHotspotResponseItem[];
-  results?: PublicCloudPerformanceHotspotResponseItem[];
-  items?: PublicCloudPerformanceHotspotResponseItem[];
-  selected_metric?: string;
 }
 
 export interface PublicCloudDatabaseMetricItem {
@@ -361,120 +737,6 @@ export interface PublicCloudDatabaseConsumerRow {
   color: string;
 }
 
-export interface PublicCloudStorageHealthResponseItem {
-  metric?: string;
-  label?: string;
-  name?: string;
-  value?: string | number;
-  unit?: string;
-}
-
-export interface PublicCloudStorageHealthResponse {
-  data?: PublicCloudStorageHealthResponseItem[];
-  results?: PublicCloudStorageHealthResponseItem[];
-  items?: PublicCloudStorageHealthResponseItem[];
-}
-
-export interface PublicCloudStorageKpi {
-  label: string;
-  value: string;
-  tone?: PublicCloudStatusTone;
-}
-
-export interface PublicCloudStorageKeyedNumberResponse {
-  data?: PublicCloudDatabaseKeyedNumberRecord[];
-  results?: PublicCloudDatabaseKeyedNumberRecord[];
-  items?: PublicCloudDatabaseKeyedNumberRecord[];
-}
-
-export interface PublicCloudStorageBarItem {
-  label: string;
-  value: number;
-  color: string;
-}
-
-export interface PublicCloudStorageSeriesPoint {
-  time?: string;
-  value?: string | number;
-}
-
-export interface PublicCloudStorageTrafficResponse {
-  read_ingress?: PublicCloudStorageSeriesPoint[];
-  readIngress?: PublicCloudStorageSeriesPoint[];
-  write_egress?: PublicCloudStorageSeriesPoint[];
-  writeEgress?: PublicCloudStorageSeriesPoint[];
-}
-
-export interface PublicCloudStorageTrendResponse {
-  [key: string]: PublicCloudStorageSeriesPoint[] | undefined;
-}
-
-export interface PublicCloudStorageTrendSeries {
-  name: string;
-  color: string;
-  values: number[];
-}
-
-export interface PublicCloudStorageTrendViewData {
-  labels: string[];
-  series: PublicCloudStorageTrendSeries[];
-}
-
-export interface PublicCloudStorageConsumerRow {
-  account: string;
-  cloud: string;
-  cloudClass: string;
-  used: string;
-  tps: string;
-  latency: string;
-  growth: string;
-  growthClass: string;
-}
-
-export interface PublicCloudStorageServicesVisibilityResponse {
-  active_accounts?: string | number;
-  activeAccounts?: string | number;
-  highest_latency_cloud?: {
-    cloud_name?: string;
-    cloudName?: string;
-    value?: string | number;
-    unit?: string;
-  };
-  highestLatencyCloud?: {
-    cloud_name?: string;
-    cloudName?: string;
-    value?: string | number;
-    unit?: string;
-  };
-  most_utilized?: {
-    cloud_name?: string;
-    cloudName?: string;
-    value?: string | number;
-    unit?: string;
-  };
-  mostUtilized?: {
-    cloud_name?: string;
-    cloudName?: string;
-    value?: string | number;
-    unit?: string;
-  };
-  total_capacity_tracked?: {
-    value?: string | number;
-    unit?: string;
-  };
-  totalCapacityTracked?: {
-    value?: string | number;
-    unit?: string;
-  };
-}
-
-export interface PublicCloudStorageDistributionItem {
-  label: string;
-  value: number;
-  percent: number;
-  color: string;
-}
-
 export interface PublicCloudOrphanedDeviceResponseItem {
   name?: string;
   device_name?: string;
@@ -546,144 +808,6 @@ export interface PublicCloudOrphanedCategoryItem {
   totalCount?: number;
 }
 
-export interface PublicCloudIdleMetricResponse {
-  used?: string | number;
-  free?: string | number;
-  percent?: string | number;
-  percentage?: string | number;
-  value?: string | number;
-}
-
-export interface PublicCloudIdleDeviceResponseItem {
-  id?: string | number;
-  uuid?: string;
-  device_id?: string | number;
-  deviceId?: string | number;
-  device_uuid?: string;
-  deviceUuid?: string;
-  resource_id?: string | number;
-  resourceId?: string | number;
-  device_name?: string;
-  deviceName?: string;
-  name?: string;
-  resource_type?: string;
-  resourceType?: string;
-  type?: string;
-  provider?: string;
-  platform?: string;
-  cloud?: string;
-  cloud_provider?: string;
-  cloudProvider?: string;
-  cloud_type?: string;
-  cloudType?: string;
-  monitoring_type?: string;
-  monitoringType?: string;
-  monitoring?: {
-    configured?: boolean;
-    enabled?: boolean;
-    observium?: boolean;
-    zabbix?: boolean;
-  };
-  avg_cpu?: PublicCloudIdleMetricResponse;
-  avgCpu?: PublicCloudIdleMetricResponse;
-  avgCPU?: PublicCloudIdleMetricResponse;
-  cpu?: PublicCloudIdleMetricResponse;
-  cpu_usage?: PublicCloudIdleMetricResponse;
-  avg_cpu_percent?: string | number;
-  avgCpuPercent?: string | number;
-  avg_cpu_percentage?: string | number;
-  cpu_percent?: string | number;
-  avg_mem?: PublicCloudIdleMetricResponse;
-  avgMem?: PublicCloudIdleMetricResponse;
-  avg_memory?: PublicCloudIdleMetricResponse;
-  memory?: PublicCloudIdleMetricResponse;
-  memory_usage?: PublicCloudIdleMetricResponse;
-  avg_mem_percent?: string | number;
-  avgMemPercent?: string | number;
-  avg_mem_percentage?: string | number;
-  memory_percent?: string | number;
-  network_io?: string | number;
-  networkIO?: string | number;
-  network?: string | number;
-  idle_duration?: string | number;
-  idleDuration?: string | number;
-  status?: string;
-}
-
-export interface PublicCloudIdleDevicesResponse {
-  count: string | number;
-  results: PublicCloudIdleDeviceResponseItem[];
-}
-
-export interface PublicCloudIdleMetric {
-  used: string;
-  free: string;
-  percent: number;
-  tone: PublicCloudStatusTone;
-}
-
-export interface PublicCloudIdleDeviceRow {
-  id: string;
-  uuid: string;
-  deviceId: string;
-  resourceId: string;
-  deviceName: string;
-  resourceType: string;
-  provider: string;
-  cloudType: string;
-  monitoringType: string;
-  monitoring?: {
-    configured?: boolean;
-    enabled?: boolean;
-    observium?: boolean;
-    zabbix?: boolean;
-  };
-  avgCpu: PublicCloudIdleMetric;
-  avgMem: PublicCloudIdleMetric;
-  networkIO: string;
-  idleDuration: string;
-  status: string;
-}
-
-export interface PublicCloudIdleDurationResponseItem {
-  duration?: string;
-  idle_duration?: string;
-  idleDuration?: string;
-  range?: string;
-  name?: string;
-  label?: string;
-  count?: string | number;
-  value?: string | number;
-  total?: string | number;
-  total_count?: string | number;
-  totalCount?: string | number;
-  devices?: string | number;
-  percent?: string | number;
-  percentage?: string | number;
-}
-
-export interface PublicCloudIdleDurationResponse {
-  results?: PublicCloudIdleDurationResponseItem[];
-  data?: PublicCloudIdleDurationResponseItem[] | PublicCloudIdleDurationResponse;
-  summary?: PublicCloudIdleDurationResponseItem[] | Record<string, string | number | PublicCloudIdleDurationResponseItem>;
-  distribution?: PublicCloudIdleDurationResponseItem[];
-  duration_distribution?: PublicCloudIdleDurationResponseItem[];
-  durationDistribution?: PublicCloudIdleDurationResponseItem[];
-  idleDurationDistribution?: PublicCloudIdleDurationResponseItem[];
-  idle_duration_distribution?: PublicCloudIdleDurationResponseItem[];
-  idle_devices_by_duration?: PublicCloudIdleDurationResponseItem[];
-  breakdown?: PublicCloudIdleDurationResponseItem[] | Record<string, string | number | PublicCloudIdleDurationResponseItem>;
-}
-
-export type PublicCloudIdleDurationApiResponse = PublicCloudIdleDurationResponse | PublicCloudIdleDurationResponseItem[];
-
-export interface PublicCloudIdleDurationItem {
-  duration: string;
-  count: number;
-  percent: number;
-  color: string;
-}
-
 export interface PublicCloudAlertSummaryMetric {
   label: string;
   value: string;
@@ -714,6 +838,7 @@ export interface PublicCloudRecentAlertResponseItem {
   device_name?: string;
   deviceName?: string;
   name?: string;
+  provider?: string;
   severity?: string;
   status?: string;
   description?: string;
@@ -754,37 +879,251 @@ export interface PublicCloudRecentAlert {
   duration: string;
 }
 
-export type PublicCloudLatencyHeatmapResponse = Record<string, Array<{ time?: string; value?: number | string }>>;
+export interface PublicCloudRecentAlertRow {
+  id: string;
+  uuid: string;
+  instanceName: string;
+  severity: PublicCloudRecentAlertSeverity;
+  severityLabel: string;
+  severityClass: string;
+  providerKey: string;
+  provider: string;
+  alert: string;
+  raised: string;
+  raisedHours: number;
+}
 
-export interface PublicCloudLatencyHeatmapCell {
-  value: number;
+export interface PublicCloudAlertsBySeverity {
+  total?: number;
+  critical?: number;
+  warning?: number;
+  info?: number;
+}
+
+export interface PublicCloudAlertsByProvider {
+  provider?: string;
+  alert_count?: number;
+}
+
+export interface PublicCloudAlertsByAge {
+  '<24h'?: number;
+  '1-7d'?: number;
+  '7-30d'?: number;
+  '30d+'?: number;
+}
+
+export interface PublicCloudAlertSeverityLegendItem {
+  label: string;
+  count: number;
   color: string;
-  tone: string;
 }
 
-export interface PublicCloudLatencyHeatmapRow {
-  account: string;
-  cells: PublicCloudLatencyHeatmapCell[];
+// ----- Cost & Optimization Opportunities widget -----
+export interface PublicCloudCostRowResponse {
+  instance?: string;
+  provider?: string;
+  region?: string;
+  type?: string;
+  cpu?: number;
+  utilization?: number | null;
+  recommended_action?: string;
+  estimated_monthly_savings?: number;
 }
 
-export type PublicCloudQueueBacklogResponse = Record<string, { messages?: number | string; percentage?: number | string }>;
+export interface PublicCloudCostOptimizationTableResponse {
+  count?: string | number;
+  next?: string | null;
+  previous?: string | null;
+  results?: PublicCloudCostRowResponse[];
+  data?: PublicCloudCostRowResponse[];
+  items?: PublicCloudCostRowResponse[];
+}
 
-export interface PublicCloudQueueBacklogRow {
-  name: string;
-  messages: string;
-  percentage: number;
+export interface PublicCloudCostRow {
+  instance: string;
+  providerKey: string;
+  provider: string;
+  region: string;
+  type: string;
+  cpuPct: number;
+  cpuLabel: string;
+  cpuTone: PublicCloudStatusTone;
+  action: string;
+  actionClass: string;
+  savings: number;
+  savingsLabel: string;
+}
+
+export interface PublicCloudSpendVsSavings {
+  current_monthly_spend?: number;
+  identified_savings?: number;
+}
+
+export interface PublicCloudRecommendedAction {
+  recommended_action?: string;
+  count?: number;
+}
+
+export interface PublicCloudPotentialSavingsByProvider {
+  provider?: string;
+  estimated_monthly_savings?: number;
+}
+
+export interface PublicCloudSpendSavingsLegendItem {
+  text: string;
   color: string;
-  tone: string;
 }
 
-/*
- * ------ Cloud Database Performance (redesigned) ------
- */
-export interface PublicCloudDatabaseKpi {
+export interface PublicCloudCostSummaryMetric {
   label: string;
   value: string;
-  unit: string;
+  tone: PublicCloudStatusTone;
+}
+
+export interface PublicCloudAutoRemediationOutcomeResponse {
+  label?: string;
+  name?: string;
+  key?: string;
+  count?: string | number;
+  value?: string | number;
+  percentage?: string | number;
+  percent?: string | number;
+}
+
+export interface PublicCloudAutoRemediationActionResponse {
+  label?: string;
+  name?: string;
+  action?: string;
+  count?: string | number;
+  value?: string | number;
+  percentage?: string | number;
+  percent?: string | number;
+}
+
+export interface PublicCloudAutoRemediationKpiResponse {
+  label?: string;
+  name?: string;
+  key?: string;
+  value?: string | number;
   tone?: PublicCloudStatusTone;
+}
+
+export interface PublicCloudAutoRemediationSummaryResponse {
+  autoRemediations?: string | number;
+  total_runs?: string | number;
+  totalRuns?: string | number;
+  total?: string | number;
+  successfulRuns?: string | number;
+  failedRuns?: string | number;
+  runningRuns?: string | number;
+  runbookSuccessPct?: string | number;
+  runbookFailurePct?: string | number;
+  avgDurationMinutes?: string | number;
+  avgMttr?: string;
+  configuredCount?: string | number;
+  avg_duration?: string | number;
+  avgDuration?: string | number;
+  average_duration?: string | number;
+  averageDuration?: string | number;
+  duration_unit?: string;
+  durationUnit?: string;
+  outcomes?: PublicCloudAutoRemediationOutcomeResponse[] | Record<string, string | number | PublicCloudAutoRemediationOutcomeResponse>;
+  run_outcomes?: PublicCloudAutoRemediationOutcomeResponse[] | Record<string, string | number | PublicCloudAutoRemediationOutcomeResponse>;
+  runOutcomes?: PublicCloudAutoRemediationOutcomeResponse[] | Record<string, string | number | PublicCloudAutoRemediationOutcomeResponse>;
+  actions?: PublicCloudAutoRemediationActionResponse[];
+  frequent_actions?: PublicCloudAutoRemediationActionResponse[];
+  frequentActions?: PublicCloudAutoRemediationActionResponse[];
+  most_frequent_actions?: PublicCloudAutoRemediationActionResponse[];
+  mostFrequentActions?: PublicCloudAutoRemediationActionResponse[];
+  topAutoRemediationActions?: PublicCloudAutoRemediationActionResponse[];
+  kpis?: PublicCloudAutoRemediationKpiResponse[];
+  metrics?: PublicCloudAutoRemediationKpiResponse[];
+  data?: PublicCloudAutoRemediationSummaryResponse;
+}
+
+export interface PublicCloudAutoRemediationOutcome {
+  label: string;
+  count: number;
+  percent: number;
+  color: string;
+}
+
+export interface PublicCloudAutoRemediationAction {
+  label: string;
+  count: number;
+  percent: number;
+  color: string;
+}
+
+export interface PublicCloudAutoRemediationKpi {
+  label: string;
+  value: string;
+  tone: PublicCloudStatusTone;
+}
+
+export interface PublicCloudAutoRemediationSummaryViewData {
+  outcomes: PublicCloudAutoRemediationOutcome[];
+  actions: PublicCloudAutoRemediationAction[];
+  kpis: PublicCloudAutoRemediationKpi[];
+  totalRunsLabel: string;
+  avgDurationLabel: string;
+  donutGradient: string;
+  hasData: boolean;
+}
+
+export interface PublicCloudAccountSubscriptionMetricResponseItem {
+  provider?: string;
+  account?: string;
+  accountName?: string;
+  account_name?: string;
+  subscription?: string;
+  project?: string;
+  compartment?: string;
+  region?: string;
+  instanceCount?: string | number;
+  instance_count?: string | number;
+  usedVcpu?: string | number;
+  used_vcpu?: string | number;
+  totalVcpu?: string | number;
+  total_vcpu?: string | number;
+  estimatedMonthlyCost?: string | number;
+  estimated_monthly_cost?: string | number;
+  monthlyCost?: string | number;
+  monthly_cost?: string | number;
+}
+
+export interface PublicCloudAccountSubscriptionMetricsResponse {
+  count?: string | number;
+  total?: string | number;
+  results?: PublicCloudAccountSubscriptionMetricResponseItem[];
+  data?: PublicCloudAccountSubscriptionMetricResponseItem[];
+  items?: PublicCloudAccountSubscriptionMetricResponseItem[];
+}
+
+export type PublicCloudAccountSubscriptionMetricsApiResponse = PublicCloudAccountSubscriptionMetricsResponse | PublicCloudAccountSubscriptionMetricResponseItem[];
+
+export interface PublicCloudAccountMetricChartResponseItem {
+  provider?: string;
+  account?: string;
+  instance_count?: string | number;
+  estimated_monthly_cost?: string | number;
+  vcpu_utilization?: string | number;
+  cost_per_instance?: string | number;
+}
+
+export type PublicCloudAccountMetricChartResponse = PublicCloudAccountMetricChartResponseItem[];
+
+export interface PublicCloudAccountSubscriptionMetricRow {
+  provider: string;
+  account: string;
+  region: string;
+  instanceCount: number;
+  usedVcpu: number;
+  totalVcpu: number;
+  vcpuPercent: number;
+  vcpuTone: PublicCloudStatusTone;
+  estimatedMonthlyCost: number;
+  estimatedMonthlyCostLabel: string;
 }
 
 export interface PublicCloudSortState {
@@ -792,324 +1131,3 @@ export interface PublicCloudSortState {
   direction: 'asc' | 'desc';
 }
 
-// top_database_performance_summary response (drives Database Overview KPI strip + Top 10 table).
-export interface PublicCloudDatabaseOverviewRowResponse {
-  uuid?: string;
-  database_instance?: string;
-  cloud?: string;
-  cloud_key?: string;
-  region?: string;
-  write_throughput?: string | number;
-  write_throughput_unit?: string;
-  write_latency?: string | number;
-  write_latency_unit?: string;
-  write_iops?: string | number;
-  write_iops_unit?: string;
-  read_throughput?: string | number;
-  read_throughput_unit?: string;
-  read_latency?: string | number;
-  read_latency_unit?: string;
-  read_iops?: string | number;
-  read_iops_unit?: string;
-  queue_depth?: string | number;
-  queue_depth_unit?: string | null;
-}
-
-export interface PublicCloudDatabaseOverviewResponse {
-  cloud?: string;
-  hours?: number;
-  count?: number;
-  data?: PublicCloudDatabaseOverviewRowResponse[];
-}
-
-// Top 10 Performance Summary header column; label already carries the unit read from the response.
-export interface PublicCloudDatabaseOverviewColumn {
-  key: string;
-  label: string;
-  numeric: boolean;
-}
-
-// Metrics are null when the response omits them, so a missing reading renders as NA instead of a
-// fabricated 0.00 (the KPI strip likewise excludes missing readings from its averages).
-export interface PublicCloudDatabaseOverviewRow {
-  instance: string;
-  uuid: string;
-  writeThroughput: number | null;
-  writeLatency: number | null;
-  writeIops: number | null;
-  readThroughput: number | null;
-  readLatency: number | null;
-  readIops: number | null;
-  queueDepth: number | null;
-}
-
-// write_performance_trend / read_performance_trend response (per-resource metric series over time).
-export interface PublicCloudDatabaseTrendPoint {
-  clock?: number;
-  value?: number | string;
-}
-
-export interface PublicCloudDatabaseTrendSeriesItem {
-  label?: string;
-  unit?: string;
-  points?: PublicCloudDatabaseTrendPoint[];
-}
-
-export interface PublicCloudDatabaseTrendResourceItem {
-  uuid?: string;
-  database_instance?: string;
-  series?: Record<string, PublicCloudDatabaseTrendSeriesItem>;
-}
-
-export interface PublicCloudDatabaseTrendResponse {
-  cloud?: string;
-  hours?: number;
-  count?: number;
-  data?: PublicCloudDatabaseTrendResourceItem[];
-}
-
-// space_consumption response (drives Space Consumption KPI strip + Top 10 Capacity table).
-export interface PublicCloudDatabaseSpaceSummaryResponse {
-  database_count?: string | number;
-  max_allocated_storage?: string | number;
-  total_allocated?: string | number;
-  average_allocated?: string | number;
-  total_free_space?: string | number;
-  average_free_space?: string | number;
-  average_utilization?: string | number;
-  storage_unit?: string;
-  utilization_unit?: string;
-}
-
-export interface PublicCloudDatabaseSpaceRowResponse {
-  uuid?: string;
-  database_instance?: string;
-  cloud?: string;
-  cloud_key?: string;
-  region?: string;
-  max_allocated_storage?: string | number;
-  max_allocated_storage_unit?: string;
-  allocated_storage?: string | number;
-  allocated_storage_unit?: string;
-  free_storage_space?: string | number;
-  free_storage_space_unit?: string;
-  utilization_percent?: string | number;
-}
-
-export interface PublicCloudDatabaseSpaceConsumptionResponse {
-  cloud?: string;
-  count?: number;
-  summary?: PublicCloudDatabaseSpaceSummaryResponse;
-  data?: PublicCloudDatabaseSpaceRowResponse[];
-}
-
-export interface PublicCloudDatabaseSpaceRow {
-  instance: string;
-  uuid: string;
-  maxAllocatedLabel: string;
-  maxAllocated: number;
-  allocatedLabel: string;
-  allocated: number;
-  spaceFreeLabel: string;
-  spaceFree: number;
-  utilization: number;
-}
-
-// top_capacity_resources response (Top 10 Capacity table; server-sorted via sort_by).
-export interface PublicCloudDatabaseCapacityRowResponse {
-  uuid?: string;
-  db_instance?: string;
-  database_instance?: string;
-  max_allocated?: string | number;
-  max_allocated_display?: string;
-  allocated?: string | number;
-  allocated_display?: string;
-  space_free?: string | number;
-  space_free_display?: string;
-  utilization?: string | number;
-  utilization_display?: string;
-}
-
-export interface PublicCloudDatabaseCapacityResponse {
-  cloud?: string;
-  sort_by?: string;
-  count?: number;
-  data?: PublicCloudDatabaseCapacityRowResponse[];
-}
-
-/*
- * ------ Cloud Storage Health (redesigned) ------
- */
-export interface PublicCloudStorageMetricPoint {
-  clock?: number;
-  time?: string;
-  value?: number;
-}
-
-// Response for the five Storage Performance trend cards (E2E, Success Server, Network/Query,
-// Queue Depth, Utilization). Each renders an area chart from `points`.
-export interface PublicCloudStorageMetricResponse {
-  metric?: string;
-  title?: string;
-  value?: string | number;
-  unit?: string;
-  display_value?: string;
-  change_percent?: number;
-  trend_direction?: string;
-  points?: PublicCloudStorageMetricPoint[];
-}
-
-export interface PublicCloudStorageHighLatencyDevice {
-  device_name?: string;
-  name?: string;
-  p95_latency?: number;
-  p95_latency_display?: string;
-  is_high_latency?: boolean;
-}
-
-// Response for the High Latency Devices bar card (one bar per device P95 latency).
-export interface PublicCloudStorageHighLatencyResponse {
-  threshold?: number;
-  threshold_display?: string;
-  value?: string | number;
-  high_latency_count?: number;
-  total_devices?: number;
-  data?: PublicCloudStorageHighLatencyDevice[];
-}
-
-export interface PublicCloudStoragePerformanceCard {
-  key: string;
-  title: string;
-  valueLabel: string;
-  unit: string;
-  deltaLabel: string;
-  deltaDirection: 'up' | 'down' | '';
-  deltaTone: PublicCloudStatusTone;
-  subtitle: string;
-  chartType: 'area' | 'bar';
-  hasData: boolean;
-  options: EChartsOption;
-}
-
-export interface PublicCloudStorageResourceRowResponse {
-  device_name?: string;
-  name?: string;
-  uuid?: string;
-  type?: string;
-  cloud?: string;
-  cloud_key?: string;
-  region?: string;
-  cloud_region?: string;
-  capacity?: string | number;
-  capacity_display?: string;
-  e2e_latency?: string | number;
-  e2e_latency_display?: string;
-  success_server_latency?: string | number;
-  success_server_latency_display?: string;
-  network_queue_delay?: string | number;
-  network_queue_delay_display?: string;
-  latency_health_score?: string | number;
-  status?: string;
-  status_icon?: string;
-}
-
-export interface PublicCloudStorageResourcesResponse {
-  cloud?: string;
-  hours?: number;
-  sort_by?: string;
-  count?: number;
-  data?: PublicCloudStorageResourceRowResponse[];
-}
-
-// Numeric fields are null when the response omits them, so a missing reading renders as NA rather
-// than a fabricated 0 (SF returns null latency and capacity on every storage row today).
-export interface PublicCloudStorageResourceRow {
-  deviceName: string;
-  uuid: string;
-  type: string;
-  cloud: string;
-  cloudRegion: string;
-  capacity: string;
-  capacityValue: number | null;
-  e2eLatency: number | null;
-  successServerLatency: number | null;
-  networkQueueDelay: number | null;
-  latencyHealthScore: number | null;
-  status: string;
-}
-
-export interface PublicCloudWritePerformanceCellResponse {
-  time?: string;
-  value?: number | string;
-  status?: string;
-}
-
-export interface PublicCloudWritePerformanceRowResponse {
-  device_name?: string;
-  name?: string;
-  values?: PublicCloudWritePerformanceCellResponse[];
-}
-
-export interface PublicCloudWritePerformanceResponse {
-  time_buckets?: string[];
-  legend?: { [key: string]: string };
-  data?: PublicCloudWritePerformanceRowResponse[];
-}
-
-export interface PublicCloudWritePerformanceCell {
-  value: number;
-  color: string;
-}
-
-export interface PublicCloudWritePerformanceRow {
-  name: string;
-  cells: PublicCloudWritePerformanceCell[];
-}
-
-export interface PublicCloudWritePerformanceViewData {
-  labels: string[];
-  rows: PublicCloudWritePerformanceRow[];
-}
-
-export interface PublicCloudLatencyBreakdownSegmentResponse {
-  name?: string;
-  label?: string;
-  key?: string;
-  value?: number | string;
-  unit?: string;
-  display_value?: string;
-  percent?: number | string;
-  percentage?: number | string;
-  color?: string;
-}
-
-export interface PublicCloudLatencyBreakdownSummaryResponse {
-  total_latency?: number | string;
-  total_latency_display?: string;
-  breakdown?: PublicCloudLatencyBreakdownSegmentResponse[];
-}
-
-export interface PublicCloudLatencyBreakdownResponse {
-  cloud?: string;
-  hours?: number;
-  count?: number;
-  summary?: PublicCloudLatencyBreakdownSummaryResponse;
-  total?: number | string;
-  unit?: string;
-  segments?: PublicCloudLatencyBreakdownSegmentResponse[];
-}
-
-export interface PublicCloudLatencyBreakdownSegment {
-  label: string;
-  valueLabel: string;
-  percent: number;
-  percentLabel: string;
-  color: string;
-}
-
-export interface PublicCloudLatencyBreakdownViewData {
-  totalLabel: string;
-  unit: string;
-  segments: PublicCloudLatencyBreakdownSegment[];
-  hasData: boolean;
-}

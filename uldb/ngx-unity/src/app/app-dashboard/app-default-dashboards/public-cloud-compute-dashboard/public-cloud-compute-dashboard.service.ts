@@ -9,28 +9,22 @@ import { environment } from 'src/environments/environment';
 import { UnityChartConfigService } from 'src/app/shared/unity-chart-config.service';
 import {
   PUBLIC_CLOUD_ACTIVE_DATABASE_WORKLOAD_ENDPOINT,
+  PUBLIC_CLOUD_ACCOUNT_SUBSCRIPTION_PROJECT_METRICS_ENDPOINT,
+  PUBLIC_CLOUD_ACCOUNT_SUBSCRIPTION_PROJECT_METRICS_RESPONSE,
+  PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_ACCOUNT_ENDPOINT,
+  PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_ACCOUNT_RESPONSE,
+  PUBLIC_CLOUD_ESTIMATED_MONTHLY_COST_BY_ACCOUNT_ENDPOINT,
+  PUBLIC_CLOUD_ESTIMATED_MONTHLY_COST_BY_ACCOUNT_RESPONSE,
+  PUBLIC_CLOUD_VCPU_UTILIZATION_BY_ACCOUNT_ENDPOINT,
+  PUBLIC_CLOUD_VCPU_UTILIZATION_BY_ACCOUNT_RESPONSE,
+  PUBLIC_CLOUD_COST_EFFICIENCY_BY_ACCOUNT_ENDPOINT,
+  PUBLIC_CLOUD_COST_EFFICIENCY_BY_ACCOUNT_RESPONSE,
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
-  PUBLIC_CLOUD_DATABASE_OVERVIEW_ENDPOINT,
-  PUBLIC_CLOUD_DATABASE_OVERVIEW_KPI_CONFIG,
-  PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS,
-  PUBLIC_CLOUD_DATABASE_WRITE_TREND_ENDPOINT,
-  PUBLIC_CLOUD_DATABASE_READ_TREND_ENDPOINT,
-  PUBLIC_CLOUD_DATABASE_CAPACITY_RESOURCES_ENDPOINT,
-  PUBLIC_CLOUD_DATABASE_SPACE_CONSUMPTION_ENDPOINT,
-  PUBLIC_CLOUD_DATABASE_SPACE_KPI_CONFIG,
-  PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS,
-  PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS,
-  PUBLIC_CLOUD_STORAGE_RESOURCES_ENDPOINT,
-  PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_ENDPOINT,
-  PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS,
-  PUBLIC_CLOUD_LATENCY_BREAKDOWN_ENDPOINT,
-  PUBLIC_CLOUD_LATENCY_BREAKDOWN_COLORS,
   PUBLIC_CLOUD_COVERAGE_GROUP_LABELS,
   PUBLIC_CLOUD_COVERAGE_GROUP_ORDER,
   PUBLIC_CLOUD_COVERAGE_PROVIDER_LABELS,
   PUBLIC_CLOUD_COVERAGE_PROVIDER_LOGOS,
   PUBLIC_CLOUD_COVERAGE_PROVIDER_ORDER,
-  PUBLIC_CLOUD_HOTSPOT_PROVIDER_LOGOS,
   PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT,
   PUBLIC_CLOUD_DATABASE_HEALTH_METRIC_COLORS,
   PUBLIC_CLOUD_DATABASE_HEALTH_SCORE_ENDPOINT,
@@ -41,32 +35,92 @@ import {
   PUBLIC_CLOUD_GEO_ALERT_SEVERITY_COLORS,
   PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS,
   PUBLIC_CLOUD_GEO_DISTRIBUTION_ENDPOINT,
-  PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT,
-  PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT,
-  PUBLIC_CLOUD_IDLE_DURATION_COLORS,
+  PUBLIC_CLOUD_GEO_DISTRIBUTION_MAX_TILES,
+  PUBLIC_CLOUD_GEO_PROVIDER_COLORS,
   PUBLIC_CLOUD_INVENTORY_SUMMARY_ENDPOINT,
-  PUBLIC_CLOUD_LATENCY_HEATMAP_COLORS,
-  PUBLIC_CLOUD_LATENCY_HEATMAP_ENDPOINT,
-  PUBLIC_CLOUD_QUEUE_BACKLOG_COLORS,
-  PUBLIC_CLOUD_QUEUE_BACKLOG_MONITOR_ENDPOINT,
   PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS,
   PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
   PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT,
-  PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_ENDPOINT,
   PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG,
-  PUBLIC_CLOUD_OBJECT_FILE_GROWTH_TREND_ENDPOINT,
-  PUBLIC_CLOUD_READ_VS_WRITE_TRAFFIC_ENDPOINT,
   PUBLIC_CLOUD_RECENT_ALERTS_ENDPOINT,
-  PUBLIC_CLOUD_STORAGE_DISTRIBUTION_ENDPOINT,
-  PUBLIC_CLOUD_STORAGE_DISTRIBUTION_COLORS,
-  PUBLIC_CLOUD_STORAGE_HEALTH_ENDPOINT,
-  PUBLIC_CLOUD_STORAGE_SERVICES_VISIBILITY_ENDPOINT,
-  PUBLIC_CLOUD_STORAGE_TREND_COLORS,
-  PUBLIC_CLOUD_STORAGE_UTILIZATION_BY_CLOUD_ENDPOINT,
-  PUBLIC_CLOUD_STORAGE_UTILIZATION_COLORS,
+  PUBLIC_CLOUD_ALERTS_BY_SEVERITY_ENDPOINT,
+  PUBLIC_CLOUD_ALERTS_BY_PROVIDER_ENDPOINT,
+  PUBLIC_CLOUD_ALERTS_BY_AGE_ENDPOINT,
+  PUBLIC_CLOUD_ALERT_SEVERITY_CHART_COLORS,
+  PUBLIC_CLOUD_ALERT_SEVERITY_ORDER,
+  PUBLIC_CLOUD_ALERT_AGE_COLORS,
+  PUBLIC_CLOUD_ALERT_AGE_ORDER,
+  PUBLIC_CLOUD_RECENT_ALERTS_RESPONSE,
+  PUBLIC_CLOUD_ALERTS_BY_SEVERITY_RESPONSE,
+  PUBLIC_CLOUD_ALERTS_BY_PROVIDER_RESPONSE,
+  PUBLIC_CLOUD_ALERTS_BY_AGE_RESPONSE,
+  PUBLIC_CLOUD_COST_OPTIMIZATION_ENDPOINT,
+  PUBLIC_CLOUD_SPEND_VS_SAVINGS_ENDPOINT,
+  PUBLIC_CLOUD_RECOMMENDED_ACTIONS_ENDPOINT,
+  PUBLIC_CLOUD_POTENTIAL_SAVINGS_BY_PROVIDER_ENDPOINT,
+  PUBLIC_CLOUD_COST_ACTION_COLORS,
+  PUBLIC_CLOUD_COST_SPEND_COLOR,
+  PUBLIC_CLOUD_COST_SAVINGS_COLOR,
+  PUBLIC_CLOUD_COST_OPTIMIZATION_RESPONSE,
+  PUBLIC_CLOUD_SPEND_VS_SAVINGS_RESPONSE,
+  PUBLIC_CLOUD_RECOMMENDED_ACTIONS_RESPONSE,
+  PUBLIC_CLOUD_POTENTIAL_SAVINGS_BY_PROVIDER_RESPONSE,
+  PUBLIC_CLOUD_AUTO_REMEDIATION_SUMMARY_ENDPOINT,
+  PUBLIC_CLOUD_AUTO_REMEDIATION_SUMMARY_RESPONSE,
+  PUBLIC_CLOUD_AUTO_REMEDIATION_ACTION_COLORS,
+  PUBLIC_CLOUD_AUTO_REMEDIATION_OUTCOME_COLORS,
   PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG,
-  PUBLIC_CLOUD_TAG_STYLE_CONFIG,
-  PUBLIC_CLOUD_TRANSACTION_VOLUME_TREND_ENDPOINT,
+  PUBLIC_CLOUD_COMPUTE_MONITORED_ENDPOINT,
+  PUBLIC_CLOUD_CLOUD_PROVIDER_DISTRIBUTION_ENDPOINT,
+  PUBLIC_CLOUD_UTILIZATION_BY_PROVIDER_ENDPOINT,
+  PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_OS_TYPE_ENDPOINT,
+  PUBLIC_CLOUD_ALERTS_SEVERITY_ENDPOINT,
+  PUBLIC_CLOUD_PROVIDER_ORDER,
+  PUBLIC_CLOUD_PROVIDER_ICON_CONFIG,
+  PUBLIC_CLOUD_COMPUTE_MONITORED_COLORS,
+  PUBLIC_CLOUD_UTILIZATION_SERIES_CONFIG,
+  PUBLIC_CLOUD_OS_TYPE_CONFIG,
+  PUBLIC_CLOUD_ALERTS_SEVERITY_CONFIG,
+  PUBLIC_CLOUD_INVENTORY_SUMMARY_RESPONSE,
+  PUBLIC_CLOUD_COMPUTE_MONITORED_RESPONSE,
+  PUBLIC_CLOUD_CLOUD_PROVIDER_DISTRIBUTION_RESPONSE,
+  PUBLIC_CLOUD_UTILIZATION_BY_PROVIDER_RESPONSE,
+  PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_OS_TYPE_RESPONSE,
+  PUBLIC_CLOUD_ALERTS_SEVERITY_RESPONSE,
+  PUBLIC_CLOUD_CAPACITY_PERFORMANCE_TABLE_ENDPOINT,
+  PUBLIC_CLOUD_CAPACITY_PERFORMANCE_CHARTS_ENDPOINT,
+  PUBLIC_CLOUD_CAPACITY_STATUS_COLORS,
+  PUBLIC_CLOUD_CAPACITY_PERFORMANCE_TABLE_RESPONSE,
+  PUBLIC_CLOUD_CAPACITY_PERFORMANCE_CHARTS_RESPONSE,
+  PUBLIC_CLOUD_STORAGE_VOLUMES_DISKS_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_PROVISIONED_BY_PROVIDER_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_TOP_VOLUMES_IOPS_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_IOPS_TIER_DISTRIBUTION_ENDPOINT,
+  PUBLIC_CLOUD_STORAGE_IOPS_TIER_COLORS,
+  PUBLIC_CLOUD_STORAGE_VOLUMES_DISKS_RESPONSE,
+  PUBLIC_CLOUD_STORAGE_PROVISIONED_BY_PROVIDER_RESPONSE,
+  PUBLIC_CLOUD_STORAGE_TOP_VOLUMES_IOPS_RESPONSE,
+  PUBLIC_CLOUD_STORAGE_IOPS_TIER_DISTRIBUTION_RESPONSE,
+  PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_ENDPOINT,
+  PUBLIC_CLOUD_PROVISIONING_REACHABILITY_ENDPOINT,
+  PUBLIC_CLOUD_PROVISIONED_BY_PROVIDER_ENDPOINT,
+  PUBLIC_CLOUD_RECENTLY_PROVISIONED_ENDPOINT,
+  PUBLIC_CLOUD_PROVISIONING_SUMMARY_METRICS_ENDPOINT,
+  PUBLIC_CLOUD_PROVISIONING_ENVIRONMENT_CLASS,
+  PUBLIC_CLOUD_PROVISIONING_SUMMARY_KPI_CONFIG,
+  PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_RESPONSE,
+  PUBLIC_CLOUD_PROVISIONING_REACHABILITY_RESPONSE,
+  PUBLIC_CLOUD_PROVISIONED_BY_PROVIDER_RESPONSE,
+  PUBLIC_CLOUD_RECENTLY_PROVISIONED_RESPONSE,
+  PUBLIC_CLOUD_PROVISIONING_SUMMARY_METRICS_RESPONSE,
+  PUBLIC_CLOUD_DATABASE_INVENTORY_ENDPOINT,
+  PUBLIC_CLOUD_DATABASE_SUMMARY_KPI_CONFIG,
+  PUBLIC_CLOUD_DATABASE_INVENTORY_RESPONSE,
+  PUBLIC_CLOUD_DB_WORKLOAD_ENDPOINT,
+  PUBLIC_CLOUD_DB_QUERY_PERFORMANCE_ENDPOINT,
+  PUBLIC_CLOUD_DB_STATUS_COLORS,
+  PUBLIC_CLOUD_DB_WORKLOAD_RESPONSE,
+  PUBLIC_CLOUD_DB_QUERY_PERFORMANCE_RESPONSE,
   PUBLIC_CLOUD_TOP_LOCK_CONTENTION_ENDPOINT,
   PUBLIC_CLOUD_TOP_MEMORY_CONSUMERS_ENDPOINT,
   PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT,
@@ -74,26 +128,13 @@ import {
 } from './public-cloud-compute-dashboard.const';
 import {
   PublicCloudAccountOption,
-  PublicCloudDatabaseKpi,
-  PublicCloudDatabaseOverviewColumn,
-  PublicCloudDatabaseOverviewResponse,
-  PublicCloudDatabaseOverviewRow,
-  PublicCloudDatabaseCapacityResponse,
-  PublicCloudDatabaseSpaceConsumptionResponse,
-  PublicCloudDatabaseSpaceRow,
-  PublicCloudDatabaseTrendResponse,
-  PublicCloudDatabaseTrendSeriesItem,
-  PublicCloudStoragePerformanceCard,
-  PublicCloudStorageMetricResponse,
-  PublicCloudStorageHighLatencyResponse,
-  PublicCloudStorageResourceRow,
-  PublicCloudStorageResourcesResponse,
-  PublicCloudWritePerformanceResponse,
-  PublicCloudWritePerformanceViewData,
-  PublicCloudLatencyBreakdownResponse,
-  PublicCloudLatencyBreakdownViewData,
+  PublicCloudAccountMetricChartResponse,
+  PublicCloudAccountMetricChartResponseItem,
+  PublicCloudAccountSubscriptionMetricResponseItem,
+  PublicCloudAccountSubscriptionMetricRow,
+  PublicCloudAccountSubscriptionMetricsApiResponse,
+  PublicCloudAccountSubscriptionMetricsResponse,
   PublicCloudActiveDatabaseWorkloadViewData,
-  PublicCloudAlertSummaryMetric,
   PublicCloudDatabaseBarItem,
   PublicCloudDatabaseBarResponseItem,
   PublicCloudDatabaseConsumerRow,
@@ -111,24 +152,51 @@ import {
   PublicCloudFiltersResponse,
   PublicCloudFilterAccountResponseItem,
   PublicCloudGeoCell,
+  PublicCloudGeoDistributionSummary,
+  PublicCloudGeoDistributionLegendItem,
   PublicCloudLockContentionResponse,
   PublicCloudLockContentionResponseItem,
   PublicCloudLockContentionRow,
-  PublicCloudIdleDeviceRow,
-  PublicCloudIdleDevicesResponse,
-  PublicCloudIdleDurationApiResponse,
-  PublicCloudIdleDurationItem,
-  PublicCloudIdleDurationResponse,
-  PublicCloudIdleDurationResponseItem,
-  PublicCloudIdleMetric,
-  PublicCloudIdleMetricResponse,
   PublicCloudInventorySummaryResponse,
-  PublicCloudInventoryTagResponse,
-  PublicCloudInventoryTags,
-  PublicCloudLatencyHeatmapResponse,
-  PublicCloudLatencyHeatmapRow,
-  PublicCloudQueueBacklogResponse,
-  PublicCloudQueueBacklogRow,
+  PublicCloudComputeMonitoredResponse,
+  PublicCloudComputeMonitoredCard,
+  PublicCloudProviderDistributionResponse,
+  PublicCloudUtilizationByProviderResponse,
+  PublicCloudOsTypeResponse,
+  PublicCloudOsTypeItem,
+  PublicCloudAlertsSeverityResponse,
+  PublicCloudAlertsSeverityItem,
+  PublicCloudCapacityPerformanceRowResponse,
+  PublicCloudCapacityPerformanceTableResponse,
+  PublicCloudCapacityPerformanceRow,
+  PublicCloudCapacityPerformanceChartsResponse,
+  PublicCloudCapacityFleetStatus,
+  PublicCloudCapacityCpuDistribution,
+  PublicCloudCapacityTopItem,
+  PublicCloudCapacityGrowthInsights,
+  PublicCloudStorageVolumeRowResponse,
+  PublicCloudStorageVolumesTableResponse,
+  PublicCloudStorageVolumeRow,
+  PublicCloudStorageProvisionedByProvider,
+  PublicCloudStorageTopVolumeResponse,
+  PublicCloudStorageIopsTier,
+  PublicCloudStorageTierLegendItem,
+  PublicCloudProvisioningRowResponse,
+  PublicCloudProvisioningTableResponse,
+  PublicCloudProvisioningRow,
+  PublicCloudProvisioningReachability,
+  PublicCloudProvisionedByProvider,
+  PublicCloudRecentlyProvisioned,
+  PublicCloudProvisioningSummaryMetricsResponse,
+  PublicCloudProvisioningSummaryMetric,
+  PublicCloudProvisioningReachabilityLegendItem,
+  PublicCloudDatabaseInventoryResponse,
+  PublicCloudDatabaseSummaryMetric,
+  PublicCloudDatabaseMonitoredCard,
+  PublicCloudDbWorkloadRowResponse,
+  PublicCloudDbWorkloadRow,
+  PublicCloudDbQueryPerformanceResponse,
+  PublicCloudDbQueryItem,
   PublicCloudOrphanedCategoryItem,
   PublicCloudOrphanedCategoryResponseItem,
   PublicCloudOrphanedDeviceResponseItem,
@@ -136,33 +204,36 @@ import {
   PublicCloudOrphanedDevicesByCategoryApiResponse,
   PublicCloudOrphanedDevicesByCategoryResponse,
   PublicCloudOrphanedDevicesResponse,
-  PublicCloudPerformanceHotspotDisk,
-  PublicCloudPerformanceHotspotReadWrite,
-  PublicCloudPerformanceHotspotRow,
-  PublicCloudPerformanceHotspotsResponse,
   PublicCloudProviderDistributionKey,
   PublicCloudPlatform,
   PublicCloudProviderDistributionItem,
-  PublicCloudRecentAlert,
+  PublicCloudRecentAlertRow,
   PublicCloudRecentAlertResponseItem,
   PublicCloudRecentAlertSeverity,
   PublicCloudRecentAlertsResponse,
-  PublicCloudRecentAlertsSummary,
+  PublicCloudAlertsBySeverity,
+  PublicCloudAlertsByProvider,
+  PublicCloudAlertsByAge,
+  PublicCloudAlertSeverityLegendItem,
+  PublicCloudCostRowResponse,
+  PublicCloudCostOptimizationTableResponse,
+  PublicCloudCostRow,
+  PublicCloudSpendVsSavings,
+  PublicCloudRecommendedAction,
+  PublicCloudPotentialSavingsByProvider,
+  PublicCloudSpendSavingsLegendItem,
+  PublicCloudCostSummaryMetric,
+  PublicCloudAutoRemediationAction,
+  PublicCloudAutoRemediationActionResponse,
+  PublicCloudAutoRemediationKpi,
+  PublicCloudAutoRemediationKpiResponse,
+  PublicCloudAutoRemediationOutcome,
+  PublicCloudAutoRemediationOutcomeResponse,
+  PublicCloudAutoRemediationSummaryResponse,
+  PublicCloudAutoRemediationSummaryViewData,
   PublicCloudRegionOption,
-  PublicCloudStorageBarItem,
-  PublicCloudStorageConsumerRow,
-  PublicCloudStorageDistributionItem,
-  PublicCloudStorageHealthResponse,
-  PublicCloudStorageKeyedNumberResponse,
-  PublicCloudStorageKpi,
-  PublicCloudStorageServicesVisibilityResponse,
-  PublicCloudStorageSeriesPoint,
-  PublicCloudStorageTrafficResponse,
-  PublicCloudStorageTrendResponse,
-  PublicCloudStorageTrendViewData,
   PublicCloudSummaryMetric,
-  PublicCloudStatusTone,
-  PublicCloudTagItem
+  PublicCloudStatusTone
 } from './public-cloud-compute-dashboard.type';
 
 @Injectable()
@@ -309,105 +380,246 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
+  getComputeMonitored(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudComputeMonitoredResponse> {
+    return this.http.get<PublicCloudComputeMonitoredResponse>(PUBLIC_CLOUD_COMPUTE_MONITORED_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getCloudProviderDistribution(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudProviderDistributionResponse> {
+    return this.http.get<PublicCloudProviderDistributionResponse>(PUBLIC_CLOUD_CLOUD_PROVIDER_DISTRIBUTION_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getUtilizationByProvider(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudUtilizationByProviderResponse> {
+    return this.http.get<PublicCloudUtilizationByProviderResponse>(PUBLIC_CLOUD_UTILIZATION_BY_PROVIDER_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getComputeInstanceByOsType(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudOsTypeResponse> {
+    return this.http.get<PublicCloudOsTypeResponse>(PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_OS_TYPE_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getAlertsSeverity(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAlertsSeverityResponse> {
+    return this.http.get<PublicCloudAlertsSeverityResponse>(PUBLIC_CLOUD_ALERTS_SEVERITY_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getInventorySummaryStaticResponse(): PublicCloudInventorySummaryResponse {
+    return PUBLIC_CLOUD_INVENTORY_SUMMARY_RESPONSE;
+  }
+
+  getComputeMonitoredStaticResponse(): PublicCloudComputeMonitoredResponse {
+    return PUBLIC_CLOUD_COMPUTE_MONITORED_RESPONSE;
+  }
+
+  getCloudProviderDistributionStaticResponse(): PublicCloudProviderDistributionResponse {
+    return PUBLIC_CLOUD_CLOUD_PROVIDER_DISTRIBUTION_RESPONSE;
+  }
+
+  getUtilizationByProviderStaticResponse(): PublicCloudUtilizationByProviderResponse {
+    return PUBLIC_CLOUD_UTILIZATION_BY_PROVIDER_RESPONSE;
+  }
+
+  getComputeInstanceByOsTypeStaticResponse(): PublicCloudOsTypeResponse {
+    return PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_OS_TYPE_RESPONSE;
+  }
+
+  getAlertsSeverityStaticResponse(): PublicCloudAlertsSeverityResponse {
+    return PUBLIC_CLOUD_ALERTS_SEVERITY_RESPONSE;
+  }
+
   convertToSummaryMetricsViewData(data: PublicCloudInventorySummaryResponse): PublicCloudSummaryMetric[] {
-    const summary = (data?.summary || {}) as Record<string, number>;
+    const summary = (data || {}) as Record<string, number>;
     return PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG.map(item => ({
       key: item.key,
       label: item.label,
+      tone: item.tone,
       value: this.formatNumber(summary[item.key])
     }));
   }
 
-  convertToProviderDistributionViewData(data: PublicCloudInventorySummaryResponse): PublicCloudProviderDistributionItem[] {
-    return (Object.keys(PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG) as PublicCloudProviderDistributionKey[]).map(key => {
+  convertToComputeMonitoredViewData(data: PublicCloudComputeMonitoredResponse): PublicCloudComputeMonitoredCard[] {
+    const rows = Array.isArray(data) ? data : [];
+    return rows.map(row => {
+      const key = this.normalizePlatformValue(row?.provider) as PublicCloudProviderDistributionKey;
+      const config = PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG[key];
+      const totalCompute = this.getNumberValue(row?.total_compute);
+      const running = this.getNumberValue(row?.running);
+      const stopped = this.getNumberValue(row?.stopped);
+      const unknown = this.getNumberValue(row?.unknown);
+      const toPercent = (value: number) => totalCompute > 0 ? (value / totalCompute) * 100 : 0;
+      return {
+        key,
+        provider: config ? config.name : String(row?.provider || '').toUpperCase(),
+        iconClass: PUBLIC_CLOUD_PROVIDER_ICON_CONFIG[key] || 'fas fa-cloud',
+        color: config ? config.color : '#5a7ed8',
+        totalCompute,
+        monitored: this.getNumberValue(row?.monitored),
+        running,
+        stopped,
+        unknown,
+        runningPercent: toPercent(running),
+        stoppedPercent: toPercent(stopped),
+        unknownPercent: toPercent(unknown)
+      };
+    }).sort((first, second) => this.getProviderOrderIndex(first.key) - this.getProviderOrderIndex(second.key));
+  }
+
+  convertToProviderDistributionViewData(data: PublicCloudProviderDistributionResponse): PublicCloudProviderDistributionItem[] {
+    return (data?.distribution || []).map(item => {
+      const key = this.normalizePlatformValue(item?.provider) as PublicCloudProviderDistributionKey;
       const config = PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG[key];
       return {
         key,
-        name: config.name,
-        count: this.getProviderDistributionCount(data, key),
-        value: this.getProviderDistributionPercentage(data, key),
-        color: config.color
+        name: config ? config.name : String(item?.provider || '').toUpperCase(),
+        count: this.getNumberValue(item?.count),
+        value: this.getNumberValue(item?.percentage),
+        color: config ? config.color : '#5a7ed8'
       };
-    });
+    }).sort((first, second) => this.getProviderOrderIndex(first.key) - this.getProviderOrderIndex(second.key));
   }
 
-  convertToProviderDistributionOptions(data: PublicCloudProviderDistributionItem[]): EChartsOption {
-    return this.getProviderDistributionOptions(data || []);
+  getProviderDistributionTotalLabel(data: PublicCloudProviderDistributionResponse): string {
+    return this.formatNumber(this.getNumberValue(data?.total_compute_instances));
   }
 
-  private getProviderDistributionOptions(items: PublicCloudProviderDistributionItem[]): EChartsOption {
+  convertToProviderDistributionOptions(data: PublicCloudProviderDistributionItem[], totalLabel = ''): EChartsOption {
+    const points = (data || []).map(item => ({
+      name: item.name,
+      key: item.key,
+      value: item.count,
+      color: item.color,
+      tooltipLabel: `${item.name}: ${this.formatNumber(item.count)} (${item.value}%)`
+    }));
+    return this.getDonutOptions(points, totalLabel);
+  }
+
+  convertToOsTypeViewData(data: PublicCloudOsTypeResponse): PublicCloudOsTypeItem[] {
+    const values = PUBLIC_CLOUD_OS_TYPE_CONFIG.map(config => ({ config, value: this.getNumberValue(data?.[config.key]) }));
+    const total = this.getNumberValue(data?.total) || values.reduce((sum, item) => sum + item.value, 0);
+    return values.map(item => ({
+      key: item.config.key,
+      label: item.config.label,
+      value: item.value,
+      percent: total ? Math.round((item.value / total) * 100) : 0,
+      color: item.config.color
+    }));
+  }
+
+  getOsTypeTotalLabel(data: PublicCloudOsTypeResponse): string {
+    const total = this.getNumberValue(data?.total) ||
+      PUBLIC_CLOUD_OS_TYPE_CONFIG.reduce((sum, config) => sum + this.getNumberValue(data?.[config.key]), 0);
+    return this.formatNumber(total);
+  }
+
+  convertToOsTypeOptions(data: PublicCloudOsTypeItem[], totalLabel = ''): EChartsOption {
+    const points = (data || []).map(item => ({
+      name: item.label,
+      key: item.key,
+      value: item.value,
+      color: item.color,
+      tooltipLabel: `${item.label}: ${this.formatNumber(item.value)} (${item.percent}%)`
+    }));
+    return this.getDonutOptions(points, totalLabel);
+  }
+
+  hasOsTypeData(data: PublicCloudOsTypeItem[]): boolean {
+    return (data || []).some(item => item.value > 0);
+  }
+
+  convertToUtilizationByProviderOptions(data: PublicCloudUtilizationByProviderResponse): EChartsOption {
+    const providerKeys = PUBLIC_CLOUD_PROVIDER_ORDER;
+    const labels = providerKeys.map(key => PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG[key].name);
+    const series: any[] = PUBLIC_CLOUD_UTILIZATION_SERIES_CONFIG.map(config => ({
+      name: config.label,
+      type: 'bar',
+      barMaxWidth: 14,
+      itemStyle: { color: config.color, borderRadius: [3, 3, 0, 0] },
+      data: providerKeys.map(key => this.getNumberValue(data?.[key]?.[config.key]))
+    }));
     return {
-      color: items.map(item => item.color),
+      color: PUBLIC_CLOUD_UTILIZATION_SERIES_CONFIG.map(config => config.color),
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      legend: { show: false },
+      grid: { left: 34, right: 12, top: 16, bottom: 24 },
+      xAxis: {
+        type: 'category',
+        data: labels,
+        axisTick: { show: false },
+        axisLine: { lineStyle: { color: '#dce2e7' } },
+        axisLabel: { color: '#5c6c82', fontSize: 11 }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        splitLine: { lineStyle: { color: '#eef1f4' } },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: '#5c6c82', fontSize: 11 }
+      },
+      series
+    };
+  }
+
+  hasUtilizationByProviderData(data: PublicCloudUtilizationByProviderResponse): boolean {
+    return PUBLIC_CLOUD_PROVIDER_ORDER.some(key =>
+      PUBLIC_CLOUD_UTILIZATION_SERIES_CONFIG.some(config => this.getNumberValue(data?.[key]?.[config.key]) > 0));
+  }
+
+  convertToAlertsSeverityViewData(data: PublicCloudAlertsSeverityResponse): PublicCloudAlertsSeverityItem[] {
+    return PUBLIC_CLOUD_ALERTS_SEVERITY_CONFIG.map(config => ({
+      key: config.key,
+      label: config.label,
+      value: this.getNumberValue(data?.[config.key]),
+      toneClass: config.toneClass
+    }));
+  }
+
+  private getProviderOrderIndex(key: string): number {
+    const index = PUBLIC_CLOUD_PROVIDER_ORDER.indexOf(key as PublicCloudProviderDistributionKey);
+    return index === -1 ? PUBLIC_CLOUD_PROVIDER_ORDER.length : index;
+  }
+
+  private getDonutOptions(points: Array<{ name: string; key?: string; value: number; color: string; tooltipLabel: string }>, totalLabel: string): EChartsOption {
+    return {
+      color: points.map(point => point.color),
       tooltip: {
         trigger: 'item',
-        formatter: (params: any) => `${params.name}: ${params.data.count || 0} (${params.data.percentage || 0}%)`
+        formatter: (params: any) => params?.data?.tooltipLabel || ''
       },
-      legend: {
-        show: false
+      title: {
+        text: totalLabel,
+        subtext: 'Instances',
+        left: 'center',
+        top: 'center',
+        itemGap: 2,
+        textStyle: { fontSize: 20, fontWeight: 700, color: '#2b3642' },
+        subtextStyle: { fontSize: 12, color: '#6b7682' }
       },
       series: [
         {
           type: 'pie',
-          radius: ['50%', '76%'],
+          radius: ['52%', '76%'],
           center: ['50%', '50%'],
           avoidLabelOverlap: true,
           label: { show: false },
           labelLine: { show: false },
-          data: items.map(item => ({
-            name: item.name,
-            key: item.key,
-            value: item.value,
-            count: item.count,
-            percentage: item.value,
-            itemStyle: { color: item.color }
+          data: points.map(point => ({
+            name: point.name,
+            key: point.key,
+            value: point.value,
+            tooltipLabel: point.tooltipLabel,
+            itemStyle: { color: point.color }
           }))
         }
       ]
     };
-  }
-
-  private getProviderDistributionCount(data: PublicCloudInventorySummaryResponse, key: PublicCloudProviderDistributionKey): number {
-    const count = Number(data?.distribution?.[key] || 0);
-    return isNaN(count) ? 0 : count;
-  }
-
-  convertToTagsViewData(data: PublicCloudInventorySummaryResponse): PublicCloudTagItem[] {
-    return this.getInventoryTagEntries(data?.tags).map((tag, index) => {
-      const style = this.getTagStyle(tag.label, index);
-      return {
-        name: tag.label,
-        count: this.formatNumber(tag.count),
-        textColor: style.textColor,
-        backgroundColor: style.backgroundColor
-      };
-    });
-  }
-
-  // Inventory tags arrive as a keyed map ({ tagName: count }) from the current response, or as an
-  // array ([{ label, count }]) from older responses; normalize both into label/count entries.
-  private getInventoryTagEntries(tags?: PublicCloudInventoryTags): PublicCloudInventoryTagResponse[] {
-    const entries: PublicCloudInventoryTagResponse[] = Array.isArray(tags)
-      ? (tags || []).map(tag => ({ label: this.getFirstValue(tag?.label), count: this.getNumericValue(tag?.count) }))
-      : Object.keys(tags || {}).map(key => ({ label: key, count: this.getNumericValue((tags as Record<string, string | number>)[key]) }));
-    return entries.filter(entry => !!entry.label);
-  }
-
-  private getProviderDistributionPercentage(data: PublicCloudInventorySummaryResponse, key: PublicCloudProviderDistributionKey): number {
-    const percentage = Number(data?.distribution_percentages?.[key]);
-    if (!isNaN(percentage)) {
-      return percentage;
-    }
-
-    const providerKeys = Object.keys(data?.distribution || {}) as PublicCloudProviderDistributionKey[];
-    const total = providerKeys.reduce((count, providerKey) => {
-      return count + Number(data.distribution[providerKey] || 0);
-    }, 0);
-    return total ? Math.round((Number(data?.distribution?.[key] || 0) / total) * 100) : 0;
-  }
-
-  private getTagStyle(label: string, index: number): PublicCloudTagItem {
-    return PUBLIC_CLOUD_TAG_STYLE_CONFIG.find(item => item.name.toLowerCase() === (label || '').toLowerCase()) ||
-      PUBLIC_CLOUD_TAG_STYLE_CONFIG[index % PUBLIC_CLOUD_TAG_STYLE_CONFIG.length];
   }
 
   private formatNumber(value: number | string): string {
@@ -429,7 +641,46 @@ export class PublicCloudComputeDashboardService {
   }
 
   convertToGeoHeatmapOptions(data: PublicCloudGeoCell[]): EChartsOption {
-    return (data || []).length ? this.getGeoHeatmapOptions(data) : {};
+    const cells = this.getGeoHeatmapLayoutCells(data || []);
+    return cells.length ? this.getGeoHeatmapOptions(cells) : {};
+  }
+
+  convertToGeoDistributionSummary(cells: PublicCloudGeoCell[]): PublicCloudGeoDistributionSummary {
+    const viewCells = cells || [];
+    return {
+      totalLocations: viewCells.length,
+      totalResources: viewCells.reduce((sum, cell) => sum + cell.totalResources, 0),
+      totalAlerts: viewCells.reduce((sum, cell) => sum + cell.totalAlerts, 0)
+    };
+  }
+
+  convertToGeoDistributionCloudOptions(cells: PublicCloudGeoCell[]): PublicCloudFilterOption[] {
+    const options = (cells || []).reduce((result: { [key: string]: PublicCloudFilterOption }, cell) => {
+      const label = cell.cloudType || 'Unknown';
+      const key = this.normalizeKey(label) || 'unknown';
+      if (!result[key]) {
+        result[key] = { value: key, label };
+      }
+      return result;
+    }, {});
+    return [
+      { value: PUBLIC_CLOUD_ALL_SELECTED_VALUE, label: 'Select All' },
+      ...Object.keys(options).map(key => options[key]).sort((first, second) => first.label.localeCompare(second.label))
+    ];
+  }
+
+  // The legend describes the rendered tiles, so it reads the same capped set the chart does.
+  convertToGeoDistributionLegends(cells: PublicCloudGeoCell[]): PublicCloudGeoDistributionLegendItem[] {
+    const legends = this.getGeoDistributionTileCells(cells).reduce((result: { [key: string]: PublicCloudGeoDistributionLegendItem }, cell) => {
+      const label = cell.cloudType || 'Unknown';
+      const key = this.normalizeKey(label) || 'unknown';
+      if (!result[key]) {
+        result[key] = { key, label, count: 0, color: cell.color || '#4a63d6' };
+      }
+      result[key].count += 1;
+      return result;
+    }, {});
+    return Object.keys(legends).map(key => legends[key]);
   }
 
   private getGeoHeatmapOptions(cells: PublicCloudGeoCell[]): EChartsOption {
@@ -447,10 +698,10 @@ export class PublicCloudComputeDashboardService {
         formatter: (info: any) => this.getGeoDistributionTooltip(info.data)
       },
       grid: {
-        top: 6,
-        right: 8,
-        bottom: 6,
-        left: 8
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
       },
       xAxis: {
         type: 'value',
@@ -561,6 +812,13 @@ export class PublicCloudComputeDashboardService {
     const severityColors = PUBLIC_CLOUD_GEO_ALERT_SEVERITY_COLORS;
     const neutralIconColor = '#7a8794';
     const neutralValueColor = '#1f2a34';
+    const textRow = (icon: string, iconColor: string, label: string, value: string, valueColor: string) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
+          <i class="fa ${icon}" style="width:14px;text-align:center;font-size:12px;color:${iconColor};"></i>${label}
+        </span>
+        <span style="font-weight:600;color:${valueColor};">${value}</span>
+      </div>`;
     const row = (icon: string, iconColor: string, label: string, value: number, valueColor: string) => `
       <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
         <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
@@ -573,6 +831,8 @@ export class PublicCloudComputeDashboardService {
       <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:#23303c;margin-bottom:8px;">
         <span style="width:9px;height:9px;border-radius:50%;background:${cell.color};display:inline-block;"></span>${cell.name}
       </div>
+      ${cell.cloudType ? textRow('fa-cloud', neutralIconColor, 'Cloud Type', cell.cloudType, neutralValueColor) : ''}
+      ${cell.cloudType ? '<div style="border-top:1px solid #e8edf1;margin:6px 0;"></div>' : ''}
       ${row('fa-th-large', '#3aa76d', 'Total Resources', cell.totalResources, neutralValueColor)}
       ${row('fa-bell', '#378ad8', 'Total Alerts', cell.totalAlerts, neutralValueColor)}
       ${row('fa-times-circle', severityColors.critical, 'Critical Alerts', cell.critical, severityColors.critical)}
@@ -587,16 +847,17 @@ export class PublicCloudComputeDashboardService {
 
   private getGeoDistributionCells(response: any): PublicCloudGeoCell[] {
     const payload = this.getGeoDistributionPayload(response);
-    const items = this.getGeoDistributionItems(payload).slice(0, 12);
+    const items = this.getGeoDistributionItems(payload);
     if (!items.length) {
       return [];
     }
 
-    const layout = this.getTreemapCells(items.map(item => item.totalResources), { x: 0, y: 0, width: 100, height: 100 });
+    const colorMap = this.getGeoDistributionCloudColorMap(items.map(item => item.cloudType || 'Unknown'));
     return items.map((item, index) => ({
       name: item.name,
-      color: PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS[index % PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS.length],
-      value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height],
+      cloudType: item.cloudType,
+      color: colorMap[this.normalizeKey(item.cloudType || 'Unknown')] || PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS[index % PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS.length],
+      value: [],
       totalResources: item.totalResources,
       totalAlerts: item.totalAlerts,
       critical: item.critical,
@@ -619,7 +880,7 @@ export class PublicCloudComputeDashboardService {
     return response;
   }
 
-  private getGeoDistributionItems(payload: any): Array<{ name: string; totalResources: number; totalAlerts: number; critical: number; warning: number; information: number; computeCount: number; platformServices: number; otherServices: number }> {
+  private getGeoDistributionItems(payload: any): Array<{ name: string; cloudType: string; totalResources: number; totalAlerts: number; critical: number; warning: number; information: number; computeCount: number; platformServices: number; otherServices: number }> {
     const source = Array.isArray(payload) ? payload : Object.keys(payload || {}).map(key => ({
       name: key,
       ...(payload[key] || {})
@@ -629,6 +890,7 @@ export class PublicCloudComputeDashboardService {
       .filter(item => item && typeof item === 'object')
       .map(item => {
         const name = String(item.name || item.location || item.datacenter || item.region || item.city || 'Unknown');
+        const cloudType = this.getFirstStringValue(item, ['cloud_type', 'cloudType', 'provider', 'cloud_provider', 'cloudProvider', 'platform', 'vendor']);
         const critical = this.getNumberFromPayload(item, ['critical_alerts', 'criticalAlerts', 'critical']);
         const warning = this.getNumberFromPayload(item, ['warning_alerts', 'warningAlerts', 'warning', 'warnings']);
         const information = this.getNumberFromPayload(item, ['information_alerts', 'informationAlerts', 'information', 'info', 'informative']);
@@ -638,10 +900,103 @@ export class PublicCloudComputeDashboardService {
         const otherServices = this.getNumberFromPayload(item, ['other_services', 'otherServices', 'other']);
         const totalResources = this.getNumberFromPayload(item, ['total_resources', 'totalResources', 'total', 'count'], computeCount + platformServices + otherServices);
 
-        return { name, totalResources, totalAlerts, critical, warning, information, computeCount, platformServices, otherServices };
+        return { name, cloudType, totalResources, totalAlerts, critical, warning, information, computeCount, platformServices, otherServices };
       })
       .filter(item => item.name && item.totalResources > 0)
       .sort((first, second) => second.totalResources - first.totalResources);
+  }
+
+  // The cells the treemap actually paints: locations with resources, capped to the readable tile count.
+  // Cells arrive sorted largest-first, so this keeps the biggest locations.
+  private getGeoDistributionTileCells(cells: PublicCloudGeoCell[]): PublicCloudGeoCell[] {
+    return (cells || [])
+      .filter(cell => cell && cell.totalResources > 0)
+      .slice(0, PUBLIC_CLOUD_GEO_DISTRIBUTION_MAX_TILES);
+  }
+
+  private getGeoHeatmapLayoutCells(cells: PublicCloudGeoCell[]): PublicCloudGeoCell[] {
+    const viewCells = this.getGeoDistributionTileCells(cells);
+    const layout = this.getTreemapCells(this.getReadableTreemapWeights(viewCells.map(cell => cell.totalResources)), { x: 0, y: 0, width: 100, height: 100 });
+    return viewCells.map((cell, index) => ({
+      ...cell,
+      value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height]
+    }));
+  }
+
+  private getGeoDistributionCloudColorMap(cloudTypes: string[]): { [cloudType: string]: string } {
+    const usedColors = new Set<string>();
+    return (cloudTypes || []).reduce((result: { [cloudType: string]: string }, cloudType, index) => {
+      const key = this.normalizeKey(cloudType || 'Unknown') || 'unknown';
+      if (!result[key]) {
+        result[key] = this.getGeoDistributionCloudColor(cloudType || 'Unknown', index, usedColors);
+        usedColors.add(result[key]);
+      }
+      return result;
+    }, {});
+  }
+
+  private getGeoDistributionCloudColor(cloudType: string, index: number, usedColors: Set<string>): string {
+    const providerKeys = this.getGeoDistributionProviderKeys(cloudType);
+    if (providerKeys.length === 1) {
+      const color = PUBLIC_CLOUD_GEO_PROVIDER_COLORS[providerKeys[0]];
+      if (color) {
+        return color;
+      }
+    }
+
+    const palette = PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS;
+    const paletteIndex = Math.abs(this.getGeoDistributionHash(this.normalizeKey(cloudType) || String(index))) % palette.length;
+    for (let offset = 0; offset < palette.length; offset++) {
+      const color = palette[(paletteIndex + offset) % palette.length];
+      if (!usedColors.has(color)) {
+        return color;
+      }
+    }
+    return palette[index % palette.length];
+  }
+
+  private getGeoDistributionProviderKeys(cloudType: string): string[] {
+    const normalizedValue = this.normalizeKey(cloudType || '');
+    const providerKeys = Object.keys(PUBLIC_CLOUD_GEO_PROVIDER_COLORS).filter(key => normalizedValue.indexOf(key) > -1);
+    return providerKeys.reduce((result: string[], key) => {
+      const providerKey = this.getGeoDistributionPrimaryProviderKey(key);
+      if (result.indexOf(providerKey) === -1) {
+        result.push(providerKey);
+      }
+      return result;
+    }, []);
+  }
+
+  private getGeoDistributionPrimaryProviderKey(providerKey: string): string {
+    const normalizedKey = this.normalizeKey(providerKey);
+    if (normalizedKey.indexOf('amazon') > -1 || normalizedKey === 'aws') {
+      return 'aws';
+    }
+    if (normalizedKey.indexOf('azure') > -1) {
+      return 'azure';
+    }
+    if (normalizedKey.indexOf('google') > -1 || normalizedKey === 'gcp') {
+      return 'gcp';
+    }
+    if (normalizedKey.indexOf('oracle') > -1 || normalizedKey === 'oci') {
+      return 'oci';
+    }
+    return normalizedKey;
+  }
+
+  private getGeoDistributionHash(value: string): number {
+    return String(value || '').split('').reduce((result, char) => ((result << 5) - result) + char.charCodeAt(0), 0);
+  }
+
+  private getReadableTreemapWeights(weights: number[]): number[] {
+    const values = (weights || []).map(weight => Math.max(Number(weight) || 0, 0));
+    const maxWeight = values.reduce((max, weight) => Math.max(max, weight), 0);
+    if (values.length <= 1 || maxWeight <= 0) {
+      return values;
+    }
+
+    const minimumWeight = maxWeight * 0.06;
+    return values.map(weight => weight > 0 ? Math.max(weight, minimumWeight) : weight);
   }
 
   // Squarified treemap: lays cells (sized by weight) into the bounds, keeping aspect ratios close to square.
@@ -993,98 +1348,1188 @@ export class PublicCloudComputeDashboardService {
    */
 
   /*
-   * -----Start----- Performance Hotspots Widget Related -------------------
+   * -----Start----- Account - Subscription - Project Metrics Widget Related -------------------
    */
-  getPerformanceHotspots(criteria: PublicCloudDashboardFilterCriteria | undefined, sort: string): Observable<PublicCloudPerformanceHotspotRow[]> {
-    const params = this.convertFiltersToApiParams(criteria).set('sort', sort);
-    return this.http.get<PublicCloudPerformanceHotspotsResponse>(PUBLIC_CLOUD_PERFORMANCE_HOTSPOTS_ENDPOINT, { params })
-      .pipe(map(res => this.convertToPerformanceHotspotRows(res)));
+  getAccountSubscriptionProjectMetrics(criteria?: PublicCloudDashboardFilterCriteria, search = '', page = 1, pageSize = 10): Observable<PublicCloudAccountSubscriptionMetricsApiResponse> {
+    let params = this.convertFiltersToApiParams(criteria);
+    if (search) {
+      params = params.set('search', search);
+    }
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    return this.http.get<PublicCloudAccountSubscriptionMetricsApiResponse>(PUBLIC_CLOUD_ACCOUNT_SUBSCRIPTION_PROJECT_METRICS_ENDPOINT, { params });
   }
 
-  convertToPerformanceHotspotRows(data: PublicCloudPerformanceHotspotsResponse): PublicCloudPerformanceHotspotRow[] {
-    const rows = data?.data || data?.results || data?.items || [];
-    return (rows || []).map(item => {
-      const cloud = this.getFirstValue(item.cloud, item.provider, item.cloud_type);
-      const cpu = this.getFirstNumericValue(item.cpu_utilization_percent, item.cpu_utilization, item.cpu_vcpus);
-      const memory = this.getFirstNumericValue(item.available_memory, item.available_memory_gb);
+  getAccountSubscriptionProjectMetricsStaticResponse(search = '', page = 1, pageSize = 10): PublicCloudAccountSubscriptionMetricsResponse {
+    const rows = PUBLIC_CLOUD_ACCOUNT_SUBSCRIPTION_PROJECT_METRICS_RESPONSE || [];
+    const normalizedSearch = String(search || '').toLowerCase().trim();
+    const filteredRows = normalizedSearch
+      ? rows.filter(row => [row.provider, row.accountName, row.account_name, row.account, row.subscription, row.project, row.compartment, row.region]
+        .some(value => String(value || '').toLowerCase().indexOf(normalizedSearch) > -1))
+      : rows;
+    const startIndex = (page - 1) * pageSize;
+    return {
+      count: filteredRows.length,
+      results: filteredRows.slice(startIndex, startIndex + pageSize)
+    };
+  }
+
+  getComputeInstanceByAccount(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAccountMetricChartResponse> {
+    return this.http.get<PublicCloudAccountMetricChartResponse>(PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_ACCOUNT_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getEstimatedMonthlyCostByAccount(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAccountMetricChartResponse> {
+    return this.http.get<PublicCloudAccountMetricChartResponse>(PUBLIC_CLOUD_ESTIMATED_MONTHLY_COST_BY_ACCOUNT_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getVcpuUtilizationByAccount(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAccountMetricChartResponse> {
+    return this.http.get<PublicCloudAccountMetricChartResponse>(PUBLIC_CLOUD_VCPU_UTILIZATION_BY_ACCOUNT_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getCostEfficiencyByAccount(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAccountMetricChartResponse> {
+    return this.http.get<PublicCloudAccountMetricChartResponse>(PUBLIC_CLOUD_COST_EFFICIENCY_BY_ACCOUNT_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getComputeInstanceByAccountStaticResponse(): PublicCloudAccountMetricChartResponse {
+    return PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_ACCOUNT_RESPONSE;
+  }
+
+  getEstimatedMonthlyCostByAccountStaticResponse(): PublicCloudAccountMetricChartResponse {
+    return PUBLIC_CLOUD_ESTIMATED_MONTHLY_COST_BY_ACCOUNT_RESPONSE;
+  }
+
+  getVcpuUtilizationByAccountStaticResponse(): PublicCloudAccountMetricChartResponse {
+    return PUBLIC_CLOUD_VCPU_UTILIZATION_BY_ACCOUNT_RESPONSE;
+  }
+
+  getCostEfficiencyByAccountStaticResponse(): PublicCloudAccountMetricChartResponse {
+    return PUBLIC_CLOUD_COST_EFFICIENCY_BY_ACCOUNT_RESPONSE;
+  }
+
+  convertToAccountSubscriptionMetricRows(data: PublicCloudAccountSubscriptionMetricsApiResponse): PublicCloudAccountSubscriptionMetricRow[] {
+    return this.getAccountSubscriptionMetricResults(data).map(item => {
+      const usedVcpu = this.getFirstNumericValue(item.usedVcpu, item.used_vcpu) || 0;
+      const totalVcpu = this.getFirstNumericValue(item.totalVcpu, item.total_vcpu) || 0;
+      const vcpuPercent = totalVcpu ? Math.min(Math.round((usedVcpu / totalVcpu) * 1000) / 10, 100) : 0;
+      const monthlyCost = this.getFirstNumericValue(item.estimatedMonthlyCost, item.estimated_monthly_cost, item.monthlyCost, item.monthly_cost) || 0;
+      const vcpuTone: PublicCloudStatusTone = vcpuPercent > 70 ? 'warning' : 'success';
       return {
-        instanceName: this.getFirstValue(item.name, item.instance_name, item.instanceName),
-        cloud,
-        cloudLogo: this.getHotspotCloudLogo(this.getFirstValue(item.cloud_key, cloud)),
-        cpuLabel: cpu === null ? 'NA' : `${this.formatNumber(cpu)}%`,
-        memoryLabel: memory === null ? 'NA' : `${this.formatNumber(memory)} GB`,
-        disk: this.convertToHotspotDisk(item.disk_utilization || item.disk_size),
-        dataDiskBytes: this.getHotspotReadWrite(
-          this.getFirstValue(item.data_disk_read_write_bytes?.read, item.disk_read_bytes_per_second),
-          this.getFirstValue(item.data_disk_read_write_bytes?.write, item.disk_write_bytes_per_second),
-          'Read: ', 'Write: ', ' B/s'),
-        dataDiskRates: this.getHotspotReadWrite(
-          this.getFirstValue(item.data_disk_read_write_rates?.read_ops, item.disk_read_operations_per_second),
-          this.getFirstValue(item.data_disk_read_write_rates?.write_ops, item.disk_write_operations_per_second),
-          'Read Ops: ', 'Write Ops: ', ' /s'),
-        networkTraffic: this.getFirstValue(item.avg_network_traffic, item.network_traffic) || 'NA'
+        provider: this.getFirstValue(item.provider),
+        account: this.getFirstValue(item.accountName, item.account_name, item.account, item.subscription, item.project, item.compartment),
+        region: this.getFirstValue(item.region),
+        instanceCount: this.getFirstNumericValue(item.instanceCount, item.instance_count) || 0,
+        usedVcpu,
+        totalVcpu,
+        vcpuPercent,
+        vcpuTone,
+        estimatedMonthlyCost: monthlyCost,
+        estimatedMonthlyCostLabel: `$${this.formatNumber(monthlyCost)}`
+      };
+    }).filter(row => !!row.provider && !!row.account);
+  }
+
+  getAccountSubscriptionProjectMetricsTotal(data: PublicCloudAccountSubscriptionMetricsApiResponse): number {
+    if (Array.isArray(data)) {
+      return data.length;
+    }
+    return Number(data?.count || data?.total || 0) || this.getAccountSubscriptionMetricResults(data).length;
+  }
+
+  convertToAccountSubscriptionInstanceChartOptions(data: PublicCloudAccountMetricChartResponse): EChartsOption {
+    return this.getAccountMetricChartOptions(data, 'Compute Instance by Account', item => this.getFirstNumericValue(item.instance_count) || 0);
+  }
+
+  convertToAccountSubscriptionCostChartOptions(data: PublicCloudAccountMetricChartResponse): EChartsOption {
+    return this.getAccountMetricChartOptions(data, 'Est. Monthly Cost by Account', item => this.getFirstNumericValue(item.estimated_monthly_cost) || 0);
+  }
+
+  convertToAccountSubscriptionVcpuChartOptions(data: PublicCloudAccountMetricChartResponse): EChartsOption {
+    return this.getAccountMetricChartOptions(data, 'vCPU Utilization by Account', item => this.getFirstNumericValue(item.vcpu_utilization) || 0, 'vCPU %');
+  }
+
+  convertToAccountSubscriptionEfficiencyChartOptions(data: PublicCloudAccountMetricChartResponse): EChartsOption {
+    return this.getAccountMetricChartOptions(data, 'Cost Efficiency ($/Compute Instance) by Account', item => this.getFirstNumericValue(item.cost_per_instance) || 0);
+  }
+
+  private getAccountSubscriptionMetricResults(data: PublicCloudAccountSubscriptionMetricsApiResponse): PublicCloudAccountSubscriptionMetricResponseItem[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return data?.results || data?.data || data?.items || [];
+  }
+
+  private getAccountMetricChartOptions(rows: PublicCloudAccountMetricChartResponse, title: string, valueGetter: (row: PublicCloudAccountMetricChartResponseItem) => number, legendName = ''): EChartsOption {
+    if (!(rows || []).length) {
+      return {};
+    }
+    const chartRows = (rows || []).slice(0, 12);
+    const labels = chartRows.map(row => row.account);
+    return {
+      color: chartRows.map(row => this.getAccountSubscriptionProviderColor(row.provider)),
+      title: {
+        text: title,
+        left: 'center',
+        top: 8,
+        textStyle: {
+          color: '#2e4055',
+          fontSize: 13,
+          fontWeight: 600
+        }
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' }
+      },
+      legend: legendName ? {
+        bottom: 6,
+        left: 'center',
+        data: [legendName],
+        icon: 'roundRect',
+        itemWidth: 14,
+        itemHeight: 14,
+        textStyle: { color: '#2e4055', fontSize: 13 }
+      } : undefined,
+      grid: {
+        left: 8,
+        right: 20,
+        top: 46,
+        bottom: legendName ? 30 : 8,
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: labels,
+        axisTick: { show: false },
+        axisLine: { lineStyle: { color: '#dce2e7' } },
+        axisLabel: {
+          color: '#5c6c82',
+          fontSize: 11,
+          interval: 0,
+          rotate: 35
+        }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        splitLine: { lineStyle: { color: '#e7ecf0' } },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: '#5c6c82', fontSize: 11 }
+      },
+      series: [
+        {
+          name: legendName || title,
+          type: 'bar',
+          barMaxWidth: 36,
+          data: chartRows.map(row => ({
+            value: valueGetter(row),
+            itemStyle: {
+              color: this.getAccountSubscriptionProviderColor(row.provider),
+              borderRadius: [3, 3, 0, 0]
+            }
+          }))
+        }
+      ]
+    };
+  }
+
+  private getAccountSubscriptionProviderColor(provider: string): string {
+    switch (this.normalizePlatformValue(provider)) {
+      case 'aws':
+        return '#ff9900';
+      case 'azure':
+        return '#087ccc';
+      case 'gcp':
+        return '#34a853';
+      case 'oci':
+      case 'oracle':
+        return '#c94736';
+      default:
+        return '#5a7ed8';
+    }
+  }
+  /*
+   * ******End ****** Account - Subscription - Project Metrics Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Capacity and Performance Widget Related -------------------
+   */
+  getCapacityPerformanceTable(criteria?: PublicCloudDashboardFilterCriteria, search = '', page = 1, pageSize = 10): Observable<PublicCloudCapacityPerformanceTableResponse> {
+    let params = this.convertFiltersToApiParams(criteria);
+    if (search) {
+      params = params.set('search', search);
+    }
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    return this.http.get<PublicCloudCapacityPerformanceTableResponse>(PUBLIC_CLOUD_CAPACITY_PERFORMANCE_TABLE_ENDPOINT, { params });
+  }
+
+  getCapacityPerformanceCharts(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudCapacityPerformanceChartsResponse> {
+    return this.http.get<PublicCloudCapacityPerformanceChartsResponse>(PUBLIC_CLOUD_CAPACITY_PERFORMANCE_CHARTS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getCapacityPerformanceTableStaticResponse(search = '', page = 1, pageSize = 10): PublicCloudCapacityPerformanceTableResponse {
+    const rows = PUBLIC_CLOUD_CAPACITY_PERFORMANCE_TABLE_RESPONSE || [];
+    const normalizedSearch = String(search || '').toLowerCase().trim();
+    const filteredRows = normalizedSearch
+      ? rows.filter(row => [row.name, row.provider, row.region, row.account, row.type, row.os]
+        .some(value => String(value || '').toLowerCase().indexOf(normalizedSearch) > -1))
+      : rows;
+    const startIndex = (page - 1) * pageSize;
+    return {
+      count: filteredRows.length,
+      results: filteredRows.slice(startIndex, startIndex + pageSize)
+    };
+  }
+
+  getCapacityPerformanceChartsStaticResponse(): PublicCloudCapacityPerformanceChartsResponse {
+    return PUBLIC_CLOUD_CAPACITY_PERFORMANCE_CHARTS_RESPONSE;
+  }
+
+  convertToCapacityPerformanceRows(data: PublicCloudCapacityPerformanceTableResponse): PublicCloudCapacityPerformanceRow[] {
+    return this.getCapacityPerformanceResults(data).map(row => {
+      const cpuPct = this.getNumberValue(row?.cpuPct);
+      const memPct = this.getNumberValue(row?.memPct);
+      const forecast = this.getNumberValue(row?.cpuForecast90d);
+      const trend = Array.isArray(row?.cpuTrend) ? row.cpuTrend.map(value => this.getNumberValue(value)) : [];
+      const forecastDirection: 'up' | 'down' | '' = forecast > cpuPct ? 'up' : (forecast < cpuPct ? 'down' : '');
+      return {
+        id: this.getFirstValue(row?.id),
+        name: this.getFirstValue(row?.name),
+        providerKey: this.normalizePlatformValue(row?.provider),
+        provider: this.getFirstValue(row?.provider),
+        region: this.getFirstValue(row?.region),
+        type: this.getFirstValue(row?.type),
+        os: this.getFirstValue(row?.os),
+        statusLabel: this.getCapacityStateLabel(row?.state),
+        statusIconClass: this.getCapacityStateIconClass(row?.state),
+        cpuPct,
+        cpuLabel: `${this.formatCapacityDecimal(cpuPct)}% CPU`,
+        cpuTone: this.getCapacityStatusTone(row?.cpuStatus),
+        memoryPct: memPct,
+        memoryLabel: `${this.formatCapacityDecimal(memPct)}% Mem`,
+        memoryTone: this.getCapacityStatusTone(row?.memStatus),
+        availableMemory: this.getFirstValue(row?.availableMemory) || 'N/A',
+        diskIops: `${this.formatNumber(this.getNumberValue(row?.diskIOPS))} IOPS`,
+        diskThroughput: `${this.formatCapacityDecimal(this.getNumberValue(row?.diskThroughputMBs))} MB/s`,
+        networkThroughput: `${this.formatCapacityDecimal(this.getNumberValue(row?.netThroughputMbps))} Mbps`,
+        networkColor: this.getCapacityStatusColor(row?.netStatus),
+        cpuTrendPoints: this.getCapacitySparklinePoints(trend),
+        cpuTrendColor: this.getCapacityTrendColor(trend),
+        hasCpuTrend: trend.length > 1,
+        forecastLabel: `${this.formatCapacityDecimal(forecast)}%`,
+        forecastDirection,
+        forecastColor: forecastDirection === 'up' ? PUBLIC_CLOUD_CAPACITY_STATUS_COLORS.critical : (forecastDirection === 'down' ? PUBLIC_CLOUD_CAPACITY_STATUS_COLORS.info : '#6b7682')
+      };
+    }).filter(row => !!row.name);
+  }
+
+  getCapacityPerformanceTotal(data: PublicCloudCapacityPerformanceTableResponse): number {
+    return Number(data?.count || 0) || this.getCapacityPerformanceResults(data).length;
+  }
+
+  convertToCapacityFleetStatusOptions(data: PublicCloudCapacityFleetStatus): EChartsOption {
+    if (!(data?.labels || []).length || !(data?.series || []).length) {
+      return {};
+    }
+    const series: any[] = (data?.series || []).map(item => ({
+      name: item.label,
+      type: 'bar',
+      barMaxWidth: 16,
+      itemStyle: { color: this.getCapacityStatusColor(item.status), borderRadius: [3, 3, 0, 0] },
+      data: item.data || []
+    }));
+    return {
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      legend: { show: false },
+      grid: { left: 34, right: 12, top: 16, bottom: 24 },
+      xAxis: { type: 'category', data: data?.labels || [], axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      yAxis: { type: 'value', min: 0, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      series
+    };
+  }
+
+  convertToCapacityCpuDistributionOptions(data: PublicCloudCapacityCpuDistribution): EChartsOption {
+    const bands = (data?.bands && data.bands.length) ? data.bands : (data?.labels || []).map((label, index) => ({
+      label,
+      status: (data?.statuses || [])[index],
+      count: (data?.counts || [])[index]
+    }));
+    const points: any[] = bands.map(band => ({
+      value: this.getNumberValue(band.count),
+      itemStyle: { color: this.getCapacityStatusColor(band.status), borderRadius: [3, 3, 0, 0] }
+    }));
+    return {
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      grid: { left: 34, right: 12, top: 16, bottom: 24 },
+      xAxis: { type: 'category', data: bands.map(band => band.label), axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      yAxis: { type: 'value', min: 0, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      series: [{ type: 'bar', barMaxWidth: 34, data: points }]
+    };
+  }
+
+  convertToCapacityTopOptions(data: PublicCloudCapacityTopItem[], valueSuffix = ''): EChartsOption {
+    // Data is highest-first; ECharts category axis renders bottom-up, so reverse for top-down display.
+    const items = (data || []).slice().reverse();
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatNumber(row.value)}${valueSuffix ? ' ' + valueSuffix : ''}` : '';
+        }
+      },
+      grid: { left: 130, right: 44, top: 6, bottom: 6 },
+      xAxis: { type: 'value', min: 0, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 10 } },
+      yAxis: { type: 'category', data: items.map(item => item.name), axisTick: { show: false }, axisLine: { show: false }, axisLabel: { color: '#4a5b6b', fontSize: 10 } },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 13,
+        label: { show: true, position: 'right', color: '#4a5b6b', fontSize: 10, formatter: (params: any) => this.formatNumber(params.value) },
+        data: items.map(item => ({ value: this.getNumberValue(item.value), itemStyle: { color: this.getAccountSubscriptionProviderColor(item.provider), borderRadius: [0, 3, 3, 0] } }))
+      }]
+    };
+  }
+
+  convertToCapacityGrowthOptions(data: PublicCloudCapacityGrowthInsights): EChartsOption {
+    const months = data?.months || [];
+    const forecastMonths = data?.forecastMonths || [];
+    const history = (data?.cpuHistory || []).map(value => this.getNumberValue(value));
+    const forecast = (data?.cpuForecast || []).map(value => this.getNumberValue(value));
+    const labels = [...months, ...forecastMonths];
+    const historyData: Array<number | null> = labels.map((label, index) => index < history.length ? history[index] : null);
+    const forecastData: Array<number | null> = labels.map(() => null);
+    if (history.length > 0) {
+      forecastData[history.length - 1] = history[history.length - 1];
+      forecast.forEach((value, index) => { forecastData[history.length + index] = value; });
+    }
+    return {
+      color: ['#2f6fed'],
+      tooltip: { trigger: 'axis' },
+      legend: { show: false },
+      grid: { left: 36, right: 16, top: 12, bottom: 24 },
+      xAxis: { type: 'category', boundaryGap: false, data: labels, axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 10 } },
+      yAxis: { type: 'value', min: 0, max: 100, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 10 } },
+      series: [
+        { name: 'CPU %', type: 'line', smooth: true, showSymbol: true, symbolSize: 6, lineStyle: { color: '#2f6fed', width: 2 }, itemStyle: { color: '#2f6fed' }, data: historyData },
+        { name: 'CPU % Forecast', type: 'line', smooth: true, showSymbol: true, symbolSize: 6, lineStyle: { color: '#2f6fed', width: 2, type: 'dashed' }, itemStyle: { color: '#2f6fed' }, data: forecastData }
+      ]
+    };
+  }
+
+  private getCapacityPerformanceResults(data: PublicCloudCapacityPerformanceTableResponse): PublicCloudCapacityPerformanceRowResponse[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return data?.results || data?.data || data?.items || [];
+  }
+
+  private getCapacityStateLabel(state?: string): string {
+    switch (String(state || '').toLowerCase()) {
+      case 'running':
+        return 'Running';
+      case 'idle':
+        return 'Idle';
+      case 'stopped':
+        return 'Stopped';
+      default:
+        return this.getFirstValue(state) || 'Unknown';
+    }
+  }
+
+  private getCapacityStateIconClass(state?: string): string {
+    switch (String(state || '').toLowerCase()) {
+      case 'running':
+        return 'fas fa-play-circle text-success';
+      case 'idle':
+        return 'fas fa-pause-circle text-warning';
+      case 'stopped':
+        return 'fas fa-stop-circle text-danger';
+      default:
+        return 'fas fa-circle text-muted';
+    }
+  }
+
+  private getCapacityStatusColor(status?: string): string {
+    return PUBLIC_CLOUD_CAPACITY_STATUS_COLORS[String(status || '').toLowerCase()] || '#c9cdd3';
+  }
+
+  private getCapacityStatusTone(status?: string): PublicCloudStatusTone {
+    switch (String(status || '').toLowerCase()) {
+      case 'critical':
+        return 'danger';
+      case 'warning':
+        return 'warning';
+      case 'info':
+        return 'success';
+      default:
+        return 'muted';
+    }
+  }
+
+  private getCapacitySparklinePoints(trend: number[]): string {
+    const values = trend || [];
+    if (values.length < 2) {
+      return '';
+    }
+    const width = 80;
+    const height = 24;
+    const maxScale = 100;
+    return values.map((value, index) => {
+      const x = (index / (values.length - 1)) * width;
+      const y = height - (Math.max(0, Math.min(value, maxScale)) / maxScale) * height;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+  }
+
+  private getCapacityTrendColor(trend: number[]): string {
+    const values = trend || [];
+    if (values.length < 2) {
+      return '#9aa6b2';
+    }
+    const delta = values[values.length - 1] - values[0];
+    if (delta > 0) {
+      return PUBLIC_CLOUD_CAPACITY_STATUS_COLORS.critical;
+    }
+    if (delta < 0) {
+      return PUBLIC_CLOUD_CAPACITY_STATUS_COLORS.info;
+    }
+    return '#9aa6b2';
+  }
+
+  private formatCapacityDecimal(value: number): string {
+    const numericValue = Number(value || 0);
+    return isNaN(numericValue) ? '0' : numericValue.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+  /*
+   * ******End ****** Capacity and Performance Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Storage - Volumes / Disks Widget Related -------------------
+   */
+  getStorageVolumesTable(criteria?: PublicCloudDashboardFilterCriteria, search = '', page = 1, pageSize = 10): Observable<PublicCloudStorageVolumesTableResponse> {
+    let params = this.convertFiltersToApiParams(criteria);
+    if (search) {
+      params = params.set('search', search);
+    }
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    return this.http.get<PublicCloudStorageVolumesTableResponse>(PUBLIC_CLOUD_STORAGE_VOLUMES_DISKS_ENDPOINT, { params });
+  }
+
+  getStorageProvisionedByProvider(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageProvisionedByProvider[]> {
+    return this.http.get<PublicCloudStorageProvisionedByProvider[]>(PUBLIC_CLOUD_STORAGE_PROVISIONED_BY_PROVIDER_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getStorageTopVolumesByDiskIops(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageTopVolumeResponse[]> {
+    return this.http.get<PublicCloudStorageTopVolumeResponse[]>(PUBLIC_CLOUD_STORAGE_TOP_VOLUMES_IOPS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getStorageIopsTierDistribution(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageIopsTier[]> {
+    return this.http.get<PublicCloudStorageIopsTier[]>(PUBLIC_CLOUD_STORAGE_IOPS_TIER_DISTRIBUTION_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getStorageVolumesTableStaticResponse(search = '', page = 1, pageSize = 10): PublicCloudStorageVolumesTableResponse {
+    const rows = PUBLIC_CLOUD_STORAGE_VOLUMES_DISKS_RESPONSE || [];
+    const normalizedSearch = String(search || '').toLowerCase().trim();
+    const filteredRows = normalizedSearch
+      ? rows.filter(row => [row.volume_name, row.attached_instance, row.provider, row.volume_type, row.iops_tier]
+        .some(value => String(value || '').toLowerCase().indexOf(normalizedSearch) > -1))
+      : rows;
+    const startIndex = (page - 1) * pageSize;
+    return {
+      count: filteredRows.length,
+      results: filteredRows.slice(startIndex, startIndex + pageSize)
+    };
+  }
+
+  getStorageProvisionedByProviderStaticResponse(): PublicCloudStorageProvisionedByProvider[] {
+    return PUBLIC_CLOUD_STORAGE_PROVISIONED_BY_PROVIDER_RESPONSE;
+  }
+
+  getStorageTopVolumesStaticResponse(): PublicCloudStorageTopVolumeResponse[] {
+    return PUBLIC_CLOUD_STORAGE_TOP_VOLUMES_IOPS_RESPONSE;
+  }
+
+  getStorageIopsTierDistributionStaticResponse(): PublicCloudStorageIopsTier[] {
+    return PUBLIC_CLOUD_STORAGE_IOPS_TIER_DISTRIBUTION_RESPONSE;
+  }
+
+  convertToStorageVolumeRows(data: PublicCloudStorageVolumesTableResponse): PublicCloudStorageVolumeRow[] {
+    return this.getStorageVolumeResults(data).map(row => {
+      const iopsThroughput = this.splitStorageIopsThroughput(row?.disk_iops_throughput);
+      const size = this.getNumberValue(row?.size_gb);
+      return {
+        volumeName: this.getFirstValue(row?.volume_name),
+        attachedInstance: this.getFirstValue(row?.attached_instance) || 'N/A',
+        providerKey: this.normalizePlatformValue(row?.provider),
+        provider: this.getFirstValue(row?.provider),
+        volumeType: this.getFirstValue(row?.volume_type) || 'N/A',
+        sizeLabel: (row?.size_gb === null || row?.size_gb === undefined) ? 'N/A' : `${this.formatNumber(size)} GB`,
+        diskIops: iopsThroughput.iops,
+        diskThroughput: iopsThroughput.throughput,
+        iopsTier: this.getFirstValue(row?.iops_tier) || 'N/A'
+      };
+    }).filter(row => !!row.volumeName);
+  }
+
+  getStorageVolumesTotal(data: PublicCloudStorageVolumesTableResponse): number {
+    return Number(data?.count || 0) || this.getStorageVolumeResults(data).length;
+  }
+
+  convertToStorageProvisionedByProviderOptions(data: PublicCloudStorageProvisionedByProvider[]): EChartsOption {
+    const items = (data || []).filter(item => !!this.getFirstValue(item?.provider));
+    const total = items.reduce((sum, item) => sum + this.getNumberValue(item.total_provisioned_storage_gb), 0);
+    if (!items.length || total <= 0) {
+      return {};
+    }
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatNumber(row.value)} GB` : '';
+        }
+      },
+      grid: { left: 52, right: 16, top: 16, bottom: 24 },
+      xAxis: { type: 'category', data: items.map(item => this.getFirstValue(item.provider)), axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      yAxis: { type: 'value', min: 0, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 40,
+        data: items.map(item => ({
+          value: this.getNumberValue(item.total_provisioned_storage_gb),
+          itemStyle: { color: this.getAccountSubscriptionProviderColor(item.provider), borderRadius: [3, 3, 0, 0] }
+        }))
+      }]
+    };
+  }
+
+  convertToStorageTopVolumesOptions(data: PublicCloudStorageTopVolumeResponse[]): EChartsOption {
+    // Data is highest-first; ECharts category axis renders bottom-up, so reverse for top-down display.
+    const items = (data || []).slice().reverse();
+    const total = items.reduce((sum, item) => sum + this.getNumberValue(item.disk_iops), 0);
+    if (!items.length || total <= 0) {
+      return {};
+    }
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatNumber(row.value)} IOPS` : '';
+        }
+      },
+      grid: { left: 130, right: 44, top: 6, bottom: 6 },
+      xAxis: { type: 'value', min: 0, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 10 } },
+      yAxis: { type: 'category', data: items.map(item => this.getStorageTopVolumeLabel(item)), axisTick: { show: false }, axisLine: { show: false }, axisLabel: { color: '#4a5b6b', fontSize: 10 } },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 13,
+        label: { show: true, position: 'right', color: '#4a5b6b', fontSize: 10, formatter: (params: any) => this.formatNumber(params.value) },
+        data: items.map(item => ({ value: this.getNumberValue(item.disk_iops), itemStyle: { color: this.getAccountSubscriptionProviderColor(item.provider), borderRadius: [0, 3, 3, 0] } }))
+      }]
+    };
+  }
+
+  convertToStorageIopsTierOptions(data: PublicCloudStorageIopsTier[]): EChartsOption {
+    const tiers = (data || []).filter(tier => this.getNumberValue(tier?.volume_count) > 0);
+    if (!tiers.length) {
+      return {};
+    }
+    const total = tiers.reduce((sum, tier) => sum + this.getNumberValue(tier.volume_count), 0);
+    return {
+      color: tiers.map(tier => this.getStorageTierColor(tier.performance_tier)),
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params?.name}: ${this.formatNumber(params?.value)} volumes`
+      },
+      title: {
+        text: this.formatNumber(total),
+        subtext: 'Volumes',
+        left: 'center',
+        top: 'center',
+        itemGap: 2,
+        textStyle: { fontSize: 20, fontWeight: 700, color: '#2b3642' },
+        subtextStyle: { fontSize: 12, color: '#6b7682' }
+      },
+      series: [{
+        type: 'pie',
+        radius: ['52%', '76%'],
+        center: ['50%', '50%'],
+        avoidLabelOverlap: true,
+        label: { show: false },
+        labelLine: { show: false },
+        data: tiers.map(tier => ({
+          name: this.getFirstValue(tier.performance_tier),
+          value: this.getNumberValue(tier.volume_count),
+          itemStyle: { color: this.getStorageTierColor(tier.performance_tier) }
+        }))
+      }]
+    };
+  }
+
+  convertToStorageTierLegend(data: PublicCloudStorageIopsTier[]): PublicCloudStorageTierLegendItem[] {
+    return (data || []).filter(tier => this.getNumberValue(tier?.volume_count) > 0).map(tier => ({
+      label: this.getFirstValue(tier.performance_tier),
+      count: this.getNumberValue(tier.volume_count),
+      color: this.getStorageTierColor(tier.performance_tier)
+    }));
+  }
+
+  private getStorageVolumeResults(data: PublicCloudStorageVolumesTableResponse): PublicCloudStorageVolumeRowResponse[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return data?.results || data?.data || data?.items || [];
+  }
+
+  private getStorageTopVolumeLabel(item: PublicCloudStorageTopVolumeResponse): string {
+    const attached = this.getFirstValue(item?.attached_instance);
+    return (attached && attached.toUpperCase() !== 'N/A') ? attached : this.getFirstValue(item?.volume_name);
+  }
+
+  // disk_iops_throughput arrives as a single string ("<iops> IOPS / <throughput> MB/s" or "N/A");
+  // split it into the two display lines the table shows (IOPS on top, throughput below).
+  private splitStorageIopsThroughput(value?: string): { iops: string; throughput: string } {
+    const raw = this.getFirstValue(value);
+    if (!raw || raw.toUpperCase() === 'N/A') {
+      return { iops: 'N/A', throughput: '' };
+    }
+    const parts = raw.split('/');
+    return { iops: (parts[0] || '').trim(), throughput: (parts[1] || '').trim() };
+  }
+
+  private getStorageTierColor(tier?: string): string {
+    return PUBLIC_CLOUD_STORAGE_IOPS_TIER_COLORS[String(tier || '').toLowerCase()] || '#c9cdd3';
+  }
+  /*
+   * ******End ****** Storage - Volumes / Disks Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Instance Provisioning Summary Widget Related -------------------
+   */
+  getInstanceProvisioningTable(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudProvisioningTableResponse> {
+    return this.http.get<PublicCloudProvisioningTableResponse>(PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getProvisioningReachability(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudProvisioningReachability> {
+    return this.http.get<PublicCloudProvisioningReachability>(PUBLIC_CLOUD_PROVISIONING_REACHABILITY_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getProvisionedByProvider(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudProvisionedByProvider[]> {
+    return this.http.get<PublicCloudProvisionedByProvider[]>(PUBLIC_CLOUD_PROVISIONED_BY_PROVIDER_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getRecentlyProvisioned(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudRecentlyProvisioned[]> {
+    return this.http.get<PublicCloudRecentlyProvisioned[]>(PUBLIC_CLOUD_RECENTLY_PROVISIONED_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getProvisioningSummaryMetrics(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudProvisioningSummaryMetricsResponse> {
+    return this.http.get<PublicCloudProvisioningSummaryMetricsResponse>(PUBLIC_CLOUD_PROVISIONING_SUMMARY_METRICS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getInstanceProvisioningTableStaticResponse(): PublicCloudProvisioningRowResponse[] {
+    return PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_RESPONSE;
+  }
+
+  getProvisioningReachabilityStaticResponse(): PublicCloudProvisioningReachability {
+    return PUBLIC_CLOUD_PROVISIONING_REACHABILITY_RESPONSE;
+  }
+
+  getProvisionedByProviderStaticResponse(): PublicCloudProvisionedByProvider[] {
+    return PUBLIC_CLOUD_PROVISIONED_BY_PROVIDER_RESPONSE;
+  }
+
+  getRecentlyProvisionedStaticResponse(): PublicCloudRecentlyProvisioned[] {
+    return PUBLIC_CLOUD_RECENTLY_PROVISIONED_RESPONSE;
+  }
+
+  getProvisioningSummaryMetricsStaticResponse(): PublicCloudProvisioningSummaryMetricsResponse {
+    return PUBLIC_CLOUD_PROVISIONING_SUMMARY_METRICS_RESPONSE;
+  }
+
+  convertToProvisioningRows(data: PublicCloudProvisioningTableResponse | PublicCloudProvisioningRowResponse[]): PublicCloudProvisioningRow[] {
+    return this.getProvisioningResults(data).map(row => {
+      const environment = this.getFirstValue(row?.environment);
+      return {
+        instanceName: this.getFirstValue(row?.instance_name),
+        providerKey: this.normalizePlatformValue(row?.provider),
+        provider: this.getFirstValue(row?.provider),
+        region: this.getFirstValue(row?.region) || 'N/A',
+        account: this.getFirstValue(row?.account) || 'N/A',
+        type: this.getFirstValue(row?.type) || 'N/A',
+        environment: environment || 'N/A',
+        environmentClass: this.getProvisioningEnvironmentClass(environment),
+        statusLabel: this.getCapacityStateLabel(row?.status),
+        statusIconClass: this.getCapacityStateIconClass(row?.status),
+        provisionedDate: this.getProvisionedDateLabel(row?.provisioned_date),
+        daysSinceProvisioned: this.getNumberValue(row?.days_since_provisioned)
       };
     }).filter(row => !!row.instanceName);
   }
 
-  private convertToHotspotDisk(disk?: { capacity?: string | number; used?: string | number; free?: string | number }): PublicCloudPerformanceHotspotDisk | null {
-    if (!disk || typeof disk !== 'object') {
-      return null;
+  convertToProvisioningSummaryMetrics(data: PublicCloudProvisioningSummaryMetricsResponse): PublicCloudProvisioningSummaryMetric[] {
+    return PUBLIC_CLOUD_PROVISIONING_SUMMARY_KPI_CONFIG.map(config => ({
+      label: config.label,
+      value: this.formatProvisioningMetricValue(this.getNumberValue(data?.[config.key]), config.format),
+      tone: config.tone
+    }));
+  }
+
+  convertToProvisioningReachabilityOptions(data: PublicCloudProvisioningReachability): EChartsOption {
+    const reachable = this.getNumberValue(data?.reachable);
+    const unreachable = this.getNumberValue(data?.unreachable);
+    if (reachable + unreachable <= 0) {
+      return {};
     }
-    const capacity = this.getFirstValue(disk.capacity);
-    const used = this.getFirstValue(disk.used);
-    const freeValue = this.getFirstNumericValue(disk.free);
-    if (!capacity && !used && freeValue === null) {
-      return null;
-    }
-    const free = freeValue === null ? 0 : Math.max(Math.min(freeValue, 100), 0);
-    const usedPercent = Math.max(Math.min(100 - free, 100), 0);
     return {
-      capacityLabel: capacity,
-      usedLabel: used,
-      freeLabel: `${this.formatNumber(free)}%`,
-      usedPercent,
-      tone: this.getHotspotDiskTone(usedPercent)
+      color: ['#3bb273', '#e5484d'],
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params?.name}: ${this.formatNumber(params?.value)}`
+      },
+      series: [{
+        type: 'pie',
+        radius: ['58%', '80%'],
+        center: ['50%', '50%'],
+        avoidLabelOverlap: true,
+        label: { show: false },
+        labelLine: { show: false },
+        data: [
+          { name: 'Reachable', value: reachable, itemStyle: { color: '#3bb273' } },
+          { name: 'Unreachable', value: unreachable, itemStyle: { color: '#e5484d' } }
+        ]
+      }]
     };
   }
 
-  private getHotspotReadWrite(read: string | number | undefined, write: string | number | undefined, readPrefix: string, writePrefix: string, suffix: string): PublicCloudPerformanceHotspotReadWrite | null {
-    const readValue = this.getFirstValue(read);
-    const writeValue = this.getFirstValue(write);
-    if (!readValue && !writeValue) {
-      return null;
+  convertToProvisioningReachabilityLegend(data: PublicCloudProvisioningReachability): PublicCloudProvisioningReachabilityLegendItem[] {
+    const reachablePct = this.getNumberValue(data?.reachable_percentage);
+    return [
+      { label: 'Reachable', percent: `${this.formatCapacityDecimal(reachablePct)}%`, color: '#3bb273' },
+      { label: 'Unreachable', percent: `${this.formatCapacityDecimal(Math.max(100 - reachablePct, 0))}%`, color: '#e5484d' }
+    ];
+  }
+
+  convertToProvisioningByProviderOptions(data: PublicCloudProvisionedByProvider[]): EChartsOption {
+    const items = (data || []).filter(item => !!this.getFirstValue(item?.provider));
+    if (!items.length) {
+      return {};
     }
     return {
-      readLabel: readValue ? `${readPrefix}${this.formatHotspotMetric(readValue)}${this.getHotspotMetricSuffix(readValue, suffix)}` : '',
-      writeLabel: writeValue ? `${writePrefix}${this.formatHotspotMetric(writeValue)}${this.getHotspotMetricSuffix(writeValue, suffix)}` : ''
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatNumber(row.value)}` : '';
+        }
+      },
+      grid: { left: 30, right: 16, top: 16, bottom: 24 },
+      xAxis: { type: 'category', data: items.map(item => this.getProvisioningProviderLabel(item.provider)), axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      yAxis: { type: 'value', min: 0, minInterval: 1, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 40,
+        data: items.map(item => ({
+          value: this.getNumberValue(item.count),
+          itemStyle: { color: this.getAccountSubscriptionProviderColor(item.provider), borderRadius: [3, 3, 0, 0] }
+        }))
+      }]
     };
   }
 
-  // Thousands-separate bare numbers (e.g. ops counts); leave values that already carry units as-is.
-  private formatHotspotMetric(value: string | number): string {
-    const numericValue = this.getFirstNumericValue(value);
-    return numericValue !== null && !/[a-z%/]/i.test(String(value)) ? this.formatNumber(numericValue) : this.getFirstValue(value);
-  }
-
-  // Bare numbers get the column unit appended; a value that already carries its own unit
-  // (e.g. "1.2 MB/s" from the older response shape) is left alone so the unit is not doubled.
-  private getHotspotMetricSuffix(value: string, suffix: string): string {
-    return /[a-z%/]/i.test(String(value)) ? '' : suffix;
-  }
-
-  private getHotspotCloudLogo(cloud: string): string {
-    const logo = PUBLIC_CLOUD_HOTSPOT_PROVIDER_LOGOS[this.normalizePlatformValue(cloud)];
-    return logo ? `${environment.assetsUrl}external-brand/${logo}` : '';
-  }
-
-  private getHotspotDiskTone(usedPercent: number): PublicCloudStatusTone {
-    if (usedPercent <= 50) {
-      return 'success';
+  convertToRecentlyProvisionedOptions(data: PublicCloudRecentlyProvisioned[]): EChartsOption {
+    const items = (data || []).filter(item => !!this.getFirstValue(item?.provisioned_date));
+    if (!items.length) {
+      return {};
     }
-    return usedPercent <= 80 ? 'warning' : 'danger';
+    // Oldest-first so the y-rank climbs with the date - the diagonal timeline the design shows.
+    const sorted = items.slice().sort((first, second) => String(first.provisioned_date).localeCompare(String(second.provisioned_date)));
+    const total = sorted.length;
+    const points: any[] = sorted.map((item, index) => ({
+      name: this.getFirstValue(item.instance_name),
+      value: [this.getFirstValue(item.provisioned_date), index + 1],
+      itemStyle: { color: this.getAccountSubscriptionProviderColor(item.provider) },
+      // Later points sit to the right, so their labels read to the left (and vice versa) to stay in frame.
+      label: {
+        show: true,
+        position: index >= total / 2 ? 'left' : 'right',
+        formatter: this.getFirstValue(item.instance_name),
+        color: '#4a5b6b',
+        fontSize: 11
+      }
+    }));
+    const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return {
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params?.data?.name}: ${params?.value?.[0] || ''}`
+      },
+      grid: { left: 90, right: 110, top: 16, bottom: 28 },
+      xAxis: {
+        type: 'time',
+        splitNumber: 5,
+        axisTick: { show: false },
+        axisLine: { lineStyle: { color: '#dce2e7' } },
+        splitLine: { lineStyle: { color: '#eef1f4' } },
+        axisLabel: {
+          color: '#5c6c82',
+          fontSize: 10,
+          hideOverlap: true,
+          formatter: (value: number) => {
+            const date = new Date(value);
+            return `${monthLabels[date.getMonth()]} ${date.getDate()}`;
+          }
+        }
+      },
+      yAxis: { type: 'value', min: 0, max: total + 1, show: false },
+      series: [{ type: 'scatter', symbolSize: 10, data: points }]
+    };
+  }
+
+  private getProvisioningResults(data: PublicCloudProvisioningTableResponse | PublicCloudProvisioningRowResponse[]): PublicCloudProvisioningRowResponse[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return data?.results || data?.data || data?.items || [];
+  }
+
+  private getProvisioningEnvironmentClass(environment?: string): string {
+    return PUBLIC_CLOUD_PROVISIONING_ENVIRONMENT_CLASS[String(environment || '').toLowerCase()] || 'provisioning-env-default';
+  }
+
+  private getProvisioningProviderLabel(provider?: string): string {
+    const value = this.getFirstValue(provider);
+    return value ? value.toUpperCase() : '';
+  }
+
+  // Provisioned date arrives as "YYYY-MM-DD" or "YYYY-MM-DD HH:MM:SS"; the table shows the date only.
+  private getProvisionedDateLabel(value?: string): string {
+    const raw = this.getFirstValue(value);
+    return raw ? raw.split(' ')[0] : 'N/A';
+  }
+
+  private formatProvisioningMetricValue(value: number, format: 'int' | 'pct' | 'min'): string {
+    if (format === 'pct') {
+      return `${this.formatCapacityDecimal(value)}%`;
+    }
+    if (format === 'min') {
+      return `${this.formatCapacityDecimal(value)}m`;
+    }
+    return this.formatNumber(value);
   }
   /*
-   * ******End ****** Performance Hotspots Widget Related ********************
+   * ******End ****** Instance Provisioning Summary Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Public Cloud Database Widget Related -------------------
+   */
+  getPublicCloudDatabase(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseInventoryResponse> {
+    return this.http.get<PublicCloudDatabaseInventoryResponse>(PUBLIC_CLOUD_DATABASE_INVENTORY_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getPublicCloudDatabaseStaticResponse(): PublicCloudDatabaseInventoryResponse {
+    return PUBLIC_CLOUD_DATABASE_INVENTORY_RESPONSE;
+  }
+
+  convertToDatabaseSummaryMetrics(data: PublicCloudDatabaseInventoryResponse): PublicCloudDatabaseSummaryMetric[] {
+    const summary = (data?.summary || {}) as Record<string, number>;
+    return PUBLIC_CLOUD_DATABASE_SUMMARY_KPI_CONFIG.map(config => ({
+      label: config.label,
+      tone: config.tone,
+      info: config.info,
+      value: this.formatDatabaseKpiValue(this.getNumberValue(summary[config.key]), config.format)
+    }));
+  }
+
+  convertToDatabaseMonitoredCards(data: PublicCloudDatabaseInventoryResponse): PublicCloudDatabaseMonitoredCard[] {
+    const discovery = data?.discovery || {};
+    return Object.keys(discovery).map(providerName => {
+      const item = discovery[providerName] || {};
+      const key = this.normalizePlatformValue(providerName) as PublicCloudProviderDistributionKey;
+      const config = PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG[key];
+      const discovered = this.getNumberValue(item.discovered);
+      const healthy = this.getNumberValue(item.healthy);
+      const degraded = this.getNumberValue(item.degraded);
+      const unknown = this.getNumberValue(item.unknown);
+      const toPercent = (value: number) => discovered > 0 ? (value / discovered) * 100 : 0;
+      return {
+        key,
+        provider: config ? config.name : String(providerName || '').toUpperCase(),
+        iconClass: PUBLIC_CLOUD_PROVIDER_ICON_CONFIG[key] || 'fas fa-cloud',
+        color: config ? config.color : '#5a7ed8',
+        discovered,
+        monitored: this.getNumberValue(item.monitored),
+        healthy,
+        degraded,
+        unknown,
+        healthyPercent: toPercent(healthy),
+        degradedPercent: toPercent(degraded),
+        unknownPercent: toPercent(unknown)
+      };
+    }).sort((first, second) => this.getProviderOrderIndex(first.key) - this.getProviderOrderIndex(second.key));
+  }
+
+  private formatDatabaseKpiValue(value: number, format: 'int' | 'pct' | 'ms'): string {
+    switch (format) {
+      case 'pct':
+        return `${value.toLocaleString('en-US', { maximumFractionDigits: 3 })}%`;
+      case 'ms':
+        return `${value.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ms`;
+      default:
+        return this.formatNumber(value);
+    }
+  }
+  /*
+   * ******End ****** Public Cloud Database Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Database - Performance and Utilization Widget Related -------------------
+   */
+  getDbWorkload(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDbWorkloadRowResponse[]> {
+    return this.http.get<PublicCloudDbWorkloadRowResponse[]>(PUBLIC_CLOUD_DB_WORKLOAD_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getDbQueryPerformance(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDbQueryPerformanceResponse> {
+    return this.http.get<PublicCloudDbQueryPerformanceResponse>(PUBLIC_CLOUD_DB_QUERY_PERFORMANCE_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getDbWorkloadStaticPage(search = '', page = 1, pageSize = 10): { count: number; results: PublicCloudDbWorkloadRowResponse[] } {
+    const rows = PUBLIC_CLOUD_DB_WORKLOAD_RESPONSE || [];
+    const normalizedSearch = String(search || '').toLowerCase().trim();
+    const filteredRows = normalizedSearch
+      ? rows.filter(row => String(row?.name || '').toLowerCase().indexOf(normalizedSearch) > -1)
+      : rows;
+    const startIndex = (page - 1) * pageSize;
+    return {
+      count: filteredRows.length,
+      results: filteredRows.slice(startIndex, startIndex + pageSize)
+    };
+  }
+
+  getDbQueryPerformanceStaticResponse(): PublicCloudDbQueryPerformanceResponse {
+    return PUBLIC_CLOUD_DB_QUERY_PERFORMANCE_RESPONSE;
+  }
+
+  convertToDbWorkloadRows(rows: PublicCloudDbWorkloadRowResponse[], queryPerf: PublicCloudDbQueryPerformanceResponse): PublicCloudDbWorkloadRow[] {
+    const engineMap = this.getDbEngineMap(queryPerf);
+    return (rows || []).map(row => {
+      const cpu = this.getNumberValue(row?.cpu_usage_system_percent);
+      const memory = this.getNumberValue(row?.memory_used_percent);
+      const usedGb = this.getNumberValue(row?.disk_used_gb);
+      const capacityGb = this.getNumberValue(row?.disk_capacity_gb);
+      const storagePct = capacityGb > 0 ? (usedGb / capacityGb) * 100 : this.getNumberValue(row?.disk_utilization_percent);
+      const diskUtil = this.getNumberValue(row?.disk_utilization_percent);
+      const iops = this.getFirstNumericValue(row?.disk_iops, row?.disk_iops_max) || 0;
+      return {
+        name: this.getFirstValue(row?.name),
+        engine: engineMap[this.getFirstValue(row?.db_uuid)] || '',
+        cpuPct: cpu,
+        cpuLabel: `${this.formatCapacityDecimal(cpu)}% CPU`,
+        cpuTone: this.getDbUsageTone(cpu),
+        memoryPct: memory,
+        memoryLabel: `${this.formatCapacityDecimal(memory)}% Mem`,
+        memoryTone: this.getDbUsageTone(memory),
+        storagePct,
+        storageTone: this.getDbUsageTone(storagePct),
+        storageTotalLabel: `Total: ${this.formatCapacityDecimal(capacityGb)} GB`,
+        storageUsedLabel: `Used: ${this.formatCapacityDecimal(usedGb)} GB`,
+        diskUtilizationPct: diskUtil,
+        diskUtilizationLabel: `${this.formatCapacityDecimal(diskUtil)}%`,
+        diskUtilizationTone: this.getDbUsageTone(diskUtil),
+        diskIops: this.formatCapacityDecimal(iops),
+        uptimeLabel: this.formatDbUptime(this.getNumberValue(row?.system_uptime_seconds))
+      };
+    }).filter(row => !!row.name);
+  }
+
+  convertToDbCacheHitOptions(data: PublicCloudDbQueryItem[]): EChartsOption {
+    return this.getDbTopBarOptions((data || []).map(item => ({
+      name: this.getFirstValue(item?.name),
+      value: this.getNumberValue(item?.hit_ratio_pct),
+      status: item?.status
+    })), '%');
+  }
+
+  convertToDbLatencyOptions(data: PublicCloudDbQueryItem[]): EChartsOption {
+    return this.getDbTopBarOptions((data || []).map(item => ({
+      name: this.getFirstValue(item?.name),
+      value: this.getNumberValue(item?.response_time_ms),
+      status: item?.status
+    })), 'ms');
+  }
+
+  convertToDbResponseTimeOptions(data: PublicCloudDbQueryItem[]): EChartsOption {
+    return this.getDbTopBarOptions((data || []).map(item => ({
+      name: this.getFirstValue(item?.name),
+      value: this.getNumberValue(item?.response_time_ms),
+      status: item?.status
+    })), 'ms');
+  }
+
+  convertToDbConnectionsOptions(data: PublicCloudDbQueryItem[]): EChartsOption {
+    return this.getDbTopBarOptions((data || []).map(item => ({
+      name: this.getFirstValue(item?.name),
+      value: this.getNumberValue(item?.active_connections),
+      status: item?.status
+    })), '');
+  }
+
+  convertToDbDeadlocksOptions(data: PublicCloudDbQueryItem[]): EChartsOption {
+    return this.getDbTopBarOptions((data || []).map(item => ({
+      name: this.getFirstValue(item?.name),
+      value: this.getNumberValue(item?.deadlock_count),
+      status: item?.status
+    })), '');
+  }
+
+  convertToDbThroughputTrendOptions(data: PublicCloudDbQueryItem[]): EChartsOption {
+    const series = data || [];
+    const withTrend = series.find(item => (item?.trend || []).length);
+    const dates = (withTrend?.trend || []).map(point => point?.date);
+    const totals = dates.map((_, index) =>
+      series.reduce((sum, item) => sum + this.getNumberValue((item?.trend || [])[index]?.transactions_per_sec), 0));
+    return {
+      color: ['#2f6fed'],
+      tooltip: { trigger: 'axis' },
+      grid: { left: 44, right: 16, top: 12, bottom: 26 },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: dates.map(date => String(date || '').slice(5)),
+        axisTick: { show: false },
+        axisLine: { lineStyle: { color: '#dce2e7' } },
+        axisLabel: { color: '#5c6c82', fontSize: 9 }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        splitLine: { lineStyle: { color: '#eef1f4' } },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: '#5c6c82', fontSize: 10 }
+      },
+      series: [{
+        name: 'Transactions/sec',
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        areaStyle: { opacity: 0.12 },
+        lineStyle: { color: '#2f6fed', width: 2 },
+        itemStyle: { color: '#2f6fed' },
+        data: totals
+      }]
+    };
+  }
+
+  private getDbEngineMap(data: PublicCloudDbQueryPerformanceResponse): { [uuid: string]: string } {
+    const sections = [data?.top_cache_hit_ratio, data?.top_latency, data?.top_errors_deadlocks, data?.top_throughput, data?.top_response_time, data?.top_connections];
+    return sections.reduce((map: { [uuid: string]: string }, list) => {
+      (list || []).forEach(item => {
+        const uuid = String(item?.db_uuid || '');
+        if (uuid && item?.db_type && !map[uuid]) {
+          map[uuid] = String(item.db_type);
+        }
+      });
+      return map;
+    }, {});
+  }
+
+  private getDbTopBarOptions(points: Array<{ name: string; value: number; status?: string }>, suffix: string): EChartsOption {
+    if (!(points || []).length) {
+      return {};
+    }
+    // Data is highest-first; ECharts category axis renders bottom-up, so reverse for top-down display.
+    const items = (points || []).slice().reverse();
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatNumber(row.value)}${suffix ? ' ' + suffix : ''}` : '';
+        }
+      },
+      grid: { left: 190, right: 46, top: 6, bottom: 6 },
+      xAxis: { type: 'value', min: 0, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 10 } },
+      yAxis: {
+        type: 'category',
+        data: items.map(item => item.name),
+        axisTick: { show: false },
+        axisLine: { show: false },
+        axisLabel: { color: '#4a5b6b', fontSize: 10, width: 180, overflow: 'truncate' }
+      },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 14,
+        label: { show: true, position: 'right', color: '#4a5b6b', fontSize: 10, formatter: (params: any) => this.formatNumber(params.value) },
+        data: items.map(item => ({ value: item.value, itemStyle: { color: this.getDbStatusColor(item.status), borderRadius: [0, 3, 3, 0] } }))
+      }]
+    };
+  }
+
+  private getDbStatusColor(status?: string): string {
+    return PUBLIC_CLOUD_DB_STATUS_COLORS[String(status || '').toLowerCase()] || '#5a7ed8';
+  }
+
+  private getDbUsageTone(pct: number): PublicCloudStatusTone {
+    if (pct > 85) {
+      return 'danger';
+    }
+    if (pct >= 50) {
+      return 'warning';
+    }
+    return 'success';
+  }
+
+  private formatDbUptime(seconds: number): string {
+    const days = Math.floor(this.getNumberValue(seconds) / 86400);
+    return `${days.toLocaleString('en-US')}d`;
+  }
+  /*
+   * ******End ****** Database - Performance and Utilization Widget Related ********************
    */
 
   /*
@@ -1481,1123 +2926,6 @@ export class PublicCloudComputeDashboardService {
    */
 
   /*
-   * -----Start----- Cloud Storage Health Widget Related -------------------
-   */
-  getCloudStorageHealth(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageHealthResponse> {
-    return this.http.get<PublicCloudStorageHealthResponse>(PUBLIC_CLOUD_STORAGE_HEALTH_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getStorageUtilizationByCloud(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageKeyedNumberResponse> {
-    return this.http.get<PublicCloudStorageKeyedNumberResponse>(PUBLIC_CLOUD_STORAGE_UTILIZATION_BY_CLOUD_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getReadVsWriteTraffic(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageTrafficResponse> {
-    return this.http.get<PublicCloudStorageTrafficResponse>(PUBLIC_CLOUD_READ_VS_WRITE_TRAFFIC_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getCloudStorageTopConsumers(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
-    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getTransactionVolumeTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageTrendResponse> {
-    return this.http.get<PublicCloudStorageTrendResponse>(PUBLIC_CLOUD_TRANSACTION_VOLUME_TREND_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getObjectFileGrowthTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageTrendResponse> {
-    return this.http.get<PublicCloudStorageTrendResponse>(PUBLIC_CLOUD_OBJECT_FILE_GROWTH_TREND_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getStorageServicesVisibility(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageServicesVisibilityResponse> {
-    return this.http.get<PublicCloudStorageServicesVisibilityResponse>(PUBLIC_CLOUD_STORAGE_SERVICES_VISIBILITY_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getCloudStorageDistribution(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageKeyedNumberResponse> {
-    return this.http.get<PublicCloudStorageKeyedNumberResponse>(PUBLIC_CLOUD_STORAGE_DISTRIBUTION_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getLatencyHeatmap(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudLatencyHeatmapResponse> {
-    return this.http.get<PublicCloudLatencyHeatmapResponse>(PUBLIC_CLOUD_LATENCY_HEATMAP_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToLatencyHeatmapRows(data: PublicCloudLatencyHeatmapResponse): PublicCloudLatencyHeatmapRow[] {
-    const source = this.getObjectResponseData(data) as PublicCloudLatencyHeatmapResponse;
-    return Object.keys(source || {}).reduce((rows: PublicCloudLatencyHeatmapRow[], account) => {
-      const entries = Array.isArray(source[account]) ? source[account] : [];
-      const cells = entries.map(entry => {
-        const value = this.getNumericValue(entry?.value);
-        return {
-          value,
-          tone: this.getLatencyHeatmapTone(value),
-          color: this.getLatencyHeatmapColor(value)
-        };
-      });
-      if (cells.length) {
-        rows.push({ account, cells });
-      }
-      return rows;
-    }, []);
-  }
-
-  private getLatencyHeatmapTone(value: number): string {
-    if (value < 20) {
-      return 'low';
-    }
-    return value > 80 ? 'high' : 'medium';
-  }
-
-  private getLatencyHeatmapColor(value: number): string {
-    return PUBLIC_CLOUD_LATENCY_HEATMAP_COLORS[this.getLatencyHeatmapTone(value)];
-  }
-
-  getQueueBacklogMonitor(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudQueueBacklogResponse> {
-    return this.http.get<PublicCloudQueueBacklogResponse>(PUBLIC_CLOUD_QUEUE_BACKLOG_MONITOR_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToQueueBacklogRows(data: PublicCloudQueueBacklogResponse): PublicCloudQueueBacklogRow[] {
-    const source = this.getObjectResponseData(data) as PublicCloudQueueBacklogResponse;
-    return Object.keys(source || {}).reduce((rows: PublicCloudQueueBacklogRow[], name) => {
-      const entry = source[name] || {};
-      const percentage = this.getNumericValue(entry.percentage);
-      rows.push({
-        name,
-        messages: this.formatNumber(this.getNumericValue(entry.messages)),
-        percentage,
-        tone: this.getQueueBacklogTone(percentage),
-        color: this.getQueueBacklogColor(percentage)
-      });
-      return rows;
-    }, []);
-  }
-
-  private getQueueBacklogTone(percentage: number): string {
-    if (percentage >= 90) {
-      return 'high';
-    }
-    return percentage >= 60 ? 'medium' : 'low';
-  }
-
-  private getQueueBacklogColor(percentage: number): string {
-    return PUBLIC_CLOUD_QUEUE_BACKLOG_COLORS[this.getQueueBacklogTone(percentage)];
-  }
-
-  convertToCloudStorageHealthMetrics(data: PublicCloudStorageHealthResponse): PublicCloudStorageKpi[] {
-    const rows = this.getDatabaseRowsFromValue(this.getObjectResponseData(data), ['results', 'items', 'rows']) as any[];
-    return (rows || []).map((item): PublicCloudStorageKpi => {
-      const label = this.getFirstValue(item.metric, item.label, item.name);
-      const value = this.getFirstNumericValue(item.value);
-      const unit = this.getFirstValue(item.unit);
-      return {
-        label,
-        value: value !== null ? this.formatStorageValue(value, unit) : '',
-        tone: label.toLowerCase().includes('availability') ? 'success' : undefined
-      };
-    }).filter(item => item.label && item.value);
-  }
-
-  convertToStorageUtilizationRows(data: PublicCloudStorageKeyedNumberResponse): PublicCloudStorageBarItem[] {
-    return this.convertStorageKeyedNumberRows(data, PUBLIC_CLOUD_STORAGE_UTILIZATION_COLORS)
-      .sort((first, second) => first.value - second.value);
-  }
-
-  convertToStorageUtilizationOptions(rows: PublicCloudStorageBarItem[]): EChartsOption {
-    return this.getStorageHorizontalBarOptions(rows);
-  }
-
-  convertToReadVsWriteTrend(data: PublicCloudStorageTrafficResponse): PublicCloudStorageTrendViewData {
-    const readRows = data?.read_ingress || data?.readIngress || [];
-    const writeRows = data?.write_egress || data?.writeEgress || [];
-    const labels = this.getStorageTrendLabels([readRows, writeRows]);
-    return {
-      labels,
-      series: [
-        {
-          name: 'Read (ingress)',
-          color: PUBLIC_CLOUD_STORAGE_TREND_COLORS.read,
-          values: this.getStorageTrendValues(readRows)
-        },
-        {
-          name: 'Write (egress)',
-          color: PUBLIC_CLOUD_STORAGE_TREND_COLORS.write,
-          values: this.getStorageTrendValues(writeRows)
-        }
-      ].filter(item => item.values.length)
-    };
-  }
-
-  convertToReadVsWriteOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
-    return this.getReadVsWriteLineOptions(data);
-  }
-
-  convertToCloudStorageTopConsumersRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudStorageConsumerRow[] {
-    return this.getDatabaseBarRows(data, ['consumers', 'databases', 'results', 'items', 'rows']).map(item => {
-      const used = this.getDatabaseItemValue(item, ['used_tb', 'used', 'storage', 'value', 'count']);
-      const cloud = this.getFirstValue(item.cloud, item.provider, item.platform);
-      const latency = this.getFirstValue(item.latency, item.latency_ms, item.avg_latency);
-      const growth = this.getFirstValue((item as any).growth, (item as any).growth_percent, (item as any).growthPercentage);
-      return {
-        account: this.getDatabaseItemLabel(item),
-        cloud,
-        cloudClass: `database-cloud-${this.normalizeCssClass(cloud)}`,
-        used: used !== null ? `${this.formatDecimalNumber(used)} TB` : '',
-        tps: this.getFirstValue((item as any).tps, (item as any).transactions, (item as any).transactions_per_sec),
-        latency: latency ? this.formatStorageValue(latency, /[a-z%]/i.test(latency) ? '' : 'ms') : '',
-        growth,
-        growthClass: this.getStorageGrowthClass(growth)
-      };
-    }).filter(item => !!item.account).slice(0, 10);
-  }
-
-  convertToTransactionVolumeTrend(data: PublicCloudStorageTrendResponse): PublicCloudStorageTrendViewData {
-    return this.convertToStorageTrendViewData(data, ['AWS', 'Azure', 'GCP', 'OCI']);
-  }
-
-  convertToObjectFileGrowthTrend(data: PublicCloudStorageTrendResponse): PublicCloudStorageTrendViewData {
-    return this.convertToStorageTrendViewData(data, ['Blob', 'File', 'Object', 'Table']);
-  }
-
-  convertToStorageTrendOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
-    return this.getStorageMultiLineOptions(data);
-  }
-
-  convertToStorageServicesVisibilityMetrics(data: PublicCloudStorageServicesVisibilityResponse): PublicCloudStorageKpi[] {
-    const latency = data?.highest_latency_cloud || data?.highestLatencyCloud;
-    const mostUtilized = data?.most_utilized || data?.mostUtilized;
-    const totalCapacity = data?.total_capacity_tracked || data?.totalCapacityTracked;
-    const metrics: PublicCloudStorageKpi[] = [
-      {
-        label: 'Active Accounts',
-        value: this.formatNumber(this.getFirstNumericValue(data?.active_accounts, data?.activeAccounts) || 0)
-      },
-      {
-        label: 'Highest Latency Cloud',
-        value: this.formatStorageCloudMetric(latency?.cloud_name || latency?.cloudName, latency?.value, latency?.unit),
-        tone: 'danger'
-      },
-      {
-        label: 'Most Utilized',
-        value: this.formatStorageCloudMetric(mostUtilized?.cloud_name || mostUtilized?.cloudName, mostUtilized?.value, mostUtilized?.unit),
-        tone: 'warning'
-      },
-      {
-        label: 'Total Capacity Tracked',
-        value: this.formatStorageValue(totalCapacity?.value, totalCapacity?.unit)
-      }
-    ];
-    return metrics.filter(item => !!item.value);
-  }
-
-  convertToCloudStorageDistributionRows(data: PublicCloudStorageKeyedNumberResponse): PublicCloudStorageDistributionItem[] {
-    const rows = this.convertStorageKeyedNumberRows(data, []);
-    const total = rows.reduce((sum, item) => sum + item.value, 0);
-    return rows.map(item => ({
-      label: item.label,
-      value: item.value,
-      percent: total ? Math.round((item.value / total) * 100) : 0,
-      color: this.getStorageDistributionColor(item.label)
-    })).filter(item => item.value > 0).sort((first, second) => {
-      return this.getStorageDistributionOrder(first.label) - this.getStorageDistributionOrder(second.label);
-    });
-  }
-
-  convertToCloudStorageDistributionOptions(rows: PublicCloudStorageDistributionItem[]): EChartsOption {
-    return {
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => `${params.name}: ${params.value}%`
-      },
-      series: [
-        {
-          type: 'pie',
-          roseType: 'area',
-          radius: ['30%', '78%'],
-          center: ['50%', '48%'],
-          avoidLabelOverlap: true,
-          minAngle: 8,
-          data: (rows || []).map(item => ({
-            name: item.label,
-            value: item.percent,
-            itemStyle: { color: item.color }
-          })),
-          label: {
-            formatter: '{c}%',
-            color: '#566170',
-            fontSize: 10
-          },
-          labelLine: {
-            length: 18,
-            length2: 14
-          }
-        }
-      ]
-    };
-  }
-
-  private convertStorageKeyedNumberRows(data: PublicCloudStorageKeyedNumberResponse, colors: string[]): PublicCloudStorageBarItem[] {
-    const source = this.getObjectResponseData(data);
-    const rows = this.getDatabaseRowsFromValue(source, ['results', 'items', 'rows']) as any[];
-    const record = rows.length ? rows[0] : source;
-    return Object.keys(record || {}).reduce((items: PublicCloudStorageBarItem[], key, index) => {
-      const value = this.getFirstNumericValue(record[key]);
-      if (value !== null) {
-        items.push({
-          label: this.formatStorageLabel(key),
-          value,
-          color: colors.length ? colors[index % colors.length] : this.getStorageDistributionColor(key)
-        });
-      }
-      return items;
-    }, []);
-  }
-
-  private getStorageHorizontalBarOptions(rows: PublicCloudStorageBarItem[]): EChartsOption {
-    return {
-      grid: {
-        left: 78,
-        right: 18,
-        top: 6,
-        bottom: 20
-      },
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => `${params.name}: ${params.value}`
-      },
-      xAxis: {
-        type: 'value',
-        min: 0,
-        max: 100,
-        splitLine: { lineStyle: { color: '#e9eef3' } },
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#7b8490',
-          fontSize: 11
-        }
-      },
-      yAxis: {
-        type: 'category',
-        inverse: true,
-        data: (rows || []).map(item => item.label),
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#6f7782',
-          fontSize: 10
-        }
-      },
-      series: [
-        {
-          type: 'bar',
-          barWidth: 28,
-          data: (rows || []).map(item => ({
-            value: item.value,
-            name: item.label,
-            itemStyle: { color: item.color, borderRadius: [4, 4, 4, 4] }
-          }))
-        }
-      ]
-    };
-  }
-
-  private convertToStorageTrendViewData(data: PublicCloudStorageTrendResponse, order: string[]): PublicCloudStorageTrendViewData {
-    const seriesRows = order
-      .filter(key => Array.isArray(data?.[key]))
-      .map(key => {
-        const rows = data[key] || [];
-        return {
-          name: this.formatStorageSeriesLabel(key),
-          color: this.getStorageTrendColor(key),
-          values: this.getStorageTrendValues(rows)
-        };
-      }).filter(item => item.values.length);
-    return {
-      labels: this.getStorageTrendLabels(order.map(key => data?.[key]).filter(rows => Array.isArray(rows)) as any[]),
-      series: seriesRows
-    };
-  }
-
-  private getReadVsWriteLineOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
-    const readValues = data.series?.[0]?.values || [];
-    const writeValues = data.series?.[1]?.values || [];
-    return this.chartConfigSvc.applyScrollableLegend({
-      legend: {
-        top: 0,
-        left: 'center',
-        icon: 'circle',
-        itemWidth: 10,
-        itemHeight: 10,
-        textStyle: { color: '#555555', fontSize: 12 }
-      },
-      grid: {
-        left: 44,
-        right: 42,
-        top: 32,
-        bottom: 28
-      },
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: data.labels,
-        axisLine: { lineStyle: { color: '#9aa6b2' } },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#6f7782',
-          fontSize: 11,
-          interval: this.getStorageAxisLabelInterval(data.labels)
-        }
-      },
-      yAxis: [
-        this.getStorageTrafficAxis('Read', 0, readValues),
-        this.getStorageTrafficAxis('Write', 1, writeValues)
-      ],
-      series: (data.series || []).map((item, index) => ({
-        name: item.name,
-        type: 'line',
-        yAxisIndex: index === 1 ? 1 : 0,
-        smooth: true,
-        symbol: 'circle',
-        symbolSize: 6,
-        lineStyle: { width: 2.5, color: item.color, type: index === 1 ? 'dashed' : 'solid' },
-        itemStyle: { color: item.color },
-        areaStyle: index === 0 ? { color: 'rgba(47, 115, 196, 0.08)' } : undefined,
-        data: item.values
-      }))
-    });
-  }
-
-  private getStorageMultiLineOptions(data: PublicCloudStorageTrendViewData): EChartsOption {
-    return this.chartConfigSvc.applyScrollableLegend({
-      legend: {
-        top: 0,
-        left: 'center',
-        icon: 'circle',
-        itemWidth: 10,
-        itemHeight: 10,
-        textStyle: { color: '#555555', fontSize: 12 }
-      },
-      grid: {
-        left: 38,
-        right: 14,
-        top: 38,
-        bottom: 26
-      },
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: data.labels,
-        axisLine: { lineStyle: { color: '#9aa6b2' } },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#6f7782',
-          fontSize: 11,
-          interval: this.getStorageAxisLabelInterval(data.labels)
-        }
-      },
-      yAxis: {
-        type: 'value',
-        splitLine: { lineStyle: { color: '#e4e9ef' } },
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { color: '#6f7782', fontSize: 11 }
-      },
-      series: (data.series || []).map(item => ({
-        name: item.name,
-        type: 'line',
-        smooth: false,
-        symbol: 'circle',
-        symbolSize: 5,
-        lineStyle: { width: 2, color: item.color },
-        itemStyle: { color: item.color },
-        data: item.values
-      }))
-    });
-  }
-
-  private getStorageTrafficAxis(name: string, index: number, values: number[]): any {
-    const bounds = this.getStorageAxisBounds(values);
-    return {
-      type: 'value',
-      name,
-      nameLocation: 'middle',
-      nameGap: 32,
-      min: bounds.min,
-      max: bounds.max,
-      interval: bounds.interval,
-      position: index === 1 ? 'right' : 'left',
-      splitLine: index === 0 ? { lineStyle: { color: '#e4e9ef' } } : { show: false },
-      axisLine: { show: false },
-      axisTick: { show: false },
-      axisLabel: {
-        color: '#6f7782',
-        fontSize: 11,
-        formatter: (value: number) => `${value}G`
-      },
-      nameTextStyle: {
-        color: index === 1 ? PUBLIC_CLOUD_STORAGE_TREND_COLORS.write : PUBLIC_CLOUD_STORAGE_TREND_COLORS.read,
-        fontWeight: 600
-      }
-    };
-  }
-
-  private getStorageAxisLabelInterval(labels: string[]): number {
-    return (labels || []).length > 8 ? 1 : 0;
-  }
-
-  private getStorageAxisBounds(values: number[]): { min: number; max: number; interval: number } {
-    if (!values.length) {
-      return { min: 0, max: 100, interval: 20 };
-    }
-    const minValue = Math.min(...values);
-    const maxValue = Math.max(...values);
-    const min = minValue >= 40 ? Math.floor(minValue / 10) * 10 : 0;
-    const max = Math.ceil((maxValue + 5) / 10) * 10;
-    return {
-      min,
-      max: max <= min ? min + 10 : max,
-      interval: max - min <= 70 ? 10 : 20
-    };
-  }
-
-  private getStorageTrendLabels(seriesRows: PublicCloudStorageSeriesPoint[][]): string[] {
-    const longest = (seriesRows || []).reduce((result, rows) => rows.length > result.length ? rows : result, [] as PublicCloudStorageSeriesPoint[]);
-    const hasApiLabels = longest.some(item => !!item?.time);
-    return longest.map((item, index) => hasApiLabels && item?.time ? item.time : `T-${longest.length - index}`);
-  }
-
-  private getStorageTrendValues(rows: PublicCloudStorageSeriesPoint[]): number[] {
-    return (rows || []).map(item => this.getFirstNumericValue(item?.value)).filter((item): item is number => item !== null);
-  }
-
-  private formatStorageValue(value: string | number | undefined | null, unit?: string): string {
-    const numericValue = this.getFirstNumericValue(value);
-    const formattedValue = numericValue !== null ? this.formatDecimalNumber(numericValue) : this.getFirstValue(value);
-    const separator = ['PB', 'TB', 'GB', 'MB'].includes(unit || '') ? ' ' : '';
-    return unit ? `${formattedValue}${separator}${unit}` : formattedValue;
-  }
-
-  private formatStorageCloudMetric(name: string | undefined, value: string | number | undefined, unit?: string): string {
-    const cloudName = this.formatStorageSeriesLabel(name);
-    const metricValue = this.formatStorageValue(value, unit);
-    return cloudName && metricValue ? `${cloudName} - ${metricValue}` : cloudName || metricValue;
-  }
-
-  private formatStorageLabel(value: string | undefined): string {
-    return String(value || '').replace(/_/g, ' ');
-  }
-
-  private formatStorageSeriesLabel(value: string | undefined): string {
-    const label = this.formatStorageLabel(value);
-    return label.toLowerCase() === 'oci' ? 'Oracle' : label;
-  }
-
-  private getStorageTrendColor(value: string): string {
-    return PUBLIC_CLOUD_STORAGE_TREND_COLORS[String(value || '').toLowerCase()] || '#5a7ed8';
-  }
-
-  private getStorageDistributionColor(label: string): string {
-    return PUBLIC_CLOUD_STORAGE_DISTRIBUTION_COLORS[String(label || '').toLowerCase()] || '#3376bd';
-  }
-
-  private getStorageDistributionOrder(label: string): number {
-    const order = ['object storage', 'file storage', 'queue storage', 'table storage'];
-    const index = order.indexOf(String(label || '').toLowerCase());
-    return index >= 0 ? index : order.length;
-  }
-
-  private getStorageGrowthClass(value: string): string {
-    if (!value) {
-      return '';
-    }
-    return value.trim().startsWith('-') ? 'storage-growth-danger' : 'storage-growth-success';
-  }
-  /*
-   * ******End ****** Cloud Storage Health Widget Related ********************
-   */
-
-  /*
-   * -----Start----- Cloud Database Performance (redesigned) Widget Related -------------------
-   */
-  getDatabaseOverview(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseOverviewResponse> {
-    return this.http.get<PublicCloudDatabaseOverviewResponse>(PUBLIC_CLOUD_DATABASE_OVERVIEW_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToDatabaseOverviewKpis(data: PublicCloudDatabaseOverviewResponse): PublicCloudDatabaseKpi[] {
-    const rows = data?.data || [];
-    return PUBLIC_CLOUD_DATABASE_OVERVIEW_KPI_CONFIG.map(item => {
-      const values = rows
-        .map(row => this.getFirstNumericValue((row as unknown as Record<string, string | number>)[item.field]))
-        .filter((value): value is number => value !== null);
-      const aggregate = !values.length ? null :
-        item.agg === 'max' ? Math.max(...values) : values.reduce((sum, value) => sum + value, 0) / values.length;
-      const unit = this.getFirstValue((rows[0] as unknown as Record<string, string>)?.[item.unitField]);
-      return this.convertToDatabaseKpi(item.label, aggregate === null ? '' : aggregate, unit);
-    });
-  }
-
-  // Header labels take their unit from the response, so the column always states the same unit as the
-  // KPI strip above it. Called with the response on load and with null before any data has arrived.
-  convertToDatabaseOverviewColumns(data: PublicCloudDatabaseOverviewResponse): PublicCloudDatabaseOverviewColumn[] {
-    const row = (data?.data || [])[0] as unknown as Record<string, string>;
-    return PUBLIC_CLOUD_DATABASE_OVERVIEW_SORT_COLUMNS.map(column => {
-      const unit = column.unitField ? this.getFirstValue(row?.[column.unitField]) : '';
-      return {
-        key: column.key,
-        label: unit ? `${column.label} (${unit})` : column.label,
-        numeric: column.numeric
-      };
-    });
-  }
-
-  // getFirstNumericValue (not getNumericValue) so a metric the response omits stays null and renders
-  // as NA, instead of being coerced to a 0 that reads as a real measurement.
-  convertToDatabaseOverviewRows(data: PublicCloudDatabaseOverviewResponse): PublicCloudDatabaseOverviewRow[] {
-    return (data?.data || []).map(item => ({
-      instance: this.getFirstValue(item.database_instance),
-      uuid: this.getFirstValue(item.uuid),
-      writeThroughput: this.getFirstNumericValue(item.write_throughput),
-      writeLatency: this.getFirstNumericValue(item.write_latency),
-      writeIops: this.getFirstNumericValue(item.write_iops),
-      readThroughput: this.getFirstNumericValue(item.read_throughput),
-      readLatency: this.getFirstNumericValue(item.read_latency),
-      readIops: this.getFirstNumericValue(item.read_iops),
-      queueDepth: this.getFirstNumericValue(item.queue_depth)
-    })).filter(row => !!row.instance);
-  }
-
-  getDatabaseWriteTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseTrendResponse> {
-    return this.http.get<PublicCloudDatabaseTrendResponse>(PUBLIC_CLOUD_DATABASE_WRITE_TREND_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getDatabaseReadTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseTrendResponse> {
-    return this.http.get<PublicCloudDatabaseTrendResponse>(PUBLIC_CLOUD_DATABASE_READ_TREND_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToDatabaseWritePerformanceOptions(data: PublicCloudDatabaseTrendResponse): EChartsOption {
-    return this.buildDatabaseTrendOptions(data, [
-      { key: 'write_throughput', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.throughput },
-      { key: 'write_iops', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.iops },
-      { key: 'write_latency', color: PUBLIC_CLOUD_DATABASE_TREND_WRITE_COLORS.latency }
-    ]);
-  }
-
-  convertToDatabaseReadPerformanceOptions(data: PublicCloudDatabaseTrendResponse): EChartsOption {
-    return this.buildDatabaseTrendOptions(data, [
-      { key: 'read_throughput', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.throughput },
-      { key: 'read_iops', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.iops },
-      { key: 'read_latency', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.latency },
-      { key: 'queue_depth', color: PUBLIC_CLOUD_DATABASE_TREND_READ_COLORS.queue_depth }
-    ]);
-  }
-
-  hasDatabaseTrendSeries(data: PublicCloudDatabaseTrendResponse): boolean {
-    const series = this.getDatabaseTrendSeries(data);
-    return Object.keys(series).some(key => !!(series[key]?.points || []).length);
-  }
-
-  // The response reports one resource per entry; today both trend endpoints return a single entry.
-  // Surfaced so the widget title can name the instance it is charting.
-  getDatabaseTrendInstance(data: PublicCloudDatabaseTrendResponse): string {
-    return this.getFirstValue((data?.data || [])[0]?.database_instance);
-  }
-
-  private getDatabaseTrendSeries(data: PublicCloudDatabaseTrendResponse): Record<string, PublicCloudDatabaseTrendSeriesItem> {
-    return ((data?.data || [])[0]?.series || {}) as Record<string, PublicCloudDatabaseTrendSeriesItem>;
-  }
-
-  // Every metric gets its own value axis scaled to its own range. Throughput and IOPS differ by 45x on
-  // the write chart and 280x on the read chart, so sharing one axis flattened IOPS onto the baseline.
-  // Only the first two axes are labelled; the rest stay hidden and their units ride in the tooltip.
-  private buildDatabaseTrendOptions(data: PublicCloudDatabaseTrendResponse, configs: Array<{ key: string, color: string }>): EChartsOption {
-    const series = this.getDatabaseTrendSeries(data);
-    const activeConfigs = configs.filter(config => !!(series[config.key]?.points || []).length);
-    const labels = this.getDatabaseTrendLabels(activeConfigs.length ? series[activeConfigs[0].key].points : [], data);
-    const chartSeries = activeConfigs.map(config => ({
-      name: this.getFirstValue(series[config.key].label) || config.key,
-      color: config.color,
-      values: (series[config.key].points || []).map(point => this.getNumericValue(point?.value)),
-      unit: this.getFirstValue(series[config.key].unit)
-    }));
-    return this.getDatabaseTrendOptions(labels, chartSeries);
-  }
-
-  // Label granularity follows the window the response reports, so a range wider than a day does not
-  // collapse into repeated dateless HH:mm ticks.
-  private getDatabaseTrendLabels(points?: Array<{ clock?: number; value?: number | string }>, data?: PublicCloudDatabaseTrendResponse): string[] {
-    const format = this.getDatabaseTrendLabelFormat(points, data);
-    return (points || []).map(point => {
-      const clock = this.getNumericValue(point?.clock);
-      return clock ? moment.unix(clock).format(format) : '';
-    });
-  }
-
-  private getDatabaseTrendLabelFormat(points?: Array<{ clock?: number }>, data?: PublicCloudDatabaseTrendResponse): string {
-    const hours = this.getFirstNumericValue(data?.hours) ?? this.getDatabaseTrendSpanHours(points);
-    if (hours === null || hours <= 24) {
-      return 'HH:mm';
-    }
-    return hours <= 24 * 7 ? 'DD MMM HH:mm' : 'DD MMM';
-  }
-
-  // Fallback when the response omits `hours`: measure the span between the first and last point.
-  private getDatabaseTrendSpanHours(points?: Array<{ clock?: number }>): number | null {
-    const clocks = (points || []).map(point => this.getNumericValue(point?.clock)).filter(clock => clock > 0);
-    return clocks.length < 2 ? null : (Math.max(...clocks) - Math.min(...clocks)) / 3600;
-  }
-
-  getDatabaseSpaceConsumption(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseSpaceConsumptionResponse> {
-    return this.http.get<PublicCloudDatabaseSpaceConsumptionResponse>(PUBLIC_CLOUD_DATABASE_SPACE_CONSUMPTION_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToDatabaseSpaceKpis(data: PublicCloudDatabaseSpaceConsumptionResponse): PublicCloudDatabaseKpi[] {
-    const summary = (data?.summary || {}) as unknown as Record<string, string | number>;
-    return PUBLIC_CLOUD_DATABASE_SPACE_KPI_CONFIG.map(item =>
-      this.convertToDatabaseKpi(item.label, summary[item.key], this.getFirstValue(summary[item.unitKey])));
-  }
-
-  getDatabaseCapacityResources(criteria: PublicCloudDashboardFilterCriteria | undefined, sortBy: string): Observable<PublicCloudDatabaseCapacityResponse> {
-    const params = this.convertFiltersToApiParams(criteria).set('sort_by', sortBy);
-    return this.http.get<PublicCloudDatabaseCapacityResponse>(PUBLIC_CLOUD_DATABASE_CAPACITY_RESOURCES_ENDPOINT, { params });
-  }
-
-  convertToDatabaseCapacityRows(data: PublicCloudDatabaseCapacityResponse): PublicCloudDatabaseSpaceRow[] {
-    return (data?.data || []).map(item => ({
-      instance: this.getFirstValue(item.database_instance, item.db_instance),
-      uuid: this.getFirstValue(item.uuid),
-      maxAllocatedLabel: this.getFirstValue(item.max_allocated_display) || this.formatDatabaseStorage(item.max_allocated),
-      maxAllocated: this.getNumericValue(item.max_allocated),
-      allocatedLabel: this.getFirstValue(item.allocated_display) || this.formatDatabaseStorage(item.allocated),
-      allocated: this.getNumericValue(item.allocated),
-      spaceFreeLabel: this.getFirstValue(item.space_free_display) || this.formatDatabaseStorage(item.space_free),
-      spaceFree: this.getNumericValue(item.space_free),
-      utilization: this.getNumericValue(item.utilization)
-    })).filter(row => !!row.instance);
-  }
-
-  private convertToDatabaseKpi(label: string, value?: string | number, unit?: string): PublicCloudDatabaseKpi {
-    const numericValue = this.getFirstNumericValue(value);
-    return {
-      label,
-      value: numericValue !== null ? this.formatMeasureValue(numericValue) : this.getFirstValue(value),
-      unit: this.getFirstValue(unit)
-    };
-  }
-
-  private formatDatabaseStorage(value?: string | number, unit?: string): string {
-    const numericValue = this.getFirstNumericValue(value);
-    const formatted = numericValue !== null ? this.formatDecimalNumber(numericValue) : this.getFirstValue(value);
-    return unit ? `${formatted} ${unit}` : formatted;
-  }
-
-  private formatMeasureValue(value: number): string {
-    return (Math.round(value * 100) / 100).toFixed(2);
-  }
-
-  private getDatabaseTrendOptions(labels: string[], series: Array<{ name: string, color: string, values: number[], unit: string }>): EChartsOption {
-    const activeSeries = series.filter(item => !!(item.values || []).length);
-    return this.chartConfigSvc.applyScrollableLegend({
-      color: activeSeries.map(item => item.color),
-      legend: {
-        top: 0,
-        left: 'center',
-        icon: 'circle',
-        itemWidth: 10,
-        itemHeight: 10,
-        textStyle: { color: '#555555', fontSize: 11 },
-        // Hidden axes mean the legend is where the reader learns each metric's unit.
-        formatter: (name: string) => this.getDatabaseTrendLegendLabel(activeSeries, name)
-      },
-      grid: {
-        left: 52,
-        right: 52,
-        top: 34,
-        bottom: 26
-      },
-      // Each series is on its own scale, so the tooltip carries the real value and unit per metric.
-      tooltip: {
-        trigger: 'axis',
-        formatter: (params: any) => this.getDatabaseTrendTooltip(activeSeries, params)
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: labels,
-        axisLine: { lineStyle: { color: '#c7ced6' } },
-        axisTick: { show: false },
-        axisLabel: { color: '#6f7782', fontSize: 11 }
-      },
-      yAxis: activeSeries.map((item, index) => this.getDatabaseTrendAxis(item, index)),
-      series: activeSeries.map((item, index) => ({
-        name: item.name,
-        type: 'line',
-        yAxisIndex: index,
-        smooth: true,
-        showSymbol: false,
-        lineStyle: { width: 2, color: item.color },
-        itemStyle: { color: item.color },
-        data: item.values
-      }))
-    });
-  }
-
-  // One axis per metric so every line uses the full plot height. Only the first two are drawn
-  // (left and right); the remainder stay hidden because there is no room to label four axes.
-  private getDatabaseTrendAxis(item: { name: string, unit: string }, index: number): any {
-    const isVisible = index < 2;
-    return {
-      type: 'value',
-      show: isVisible,
-      name: isVisible ? this.getDatabaseTrendAxisName(item) : '',
-      nameLocation: 'middle',
-      nameGap: index === 0 ? 38 : 40,
-      nameTextStyle: { color: '#8a94a2', fontSize: 10 },
-      position: index === 0 ? 'left' : 'right',
-      splitLine: index === 0 ? { lineStyle: { color: '#eef1f5' } } : { show: false },
-      axisLine: { show: false },
-      axisTick: { show: false },
-      axisLabel: { color: '#6f7782', fontSize: 11 }
-    };
-  }
-
-  private getDatabaseTrendAxisName(item: { name: string, unit: string }): string {
-    return item.unit ? `${item.name} (${item.unit})` : item.name;
-  }
-
-  private getDatabaseTrendLegendLabel(series: Array<{ name: string, unit: string }>, name: string): string {
-    const item = series.find(entry => entry.name === name);
-    return item && item.unit ? `${name} (${item.unit})` : name;
-  }
-
-  private getDatabaseTrendTooltip(series: Array<{ name: string, unit: string }>, params: any): string {
-    const rows = Array.isArray(params) ? params : [params];
-    const header = this.getFirstValue(rows[0]?.axisValueLabel, rows[0]?.axisValue);
-    const lines = rows.map(row => {
-      const item = series.find(entry => entry.name === row?.seriesName);
-      const unit = item && item.unit ? ` ${item.unit}` : '';
-      return `${row?.marker || ''}${row?.seriesName}: ${this.getFirstValue(row?.value)}${unit}`;
-    });
-    return [header, ...lines].filter(line => !!line).join('<br/>');
-  }
-  /*
-   * ******End ****** Cloud Database Performance (redesigned) Widget Related ********************
-   */
-
-  /*
-   * -----Start----- Cloud Storage Health (redesigned) Widget Related -------------------
-   */
-  // Each Storage Performance card has its own endpoint. The trend and high-latency responses have
-  // different shapes; the two converters below each read only their own fields, so one getter serves both.
-  getStoragePerformanceMetric(endpoint: string, criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudStorageMetricResponse & PublicCloudStorageHighLatencyResponse> {
-    return this.http.get<PublicCloudStorageMetricResponse & PublicCloudStorageHighLatencyResponse>(endpoint, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToStorageTrendCard(data: PublicCloudStorageMetricResponse, color: string, fallbackTitle = ''): PublicCloudStoragePerformanceCard {
-    const points = data?.points || [];
-    const labels = points.map(point => this.getFirstValue(point?.time));
-    const values = points.map(point => this.getNumericValue(point?.value));
-    const unit = this.getFirstValue(data?.unit);
-    const changeValue = this.getFirstValue(data?.change_percent);
-    const direction = this.normalizeDeltaDirection(data?.trend_direction);
-    return {
-      key: this.getFirstValue(data?.metric),
-      title: this.getFirstValue(data?.title, fallbackTitle),
-      valueLabel: this.getFirstValue(data?.value),
-      unit,
-      deltaLabel: changeValue ? `${changeValue}%` : '',
-      deltaDirection: direction,
-      deltaTone: this.getStorageTrendDeltaTone(direction),
-      subtitle: '',
-      chartType: 'area',
-      hasData: !!points.length,
-      options: this.getStorageCardAreaOptions(values, labels, color, unit)
-    };
-  }
-
-  convertToStorageHighLatencyCard(data: PublicCloudStorageHighLatencyResponse, color: string, fallbackTitle = 'High Latency Devices'): PublicCloudStoragePerformanceCard {
-    const devices = data?.data || [];
-    const values = devices.map(device => this.getNumericValue(device?.p95_latency));
-    return {
-      key: 'high_latency_devices',
-      title: fallbackTitle,
-      valueLabel: this.getFirstValue(data?.value),
-      unit: '',
-      deltaLabel: '',
-      deltaDirection: '',
-      deltaTone: 'muted',
-      subtitle: this.getFirstValue(data?.threshold_display),
-      chartType: 'bar',
-      // The title is hardcoded, so data presence comes from the monitored devices: a 0/0 response
-      // (no devices at all) leaves the card with nothing to show.
-      hasData: !!devices.length || this.getNumericValue(data?.total_devices) > 0,
-      options: this.getStorageCardBarOptions(values, color)
-    };
-  }
-
-  getStorageResources(criteria: PublicCloudDashboardFilterCriteria | undefined, sortBy: string): Observable<PublicCloudStorageResourcesResponse> {
-    const params = this.convertFiltersToApiParams(criteria).set('sort_by', sortBy);
-    return this.http.get<PublicCloudStorageResourcesResponse>(PUBLIC_CLOUD_STORAGE_RESOURCES_ENDPOINT, { params });
-  }
-
-  convertToStorageResourceRows(data: PublicCloudStorageResourcesResponse): PublicCloudStorageResourceRow[] {
-    return (data?.data || []).map(item => {
-      const cloud = this.getFirstValue(item.cloud);
-      const region = this.getFirstValue(item.region);
-      return {
-        deviceName: this.getFirstValue(item.device_name, item.name),
-        uuid: this.getFirstValue(item.uuid),
-        type: this.getFirstValue(item.type),
-        cloud,
-        cloudRegion: this.getFirstValue(item.cloud_region) || [cloud, region].filter(value => !!value).join('/'),
-        // getFirstNumericValue (not getNumericValue) so a metric the response omits stays null and
-        // renders as NA. SF returns null latencies on every storage row, which previously showed 0.0ms.
-        capacity: this.getFirstValue(item.capacity_display, item.capacity),
-        capacityValue: this.getFirstNumericValue(item.capacity),
-        e2eLatency: this.getFirstNumericValue(item.e2e_latency),
-        successServerLatency: this.getFirstNumericValue(item.success_server_latency),
-        networkQueueDelay: this.getFirstNumericValue(item.network_queue_delay),
-        latencyHealthScore: this.getFirstNumericValue(item.latency_health_score),
-        status: this.getFirstValue(item.status)
-      };
-    }).filter(row => !!row.deviceName);
-  }
-
-  private normalizeDeltaDirection(value?: string): 'up' | 'down' | '' {
-    const normalized = String(value || '').toLowerCase();
-    if (normalized === 'up' || normalized === 'down') {
-      return normalized;
-    }
-    return '';
-  }
-
-  // The trend endpoints expose only a direction (no tone), so tone is derived: rising -> warning, falling -> improving.
-  private getStorageTrendDeltaTone(direction: 'up' | 'down' | ''): PublicCloudStatusTone {
-    if (direction === 'up') {
-      return 'warning';
-    }
-    if (direction === 'down') {
-      return 'success';
-    }
-    return 'muted';
-  }
-
-  private getStorageCardAreaOptions(values: number[], labels: string[], color: string, unit: string): EChartsOption {
-    return {
-      grid: { left: 40, right: 10, top: 8, bottom: 20 },
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: labels,
-        axisTick: { show: false },
-        axisLine: { lineStyle: { color: '#e4e9ef' } },
-        axisLabel: {
-          color: '#9aa6b2',
-          fontSize: 10,
-          interval: this.getStoragePerformanceLabelInterval(labels)
-        },
-        splitLine: { show: false }
-      },
-      yAxis: {
-        type: 'value',
-        min: 0,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        splitLine: { lineStyle: { color: '#eef1f5' } },
-        axisLabel: {
-          color: '#9aa6b2',
-          fontSize: 10,
-          formatter: (value: number) => `${value}${unit}`
-        }
-      },
-      series: [
-        {
-          type: 'line',
-          smooth: true,
-          showSymbol: false,
-          lineStyle: { width: 2, color },
-          itemStyle: { color },
-          areaStyle: { color: this.getStorageCardAreaColor(color) },
-          data: values
-        }
-      ]
-    };
-  }
-
-  private getStorageCardBarOptions(values: number[], color: string): EChartsOption {
-    return {
-      grid: { left: 6, right: 6, top: 10, bottom: 6 },
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        show: false,
-        data: values.map((entry, index) => String(index))
-      },
-      yAxis: { type: 'value', show: false },
-      series: [
-        {
-          type: 'bar',
-          barWidth: '55%',
-          itemStyle: { color, borderRadius: [2, 2, 0, 0] },
-          data: values
-        }
-      ]
-    };
-  }
-
-  private getStoragePerformanceLabelInterval(labels: string[]): number {
-    const length = (labels || []).length;
-    return length > 6 ? Math.ceil(length / 5) - 1 : 0;
-  }
-
-  private getStorageCardAreaColor(color: string): string {
-    const normalized = String(color || '').replace('#', '');
-    if (normalized.length !== 6) {
-      return 'rgba(63, 140, 255, 0.15)';
-    }
-    const r = parseInt(normalized.slice(0, 2), 16);
-    const g = parseInt(normalized.slice(2, 4), 16);
-    const b = parseInt(normalized.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, 0.15)`;
-  }
-
-  getWritePerformanceTrend(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudWritePerformanceResponse> {
-    return this.http.get<PublicCloudWritePerformanceResponse>(PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToWritePerformanceViewData(data: PublicCloudWritePerformanceResponse): PublicCloudWritePerformanceViewData {
-    const source = this.getObjectResponseData(data) as PublicCloudWritePerformanceResponse;
-    const labels = (source?.time_buckets || []).map(bucket => this.getFirstValue(bucket));
-    const rows = (source?.data || []).map(item => ({
-      name: this.getFirstValue(item.device_name, item.name),
-      cells: (item.values || []).map(entry => {
-        const value = this.getNumericValue(entry?.value);
-        return { value, color: this.getWritePerformanceColor(value, this.getFirstValue(entry?.status)) };
-      })
-    })).filter(row => !!row.name && row.cells.length);
-    return { labels, rows };
-  }
-
-  // Cell colour is driven by the per-cell status; falls back to write-latency thresholds
-  // (<=10 healthy, <=20 warning, >20 critical) when a status is not supplied.
-  private getWritePerformanceColor(value: number, status?: string): string {
-    switch (String(status || '').toLowerCase()) {
-      case 'healthy':
-        return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.low;
-      case 'warning':
-        return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.medium;
-      case 'critical':
-        return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.high;
-      case 'unknown':
-        return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.unknown;
-      default:
-        break;
-    }
-    if (value <= 10) {
-      return PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.low;
-    }
-    return value <= 20 ? PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.medium : PUBLIC_CLOUD_WRITE_PERFORMANCE_HEATMAP_COLORS.high;
-  }
-
-  getLatencyBreakdown(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudLatencyBreakdownResponse> {
-    return this.http.get<PublicCloudLatencyBreakdownResponse>(PUBLIC_CLOUD_LATENCY_BREAKDOWN_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToLatencyBreakdownViewData(data: PublicCloudLatencyBreakdownResponse): PublicCloudLatencyBreakdownViewData {
-    const source = this.getObjectResponseData(data) as PublicCloudLatencyBreakdownResponse;
-    const summary = source?.summary;
-    const breakdown = summary?.breakdown || source?.segments || [];
-    const total = this.getFirstNumericValue(summary?.total_latency, source?.total);
-    const unit = this.getFirstValue(breakdown[0]?.unit, source?.unit) || 'ms';
-    const segments = breakdown.map((segment, index) => {
-      const value = this.getFirstNumericValue(segment?.value);
-      const percent = this.getFirstNumericValue(segment?.percentage, segment?.percent);
-      return {
-        label: this.getFirstValue(segment?.name, segment?.label),
-        valueLabel: this.getFirstValue(segment?.display_value) || (value !== null ? `${this.formatDecimalNumber(value)} ${unit}` : ''),
-        percent: percent !== null ? percent : 0,
-        percentLabel: percent !== null ? `(${this.formatNumber(percent)}%)` : '',
-        color: segment?.color || PUBLIC_CLOUD_LATENCY_BREAKDOWN_COLORS[index % PUBLIC_CLOUD_LATENCY_BREAKDOWN_COLORS.length]
-      };
-    }).filter(segment => !!segment.label);
-    return {
-      totalLabel: total !== null ? this.formatDecimalNumber(total) : this.getFirstValue(summary?.total_latency_display),
-      unit,
-      segments,
-      // A donut of all-zero segments draws nothing, so an all-zero breakdown is no data, not data.
-      // Checks the raw values too, in case a segment carries a value but no percentage.
-      hasData: segments.some(segment => segment.percent > 0) ||
-        breakdown.some(segment => (this.getFirstNumericValue(segment?.value) || 0) > 0) ||
-        (total !== null && total > 0)
-    };
-  }
-
-  convertToLatencyBreakdownOptions(data: PublicCloudLatencyBreakdownViewData): EChartsOption {
-    const segments = data?.segments || [];
-    return {
-      color: segments.map(segment => segment.color),
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => `${params.name}: ${params.data.valueLabel} ${params.data.percentLabel}`
-      },
-      legend: { show: false },
-      series: [
-        {
-          type: 'pie',
-          radius: ['62%', '86%'],
-          center: ['50%', '50%'],
-          avoidLabelOverlap: true,
-          label: { show: false },
-          labelLine: { show: false },
-          data: segments.map(segment => ({
-            name: segment.label,
-            value: segment.percent,
-            valueLabel: segment.valueLabel,
-            percentLabel: segment.percentLabel,
-            itemStyle: { color: segment.color }
-          }))
-        }
-      ]
-    };
-  }
-  /*
-   * ******End ****** Cloud Storage Health (redesigned) Widget Related ********************
-   */
-
-  /*
    * -----Start----- Orphaned Devices Widgets Related -------------------
    */
   getOrphanedDevices(criteria?: PublicCloudDashboardFilterCriteria, page = 1, pageSize = 10): Observable<PublicCloudOrphanedDevicesResponse> {
@@ -2818,259 +3146,9 @@ export class PublicCloudComputeDashboardService {
    * ******End ****** Orphaned Devices Widgets Related ********************
    */
 
-  /*
-   * -----Start----- Idle Devices Widgets Related -------------------
-   */
-  getIdleDevices(criteria?: PublicCloudDashboardFilterCriteria, page = 1, pageSize = 10): Observable<PublicCloudIdleDevicesResponse> {
-    let params = this.convertFiltersToApiParams(criteria);
-    params = params.set('page', String(page));
-    params = params.set('page_size', String(pageSize));
-    params = params.set('offset', String((page - 1) * pageSize));
-    return this.http.get<PublicCloudIdleDevicesResponse>(PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT, { params });
-  }
-
-  getIdleDevicesByDuration(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudIdleDurationApiResponse> {
-    return this.http.get<PublicCloudIdleDurationApiResponse>(PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToIdleDevicesViewData(data: PublicCloudIdleDevicesResponse): PublicCloudIdleDeviceRow[] {
-    return (data?.results || []).map(item => {
-      const row = item as Record<string, any>;
-      return {
-        id: this.getFirstValue(row.id),
-        uuid: this.getFirstValue(row.uuid, row.id),
-        deviceId: this.getFirstValue(row.device_id, row.deviceId, row.device_uuid, row.deviceUuid, row.uuid, row.id),
-        resourceId: this.getFirstValue(row.resource_id, row.resourceId, row.uuid, row.id),
-        deviceName: this.getFirstValue(row.device_name, row.deviceName, row.name, row.instance_name),
-        resourceType: this.getFirstValue(row.resource_type, row.resourceType, row.type),
-        provider: this.getFirstValue(row.provider, row.platform, row.cloud_provider, row.cloudProvider, row.cloud, row.cloud_type, row.cloudType),
-        cloudType: this.getFirstValue(row.cloud_type, row.cloudType, row.cloud, row.provider, row.platform),
-        monitoringType: this.getFirstValue(row.monitoring_type, row.monitoringType),
-        monitoring: row.monitoring,
-        avgCpu: this.convertToIdleMetric(
-          this.getFirstObject(row.avg_cpu, row.avgCpu, row.avgCPU, row.cpu, row.cpu_usage, row.average_cpu),
-          this.getFirstScalar(row.avg_cpu_percent, row.avgCpuPercent, row.avg_cpu_percentage, row.cpu_percent, row.cpuPercentage, row.avg_cpu, row.avgCpu, row.avgCPU, row.cpu, row.cpu_usage, row.average_cpu)
-        ),
-        avgMem: this.convertToIdleMetric(
-          this.getFirstObject(row.avg_mem, row.avgMem, row.avg_memory, row.memory, row.memory_usage, row.average_memory),
-          this.getFirstScalar(row.avg_mem_percent, row.avgMemPercent, row.avg_mem_percentage, row.memory_percent, row.memoryPercentage, row.avg_mem, row.avgMem, row.avg_memory, row.memory, row.memory_usage, row.average_memory)
-        ),
-        networkIO: this.getFirstValue(row.network_io, row.networkIO, row.network, row.network_in_out),
-        idleDuration: this.getFirstValue(row.idle_duration, row.idleDuration, row.duration),
-        status: this.getFirstValue(row.status)
-      };
-    });
-  }
-
-  convertToIdleDevicesTotal(data: PublicCloudIdleDevicesResponse): number {
-    return Number(data?.count || 0);
-  }
-
-  convertToIdleDurationViewData(data: PublicCloudIdleDurationApiResponse): PublicCloudIdleDurationItem[] {
-    const durationData = this.sortIdleDurationBuckets(this.getIdleDurationResults(data));
-    const maxCount = Math.max(...durationData.map(item => this.getIdleDurationCount(item)), 0);
-    return durationData.filter(item => this.getIdleDurationCount(item) > 0).map((item, index) => {
-      const count = this.getIdleDurationCount(item);
-      const duration = this.getIdleDurationLabel(item);
-      return {
-        duration,
-        count,
-        percent: maxCount ? Math.round((count / maxCount) * 100) : 0,
-        color: PUBLIC_CLOUD_IDLE_DURATION_COLORS[index % PUBLIC_CLOUD_IDLE_DURATION_COLORS.length]
-      };
-    });
-  }
-
-  convertToIdleDurationOptions(data: PublicCloudIdleDurationItem[]): EChartsOption {
-    return {
-      color: (data || []).map(item => item.color),
-      tooltip: {
-        trigger: 'item',
-        formatter: '{b}: {c}'
-      },
-      legend: {
-        show: false
-      },
-      series: [
-        {
-          name: 'Idle Duration Distribution',
-          type: 'pie',
-          roseType: 'radius',
-          radius: ['34%', '82%'],
-          center: ['50%', '50%'],
-          avoidLabelOverlap: false,
-          label: { show: false },
-          labelLine: { show: false },
-          data: (data || []).map(item => ({
-            value: item.count,
-            name: item.duration,
-            itemStyle: { color: item.color }
-          })),
-          itemStyle: {
-            borderWidth: 0
-          }
-        }
-      ]
-    };
-  }
-
-  hasIdleDurationData(data: PublicCloudIdleDurationItem[]): boolean {
-    return (data || []).some(item => Number(item.count || 0) > 0);
-  }
-
-  private convertToIdleMetric(metric?: PublicCloudIdleMetricResponse, percentValue?: string | number): PublicCloudIdleMetric {
-    const usedValue = metric?.used ?? metric?.value;
-    const freeValue = metric?.free;
-    const explicitPercent = this.getNumericValue(metric?.percent || metric?.percentage || percentValue);
-    const freePercent = this.getNumericValue(freeValue);
-    const usedPercent = explicitPercent || (freePercent ? 100 - freePercent : this.getNumericValue(usedValue));
-    const percent = Math.max(Math.min(Number(usedPercent || 0), 100), 0);
-    return {
-      used: this.getFirstValue(usedValue, percent),
-      free: this.getFirstValue(freeValue, `${Math.max(100 - percent, 0)}%`),
-      percent,
-      tone: this.getProgressTone(percent)
-    };
-  }
-
-  private getIdleDurationResults(data: PublicCloudIdleDurationApiResponse): PublicCloudIdleDurationResponseItem[] {
-    return this.getIdleDurationResultsFromValue(data);
-  }
-
-  private getIdleDurationResultsFromValue(value: any): PublicCloudIdleDurationResponseItem[] {
-    if (!value) {
-      return [];
-    }
-    if (Array.isArray(value)) {
-      return value.filter(item => this.isIdleDurationBucketItem(item));
-    }
-
-    const record = value as Record<string, any>;
-    const containerKeys = [
-      'idleDurationDistribution',
-      'idle_duration_distribution',
-      'durationDistribution',
-      'duration_distribution',
-      'idle_devices_by_duration',
-      'summary',
-      'distribution',
-      'breakdown',
-      'results'
-    ];
-
-    for (const key of containerKeys) {
-      const rows = this.getIdleDurationResultsFromValue(record[key]);
-      if (rows.length) {
-        return rows;
-      }
-    }
-
-    const nestedRows = this.getIdleDurationResultsFromValue(record.data);
-    if (nestedRows.length) {
-      return nestedRows;
-    }
-
-    return this.convertIdleDurationRecordToItems(value as PublicCloudIdleDurationResponse);
-  }
-
-  private convertIdleDurationRecordToItems(data: PublicCloudIdleDurationResponse): PublicCloudIdleDurationResponseItem[] {
-    const record = data as unknown as Record<string, string | number | PublicCloudIdleDurationResponseItem>;
-    return Object.keys(data || {}).reduce((items: PublicCloudIdleDurationResponseItem[], key) => {
-      if (this.isIdleDurationMetadataKey(key)) {
-        return items;
-      }
-      const value = record[key];
-      if (value && typeof value === 'object') {
-        const item = {
-          ...value,
-          duration: value.duration || value.idle_duration || value.idleDuration || value.range || value.name || value.label || key
-        };
-        if (this.isIdleDurationBucketItem(item)) {
-          items.push(item);
-        }
-        return items;
-      }
-      if (this.isIdleDurationBucketKey(key)) {
-        items.push({
-          duration: key,
-          count: Number(value || 0)
-        });
-      }
-      return items;
-    }, []);
-  }
-
-  private getIdleDurationCount(item: PublicCloudIdleDurationResponseItem): number {
-    return Number(item?.count || item?.value || item?.total || item?.total_count || item?.totalCount || item?.devices || item?.percent || item?.percentage || 0);
-  }
-
-  private getIdleDurationLabel(item: PublicCloudIdleDurationResponseItem): string {
-    return this.getFirstValue(item.duration, item.idle_duration, item.idleDuration, item.range, item.name, item.label);
-  }
-
-  private sortIdleDurationBuckets(items: PublicCloudIdleDurationResponseItem[]): PublicCloudIdleDurationResponseItem[] {
-    return [...(items || [])].sort((first, second) => {
-      return this.getIdleDurationSortValue(this.getIdleDurationLabel(first)) - this.getIdleDurationSortValue(this.getIdleDurationLabel(second));
-    });
-  }
-
-  private getIdleDurationSortValue(label: string): number {
-    const normalizedLabel = String(label || '').toLowerCase().replace(/\s+/g, '');
-    if (normalizedLabel.startsWith('0-7')) {
-      return 0;
-    }
-    if (normalizedLabel.startsWith('7-15')) {
-      return 1;
-    }
-    if (normalizedLabel.startsWith('15-30')) {
-      return 2;
-    }
-    if (normalizedLabel.startsWith('30+')) {
-      return 3;
-    }
-    const firstNumber = normalizedLabel.match(/^\d+/);
-    return firstNumber ? Number(firstNumber[0]) : 999;
-  }
-
-  private isIdleDurationBucketItem(item: PublicCloudIdleDurationResponseItem): boolean {
-    return !!item && this.getIdleDurationCount(item) > 0 && this.isIdleDurationBucketKey(this.getIdleDurationLabel(item));
-  }
-
-  private isIdleDurationMetadataKey(key: string): boolean {
-    return ['total_idle_count', 'total_count', 'totalCount', 'total', 'count'].includes(key);
-  }
-
-  private isIdleDurationBucketKey(key: string): boolean {
-    const normalizedKey = String(key || '').toLowerCase().replace(/_/g, ' ').trim();
-    return !!normalizedKey && !this.isIdleDurationMetadataKey(key) && (
-      normalizedKey.includes('day') ||
-      /^\d+\s*[-+]\s*\d*/.test(normalizedKey) ||
-      /^\d+\+/.test(normalizedKey)
-    );
-  }
-
-  private getFirstObject(...values: any[]): PublicCloudIdleMetricResponse | undefined {
-    return values.find(value => value && typeof value === 'object');
-  }
-
-  private getFirstScalar(...values: any[]): string | number {
-    const value = values.find(item => item !== undefined && item !== null && item !== '' && typeof item !== 'object');
-    return value === undefined || value === null ? '' : value;
-  }
-
-  private getProgressTone(percent: number): PublicCloudStatusTone {
-    return percent < 65 ? 'success' : percent < 85 ? 'warning' : 'danger';
-  }
-
   private getNumericValue(value: string | number | undefined | null): number {
     return Number(String(value ?? '').replace(/[^0-9.-]/g, '')) || 0;
   }
-  /*
-   * ******End ****** Idle Devices Widgets Related ********************
-   */
-
   /*
    * -----Start----- Alert & Events View Widget Related -------------------
    */
@@ -3080,49 +3158,149 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  convertToRecentAlertSummaryMetricsViewData(data: PublicCloudRecentAlertsResponse): PublicCloudAlertSummaryMetric[] {
-    const summary = this.getRecentAlertSummary(data);
-    return [
-      {
-        label: 'Critical Alerts',
-        value: String(this.getRecentAlertSummaryValue(summary, ['critical_alerts', 'criticalAlerts', 'critical'])),
-        tone: 'danger'
-      },
-      {
-        label: 'Warning Alerts',
-        value: String(this.getRecentAlertSummaryValue(summary, ['warning_alerts', 'warningAlerts', 'warning'])),
-        tone: 'warning'
-      },
-      {
-        label: 'Info Alerts',
-        value: String(this.getRecentAlertSummaryValue(summary, ['info_alerts', 'infoAlerts', 'information', 'info'])),
-        tone: 'primary'
-      }
-    ];
+  getAlertsBySeverity(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAlertsBySeverity> {
+    return this.http.get<PublicCloudAlertsBySeverity>(PUBLIC_CLOUD_ALERTS_BY_SEVERITY_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
   }
 
-  convertToRecentAlertsViewData(data: PublicCloudRecentAlertsResponse): PublicCloudRecentAlert[] {
-    return this.getRecentAlertRows(data).map(item => ({
-      id: this.getFirstValue(item.id, item.alert_id, item.alertId, item.uuid, item.alert_uuid, item.alertUuid),
-      uuid: this.getFirstValue(item.uuid, item.alert_uuid, item.alertUuid, item.id, item.alert_id, item.alertId),
-      deviceName: this.getFirstValue(item.device_name, item.deviceName, item.name),
-      severity: this.getRecentAlertSeverity(this.getFirstValue(item.severity, item.status)),
-      description: this.getFirstValue(item.description),
-      source: this.getFirstValue(item.source),
-      acknowledged: this.formatRecentAlertAcknowledged(item.acknowledged),
-      duration: this.getFirstValue(item.duration)
+  getAlertsByProvider(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAlertsByProvider[]> {
+    return this.http.get<PublicCloudAlertsByProvider[]>(PUBLIC_CLOUD_ALERTS_BY_PROVIDER_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getAlertsByAge(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAlertsByAge> {
+    return this.http.get<PublicCloudAlertsByAge>(PUBLIC_CLOUD_ALERTS_BY_AGE_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getRecentAlertsStaticResponse(): PublicCloudRecentAlertsResponse {
+    return PUBLIC_CLOUD_RECENT_ALERTS_RESPONSE;
+  }
+
+  getAlertsBySeverityStaticResponse(): PublicCloudAlertsBySeverity {
+    return PUBLIC_CLOUD_ALERTS_BY_SEVERITY_RESPONSE;
+  }
+
+  getAlertsByProviderStaticResponse(): PublicCloudAlertsByProvider[] {
+    return PUBLIC_CLOUD_ALERTS_BY_PROVIDER_RESPONSE;
+  }
+
+  getAlertsByAgeStaticResponse(): PublicCloudAlertsByAge {
+    return PUBLIC_CLOUD_ALERTS_BY_AGE_RESPONSE;
+  }
+
+  convertToRecentAlertRows(data: PublicCloudRecentAlertsResponse): PublicCloudRecentAlertRow[] {
+    return this.getRecentAlertRows(data).map(item => {
+      const severity = this.getRecentAlertSeverity(this.getFirstValue(item.severity, item.status));
+      const providerKey = this.getAlertProviderKey(item);
+      const raised = this.getFirstValue(item.duration);
+      return {
+        id: this.getFirstValue(item.id, item.alert_id, item.alertId, item.uuid, item.alert_uuid, item.alertUuid),
+        uuid: this.getFirstValue(item.uuid, item.alert_uuid, item.alertUuid, item.id, item.alert_id, item.alertId),
+        instanceName: this.getFirstValue(item.device_name, item.deviceName, item.name),
+        severity,
+        severityLabel: this.getAlertSeverityLabel(severity),
+        severityClass: `alert-severity-${severity}`,
+        providerKey,
+        provider: providerKey ? providerKey.toUpperCase() : 'N/A',
+        alert: this.getFirstValue(item.description) || 'N/A',
+        raised: raised ? `${raised} ago` : 'N/A',
+        raisedHours: this.parseAlertRaisedHours(raised)
+      };
+    }).filter(row => !!row.instanceName || row.alert !== 'N/A');
+  }
+
+  convertToAlertsBySeverityOptions(data: PublicCloudAlertsBySeverity): EChartsOption {
+    const points = PUBLIC_CLOUD_ALERT_SEVERITY_ORDER
+      .map(key => ({ key, value: this.getNumberValue((data as any)?.[key]) }))
+      .filter(point => point.value > 0);
+    if (!points.length) {
+      return {};
+    }
+    const total = this.getNumberValue(data?.total) || points.reduce((sum, point) => sum + point.value, 0);
+    return {
+      color: points.map(point => this.getAlertSeverityChartColor(point.key)),
+      tooltip: { trigger: 'item', formatter: (params: any) => `${params?.name}: ${this.formatNumber(params?.value)}` },
+      title: {
+        text: this.formatNumber(total),
+        subtext: 'Alerts',
+        left: 'center',
+        top: 'center',
+        itemGap: 2,
+        textStyle: { fontSize: 20, fontWeight: 700, color: '#2b3642' },
+        subtextStyle: { fontSize: 12, color: '#6b7682' }
+      },
+      series: [{
+        type: 'pie',
+        radius: ['52%', '76%'],
+        center: ['50%', '50%'],
+        avoidLabelOverlap: true,
+        label: { show: false },
+        labelLine: { show: false },
+        data: points.map(point => ({ name: this.getAlertSeverityLabel(point.key), value: point.value, itemStyle: { color: this.getAlertSeverityChartColor(point.key) } }))
+      }]
+    };
+  }
+
+  convertToAlertsBySeverityLegend(data: PublicCloudAlertsBySeverity): PublicCloudAlertSeverityLegendItem[] {
+    return PUBLIC_CLOUD_ALERT_SEVERITY_ORDER.map(key => ({
+      label: this.getAlertSeverityLabel(key),
+      count: this.getNumberValue((data as any)?.[key]),
+      color: this.getAlertSeverityChartColor(key)
     }));
   }
 
-  private getRecentAlertSummary(data: PublicCloudRecentAlertsResponse): PublicCloudRecentAlertsSummary {
-    const nestedData = !Array.isArray(data?.data) ? data?.data : null;
-    return data?.alertSummary || data?.alert_summary || data?.summary ||
-      nestedData?.alertSummary || nestedData?.alert_summary || nestedData?.summary || {};
+  convertToAlertsByProviderOptions(data: PublicCloudAlertsByProvider[]): EChartsOption {
+    const items = (data || []).filter(item => !!this.getFirstValue(item?.provider));
+    if (!items.length) {
+      return {};
+    }
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatNumber(row.value)}` : '';
+        }
+      },
+      grid: { left: 30, right: 16, top: 16, bottom: 24 },
+      xAxis: { type: 'category', data: items.map(item => (this.getFirstValue(item.provider) || '').toUpperCase()), axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      yAxis: { type: 'value', min: 0, minInterval: 1, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 40,
+        data: items.map(item => ({ value: this.getNumberValue(item.alert_count), itemStyle: { color: this.getAccountSubscriptionProviderColor(item.provider), borderRadius: [3, 3, 0, 0] } }))
+      }]
+    };
   }
 
-  private getRecentAlertSummaryValue(summary: PublicCloudRecentAlertsSummary, keys: Array<keyof PublicCloudRecentAlertsSummary>): number {
-    const value = keys.map(key => summary?.[key]).find(item => item !== undefined && item !== null);
-    return Number(value || 0);
+  convertToAlertsByAgeOptions(data: PublicCloudAlertsByAge): EChartsOption {
+    const buckets = PUBLIC_CLOUD_ALERT_AGE_ORDER.map(key => ({ key, value: this.getNumberValue((data as any)?.[key]) }));
+    if (!buckets.some(bucket => bucket.value > 0)) {
+      return {};
+    }
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatNumber(row.value)}` : '';
+        }
+      },
+      grid: { left: 30, right: 16, top: 16, bottom: 24 },
+      xAxis: { type: 'category', data: buckets.map(bucket => bucket.key), axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      yAxis: { type: 'value', min: 0, minInterval: 1, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 40,
+        data: buckets.map(bucket => ({ value: bucket.value, itemStyle: { color: this.getAlertAgeColor(bucket.key), borderRadius: [3, 3, 0, 0] } }))
+      }]
+    };
   }
 
   private getRecentAlertRows(data: PublicCloudRecentAlertsResponse): PublicCloudRecentAlertResponseItem[] {
@@ -3152,21 +3330,392 @@ export class PublicCloudComputeDashboardService {
     }
   }
 
-  private formatRecentAlertAcknowledged(value: string | boolean | undefined): string {
-    if (typeof value === 'boolean') {
-      return value ? 'Yes' : 'No';
+  private getAlertSeverityLabel(severity: string): string {
+    switch ((severity || '').toLowerCase()) {
+      case 'critical':
+        return 'Critical';
+      case 'warning':
+        return 'Warning';
+      case 'info':
+        return 'Info';
+      default:
+        return this.getFirstValue(severity) || 'Unknown';
     }
-    const normalizedValue = String(value || '').toLowerCase();
-    if (normalizedValue === 'true') {
-      return 'Yes';
+  }
+
+  private getAlertSeverityChartColor(key: string): string {
+    return PUBLIC_CLOUD_ALERT_SEVERITY_CHART_COLORS[String(key || '').toLowerCase()] || '#c9cdd3';
+  }
+
+  private getAlertAgeColor(key: string): string {
+    return PUBLIC_CLOUD_ALERT_AGE_COLORS[key] || '#9aa4b2';
+  }
+
+  // provider is not part of the current recent_alerts item, so it is read when present and otherwise
+  // derived from the instance-name prefix (aws-/azure-/gcp-/oci-).
+  private getAlertProviderKey(item: PublicCloudRecentAlertResponseItem): string {
+    const explicit = this.normalizePlatformValue(item?.provider);
+    if (explicit) {
+      return explicit;
     }
-    if (normalizedValue === 'false') {
-      return 'No';
+    const name = String(item?.device_name || item?.deviceName || item?.name || '').toLowerCase();
+    if (name.indexOf('aws') === 0) {
+      return 'aws';
     }
-    return String(value || '');
+    if (name.indexOf('azure') === 0) {
+      return 'azure';
+    }
+    if (name.indexOf('gcp') === 0) {
+      return 'gcp';
+    }
+    if (name.indexOf('oci') === 0) {
+      return 'oci';
+    }
+    return '';
+  }
+
+  // duration arrives like "958d 15h" / "63h" / "1h 30m"; convert to total hours for the Raised sort.
+  private parseAlertRaisedHours(value: string): number {
+    const raw = String(value || '');
+    let hours = 0;
+    const days = raw.match(/(\d+)\s*d/);
+    if (days) {
+      hours += Number(days[1]) * 24;
+    }
+    const hrs = raw.match(/(\d+)\s*h/);
+    if (hrs) {
+      hours += Number(hrs[1]);
+    }
+    const mins = raw.match(/(\d+)\s*m/);
+    if (mins) {
+      hours += Number(mins[1]) / 60;
+    }
+    return hours;
   }
   /*
    * ******End ****** Alert & Events View Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Cost & Optimization Opportunities Widget Related -------------------
+   */
+  getCostOptimization(criteria?: PublicCloudDashboardFilterCriteria, search = '', page = 1, pageSize = 10): Observable<PublicCloudCostOptimizationTableResponse> {
+    let params = this.convertFiltersToApiParams(criteria);
+    if (search) {
+      params = params.set('search', search);
+    }
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    return this.http.get<PublicCloudCostOptimizationTableResponse>(PUBLIC_CLOUD_COST_OPTIMIZATION_ENDPOINT, { params });
+  }
+
+  getSpendVsSavings(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudSpendVsSavings> {
+    return this.http.get<PublicCloudSpendVsSavings>(PUBLIC_CLOUD_SPEND_VS_SAVINGS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getRecommendedActions(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudRecommendedAction[]> {
+    return this.http.get<PublicCloudRecommendedAction[]>(PUBLIC_CLOUD_RECOMMENDED_ACTIONS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getPotentialSavingsByProvider(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudPotentialSavingsByProvider[]> {
+    return this.http.get<PublicCloudPotentialSavingsByProvider[]>(PUBLIC_CLOUD_POTENTIAL_SAVINGS_BY_PROVIDER_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getCostOptimizationStaticResponse(): PublicCloudCostRowResponse[] {
+    return PUBLIC_CLOUD_COST_OPTIMIZATION_RESPONSE;
+  }
+
+  getSpendVsSavingsStaticResponse(): PublicCloudSpendVsSavings {
+    return PUBLIC_CLOUD_SPEND_VS_SAVINGS_RESPONSE;
+  }
+
+  getRecommendedActionsStaticResponse(): PublicCloudRecommendedAction[] {
+    return PUBLIC_CLOUD_RECOMMENDED_ACTIONS_RESPONSE;
+  }
+
+  getPotentialSavingsByProviderStaticResponse(): PublicCloudPotentialSavingsByProvider[] {
+    return PUBLIC_CLOUD_POTENTIAL_SAVINGS_BY_PROVIDER_RESPONSE;
+  }
+
+  convertToCostRows(data: PublicCloudCostOptimizationTableResponse | PublicCloudCostRowResponse[]): PublicCloudCostRow[] {
+    return this.getCostOptimizationResults(data).map(item => {
+      const cpuPct = this.getNumberValue(item?.utilization);
+      const savings = this.getNumberValue(item?.estimated_monthly_savings);
+      const action = this.getFirstValue(item?.recommended_action) || 'N/A';
+      return {
+        instance: this.getFirstValue(item?.instance),
+        providerKey: this.normalizePlatformValue(item?.provider),
+        provider: this.getFirstValue(item?.provider),
+        region: this.getFirstValue(item?.region) || 'N/A',
+        type: this.getFirstValue(item?.type) || 'N/A',
+        cpuPct,
+        cpuLabel: `${this.formatCapacityDecimal(cpuPct)}% CPU`,
+        cpuTone: this.getCostCpuTone(cpuPct),
+        action,
+        actionClass: this.getCostActionClass(action),
+        savings,
+        savingsLabel: this.formatCostCurrency(savings)
+      };
+    }).filter(row => !!row.instance);
+  }
+
+  getCostOptimizationTotal(data: PublicCloudCostOptimizationTableResponse | PublicCloudCostRowResponse[]): number {
+    if (Array.isArray(data)) {
+      return data.length;
+    }
+    return Number(data?.count || 0) || this.getCostOptimizationResults(data).length;
+  }
+
+  private getCostOptimizationResults(data: PublicCloudCostOptimizationTableResponse | PublicCloudCostRowResponse[]): PublicCloudCostRowResponse[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return data?.results || data?.data || data?.items || [];
+  }
+
+  convertToSpendVsSavingsOptions(data: PublicCloudSpendVsSavings): EChartsOption {
+    const spend = this.getNumberValue(data?.current_monthly_spend);
+    const savings = this.getNumberValue(data?.identified_savings);
+    if (spend + savings <= 0) {
+      return {};
+    }
+    return {
+      color: [PUBLIC_CLOUD_COST_SPEND_COLOR, PUBLIC_CLOUD_COST_SAVINGS_COLOR],
+      tooltip: { trigger: 'item', formatter: (params: any) => `${params?.name}: ${this.formatCostCurrency(params?.value)}` },
+      title: {
+        text: this.formatCostCurrency(spend),
+        left: 'center',
+        top: 'center',
+        textStyle: { fontSize: 18, fontWeight: 700, color: '#2b3642' }
+      },
+      series: [{
+        type: 'pie',
+        radius: ['62%', '82%'],
+        center: ['50%', '50%'],
+        avoidLabelOverlap: true,
+        label: { show: false },
+        labelLine: { show: false },
+        data: [
+          { name: 'Current monthly spend', value: spend, itemStyle: { color: PUBLIC_CLOUD_COST_SPEND_COLOR } },
+          { name: 'Identified savings', value: savings, itemStyle: { color: PUBLIC_CLOUD_COST_SAVINGS_COLOR } }
+        ]
+      }]
+    };
+  }
+
+  convertToSpendVsSavingsLegend(data: PublicCloudSpendVsSavings): PublicCloudSpendSavingsLegendItem[] {
+    return [
+      { text: `Current monthly spend: ${this.formatCostCurrency(this.getNumberValue(data?.current_monthly_spend))}`, color: PUBLIC_CLOUD_COST_SPEND_COLOR },
+      { text: `Identified savings: ${this.formatCostCurrency(this.getNumberValue(data?.identified_savings))}/mo`, color: PUBLIC_CLOUD_COST_SAVINGS_COLOR }
+    ];
+  }
+
+  convertToRecommendedActionsOptions(data: PublicCloudRecommendedAction[]): EChartsOption {
+    const items = (data || []).filter(item => !!this.getFirstValue(item?.recommended_action));
+    if (!items.length) {
+      return {};
+    }
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatNumber(row.value)}` : '';
+        }
+      },
+      grid: { left: 160, right: 40, top: 8, bottom: 8 },
+      xAxis: { type: 'value', min: 0, show: false },
+      yAxis: { type: 'category', inverse: true, data: items.map(item => this.getFirstValue(item.recommended_action)), axisTick: { show: false }, axisLine: { show: false }, axisLabel: { color: '#4a5b6b', fontSize: 11 } },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 18,
+        label: { show: true, position: 'right', color: '#4a5b6b', fontSize: 11, formatter: (params: any) => this.formatNumber(params.value) },
+        data: items.map(item => ({ value: this.getNumberValue(item.count), itemStyle: { color: this.getCostActionColor(item.recommended_action), borderRadius: [0, 3, 3, 0] } }))
+      }]
+    };
+  }
+
+  convertToPotentialSavingsByProviderOptions(data: PublicCloudPotentialSavingsByProvider[]): EChartsOption {
+    const order = ['aws', 'azure', 'gcp', 'oci'];
+    const items = (data || []).filter(item => !!this.getFirstValue(item?.provider)).slice()
+      .sort((first, second) => order.indexOf(this.normalizePlatformValue(first.provider)) - order.indexOf(this.normalizePlatformValue(second.provider)));
+    if (!items.some(item => this.getNumberValue(item.estimated_monthly_savings) > 0)) {
+      return {};
+    }
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const row = params && params[0];
+          return row ? `${row.axisValue}: ${this.formatCostCurrency(row.value)}` : '';
+        }
+      },
+      grid: { left: 48, right: 16, top: 16, bottom: 24 },
+      xAxis: { type: 'category', data: items.map(item => (this.getFirstValue(item.provider) || '').toUpperCase()), axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      yAxis: { type: 'value', min: 0, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
+      series: [{
+        type: 'bar',
+        barMaxWidth: 46,
+        data: items.map(item => ({ value: this.getNumberValue(item.estimated_monthly_savings), itemStyle: { color: this.getAccountSubscriptionProviderColor(item.provider), borderRadius: [3, 3, 0, 0] } }))
+      }]
+    };
+  }
+
+  convertToCostSummaryMetrics(spend: PublicCloudSpendVsSavings, actions: PublicCloudRecommendedAction[]): PublicCloudCostSummaryMetric[] {
+    return [
+      { label: 'Monthly Spend', value: this.formatCostCurrency(this.getNumberValue(spend?.current_monthly_spend)), tone: 'primary' },
+      { label: 'Potential Savings', value: this.formatCostCurrency(this.getNumberValue(spend?.identified_savings)), tone: 'warning' },
+      { label: 'Rightsizing Candidates', value: String(this.getCostActionCount(actions, 'rightsize')), tone: 'primary' },
+      { label: 'Idle Instances', value: String(this.getCostActionCount(actions, 'idle')), tone: 'danger' }
+    ];
+  }
+
+  private getCostCpuTone(cpuPct: number): PublicCloudStatusTone {
+    if (cpuPct >= 85) {
+      return 'danger';
+    }
+    return cpuPct >= 50 ? 'warning' : 'success';
+  }
+
+  private getCostActionKind(action?: string): string {
+    const value = String(action || '').toLowerCase();
+    if (value.indexOf('rightsize') > -1 || value.indexOf('right size') > -1) {
+      return 'rightsize';
+    }
+    if (value.indexOf('stop') > -1 || value.indexOf('idle') > -1 || value.indexOf('terminate') > -1) {
+      return 'idle';
+    }
+    return '';
+  }
+
+  private getCostActionClass(action?: string): string {
+    const kind = this.getCostActionKind(action);
+    return kind ? `cost-action-${kind}` : 'cost-action-default';
+  }
+
+  private getCostActionColor(action?: string): string {
+    return PUBLIC_CLOUD_COST_ACTION_COLORS[this.getCostActionKind(action)] || '#9aa4b2';
+  }
+
+  private getCostActionCount(actions: PublicCloudRecommendedAction[], kind: string): number {
+    return (actions || []).filter(item => this.getCostActionKind(item?.recommended_action) === kind)
+      .reduce((sum, item) => sum + this.getNumberValue(item?.count), 0);
+  }
+
+  private formatCostCurrency(value: number | string | undefined): string {
+    return `$${Math.round(this.getNumberValue(value)).toLocaleString('en-US')}`;
+  }
+  /*
+   * ******End ****** Cost & Optimization Opportunities Widget Related ********************
+   */
+
+  /*
+   * -----Start----- Auto-Remediation Summary Widget Related -------------------
+   */
+  getAutoRemediationSummary(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAutoRemediationSummaryResponse> {
+    return this.http.get<PublicCloudAutoRemediationSummaryResponse>(PUBLIC_CLOUD_AUTO_REMEDIATION_SUMMARY_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getAutoRemediationSummaryStaticResponse(): PublicCloudAutoRemediationSummaryResponse {
+    return PUBLIC_CLOUD_AUTO_REMEDIATION_SUMMARY_RESPONSE;
+  }
+
+  convertToAutoRemediationSummaryViewData(data: PublicCloudAutoRemediationSummaryResponse): PublicCloudAutoRemediationSummaryViewData {
+    const source = this.getObjectResponseData(data) as PublicCloudAutoRemediationSummaryResponse;
+    const totalRuns = this.getFirstNumericValue(source?.autoRemediations, source?.totalRuns, source?.total_runs, source?.total) || 0;
+    const successfulRuns = this.getFirstNumericValue(source?.successfulRuns) || 0;
+    const failedRuns = this.getFirstNumericValue(source?.failedRuns) || 0;
+    const successPct = this.getAutoRemediationPercent(source?.runbookSuccessPct, successfulRuns, totalRuns);
+    const failurePct = this.getAutoRemediationPercent(source?.runbookFailurePct, failedRuns, totalRuns);
+    const actions = this.convertToAutoRemediationActions(source);
+    const avgMttr = this.getFirstValue(source?.avgMttr) ||
+      (this.getFirstNumericValue(source?.avgDurationMinutes, source?.avg_duration, source?.avgDuration, source?.average_duration, source?.averageDuration) !== null
+        ? `${this.formatNumber(this.getFirstNumericValue(source?.avgDurationMinutes, source?.avg_duration, source?.avgDuration, source?.average_duration, source?.averageDuration) || 0)}m`
+        : '');
+
+    const outcomes: PublicCloudAutoRemediationOutcome[] = [
+      {
+        label: 'Successful',
+        count: successfulRuns,
+        percent: successPct,
+        color: PUBLIC_CLOUD_AUTO_REMEDIATION_OUTCOME_COLORS.successful
+      },
+      {
+        label: 'Failed',
+        count: failedRuns,
+        percent: failurePct,
+        color: PUBLIC_CLOUD_AUTO_REMEDIATION_OUTCOME_COLORS.failed
+      }
+    ];
+
+    const kpis: PublicCloudAutoRemediationKpi[] = [
+      {
+        label: 'Auto-Remediations',
+        value: this.formatNumber(totalRuns),
+        tone: 'primary'
+      },
+      {
+        label: 'Runbook Success',
+        value: `${this.formatNumber(successPct)}%`,
+        tone: 'success'
+      },
+      {
+        label: 'Avg MTTR',
+        value: avgMttr,
+        tone: 'primary'
+      },
+      {
+        label: 'Runbook Failures',
+        value: this.formatNumber(failedRuns),
+        tone: 'danger'
+      }
+    ];
+
+    return {
+      outcomes,
+      actions,
+      kpis,
+      totalRunsLabel: this.formatNumber(totalRuns),
+      avgDurationLabel: avgMttr,
+      donutGradient: `conic-gradient(${PUBLIC_CLOUD_AUTO_REMEDIATION_OUTCOME_COLORS.successful} 0 ${successPct}%, ${PUBLIC_CLOUD_AUTO_REMEDIATION_OUTCOME_COLORS.failed} ${successPct}% 100%)`,
+      hasData: totalRuns > 0 || actions.length > 0 || kpis.some(item => !!item.value)
+    };
+  }
+
+  private convertToAutoRemediationActions(source: PublicCloudAutoRemediationSummaryResponse): PublicCloudAutoRemediationAction[] {
+    const actionRows = source?.topAutoRemediationActions || source?.mostFrequentActions ||
+      source?.most_frequent_actions || source?.frequentActions || source?.frequent_actions || source?.actions || [];
+    const maxCount = Math.max(...(actionRows || []).map(item => this.getFirstNumericValue(item?.count, item?.value) || 0), 0);
+    return (actionRows || []).map((item, index) => {
+      const count = this.getFirstNumericValue(item?.count, item?.value) || 0;
+      return {
+        label: this.getFirstValue(item?.name, item?.label, item?.action),
+        count,
+        percent: maxCount ? Math.round((count / maxCount) * 100) : 0,
+        color: PUBLIC_CLOUD_AUTO_REMEDIATION_ACTION_COLORS[index % PUBLIC_CLOUD_AUTO_REMEDIATION_ACTION_COLORS.length]
+      };
+    }).filter(item => !!item.label);
+  }
+
+  private getAutoRemediationPercent(value: string | number | undefined, count: number, total: number): number {
+    const percent = this.getFirstNumericValue(value);
+    if (percent !== null) {
+      return percent;
+    }
+    return total ? Math.round((count / total) * 1000) / 10 : 0;
+  }
+  /*
+   * ******End ****** Auto-Remediation Summary Widget Related ********************
    */
 
 }

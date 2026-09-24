@@ -252,9 +252,7 @@
   gap: 6px;
 }
 
-.dashboard-card+.section-title,
-.orphaned-widgets-grid+.idle-widgets-grid,
-.idle-widgets-grid+.section-title {
+.dashboard-card+.section-title {
   margin-top: 1rem;
   margin-bottom: 0.3rem;
 }
@@ -296,19 +294,52 @@
 .summary-metrics {
   position: relative;
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px 0;
   min-height: 46px;
   margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e3e8ed;
 }
 
 .summary-metric {
-  min-width: 78px;
+  flex: 1 1 auto;
+  min-width: 104px;
   padding: 0 16px;
   border-right: 1px solid #c6cdd4;
   text-align: left;
 
   &:last-child {
     border-right: 0;
+  }
+}
+
+// The metrics strip is a bordered sub-card inside the main widget card, sitting below the
+// table/chart view with a clear gap. The main card has no bottom padding (padding: 14px 14px 0),
+// so the sub-card adds a matching bottom margin for symmetric spacing inside the card.
+.provisioning-summary-substrip {
+  margin-top: 16px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+}
+
+// Inside the sub-card the strip drops the internal divider/spacing the shared .summary-metrics
+// carries for stacking above other content, and gives each metric an equal share so the columns
+// and dividers line up evenly.
+.summary-metrics.provisioning-summary-strip {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+
+  .summary-metric {
+    flex: 1 1 0;
+
+    &:first-child {
+      padding-left: 0;
+    }
   }
 }
 
@@ -360,17 +391,30 @@
   line-height: 24px;
 }
 
-.metric-primary {
+.metric-value.tone-primary {
   color: #2588df;
-  font-size: 24px;
-  line-height: 26px;
 }
 
-.inventory-grid {
+.metric-value.tone-success {
+  color: #00ad73;
+}
+
+.metric-value.tone-danger {
+  color: #e24f5d;
+}
+
+.metric-value.tone-muted {
+  color: #27313b;
+}
+
+// auto-fit collapses tracks that have no widget in them (e.g. Alerts Severity hidden when
+// there are no alerts), so the remaining widgets stretch to fill the row instead of leaving
+// empty space - this also folds in the old 1100px/640px column-count breakpoints.
+.inventory-chart-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 24px;
-  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  align-items: stretch;
 }
 
 .widget-title {
@@ -380,43 +424,451 @@
   color: #202a33;
 }
 
-.provider-panel {
-  position: relative;
+.monitored-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0 0 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e3e8ed;
+}
+
+.monitored-card {
+  flex: 1 1 190px;
+  min-width: 190px;
+  border: 1px solid #dce2e7;
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #fbfbfc;
+}
+
+.monitored-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.monitored-card-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #202a33;
+}
+
+.monitored-card-count {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.monitored-card-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #7c8796;
+
+  strong {
+    color: #202a33;
+    font-weight: 700;
+  }
+}
+
+.monitored-stackbar {
+  display: flex;
+  height: 8px;
+  margin-top: 10px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #eef0f3;
+
+  span {
+    height: 100%;
+  }
+}
+
+.monitored-seg-running,
+.monitored-seg-healthy {
+  background: #3bb273;
+}
+
+.monitored-seg-stopped,
+.monitored-seg-degraded {
+  background: #e5484d;
+}
+
+.monitored-seg-unknown {
+  background: #c9cdd3;
+}
+
+.monitored-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: #6b7682;
+}
+
+.monitored-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.monitored-dot-running,
+.monitored-dot-healthy {
+  background: #3bb273;
+}
+
+.monitored-dot-stopped,
+.monitored-dot-degraded {
+  background: #e5484d;
+}
+
+.monitored-dot-unknown {
+  background: #c9cdd3;
+}
+
+.inventory-chart-box {
   display: flex;
   flex-direction: column;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+
+  .widget-title {
+    margin: 0;
+    padding: 9px 14px;
+    background: #f7f8fa;
+    border-bottom: 1px solid #e9edf1;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2b3441;
+  }
+}
+
+.inventory-chart {
+  width: 100%;
+  height: 190px;
+  padding: 8px 6px 0;
+}
+
+.inventory-chart-legend {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  min-height: 158px;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 8px 12px 12px;
+  font-size: 11px;
+  color: #5e6874;
 }
 
-.provider-distribution-panel,
-.tags-panel {
-  position: relative;
+.inventory-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.inventory-info-icon {
+  margin-left: 4px;
+  color: #9aa6b2;
+  font-size: 11px;
+  cursor: help;
+}
+
+.severity-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+  padding: 12px;
+  min-height: 190px;
+}
+
+.sev-pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+
+  span {
+    font-weight: 400;
+    font-size: 11px;
+    margin-left: 4px;
+  }
+}
+
+.sev-pill.sev-critical {
+  background: #fde3e2;
+  color: #e5484d;
+}
+
+.sev-pill.sev-warning {
+  background: #fdeecb;
+  color: #c8871a;
+}
+
+.sev-pill.sev-info {
+  background: #dce8fd;
+  color: #2f6fed;
+}
+
+// ----- Capacity and Performance widget -----
+// Wide 11-column table: horizontal + vertical scroll with content-sized columns (the proportional
+// truncateText directive forces fit-to-container, which crams 11 columns unreadably here).
+.capacity-table-scroll {
+  max-height: 380px;
+  overflow: auto;
+}
+
+.capacity-table {
+  min-width: 1200px;
+}
+
+.capacity-instance {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.capacity-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+
+  i {
+    font-size: 13px;
+  }
+}
+
+.capacity-os {
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.capacity-cpu-cell {
+  min-width: 160px;
+}
+
+.capacity-cpu-label {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.db-storage-total {
+  text-align: right;
+  font-size: 11px;
+  color: #7c8796;
+  line-height: 14px;
+}
+
+.db-storage-used {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #7c8796;
+  line-height: 14px;
+}
+
+.capacity-disk-iops {
+  color: #333f4a;
+}
+
+.capacity-disk-throughput {
+  color: #7c8796;
+  font-size: 11px;
+}
+
+.capacity-mem-available {
+  color: #7c8796;
+  font-size: 11px;
+}
+
+.capacity-network {
+  font-weight: 600;
+}
+
+.capacity-trend-spark {
+  width: 82px;
+  height: 24px;
+}
+
+.capacity-forecast {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.capacity-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+@media (max-width: 900px) {
+  .capacity-chart-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.capacity-chart-panel {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
 }
 
-.provider-chart {
-  width: 140px;
-  height: 106px;
-  margin-top: 4px;
+.capacity-chart-title {
+  padding: 9px 14px;
+  background: #f7f8fa;
+  border-bottom: 1px solid #e9edf1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2b3441;
 }
 
-.inventory-geo-panel {
-  position: relative;
-  min-height: 232px;
+.capacity-chart-subtitle {
+  color: #7a8391;
+  font-size: 11px;
+  font-weight: 400;
 }
 
-.geo-chart {
+.capacity-chart {
   width: 100%;
-  height: 232px;
-  margin-top: 6px;
+  height: 230px;
+  padding: 8px 6px 6px;
+}
+
+.capacity-chart-tall {
+  height: 300px;
+}
+
+.capacity-chart-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 0 12px 12px;
+  font-size: 11px;
+  color: #5e6874;
+}
+
+.capacity-chart-legend-note {
+  color: #7a8391;
 }
 
 .chart-click-target {
   cursor: pointer;
+}
+
+.geo-card {
+  min-height: 300px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.geo-distribution-chart {
+  height: 300px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.pcgeo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 8px 14px 7px;
+  border-bottom: 1px solid #e3e8ed;
+}
+
+.pcgeo-kpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.pcgeo-kpi {
+  min-width: 0;
+}
+
+.pcgeo-kpi-label {
+  color: #5f6f86;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.pcgeo-kpi-value {
+  margin-top: 1px;
+  color: #17a2b8;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 21px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pcgeo-platform-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 180px;
+  color: #20272e;
+  font-size: 11px;
+
+  label {
+    margin: 0;
+    color: #5f6f86;
+  }
+
+  .form-control {
+    height: 28px;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-color: #b8c2cc;
+  }
+}
+
+.pcgeo-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding: 8px 16px 10px;
+  border-top: 1px solid #e3e8ed;
+  color: #4a5b6b;
+  font-size: 12px;
+}
+
+.pcgeo-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pcgeo-legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 
 .provider-legend {
@@ -739,198 +1191,323 @@ button.legend-link {
   }
 }
 
-.performance-hotspots-card {
-  position: relative;
-  padding: 14px 16px 16px;
+.account-metrics-subtitle {
+  color: #7c8796;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+  margin-left: 8px;
 }
 
-// While the widget is loading the table/legend are not yet rendered, so reserve a comfortable
-// height (matching the loaded card) instead of collapsing to a thin strip behind the spinner.
-.performance-hotspots-card.hotspots-loading {
-  min-height: 320px;
-}
-
-.hotspots-legend {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px 40px;
-  margin-bottom: 12px;
-  color: #26313b;
-  font-size: 13px;
-  line-height: 18px;
-}
-
-.hotspot-legend-dot {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-.hotspot-legend-dot.legend-success {
-  background: #1ab877;
-}
-
-.hotspot-legend-dot.legend-warning {
-  background: #ff8a00;
-}
-
-.hotspot-legend-dot.legend-danger {
-  background: #d90000;
-}
-
-.hotspots-table-wrap {
-  max-height: 330px;
-  overflow-y: auto;
-}
-
-.performance-hotspots-table {
-  table-layout: fixed;
-  width: 100%;
-
-  .hotspot-instance-col {
-    width: 13%;
-  }
-
-  .hotspot-cloud-col {
-    width: 10%;
-  }
-
-  .hotspot-metric-col {
-    width: 11%;
-  }
-
-  .hotspot-disk-col {
-    width: 15%;
-  }
-
-  .hotspot-rw-col {
-    width: 13%;
-  }
-
-  .hotspot-network-col {
-    width: 14%;
-  }
-
-  thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background: #eef1f3;
-    border: 0;
-    color: #27313b;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 6px 10px;
-    vertical-align: middle;
-  }
-
-  td {
-    border-color: #dce2e6;
-    color: #26313b;
-    font-size: 12px;
-    vertical-align: middle;
-    padding: 8px 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .table-link {
-    font-size: 12px;
+.account-metrics-view-toggle {
+  .btn {
+    min-width: 36px;
   }
 }
 
-.sortable-col {
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.performance-hotspots-table thead th.sortable-col.sort-active {
-  color: #1a73e8;
-  background: #dceafc;
-  font-weight: 700;
-}
-
-.performance-hotspots-table thead th.sortable-col.sort-active .fa-caret-down {
-  margin-left: 4px;
-  color: #1a73e8;
-}
-
-.hotspot-cloud-logo {
-  height: 22px;
-  max-width: 104px;
-  object-fit: contain;
-}
-
-.hotspot-disk-capacity {
-  color: #6a7682;
-  font-size: 11px;
-  margin-bottom: 4px;
-}
-
-.hotspot-disk-track {
-  height: 7px;
-  background: #e4e8ec;
-  border-radius: 4px;
+.account-metrics-card {
+  padding: 14px 14px 0;
   overflow: hidden;
 }
 
-.hotspot-disk-fill {
-  height: 100%;
-  border-radius: 4px;
+.account-metrics-search {
+  position: relative;
+  width: 326px;
+  max-width: 100%;
+  margin: 0 0 12px;
+
+  i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a3b8;
+    font-size: 13px;
+    z-index: 1;
+  }
+
+  .form-control {
+    height: 37px;
+    padding-left: 38px;
+    color: #2b3642;
+    font-size: 13px;
+    border-color: #c9d3de;
+  }
 }
 
-.hotspot-disk-fill.tone-success {
-  background: #1ab877;
+// Both classes sit on the same wrapper; scope to the compound selector so this max-height wins
+// over the shared .database-scroll-table rule (defined later in this file). Sized to show 5 rows.
+.account-metrics-table-wrap.database-scroll-table {
+  max-height: 380px;
+  overflow-y: auto;
 }
 
-.hotspot-disk-fill.tone-warning {
-  background: #ff8a00;
+.account-metrics-table {
+  table-layout: fixed;
+  width: 100%;
+
+  th {
+    height: 34px;
+  }
+
+  td {
+    height: 44px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
 }
 
-.hotspot-disk-fill.tone-danger {
-  background: #d90000;
+.account-provider-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 53px;
+  height: 20px;
+  padding: 0 10px;
+  border-radius: 11px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
 }
 
-.hotspot-disk-meta {
+.account-provider-aws {
+  background: #ff9900;
+  color: #111111;
+}
+
+.account-provider-azure {
+  background: #087ccc;
+}
+
+.account-provider-gcp {
+  background: #34a853;
+}
+
+.account-provider-oci,
+.account-provider-oracle {
+  background: #c94736;
+}
+
+// Environment badge pills for the Instance Provisioning table. Colored variants (pink / gray /
+// tan / green) are specific tints Bootstrap utilities cannot express, so they are scoped here.
+.provisioning-env {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.provisioning-env-production {
+  background: #fdecef;
+  color: #d6456a;
+}
+
+.provisioning-env-test {
+  background: #edf0f3;
+  color: #5c6c82;
+}
+
+.provisioning-env-staging {
+  background: #fdf3e0;
+  color: #b7791f;
+}
+
+.provisioning-env-development {
+  background: #e7f6ee;
+  color: #2f9e6b;
+}
+
+.provisioning-env-default {
+  background: #edf0f3;
+  color: #5c6c82;
+}
+
+// Severity badge pills for the Recent Alerts table (pink / amber / green tints Bootstrap utilities
+// cannot express). Note: the table Info badge is green while the severity CHART uses blue for Info,
+// per the design.
+.alert-severity {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.alert-severity-critical {
+  background: #fdecef;
+  color: #d6456a;
+}
+
+.alert-severity-warning {
+  background: #fdf3e0;
+  color: #b7791f;
+}
+
+.alert-severity-info {
+  background: #e7f6ee;
+  color: #2f9e6b;
+}
+
+.alert-severity-muted {
+  background: #edf0f3;
+  color: #5c6c82;
+}
+
+// ----- Cost & Optimization Opportunities widget -----
+// Italic caption that sits inline on the header row (right of the heading/toggle), wrapping to a
+// second line if needed but starting on the header line.
+.cost-optimization-subtitle {
+  margin: 0 14px;
+  padding-top: 3px;
+  color: #7a8391;
+  font-size: 11.5px;
+  font-style: italic;
+  line-height: 1.35;
+  font-weight: 400;
+}
+
+// Recommended-action text link colors (rightsize blue, idle amber).
+.cost-action-text {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cost-action-rightsize {
+  color: #2f6fed;
+}
+
+.cost-action-idle {
+  color: #e08600;
+}
+
+.cost-action-default {
+  color: #5c6c82;
+}
+
+// Chart-view section headings.
+.cost-chart-section-title {
+  margin-bottom: 12px;
+  color: #2b3441;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cost-chart-subtitle {
+  margin-bottom: 6px;
+  color: #2b3441;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+// Spend vs Savings donut + stacked legend.
+.cost-spend-donut {
+  width: 132px;
+  height: 132px;
+  flex: 0 0 132px;
+}
+
+.cost-spend-legend {
+  margin-left: 16px;
+}
+
+.cost-spend-legend-item {
   display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  color: #33404d;
+  font-size: 13px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.cost-recommended-chart {
+  width: 100%;
+  height: 118px;
+}
+
+.cost-provider-chart {
+  width: 100%;
+  height: 210px;
+  padding: 8px 6px 6px;
+}
+
+.account-vcpu-total {
+  color: #008f92;
+  font-size: 11.5px;
+  line-height: 14px;
+  text-align: right;
+}
+
+.account-vcpu-track {
+  height: 7px;
+  margin: 2px 0;
+  background: #eceff2;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.account-vcpu-fill {
+  height: 100%;
+  border-radius: 5px;
+}
+
+.account-vcpu-used {
+  color: #008f92;
+  font-size: 11.5px;
+  line-height: 14px;
+}
+
+.account-metrics-pagination-row {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 4px;
-  color: #6a7682;
-  font-size: 11px;
+  gap: 12px;
+  padding: 10px 0;
+  color: #7c8796;
+  font-size: 13px;
 }
 
-.hotspot-rw-read {
-  color: #1f7ed0;
-  line-height: 18px;
+.account-metrics-chart-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-bottom: 14px;
 }
 
-.hotspot-rw-write {
-  color: #e8862a;
-  line-height: 18px;
+.account-metrics-chart-panel {
+  flex: 1 1 calc(50% - 10px);
+  min-width: 420px;
+  border: 1px solid #dce2e7;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ffffff;
 }
 
-.orphaned-widgets-grid,
-.idle-widgets-grid {
+.account-metrics-chart {
+  width: 100%;
+  height: 300px;
+}
+
+.orphaned-widgets-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.85fr) minmax(360px, 1fr);
   gap: 10px;
 }
 
-.orphaned-widgets-grid.single-widget-grid,
-.idle-widgets-grid.single-widget-grid {
+.orphaned-widgets-grid.single-widget-grid {
   grid-template-columns: minmax(0, 1fr);
 }
 
 .orphaned-device-card,
-.orphaned-category-card,
-.idle-device-card,
-.idle-duration-card {
+.orphaned-category-card {
   padding: 0;
   overflow: hidden;
 }
@@ -957,8 +1534,7 @@ button.legend-link {
   flex-direction: column;
 }
 
-.orphaned-widget-col .orphaned-table-wrap,
-.orphaned-widget-col .idle-table-wrap {
+.orphaned-widget-col .orphaned-table-wrap {
   flex: 1 1 auto;
 }
 
@@ -973,8 +1549,7 @@ button.legend-link {
   padding: 3px 7px;
 }
 
-.orphaned-table-wrap,
-.idle-table-wrap {
+.orphaned-table-wrap {
   position: relative;
   padding: 8px 12px 0;
 }
@@ -1016,8 +1591,7 @@ button.legend-link {
 }
 
 // Cell text wrappers may not exceed their fixed-layout columns so truncateText can ellipsize.
-.orphaned-table td>div,
-.idle-devices-table td>div {
+.orphaned-table td>div {
   max-width: 100%;
 }
 
@@ -1061,88 +1635,7 @@ button.legend-link {
   }
 }
 
-.idle-table-wrap {
-  overflow-x: hidden;
-}
-
-// Cap the idle table at ~6 records; extra rows scroll here. The legend (above) and the pagination
-// (below, outside .idle-table-wrap) stay fixed and always visible.
-.idle-table-scroll {
-  max-height: 265px;
-  overflow-y: auto;
-}
-
-.idle-list-empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 280px;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-.idle-devices-table {
-  table-layout: fixed;
-  min-width: 0;
-  width: 100%;
-
-  .idle-device-name-col {
-    width: 28%;
-  }
-
-  .idle-resource-col {
-    width: 10%;
-  }
-
-  .idle-metric-col {
-    width: 18%;
-  }
-
-  .idle-network-col {
-    width: 8%;
-  }
-
-  .idle-duration-col {
-    width: 12%;
-  }
-
-  .idle-status-col {
-    width: 6%;
-  }
-
-  th,
-  td {
-    font-size: 12px;
-    padding: 6px 6px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  // Force the name div to fill its (colgroup-sized) column so it truncates at the real column width.
-  td:first-child > div {
-    width: 100% !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  th:last-child,
-  td:last-child {
-    text-align: center;
-  }
-
-  i {
-    font-size: 14px;
-  }
-
-  .storage-meta {
-    font-size: 10px;
-    gap: 4px;
-  }
-}
-
-.orphaned-pagination-row,
-.idle-pagination-row {
+.orphaned-pagination-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1158,8 +1651,7 @@ button.legend-link {
   line-height: 15px;
 }
 
-.orphaned-pagination-row table-pager,
-.idle-pagination-row table-pager {
+.orphaned-pagination-row table-pager {
   margin-left: auto;
   display: block;
 }
@@ -1229,94 +1721,6 @@ button.legend-link {
   outline-offset: 2px;
 }
 
-.idle-duration-body {
-  position: relative;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 300px;
-  padding: 16px 24px 18px;
-}
-
-.idle-duration-empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 278px;
-  color: #6c757d;
-  text-align: center;
-}
-
-.idle-duration-content {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.idle-duration-bars {
-  display: grid;
-  gap: 6px;
-}
-
-.idle-duration-row {
-  display: grid;
-  grid-template-columns: 84px minmax(150px, 1fr) 34px;
-  align-items: center;
-  column-gap: 8px;
-  color: #2b333c;
-  font-size: 14px;
-}
-
-.idle-duration-label {
-  border-bottom: 1px solid #e1e5e8;
-  line-height: 24px;
-  white-space: nowrap;
-}
-
-.idle-duration-track {
-  height: 24px;
-  overflow: hidden;
-  background: #d8d8d8;
-  border-radius: 5px;
-}
-
-.idle-duration-fill {
-  min-width: 42px;
-  height: 100%;
-  border-radius: 5px;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.idle-duration-value {
-  text-align: right;
-  white-space: nowrap;
-}
-
-// Bars and donut share the height budget so the duration card's worst case (all four buckets +
-// chart) stays below the idle list card's height (legend + 6-row scroll + pager), keeping the
-// list the row-height driver.
-.idle-duration-chart {
-  width: 100%;
-  height: 185px;
-  margin: 12px auto 0;
-}
-
-.cloud-database-card {
-  overflow: hidden;
-}
-
-// Space Consumption stands as its own widget; give the leading KPI strip a little headroom
-// since the card does not start with a subsection title.
-.database-space-card {
-  padding-top: 8px;
-}
-
 .cloud-database-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1328,15 +1732,6 @@ button.legend-link {
 .cloud-database-widget {
   position: relative;
   min-height: 188px;
-}
-
-.database-widget-title {
-  color: #202a33;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 17px;
-  margin-bottom: 12px;
-  text-align: center;
 }
 
 .widget-no-data {
@@ -1526,39 +1921,6 @@ button.legend-link {
   }
 }
 
-.database-cloud-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 52px;
-  padding: 4px 11px;
-  border-radius: 13px;
-  background: #e6f5ee;
-  color: #008f68;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.database-cloud-azure {
-  background: #fde8cf;
-  color: #bf6c00;
-}
-
-.database-cloud-oracle {
-  background: #dff3ec;
-  color: #008f68;
-}
-
-.database-cloud-aws {
-  background: #dff3ec;
-  color: #008f68;
-}
-
-.database-cloud-gcp {
-  background: #fde8cf;
-  color: #bf6c00;
-}
-
 .database-memory-list {
   display: grid;
   gap: 10px;
@@ -1628,283 +1990,6 @@ button.legend-link {
   margin-top: 16px;
 }
 
-.cloud-storage-card {
-  overflow: hidden;
-  margin-top: 12px;
-}
-
-.cloud-storage-kpi-strip,
-.cloud-storage-visibility-strip {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  max-width: 940px;
-  margin: 0 auto;
-  padding: 10px 18px 12px;
-}
-
-.cloud-storage-visibility-strip {
-  max-width: 900px;
-  padding: 8px 18px 12px;
-}
-
-.cloud-storage-kpi {
-  min-height: 54px;
-  padding: 0 28px;
-}
-
-.cloud-storage-kpi + .cloud-storage-kpi {
-  border-left: 1px solid #cbd3da;
-}
-
-.cloud-storage-kpi-label {
-  color: #6f7f91;
-  font-size: 14px;
-  line-height: 20px;
-  margin-bottom: 5px;
-}
-
-.cloud-storage-kpi-value {
-  color: #202a33;
-  font-size: 23px;
-  font-weight: 600;
-  line-height: 27px;
-  white-space: nowrap;
-}
-
-.cloud-storage-subsection-title {
-  color: #202a33;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 20px;
-  text-align: center;
-  margin: 14px 0 10px;
-}
-
-.cloud-storage-performance-grid,
-.cloud-storage-operation-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: 36px;
-  padding: 0 24px;
-}
-
-.cloud-storage-performance-grid {
-  grid-template-columns: minmax(300px, 1fr) minmax(380px, 1.05fr) minmax(330px, 1.1fr);
-  max-width: 1260px;
-  margin: 0 auto;
-}
-
-.cloud-storage-widget {
-  position: relative;
-  min-height: 190px;
-}
-
-.storage-utilization-chart {
-  width: 100%;
-  height: 210px;
-}
-
-.read-write-chart {
-  width: 100%;
-  height: 230px;
-}
-
-.latency-heatmap-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  color: #7b8794;
-  font-size: 11px;
-  line-height: 14px;
-}
-
-.latency-heatmap-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.latency-heatmap-account {
-  flex: 0 0 84px;
-  max-width: 84px;
-  color: #3a4651;
-  font-size: 11px;
-  line-height: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.latency-heatmap-cells {
-  display: flex;
-  flex: 1 1 auto;
-  gap: 3px;
-  min-width: 0;
-}
-
-.latency-heatmap-cell {
-  flex: 1 1 0;
-  min-width: 0;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.latency-heatmap-legend {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 12px;
-  color: #5f6f86;
-  font-size: 11px;
-  line-height: 16px;
-}
-
-.cloud-storage-operation-grid {
-  padding-top: 0;
-}
-
-.cloud-storage-consumer-table {
-  width: 100%;
-
-  th,
-  td {
-    border-color: #edf0f2;
-    color: #26313b;
-    font-size: 12px;
-    padding: 6px 8px;
-    white-space: nowrap;
-    vertical-align: middle;
-  }
-
-  th {
-    border-top: 0;
-    font-weight: 600;
-  }
-
-  td:first-child {
-    max-width: 130px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-.storage-growth-pill {
-  display: inline-flex;
-  min-width: 58px;
-  justify-content: center;
-  border-radius: 14px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.storage-growth-success {
-  background: #dff3ec;
-  color: #008f68;
-}
-
-.storage-growth-danger {
-  background: #fde8ea;
-  color: #d63b3b;
-}
-
-.storage-trend-chart {
-  width: 100%;
-  height: 220px;
-}
-
-.cloud-storage-distribution-row {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 40px;
-  padding: 0 24px 16px;
-}
-
-.cloud-storage-distribution-widget {
-  width: 470px;
-  min-height: 270px;
-}
-
-.queue-backlog-widget {
-  margin-right: auto;
-  flex: 1 1 auto;
-  min-width: 0;
-  max-width: 560px;
-}
-
-.queue-backlog-row {
-  margin-bottom: 14px;
-}
-
-.queue-backlog-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-
-.queue-backlog-name {
-  color: #1f2a34;
-  font-weight: 600;
-}
-
-.queue-backlog-msgs {
-  color: #6c7884;
-}
-
-.queue-backlog-percent {
-  margin-left: auto;
-  color: #3a4651;
-  font-weight: 600;
-}
-
-.queue-backlog-track {
-  height: 12px;
-  border-radius: 7px;
-  background: #eef1f4;
-  overflow: hidden;
-}
-
-.queue-backlog-fill {
-  height: 100%;
-  min-width: 6px;
-  border-radius: 7px;
-}
-
-.cloud-storage-distribution-chart {
-  width: 100%;
-  height: 215px;
-}
-
-.cloud-storage-distribution-legend {
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
-  gap: 7px 18px;
-  justify-content: center;
-  color: #34404c;
-  font-size: 13px;
-  line-height: 18px;
-
-  strong {
-    color: #34404c;
-    font-weight: 500;
-    margin-left: 8px;
-  }
-}
 
 .alert-table {
   th {
@@ -2117,6 +2202,174 @@ button.legend-link {
   }
 }
 
+.auto-remediation-card {
+  padding: 18px 20px 20px;
+  overflow: hidden;
+}
+
+.auto-remediation-main {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.75fr) minmax(420px, 1.6fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.auto-remediation-widget-title {
+  color: #121820;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  margin-bottom: 12px;
+
+  i {
+    font-size: 13px;
+    margin-left: 3px;
+  }
+}
+
+.auto-remediation-outcome-body {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  min-height: 132px;
+}
+
+.auto-remediation-donut {
+  width: 106px;
+  height: 106px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.auto-remediation-donut-inner {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.auto-remediation-legend {
+  display: grid;
+  gap: 13px;
+  color: #1f2a34;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.auto-remediation-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auto-remediation-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.auto-remediation-action-list {
+  display: grid;
+  gap: 5px;
+}
+
+.auto-remediation-action-row {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr) 38px;
+  align-items: center;
+  column-gap: 12px;
+}
+
+.auto-remediation-action-label {
+  color: #121820;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auto-remediation-action-track {
+  height: 20px;
+  background: #eef0f2;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.auto-remediation-action-fill {
+  height: 100%;
+  min-width: 4px;
+  border-radius: 4px;
+}
+
+.auto-remediation-action-count {
+  color: #596b85;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.auto-remediation-summary-strip {
+  margin: 16px -20px 20px;
+  padding: 11px 16px;
+  border-top: 1px solid #dce2e7;
+  border-bottom: 1px solid #dce2e7;
+  background: #f8fafc;
+  color: #34445a;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.auto-remediation-kpi-box {
+  display: inline-flex;
+  align-items: center;
+  min-width: 520px;
+  max-width: 100%;
+  padding: 18px 22px;
+  border: 1px solid #dce2e7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.auto-remediation-kpi {
+  min-width: 130px;
+  padding: 0 22px;
+  text-align: center;
+
+  &:first-child {
+    padding-left: 0;
+  }
+
+  &:last-child {
+    padding-right: 0;
+  }
+}
+
+.auto-remediation-kpi + .auto-remediation-kpi {
+  border-left: 1px solid #dce2e7;
+}
+
+.auto-remediation-kpi-label {
+  color: #566782;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.auto-remediation-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
 .severity-dot {
   display: inline-flex;
   align-items: center;
@@ -2151,8 +2404,7 @@ button.legend-link {
 
 @media (max-width: 1100px) {
 
-  .orphaned-widgets-grid,
-  .idle-widgets-grid {
+  .orphaned-widgets-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -2167,15 +2419,17 @@ button.legend-link {
     grid-template-columns: 1fr;
   }
 
-  .cloud-storage-performance-grid,
-  .cloud-storage-operation-grid {
+  .auto-remediation-main {
     grid-template-columns: 1fr;
-    row-gap: 18px;
   }
 
-  .cloud-storage-distribution-row {
-    justify-content: center;
-    padding-right: 24px;
+  .auto-remediation-action-row {
+    grid-template-columns: 190px minmax(0, 1fr) 38px;
+  }
+
+  .account-metrics-chart-panel {
+    flex-basis: 100%;
+    min-width: 0;
   }
 }
 
@@ -2217,35 +2471,6 @@ button.legend-link {
     padding: 18px 14px;
   }
 
-  .cloud-storage-kpi-strip,
-  .cloud-storage-visibility-strip {
-    grid-template-columns: 1fr;
-    padding: 14px;
-  }
-
-  .cloud-storage-kpi {
-    border-left: 0;
-    padding: 12px 0;
-
-    &:first-child {
-      border-top: 0;
-    }
-  }
-
-  .cloud-storage-kpi + .cloud-storage-kpi {
-    border-left: 0;
-    border-top: 1px solid #cbd3da;
-  }
-
-  .cloud-storage-performance-grid,
-  .cloud-storage-operation-grid {
-    padding: 0 14px;
-  }
-
-  .cloud-storage-distribution-widget {
-    width: 100%;
-  }
-
   .database-health-row,
   .database-storage-row {
     grid-template-columns: 1fr;
@@ -2262,70 +2487,62 @@ button.legend-link {
     gap: 10px;
   }
 
-}
+  .auto-remediation-outcome-body {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-/* ------ Cloud Database Performance (redesigned) ------ */
-.cloud-database-subsection-title {
-  color: #202a33;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 20px;
-  margin: 18px 4px 12px;
-}
+  .auto-remediation-action-row {
+    grid-template-columns: 1fr;
+    row-gap: 4px;
+  }
 
-.database-kpi-strip {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  padding: 4px 6px 14px;
-}
+  .auto-remediation-action-label {
+    text-align: left;
+  }
 
-.database-kpi {
-  flex: 1 1 0;
-  min-width: 140px;
-  padding: 0 18px;
-}
+  .auto-remediation-action-count {
+    text-align: right;
+  }
 
-.database-kpi + .database-kpi {
-  border-left: 1px solid #e4e9ef;
-}
+  .auto-remediation-kpi-box {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
 
-.database-kpi-label {
-  color: #6f7f91;
-  font-size: 13px;
-  line-height: 18px;
-  margin-bottom: 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .auto-remediation-kpi {
+    padding: 12px 0;
 
-.database-kpi-value {
-  color: #202a33;
-  font-size: 21px;
-  font-weight: 600;
-  line-height: 25px;
-  white-space: nowrap;
-}
+    &:first-child {
+      padding-top: 0;
+    }
 
-.database-kpi-unit {
-  color: #8a94a2;
-  font-size: 12px;
-  font-weight: 400;
-  margin-left: 4px;
-}
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
 
-.database-table-title {
-  color: #202a33;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 18px;
-  margin: 6px 4px 8px;
-}
+  .auto-remediation-kpi + .auto-remediation-kpi {
+    border-left: 0;
+    border-top: 1px solid #dce2e7;
+  }
 
-.database-table-widget {
-  position: relative;
-  padding: 0 4px 8px;
+  .account-metrics-subtitle {
+    display: block;
+    margin: 3px 0 0;
+  }
+
+  .account-metrics-pagination-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .account-metrics-chart {
+    height: 280px;
+  }
+
 }
 
 .database-scroll-table {
@@ -2375,273 +2592,3 @@ button.legend-link {
   color: #1a73e8;
 }
 
-.database-trend-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 28px;
-  padding: 0 4px 10px;
-}
-
-.database-trend-widget {
-  min-height: 260px;
-}
-
-.database-trend-chart {
-  height: 244px;
-  width: 100%;
-}
-
-/* ------ Cloud Storage Health (redesigned) ------ */
-.storage-performance-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  padding: 4px 6px 14px;
-}
-
-.storage-performance-card {
-  border: 1px solid #e4e9ef;
-  border-radius: 8px;
-  padding: 12px 14px;
-  background: #ffffff;
-}
-
-.storage-performance-card-head {
-  display: flex;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.storage-performance-card-title {
-  color: #46525f;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 17px;
-}
-
-.storage-performance-card-badge {
-  margin-left: auto;
-  color: #8a94a2;
-  font-size: 11px;
-}
-
-.storage-performance-card-delta {
-  margin-left: auto;
-  font-size: 12px;
-  font-weight: 600;
-
-  i {
-    margin-right: 3px;
-  }
-}
-
-.storage-performance-card-value {
-  color: #202a33;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 28px;
-  margin-bottom: 4px;
-}
-
-.storage-performance-card-unit {
-  color: #8a94a2;
-  font-size: 12px;
-  font-weight: 400;
-  margin-left: 4px;
-}
-
-.storage-performance-card-chart {
-  height: 118px;
-  width: 100%;
-}
-
-.storage-resource-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 22px;
-  justify-content: center;
-  padding: 4px 6px 12px;
-
-  span {
-    color: #46525f;
-    font-size: 12px;
-  }
-
-  i {
-    margin-right: 6px;
-  }
-}
-
-// Latency Metric stands as its own widget; the card supplies the top inset the removed
-// in-card title used to provide.
-.latency-metric-card {
-  overflow: hidden;
-  margin-top: 12px;
-  padding-top: 14px;
-}
-
-.latency-metric-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-  gap: 24px;
-  padding: 0 24px 18px;
-  align-items: start;
-}
-
-.latency-metric-widget {
-  position: relative;
-  min-height: 200px;
-}
-
-.latency-metric-widget-title {
-  color: #46525f;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 18px;
-  margin-bottom: 14px;
-}
-
-.latency-breakdown-widget {
-  border-left: 1px solid #e4e9ef;
-  padding-left: 24px;
-}
-
-.write-perf-scroll {
-  border: 1px solid #e6eaef;
-  border-radius: 6px;
-  padding: 2px 6px 4px;
-}
-
-.write-perf-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 3px;
-
-  th {
-    color: #6a7682;
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    padding: 1px 0 4px;
-    white-space: nowrap;
-  }
-}
-
-.write-perf-name-col {
-  width: 94px;
-}
-
-.write-perf-name {
-  color: #46525f;
-  font-size: 11px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 8px;
-}
-
-.write-perf-cell {
-  height: 22px;
-  min-width: 26px;
-  border-radius: 3px;
-  text-align: center;
-  color: #3a4651;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.latency-breakdown-body {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  flex-wrap: wrap;
-}
-
-.latency-breakdown-chart-wrap {
-  position: relative;
-  flex: 0 0 auto;
-  width: 150px;
-  height: 150px;
-}
-
-.latency-breakdown-chart {
-  width: 100%;
-  height: 100%;
-}
-
-.latency-breakdown-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.latency-breakdown-total-label {
-  color: #7b8794;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-.latency-breakdown-total-value {
-  color: #202a33;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 26px;
-}
-
-.latency-breakdown-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-  flex: 0 1 auto;
-  min-width: 190px;
-  max-width: 250px;
-}
-
-.latency-breakdown-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #46525f;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-.latency-breakdown-dot {
-  flex: 0 0 auto;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-}
-
-.latency-breakdown-legend-label {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.latency-breakdown-legend-value {
-  flex: 0 0 auto;
-  color: #5b6671;
-  white-space: nowrap;
-}
-
-@media (max-width: 1199px) {
-  .database-trend-grid,
-  .storage-performance-grid,
-  .latency-metric-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .latency-breakdown-widget {
-    border-left: 0;
-    padding-left: 0;
-    border-top: 1px solid #e4e9ef;
-    padding-top: 16px;
-  }
-}

@@ -93,74 +93,181 @@
             <div class="inventory-note">*The Displayed Values Represent Only Devices Discovered And Currently Onboarded For Monitoring Within The Selected Time Range</div>
         </div>
         <div class="dashboard-card inventory-card" *ngIf="hasInventoryWidgets"
-            [class.inventory-loading]="widgetLoading.inventorySummary || widgetLoading.geoDistribution">
+            [class.inventory-loading]="widgetLoading.inventorySummary">
             <app-spinner [name]="loaderNames.inventoryCard" [width]="0"></app-spinner>
             <div class="summary-metrics" *ngIf="hasSummaryMetrics">
-                <div class="summary-metric" *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex">
+                <div class="summary-metric" *ngFor="let metric of summaryMetrics; trackBy: trackByIndex">
                     <button type="button" class="metric-label metric-link" (click)="openSummaryMetric(metric)"
                         [tooltip]="'Open linked page'" container="body">{{metric.label}}</button>
-                    <div class="metric-value" [ngClass]="{'metric-primary': first}">{{metric.value}}</div>
+                    <div class="metric-value" [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</div>
                 </div>
             </div>
-            <div class="inventory-grid">
-                <div class="provider-panel">
-                    <div class="provider-distribution-panel">
-                        <div class="widget-title">Cloud Provider Distribution</div>
-                        <ng-container *ngIf="hasProviderDistributionData; else providerNoData">
-                            <div echarts [options]="providerDistributionOptions" (chartInit)="onProviderDistributionChartInit($event)"
-                                class="provider-chart chart-click-target"></div>
-                            <div class="provider-legend">
-                                <button type="button" class="legend-item legend-link"
-                                    *ngFor="let provider of providerDistribution; trackBy: trackByIndex"
-                                    (click)="openProviderDistribution(provider)"
-                                    [tooltip]="'Open linked page'" container="body">
-                                    <span class="legend-dot" [style.background]="provider.color"></span>
-                                    {{provider.name}} {{provider.value}}%
-                                </button>
-                            </div>
-                        </ng-container>
-                        <ng-template #providerNoData>
-                            <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No Cloud Provider Distribution data available</div>
-                        </ng-template>
+
+            <div class="monitored-row" *ngIf="hasMonitoredProviders">
+                <div class="monitored-card" *ngFor="let card of monitoredProviders; trackBy: trackByIndex">
+                    <div class="monitored-card-head">
+                        <span class="monitored-card-name">
+                            <i [ngClass]="card.iconClass" [style.color]="card.color"></i>{{card.provider}}
+                        </span>
+                        <span class="monitored-card-count" [style.color]="card.color">{{card.totalCompute | number}}</span>
                     </div>
-                    <div class="tags-panel">
-                        <div class="tags-title">Tags</div>
-                        <ng-container *ngIf="tags.length; else tagsNoData">
-                            <div class="tag-list">
-                                <span class="tag-chip" *ngFor="let tag of tags; trackBy: trackByIndex"
-                                    [style.color]="tag.textColor" [style.background]="tag.backgroundColor">
-                                    {{tag.name}} {{tag.count}}
-                                </span>
-                            </div>
-                        </ng-container>
-                        <ng-template #tagsNoData>
-                            <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No Tags data available</div>
-                        </ng-template>
+                    <div class="monitored-card-stat">
+                        <span>Compute Monitored</span>
+                        <strong>{{card.monitored | number}} / {{card.totalCompute | number}}</strong>
+                    </div>
+                    <div class="monitored-stackbar">
+                        <span class="monitored-seg-running" [style.width.%]="card.runningPercent"></span>
+                        <span class="monitored-seg-stopped" [style.width.%]="card.stoppedPercent"></span>
+                        <span class="monitored-seg-unknown" [style.width.%]="card.unknownPercent"></span>
+                    </div>
+                    <div class="monitored-legend">
+                        <span><i class="monitored-dot monitored-dot-running"></i>Running {{card.running | number}}</span>
+                        <span><i class="monitored-dot monitored-dot-stopped"></i>Stopped {{card.stopped | number}}</span>
+                        <span><i class="monitored-dot monitored-dot-unknown"></i>Unknown {{card.unknown | number}}</span>
                     </div>
                 </div>
-                <div class="inventory-geo-panel">
-                    <div class="widget-title">Geo Distribution</div>
-                    <ng-container *ngIf="hasGeoDistributionData; else geoNoData">
-                        <div echarts [options]="geoHeatmapOptions" (chartInit)="onGeoDistributionChartInit($event)"
-                            class="geo-chart chart-click-target"></div>
+            </div>
+
+            <div class="inventory-chart-grid">
+                <div class="inventory-chart-box" *ngIf="hasProviderDistribution">
+                    <div class="widget-title">Cloud Provider Distribution
+                        <i class="fas fa-info-circle inventory-info-icon"
+                            [tooltip]="'Share of total compute instances by cloud provider.'" container="body"></i>
+                    </div>
+                    <ng-container *ngIf="hasProviderDistributionData; else providerNoData">
+                        <div echarts [options]="providerDistributionOptions" (chartInit)="onProviderDistributionChartInit($event)"
+                            class="inventory-chart chart-click-target"></div>
+                        <div class="inventory-chart-legend">
+                            <button type="button" class="inventory-legend-item legend-link"
+                                *ngFor="let provider of providerDistribution; trackBy: trackByIndex"
+                                (click)="openProviderDistribution(provider)"
+                                [tooltip]="'Open linked page'" container="body">
+                                <span class="legend-dot" [style.background]="provider.color"></span>
+                                {{provider.name}} {{provider.value}}%
+                            </button>
+                        </div>
                     </ng-container>
-                    <ng-template #geoNoData>
-                        <div class="inventory-widget-empty" *ngIf="!widgetLoading.geoDistribution">No Region wise data available for Geo Distribution</div>
+                    <ng-template #providerNoData>
+                        <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No data available</div>
                     </ng-template>
+                </div>
+
+                <div class="inventory-chart-box" *ngIf="hasUtilizationByProvider">
+                    <div class="widget-title">Combined &ndash; Utilization by Provider (%Used)
+                        <i class="fas fa-info-circle inventory-info-icon"
+                            [tooltip]="'Average compute and storage utilization per provider, based on current live usage, alongside the number of databases monitored per provider.'"
+                            container="body"></i>
+                    </div>
+                    <ng-container *ngIf="utilizationByProviderHasData; else utilizationNoData">
+                        <div echarts [options]="utilizationByProviderOptions" class="inventory-chart"></div>
+                        <div class="inventory-chart-legend">
+                            <span class="inventory-legend-item"><span class="legend-dot" style="background:#2f6fed"></span>Compute</span>
+                            <span class="inventory-legend-item"><span class="legend-dot" style="background:#7d5cf5"></span>Database Count</span>
+                            <span class="inventory-legend-item"><span class="legend-dot" style="background:#17a2b8"></span>Storage</span>
+                        </div>
+                    </ng-container>
+                    <ng-template #utilizationNoData>
+                        <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="inventory-chart-box" *ngIf="hasOsType">
+                    <div class="widget-title">Compute Instance Count by Os Type
+                        <i class="fas fa-info-circle inventory-info-icon"
+                            [tooltip]="'Distribution of instances by operating system family.'" container="body"></i>
+                    </div>
+                    <ng-container *ngIf="hasOsTypeData; else osTypeNoData">
+                        <div echarts [options]="osTypeOptions" class="inventory-chart"></div>
+                        <div class="inventory-chart-legend">
+                            <span class="inventory-legend-item" *ngFor="let item of osTypeDistribution; trackBy: trackByIndex">
+                                <span class="legend-dot" [style.background]="item.color"></span>{{item.label}} {{item.percent}}%
+                            </span>
+                        </div>
+                    </ng-container>
+                    <ng-template #osTypeNoData>
+                        <div class="inventory-widget-empty" *ngIf="!widgetLoading.inventorySummary">No data available</div>
+                    </ng-template>
+                </div>
+
+                <div class="inventory-chart-box" *ngIf="hasAlertsSeverity">
+                    <div class="widget-title">Alerts Severity
+                        <i class="fas fa-info-circle inventory-info-icon"
+                            [tooltip]="'Open alert counts by severity. Red = Critical, Orange = Warning, Green = Info.'" container="body"></i>
+                    </div>
+                    <div class="severity-row">
+                        <div class="sev-pill" [ngClass]="item.toneClass"
+                            *ngFor="let item of alertsSeverity; trackBy: trackByIndex">
+                            {{item.value | number}} <span>{{item.label}}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasPublicCloudCoverage">
-            <div class="mb-0">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources</div>
-            <div class="btn-group" role="group" aria-label="Sort public cloud resources">
-                <button type="button" class="btn btn-sm"
-                    [ngClass]="publicCloudCoverageSortOrder === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
-                    (click)="onPublicCloudCoverageSortChange('asc')">A-Z</button>
-                <button type="button" class="btn btn-sm"
-                    [ngClass]="publicCloudCoverageSortOrder === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
-                    (click)="onPublicCloudCoverageSortChange('desc')">Z-A</button>
+        <div class="section-title section-title-with-link" *ngIf="hasGeoDistribution">
+            Public Cloud Geo Distribution
+            <button type="button" class="header-link-icon" (click)="openPublicCloudGeoDistribution()"
+                [tooltip]="'Open linked page'" container="body">
+                <i class="fas fa-link"></i>
+            </button>
+        </div>
+        <div class="dashboard-card geo-card" *ngIf="hasGeoDistribution">
+            <app-spinner [name]="loaderNames.geoDistribution" [width]="0"></app-spinner>
+            <div class="pcgeo-header" *ngIf="geoDistributionCells.length">
+                <div class="pcgeo-kpis">
+                    <div class="pcgeo-kpi">
+                        <div class="pcgeo-kpi-label">Cloud Regions</div>
+                        <div class="pcgeo-kpi-value">{{geoDistributionSummary.totalLocations | number}}</div>
+                    </div>
+                    <div class="pcgeo-kpi">
+                        <div class="pcgeo-kpi-label">Total Resources</div>
+                        <div class="pcgeo-kpi-value">{{geoDistributionSummary.totalResources | number}}</div>
+                    </div>
+                    <div class="pcgeo-kpi">
+                        <div class="pcgeo-kpi-label">Total Alerts</div>
+                        <div class="pcgeo-kpi-value">{{geoDistributionSummary.totalAlerts | number}}</div>
+                    </div>
+                </div>
+                <div class="pcgeo-platform-filter">
+                    <label>Cloud Type</label>
+                    <select class="form-control" [value]="selectedGeoDistributionCloudType"
+                        (change)="onGeoDistributionCloudTypeChange($event)">
+                        <option *ngFor="let option of geoDistributionCloudOptions; trackBy: trackByValue"
+                            [value]="option.value"
+                            [selected]="option.value === selectedGeoDistributionCloudType">{{option.label}}</option>
+                    </select>
+                </div>
             </div>
+            <div echarts [options]="geoHeatmapOptions" (chartInit)="onGeoDistributionChartInit($event)"
+                class="geo-distribution-chart chart-click-target" *ngIf="hasChartData(geoHeatmapOptions)"></div>
+            <div class="widget-no-data"
+                *ngIf="!widgetLoading.geoDistribution && geoDistributionCells.length && !hasChartData(geoHeatmapOptions)">
+                No data available
+            </div>
+            <div class="pcgeo-legend" *ngIf="geoDistributionLegends.length">
+                <span class="pcgeo-legend-item"
+                    *ngFor="let legend of geoDistributionLegends; trackBy: trackByIndex">
+                    <span class="pcgeo-legend-dot" [style.background]="legend.color"></span>{{legend.label}}
+                    ({{legend.count}})
+                </span>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasPublicCloudCoverage">
+            <div class="d-flex align-items-center">
+                <span class="mb-0">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources</span>
+                <div class="btn-group ml-3" role="group" aria-label="Sort public cloud resources">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="publicCloudCoverageSortOrder === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onPublicCloudCoverageSortChange('asc')">A-Z</button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="publicCloudCoverageSortOrder === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onPublicCloudCoverageSortChange('desc')">Z-A</button>
+                </div>
+            </div>
+            <i class="fas fa-info-circle inventory-info-icon"
+                [tooltip]="'Resource inventory grouped by category (Compute, Platform Services, Other Services) and cloud provider.'"
+                container="body"></i>
         </div>
         <div class="dashboard-card public-coverage-card" *ngIf="hasPublicCloudCoverage">
             <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
@@ -220,384 +327,738 @@
             </div>
         </div>
 
-        <div class="section-title" *ngIf="showPerformanceHotspots">Performance Hotspots</div>
-        <div class="dashboard-card performance-hotspots-card" *ngIf="showPerformanceHotspots"
-            [class.hotspots-loading]="widgetLoading.performanceHotspots">
-            <app-spinner [name]="loaderNames.performanceHotspots" [width]="0"></app-spinner>
-            <ng-container *ngIf="performanceHotspots.length; else hotspotsNoData">
-            <div class="hotspots-legend">
-                <span><i class="hotspot-legend-dot legend-success"></i>Healthy / Low Utilization (0&ndash;50%)</span>
-                <span><i class="hotspot-legend-dot legend-warning"></i>Warning / Moderate Utilization (51&ndash;80%)</span>
-                <span><i class="hotspot-legend-dot legend-danger"></i>Critical / High Utilization (81&ndash;100%)</span>
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasAccountSubscriptionProjectMetrics">
+            <div class="d-flex align-items-center">
+                <span class="mb-0">Account - Subscription - Project Metrics</span>
+                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch account metrics view">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="accountSubscriptionProjectMetricsView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setAccountSubscriptionProjectMetricsView('table')" [tooltip]="'Table View'" container="body">
+                        <i class="fas fa-table"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="accountSubscriptionProjectMetricsView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setAccountSubscriptionProjectMetricsView('chart')" [tooltip]="'Chart View'" container="body">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                </div>
             </div>
-            <div class="hotspots-table-wrap">
-                <table class="table table-sm performance-hotspots-table mb-0">
-                    <colgroup>
-                        <col class="hotspot-instance-col">
-                        <col class="hotspot-cloud-col">
-                        <col class="hotspot-metric-col">
-                        <col class="hotspot-metric-col">
-                        <col class="hotspot-disk-col">
-                        <col class="hotspot-rw-col">
-                        <col class="hotspot-rw-col">
-                        <col class="hotspot-network-col">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>Instance Name</th>
-                            <th>Cloud</th>
-                            <th class="sortable-col" [class.sort-active]="isHotspotSortActive('cpu_utilization')"
-                                (click)="sortPerformanceHotspots('cpu_utilization')">
-                                CPU Utilization <i [ngClass]="getHotspotSortIcon('cpu_utilization')" *ngIf="isHotspotSortActive('cpu_utilization')"></i>
-                            </th>
-                            <th class="sortable-col" [class.sort-active]="isHotspotSortActive('available_memory')"
-                                (click)="sortPerformanceHotspots('available_memory')">
-                                Available Memory <i [ngClass]="getHotspotSortIcon('available_memory')" *ngIf="isHotspotSortActive('available_memory')"></i>
-                            </th>
-                            <th class="sortable-col" [class.sort-active]="isHotspotSortActive('disk_size')"
-                                (click)="sortPerformanceHotspots('disk_size')">
-                                Disk Size <i [ngClass]="getHotspotSortIcon('disk_size')" *ngIf="isHotspotSortActive('disk_size')"></i>
-                            </th>
-                            <th>Data Disk Read/Write Bytes</th>
-                            <th>Data Disk Read/Write Rates</th>
-                            <th class="sortable-col" [class.sort-active]="isHotspotSortActive('network_traffic')"
-                                (click)="sortPerformanceHotspots('network_traffic')">
-                                Network Traffic <i [ngClass]="getHotspotSortIcon('network_traffic')" *ngIf="isHotspotSortActive('network_traffic')"></i>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let row of performanceHotspots; trackBy: trackByIndex">
-                            <td>
-                                <button type="button" class="btn btn-link p-0 table-link" (click)="openHotspotInstance(row)"
-                                    [tooltip]="'Open linked page'" container="body">{{row.instanceName}}</button>
-                            </td>
-                            <td>
-                                <img class="hotspot-cloud-logo" *ngIf="row.cloudLogo; else hotspotCloudNa"
-                                    [src]="row.cloudLogo" [alt]="row.cloud">
-                                <ng-template #hotspotCloudNa>{{row.cloud || 'NA'}}</ng-template>
-                            </td>
-                            <td>{{row.cpuLabel}}</td>
-                            <td>{{row.memoryLabel}}</td>
-                            <td>
-                                <ng-container *ngIf="row.disk; else hotspotDiskNa">
-                                    <div class="hotspot-disk-capacity">Capacity: {{row.disk.capacityLabel}}</div>
-                                    <div class="hotspot-disk-track">
-                                        <div class="hotspot-disk-fill" [ngClass]="getStatusClass(row.disk.tone)"
-                                            [style.width.%]="row.disk.usedPercent"></div>
-                                    </div>
-                                    <div class="hotspot-disk-meta">
-                                        <span>Used: {{row.disk.usedLabel}}</span>
-                                        <span>Free: {{row.disk.freeLabel}}</span>
-                                    </div>
-                                </ng-container>
-                                <ng-template #hotspotDiskNa>NA</ng-template>
-                            </td>
-                            <td>
-                                <ng-container *ngIf="row.dataDiskBytes; else hotspotBytesNa">
-                                    <div class="hotspot-rw-read" *ngIf="row.dataDiskBytes.readLabel">{{row.dataDiskBytes.readLabel}}</div>
-                                    <div class="hotspot-rw-write" *ngIf="row.dataDiskBytes.writeLabel">{{row.dataDiskBytes.writeLabel}}</div>
-                                </ng-container>
-                                <ng-template #hotspotBytesNa>NA</ng-template>
-                            </td>
-                            <td>
-                                <ng-container *ngIf="row.dataDiskRates; else hotspotRatesNa">
-                                    <div class="hotspot-rw-read" *ngIf="row.dataDiskRates.readLabel">{{row.dataDiskRates.readLabel}}</div>
-                                    <div class="hotspot-rw-write" *ngIf="row.dataDiskRates.writeLabel">{{row.dataDiskRates.writeLabel}}</div>
-                                </ng-container>
-                                <ng-template #hotspotRatesNa>NA</ng-template>
-                            </td>
-                            <td>{{row.networkTraffic}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <i class="fas fa-info-circle inventory-info-icon"
+                [tooltip]="'Covers AWS Accounts, Azure Subscriptions, GCP Projects & OCI Compartments'"
+                container="body"></i>
+        </div>
+        <div class="dashboard-card account-metrics-card" *ngIf="hasAccountSubscriptionProjectMetrics">
+            <app-spinner [name]="loaderNames.accountSubscriptionProjectMetrics" [width]="0"></app-spinner>
+            <ng-container *ngIf="accountSubscriptionProjectMetricsView === 'table'; else accountMetricsChartView">
+                <div class="account-metrics-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" [value]="accountSubscriptionProjectMetricsSearch"
+                        placeholder="Search Account or Provider..."
+                        (input)="onAccountSubscriptionProjectMetricsSearch($event)" />
+                </div>
+                <ng-container *ngIf="accountSubscriptionProjectMetricRows.length; else accountMetricsNoData">
+                    <div class="database-scroll-table account-metrics-table-wrap">
+                        <table class="table table-sm database-metric-table account-metrics-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Provider <i class="fas fa-sort ml-1"></i></th>
+                                    <th>Account / Subscription / Project <i class="fas fa-sort ml-1"></i></th>
+                                    <th>Region <i class="fas fa-sort ml-1"></i></th>
+                                    <th class="text-center">Instance Count <i class="fas fa-sort ml-1"></i></th>
+                                    <th>vCPU Usage <i class="fas fa-info-circle text-muted"></i> <i class="fas fa-sort ml-1"></i></th>
+                                    <th class="text-right">Est. Monthly Cost <i class="fas fa-sort ml-1"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of accountSubscriptionProjectMetricRows; trackBy: trackByIndex" truncateText>
+                                    <td class="tdw-9">
+                                        <span class="account-provider-pill" [ngClass]="'account-provider-' + row.provider.toLowerCase()">{{row.provider}}</span>
+                                    </td>
+                                    <td class="tdw-24">
+                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.account">{{row.account}}</button>
+                                    </td>
+                                    <td class="tdw-10">{{row.region}}</td>
+                                    <td class="tdw-9 text-center">{{row.instanceCount}}</td>
+                                    <td class="tdw-32">
+                                        <div class="account-vcpu-total">Total vCPU: {{row.totalVcpu | number:'1.0-1'}}</div>
+                                        <div class="account-vcpu-track">
+                                            <div class="account-vcpu-fill" [ngClass]="getStatusClass(row.vcpuTone)"
+                                                [style.width.%]="row.vcpuPercent"></div>
+                                        </div>
+                                        <div class="account-vcpu-used">Used: {{row.usedVcpu | number:'1.0-1'}} vCPU</div>
+                                    </td>
+                                    <td class="tdw-16 text-right">{{row.estimatedMonthlyCostLabel}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="account-metrics-pagination-row">
+                        <div>Show {{accountSubscriptionProjectMetricsPageSize}} | {{accountSubscriptionProjectMetricRows.length ? ((accountSubscriptionProjectMetricsPageNo - 1) * accountSubscriptionProjectMetricsPageSize) + 1 : 0}}-{{((accountSubscriptionProjectMetricsPageNo - 1) * accountSubscriptionProjectMetricsPageSize) + accountSubscriptionProjectMetricRows.length}} of {{accountSubscriptionProjectMetricsTotal}}</div>
+                        <table-pager [compact]="true" [pageNo]="accountSubscriptionProjectMetricsPageNo"
+                            [pageSize]="accountSubscriptionProjectMetricsPageSize"
+                            [totalCount]="accountSubscriptionProjectMetricsTotal"
+                            (pageChange)="accountSubscriptionProjectMetricsPageChange($event)"></table-pager>
+                    </div>
+                </ng-container>
             </ng-container>
-            <ng-template #hotspotsNoData>
-                <div class="widget-no-data" *ngIf="!widgetLoading.performanceHotspots">No data available</div>
+            <ng-template #accountMetricsChartView>
+                <div class="account-metrics-chart-grid">
+                    <div class="account-metrics-chart-panel">
+                        <div echarts [options]="accountSubscriptionProjectInstanceOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectInstanceOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectInstanceOptions)">No data available</div>
+                    </div>
+                    <div class="account-metrics-chart-panel">
+                        <div echarts [options]="accountSubscriptionProjectCostOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectCostOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectCostOptions)">No data available</div>
+                    </div>
+                    <div class="account-metrics-chart-panel">
+                        <div echarts [options]="accountSubscriptionProjectVcpuOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectVcpuOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectVcpuOptions)">No data available</div>
+                    </div>
+                    <div class="account-metrics-chart-panel">
+                        <div echarts [options]="accountSubscriptionProjectEfficiencyOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectEfficiencyOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectEfficiencyOptions)">No data available</div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #accountMetricsNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.accountSubscriptionProjectMetrics">No data available</div>
             </ng-template>
         </div>
 
-        <div class="section-title" *ngIf="hasCloudDatabasePerformanceSection">Cloud Database Performance</div>
-        <div class="dashboard-card cloud-database-card" *ngIf="hasCloudDatabasePerformanceSection">
-
-            <ng-container *ngIf="hasDatabaseOverviewData">
-            <div class="cloud-database-subsection-title">Database Overview</div>
-            <div class="database-kpi-strip">
-                <app-spinner [name]="loaderNames.databaseOverview" [width]="0"></app-spinner>
-                <ng-container *ngIf="hasDatabaseOverviewKpis; else databaseOverviewKpiNoData">
-                    <div class="database-kpi" *ngFor="let kpi of databaseOverviewKpis; trackBy: trackByIndex">
-                        <div class="database-kpi-label">{{kpi.label}}</div>
-                        <div class="database-kpi-value">
-                            {{kpi.value}}<span class="database-kpi-unit" *ngIf="kpi.unit">{{kpi.unit}}</span>
-                        </div>
-                    </div>
-                </ng-container>
-                <ng-template #databaseOverviewKpiNoData>
-                    <div class="widget-no-data" *ngIf="!widgetLoading.databaseOverview">No data available</div>
-                </ng-template>
-            </div>
-
-            <div class="database-table-title">Top 10 Performance Summary</div>
-            <div class="database-table-widget">
-                <ng-container *ngIf="databaseOverviewRows.length; else databaseOverviewTableNoData">
-                    <div class="database-scroll-table">
-                        <table class="table table-sm database-metric-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th *ngFor="let column of databaseOverviewSortColumns; trackBy: trackByIndex"
-                                        class="sortable-th" [class.text-right]="column.numeric"
-                                        [class.sort-active]="databaseOverviewSort.key === column.key"
-                                        (click)="sortDatabaseOverview(column.key)">
-                                        {{column.label}}
-                                        <i [ngClass]="getSortIconClass(databaseOverviewSort, column.key)"></i>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of databaseOverviewRows; trackBy: trackByUuid" truncateText>
-                                    <td class="tdw-23">
-                                        <button type="button" class="btn btn-link p-0 table-link"
-                                            [tooltip]="row.instance"
-                                            (click)="openDatabaseInstance(row)">{{row.instance}}</button>
-                                    </td>
-                                    <td class="tdw-12 text-right">{{row.writeThroughput === null ? 'NA' : (row.writeThroughput | number:'1.2-2')}}</td>
-                                    <td class="tdw-11 text-right">{{row.writeLatency === null ? 'NA' : (row.writeLatency | number:'1.2-2')}}</td>
-                                    <td class="tdw-11 text-right">{{row.writeIops === null ? 'NA' : (row.writeIops | number:'1.2-2')}}</td>
-                                    <td class="tdw-12 text-right">{{row.readThroughput === null ? 'NA' : (row.readThroughput | number:'1.2-2')}}</td>
-                                    <td class="tdw-11 text-right">{{row.readLatency === null ? 'NA' : (row.readLatency | number:'1.2-2')}}</td>
-                                    <td class="tdw-11 text-right">{{row.readIops === null ? 'NA' : (row.readIops | number:'1.2-2')}}</td>
-                                    <td class="tdw-9 text-right">{{row.queueDepth === null ? 'NA' : (row.queueDepth | number:'1.3-3')}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </ng-container>
-                <ng-template #databaseOverviewTableNoData>
-                    <div class="widget-no-data" *ngIf="!widgetLoading.databaseOverview">No data available</div>
-                </ng-template>
-            </div>
-            </ng-container>
-
-            <ng-container *ngIf="hasDatabaseTrendData">
-            <div class="cloud-database-subsection-title">Trend Chart</div>
-            <div class="database-trend-grid">
-                <app-spinner [name]="loaderNames.databasePerformanceTrend" [width]="0"></app-spinner>
-                <div class="database-trend-widget">
-                    <div class="database-widget-title">Write Performance Trend<span
-                            *ngIf="databaseWriteTrendInstance"> - {{databaseWriteTrendInstance}}</span></div>
-                    <ng-container *ngIf="hasDatabaseWriteTrend; else databaseWriteTrendNoData">
-                        <div echarts [options]="databaseWritePerformanceOptions" class="database-trend-chart"></div>
-                    </ng-container>
-                    <ng-template #databaseWriteTrendNoData>
-                        <div class="widget-no-data" *ngIf="!widgetLoading.databasePerformanceTrend">No data available</div>
-                    </ng-template>
-                </div>
-                <div class="database-trend-widget">
-                    <div class="database-widget-title">Read Performance Trend<span
-                            *ngIf="databaseReadTrendInstance"> - {{databaseReadTrendInstance}}</span></div>
-                    <ng-container *ngIf="hasDatabaseReadTrend; else databaseReadTrendNoData">
-                        <div echarts [options]="databaseReadPerformanceOptions" class="database-trend-chart"></div>
-                    </ng-container>
-                    <ng-template #databaseReadTrendNoData>
-                        <div class="widget-no-data" *ngIf="!widgetLoading.databasePerformanceTrend">No data available</div>
-                    </ng-template>
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasCapacityPerformance">
+            <div class="d-flex align-items-center">
+                <span class="mb-0">Capacity and Performance</span>
+                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch capacity view">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="capacityPerformanceView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setCapacityPerformanceView('table')" [tooltip]="'Table View'" container="body">
+                        <i class="fas fa-table"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="capacityPerformanceView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setCapacityPerformanceView('chart')" [tooltip]="'Chart View'" container="body">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
                 </div>
             </div>
-            </ng-container>
+            <i class="fas fa-info-circle inventory-info-icon"
+                [tooltip]="'Per-instance capacity and performance: status, CPU usage, disk IOPS/throughput, network throughput, 30-day CPU trend and 90-day forecast.'"
+                container="body"></i>
         </div>
-
-        <div class="section-title" *ngIf="hasDatabaseSpaceSection">Space Consumption</div>
-        <div class="dashboard-card cloud-database-card database-space-card" *ngIf="hasDatabaseSpaceSection">
-            <div class="database-kpi-strip">
-                <app-spinner [name]="loaderNames.databaseSpaceConsumption" [width]="0"></app-spinner>
-                <ng-container *ngIf="hasDatabaseSpaceData; else databaseSpaceKpiNoData">
-                    <div class="database-kpi" *ngFor="let kpi of databaseSpaceKpis; trackBy: trackByIndex">
-                        <div class="database-kpi-label">{{kpi.label}}</div>
-                        <div class="database-kpi-value" [ngClass]="getStatusClass(kpi.tone)">
-                            {{kpi.value}}<span class="database-kpi-unit" *ngIf="kpi.unit">{{kpi.unit}}</span>
-                        </div>
-                    </div>
-                </ng-container>
-                <ng-template #databaseSpaceKpiNoData>
-                    <div class="widget-no-data" *ngIf="!widgetLoading.databaseSpaceConsumption">No data available</div>
-                </ng-template>
-            </div>
-
-            <div class="database-table-title">Top 10 Capacity Per Resource</div>
-            <div class="database-table-widget">
-                <app-spinner [name]="loaderNames.databaseCapacityResources" [width]="0"></app-spinner>
-                <ng-container *ngIf="databaseSpaceRows.length; else databaseSpaceTableNoData">
-                    <div class="database-scroll-table">
-                        <table class="table table-sm database-metric-table mb-0">
+        <div class="dashboard-card account-metrics-card" *ngIf="hasCapacityPerformance">
+            <app-spinner [name]="loaderNames.capacityPerformance" [width]="0"></app-spinner>
+            <ng-container *ngIf="capacityPerformanceView === 'table'; else capacityChartView">
+                <div class="account-metrics-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" [value]="capacityPerformanceSearch"
+                        placeholder="Search instance name..."
+                        (input)="onCapacityPerformanceSearch($event)" />
+                </div>
+                <ng-container *ngIf="capacityPerformanceRows.length; else capacityNoData">
+                    <div class="capacity-table-scroll">
+                        <table class="table table-sm database-metric-table capacity-table mb-0">
                             <thead>
                                 <tr>
-                                    <th *ngFor="let column of databaseSpaceSortColumns; trackBy: trackByIndex"
-                                        [class.sortable-th]="column.sortKey" [class.text-right]="column.numeric"
-                                        [class.sort-active]="isCapacitySortActive(column.sortKey)"
-                                        (click)="column.sortKey && sortDatabaseCapacity(column.sortKey)">
-                                        {{column.label}}
-                                        <i class="fas" [ngClass]="isCapacitySortActive(column.sortKey) ? 'fa-sort-down' : 'fa-sort'"
-                                            *ngIf="column.sortKey"></i>
-                                    </th>
+                                    <th>Instance</th>
+                                    <th>Status <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Green = Running, Orange = Idle (powered on, low utilization), Red = Stopped.'" container="body"></i></th>
+                                    <th>Provider</th>
+                                    <th>Region</th>
+                                    <th>Type</th>
+                                    <th>OS</th>
+                                    <th>CPU Usage <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Green: below 50% (healthy) - Orange: 50-85% (elevated) - Red: above 85% (critical). Natively reported by all four providers.'" container="body"></i></th>
+                                    <th>Memory Usage <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Memory in use vs available on the instance. Green: below 50% - Orange: 50-85% - Red: above 85%.'" container="body"></i></th>
+                                    <th>Disk IOPS/Throughput <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Read/write operations and throughput, natively reported by all four providers.'" container="body"></i></th>
+                                    <th>Network Throughput <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Green: normal traffic - Orange: elevated - Red: sustained high throughput, worth investigating.'" container="body"></i></th>
+                                    <th>30-Day CPU Trend <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Sparkline of the last 6 CPU samples over the past 30 days. Line color: green = trending down, red = trending up.'" container="body"></i></th>
+                                    <th>90-Day Forecast <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Projected CPU utilization 90 days out based on the recent trend. Red = projected to increase, Green = projected to decrease.'" container="body"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of databaseSpaceRows; trackBy: trackByIndex">
-                                    <td>
-                                        <button type="button" class="btn btn-link p-0 table-link"
-                                            (click)="openDatabaseInstance(row)">{{row.instance}}</button>
+                                <tr *ngFor="let row of capacityPerformanceRows; trackBy: trackByIndex">
+                                    <td class="capacity-instance">
+                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.name">{{row.name}}</button>
                                     </td>
-                                    <td class="text-right">{{row.maxAllocatedLabel}}</td>
-                                    <td class="text-right">{{row.allocatedLabel}}</td>
-                                    <td class="text-right">{{row.spaceFreeLabel}}</td>
-                                    <td class="text-right">{{row.utilization | number:'1.2-2'}}%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </ng-container>
-                <ng-template #databaseSpaceTableNoData>
-                    <div class="widget-no-data" *ngIf="!widgetLoading.databaseCapacityResources">No data available</div>
-                </ng-template>
-            </div>
-        </div>
-
-        <div class="section-title" *ngIf="hasCloudStorageHealthSection">Cloud Storage Health</div>
-        <div class="dashboard-card cloud-storage-card" *ngIf="hasCloudStorageHealthSection">
-
-            <ng-container *ngIf="hasStoragePerformanceData">
-            <div class="cloud-database-subsection-title">Storage Performance</div>
-            <div class="storage-performance-grid">
-                <app-spinner [name]="loaderNames.storagePerformance" [width]="0"></app-spinner>
-                <ng-container *ngIf="hasStoragePerformanceData; else storagePerformanceNoData">
-                    <div class="storage-performance-card" *ngFor="let card of storagePerformanceCards; trackBy: trackByIndex">
-                        <div class="storage-performance-card-head">
-                            <span class="storage-performance-card-title">{{card.title}}</span>
-                            <span class="storage-performance-card-badge" *ngIf="card.subtitle">{{card.subtitle}}</span>
-                            <span class="storage-performance-card-delta" [ngClass]="getStatusClass(card.deltaTone)"
-                                *ngIf="card.deltaLabel">
-                                <i [ngClass]="getDeltaIconClass(card.deltaDirection)" *ngIf="card.deltaDirection"></i>{{card.deltaLabel}}
-                            </span>
-                        </div>
-                        <div class="storage-performance-card-value">
-                            {{card.valueLabel}}<span class="storage-performance-card-unit" *ngIf="card.unit">{{card.unit}}</span>
-                        </div>
-                        <div echarts [options]="card.options" class="storage-performance-card-chart"></div>
-                    </div>
-                </ng-container>
-                <ng-template #storagePerformanceNoData>
-                    <div class="widget-no-data" *ngIf="!widgetLoading.storagePerformance">No data available</div>
-                </ng-template>
-            </div>
-            </ng-container>
-
-            <ng-container *ngIf="hasStorageResourcesData">
-            <div class="cloud-database-subsection-title">Top 10 Storage Resource</div>
-            <div class="storage-resource-legend">
-                <span *ngFor="let item of storageStatusLegend; trackBy: trackByIndex">
-                    <i [ngClass]="getStorageStatusIconClass(item.status)"></i>{{item.label}}
-                </span>
-            </div>
-            <div class="database-table-widget">
-                <app-spinner [name]="loaderNames.storageResources" [width]="0"></app-spinner>
-                <ng-container *ngIf="storageResources.length; else storageResourcesNoData">
-                    <div class="database-scroll-table">
-                        <table class="table table-sm database-metric-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th *ngFor="let column of storageResourceSortColumns; trackBy: trackByIndex"
-                                        [class.sortable-th]="column.sortKey" [class.text-right]="column.numeric"
-                                        [class.sort-active]="isStorageSortActive(column.sortKey)"
-                                        (click)="column.sortKey && sortStorageResources(column.sortKey)">
-                                        {{column.label}}
-                                        <i class="fas" [ngClass]="isStorageSortActive(column.sortKey) ? 'fa-sort-down' : 'fa-sort'"
-                                            *ngIf="column.sortKey"></i>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of storageResources; trackBy: trackByIndex">
                                     <td>
-                                        <button type="button" class="btn btn-link p-0 table-link"
-                                            (click)="openStorageResource(row)">{{row.deviceName}}</button>
+                                        <span class="capacity-status"><i [ngClass]="row.statusIconClass"></i>{{row.statusLabel}}</span>
                                     </td>
+                                    <td>
+                                        <span class="account-provider-pill" [ngClass]="'account-provider-' + row.providerKey">{{row.provider}}</span>
+                                    </td>
+                                    <td>{{row.region}}</td>
                                     <td>{{row.type}}</td>
-                                    <td>{{row.cloudRegion}}</td>
-                                    <td class="text-right">{{row.capacity || 'NA'}}</td>
-                                    <td class="text-right">{{row.e2eLatency === null ? 'NA' : (row.e2eLatency | number:'1.1-1') + 'ms'}}</td>
-                                    <td class="text-right">{{row.successServerLatency === null ? 'NA' : (row.successServerLatency | number:'1.1-1') + 'ms'}}</td>
-                                    <td class="text-right">{{row.networkQueueDelay === null ? 'NA' : (row.networkQueueDelay | number:'1.1-1') + 'ms'}}</td>
-                                    <td class="text-right">{{row.latencyHealthScore === null ? 'NA' : row.latencyHealthScore}}</td>
-                                    <td class="text-center"><i [ngClass]="getStorageStatusIconClass(row.status)"></i></td>
+                                    <td>
+                                        <div class="capacity-os" [tooltip]="row.os">{{row.os}}</div>
+                                    </td>
+                                    <td class="capacity-cpu-cell">
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(row.cpuTone)" [style.width.%]="row.cpuPct"></div>
+                                        </div>
+                                        <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.cpuTone)">{{row.cpuLabel}}</div>
+                                    </td>
+                                    <td class="capacity-cpu-cell">
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(row.memoryTone)" [style.width.%]="row.memoryPct"></div>
+                                        </div>
+                                        <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.memoryTone)">{{row.memoryLabel}}</div>
+                                        <div class="capacity-mem-available">Avail: {{row.availableMemory}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="capacity-disk-iops">{{row.diskIops}}</div>
+                                        <div class="capacity-disk-throughput">{{row.diskThroughput}}</div>
+                                    </td>
+                                    <td class="capacity-network" [style.color]="row.networkColor">{{row.networkThroughput}}</td>
+                                    <td>
+                                        <svg *ngIf="row.hasCpuTrend; else trendNa" class="capacity-trend-spark" viewBox="0 0 80 24" preserveAspectRatio="none">
+                                            <polyline [attr.points]="row.cpuTrendPoints" [attr.stroke]="row.cpuTrendColor" fill="none" stroke-width="1.5"></polyline>
+                                        </svg>
+                                        <ng-template #trendNa>NA</ng-template>
+                                    </td>
+                                    <td class="capacity-forecast" [style.color]="row.forecastColor">
+                                        <i [ngClass]="row.forecastDirection === 'up' ? 'fas fa-caret-up' : 'fas fa-caret-down'"
+                                            *ngIf="row.forecastDirection"></i>
+                                        {{row.forecastLabel}}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    <div class="account-metrics-pagination-row">
+                        <div>Show {{capacityPerformancePageSize}} | {{capacityPerformanceRows.length ? ((capacityPerformancePageNo - 1) * capacityPerformancePageSize) + 1 : 0}}-{{((capacityPerformancePageNo - 1) * capacityPerformancePageSize) + capacityPerformanceRows.length}} of {{capacityPerformanceTotal}}</div>
+                        <table-pager [compact]="true" [pageNo]="capacityPerformancePageNo"
+                            [pageSize]="capacityPerformancePageSize"
+                            [totalCount]="capacityPerformanceTotal"
+                            (pageChange)="capacityPerformancePageChange($event)"></table-pager>
+                    </div>
                 </ng-container>
-                <ng-template #storageResourcesNoData>
-                    <div class="widget-no-data" *ngIf="!widgetLoading.storageResources">No data available</div>
-                </ng-template>
-            </div>
             </ng-container>
+            <ng-template #capacityChartView>
+                <div class="capacity-chart-grid">
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Compute Instance &ndash; Fleet Status by Provider
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Instance count broken down by Running / Idle / Stopped, per cloud provider - a quick fleet-health snapshot.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="capacityFleetStatusOptions" class="capacity-chart" *ngIf="hasChartData(capacityFleetStatusOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(capacityFleetStatusOptions)">No data available</div>
+                        <div class="capacity-chart-legend">
+                            <span class="inventory-legend-item"><span class="legend-dot" style="background:#3bb273"></span>Running</span>
+                            <span class="inventory-legend-item"><span class="legend-dot" style="background:#f5a623"></span>Idle</span>
+                            <span class="inventory-legend-item"><span class="legend-dot" style="background:#e5484d"></span>Stopped</span>
+                        </div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">CPU Utilization Distribution
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'How many instances fall into each utilization band. A cluster in the low bands signals rightsizing opportunity; a cluster near 100% signals a scaling risk.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="capacityCpuDistributionOptions" class="capacity-chart" *ngIf="hasChartData(capacityCpuDistributionOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(capacityCpuDistributionOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Top 10 &ndash; CPU Utilization
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'The 10 instances with the highest current CPU utilization, highest first.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="capacityTop10CpuOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(capacityTop10CpuOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(capacityTop10CpuOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Top 10 &ndash; Disk IOPS / Throughput
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'The 10 instances driving the most disk I/O operations per second.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="capacityTop10DiskIopsOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(capacityTop10DiskIopsOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(capacityTop10DiskIopsOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Top 10 &ndash; Network Throughput
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'The 10 instances with the highest current network throughput, highest first.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="capacityTop10NetworkOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(capacityTop10NetworkOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(capacityTop10NetworkOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Capacity and Growth Insights
+                            <span class="capacity-chart-subtitle">&ndash; Trend &amp; 90-Day Forecast</span>
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Fleet-wide average CPU utilization over the trailing 12 months, with a 90-day forecast. Dashed segments are projected, not measured.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="capacityGrowthInsightsOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(capacityGrowthInsightsOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(capacityGrowthInsightsOptions)">No data available</div>
+                        <div class="capacity-chart-legend">
+                            <span class="inventory-legend-item"><span class="legend-dot" style="background:#2f6fed"></span>CPU %</span>
+                            <span class="capacity-chart-legend-note">&middot; trailing 12 months, dashed = forecast</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #capacityNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.capacityPerformance">No data available</div>
+            </ng-template>
         </div>
 
-        <div class="section-title" *ngIf="hasLatencyMetricSection">Latency Metric</div>
-        <div class="dashboard-card latency-metric-card" *ngIf="hasLatencyMetricSection">
-            <div class="latency-metric-grid">
-                <div class="latency-metric-widget write-perf-widget">
-                    <app-spinner [name]="loaderNames.writePerformanceTrend" [width]="0"></app-spinner>
-                    <div class="latency-metric-widget-title">Write Performance Trend</div>
-                    <ng-container *ngIf="writePerformanceTrend.rows.length; else writePerfNoData">
-                        <div class="write-perf-scroll">
-                            <table class="write-perf-table">
-                                <thead>
-                                    <tr>
-                                        <th class="write-perf-name-col"></th>
-                                        <th *ngFor="let label of writePerformanceTrend.labels; trackBy: trackByIndex">{{label}}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let row of writePerformanceTrend.rows; trackBy: trackByIndex">
-                                        <td class="write-perf-name">{{row.name}}</td>
-                                        <td class="write-perf-cell" *ngFor="let cell of row.cells; trackBy: trackByIndex"
-                                            [style.background]="cell.color">{{cell.value}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </ng-container>
-                    <ng-template #writePerfNoData>
-                        <div class="widget-no-data" *ngIf="!widgetLoading.writePerformanceTrend">No data available</div>
-                    </ng-template>
-                </div>
-                <div class="latency-metric-widget latency-breakdown-widget">
-                    <app-spinner [name]="loaderNames.latencyBreakdown" [width]="0"></app-spinner>
-                    <div class="latency-metric-widget-title">Latency Breakdown</div>
-                    <ng-container *ngIf="latencyBreakdown?.hasData; else latencyBreakdownNoData">
-                        <div class="latency-breakdown-body">
-                            <div class="latency-breakdown-chart-wrap">
-                                <div echarts [options]="latencyBreakdownOptions" class="latency-breakdown-chart"></div>
-                                <div class="latency-breakdown-center">
-                                    <span class="latency-breakdown-total-label">Total</span>
-                                    <strong class="latency-breakdown-total-value">{{latencyBreakdown.totalLabel}} {{latencyBreakdown.unit}}</strong>
-                                </div>
-                            </div>
-                            <div class="latency-breakdown-legend">
-                                <div class="latency-breakdown-legend-item"
-                                    *ngFor="let segment of latencyBreakdown.segments; trackBy: trackByIndex">
-                                    <span class="latency-breakdown-dot" [style.background]="segment.color"></span>
-                                    <span class="latency-breakdown-legend-label">{{segment.label}}</span>
-                                    <span class="latency-breakdown-legend-value">{{segment.valueLabel}} {{segment.percentLabel}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </ng-container>
-                    <ng-template #latencyBreakdownNoData>
-                        <div class="widget-no-data" *ngIf="!widgetLoading.latencyBreakdown">No data available</div>
-                    </ng-template>
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasStorageVolumesDisks">
+            <div class="d-flex align-items-center">
+                <span class="mb-0">Storage &ndash; Volumes / Disks</span>
+                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch storage view">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="storageVolumesView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setStorageVolumesView('table')" [tooltip]="'Table View'" container="body">
+                        <i class="fas fa-table"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="storageVolumesView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setStorageVolumesView('chart')" [tooltip]="'Chart View'" container="body">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
                 </div>
             </div>
+            <i class="fas fa-info-circle inventory-info-icon"
+                [tooltip]="'Per-volume storage inventory across all cloud providers: attached instance, volume type, provisioned size, disk IOPS/throughput and IOPS tier.'"
+                container="body"></i>
+        </div>
+        <div class="dashboard-card account-metrics-card" *ngIf="hasStorageVolumesDisks">
+            <app-spinner [name]="loaderNames.storageVolumesDisks" [width]="0"></app-spinner>
+            <ng-container *ngIf="storageVolumesView === 'table'; else storageChartView">
+                <div class="account-metrics-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" [value]="storageVolumesSearch"
+                        placeholder="Search volume or instance..."
+                        (input)="onStorageVolumesSearch($event)" />
+                </div>
+                <ng-container *ngIf="storageVolumesRows.length; else storageNoData">
+                    <div class="capacity-table-scroll">
+                        <table class="table table-sm database-metric-table capacity-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Attached Instance</th>
+                                    <th>Provider</th>
+                                    <th>Volume Type</th>
+                                    <th>Size (GB)</th>
+                                    <th>Disk IOPS/Throughput <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Provisioned disk IOPS and throughput per volume, natively reported by each provider.'" container="body"></i></th>
+                                    <th>IOPS Tier</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of storageVolumesRows; trackBy: trackByIndex">
+                                    <td class="capacity-instance">
+                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.attachedInstance">{{row.attachedInstance}}</button>
+                                    </td>
+                                    <td>
+                                        <span class="account-provider-pill" [ngClass]="'account-provider-' + row.providerKey">{{row.provider}}</span>
+                                    </td>
+                                    <td>{{row.volumeType}}</td>
+                                    <td>{{row.sizeLabel}}</td>
+                                    <td>
+                                        <div class="capacity-disk-iops">{{row.diskIops}}</div>
+                                        <div class="capacity-disk-throughput" *ngIf="row.diskThroughput">{{row.diskThroughput}}</div>
+                                    </td>
+                                    <td>{{row.iopsTier}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="account-metrics-pagination-row">
+                        <div>Show {{storageVolumesPageSize}} | {{storageVolumesRows.length ? ((storageVolumesPageNo - 1) * storageVolumesPageSize) + 1 : 0}}-{{((storageVolumesPageNo - 1) * storageVolumesPageSize) + storageVolumesRows.length}} of {{storageVolumesTotal}}</div>
+                        <table-pager [compact]="true" [pageNo]="storageVolumesPageNo"
+                            [pageSize]="storageVolumesPageSize"
+                            [totalCount]="storageVolumesTotal"
+                            (pageChange)="storageVolumesPageChange($event)"></table-pager>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #storageChartView>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">Total Provisioned Storage by Provider (GB)
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'Sum of provisioned volume size (GB) per cloud provider.'" container="body"></i>
+                            </div>
+                            <div echarts [options]="storageProvisionedByProviderOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(storageProvisionedByProviderOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(storageProvisionedByProviderOptions)">No data available</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">Top 10 Volumes by Disk IOPS
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'The 10 volumes with the highest provisioned disk IOPS, highest first.'" container="body"></i>
+                            </div>
+                            <div echarts [options]="storageTopVolumesOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(storageTopVolumesOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(storageTopVolumesOptions)">No data available</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">IOPS Tier Distribution
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'Share of volumes across performance tiers (Standard / Balanced / High Performance).'" container="body"></i>
+                            </div>
+                            <div echarts [options]="storageIopsTierOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(storageIopsTierOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(storageIopsTierOptions)">No data available</div>
+                            <div class="capacity-chart-legend">
+                                <span class="inventory-legend-item" *ngFor="let tier of storageIopsTierLegend; trackBy: trackByIndex">
+                                    <span class="legend-dot" [style.background]="tier.color"></span>{{tier.label}} ({{tier.count}})
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #storageNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.storageVolumesDisks">No data available</div>
+            </ng-template>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasPublicCloudDatabase">
+            <span class="mb-0">Public Cloud Database</span>
+            <i class="fas fa-info-circle inventory-info-icon"
+                [tooltip]="'Executive KPIs & performance across relational, NoSQL and managed database services'"
+                container="body"></i>
+        </div>
+        <div class="dashboard-card inventory-card" *ngIf="hasPublicCloudDatabase">
+            <app-spinner [name]="loaderNames.publicCloudDatabase" [width]="0"></app-spinner>
+            <div class="summary-metrics" *ngIf="hasDatabaseSummary">
+                <div class="summary-metric" *ngFor="let metric of databaseSummaryMetrics; trackBy: trackByIndex">
+                    <div class="metric-label">{{metric.label}}<i class="fas fa-info-circle inventory-info-icon"
+                        *ngIf="metric.info" [tooltip]="metric.info" container="body"></i></div>
+                    <div class="metric-value" [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</div>
+                </div>
+            </div>
+            <div class="monitored-row" *ngIf="databaseMonitoredCards.length">
+                <div class="monitored-card" *ngFor="let card of databaseMonitoredCards; trackBy: trackByIndex">
+                    <div class="monitored-card-head">
+                        <span class="monitored-card-name">
+                            <i [ngClass]="card.iconClass" [style.color]="card.color"></i>{{card.provider}}
+                        </span>
+                        <span class="monitored-card-count" [style.color]="card.color">{{card.discovered | number}}</span>
+                    </div>
+                    <div class="monitored-card-stat">
+                        <span>Database Monitored</span>
+                        <strong>{{card.monitored | number}} / {{card.discovered | number}}</strong>
+                    </div>
+                    <div class="monitored-stackbar">
+                        <span class="monitored-seg-healthy" [style.width.%]="card.healthyPercent"></span>
+                        <span class="monitored-seg-degraded" [style.width.%]="card.degradedPercent"></span>
+                        <span class="monitored-seg-unknown" [style.width.%]="card.unknownPercent"></span>
+                    </div>
+                    <div class="monitored-legend">
+                        <span><i class="monitored-dot monitored-dot-healthy"></i>Healthy {{card.healthy | number}}</span>
+                        <span><i class="monitored-dot monitored-dot-degraded"></i>Degraded {{card.degraded | number}}</span>
+                        <span><i class="monitored-dot monitored-dot-unknown"></i>Unknown {{card.unknown | number}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasDatabasePerformance">
+            <div class="d-flex align-items-center">
+                <span class="mb-0">Database &ndash; Performance and Utilization</span>
+                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch database view">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="databasePerformanceView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setDatabasePerformanceView('table')" [tooltip]="'Table View'" container="body">
+                        <i class="fas fa-table"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="databasePerformanceView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setDatabasePerformanceView('chart')" [tooltip]="'Chart View'" container="body">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                </div>
+            </div>
+            <i class="fas fa-info-circle inventory-info-icon"
+                [tooltip]="'Per-database performance and resource utilization across relational, NoSQL and managed databases.'"
+                container="body"></i>
+        </div>
+        <div class="dashboard-card account-metrics-card" *ngIf="hasDatabasePerformance">
+            <app-spinner [name]="loaderNames.databasePerformance" [width]="0"></app-spinner>
+            <ng-container *ngIf="databasePerformanceView === 'table'; else databasePerformanceChartView">
+                <div class="account-metrics-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" [value]="databasePerformanceSearch"
+                        placeholder="Search database..."
+                        (input)="onDatabasePerformanceSearch($event)" />
+                </div>
+                <ng-container *ngIf="databasePerformanceRows.length; else databasePerformanceNoData">
+                    <div class="capacity-table-scroll">
+                        <table class="table table-sm database-metric-table capacity-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Database</th>
+                                    <th>Engine</th>
+                                    <th>CPU Usage <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Green: below 50% (healthy) - Orange: 50-85% (elevated) - Red: above 85% (critical).'" container="body"></i></th>
+                                    <th>Memory Used <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Percentage of memory in use on the database host.'" container="body"></i></th>
+                                    <th>Storage Used <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Used vs provisioned disk capacity for the database.'" container="body"></i></th>
+                                    <th>Disk Utilization <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Percentage of time the disk is busy servicing I/O.'" container="body"></i></th>
+                                    <th>Disk IOPS</th>
+                                    <th>Uptime</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of databasePerformanceRows; trackBy: trackByIndex">
+                                    <td class="capacity-instance">
+                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.name">{{row.name}}</button>
+                                    </td>
+                                    <td>{{row.engine || 'NA'}}</td>
+                                    <td class="capacity-cpu-cell">
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(row.cpuTone)" [style.width.%]="row.cpuPct"></div>
+                                        </div>
+                                        <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.cpuTone)">{{row.cpuLabel}}</div>
+                                    </td>
+                                    <td class="capacity-cpu-cell">
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(row.memoryTone)" [style.width.%]="row.memoryPct"></div>
+                                        </div>
+                                        <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.memoryTone)">{{row.memoryLabel}}</div>
+                                    </td>
+                                    <td class="capacity-cpu-cell">
+                                        <div class="db-storage-total">{{row.storageTotalLabel}}</div>
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(row.storageTone)" [style.width.%]="row.storagePct"></div>
+                                        </div>
+                                        <div class="db-storage-used">{{row.storageUsedLabel}}</div>
+                                    </td>
+                                    <td class="capacity-cpu-cell">
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(row.diskUtilizationTone)" [style.width.%]="row.diskUtilizationPct"></div>
+                                        </div>
+                                        <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.diskUtilizationTone)">{{row.diskUtilizationLabel}}</div>
+                                    </td>
+                                    <td>{{row.diskIops}}</td>
+                                    <td>{{row.uptimeLabel}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="account-metrics-pagination-row">
+                        <div>Show {{databasePerformancePageSize}} | {{databasePerformanceRows.length ? ((databasePerformancePageNo - 1) * databasePerformancePageSize) + 1 : 0}}-{{((databasePerformancePageNo - 1) * databasePerformancePageSize) + databasePerformanceRows.length}} of {{databasePerformanceTotal}}</div>
+                        <table-pager [compact]="true" [pageNo]="databasePerformancePageNo"
+                            [pageSize]="databasePerformancePageSize"
+                            [totalCount]="databasePerformanceTotal"
+                            (pageChange)="databasePerformancePageChange($event)"></table-pager>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #databasePerformanceChartView>
+                <div class="capacity-chart-grid">
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Top Cache Hit Ratio
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Buffer/cache hit ratio per database. Lower ratios (red) mean more reads are going to disk.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="dbCacheHitOptions" class="capacity-chart" *ngIf="hasChartData(dbCacheHitOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(dbCacheHitOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Top Latency
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Query response latency per database (ms), highest first.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="dbLatencyOptions" class="capacity-chart" *ngIf="hasChartData(dbLatencyOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(dbLatencyOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Top Response Time
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Average query response time per database (ms), lowest is best.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="dbResponseTimeOptions" class="capacity-chart" *ngIf="hasChartData(dbResponseTimeOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(dbResponseTimeOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Top Active Connections
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Active client connections/sessions per database, highest first.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="dbConnectionsOptions" class="capacity-chart" *ngIf="hasChartData(dbConnectionsOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(dbConnectionsOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Top Errors / Deadlocks
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Deadlock count per database over the selected period.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="dbDeadlocksOptions" class="capacity-chart" *ngIf="hasChartData(dbDeadlocksOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(dbDeadlocksOptions)">No data available</div>
+                    </div>
+                    <div class="capacity-chart-panel">
+                        <div class="capacity-chart-title">Throughput Trend
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Aggregate transactions per second across all databases, trailing 30 days.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="dbThroughputTrendOptions" class="capacity-chart" *ngIf="hasChartData(dbThroughputTrendOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(dbThroughputTrendOptions)">No data available</div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #databasePerformanceNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.databasePerformance">No data available</div>
+            </ng-template>
+        </div>
+
+        <div class="d-flex align-items-start section-title" *ngIf="hasCostOptimization">
+            <div class="d-flex align-items-center flex-shrink-0">
+                <span class="mb-0">Cost &amp; Optimization Opportunities</span>
+                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch cost view">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="costOptimizationView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setCostOptimizationView('table')" [tooltip]="'Table View'" container="body">
+                        <i class="fas fa-table"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="costOptimizationView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setCostOptimizationView('chart')" [tooltip]="'Chart View'" container="body">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="cost-optimization-subtitle flex-grow-1">FinOps &ndash; rightsizing &amp; idle-resource savings identified this cycle (Compute Instances / VMs only) &middot; Native cost-metric collection confirmed for AWS (Cost Explorer); Azure/GCP/OCI figures are estimated pending confirmation of an equivalent native billing metric.</div>
+            <i class="fas fa-info-circle inventory-info-icon flex-shrink-0"
+                [tooltip]="'FinOps rightsizing and idle-resource savings opportunities for compute instances / VMs across all cloud providers.'"
+                container="body"></i>
+        </div>
+        <div class="dashboard-card account-metrics-card" *ngIf="hasCostOptimization">
+            <app-spinner [name]="loaderNames.costOptimization" [width]="0"></app-spinner>
+            <ng-container *ngIf="costOptimizationView === 'table'; else costOptimizationChartView">
+                <div class="account-metrics-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" [value]="costOptimizationSearch"
+                        placeholder="Search instance..."
+                        (input)="onCostOptimizationSearch($event)" />
+                </div>
+                <ng-container *ngIf="costOptimizationRows.length; else costOptimizationNoData">
+                    <div class="table-responsive">
+                        <table class="table table-sm database-metric-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Instance</th>
+                                    <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'provider'"
+                                        (click)="sortCostOptimization('provider')">
+                                        Provider <i [ngClass]="getSortIconClass(costOptimizationSort, 'provider')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'region'"
+                                        (click)="sortCostOptimization('region')">
+                                        Region <i [ngClass]="getSortIconClass(costOptimizationSort, 'region')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'type'"
+                                        (click)="sortCostOptimization('type')">
+                                        Type <i [ngClass]="getSortIconClass(costOptimizationSort, 'type')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'cpuPct'"
+                                        (click)="sortCostOptimization('cpuPct')">
+                                        CPU Utilization <i class="fas fa-info-circle inventory-info-icon"
+                                            [tooltip]="'Average CPU utilization; low values flag rightsizing or idle candidates.'" container="body"></i>
+                                        <i [ngClass]="getSortIconClass(costOptimizationSort, 'cpuPct')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'action'"
+                                        (click)="sortCostOptimization('action')">
+                                        Recommended Action <i class="fas fa-info-circle inventory-info-icon"
+                                            [tooltip]="'Rightsize = reduce vCPU on over-provisioned instances; Stop / Terminate Idle = shut down or remove idle instances.'" container="body"></i>
+                                        <i [ngClass]="getSortIconClass(costOptimizationSort, 'action')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'savings'"
+                                        (click)="sortCostOptimization('savings')">
+                                        Est. Monthly Savings <i [ngClass]="getSortIconClass(costOptimizationSort, 'savings')"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of costOptimizationRows; trackBy: trackByIndex" truncateText>
+                                    <td class="tdw-17">
+                                        <button type="button" class="btn btn-link p-0 table-link text-left"
+                                            [tooltip]="row.instance">{{row.instance}}</button>
+                                    </td>
+                                    <td class="tdw-9">
+                                        <div><span class="account-provider-pill" [ngClass]="'account-provider-' + row.providerKey">{{row.provider}}</span></div>
+                                    </td>
+                                    <td class="tdw-11" [tooltip]="row.region">{{row.region}}</td>
+                                    <td class="tdw-15" [tooltip]="row.type">{{row.type}}</td>
+                                    <td class="tdw-22">
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(row.cpuTone)" [style.width.%]="row.cpuPct"></div>
+                                        </div>
+                                        <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.cpuTone)">{{row.cpuLabel}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <span class="cost-action-text" [ngClass]="row.actionClass">{{row.action}}</span>
+                                    </td>
+                                    <td class="tdw-11">{{row.savingsLabel}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="account-metrics-pagination-row">
+                        <div>Show {{costOptimizationPageSize}} | {{costOptimizationRows.length ? ((costOptimizationPageNo - 1) * costOptimizationPageSize) + 1 : 0}}-{{((costOptimizationPageNo - 1) * costOptimizationPageSize) + costOptimizationRows.length}} of {{costOptimizationTotal}}</div>
+                        <table-pager [compact]="true" [pageNo]="costOptimizationPageNo"
+                            [pageSize]="costOptimizationPageSize"
+                            [totalCount]="costOptimizationTotal"
+                            (pageChange)="costOptimizationPageChange($event)"></table-pager>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #costOptimizationChartView>
+                <div class="cost-chart-section-title">Spend vs Savings
+                    <i class="fas fa-info-circle inventory-info-icon"
+                        [tooltip]="'Current monthly compute spend vs the savings identified this cycle.'" container="body"></i>
+                </div>
+                <div class="row">
+                    <div class="col-lg-5 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div echarts [options]="spendVsSavingsOptions" class="cost-spend-donut" *ngIf="hasChartData(spendVsSavingsOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(spendVsSavingsOptions)">No data available</div>
+                            <div class="cost-spend-legend">
+                                <div class="cost-spend-legend-item" *ngFor="let item of spendVsSavingsLegend; trackBy: trackByIndex">
+                                    <span class="legend-dot" [style.background]="item.color"></span>{{item.text}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 mb-3">
+                        <div class="cost-chart-subtitle">Recommended Actions
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Number of instances per recommended action.'" container="body"></i>
+                        </div>
+                        <div echarts [options]="recommendedActionsOptions" class="cost-recommended-chart" *ngIf="hasChartData(recommendedActionsOptions)"></div>
+                        <div class="widget-no-data" *ngIf="!hasChartData(recommendedActionsOptions)">No data available</div>
+                    </div>
+                </div>
+                <div class="capacity-chart-panel">
+                    <div class="capacity-chart-title">Potential Savings by Provider
+                        <i class="fas fa-info-circle inventory-info-icon"
+                            [tooltip]="'Estimated monthly savings available per cloud provider.'" container="body"></i>
+                    </div>
+                    <div echarts [options]="potentialSavingsByProviderOptions" class="cost-provider-chart" *ngIf="hasChartData(potentialSavingsByProviderOptions)"></div>
+                    <div class="widget-no-data" *ngIf="!hasChartData(potentialSavingsByProviderOptions)">No data available</div>
+                </div>
+                <div class="provisioning-summary-substrip" *ngIf="hasCostSummary">
+                    <div class="summary-metrics provisioning-summary-strip">
+                        <div class="summary-metric" *ngFor="let metric of costSummaryMetrics; trackBy: trackByIndex">
+                            <div class="metric-label">{{metric.label}}</div>
+                            <div class="metric-value" [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #costOptimizationNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.costOptimization">No data available</div>
+            </ng-template>
         </div>
 
         <div class="orphaned-widgets-grid mt-3" *ngIf="hasOrphanedDevices || hasOrphanedByCategory"
@@ -697,166 +1158,331 @@
             </div>
         </div>
 
-        <div class="idle-widgets-grid mt-3" *ngIf="hasIdleDevices || hasIdleDuration"
-            [ngClass]="{'single-widget-grid': !(hasIdleDevices && hasIdleDuration)}">
-            <div class="orphaned-widget-col" *ngIf="hasIdleDevices">
-                <div class="subsection-title orphaned-widget-title">
-                    <span class="badge badge-secondary orphaned-count-badge">{{idleDevicesTotal}}</span>
-                    Idle Device Analysis
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasRecentAlerts">
+            <div class="d-flex align-items-center">
+                <span class="mb-0">Recent Alerts &ndash; Critical / Warning / Info</span>
+                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch alerts view">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="recentAlertsView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setRecentAlertsView('table')" [tooltip]="'Table View'" container="body">
+                        <i class="fas fa-table"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="recentAlertsView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setRecentAlertsView('chart')" [tooltip]="'Chart View'" container="body">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
                 </div>
-                <div class="dashboard-card idle-device-card">
-                    <div class="idle-table-wrap">
-                        <app-spinner [name]="loaderNames.idleDevices" [width]="0"></app-spinner>
-                        <div class="device-status-legend" *ngIf="idleDevices.length">
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-check-circle text-success"></i>
-                                Active / Reachable
-                            </span>
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-exclamation-circle text-warning"></i>
-                                Partially Reachable / Warning State
-                            </span>
-                            <span class="device-status-legend-item">
-                                <i class="fas fa-exclamation-triangle text-danger"></i>
-                                Offline / Critical / Unreachable
-                            </span>
-                        </div>
-                        <div class="idle-table-scroll">
-                        <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
-                            <colgroup>
-                                <col class="idle-device-name-col">
-                                <col class="idle-resource-col">
-                                <col class="idle-metric-col">
-                                <col class="idle-metric-col">
-                                <col class="idle-network-col">
-                                <col class="idle-duration-col">
-                                <col class="idle-status-col">
-                            </colgroup>
+            </div>
+            <i class="fas fa-info-circle inventory-info-icon"
+                [tooltip]="'Recent Critical / Warning / Info alerts across all cloud providers, with severity, provider, alert detail and how long ago each was raised.'"
+                container="body"></i>
+        </div>
+        <div class="dashboard-card account-metrics-card" *ngIf="hasRecentAlerts">
+            <app-spinner [name]="loaderNames.recentAlerts" [width]="0"></app-spinner>
+            <ng-container *ngIf="recentAlertsView === 'table'; else recentAlertsChartView">
+                <div class="account-metrics-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" [value]="recentAlertsSearch"
+                        placeholder="Search instance or alert..."
+                        (input)="onRecentAlertsSearch($event)" />
+                </div>
+                <ng-container *ngIf="recentAlerts.length; else recentAlertsNoData">
+                    <div class="table-responsive">
+                        <table class="table table-sm database-metric-table mb-0">
                             <thead>
                                 <tr>
-                                    <th>Device Name</th>
-                                    <th>Type</th>
-                                    <th>Avg CPU %</th>
-                                    <th>Avg Mem %</th>
-                                    <th>Network I/O</th>
-                                    <th>Idle Duration</th>
-                                    <th>Status</th>
+                                    <th class="sortable-th" [class.sort-active]="recentAlertsSort.key === 'instanceName'"
+                                        (click)="sortRecentAlerts('instanceName')">
+                                        Instance / Resource <i [ngClass]="getSortIconClass(recentAlertsSort, 'instanceName')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="recentAlertsSort.key === 'severity'"
+                                        (click)="sortRecentAlerts('severity')">
+                                        Severity <i class="fas fa-info-circle inventory-info-icon"
+                                            [tooltip]="'Critical = red, Warning = amber, Info = blue.'" container="body"></i>
+                                        <i [ngClass]="getSortIconClass(recentAlertsSort, 'severity')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="recentAlertsSort.key === 'provider'"
+                                        (click)="sortRecentAlerts('provider')">
+                                        Provider <i [ngClass]="getSortIconClass(recentAlertsSort, 'provider')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="recentAlertsSort.key === 'alert'"
+                                        (click)="sortRecentAlerts('alert')">
+                                        Alert <i [ngClass]="getSortIconClass(recentAlertsSort, 'alert')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="recentAlertsSort.key === 'raisedHours'"
+                                        (click)="sortRecentAlerts('raisedHours')">
+                                        Raised <i [ngClass]="getSortIconClass(recentAlertsSort, 'raisedHours')"></i>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let device of idleDevices; trackBy: trackByIndex">
-                                    <td>
-                                        <div class="text-primary pointer-link" [tooltip]="device.deviceName"
-                                            (click)="openIdleDevice(device)">{{device.deviceName}}</div>
+                                <tr *ngFor="let alert of recentAlerts; trackBy: trackByIndex" truncateText>
+                                    <td class="tdw-27">
+                                        <button type="button" class="btn btn-link p-0 table-link text-left"
+                                            [tooltip]="alert.instanceName" (click)="showAlertDetails(alert)">{{alert.instanceName}}</button>
                                     </td>
-                                    <td>{{device.resourceType}}</td>
-                                    <td>
-                                        <div class="progress-track">
-                                            <div class="progress-fill" [ngClass]="getStatusClass(device.avgCpu.tone)"
-                                                [style.width.%]="device.avgCpu.percent"></div>
-                                        </div>
-                                        <div class="storage-meta">
-                                            <span>Used: {{device.avgCpu.used}}</span>
-                                            <span>Free: {{device.avgCpu.free}}</span>
-                                        </div>
+                                    <td class="tdw-13">
+                                        <div><span class="alert-severity" [ngClass]="alert.severityClass">{{alert.severityLabel}}</span></div>
                                     </td>
-                                    <td>
-                                        <div class="progress-track">
-                                            <div class="progress-fill" [ngClass]="getStatusClass(device.avgMem.tone)"
-                                                [style.width.%]="device.avgMem.percent"></div>
-                                        </div>
-                                        <div class="storage-meta">
-                                            <span>Used: {{device.avgMem.used}}</span>
-                                            <span>Free: {{device.avgMem.free}}</span>
-                                        </div>
+                                    <td class="tdw-13">
+                                        <div><span class="account-provider-pill" [ngClass]="'account-provider-' + alert.providerKey">{{alert.provider}}</span></div>
                                     </td>
-                                    <td>{{device.networkIO}}</td>
-                                    <td>{{device.idleDuration}}</td>
-                                    <td><i [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
+                                    <td class="tdw-31" [tooltip]="alert.alert">{{alert.alert}}</td>
+                                    <td class="tdw-16">{{alert.raised}}</td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="account-metrics-pagination-row">
+                        <div>Show {{recentAlertsPageSize}} | {{recentAlerts.length ? ((recentAlertsPageNo - 1) * recentAlertsPageSize) + 1 : 0}}-{{((recentAlertsPageNo - 1) * recentAlertsPageSize) + recentAlerts.length}} of {{recentAlertsTotal}}</div>
+                        <table-pager [compact]="true" [pageNo]="recentAlertsPageNo"
+                            [pageSize]="recentAlertsPageSize"
+                            [totalCount]="recentAlertsTotal"
+                            (pageChange)="recentAlertsPageChange($event)"></table-pager>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #recentAlertsChartView>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">Alerts by Severity
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'Share of alerts by severity (Critical / Warning / Info).'" container="body"></i>
+                            </div>
+                            <div echarts [options]="alertsBySeverityOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(alertsBySeverityOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(alertsBySeverityOptions)">No data available</div>
+                            <div class="capacity-chart-legend">
+                                <span class="inventory-legend-item" *ngFor="let item of alertsBySeverityLegend; trackBy: trackByIndex">
+                                    <span class="legend-dot" [style.background]="item.color"></span>{{item.label}} ({{item.count}})
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="idle-pagination-row" *ngIf="idleDevices.length">
-                        <div class="orphaned-footer-note">*Device With <20% Memory And <5% CPU Utilization,
-                            Indicating Low Activity.</div>
-                        <table-pager [compact]="true" [pageNo]="idleDevicesPageNo"
-                            [pageSize]="idleDevicesPageSize" [totalCount]="idleDevicesTotal"
-                            (pageChange)="idleDevicesPageChange($event)"></table-pager>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">Alerts by Provider
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'Count of alerts per cloud provider.'" container="body"></i>
+                            </div>
+                            <div echarts [options]="alertsByProviderOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(alertsByProviderOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(alertsByProviderOptions)">No data available</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">Alerts by Age
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'Alert count grouped by how long ago each was raised.'" container="body"></i>
+                            </div>
+                            <div echarts [options]="alertsByAgeOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(alertsByAgeOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(alertsByAgeOptions)">No data available</div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </ng-template>
+            <ng-template #recentAlertsNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.recentAlerts">No data available</div>
+            </ng-template>
+        </div>
 
-            <div class="orphaned-widget-col" *ngIf="hasIdleDuration">
-                <div class="subsection-title orphaned-widget-title">Idle Duration Distribution</div>
-                <div class="dashboard-card idle-duration-card">
-                    <div class="idle-duration-body">
-                        <app-spinner [name]="loaderNames.idleDuration" [width]="0"></app-spinner>
-                        <div class="idle-duration-content" *ngIf="idleDurationHasData">
-                            <div class="idle-duration-bars">
-                                <div class="idle-duration-row" *ngFor="let item of idleDurationRows; trackBy: trackByIndex">
-                                    <div class="idle-duration-label">{{item.duration}}</div>
-                                    <div class="idle-duration-track">
-                                        <div class="idle-duration-fill" [style.width.%]="item.percent"
-                                            [style.background]="item.color">
-                                            <span>{{item.count}}</span>
-                                        </div>
-                                    </div>
-                                    <div class="idle-duration-value">{{item.count}}</div>
+        <div class="section-title" *ngIf="hasAutoRemediationSummary">Auto-Remediation Summary</div>
+        <div class="dashboard-card auto-remediation-card" *ngIf="hasAutoRemediationSummary">
+            <app-spinner [name]="loaderNames.autoRemediationSummary" [width]="0"></app-spinner>
+            <ng-container *ngIf="autoRemediationSummary?.hasData; else autoRemediationNoData">
+                <div class="auto-remediation-main">
+                    <div class="auto-remediation-outcomes">
+                        <div class="auto-remediation-widget-title">
+                            Run Outcomes <i class="fas fa-info-circle text-muted"></i>
+                        </div>
+                        <div class="auto-remediation-outcome-body">
+                            <div class="auto-remediation-donut" [style.background]="autoRemediationSummary.donutGradient">
+                                <div class="auto-remediation-donut-inner"></div>
+                            </div>
+                            <div class="auto-remediation-legend">
+                                <div class="auto-remediation-legend-item"
+                                    *ngFor="let item of autoRemediationSummary.outcomes; trackBy: trackByIndex">
+                                    <span class="auto-remediation-dot" [style.background]="item.color"></span>
+                                    <span>{{item.label}} {{item.percent | number:'1.1-1'}}%</span>
                                 </div>
                             </div>
-                            <div echarts [options]="idleDurationOptions" class="idle-duration-chart"></div>
+                        </div>
+                    </div>
+                    <div class="auto-remediation-actions">
+                        <div class="auto-remediation-widget-title">
+                            Most Frequent Actions <i class="fas fa-info-circle text-muted"></i>
+                        </div>
+                        <div class="auto-remediation-action-list">
+                            <div class="auto-remediation-action-row"
+                                *ngFor="let action of autoRemediationSummary.actions; trackBy: trackByIndex">
+                                <div class="auto-remediation-action-label" [tooltip]="action.label">{{action.label}}</div>
+                                <div class="auto-remediation-action-track">
+                                    <div class="auto-remediation-action-fill" [style.width.%]="action.percent"
+                                        [style.background]="action.color"></div>
+                                </div>
+                                <div class="auto-remediation-action-count">{{action.count}}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="auto-remediation-summary-strip">
+                    Total runs: {{autoRemediationSummary.totalRunsLabel}} | Avg duration: {{autoRemediationSummary.avgDurationLabel}}
+                </div>
+                <div class="auto-remediation-kpi-box">
+                    <div class="auto-remediation-kpi" *ngFor="let kpi of autoRemediationSummary.kpis; trackBy: trackByIndex">
+                        <div class="auto-remediation-kpi-label">{{kpi.label}}</div>
+                        <div class="auto-remediation-kpi-value" [ngClass]="getStatusClass(kpi.tone)">{{kpi.value}}</div>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-template #autoRemediationNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.autoRemediationSummary">No data available</div>
+            </ng-template>
         </div>
-        <div class="section-title section-title-with-link" *ngIf="hasRecentAlertSummary || hasRecentAlerts">
-            Recent Alerts
-            <button type="button" class="header-link-icon" (click)="openRecentAlerts()"
-                [tooltip]="'Open linked page'" container="body">
-                <i class="fas fa-link"></i>
-            </button>
-        </div>
-        <div class="dashboard-card alert-card recent-alerts-card" *ngIf="hasRecentAlertSummary || hasRecentAlerts">
-            <div class="alert-summary" *ngIf="hasRecentAlertSummary">
-                <app-spinner [name]="loaderNames.recentAlertSummary" [width]="0"></app-spinner>
-                <div class="alert-summary-metric pointer-link"
-                    *ngFor="let metric of recentAlertSummaryMetrics; trackBy: trackByIndex"
-                    (click)="openRecentAlerts()" [tooltip]="'Open linked page'" container="body">
-                    <div>{{metric.label}}</div>
-                    <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasInstanceProvisioning">
+            <div class="d-flex align-items-center">
+                <span class="mb-0">Instance Provisioning Summary</span>
+                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch provisioning view">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="provisioningView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setProvisioningView('table')" [tooltip]="'Table View'" container="body">
+                        <i class="fas fa-table"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="provisioningView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="setProvisioningView('chart')" [tooltip]="'Chart View'" container="body">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
                 </div>
             </div>
-
-            <div class="table-responsive" *ngIf="hasRecentAlerts">
-                <app-spinner [name]="loaderNames.recentAlerts" [width]="0"></app-spinner>
-                <table class="table table-sm alert-table mb-0" *ngIf="recentAlerts.length">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Device Name</th>
-                            <th>Severity</th>
-                            <th>Description</th>
-                            <th>Source</th>
-                            <th>Acknowledged</th>
-                            <th>Duration</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let alert of recentAlerts; trackBy: trackByIndex">
-                            <td><button type="button" class="btn btn-link p-0 table-link"
-                                    (click)="showAlertDetails(alert)">{{alert.id}}</button></td>
-                            <td>{{alert.deviceName}}</td>
-                            <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td>
-                            <td>{{alert.description}}</td>
-                            <td>{{alert.source}}</td>
-                            <td>{{alert.acknowledged}}</td>
-                            <td>{{alert.duration}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <i class="fas fa-info-circle inventory-info-icon"
+                [tooltip]="'Newly provisioned instances across all cloud providers: provider, region, account, type, environment, status and provisioning recency.'"
+                container="body"></i>
+        </div>
+        <div class="dashboard-card account-metrics-card" *ngIf="hasInstanceProvisioning">
+            <app-spinner [name]="loaderNames.instanceProvisioning" [width]="0"></app-spinner>
+            <ng-container *ngIf="provisioningView === 'table'; else provisioningChartView">
+                <ng-container *ngIf="provisioningRows.length; else provisioningNoData">
+                    <div class="table-responsive">
+                        <table class="table table-sm database-metric-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'instanceName'"
+                                        (click)="sortProvisioning('instanceName')">
+                                        Instance <i [ngClass]="getSortIconClass(provisioningSort, 'instanceName')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'provider'"
+                                        (click)="sortProvisioning('provider')">
+                                        Provider <i [ngClass]="getSortIconClass(provisioningSort, 'provider')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'region'"
+                                        (click)="sortProvisioning('region')">
+                                        Region <i [ngClass]="getSortIconClass(provisioningSort, 'region')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'account'"
+                                        (click)="sortProvisioning('account')">
+                                        Account / Subscription / Project <i [ngClass]="getSortIconClass(provisioningSort, 'account')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'type'"
+                                        (click)="sortProvisioning('type')">
+                                        Type <i [ngClass]="getSortIconClass(provisioningSort, 'type')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'environment'"
+                                        (click)="sortProvisioning('environment')">
+                                        Environment <i [ngClass]="getSortIconClass(provisioningSort, 'environment')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'statusLabel'"
+                                        (click)="sortProvisioning('statusLabel')">
+                                        Status <i class="fas fa-info-circle inventory-info-icon"
+                                            [tooltip]="'Green = Running, Orange = Idle (powered on, low utilization), Red = Stopped.'" container="body"></i>
+                                        <i [ngClass]="getSortIconClass(provisioningSort, 'statusLabel')"></i>
+                                    </th>
+                                    <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'provisionedDate'"
+                                        (click)="sortProvisioning('provisionedDate')">
+                                        Provisioned Date <i [ngClass]="getSortIconClass(provisioningSort, 'provisionedDate')"></i>
+                                    </th>
+                                    <th class="sortable-th text-right" [class.sort-active]="provisioningSort.key === 'daysSinceProvisioned'"
+                                        (click)="sortProvisioning('daysSinceProvisioned')">
+                                        Days Since Provisioned <i [ngClass]="getSortIconClass(provisioningSort, 'daysSinceProvisioned')"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of provisioningRows; trackBy: trackByIndex" truncateText>
+                                    <td class="tdw-14">
+                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.instanceName">{{row.instanceName}}</button>
+                                    </td>
+                                    <td class="tdw-9">
+                                        <span class="account-provider-pill" [ngClass]="'account-provider-' + row.providerKey">{{row.provider}}</span>
+                                    </td>
+                                    <td class="tdw-11" [tooltip]="row.region">{{row.region}}</td>
+                                    <td class="tdw-17" [tooltip]="row.account">{{row.account}}</td>
+                                    <td class="tdw-13" [tooltip]="row.type">{{row.type}}</td>
+                                    <td class="tdw-11">
+                                        <span class="provisioning-env" [ngClass]="row.environmentClass">{{row.environment}}</span>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <span class="capacity-status"><i [ngClass]="row.statusIconClass"></i>{{row.statusLabel}}</span>
+                                    </td>
+                                    <td class="tdw-10">{{row.provisionedDate}}</td>
+                                    <td class="tdw-5 text-right">{{row.daysSinceProvisioned}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #provisioningChartView>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">Reachability
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'Share of provisioned instances that are reachable vs unreachable.'" container="body"></i>
+                            </div>
+                            <div echarts [options]="provisioningReachabilityOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(provisioningReachabilityOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(provisioningReachabilityOptions)">No data available</div>
+                            <div class="capacity-chart-legend">
+                                <span class="inventory-legend-item" *ngFor="let item of provisioningReachabilityLegend; trackBy: trackByIndex">
+                                    <span class="legend-dot" [style.background]="item.color"></span>{{item.label}} {{item.percent}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">Provisioned by Provider
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'Count of provisioned instances per cloud provider.'" container="body"></i>
+                            </div>
+                            <div echarts [options]="provisionedByProviderOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(provisionedByProviderOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(provisionedByProviderOptions)">No data available</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12 mb-3">
+                        <div class="capacity-chart-panel h-100">
+                            <div class="capacity-chart-title">Recently Provisioned (last 10)
+                                <i class="fas fa-info-circle inventory-info-icon"
+                                    [tooltip]="'The 10 most recently provisioned instances, plotted by provision date.'" container="body"></i>
+                            </div>
+                            <div echarts [options]="recentlyProvisionedOptions" class="capacity-chart capacity-chart-tall" *ngIf="hasChartData(recentlyProvisionedOptions)"></div>
+                            <div class="widget-no-data" *ngIf="!hasChartData(recentlyProvisionedOptions)">No data available</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #provisioningNoData>
+                <div class="widget-no-data" *ngIf="!widgetLoading.instanceProvisioning">No data available</div>
+            </ng-template>
+            <div class="provisioning-summary-substrip" *ngIf="hasProvisioningSummary">
+                <div class="summary-metrics provisioning-summary-strip">
+                    <div class="summary-metric" *ngFor="let metric of provisioningSummaryMetrics; trackBy: trackByIndex">
+                        <div class="metric-label">{{metric.label}}</div>
+                        <div class="metric-value" [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</div>
+                    </div>
+                </div>
             </div>
         </div>
 
