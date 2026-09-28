@@ -258,6 +258,8 @@
 }
 
 .dashboard-card {
+  // Reserve height so every widget card keeps a proper size while loading (spinner only) and in the empty state.
+  min-height: 300px;
   position: relative;
   background: #ffffff;
   border: 1px solid #cbd3da;
@@ -289,6 +291,18 @@
 // single overlay looks like a full widget instead of a thin strip.
 .inventory-card.inventory-loading {
   min-height: 380px;
+}
+
+// Public Cloud Database shows only KPIs + monitored cards. Keep it compact and drop the trailing
+// divider/spacing under the last (monitored) row so there is no dangling line + empty space.
+.database-summary-card {
+  min-height: 250px;
+}
+
+.database-summary-card .monitored-row {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .summary-metrics {
@@ -758,6 +772,11 @@
   height: 300px;
 }
 
+// Empty state fills the panel so the message centers within the chart area (panel is a flex column).
+.capacity-chart-panel .widget-no-data {
+  flex: 1 1 auto;
+}
+
 .capacity-chart-legend {
   display: flex;
   align-items: center;
@@ -1206,8 +1225,16 @@ button.legend-link {
 }
 
 .account-metrics-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
   padding: 14px 14px 0;
   overflow: hidden;
+}
+
+// In the empty state the message is the card's only content; let it fill so it centers in the card.
+.account-metrics-card > .widget-no-data {
+  flex: 1 1 auto;
 }
 
 .account-metrics-search {
@@ -1494,6 +1521,11 @@ button.legend-link {
 .account-metrics-chart {
   width: 100%;
   height: 300px;
+}
+
+// Empty state fills the same height as the chart so the message centers within the chart area.
+.account-metrics-chart-panel .widget-no-data {
+  min-height: 300px;
 }
 
 .orphaned-widgets-grid {
@@ -2203,8 +2235,15 @@ button.legend-link {
 }
 
 .auto-remediation-card {
+  display: flex;
+  flex-direction: column;
   padding: 18px 20px 20px;
   overflow: hidden;
+}
+
+// In the empty state the message is the card's only content; let it fill so it centers in the card.
+.auto-remediation-card > .widget-no-data {
+  flex: 1 1 auto;
 }
 
 .auto-remediation-main {

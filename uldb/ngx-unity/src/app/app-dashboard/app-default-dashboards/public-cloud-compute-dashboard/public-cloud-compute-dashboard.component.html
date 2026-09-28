@@ -350,7 +350,7 @@
         <div class="dashboard-card account-metrics-card" *ngIf="hasAccountSubscriptionProjectMetrics">
             <app-spinner [name]="loaderNames.accountSubscriptionProjectMetrics" [width]="0"></app-spinner>
             <ng-container *ngIf="accountSubscriptionProjectMetricsView === 'table'; else accountMetricsChartView">
-                <div class="account-metrics-search">
+                <div class="account-metrics-search" *ngIf="accountSubscriptionProjectMetricRows.length || accountSubscriptionProjectMetricsSearch">
                     <i class="fas fa-search"></i>
                     <input type="text" class="form-control" [value]="accountSubscriptionProjectMetricsSearch"
                         placeholder="Search Account or Provider..."
@@ -404,18 +404,22 @@
             <ng-template #accountMetricsChartView>
                 <div class="account-metrics-chart-grid">
                     <div class="account-metrics-chart-panel">
+                        <div class="capacity-chart-title">Compute Instance by Account</div>
                         <div echarts [options]="accountSubscriptionProjectInstanceOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectInstanceOptions)"></div>
                         <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectInstanceOptions)">No data available</div>
                     </div>
                     <div class="account-metrics-chart-panel">
+                        <div class="capacity-chart-title">Est. Monthly Cost by Account</div>
                         <div echarts [options]="accountSubscriptionProjectCostOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectCostOptions)"></div>
                         <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectCostOptions)">No data available</div>
                     </div>
                     <div class="account-metrics-chart-panel">
+                        <div class="capacity-chart-title">vCPU Utilization by Account</div>
                         <div echarts [options]="accountSubscriptionProjectVcpuOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectVcpuOptions)"></div>
                         <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectVcpuOptions)">No data available</div>
                     </div>
                     <div class="account-metrics-chart-panel">
+                        <div class="capacity-chart-title">Cost Efficiency ($/Compute Instance) by Account</div>
                         <div echarts [options]="accountSubscriptionProjectEfficiencyOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectEfficiencyOptions)"></div>
                         <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectEfficiencyOptions)">No data available</div>
                     </div>
@@ -449,7 +453,7 @@
         <div class="dashboard-card account-metrics-card" *ngIf="hasCapacityPerformance">
             <app-spinner [name]="loaderNames.capacityPerformance" [width]="0"></app-spinner>
             <ng-container *ngIf="capacityPerformanceView === 'table'; else capacityChartView">
-                <div class="account-metrics-search">
+                <div class="account-metrics-search" *ngIf="capacityPerformanceRows.length || capacityPerformanceSearch">
                     <i class="fas fa-search"></i>
                     <input type="text" class="form-control" [value]="capacityPerformanceSearch"
                         placeholder="Search instance name..."
@@ -629,7 +633,7 @@
         <div class="dashboard-card account-metrics-card" *ngIf="hasStorageVolumesDisks">
             <app-spinner [name]="loaderNames.storageVolumesDisks" [width]="0"></app-spinner>
             <ng-container *ngIf="storageVolumesView === 'table'; else storageChartView">
-                <div class="account-metrics-search">
+                <div class="account-metrics-search" *ngIf="storageVolumesRows.length || storageVolumesSearch">
                     <i class="fas fa-search"></i>
                     <input type="text" class="form-control" [value]="storageVolumesSearch"
                         placeholder="Search volume or instance..."
@@ -727,7 +731,7 @@
                 [tooltip]="'Executive KPIs & performance across relational, NoSQL and managed database services'"
                 container="body"></i>
         </div>
-        <div class="dashboard-card inventory-card" *ngIf="hasPublicCloudDatabase">
+        <div class="dashboard-card inventory-card database-summary-card" *ngIf="hasPublicCloudDatabase">
             <app-spinner [name]="loaderNames.publicCloudDatabase" [width]="0"></app-spinner>
             <div class="summary-metrics" *ngIf="hasDatabaseSummary">
                 <div class="summary-metric" *ngFor="let metric of databaseSummaryMetrics; trackBy: trackByIndex">
@@ -785,7 +789,7 @@
         <div class="dashboard-card account-metrics-card" *ngIf="hasDatabasePerformance">
             <app-spinner [name]="loaderNames.databasePerformance" [width]="0"></app-spinner>
             <ng-container *ngIf="databasePerformanceView === 'table'; else databasePerformanceChartView">
-                <div class="account-metrics-search">
+                <div class="account-metrics-search" *ngIf="databasePerformanceRows.length || databasePerformanceSearch">
                     <i class="fas fa-search"></i>
                     <input type="text" class="form-control" [value]="databasePerformanceSearch"
                         placeholder="Search database..."
@@ -937,7 +941,7 @@
         <div class="dashboard-card account-metrics-card" *ngIf="hasCostOptimization">
             <app-spinner [name]="loaderNames.costOptimization" [width]="0"></app-spinner>
             <ng-container *ngIf="costOptimizationView === 'table'; else costOptimizationChartView">
-                <div class="account-metrics-search">
+                <div class="account-metrics-search" *ngIf="costOptimizationRows.length || costOptimizationSearch">
                     <i class="fas fa-search"></i>
                     <input type="text" class="form-control" [value]="costOptimizationSearch"
                         placeholder="Search instance..."
@@ -1161,6 +1165,10 @@
         <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasRecentAlerts">
             <div class="d-flex align-items-center">
                 <span class="mb-0">Recent Alerts &ndash; Critical / Warning / Info</span>
+                <button type="button" class="header-link-icon ml-2" (click)="openRecentAlerts()"
+                    [tooltip]="'Open linked page'" container="body">
+                    <i class="fas fa-link"></i>
+                </button>
                 <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch alerts view">
                     <button type="button" class="btn btn-sm"
                         [ngClass]="recentAlertsView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
@@ -1181,7 +1189,7 @@
         <div class="dashboard-card account-metrics-card" *ngIf="hasRecentAlerts">
             <app-spinner [name]="loaderNames.recentAlerts" [width]="0"></app-spinner>
             <ng-container *ngIf="recentAlertsView === 'table'; else recentAlertsChartView">
-                <div class="account-metrics-search">
+                <div class="account-metrics-search" *ngIf="recentAlerts.length || recentAlertsSearch">
                     <i class="fas fa-search"></i>
                     <input type="text" class="form-control" [value]="recentAlertsSearch"
                         placeholder="Search instance or alert..."

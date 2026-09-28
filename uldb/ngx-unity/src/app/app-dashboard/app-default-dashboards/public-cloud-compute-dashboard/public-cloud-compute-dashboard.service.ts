@@ -8,17 +8,11 @@ import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { UnityChartConfigService } from 'src/app/shared/unity-chart-config.service';
 import {
-  PUBLIC_CLOUD_ACTIVE_DATABASE_WORKLOAD_ENDPOINT,
   PUBLIC_CLOUD_ACCOUNT_SUBSCRIPTION_PROJECT_METRICS_ENDPOINT,
-  PUBLIC_CLOUD_ACCOUNT_SUBSCRIPTION_PROJECT_METRICS_RESPONSE,
   PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_ACCOUNT_ENDPOINT,
-  PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_ACCOUNT_RESPONSE,
   PUBLIC_CLOUD_ESTIMATED_MONTHLY_COST_BY_ACCOUNT_ENDPOINT,
-  PUBLIC_CLOUD_ESTIMATED_MONTHLY_COST_BY_ACCOUNT_RESPONSE,
   PUBLIC_CLOUD_VCPU_UTILIZATION_BY_ACCOUNT_ENDPOINT,
-  PUBLIC_CLOUD_VCPU_UTILIZATION_BY_ACCOUNT_RESPONSE,
   PUBLIC_CLOUD_COST_EFFICIENCY_BY_ACCOUNT_ENDPOINT,
-  PUBLIC_CLOUD_COST_EFFICIENCY_BY_ACCOUNT_RESPONSE,
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
   PUBLIC_CLOUD_COVERAGE_GROUP_LABELS,
   PUBLIC_CLOUD_COVERAGE_GROUP_ORDER,
@@ -26,11 +20,6 @@ import {
   PUBLIC_CLOUD_COVERAGE_PROVIDER_LOGOS,
   PUBLIC_CLOUD_COVERAGE_PROVIDER_ORDER,
   PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT,
-  PUBLIC_CLOUD_DATABASE_HEALTH_METRIC_COLORS,
-  PUBLIC_CLOUD_DATABASE_HEALTH_SCORE_ENDPOINT,
-  PUBLIC_CLOUD_DATABASE_LATENCY_COLORS,
-  PUBLIC_CLOUD_DATABASE_LATENCY_OVERVIEW_ENDPOINT,
-  PUBLIC_CLOUD_DATABASE_WIDGET_COLORS,
   PUBLIC_CLOUD_FILTERS_ENDPOINT,
   PUBLIC_CLOUD_GEO_ALERT_SEVERITY_COLORS,
   PUBLIC_CLOUD_GEO_DISTRIBUTION_COLORS,
@@ -50,10 +39,6 @@ import {
   PUBLIC_CLOUD_ALERT_SEVERITY_ORDER,
   PUBLIC_CLOUD_ALERT_AGE_COLORS,
   PUBLIC_CLOUD_ALERT_AGE_ORDER,
-  PUBLIC_CLOUD_RECENT_ALERTS_RESPONSE,
-  PUBLIC_CLOUD_ALERTS_BY_SEVERITY_RESPONSE,
-  PUBLIC_CLOUD_ALERTS_BY_PROVIDER_RESPONSE,
-  PUBLIC_CLOUD_ALERTS_BY_AGE_RESPONSE,
   PUBLIC_CLOUD_COST_OPTIMIZATION_ENDPOINT,
   PUBLIC_CLOUD_SPEND_VS_SAVINGS_ENDPOINT,
   PUBLIC_CLOUD_RECOMMENDED_ACTIONS_ENDPOINT,
@@ -61,12 +46,7 @@ import {
   PUBLIC_CLOUD_COST_ACTION_COLORS,
   PUBLIC_CLOUD_COST_SPEND_COLOR,
   PUBLIC_CLOUD_COST_SAVINGS_COLOR,
-  PUBLIC_CLOUD_COST_OPTIMIZATION_RESPONSE,
-  PUBLIC_CLOUD_SPEND_VS_SAVINGS_RESPONSE,
-  PUBLIC_CLOUD_RECOMMENDED_ACTIONS_RESPONSE,
-  PUBLIC_CLOUD_POTENTIAL_SAVINGS_BY_PROVIDER_RESPONSE,
   PUBLIC_CLOUD_AUTO_REMEDIATION_SUMMARY_ENDPOINT,
-  PUBLIC_CLOUD_AUTO_REMEDIATION_SUMMARY_RESPONSE,
   PUBLIC_CLOUD_AUTO_REMEDIATION_ACTION_COLORS,
   PUBLIC_CLOUD_AUTO_REMEDIATION_OUTCOME_COLORS,
   PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG,
@@ -81,26 +61,14 @@ import {
   PUBLIC_CLOUD_UTILIZATION_SERIES_CONFIG,
   PUBLIC_CLOUD_OS_TYPE_CONFIG,
   PUBLIC_CLOUD_ALERTS_SEVERITY_CONFIG,
-  PUBLIC_CLOUD_INVENTORY_SUMMARY_RESPONSE,
-  PUBLIC_CLOUD_COMPUTE_MONITORED_RESPONSE,
-  PUBLIC_CLOUD_CLOUD_PROVIDER_DISTRIBUTION_RESPONSE,
-  PUBLIC_CLOUD_UTILIZATION_BY_PROVIDER_RESPONSE,
-  PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_OS_TYPE_RESPONSE,
-  PUBLIC_CLOUD_ALERTS_SEVERITY_RESPONSE,
   PUBLIC_CLOUD_CAPACITY_PERFORMANCE_TABLE_ENDPOINT,
   PUBLIC_CLOUD_CAPACITY_PERFORMANCE_CHARTS_ENDPOINT,
   PUBLIC_CLOUD_CAPACITY_STATUS_COLORS,
-  PUBLIC_CLOUD_CAPACITY_PERFORMANCE_TABLE_RESPONSE,
-  PUBLIC_CLOUD_CAPACITY_PERFORMANCE_CHARTS_RESPONSE,
   PUBLIC_CLOUD_STORAGE_VOLUMES_DISKS_ENDPOINT,
   PUBLIC_CLOUD_STORAGE_PROVISIONED_BY_PROVIDER_ENDPOINT,
   PUBLIC_CLOUD_STORAGE_TOP_VOLUMES_IOPS_ENDPOINT,
   PUBLIC_CLOUD_STORAGE_IOPS_TIER_DISTRIBUTION_ENDPOINT,
   PUBLIC_CLOUD_STORAGE_IOPS_TIER_COLORS,
-  PUBLIC_CLOUD_STORAGE_VOLUMES_DISKS_RESPONSE,
-  PUBLIC_CLOUD_STORAGE_PROVISIONED_BY_PROVIDER_RESPONSE,
-  PUBLIC_CLOUD_STORAGE_TOP_VOLUMES_IOPS_RESPONSE,
-  PUBLIC_CLOUD_STORAGE_IOPS_TIER_DISTRIBUTION_RESPONSE,
   PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_ENDPOINT,
   PUBLIC_CLOUD_PROVISIONING_REACHABILITY_ENDPOINT,
   PUBLIC_CLOUD_PROVISIONED_BY_PROVIDER_ENDPOINT,
@@ -108,22 +76,11 @@ import {
   PUBLIC_CLOUD_PROVISIONING_SUMMARY_METRICS_ENDPOINT,
   PUBLIC_CLOUD_PROVISIONING_ENVIRONMENT_CLASS,
   PUBLIC_CLOUD_PROVISIONING_SUMMARY_KPI_CONFIG,
-  PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_RESPONSE,
-  PUBLIC_CLOUD_PROVISIONING_REACHABILITY_RESPONSE,
-  PUBLIC_CLOUD_PROVISIONED_BY_PROVIDER_RESPONSE,
-  PUBLIC_CLOUD_RECENTLY_PROVISIONED_RESPONSE,
-  PUBLIC_CLOUD_PROVISIONING_SUMMARY_METRICS_RESPONSE,
   PUBLIC_CLOUD_DATABASE_INVENTORY_ENDPOINT,
   PUBLIC_CLOUD_DATABASE_SUMMARY_KPI_CONFIG,
-  PUBLIC_CLOUD_DATABASE_INVENTORY_RESPONSE,
   PUBLIC_CLOUD_DB_WORKLOAD_ENDPOINT,
   PUBLIC_CLOUD_DB_QUERY_PERFORMANCE_ENDPOINT,
   PUBLIC_CLOUD_DB_STATUS_COLORS,
-  PUBLIC_CLOUD_DB_WORKLOAD_RESPONSE,
-  PUBLIC_CLOUD_DB_QUERY_PERFORMANCE_RESPONSE,
-  PUBLIC_CLOUD_TOP_LOCK_CONTENTION_ENDPOINT,
-  PUBLIC_CLOUD_TOP_MEMORY_CONSUMERS_ENDPOINT,
-  PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT,
   PUBLIC_CLOUD_TIME_RANGE_PARAM_MAP
 } from './public-cloud-compute-dashboard.const';
 import {
@@ -133,16 +90,6 @@ import {
   PublicCloudAccountSubscriptionMetricResponseItem,
   PublicCloudAccountSubscriptionMetricRow,
   PublicCloudAccountSubscriptionMetricsApiResponse,
-  PublicCloudAccountSubscriptionMetricsResponse,
-  PublicCloudActiveDatabaseWorkloadViewData,
-  PublicCloudDatabaseBarItem,
-  PublicCloudDatabaseBarResponseItem,
-  PublicCloudDatabaseConsumerRow,
-  PublicCloudDatabaseHealthMetric,
-  PublicCloudDatabaseHealthScoreResponse,
-  PublicCloudDatabaseHealthScoreViewData,
-  PublicCloudDatabaseMetricItem,
-  PublicCloudDatabaseWidgetResponse,
   PublicCloudCoverageCard,
   PublicCloudCoverageGroup,
   PublicCloudCoverageRow,
@@ -154,9 +101,6 @@ import {
   PublicCloudGeoCell,
   PublicCloudGeoDistributionSummary,
   PublicCloudGeoDistributionLegendItem,
-  PublicCloudLockContentionResponse,
-  PublicCloudLockContentionResponseItem,
-  PublicCloudLockContentionRow,
   PublicCloudInventorySummaryResponse,
   PublicCloudComputeMonitoredResponse,
   PublicCloudComputeMonitoredCard,
@@ -410,30 +354,6 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  getInventorySummaryStaticResponse(): PublicCloudInventorySummaryResponse {
-    return PUBLIC_CLOUD_INVENTORY_SUMMARY_RESPONSE;
-  }
-
-  getComputeMonitoredStaticResponse(): PublicCloudComputeMonitoredResponse {
-    return PUBLIC_CLOUD_COMPUTE_MONITORED_RESPONSE;
-  }
-
-  getCloudProviderDistributionStaticResponse(): PublicCloudProviderDistributionResponse {
-    return PUBLIC_CLOUD_CLOUD_PROVIDER_DISTRIBUTION_RESPONSE;
-  }
-
-  getUtilizationByProviderStaticResponse(): PublicCloudUtilizationByProviderResponse {
-    return PUBLIC_CLOUD_UTILIZATION_BY_PROVIDER_RESPONSE;
-  }
-
-  getComputeInstanceByOsTypeStaticResponse(): PublicCloudOsTypeResponse {
-    return PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_OS_TYPE_RESPONSE;
-  }
-
-  getAlertsSeverityStaticResponse(): PublicCloudAlertsSeverityResponse {
-    return PUBLIC_CLOUD_ALERTS_SEVERITY_RESPONSE;
-  }
-
   convertToSummaryMetricsViewData(data: PublicCloudInventorySummaryResponse): PublicCloudSummaryMetric[] {
     const summary = (data || {}) as Record<string, number>;
     return PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG.map(item => ({
@@ -468,7 +388,10 @@ export class PublicCloudComputeDashboardService {
         stoppedPercent: toPercent(stopped),
         unknownPercent: toPercent(unknown)
       };
-    }).sort((first, second) => this.getProviderOrderIndex(first.key) - this.getProviderOrderIndex(second.key));
+    })
+      // Drop providers with no compute data so an all-zero provider cannot keep the widget visible.
+      .filter(card => card.totalCompute > 0 || card.monitored > 0 || card.running > 0 || card.stopped > 0 || card.unknown > 0)
+      .sort((first, second) => this.getProviderOrderIndex(first.key) - this.getProviderOrderIndex(second.key));
   }
 
   convertToProviderDistributionViewData(data: PublicCloudProviderDistributionResponse): PublicCloudProviderDistributionItem[] {
@@ -1360,20 +1283,6 @@ export class PublicCloudComputeDashboardService {
     return this.http.get<PublicCloudAccountSubscriptionMetricsApiResponse>(PUBLIC_CLOUD_ACCOUNT_SUBSCRIPTION_PROJECT_METRICS_ENDPOINT, { params });
   }
 
-  getAccountSubscriptionProjectMetricsStaticResponse(search = '', page = 1, pageSize = 10): PublicCloudAccountSubscriptionMetricsResponse {
-    const rows = PUBLIC_CLOUD_ACCOUNT_SUBSCRIPTION_PROJECT_METRICS_RESPONSE || [];
-    const normalizedSearch = String(search || '').toLowerCase().trim();
-    const filteredRows = normalizedSearch
-      ? rows.filter(row => [row.provider, row.accountName, row.account_name, row.account, row.subscription, row.project, row.compartment, row.region]
-        .some(value => String(value || '').toLowerCase().indexOf(normalizedSearch) > -1))
-      : rows;
-    const startIndex = (page - 1) * pageSize;
-    return {
-      count: filteredRows.length,
-      results: filteredRows.slice(startIndex, startIndex + pageSize)
-    };
-  }
-
   getComputeInstanceByAccount(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAccountMetricChartResponse> {
     return this.http.get<PublicCloudAccountMetricChartResponse>(PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_ACCOUNT_ENDPOINT, {
       params: this.convertFiltersToApiParams(criteria)
@@ -1396,22 +1305,6 @@ export class PublicCloudComputeDashboardService {
     return this.http.get<PublicCloudAccountMetricChartResponse>(PUBLIC_CLOUD_COST_EFFICIENCY_BY_ACCOUNT_ENDPOINT, {
       params: this.convertFiltersToApiParams(criteria)
     });
-  }
-
-  getComputeInstanceByAccountStaticResponse(): PublicCloudAccountMetricChartResponse {
-    return PUBLIC_CLOUD_COMPUTE_INSTANCE_BY_ACCOUNT_RESPONSE;
-  }
-
-  getEstimatedMonthlyCostByAccountStaticResponse(): PublicCloudAccountMetricChartResponse {
-    return PUBLIC_CLOUD_ESTIMATED_MONTHLY_COST_BY_ACCOUNT_RESPONSE;
-  }
-
-  getVcpuUtilizationByAccountStaticResponse(): PublicCloudAccountMetricChartResponse {
-    return PUBLIC_CLOUD_VCPU_UTILIZATION_BY_ACCOUNT_RESPONSE;
-  }
-
-  getCostEfficiencyByAccountStaticResponse(): PublicCloudAccountMetricChartResponse {
-    return PUBLIC_CLOUD_COST_EFFICIENCY_BY_ACCOUNT_RESPONSE;
   }
 
   convertToAccountSubscriptionMetricRows(data: PublicCloudAccountSubscriptionMetricsApiResponse): PublicCloudAccountSubscriptionMetricRow[] {
@@ -1467,23 +1360,15 @@ export class PublicCloudComputeDashboardService {
   }
 
   private getAccountMetricChartOptions(rows: PublicCloudAccountMetricChartResponse, title: string, valueGetter: (row: PublicCloudAccountMetricChartResponseItem) => number, legendName = ''): EChartsOption {
-    if (!(rows || []).length) {
+    const chartRows = (rows || []).slice(0, 12);
+    // No rows, or every account value is zero, means there is nothing to plot -> empty state.
+    if (!chartRows.length || !chartRows.some(row => valueGetter(row) > 0)) {
       return {};
     }
-    const chartRows = (rows || []).slice(0, 12);
     const labels = chartRows.map(row => row.account);
     return {
       color: chartRows.map(row => this.getAccountSubscriptionProviderColor(row.provider)),
-      title: {
-        text: title,
-        left: 'center',
-        top: 8,
-        textStyle: {
-          color: '#2e4055',
-          fontSize: 13,
-          fontWeight: 600
-        }
-      },
+      // Title is rendered as an HTML header above the chart (see template) so it stays visible in the no-data state.
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' }
@@ -1500,7 +1385,7 @@ export class PublicCloudComputeDashboardService {
       grid: {
         left: 8,
         right: 20,
-        top: 46,
+        top: 16,
         bottom: legendName ? 30 : 8,
         containLabel: true
       },
@@ -1579,24 +1464,6 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  getCapacityPerformanceTableStaticResponse(search = '', page = 1, pageSize = 10): PublicCloudCapacityPerformanceTableResponse {
-    const rows = PUBLIC_CLOUD_CAPACITY_PERFORMANCE_TABLE_RESPONSE || [];
-    const normalizedSearch = String(search || '').toLowerCase().trim();
-    const filteredRows = normalizedSearch
-      ? rows.filter(row => [row.name, row.provider, row.region, row.account, row.type, row.os]
-        .some(value => String(value || '').toLowerCase().indexOf(normalizedSearch) > -1))
-      : rows;
-    const startIndex = (page - 1) * pageSize;
-    return {
-      count: filteredRows.length,
-      results: filteredRows.slice(startIndex, startIndex + pageSize)
-    };
-  }
-
-  getCapacityPerformanceChartsStaticResponse(): PublicCloudCapacityPerformanceChartsResponse {
-    return PUBLIC_CLOUD_CAPACITY_PERFORMANCE_CHARTS_RESPONSE;
-  }
-
   convertToCapacityPerformanceRows(data: PublicCloudCapacityPerformanceTableResponse): PublicCloudCapacityPerformanceRow[] {
     return this.getCapacityPerformanceResults(data).map(row => {
       const cpuPct = this.getNumberValue(row?.cpuPct);
@@ -1640,7 +1507,8 @@ export class PublicCloudComputeDashboardService {
   }
 
   convertToCapacityFleetStatusOptions(data: PublicCloudCapacityFleetStatus): EChartsOption {
-    if (!(data?.labels || []).length || !(data?.series || []).length) {
+    if (!(data?.labels || []).length || !(data?.series || []).length ||
+      !(data?.series || []).some(item => (item.data || []).some(value => this.getNumberValue(value) > 0))) {
       return {};
     }
     const series: any[] = (data?.series || []).map(item => ({
@@ -1670,6 +1538,10 @@ export class PublicCloudComputeDashboardService {
       value: this.getNumberValue(band.count),
       itemStyle: { color: this.getCapacityStatusColor(band.status), borderRadius: [3, 3, 0, 0] }
     }));
+    // No bands, or every band count is zero, means there is nothing to plot -> empty state.
+    if (!points.length || !points.some(point => point.value > 0)) {
+      return {};
+    }
     return {
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       grid: { left: 34, right: 12, top: 16, bottom: 24 },
@@ -1682,6 +1554,10 @@ export class PublicCloudComputeDashboardService {
   convertToCapacityTopOptions(data: PublicCloudCapacityTopItem[], valueSuffix = ''): EChartsOption {
     // Data is highest-first; ECharts category axis renders bottom-up, so reverse for top-down display.
     const items = (data || []).slice().reverse();
+    // No items, or every value is zero, means there is nothing to plot -> empty state.
+    if (!items.length || !items.some(item => this.getNumberValue(item.value) > 0)) {
+      return {};
+    }
     return {
       tooltip: {
         trigger: 'axis',
@@ -1706,6 +1582,12 @@ export class PublicCloudComputeDashboardService {
   convertToCapacityGrowthOptions(data: PublicCloudCapacityGrowthInsights): EChartsOption {
     const months = data?.months || [];
     const forecastMonths = data?.forecastMonths || [];
+    // Nothing to plot when every history/forecast point is missing (null) -> empty state.
+    const hasSeriesValues = [...(data?.cpuHistory || []), ...(data?.cpuForecast || [])]
+      .some(value => value !== null && value !== undefined && !isNaN(Number(value)));
+    if (!hasSeriesValues) {
+      return {};
+    }
     const history = (data?.cpuHistory || []).map(value => this.getNumberValue(value));
     const forecast = (data?.cpuForecast || []).map(value => this.getNumberValue(value));
     const labels = [...months, ...forecastMonths];
@@ -1846,32 +1728,6 @@ export class PublicCloudComputeDashboardService {
     return this.http.get<PublicCloudStorageIopsTier[]>(PUBLIC_CLOUD_STORAGE_IOPS_TIER_DISTRIBUTION_ENDPOINT, {
       params: this.convertFiltersToApiParams(criteria)
     });
-  }
-
-  getStorageVolumesTableStaticResponse(search = '', page = 1, pageSize = 10): PublicCloudStorageVolumesTableResponse {
-    const rows = PUBLIC_CLOUD_STORAGE_VOLUMES_DISKS_RESPONSE || [];
-    const normalizedSearch = String(search || '').toLowerCase().trim();
-    const filteredRows = normalizedSearch
-      ? rows.filter(row => [row.volume_name, row.attached_instance, row.provider, row.volume_type, row.iops_tier]
-        .some(value => String(value || '').toLowerCase().indexOf(normalizedSearch) > -1))
-      : rows;
-    const startIndex = (page - 1) * pageSize;
-    return {
-      count: filteredRows.length,
-      results: filteredRows.slice(startIndex, startIndex + pageSize)
-    };
-  }
-
-  getStorageProvisionedByProviderStaticResponse(): PublicCloudStorageProvisionedByProvider[] {
-    return PUBLIC_CLOUD_STORAGE_PROVISIONED_BY_PROVIDER_RESPONSE;
-  }
-
-  getStorageTopVolumesStaticResponse(): PublicCloudStorageTopVolumeResponse[] {
-    return PUBLIC_CLOUD_STORAGE_TOP_VOLUMES_IOPS_RESPONSE;
-  }
-
-  getStorageIopsTierDistributionStaticResponse(): PublicCloudStorageIopsTier[] {
-    return PUBLIC_CLOUD_STORAGE_IOPS_TIER_DISTRIBUTION_RESPONSE;
   }
 
   convertToStorageVolumeRows(data: PublicCloudStorageVolumesTableResponse): PublicCloudStorageVolumeRow[] {
@@ -2061,26 +1917,6 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  getInstanceProvisioningTableStaticResponse(): PublicCloudProvisioningRowResponse[] {
-    return PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_RESPONSE;
-  }
-
-  getProvisioningReachabilityStaticResponse(): PublicCloudProvisioningReachability {
-    return PUBLIC_CLOUD_PROVISIONING_REACHABILITY_RESPONSE;
-  }
-
-  getProvisionedByProviderStaticResponse(): PublicCloudProvisionedByProvider[] {
-    return PUBLIC_CLOUD_PROVISIONED_BY_PROVIDER_RESPONSE;
-  }
-
-  getRecentlyProvisionedStaticResponse(): PublicCloudRecentlyProvisioned[] {
-    return PUBLIC_CLOUD_RECENTLY_PROVISIONED_RESPONSE;
-  }
-
-  getProvisioningSummaryMetricsStaticResponse(): PublicCloudProvisioningSummaryMetricsResponse {
-    return PUBLIC_CLOUD_PROVISIONING_SUMMARY_METRICS_RESPONSE;
-  }
-
   convertToProvisioningRows(data: PublicCloudProvisioningTableResponse | PublicCloudProvisioningRowResponse[]): PublicCloudProvisioningRow[] {
     return this.getProvisioningResults(data).map(row => {
       const environment = this.getFirstValue(row?.environment);
@@ -2265,10 +2101,6 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  getPublicCloudDatabaseStaticResponse(): PublicCloudDatabaseInventoryResponse {
-    return PUBLIC_CLOUD_DATABASE_INVENTORY_RESPONSE;
-  }
-
   convertToDatabaseSummaryMetrics(data: PublicCloudDatabaseInventoryResponse): PublicCloudDatabaseSummaryMetric[] {
     const summary = (data?.summary || {}) as Record<string, number>;
     return PUBLIC_CLOUD_DATABASE_SUMMARY_KPI_CONFIG.map(config => ({
@@ -2304,7 +2136,10 @@ export class PublicCloudComputeDashboardService {
         degradedPercent: toPercent(degraded),
         unknownPercent: toPercent(unknown)
       };
-    }).sort((first, second) => this.getProviderOrderIndex(first.key) - this.getProviderOrderIndex(second.key));
+    })
+      // Drop providers with no discovered/monitored databases so all-zero cards are not rendered.
+      .filter(card => card.discovered > 0 || card.monitored > 0 || card.healthy > 0 || card.degraded > 0 || card.unknown > 0)
+      .sort((first, second) => this.getProviderOrderIndex(first.key) - this.getProviderOrderIndex(second.key));
   }
 
   private formatDatabaseKpiValue(value: number, format: 'int' | 'pct' | 'ms'): string {
@@ -2334,23 +2169,6 @@ export class PublicCloudComputeDashboardService {
     return this.http.get<PublicCloudDbQueryPerformanceResponse>(PUBLIC_CLOUD_DB_QUERY_PERFORMANCE_ENDPOINT, {
       params: this.convertFiltersToApiParams(criteria)
     });
-  }
-
-  getDbWorkloadStaticPage(search = '', page = 1, pageSize = 10): { count: number; results: PublicCloudDbWorkloadRowResponse[] } {
-    const rows = PUBLIC_CLOUD_DB_WORKLOAD_RESPONSE || [];
-    const normalizedSearch = String(search || '').toLowerCase().trim();
-    const filteredRows = normalizedSearch
-      ? rows.filter(row => String(row?.name || '').toLowerCase().indexOf(normalizedSearch) > -1)
-      : rows;
-    const startIndex = (page - 1) * pageSize;
-    return {
-      count: filteredRows.length,
-      results: filteredRows.slice(startIndex, startIndex + pageSize)
-    };
-  }
-
-  getDbQueryPerformanceStaticResponse(): PublicCloudDbQueryPerformanceResponse {
-    return PUBLIC_CLOUD_DB_QUERY_PERFORMANCE_RESPONSE;
   }
 
   convertToDbWorkloadRows(rows: PublicCloudDbWorkloadRowResponse[], queryPerf: PublicCloudDbQueryPerformanceResponse): PublicCloudDbWorkloadRow[] {
@@ -2431,6 +2249,10 @@ export class PublicCloudComputeDashboardService {
     const dates = (withTrend?.trend || []).map(point => point?.date);
     const totals = dates.map((_, index) =>
       series.reduce((sum, item) => sum + this.getNumberValue((item?.trend || [])[index]?.transactions_per_sec), 0));
+    // No trend dates, or every day total is zero, means there is nothing to plot -> empty state.
+    if (!dates.length || !totals.some(total => total > 0)) {
+      return {};
+    }
     return {
       color: ['#2f6fed'],
       tooltip: { trigger: 'axis' },
@@ -2478,7 +2300,8 @@ export class PublicCloudComputeDashboardService {
   }
 
   private getDbTopBarOptions(points: Array<{ name: string; value: number; status?: string }>, suffix: string): EChartsOption {
-    if (!(points || []).length) {
+    // No points, or every value is zero, means there is nothing to plot -> empty state.
+    if (!(points || []).length || !points.some(point => point.value > 0)) {
       return {};
     }
     // Data is highest-first; ECharts category axis renders bottom-up, so reverse for top-down display.
@@ -2532,361 +2355,11 @@ export class PublicCloudComputeDashboardService {
    * ******End ****** Database - Performance and Utilization Widget Related ********************
    */
 
-  /*
-   * -----Start----- Cloud Database Performance Widget Related -------------------
-   */
-  getDatabaseHealthScore(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseHealthScoreResponse> {
-    return this.http.get<PublicCloudDatabaseHealthScoreResponse>(PUBLIC_CLOUD_DATABASE_HEALTH_SCORE_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getActiveDatabaseWorkload(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
-    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_ACTIVE_DATABASE_WORKLOAD_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getDatabaseLatencyOverview(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
-    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_DATABASE_LATENCY_OVERVIEW_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getTopLockContention(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudLockContentionResponse> {
-    return this.http.get<PublicCloudLockContentionResponse>(PUBLIC_CLOUD_TOP_LOCK_CONTENTION_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getTopMemoryConsumers(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
-    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_TOP_MEMORY_CONSUMERS_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  getTopStorageConsumers(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseWidgetResponse> {
-    return this.http.get<PublicCloudDatabaseWidgetResponse>(PUBLIC_CLOUD_TOP_STORAGE_CONSUMERS_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToDatabaseHealthScoreViewData(data: PublicCloudDatabaseHealthScoreResponse): PublicCloudDatabaseHealthScoreViewData {
-    const source = this.getObjectResponseData(data) as PublicCloudDatabaseHealthScoreResponse;
-    const healthPie = source?.health_pie || source?.healthPie;
-    const scoreValue = this.getFirstNumericValue(healthPie?.health_score, healthPie?.healthScore, healthPie?.score,
-      source?.score, source?.health_score, source?.healthScore, source?.value);
-    const maxValue = this.getFirstNumericValue(healthPie?.max, healthPie?.total, source?.max, source?.total) || 100;
-    const metrics = this.getDatabaseHealthMetricRows(data).map(item => this.convertToDatabaseHealthMetric(item));
-    const hasScore = scoreValue !== null;
-    const score = hasScore ? Math.max(Math.min(scoreValue, maxValue), 0) : 0;
-    const scorePercent = maxValue ? Math.max(Math.min((score / maxValue) * 100, 100), 0) : 0;
-    return {
-      score,
-      scoreLabel: hasScore ? `${this.formatNumber(score)}/${this.formatNumber(maxValue)}` : '',
-      scoreGradient: `conic-gradient(#14bd75 0 ${scorePercent}%, #cfeedd ${scorePercent}% 100%)`,
-      metrics,
-      hasData: hasScore || !!metrics.length
-    };
-  }
-
-  convertToActiveDatabaseWorkloadViewData(data: PublicCloudDatabaseWidgetResponse): PublicCloudActiveDatabaseWorkloadViewData {
-    const source = this.getObjectResponseData(data) as PublicCloudDatabaseWidgetResponse;
-    const rows = this.getDatabaseBarRows(data, ['workloads', 'databases', 'results', 'items', 'rows']).map((item, index) => {
-      const value = this.getDatabaseItemValue(item, ['transactions_per_sec', 'transactions', 'value', 'count', 'total']);
-      const rowValue = value === null ? -1 : value;
-      return {
-        label: this.getDatabaseItemLabel(item),
-        value: rowValue,
-        color: this.getDatabaseItemColor(item, index),
-        displayValue: this.formatNumber(rowValue)
-      };
-    }).filter(item => item.label && item.value >= 0);
-
-    const totalRawValue = this.getFirstValue(source?.summary?.value, source?.summary?.total, source?.total, source?.value);
-    const total = this.getFirstNumericValue(source?.summary?.value, source?.summary?.total, source?.total, source?.value);
-    return {
-      totalLabel: totalRawValue && /[a-z]/i.test(totalRawValue) ? totalRawValue : total !== null ? this.formatCompactNumber(total) : '',
-      unit: source?.summary?.unit || source?.unit || 'transactions/sec',
-      rows
-    };
-  }
-
-  convertToActiveDatabaseWorkloadOptions(rows: PublicCloudDatabaseBarItem[]): EChartsOption {
-    return this.getDatabaseHorizontalBarOptions(rows, 100, false);
-  }
-
-  convertToDatabaseLatencyRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudDatabaseBarItem[] {
-    return this.getDatabaseBarRows(data, ['latency', 'databases', 'results', 'items', 'rows']).map((item, index) => {
-      const value = this.getDatabaseItemValue(item, ['latency_ms', 'avg_latency', 'latency', 'value', 'percent', 'percentage']);
-      const rowValue = value === null ? -1 : value;
-      return {
-        label: this.getDatabaseItemLabel(item),
-        value: rowValue,
-        color: this.getLatencyColor(item, index)
-      };
-    }).filter(item => item.label && item.value >= 0);
-  }
-
-  convertToDatabaseLatencyOptions(rows: PublicCloudDatabaseBarItem[]): EChartsOption {
-    return this.getDatabaseHorizontalBarOptions(rows, 100, true);
-  }
-
-  convertToTopLockContentionRows(data: PublicCloudLockContentionResponse): PublicCloudLockContentionRow[] {
-    return this.getLockContentionRows(data).map(item => {
-      const cloud = this.getFirstValue(item.cloud, item.provider, item.platform);
-      return {
-        database: this.getFirstValue(item.database, item.database_name, item.databaseName, item.name),
-        locks: this.formatNumber(this.getFirstNumericValue(item.locks, item.lock_count, item.lockCount) || 0),
-        type: this.getFirstValue(item.type, item.lock_type, item.lockType),
-        wait: this.formatDatabaseWaitValue(this.getFirstValue(item.wait, item.wait_time, item.waitTime)),
-        cloud,
-        cloudClass: `database-cloud-${this.normalizeCssClass(cloud)}`
-      };
-    }).filter(row => !!row.database);
-  }
-
-  convertToTopMemoryConsumersRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudDatabaseConsumerRow[] {
-    return this.getDatabaseMemoryConsumerRows(data).map((item, index) => {
-      const value = this.getDatabaseItemValue(item, ['memory_gb', 'memory', 'used', 'value', 'count', 'total']);
-      const rowValue = value === null ? -1 : value;
-      return {
-        name: this.getDatabaseItemLabel(item),
-        value: rowValue,
-        displayValue: `${this.formatNumber(rowValue)} GB`,
-        percent: 0,
-        color: this.getDatabaseItemColor(item, index)
-      };
-    }).filter(item => item.name && item.value >= 0).slice(0, 10);
-  }
-
-  convertToTopStorageConsumersRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudDatabaseConsumerRow[] {
-    return this.getDatabaseBarRows(data, ['consumers', 'databases', 'results', 'items', 'rows']).map((item, index) => {
-      const value = this.getDatabaseItemValue(item, ['used_tb', 'used', 'storage', 'value', 'count']);
-      const rowValue = value === null ? -1 : value;
-      const total = this.getFirstNumericValue(item.total_tb, item.capacity, item.total);
-      const percent = this.getDatabaseItemPercent(item, rowValue, total || 0);
-      return {
-        name: this.getDatabaseItemLabel(item),
-        value: rowValue,
-        displayValue: `${this.formatDecimalNumber(rowValue)} TB`,
-        totalValue: total || undefined,
-        totalLabel: total ? `${this.formatDecimalNumber(total)}T` : '',
-        percent,
-        color: this.getStorageConsumerColor(item, index)
-      };
-    }).filter(item => item.name && item.value >= 0).slice(0, 10);
-  }
-
-  private convertToDatabaseHealthMetric(item: PublicCloudDatabaseMetricItem): PublicCloudDatabaseHealthMetric {
-    const label = this.formatDatabaseLabel(this.getFirstValue(item.label, item.name, item.metric, item.category));
-    const value = this.getFirstNumericValue(item.current, item.value, item.score, item.count) || 0;
-    const total = this.getFirstNumericValue(item.total, item.max, item.target, item.threshold) || 100;
-    const percent = this.getDatabaseItemPercent(item, value, total);
-    return {
-      label,
-      value: this.formatNumber(value),
-      total: this.formatNumber(total),
-      percent,
-      color: item.color || this.getHealthMetricColor(label)
-    };
-  }
-
-  private getDatabaseHealthMetricRows(data: PublicCloudDatabaseHealthScoreResponse): PublicCloudDatabaseMetricItem[] {
-    const source = this.getObjectResponseData(data) as PublicCloudDatabaseHealthScoreResponse;
-    const metricSource = source?.metrics || source?.results || source?.items || source?.data;
-    const keyedMetricRows = this.convertDatabaseMetricRecordToItems(metricSource);
-    if (keyedMetricRows.length) {
-      return keyedMetricRows;
-    }
-    const rows = this.getDatabaseRowsFromValue(metricSource, []);
-    if (rows.length) {
-      return rows as PublicCloudDatabaseMetricItem[];
-    }
-    return this.convertDatabaseMetricRecordToItems(source);
-  }
-
-  private convertDatabaseMetricRecordToItems(data: any): PublicCloudDatabaseMetricItem[] {
-    const record = data as unknown as Record<string, string | number | PublicCloudDatabaseMetricItem>;
-    return ['latency', 'locks', 'memory', 'storage'].reduce((items: PublicCloudDatabaseMetricItem[], key) => {
-      const recordKey = Object.keys(record || {}).find(item => item.toLowerCase() === key);
-      const value = recordKey ? record?.[recordKey] : undefined;
-      if (value !== undefined && value !== null && value !== '') {
-        const itemValue: PublicCloudDatabaseMetricItem = typeof value === 'object' ? value as PublicCloudDatabaseMetricItem : { value };
-        items.push({
-          ...itemValue,
-          label: itemValue.label || itemValue.name || itemValue.metric || itemValue.category || recordKey || key
-        });
-      }
-      return items;
-    }, []);
-  }
-
-  private getDatabaseBarRows(data: PublicCloudDatabaseWidgetResponse, keys: string[]): PublicCloudDatabaseBarResponseItem[] {
-    const source = this.getObjectResponseData(data);
-    const rows = this.getDatabaseRowsFromValue(source, keys) as PublicCloudDatabaseBarResponseItem[];
-    return rows.length ? rows : this.convertDatabaseRecordToBarItems(source);
-  }
-
-  private getLockContentionRows(data: PublicCloudLockContentionResponse): PublicCloudLockContentionResponseItem[] {
-    const source = this.getObjectResponseData(data);
-    return this.getDatabaseRowsFromValue(source, ['results', 'items', 'rows']) as PublicCloudLockContentionResponseItem[];
-  }
-
-  private getDatabaseMemoryConsumerRows(data: PublicCloudDatabaseWidgetResponse): PublicCloudDatabaseBarResponseItem[] {
-    const rows = this.getDatabaseBarRows(data, ['consumers', 'databases', 'results', 'items', 'rows']);
-    if (rows.length === 1 && !this.getDatabaseItemLabel(rows[0]) &&
-      this.getDatabaseItemValue(rows[0], ['memory_gb', 'memory', 'used', 'value', 'count', 'total']) === null) {
-      return this.convertDatabaseRecordToBarItems(rows[0]);
-    }
-    return rows;
-  }
-
   private getObjectResponseData(data: any): any {
     if (data?.data && !Array.isArray(data.data) && typeof data.data === 'object') {
       return data.data;
     }
     return data;
-  }
-
-  private getDatabaseRowsFromValue(value: any, keys: string[]): any[] {
-    if (!value) {
-      return [];
-    }
-    if (Array.isArray(value)) {
-      return value;
-    }
-    const record = value as Record<string, any>;
-    const containerKeys = [...keys, 'data', 'results', 'items', 'rows'];
-    for (const key of containerKeys) {
-      const rows = this.getDatabaseRowsFromValue(record[key], []);
-      if (rows.length) {
-        return rows;
-      }
-    }
-    return [];
-  }
-
-  private convertDatabaseRecordToBarItems(data: any): PublicCloudDatabaseBarResponseItem[] {
-    const record = data as Record<string, any>;
-    return Object.keys(record || {}).reduce((items: PublicCloudDatabaseBarResponseItem[], key) => {
-      if (['total', 'value', 'unit', 'data', 'results', 'items', 'rows'].includes(key)) {
-        return items;
-      }
-      const value = record[key];
-      if (value !== undefined && value !== null && value !== '' && typeof value !== 'object') {
-        items.push({
-          name: key,
-          value
-        });
-      }
-      return items;
-    }, []);
-  }
-
-  private getDatabaseItemLabel(item: PublicCloudDatabaseBarResponseItem): string {
-    return this.getFirstValue(item.name, item.label, item.database, item.database_name, item.databaseName, item.service, item.cloud, item.provider);
-  }
-
-  private getDatabaseItemValue(item: PublicCloudDatabaseBarResponseItem, keys: string[]): number | null {
-    const record = item as unknown as Record<string, string | number>;
-    const value = keys.map(key => record[key]).find(itemValue => itemValue !== undefined && itemValue !== null && itemValue !== '');
-    return value === undefined || value === null || value === '' ? null : this.getFirstNumericValue(value);
-  }
-
-  private getDatabaseItemPercent(item: PublicCloudDatabaseMetricItem | PublicCloudDatabaseBarResponseItem, value: number, total: number): number {
-    const percent = this.getFirstNumericValue(item.percent, item.percentage);
-    if (percent !== null) {
-      return Math.max(Math.min(percent, 100), 0);
-    }
-    return total ? Math.max(Math.min(Math.round((value / total) * 100), 100), 0) : Math.max(Math.min(value, 100), 0);
-  }
-
-  private getDatabaseItemColor(item: PublicCloudDatabaseBarResponseItem, index: number): string {
-    return item.color || PUBLIC_CLOUD_DATABASE_WIDGET_COLORS[index % PUBLIC_CLOUD_DATABASE_WIDGET_COLORS.length];
-  }
-
-  private getLatencyColor(item: PublicCloudDatabaseBarResponseItem, index: number): string {
-    const key = this.getFirstValue(item.tone, item.status, item.bucket).toLowerCase();
-    const designColors = ['#5fa2dd', '#e99a5c', '#43c78c', '#c65355', '#bd8752'];
-    return PUBLIC_CLOUD_DATABASE_LATENCY_COLORS[key] || item.color || designColors[index % designColors.length];
-  }
-
-  private getStorageConsumerColor(item: PublicCloudDatabaseBarResponseItem, index: number): string {
-    const designColors = ['#87d3aa', '#ff9f32', '#f68d93', '#f7dda7', '#43c78c', '#f68d93', '#f7dda7', '#ff9f32', '#ff9f32', '#43c78c'];
-    return item.color || designColors[index % designColors.length];
-  }
-
-  private formatDatabaseWaitValue(value: string): string {
-    if (!value) {
-      return '';
-    }
-    return /[a-z]/i.test(value) ? value : `${value}s`;
-  }
-
-  private getHealthMetricColor(label: string): string {
-    const key = String(label || '').toLowerCase();
-    const metricKey = Object.keys(PUBLIC_CLOUD_DATABASE_HEALTH_METRIC_COLORS).find(item => key.includes(item));
-    return metricKey ? PUBLIC_CLOUD_DATABASE_HEALTH_METRIC_COLORS[metricKey] : '#13bd77';
-  }
-
-  private getDatabaseHorizontalBarOptions(rows: PublicCloudDatabaseBarItem[], maxValue: number, showTopAxis: boolean): EChartsOption {
-    return {
-      grid: {
-        left: showTopAxis ? 110 : 116,
-        right: showTopAxis ? 18 : 12,
-        top: showTopAxis ? 28 : 8,
-        bottom: 4
-      },
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => `${params.name}: ${params.value}`
-      },
-      xAxis: {
-        type: 'value',
-        min: 0,
-        max: maxValue,
-        position: 'top',
-        splitLine: { show: false },
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          show: showTopAxis,
-          color: '#555555',
-          fontSize: 12
-        }
-      },
-      yAxis: {
-        type: 'category',
-        inverse: true,
-        data: (rows || []).map(item => item.label),
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#555555',
-          fontSize: 12
-        }
-      },
-      series: [
-        {
-          type: 'bar',
-          barWidth: showTopAxis ? 40 : 34,
-          barCategoryGap: showTopAxis ? '28%' : '24%',
-          data: (rows || []).map(item => ({
-            value: item.value,
-            name: item.label,
-            itemStyle: { color: item.color }
-          })),
-          label: {
-            show: !showTopAxis,
-            position: 'insideRight',
-            color: '#1f2933',
-            fontSize: 13,
-            formatter: '{c}'
-          }
-        }
-      ]
-    };
   }
 
   private getFirstNumericValue(...values: Array<string | number | undefined | null>): number | null {
@@ -2900,30 +2373,6 @@ export class PublicCloudComputeDashboardService {
     const numericValue = this.getNumericValue(value);
     return isNaN(numericValue) ? null : numericValue;
   }
-
-  private formatCompactNumber(value: number): string {
-    if (value >= 1000) {
-      return `${Number((value / 1000).toFixed(1))}k`;
-    }
-    return this.formatNumber(value);
-  }
-
-  private formatDecimalNumber(value: number): string {
-    return Number(value || 0).toLocaleString('en-US', {
-      maximumFractionDigits: 2
-    });
-  }
-
-  private formatDatabaseLabel(value: string): string {
-    return this.formatRegionLabel(value || '');
-  }
-
-  private normalizeCssClass(value: string): string {
-    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  }
-  /*
-   * ******End ****** Cloud Database Performance Widget Related ********************
-   */
 
   /*
    * -----Start----- Orphaned Devices Widgets Related -------------------
@@ -3176,22 +2625,6 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  getRecentAlertsStaticResponse(): PublicCloudRecentAlertsResponse {
-    return PUBLIC_CLOUD_RECENT_ALERTS_RESPONSE;
-  }
-
-  getAlertsBySeverityStaticResponse(): PublicCloudAlertsBySeverity {
-    return PUBLIC_CLOUD_ALERTS_BY_SEVERITY_RESPONSE;
-  }
-
-  getAlertsByProviderStaticResponse(): PublicCloudAlertsByProvider[] {
-    return PUBLIC_CLOUD_ALERTS_BY_PROVIDER_RESPONSE;
-  }
-
-  getAlertsByAgeStaticResponse(): PublicCloudAlertsByAge {
-    return PUBLIC_CLOUD_ALERTS_BY_AGE_RESPONSE;
-  }
-
   convertToRecentAlertRows(data: PublicCloudRecentAlertsResponse): PublicCloudRecentAlertRow[] {
     return this.getRecentAlertRows(data).map(item => {
       const severity = this.getRecentAlertSeverity(this.getFirstValue(item.severity, item.status));
@@ -3427,22 +2860,6 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  getCostOptimizationStaticResponse(): PublicCloudCostRowResponse[] {
-    return PUBLIC_CLOUD_COST_OPTIMIZATION_RESPONSE;
-  }
-
-  getSpendVsSavingsStaticResponse(): PublicCloudSpendVsSavings {
-    return PUBLIC_CLOUD_SPEND_VS_SAVINGS_RESPONSE;
-  }
-
-  getRecommendedActionsStaticResponse(): PublicCloudRecommendedAction[] {
-    return PUBLIC_CLOUD_RECOMMENDED_ACTIONS_RESPONSE;
-  }
-
-  getPotentialSavingsByProviderStaticResponse(): PublicCloudPotentialSavingsByProvider[] {
-    return PUBLIC_CLOUD_POTENTIAL_SAVINGS_BY_PROVIDER_RESPONSE;
-  }
-
   convertToCostRows(data: PublicCloudCostOptimizationTableResponse | PublicCloudCostRowResponse[]): PublicCloudCostRow[] {
     return this.getCostOptimizationResults(data).map(item => {
       const cpuPct = this.getNumberValue(item?.utilization);
@@ -3626,10 +3043,6 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  getAutoRemediationSummaryStaticResponse(): PublicCloudAutoRemediationSummaryResponse {
-    return PUBLIC_CLOUD_AUTO_REMEDIATION_SUMMARY_RESPONSE;
-  }
-
   convertToAutoRemediationSummaryViewData(data: PublicCloudAutoRemediationSummaryResponse): PublicCloudAutoRemediationSummaryViewData {
     const source = this.getObjectResponseData(data) as PublicCloudAutoRemediationSummaryResponse;
     const totalRuns = this.getFirstNumericValue(source?.autoRemediations, source?.totalRuns, source?.total_runs, source?.total) || 0;
@@ -3688,7 +3101,7 @@ export class PublicCloudComputeDashboardService {
       totalRunsLabel: this.formatNumber(totalRuns),
       avgDurationLabel: avgMttr,
       donutGradient: `conic-gradient(${PUBLIC_CLOUD_AUTO_REMEDIATION_OUTCOME_COLORS.successful} 0 ${successPct}%, ${PUBLIC_CLOUD_AUTO_REMEDIATION_OUTCOME_COLORS.failed} ${successPct}% 100%)`,
-      hasData: totalRuns > 0 || actions.length > 0 || kpis.some(item => !!item.value)
+      hasData: totalRuns > 0 || successfulRuns > 0 || failedRuns > 0 || actions.length > 0
     };
   }
 

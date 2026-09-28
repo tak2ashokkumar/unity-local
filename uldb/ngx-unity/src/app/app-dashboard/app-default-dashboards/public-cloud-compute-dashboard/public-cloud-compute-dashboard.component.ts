@@ -9,7 +9,6 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
-import { DateRangeOption } from 'src/app/shared/custom-date-dropdown/custom-date-dropdown.component';
 import { PublicCloudComputeDashboardService } from './public-cloud-compute-dashboard.service';
 import {
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
@@ -356,11 +355,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}T${isEnd ? '23:59:59' : '00:00:00'}Z`;
-  }
-
-  /** Reloads the page filters from the source sequence and then refreshes all widgets. */
-  refreshData() {
-    this.loadFilterOptionsAndDashboard();
   }
 
   /** Reloads all filter options and recreates the filter form before widgets are refreshed. */
