@@ -1,0 +1,149 @@
+/*
+ * unity-admin design tokens
+ * -----------------------------------------------------------------------------
+ * A modernized take on the legacy AngularJS admin panel's green theme. The brand
+ * green (#279B6C) and its hover (#67B897) are preserved as the canonical anchors;
+ * everything else is a refined, cohesive system built around them: a full green
+ * ramp, a neutral slate ramp for the dark sidebar, status colors, elevation,
+ * radius, and a type scale. Layout metrics (sidebar width, 64px header) match the
+ * original so the overall layout is unchanged.
+ */
+:root {
+  /* ---- Brand green ramp (anchored on #279B6C / #67B897) ---- */
+  --green-50: #f0faf5;
+  --green-100: #dcf3e8;
+  --green-200: #bce6d2;
+  --green-300: #8fd3b4;
+  --green-400: #67b897;   /* legacy hover */
+  --green-500: #33a074;
+  --green-600: #279b6c;   /* legacy primary - canonical brand */
+  --green-700: #1f8058;
+  --green-800: #1a6647;
+  --green-900: #16513a;
+  --green-950: #0c2f22;
+
+  /* Semantic brand aliases */
+  --brand: var(--green-600);
+  --brand-strong: var(--green-700);
+  --brand-soft: var(--green-100);
+  --brand-tint: rgba(39, 155, 108, 0.10);
+  --brand-tint-strong: rgba(39, 155, 108, 0.18);
+  --brand-ring: rgba(39, 155, 108, 0.35);
+  --brand-accent: #23af71;
+
+  /* ---- Neutral slate ramp (sidebar + text) ---- */
+  --slate-25: #f7f9f8;
+  --slate-50: #f1f4f3;
+  --slate-100: #e6ecea;
+  --slate-200: #d3dbd8;
+  --slate-300: #b4c0bc;
+  --slate-400: #889792;
+  --slate-500: #62726d;
+  --slate-600: #495651;
+  --slate-700: #333f3b;
+  --slate-800: #232c29;
+  --slate-900: #19201d;
+  --slate-950: #101512;
+
+  /* ---- Surfaces ---- */
+  --bg-app: #f4f7f6;
+  --bg-elevated: #ffffff;
+  --bg-subtle: #f7faf9;
+  --bg-inset: #eef3f1;
+  --surface-card: #ffffff;
+  --surface-header: linear-gradient(180deg, #2aa274 0%, #279b6c 55%, #23935f 100%);
+  --surface-sidebar: linear-gradient(180deg, #222b28 0%, #1b2220 100%);
+  --surface-sidebar-solid: #1e2523;
+
+  /* ---- Text ---- */
+  --text-strong: #16211d;
+  --text: #26312c;
+  --text-muted: #5f6d67;
+  --text-faint: #86958f;
+  --text-on-brand: #ffffff;
+  --text-on-dark: #e7efeb;
+  --text-on-dark-muted: #9fb0aa;
+
+  /* Table row hover. Deliberately OPAQUE, not a brand-tint alpha: the pinned
+     actions column is a sticky cell, and scrolled content would show straight
+     through a translucent background. */
+  --row-hover: #eff7f3;
+
+  /* ---- Borders / dividers ---- */
+  --border: #e2e8e5;
+  --border-strong: #cdd7d3;
+  --border-dark: #2e3a36;
+  --divider: #eef2f0;
+
+  /* ---- Status ---- */
+  --success: #2fa36a;
+  --success-soft: #e4f5ec;
+  --warning: #e8a13a;
+  --warning-soft: #fbf1de;
+  --danger: #de5049;
+  --danger-soft: #fbe7e6;
+  --info: #3d9bc4;
+  --info-soft: #e2f2f8;
+  --neutral: #7b8a84;
+
+  /* ---- Elevation (soft, layered) ---- */
+  --shadow-xs: 0 1px 2px rgba(16, 34, 27, 0.06);
+  --shadow-sm: 0 1px 2px rgba(16, 34, 27, 0.06), 0 1px 3px rgba(16, 34, 27, 0.08);
+  --shadow-md: 0 2px 4px rgba(16, 34, 27, 0.06), 0 6px 16px rgba(16, 34, 27, 0.08);
+  --shadow-lg: 0 8px 24px rgba(16, 34, 27, 0.12), 0 2px 6px rgba(16, 34, 27, 0.08);
+  --shadow-brand: 0 6px 18px rgba(39, 155, 108, 0.28);
+  --shadow-header: 0 1px 0 rgba(0, 0, 0, 0.06), 0 4px 14px rgba(16, 34, 27, 0.10);
+
+  /* ---- Radius (modernized from the legacy squared corners) ---- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* ---- Typography ---- */
+  --font-sans: 'IBM Plex Sans', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', ui-monospace, Menlo, Consolas, monospace;
+
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 20px;
+  --fs-2xl: 25px;
+  --fs-3xl: 32px;
+  --fs-huge: 40px;
+
+  --fw-light: 300;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.2;
+  --lh-normal: 1.5;
+
+  /* ---- Layout metrics (match legacy) ---- */
+  --sidebar-w: 256px;
+  --sidebar-w-collapsed: 72px;
+  --header-h: 64px;
+  /* Matches ngx-unity's `.main .container-fluid { padding: 0 20px }`. */
+  --content-pad: 20px;
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+
+  /* ---- Z-index scale ---- */
+  --z-header: 100;
+  --z-sidebar: 200;
+  --z-dropdown: 900;
+  --z-modal: 1000;
+  --z-toast: 1100;
+}

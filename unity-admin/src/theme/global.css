@@ -1,0 +1,151 @@
+/* unity-admin global base styles */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-normal);
+  line-height: var(--lh-normal);
+  color: var(--text);
+  background: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--fw-semibold);
+  color: var(--text-strong);
+  line-height: var(--lh-tight);
+}
+
+a {
+  color: var(--brand-strong);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease);
+}
+a:hover {
+  color: var(--brand);
+}
+
+button {
+  font-family: inherit;
+}
+
+p {
+  margin: 0 0 0.75em;
+}
+
+code, pre, .mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum' 1;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--divider);
+  margin: 16px 0;
+}
+
+/* ---- Scrollbars ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--slate-300) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--slate-300);
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--slate-400);
+  background-clip: content-box;
+}
+
+/* Dark scrollbars inside the sidebar */
+.app-sidebar *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  background-clip: content-box;
+}
+.app-sidebar * {
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+/* ---- Selection ---- */
+::selection {
+  background: var(--brand-tint-strong);
+  color: var(--text-strong);
+}
+
+/* ---- Focus ring ---- */
+:focus-visible {
+  outline: 2px solid var(--brand-ring);
+  outline-offset: 2px;
+}
+
+/* ---- Utility helpers (small, reused everywhere) ---- */
+.u-muted { color: var(--text-muted); }
+.u-faint { color: var(--text-faint); }
+.u-mono { font-family: var(--font-mono); }
+.u-nowrap { white-space: nowrap; }
+.u-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.u-flex { display: flex; }
+.u-flex-center { display: flex; align-items: center; }
+.u-between { display: flex; align-items: center; justify-content: space-between; }
+.u-gap-sm { gap: 8px; }
+.u-gap { gap: 12px; }
+.u-gap-lg { gap: 20px; }
+.u-grow { flex: 1 1 auto; }
+.u-hidden { display: none !important; }
+
+/* ---- Page entrance animation ---- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

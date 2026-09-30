@@ -1,0 +1,34 @@
+{
+  "name": "unity-admin",
+  "version": "0.0.0",
+  "description": "United Layer Admin Panel - modern React replica of the legacy AngularJS admin (uldb/static)",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:nocheck": "vite build",
+    "preview": "vite preview",
+    "static-server": "node static-server.js --dist=dist --port=8096 --host=0.0.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^1.47.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-mono": "^5.1.0",
+    "@fontsource/ibm-plex-sans": "^5.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.2.0"
+  },
+  "overrides": {
+    "lucide-react": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
+  }
+}

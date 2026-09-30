@@ -3,20 +3,71 @@
 UNITY_HOME="/c/Users/AshokKumar/Desktop/unity-local"
 export PATH="$UNITY_HOME/tools/python/Scripts:$UNITY_HOME/tools/python:$PATH"
 
+# =====================================================================
+#  Node.js Version Switching (Node 14 for ngx-unity, Node 24 for unity-admin)
+# =====================================================================
+use_node_latest() {
+    case "$PATH" in
+        "$UNITY_HOME/tools/node-latest:"*) return 0 ;;
+    esac
+    local clean_path=":$PATH:"
+    clean_path="${clean_path//:$UNITY_HOME\/tools\/node:/:}"
+    clean_path="${clean_path//:$UNITY_HOME\/tools\/node-latest:/:}"
+    clean_path="${clean_path#:}"
+    clean_path="${clean_path%:}"
+    export PATH="$UNITY_HOME/tools/node-latest:$clean_path"
+}
+
+use_node_14() {
+    case "$PATH" in
+        "$UNITY_HOME/tools/node:"*) return 0 ;;
+    esac
+    local clean_path=":$PATH:"
+    clean_path="${clean_path//:$UNITY_HOME\/tools\/node:/:}"
+    clean_path="${clean_path//:$UNITY_HOME\/tools\/node-latest:/:}"
+    clean_path="${clean_path#:}"
+    clean_path="${clean_path%:}"
+    export PATH="$UNITY_HOME/tools/node:$clean_path"
+}
+
+auto_switch_node() {
+    if [[ "$PWD" == *"unity-admin"* ]]; then
+        use_node_latest
+    elif [[ "$PWD" == *"unity-local"* ]]; then
+        use_node_14
+    fi
+}
+
+cd() {
+    builtin cd "$@" || return
+    auto_switch_node
+}
+
+alias node-latest='use_node_latest && echo "Active Node: $(node -v) (node-latest)"'
+alias node-14='use_node_14 && echo "Active Node: $(node -v) (Node 14)"'
+alias whichnode='echo "Active Node: $(node -v) from $(which node 2>/dev/null || type -p node)"'
+
+# Auto-detect right away for current directory
+auto_switch_node
+
 cdd(){
-    cd "$UNITY_HOME"
+    cd "$UNITY_HOME" || return
+    use_node_14
 }
 
 uldb(){
-   cd "$UNITY_HOME/uldb"
+   cd "$UNITY_HOME/uldb" || return
+   use_node_14
 }
 
 unity(){
-    cd "$UNITY_HOME/uldb/ngx-unity"
+    cd "$UNITY_HOME/uldb/ngx-unity" || return
+    use_node_14
 }
 
 mtp(){
-    cd "$UNITY_HOME/uldb/ngx-mtp"
+    cd "$UNITY_HOME/uldb/ngx-mtp" || return
+    use_node_14
 }
 
 mockapi(){
@@ -46,7 +97,7 @@ startmock(){
 #  groups below. Within a group the three commands are equivalent - they are
 #  named per app just so the intent is obvious.
 #
-#  /admin serves the React admin (ngx-admin) by default; use the matching
+#  /admin serves the React admin (unity-admin) by default; use the matching
 #  *-admin-legacy command when you want the old AngularJS panel instead.
 # =====================================================================
 
@@ -87,9 +138,10 @@ serveadmin() {
     node server.js
 }
 
-# ---- admin panel : React (uldb/ngx-admin) ----
+# ---- admin panel : React (unity-admin) ----
 adminreact() {
-    cd "$UNITY_HOME/uldb/ngx-admin" || return
+    cd "$UNITY_HOME/unity-admin" || return
+    use_node_latest
 }
 
 buildadmin() {          # one-off production build -> dist/

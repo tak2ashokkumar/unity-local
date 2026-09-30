@@ -57,7 +57,7 @@ const ENV_ALIASES = { prod: "sf" };
  *  `node server.js`. Change it if you want a different bare-run default.
  *  To see what a RUNNING proxy is on:  GET http://localhost:8091/__admin_env
  * --------------------------------------------------------------------- */
-const DEFAULT_API_ENV = "mock";
+const DEFAULT_API_ENV = "sf";
 
 function resolveEnv() {
   let name = (process.env.API_ENV || "").toLowerCase().trim();
