@@ -39,7 +39,7 @@ from integ.veeam.models import Veeam
 from app.common.utils import Device
 from app.user2.models import User
 from django.urls import reverse
-from agent.models import AgentConfig
+from agent.models import AgentConfig, CollectorTask
 from django.utils import timezone
 from django.contrib.sites.models import Site
 from django.conf import settings
@@ -49,12 +49,64 @@ from django.utils.dateparse import parse_date
 logger = logging.getLogger(__name__)
 
 
+class CollectorTaskResponse(object):
+    def __init__(self, status_code, data):
+        self.status_code = status_code
+        self._data = data
+        try:
+            self.content = json.dumps(data)
+            self.text = self.content
+        except TypeError:
+            self.content = str(data)
+            self.text = self.content
+
+    def json(self):
+        return self._data
+
+
+def collector_task_succeeded(task_response):
+    task_status, _ = task_response
+    return task_status == CollectorTask.TASK_SUCCESS
+
+
+def collector_task_result(task_response):
+    _, result = task_response
+    return result
+
+
+def collector_result_value(result, *keys):
+    if isinstance(result, dict):
+        for key in keys:
+            value = result.get(key)
+            if value is not None:
+                if isinstance(value, dict):
+                    nested_value = collector_result_value(value, *keys)
+                    if nested_value is not value:
+                        return nested_value
+                return value
+    return result
+
+
+def collector_task_response(task_response):
+    task_status, result = task_response
+    status_code = 200 if task_status == CollectorTask.TASK_SUCCESS else 400
+    if isinstance(result, dict) and result.get("status_code") is not None:
+        try:
+            status_code = int(result.get("status_code"))
+        except (TypeError, ValueError):
+            status_code = 400
+    return CollectorTaskResponse(status_code, result)
+
+
 NETWORK_DEVICES_DEFAULT_FILE_TYPE_MAP = OrderedDict([
     ("cisco_ios", "cfg"),
     ("cisco_ftd", "encrypted package"),
     ("cisco_nxos", "cfg"),
     ("f5_ltm", "ucs"),
     ("fortinet", "conf"),
+    ("juniper", "cfg"),
+    ("juniper_junos", "cfg"),
+    # ("juniper_screenos", "cfg"),
     ("paloalto_panos", "tgz")
 ])
 
@@ -65,6 +117,9 @@ NETWORK_DEVICE_CONFIG_TYPE_MAP = OrderedDict([
     ("cisco_nxos", "Cisco Nexus"),
     ("f5_ltm", "F5"),
     ("fortinet", "Fortinet"),
+    ("juniper", "Juniper"),
+    ("juniper_junos", "Juniper JunOS"),
+    # ("juniper_screenos", "Juniper ScreenOS"),
     ("paloalto_panos", "Palo Alto")
 ])
 
@@ -75,6 +130,9 @@ NETWORK_DEVICE_DEFAULT_CREDENTIAL_TYPE_MAP = OrderedDict([
     ("cisco_nxos", ["SSH"]),
     ("f5_ltm", ["SSH"]),
     ("fortinet", ["API Token", "API User"]),
+    ("juniper", ["SSH"]),
+    ("juniper_junos", ["SSH"]),
+    # ("juniper_screenos", ["SSH"]),
     ("paloalto_panos", ["SSH"])
 ])
 
@@ -111,51 +169,51 @@ SWITCH_MODEL_LIFECYCLE_DATES = {
 FIREWALL_MODEL_LIFECYCLE_DATES = {
     "Juniper": {
         "SSG-140": {
-            "end_of_life": "2018-04-30", 
-            "end_of_support": "2022-12-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2018-04-30",
+            "end_of_support": "2022-12-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX240H2": {
-            "end_of_life": "2018-05-30", 
-            "end_of_support": "2023-11-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2018-05-30",
+            "end_of_support": "2023-11-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX1400": {
-            "end_of_life": "2017-06-01", 
-            "end_of_support": "2022-12-01", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2017-06-01",
+            "end_of_support": "2022-12-01",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX340": {
-            "end_of_life": "2024-04-15", 
-            "end_of_support": None, 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-04-15",
+            "end_of_support": None,
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX650": {
-            "end_of_life": "2015-11-01", 
-            "end_of_support": "2021-05-01", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2015-11-01",
+            "end_of_support": "2021-05-01",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX550m": {
-            "end_of_life": "2022-09-15", 
-            "end_of_support": "2024-11-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2022-09-15",
+            "end_of_support": "2024-11-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "srx550m": {
-            "end_of_life": "2022-09-15", 
-            "end_of_support": "2024-11-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2022-09-15",
+            "end_of_support": "2024-11-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX220H-POE": {
-            "end_of_life": "2013-12-10", 
-            "end_of_support": "2019-05-10", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2013-12-10",
+            "end_of_support": "2019-05-10",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SFX220H": {
@@ -166,44 +224,44 @@ FIREWALL_MODEL_LIFECYCLE_DATES = {
         },
         "SRX100H": {
             "end_of_life": "2013-12-10",
-            "end_of_support": "2019-05-10", 
-            "end_of_extended_support": None, 
+            "end_of_support": "2019-05-10",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX345": {
             "end_of_life": "2021-10-06",
-            "end_of_support": None, 
-            "end_of_extended_support": None, 
+            "end_of_support": None,
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX220": {
             "end_of_life": "2018-11-30",
-            "end_of_support": "2024-11-30", 
-            "end_of_extended_support": None, 
+            "end_of_support": "2024-11-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX240": {
-            "end_of_life": "2015-11-01", 
-            "end_of_support": "2021-05-01", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2015-11-01",
+            "end_of_support": "2021-05-01",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX550": {
-            "end_of_life": "2018-05-30", 
-            "end_of_support": "2024-11-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2018-05-30",
+            "end_of_support": "2024-11-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX320": {
-            "end_of_life": "2021-07-15", 
-            "end_of_support": None, 
-            "end_of_extended_support": None, 
+            "end_of_life": "2021-07-15",
+            "end_of_support": None,
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX240H": {
-            "end_of_life": "2015-11-01", 
-            "end_of_support": "2021-05-01", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2015-11-01",
+            "end_of_support": "2021-05-01",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "SRX210": {
@@ -221,247 +279,247 @@ FIREWALL_MODEL_LIFECYCLE_DATES = {
     },
     "Junper": {
         "SRX320": {
-            "end_of_life": "2021-07-15", 
-            "end_of_support": None, 
-            "end_of_extended_support": None, 
+            "end_of_life": "2021-07-15",
+            "end_of_support": None,
+            "end_of_extended_support": None,
             "end_of_security_support": None
         }
     },
     "Cisco": {
         "Cisco Meraki MX-100": {
-            "end_of_life": "2022-02-01", 
-            "end_of_support": "2027-02-01", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2022-02-01",
+            "end_of_support": "2027-02-01",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "Catalyst 3750-48PS-S": {
-            "end_of_life": "2023-03-07", 
-            "end_of_support": "2025-09-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2023-03-07",
+            "end_of_support": "2025-09-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA5506-X": {
-            "end_of_life": "2021-02-01", 
-            "end_of_support": "2026-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2021-02-01",
+            "end_of_support": "2026-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA5506-K9": {
-            "end_of_life": "2021-02-01", 
-            "end_of_support": "2026-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2021-02-01",
+            "end_of_support": "2026-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA5525-X": {
-            "end_of_life": "2022-09-02", 
-            "end_of_support": "2025-09-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2022-09-02",
+            "end_of_support": "2025-09-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA5505": {
-            "end_of_life": "2017-02-24", 
-            "end_of_support": "2022-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2017-02-24",
+            "end_of_support": "2022-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA5585-X 10": {
-            "end_of_life": "2017-12-01", 
-            "end_of_support": "2023-05-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2017-12-01",
+            "end_of_support": "2023-05-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "Firepower 2140": {
-            "end_of_life": "2024-11-26", 
-            "end_of_support": "2030-05-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-11-26",
+            "end_of_support": "2030-05-31",
+            "end_of_extended_support": None,
             "end_of_security_support": "2030-05-31"
         },
         "Firepower 2130": {
-            "end_of_life": "2024-11-26", 
-            "end_of_support": "2030-05-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-11-26",
+            "end_of_support": "2030-05-31",
+            "end_of_extended_support": None,
             "end_of_security_support": "2030-05-31"
         },
         "Firepower 2120": {
-            "end_of_life": "2024-11-26", 
-            "end_of_support": "2030-05-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-11-26",
+            "end_of_support": "2030-05-31",
+            "end_of_extended_support": None,
             "end_of_security_support": "2030-05-31"
         },
     },
     "cisco Systems Inc.": {
         "ASA 5585-X 10": {
-            "end_of_life": "2017-12-01", 
-            "end_of_support": "2023-05-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2017-12-01",
+            "end_of_support": "2023-05-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         }
     },
     "CISCO": {
         "Cisco Meraki MX-100": {
-            "end_of_life": "2022-02-01", 
-            "end_of_support": "2027-02-01", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2022-02-01",
+            "end_of_support": "2027-02-01",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "CATALYST 3750-48PS-S": {
-            "end_of_life": "2023-03-07", 
-            "end_of_support": "2025-09-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2023-03-07",
+            "end_of_support": "2025-09-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA5506-x": {
-            "end_of_life": "2021-02-01", 
-            "end_of_support": "2026-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2021-02-01",
+            "end_of_support": "2026-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA5525X": {
-            "end_of_life": "2022-09-02", 
-            "end_of_support": "2025-09-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2022-09-02",
+            "end_of_support": "2025-09-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA5505": {
-            "end_of_life": "2017-02-24", 
-            "end_of_support": "2022-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2017-02-24",
+            "end_of_support": "2022-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "ASA 5506-K9": {
-            "end_of_life": "2021-02-01", 
-            "end_of_support": "2026-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2021-02-01",
+            "end_of_support": "2026-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "Firepower 2140": {
-            "end_of_life": "2024-11-26", 
-            "end_of_support": "2030-05-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-11-26",
+            "end_of_support": "2030-05-31",
+            "end_of_extended_support": None,
             "end_of_security_support": "2030-05-31"
         },
         "Firepower 2130": {
-            "end_of_life": "2024-11-26", 
-            "end_of_support": "2030-05-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-11-26",
+            "end_of_support": "2030-05-31",
+            "end_of_extended_support": None,
             "end_of_security_support": "2030-05-31"
         },
         "Firepower 2120": {
-            "end_of_life": "2024-11-26", 
-            "end_of_support": "2030-05-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-11-26",
+            "end_of_support": "2030-05-31",
+            "end_of_extended_support": None,
             "end_of_security_support": "2030-05-31"
         }
     },
     "Fortinet": {
         "FortiGate 50E": {
-            "end_of_life": None, 
-            "end_of_support": "2026-11-14", 
-            "end_of_extended_support": None, 
+            "end_of_life": None,
+            "end_of_support": "2026-11-14",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "FortiGate 60E": {
-            "end_of_life": None, 
-            "end_of_support": "2026-07-15", 
-            "end_of_extended_support": None, 
+            "end_of_life": None,
+            "end_of_support": "2026-07-15",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "FortiGate 100E": {
-            "end_of_life": None, 
-            "end_of_support": "2026-08-17", 
-            "end_of_extended_support": None, 
+            "end_of_life": None,
+            "end_of_support": "2026-08-17",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "Fortigate 400F": {
-            "end_of_life": None, 
+            "end_of_life": None,
             "end_of_support": None,
-            "end_of_extended_support": None, 
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "Fortiproxy 400G": {
-            "end_of_life": None, 
+            "end_of_life": None,
             "end_of_support": None,
-            "end_of_extended_support": None, 
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "FPX400G": {
-            "end_of_life": None, 
+            "end_of_life": None,
             "end_of_support": None,
-            "end_of_extended_support": None, 
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "FPX_400G": {
-            "end_of_life": None, 
+            "end_of_life": None,
             "end_of_support": None,
-            "end_of_extended_support": None, 
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "FGT_400F": {
-            "end_of_life": None, 
+            "end_of_life": None,
             "end_of_support": None,
-            "end_of_extended_support": None, 
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
     },
     "Palo Alto": {
         "PA-850": {
-            "end_of_life": "2024-08-31", 
-            "end_of_support": "2029-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-08-31",
+            "end_of_support": "2029-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-820": {
-            "end_of_life": "2024-08-31", 
-            "end_of_support": "2029-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-08-31",
+            "end_of_support": "2029-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-3050": {
-            "end_of_life": "2019-10-31", 
-            "end_of_support": "2024-10-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2019-10-31",
+            "end_of_support": "2024-10-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PaloAlto PA-3050": {
-            "end_of_life": "2019-10-31", 
-            "end_of_support": "2024-10-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2019-10-31",
+            "end_of_support": "2024-10-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-2020": {
-            "end_of_life": "2015-04-30", 
-            "end_of_support": "2020-04-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2015-04-30",
+            "end_of_support": "2020-04-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-3020": {
-            "end_of_life": "2019-10-31", 
-            "end_of_support": "2024-10-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2019-10-31",
+            "end_of_support": "2024-10-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-3250": {
-            "end_of_life": "2023-08-31", 
-            "end_of_support": "2028-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2023-08-31",
+            "end_of_support": "2028-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-3260": {
-            "end_of_life": "2023-08-31", 
-            "end_of_support": "2028-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2023-08-31",
+            "end_of_support": "2028-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
-        }, 
+        },
         "PA-3410": {
-            "end_of_life": "2019-10-31", 
-            "end_of_support": "2024-10-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2019-10-31",
+            "end_of_support": "2024-10-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA3410": {
-            "end_of_life": "2019-10-31", 
-            "end_of_support": "2024-10-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2019-10-31",
+            "end_of_support": "2024-10-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-220": {
@@ -485,55 +543,55 @@ FIREWALL_MODEL_LIFECYCLE_DATES = {
     },
     "Paloalto": {
         "PA-850": {
-            "end_of_life": "2024-08-31", 
-            "end_of_support": "2029-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-08-31",
+            "end_of_support": "2029-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-820": {
-            "end_of_life": "2024-08-31", 
-            "end_of_support": "2029-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2024-08-31",
+            "end_of_support": "2029-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-2020": {
-            "end_of_life": "2015-04-30", 
-            "end_of_support": "2020-04-30", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2015-04-30",
+            "end_of_support": "2020-04-30",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-3020": {
-            "end_of_life": "2019-10-31", 
-            "end_of_support": "2024-10-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2019-10-31",
+            "end_of_support": "2024-10-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "PA-3260": {
-            "end_of_life": "2023-08-31", 
-            "end_of_support": "2028-08-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2023-08-31",
+            "end_of_support": "2028-08-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         }
     },
     "Palo Alto Networks": {
         "PA-3410": {
-            "end_of_life": "2019-10-31", 
-            "end_of_support": "2024-10-31", 
-            "end_of_extended_support": None, 
+            "end_of_life": "2019-10-31",
+            "end_of_support": "2024-10-31",
+            "end_of_extended_support": None,
             "end_of_security_support": None
         }
     },
     "Netgear": {
         "ProSafe SRX5308": {
-            "end_of_life": None, 
-            "end_of_support": None, 
-            "end_of_extended_support": None, 
+            "end_of_life": None,
+            "end_of_support": None,
+            "end_of_extended_support": None,
             "end_of_security_support": None
         },
         "Prosafe SRX5308": {
-            "end_of_life": None, 
-            "end_of_support": None, 
-            "end_of_extended_support": None, 
+            "end_of_life": None,
+            "end_of_support": None,
+            "end_of_extended_support": None,
             "end_of_security_support": None
         }
     },
@@ -1263,14 +1321,19 @@ def collector_request(agent, data):
     post_url = 'https://{ip_address}/discovery/device_status/'.format(
         ip_address=getattr(agent, 'ip_address', None)
     )
-    agent.post_to_collector(post_url, data)
+    response = agent.post_to_collector(post_url, data)
+    if getattr(agent, "is_ztc", False) and not collector_task_succeeded(response):
+        logger.error("Failed to submit device status task to ZTC collector %s", agent.ip_address)
 
 
 def clean_collector_status_data(agent):
     post_url = 'https://{ip_address}/discovery/device_status/remove_devices/'.format(
         ip_address=getattr(agent, 'ip_address', None)
     )
-    response = agent.post_to_collector(post_url, data=None)
+    data = json.dumps({}) if getattr(agent, "is_ztc", False) else None
+    response = agent.post_to_collector(post_url, data=data)
+    if getattr(agent, "is_ztc", False):
+        return collector_task_response(response)
     return response
 
 
@@ -1303,6 +1366,21 @@ def poll_status_from_monitoring():
 def process_device_configurations(device, device_content_type, customer, bulk, executed_by=None):
     backup_uuids = []
     credential = device.ncm_credentials
+    if not credential:
+        device.is_in_progress = False
+        device.save()
+        msg = "Credential Not Present for device {}({}).".format(device.name, device.management_ip)
+        if bulk:
+            logger.error(msg)
+            return {
+                "device_name": device.name,
+                "device_config_type": device.config_device_type,
+                "device_type": device.DEVICE_TYPE,
+                "device_ip": device.management_ip,
+                "uuid": device.uuid,
+                "error": msg
+            }
+        raise BadRequestError(msg)
     device_collector = device.collector
     device_data = {
         "device_type": device.config_device_type,
@@ -1377,16 +1455,23 @@ def process_device_configurations(device, device_content_type, customer, bulk, e
             }
         raise BadRequestError(msg)
     device_data["config_file_type"] = config_file_type
-    headers = device.collector.get_auth_token_headers()
+    headers = None
+    if not getattr(device.collector, "is_ztc", False):
+        headers = device.collector.get_auth_token_headers()
     test_connection_url = "https://" + device.collector.ip_address + "/discovery/test_connection/"
-    response = requests.post(
-        test_connection_url,
-        data=json.dumps(device_data),
-        headers=headers,
-        verify=False,
-        timeout=120
-    )
-    if response.status_code != 200:
+    if getattr(device.collector, "is_ztc", False):
+        response = device.collector.post_to_collector(test_connection_url, json.dumps(device_data))
+        connection_failed = not collector_task_succeeded(response)
+    else:
+        response = requests.post(
+            test_connection_url,
+            data=json.dumps(device_data),
+            headers=headers,
+            verify=False,
+            timeout=120
+        )
+        connection_failed = response.status_code != 200
+    if connection_failed:
         device.is_in_progress = False
         device.save()
         msg = "Failed to establish connection for device {}({}).".format(device.name, device.management_ip)
@@ -1410,7 +1495,7 @@ def process_device_configurations(device, device_content_type, customer, bulk, e
 
     if (
         not configurations.filter(is_startup_config=True) and
-        device.config_device_type not in ["cisco_ftd", "f5_ltm", "fortinet", "paloalto_panos"]
+        device.config_device_type not in ["cisco_ftd", "f5_ltm", "fortinet", "paloalto_panos", "juniper", "juniper_junos"]
     ):
         # Currently supported for cisco ios and cisco nxos devices
         startup_config_url = "https://" + device.collector.ip_address + "/discovery/device_startup_config/"
@@ -1423,18 +1508,39 @@ def process_device_configurations(device, device_content_type, customer, bulk, e
             customer=customer
         )
         device_data["uuid"] = str(startup_config_instance.uuid)
-        response = requests.post(
-            startup_config_url,
-            data=json.dumps(device_data),
-            headers=headers,
-            verify=False,
-            timeout=600
-        )
-        if response.status_code != 200:
+        if getattr(device.collector, "is_ztc", False):
+            response = device.collector.post_to_collector(startup_config_url, json.dumps(device_data))
+            startup_config_result = collector_task_result(response)
+            startup_config_path = collector_result_value(
+                startup_config_result,
+                "data",
+                "path",
+                "result"
+            ) if collector_task_succeeded(response) else None
+            startup_config_failed = (
+                not startup_config_path or
+                (
+                    isinstance(startup_config_result, dict) and
+                    startup_config_result.get("state") == "FAILURE"
+                )
+            )
+        else:
+            response = requests.post(
+                startup_config_url,
+                data=json.dumps(device_data),
+                headers=headers,
+                verify=False,
+                timeout=600
+            )
+            startup_config_failed = response.status_code != 200
+            if not startup_config_failed:
+                startup_config_path = response.json()["data"]
+        if startup_config_failed:
             startup_config_instance.delete()
             device.is_in_progress = False
             device.save()
-            logger.error(str(response.text))
+            if not getattr(device.collector, "is_ztc", False):
+                logger.error(str(response.text))
             msg = "Failed to fetch startup configuration for device {}({}).".format(device.name, device.management_ip)
             if bulk:
                 logger.error(msg)
@@ -1447,7 +1553,6 @@ def process_device_configurations(device, device_content_type, customer, bulk, e
                     "error": msg
                 }
             raise BadRequestError(msg)
-        startup_config_path = response.json()["data"]
         try:
             file_dir = os.path.join(
                 settings.MEDIA_ROOT,
@@ -1493,7 +1598,7 @@ def process_device_configurations(device, device_content_type, customer, bulk, e
         else:
             backup_uuids.append(str(startup_config_instance.uuid))
 
-    # Currently cisco ftd, cisco ios, cisco nxos, fortinet, f5_ltm and paloalto_panos are supported
+    # Currently cisco ftd, cisco ios, cisco nxos, fortinet, f5_ltm, juniper, juniper_junos and paloalto_panos are supported
     running_config_url = "https://" + device.collector.ip_address + "/discovery/device_running_config/"
     file_password = device.default_encryption_password if device.config_device_type == "fortinet" else None
     running_config_instance = DeviceConfigurationData.objects.create(
@@ -1505,18 +1610,38 @@ def process_device_configurations(device, device_content_type, customer, bulk, e
         customer=customer
     )
     device_data["uuid"] = str(running_config_instance.uuid)
-    response = requests.post(
-        running_config_url,
-        data=json.dumps(device_data),
-        headers=headers,
-        verify=False,
-        timeout=600
-    )
-    if response.status_code != 200:
+    if getattr(device.collector, "is_ztc", False):
+        response = device.collector.post_to_collector(running_config_url, json.dumps(device_data))
+        running_config_result = collector_task_result(response)
+        running_config_path = collector_result_value(
+            running_config_result,
+            "data",
+            "path",
+            "result"
+        ) if collector_task_succeeded(response) else None
+        running_config_failed = (
+            not running_config_path or
+            isinstance(running_config_path, dict) or
+            (
+                isinstance(running_config_result, dict) and
+                running_config_result.get("state") == "FAILURE"
+            )
+        )
+    else:
+        response = requests.post(
+            running_config_url,
+            data=json.dumps(device_data),
+            headers=headers,
+            verify=False,
+            timeout=600
+        )
+        running_config_failed = response.status_code != 200
+    if running_config_failed:
         device.is_in_progress = False
         device.save()
         running_config_instance.delete()
-        logger.error(str(response.text))
+        if not getattr(device.collector, "is_ztc", False):
+            logger.error(str(response.text))
         msg = "Failed to fetch running configuration for device {}({}).".format(device.name, device.management_ip)
         if bulk:
             logger.error(msg)
@@ -1529,40 +1654,41 @@ def process_device_configurations(device, device_content_type, customer, bulk, e
                 "error": msg
             }
         raise BadRequestError(msg)
-    running_config_task_id = response.json()["task_id"]
-    task_url = "https://" + device.collector.ip_address + "/discovery/task/{}/".format(running_config_task_id)
-    while True:
-        response = requests.get(
-            task_url,
-            headers=headers,
-            verify=False,
-            timeout=60
-        )
-        if response.status_code == 200:
-            task_result = response.json()
-            if task_result.get("state") in ["SUCCESS", "PENDING", "STARTED", "FAILURE"]:
-                if task_result.get("state") == "SUCCESS":
-                    running_config_path = task_result.get("result")
-                    break
-                elif task_result.get("state") == "FAILURE":
-                    result = task_result.get("result")
-                    device.is_in_progress = False
-                    device.save()
-                    running_config_instance.delete()
-                    logger.error(result)
-                    msg = "Failed to fetch running configuration for device {}({}).".format(device.name, device.management_ip)
-                    if bulk:
-                        logger.error(msg)
-                        return {
-                            "device_name": device.name,
-                            "device_config_type": device.config_device_type,
-                            "device_type": device.DEVICE_TYPE,
-                            "device_ip": device.management_ip,
-                            "uuid": device.uuid,
-                            "error": msg
-                        }
-                    raise BadRequestError(msg)
-        time.sleep(10)
+    if not getattr(device.collector, "is_ztc", False):
+        running_config_task_id = response.json()["task_id"]
+        task_url = "https://" + device.collector.ip_address + "/discovery/task/{}/".format(running_config_task_id)
+        while True:
+            response = requests.get(
+                task_url,
+                headers=headers,
+                verify=False,
+                timeout=60
+            )
+            if response.status_code == 200:
+                task_result = response.json()
+                if task_result.get("state") in ["SUCCESS", "PENDING", "STARTED", "FAILURE"]:
+                    if task_result.get("state") == "SUCCESS":
+                        running_config_path = task_result.get("result")
+                        break
+                    elif task_result.get("state") == "FAILURE":
+                        result = task_result.get("result")
+                        device.is_in_progress = False
+                        device.save()
+                        running_config_instance.delete()
+                        logger.error(result)
+                        msg = "Failed to fetch running configuration for device {}({}).".format(device.name, device.management_ip)
+                        if bulk:
+                            logger.error(msg)
+                            return {
+                                "device_name": device.name,
+                                "device_config_type": device.config_device_type,
+                                "device_type": device.DEVICE_TYPE,
+                                "device_ip": device.management_ip,
+                                "uuid": device.uuid,
+                                "error": msg
+                            }
+                        raise BadRequestError(msg)
+            time.sleep(10)
     try:
         file_dir = os.path.join(
             settings.MEDIA_ROOT,
@@ -1810,7 +1936,9 @@ def sync_latest_iot_device_data(uuid, device_type, data_type):
     iot_device = device_model.objects.get(uuid=uuid)
     if not iot_device.collector or not iot_device.collector.ip_address or not iot_device.model or not iot_device.model.manufacturer:
         return False
-    headers = iot_device.collector.get_auth_token_headers()
+    headers = None
+    if not getattr(iot_device.collector, "is_ztc", False):
+        headers = iot_device.collector.get_auth_token_headers()
     data_url = "https://{}/discovery/{}/".format(iot_device.collector.ip_address, data_type)
     snmp_creds = []
     if hasattr(iot_device, "credentials_m2m"):
@@ -1842,16 +1970,22 @@ def sync_latest_iot_device_data(uuid, device_type, data_type):
         "ip_address": iot_device.ip_address,
         "unique_id": str(uuid)
     }
-    response = requests.post(
-        data_url,
-        data=json.dumps(data),
-        headers=headers,
-        verify=False,
-        timeout=600
-    )
-    if response.status_code == 200:
-        response_json = response.json()
-        latest_avg_value = response_json["value"]
+    if getattr(iot_device.collector, "is_ztc", False):
+        response = iot_device.collector.post_to_collector(data_url, json.dumps(data))
+        response_json = collector_task_result(response) if collector_task_succeeded(response) else None
+    else:
+        response = requests.post(
+            data_url,
+            data=json.dumps(data),
+            headers=headers,
+            verify=False,
+            timeout=600
+        )
+        response_json = response.json() if response.status_code == 200 else None
+    if isinstance(response_json, dict):
+        if isinstance(response_json.get("data"), dict):
+            response_json = response_json["data"]
+        latest_avg_value = response_json.get("value", 0)
     else:
         latest_avg_value = 0
     historymodel = history_model_map[data_type]
@@ -1890,7 +2024,7 @@ def delete_device_configurations(device_model):
             device_id=dev_obj.id,
             customer=customer,
             is_startup_config=False,
-            is_golden_config= False
+            is_golden_config=False
         ).order_by('-created_at')
         to_delete_configs = configs[15:]
         for config in to_delete_configs:
@@ -1938,13 +2072,14 @@ def delete_device_configurations(device_model):
         DeviceConfigurationData.objects.filter(uuid__in=path_empty).delete()
     logger.debug("Completed")
 
+
 def update_load_balancer_lifecycle_dates():
     for load_balancer_model in LoadBalancerModel.objects.all():
         if not load_balancer_model.manufacturer or not load_balancer_model.manufacturer.name or not load_balancer_model.name:
             continue
         manufacturer_name = load_balancer_model.manufacturer.name
         model_name = load_balancer_model.name
- 
+
         manufacturer_lifecycle = LOADBALANCER_MODEL_LIFECYCLE_DATES.get(manufacturer_name)
         if manufacturer_lifecycle:
             model_lifecycle = manufacturer_lifecycle.get(model_name)
@@ -1962,15 +2097,15 @@ def update_load_balancer_lifecycle_dates():
                 if end_of_security_support:
                     load_balancer_model.end_of_security_support = parse_date(end_of_security_support)
                 load_balancer_model.save()
- 
- 
+
+
 def update_firewall_lifecycle_dates():
     for firewall_model in FirewallModel.objects.all():
         if not firewall_model.manufacturer or not firewall_model.manufacturer.name or not firewall_model.name:
             continue
         manufacturer_name = firewall_model.manufacturer.name
         model_name = firewall_model.name
- 
+
         manufacturer_lifecycle = FIREWALL_MODEL_LIFECYCLE_DATES.get(manufacturer_name)
         if manufacturer_lifecycle:
             model_lifecycle = manufacturer_lifecycle.get(model_name)
@@ -1988,15 +2123,15 @@ def update_firewall_lifecycle_dates():
                 if end_of_security_support:
                     firewall_model.end_of_security_support = parse_date(end_of_security_support)
                 firewall_model.save()
- 
- 
+
+
 def update_switch_lifecycle_dates():
     for switch_model in SwitchModel.objects.all():
         if not switch_model.manufacturer or not switch_model.manufacturer.name or not switch_model.name:
             continue
         manufacturer_name = switch_model.manufacturer.name
         model_name = switch_model.name
- 
+
         manufacturer_lifecycle = SWITCH_MODEL_LIFECYCLE_DATES.get(manufacturer_name)
         if manufacturer_lifecycle:
             model_lifecycle = manufacturer_lifecycle.get(model_name)
@@ -2018,7 +2153,7 @@ def update_switch_lifecycle_dates():
 
 def update_software_server_lifecycle_dates():
     from unity_discovery.models import DeviceSoftwareServer
-    for software_server in  DeviceSoftwareServer.objects.all():
+    for software_server in DeviceSoftwareServer.objects.all():
         software_server_name = software_server.name
         if not software_server_name:
             continue
@@ -2037,4 +2172,3 @@ def update_software_server_lifecycle_dates():
             if end_of_security_support:
                 software_server.end_of_security_support = parse_date(end_of_security_support)
             software_server.save()
-

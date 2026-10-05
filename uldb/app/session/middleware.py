@@ -10,6 +10,19 @@ import json
 logger = logging.getLogger(__name__)  # logger from settings.py
 
 
+def _derive_session_cookie_domain(request):
+    configured = getattr(settings, 'SESSION_COOKIE_DOMAIN', None)
+    if configured is not None:
+        return configured
+
+    host = request.META.get('HTTP_HOST', '').split(':')[0]
+    parts = host.split('.')
+
+    if len(parts) >= 3 and not parts[-1].isdigit():
+        return '.' + '.'.join(parts[-3:])
+    return None
+
+
 class ULSessionMiddleware(object):
     """
     Middleware that provides ip and user_agent to the session store.
@@ -56,7 +69,7 @@ class ULSessionMiddleware(object):
                         request.session.session_key,
                         max_age=max_age,
                         expires=expires,
-                        domain=settings.SESSION_COOKIE_DOMAIN,
+                        domain=_derive_session_cookie_domain(request),
                         path=settings.SESSION_COOKIE_PATH,
                         secure=settings.SESSION_COOKIE_SECURE or None,
                         httponly=settings.SESSION_COOKIE_HTTPONLY or None)

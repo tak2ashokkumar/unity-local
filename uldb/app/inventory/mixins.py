@@ -924,7 +924,14 @@ class SNMPDeviceMixin(models.Model):
         ('SNMP', 'SNMP'),
         ('Agent', 'Agent'),
         ('HTTP', 'HTTP'),
-        ('API', 'API')
+        ('API', 'API'),
+        ('SSH', 'SSH'),
+        ('WinRM', 'WinRM')
+    )
+
+    CREDENTIAL_MODES = (
+        ('local', 'Local'),
+        ('my_cred', 'My Credentials')
     )
 
     connection_type = models.CharField(max_length=50, choices=CONNECTION_TYPES, null=True, blank=True)
@@ -938,6 +945,12 @@ class SNMPDeviceMixin(models.Model):
     snmp_cryptopass = EncryptedPasswordField(null=True)
     snmp_cryptoalgo = models.CharField(max_length=16, choices=CRYPTO_ALGOS, null=True, blank=True)
     mtp_templates = ArrayField(models.IntegerField(), blank=True, null=True)
+    mon_connection_type = models.CharField(max_length=50, null=True, blank=True)
+    mon_port = models.IntegerField(null=True, blank=True)
+    mon_credential_mode = models.CharField(max_length=20, choices=CREDENTIAL_MODES, null=True, blank=True)
+    mon_credential_id = models.UUIDField(null=True, blank=True)
+    mon_username = models.CharField(max_length=128, null=True, blank=True)
+    mon_password = EncryptedPasswordField(null=True)
 
     class Meta:
         abstract = True
@@ -952,6 +965,12 @@ class SNMPDeviceMixin(models.Model):
         self.snmp_cryptopass = None
         self.snmp_cryptoalgo = None
         self.mtp_templates = None
+        self.mon_connection_type = None
+        self.mon_port = None
+        self.mon_credential_mode = None
+        self.mon_credential_id = None
+        self.mon_username = None
+        self.mon_password = None
 
 
 class TagMixin(models.Model):
@@ -1093,7 +1112,23 @@ class MonitoringMethodsMixin(models.Model, WatchMethodsMixin):
         """
         self.connection_type = data.get('connection_type')
         if self.connection_type != 'API':
-            self.ip_address = data.get('ip_address')
+            self.ip_address = data.get('host_ip') or data.get('ip_address')
+        elif not self.ip_address:
+            self.ip_address = (
+                data.get('host_ip') or
+                data.get('ip_address') or
+                getattr(self, 'management_ip', None)
+            )
+        if self.connection_type == 'API':
+            port = data.get('port') or getattr(self, 'port', None) or 443
+            if hasattr(self, 'port'):
+                self.port = port
+            if hasattr(self, 'host_url') and 'host_url' in data:
+                self.host_url = data.get('host_url')
+            if hasattr(self, 'username') and 'username' in data:
+                self.username = data.get('username')
+            if hasattr(self, 'password') and 'password' in data:
+                self.password = data.get('password')
         self.snmp_community = data.get('snmp_community')
         self.snmp_version = data.get('snmp_version')
         self.snmp_authlevel = data.get('snmp_authlevel')
@@ -1102,6 +1137,27 @@ class MonitoringMethodsMixin(models.Model, WatchMethodsMixin):
         self.snmp_authalgo = data.get('snmp_authalgo')
         self.snmp_cryptopass = data.get('snmp_cryptopass')
         self.snmp_cryptoalgo = data.get('snmp_cryptoalgo')
+        if data.get('mtp_templates'):
+            self.mtp_templates = data.get('mtp_templates')
+        
+        mon_connection_type = data.get('mon_connection_type')
+        if mon_connection_type in ['SSH', 'WinRM']:
+            self.connection_type = mon_connection_type
+        if mon_connection_type:
+            self.mon_connection_type = mon_connection_type
+            mon_port = data.get('mon_port')
+            if mon_port:
+                self.mon_port = mon_port
+            elif mon_connection_type == 'SSH':
+                self.mon_port = 22
+            elif mon_connection_type == 'WinRM':
+                self.mon_port = 5985
+            mon_credential_mode = data.get('mon_credential_mode')
+            self.mon_credential_mode = mon_credential_mode
+            self.mon_credential_id = data.get('mon_credential_id')
+            self.mon_username = data.get('mon_username')
+            self.mon_password = data.get('mon_password') if mon_credential_mode == 'my_cred' else None
+
         if self.DEVICE_TYPE == Device.hypervisor:
             if hasattr(self, 'bm_server'):
                 # If the request data has bmc_type field
@@ -1208,9 +1264,12 @@ class MonitoringMethodsMixin(models.Model, WatchMethodsMixin):
         monitor_by = self.monitor_by
         del_item = None
         if monitor_by.get('zabbix') and self.zabbix:
-            del_item = self.zabbix.delete()
+            try:
+                del_item = self.zabbix.delete()
+            except Exception:
+                logger.exception("Failed to delete Zabbix host for %s", self)
             for component in self.get_related_components():
-                    component.delete_monitoring()
+                component.delete_monitoring()
 
         elif monitor_by.get('observium'):
             del_item = self.delete_observium_monitoring()
@@ -1611,7 +1670,10 @@ class SoftDeleteMixin(models.Model):
     # soft delete
     def delete(self, using=None, keep_parents=False):
         self.is_deleted = True
-        self.save(update_fields=["is_deleted"])
+        zabbix = getattr(self, 'zabbix', None)
+        if zabbix:
+            zabbix.disable()
+        self.save(update_fields=['is_deleted'])
 
 class LifeCycleStageMixin(models.Model):
     LIFE_CYCLE_STAGE_CHOICES = (

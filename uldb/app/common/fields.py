@@ -11,6 +11,7 @@ from django.contrib.postgres.fields import JSONField
 
 from Crypto.Cipher import AES
 from Crypto import Random
+import json
 
 from base64 import b64encode, b64decode
 
@@ -49,6 +50,9 @@ class EncryptedPasswordField(JSONField):
         """
         Prepare the value before it hits db.
         """
+        if value is not None and not isinstance(value, (basestring, dict, list)):
+            # Credentials may arrive as numbers, including zero.
+            value = unicode(value)
         rndfile = Random.new()
         iv = rndfile.read(16)
         aes_key = _aes_key(self.encryption_key)
@@ -56,6 +60,8 @@ class EncryptedPasswordField(JSONField):
         if value:
             if isinstance(value, unicode):
                 value = value.encode('utf-8')
+            elif isinstance(value, (dict, list)):
+                value = json.dumps(value)
             padded_value = _pad_aes(value)
             m = cipher.encrypt(padded_value)
             result = {
@@ -88,7 +94,15 @@ class EncryptedPasswordField(JSONField):
 
             for encoding in ['utf-8', 'windows-1252', 'latin-1', 'iso-8859-15']:
                 try:
-                    return message.decode(encoding)
+                    decoded = message.decode(encoding)
+                    try:
+                        parsed = json.loads(decoded)
+                    except (ValueError, TypeError):
+                        return decoded
+                    # Only structured payloads are JSON. Preserve scalar
+                    # credential text so numeric passwords survive re-saving.
+                    return parsed if isinstance(parsed, (dict, list)) else decoded
+                    
                 except UnicodeDecodeError:
                     continue
 

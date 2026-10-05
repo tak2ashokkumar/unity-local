@@ -92,7 +92,7 @@ HEADERS_DICT = {
     ],
     "Databases": ['db_instance_name', 'db_type', 'port', 'management_ip'],
     "Database Entity": ['name', 'short_description'],
-    "VMWare VMs": ['name']
+    "VMWare VM": ['name']
 }
 
 DEVICE_MISMATCH_MAP = {

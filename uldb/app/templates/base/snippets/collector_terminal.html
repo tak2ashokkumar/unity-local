@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Collector Terminal — {{ collector_cn }}</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0c10;--surface:#0d1117;--border:#1e2230;
+  --green:#22c55e;--blue:#38bdf8;--purple:#a78bfa;--cyan:#22d3ee;
+  --muted:#4b5563;--text:#e2e8f0;--accent:#00d4ff
+}
+html,body{width:100%;height:100%;overflow:hidden}
+body{display:flex;flex-direction:column;background:var(--bg);
+  font-family:'Consolas','Courier New',monospace;font-size:13px;color:var(--text)}
+#info-bar{background:#080b0f;border-bottom:1px solid var(--border);
+  padding:5px 14px;display:flex;align-items:center;gap:10px;
+  font-size:10px;color:var(--muted);flex-shrink:0}
+.hl{color:var(--accent)}.sep{color:var(--border)}
+#proto-badge{margin-left:auto;background:rgba(0,212,255,0.1);
+  border:1px solid rgba(0,212,255,0.2);color:var(--accent);
+  padding:2px 8px;border-radius:3px;font-size:9px;letter-spacing:0.08em}
+#tab-bar{background:#080b0f;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-end;padding:0 10px;flex-shrink:0}
+.tab{padding:5px 14px;font-size:9px;color:var(--muted);
+  border:1px solid transparent;border-bottom:none;
+  border-radius:4px 4px 0 0;display:flex;align-items:center;gap:6px;position:relative;top:1px}
+.tab.active{background:var(--surface);border-color:var(--border);color:var(--text)}
+.tab-dot{width:6px;height:6px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 4px var(--accent)}
+#out{flex:1;overflow-y:auto;padding:12px 16px;background:#080b0f;
+  white-space:pre-wrap;word-wrap:break-word;line-height:1.75;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+#out::-webkit-scrollbar{width:4px}
+#out::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#input-row{border-top:1px solid var(--border);padding:9px 16px;
+  display:flex;align-items:center;background:#080b0f;flex-shrink:0}
+#prompt{display:flex;align-items:baseline;white-space:nowrap;
+  font-size:13px;flex-shrink:0;user-select:none}
+.p-user{color:#22c55e}.p-at{color:var(--muted)}.p-host{color:#38bdf8}
+.p-colon{color:var(--muted)}.p-path{color:#a78bfa}.p-hash{color:#22c55e;margin-right:8px}
+#cmd{flex:1;background:transparent;border:none;outline:none;
+  font-family:'Consolas','Courier New',monospace;font-size:13px;
+  color:var(--text);caret-color:var(--accent);padding-left:6px}
+#cmd::placeholder{color:var(--muted);font-size:11px}
+#status-bar{background:#080b0f;border-top:1px solid var(--border);
+  padding:4px 14px;display:flex;align-items:center;gap:12px;
+  font-size:9px;color:var(--muted);flex-shrink:0}
+#st-dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+#st-dot.connected{background:var(--accent);box-shadow:0 0 5px var(--accent);
+  animation:dotPulse 2s ease-in-out infinite}
+#st-dot.error{background:#ef4444}
+#st-text.connected{color:var(--accent)}
+#st-meta{margin-left:auto;display:flex;gap:12px}
+.kbd{background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  padding:1px 5px;border-radius:3px;font-size:8px}
+#overlay{position:fixed;inset:0;background:var(--surface);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;z-index:100;transition:opacity 0.4s ease}
+#overlay.hidden{opacity:0;pointer-events:none}
+.ov-icon{font-size:28px;animation:ovPulse 1.2s ease-in-out infinite}
+.ov-title{font-size:13px;font-weight:600;color:var(--text);letter-spacing:0.06em}
+.ov-host{font-size:10px;color:var(--accent)}
+.ov-bar{width:180px;height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.ov-fill{height:100%;background:linear-gradient(90deg,var(--accent),#22c55e);
+  animation:ovFill 1.5s ease forwards}
+.ov-steps{display:flex;flex-direction:column;gap:5px;min-width:220px}
+.ov-step{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:7px;
+  opacity:0;transition:opacity 0.3s ease,transform 0.3s ease;transform:translateX(-4px)}
+.ov-step.show{opacity:1;transform:translateX(0)}
+.ov-step.ok{color:#22c55e}.ov-step.act{color:var(--accent)}
+@keyframes ovPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes ovFill{0%{width:0%}40%{width:55%}85%{width:90%}100%{width:100%}}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+</head>
+<body>
+<div id="info-bar">
+  <span>COLLECTOR SHELL</span>
+  <span class="sep">|</span>
+  <span class="hl">{{ collector_cn }}</span>
+  <span id="proto-badge">ZTC · BASH</span>
+</div>
+<div id="tab-bar">
+  <div class="tab active">
+    <div class="tab-dot"></div>
+    <span>{{ collector_cn }}</span>
+  </div>
+</div>
+<div id="out"></div>
+<div id="input-row">
+  <div id="prompt">
+    <span class="p-user">unityone</span><span class="p-at">@</span><span class="p-host">collector</span><span class="p-colon">:</span><span class="p-path">~</span><span class="p-hash">#</span>
+  </div>
+  <input id="cmd" type="text" autofocus autocomplete="off" spellcheck="false" placeholder="type commands here..." />
+</div>
+<div id="status-bar">
+  <div id="st-dot"></div>
+  <span id="st-text">connecting</span>
+  <span style="color:var(--border)">|</span>
+  <span id="st-size">200×30</span>
+  <div id="st-meta">
+    <span><span class="kbd">Ctrl+C</span> interrupt</span>
+    <span><span class="kbd">Ctrl+D</span> logout</span>
+    <span><span class="kbd">↑↓</span> history</span>
+    <span>ZTC collector shell</span>
+  </div>
+</div>
+<div id="overlay">
+  <div class="ov-icon">🖥️</div>
+  <div class="ov-title">Connecting to Collector</div>
+  <div class="ov-host">{{ collector_cn }}</div>
+  <div class="ov-bar"><div class="ov-fill"></div></div>
+  <div class="ov-steps">
+    <div class="ov-step ok">✓ ZTC tunnel ready</div>
+    <div class="ov-step ok">✓ Collector reachable</div>
+    <div class="ov-step act">⟳ Opening bash session...</div>
+  </div>
+</div>
+<script>
+var COLLECTOR_UUID = "{{ collector_uuid }}";
+var SESSION_ID     = "{{ session_id }}";
+var COLLECTOR_CN   = "{{ collector_cn }}";
+var proto = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+var wsurl = proto + location.host + '/webterminal/collector/' + COLLECTOR_UUID + '/' + SESSION_ID + '/';
+var out = document.getElementById('out');
+var cmd = document.getElementById('cmd');
+var ws, buf = '', flushTimer = null;
+var cmdHistory = [], histIdx = -1;
+var cols = 200, rows = 30;
+var overlayHidden = false;
+
+document.querySelectorAll('.ov-step').forEach(function(s, i) {
+  setTimeout(function() { s.classList.add('show'); }, i * 350 + 100);
+});
+
+function flush() {
+  if (buf.length > 0) {
+    out.textContent += clean(buf); buf = '';
+    out.scrollTop = out.scrollHeight;
+  }
+  flushTimer = null;
+}
+function write(s) {
+  buf += s;
+  if (!flushTimer) flushTimer = setTimeout(flush, 20);
+}
+function clean(s) {
+  return s
+    .replace(/\x1b\[\?2004[hl]/g,'')
+    .replace(/\x1b\[[0-9;]*[a-zA-Z]/g,'')
+    .replace(/\x1b\][^\x07]*\x07/g,'')
+    .replace(/\x1b[()][AB012]/g,'')
+    .replace(/\x1b[^a-zA-Z\[]/g,'')
+    .replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+}
+function setStatus(state) {
+  document.getElementById('st-dot').className = state;
+  var t = document.getElementById('st-text');
+  t.className = state; t.textContent = state;
+}
+function hideOverlay() {
+  if (!overlayHidden) {
+    overlayHidden = true;
+    document.getElementById('overlay').classList.add('hidden');
+    setStatus('connected');
+    cmd.focus();
+  }
+}
+function connect() {
+  setStatus('connecting');
+  ws = new WebSocket(wsurl);
+  ws.onopen = function() {
+    ws.send(JSON.stringify({
+      tp: 'init',
+      data: { rows:rows, cols:cols, collector_cn:COLLECTOR_CN, session_type:'collector_bash' }
+    }));
+  };
+  ws.onmessage = function(e) {
+    hideOverlay();
+    write(e.data);
+  };
+  ws.onclose = function(e) {
+    setStatus('error');
+    write('\n[disconnected code=' + e.code + ']\n');
+  };
+  ws.onerror = function() { setStatus('error'); };
+}
+cmd.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    var t = cmd.value; cmd.value = ''; histIdx = -1;
+    if (t) { cmdHistory.unshift(t); if (cmdHistory.length > 200) cmdHistory.pop(); }
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({tp:'data', data:t+'\n'}));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (histIdx < cmdHistory.length-1) { histIdx++; cmd.value = cmdHistory[histIdx]; }
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (histIdx > 0) { histIdx--; cmd.value = cmdHistory[histIdx]; }
+    else { histIdx = -1; cmd.value = ''; }
+  } else if (e.ctrlKey && e.key === 'c') {
+    e.preventDefault();
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({tp:'data', data:'\u0003'}));
+  } else if (e.ctrlKey && e.key === 'd') {
+    e.preventDefault();
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({tp:'data', data:'\u0004'}));
+  } else if (e.ctrlKey && e.key === 'l') {
+    e.preventDefault(); out.textContent = '';
+  } else if (e.key === 'Tab') {
+    e.preventDefault();
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({tp:'data', data:'\t'}));
+  }
+});
+connect();
+</script>
+</body>
+</html>

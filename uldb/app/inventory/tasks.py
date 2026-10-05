@@ -28,7 +28,10 @@ from .utils import (
     update_switch_lifecycle_dates,
     update_firewall_lifecycle_dates,
     update_load_balancer_lifecycle_dates,
-    update_software_server_lifecycle_dates
+    update_software_server_lifecycle_dates,
+    collector_result_value,
+    collector_task_result,
+    collector_task_succeeded
 )
 from agent.models import AgentConfig
 from integ.monitoring.utils import get_model_obj
@@ -106,7 +109,9 @@ def poll_device_status(agent_id, data):
     post_url = 'https://{ip_address}/discovery/device_status/'.format(
         ip_address=getattr(agent, 'ip_address', None)
     )
-    agent.post_to_collector(post_url, data)
+    response = agent.post_to_collector(post_url, data)
+    if getattr(agent, "is_ztc", False) and not collector_task_succeeded(response):
+        logger.error("Failed to submit device status task to ZTC collector %s", agent.ip_address)
 
 
 @task_config(speed='veryfast')
@@ -214,37 +219,60 @@ def restore_configuration_task(config_uuid):
     agent_ip_address = device.collector.ip_address
     agent_username = device.collector.ssh_username
     agent_password = device.collector.ssh_password
+    agent_ssh_port = device.collector.ssh_port
     device_data['ssh_ip_address'] = agent_ip_address
     device_data['ssh_username'] = agent_username
     device_data['ssh_password'] = agent_password
     device_data['config_file_type'] = device.config_file_type
     if device.config_device_type == 'fortinet':  # Currently supported for only Fortinet/Fortigate
         device_data['encrypted_password'] = restore_config_file.file_password
-    headers = device.collector.get_auth_token_headers()
+    headers = None
+    if not getattr(device.collector, "is_ztc", False):
+        headers = device.collector.get_auth_token_headers()
     test_connection_url = 'https://' + device.collector.ip_address + '/discovery/test_connection/'
-    response = requests.post(
-        test_connection_url,
-        data=json.dumps(device_data),
-        headers=headers,
-        verify=False,
-        timeout=120
-    )
-    if response.status_code != 200:
+    if getattr(device.collector, "is_ztc", False):
+        response = device.collector.post_to_collector(test_connection_url, json.dumps(device_data))
+        connection_failed = not collector_task_succeeded(response)
+    else:
+        response = requests.post(
+            test_connection_url,
+            data=json.dumps(device_data),
+            headers=headers,
+            verify=False,
+            timeout=120
+        )
+        connection_failed = response.status_code != 200
+    if connection_failed:
         raise Exception('Credentials are invalid.')
     restore_file_path = restore_config_file.config_file
     root_media_url = 'https://' + device.collector.ip_address + '/discovery/media_directory/'
-    response = requests.get(
-        root_media_url,
-        headers=headers,
-        verify=False,
-        timeout=60
-    )
-    if response.status_code != 200:
+    if getattr(device.collector, "is_ztc", False):
+        response = device.collector.post_to_collector(root_media_url, json.dumps({}))
+        root_media_path = collector_result_value(
+            collector_task_result(response),
+            "path",
+            "data",
+            "result"
+        ) if collector_task_succeeded(response) else None
+    else:
+        response = requests.get(
+            root_media_url,
+            headers=headers,
+            verify=False,
+            timeout=60
+        )
+        root_media_path = response.json()['path'] if response.status_code == 200 else None
+    if not root_media_path:
         raise Exception('Failed to get root media.')
-    agent_file_dir = response.json()['path'] + 'configurations'
+    agent_file_dir = root_media_path + 'configurations'
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(agent_ip_address, username=agent_username, password=agent_password)
+    ssh.connect(
+        agent_ip_address,
+        port=agent_ssh_port,
+        username=agent_username,
+        password=agent_password
+    )
     sftp = ssh.open_sftp()
     try:
         sftp.stat(agent_file_dir)
@@ -257,34 +285,43 @@ def restore_configuration_task(config_uuid):
         'file_path': agent_file_path,
         'device_data': device_data
     }
-    response = requests.post(
-        restore_configuration_url,
-        data=json.dumps(restore_data),
-        headers=headers,
-        verify=False,
-        timeout=120
-    )
-    if response.status_code != 200:
-        raise Exception('Config restoration failed.')
-    task_id = response.json()['task_id']
-    while True:
-        task_url = 'https://' + device.collector.ip_address + '/discovery/task/{}/'.format(task_id)
-        response = requests.get(
-            task_url,
+    if getattr(device.collector, "is_ztc", False):
+        response = device.collector.post_to_collector(restore_configuration_url, json.dumps(restore_data))
+        if not collector_task_succeeded(response):
+            raise Exception('Config restoration failed.')
+        task_result = collector_task_result(response)
+        if isinstance(task_result, dict) and task_result.get('state') == 'FAILURE':
+            logger.error(task_result.get('result'))
+            raise Exception('Restoration Failed!')
+    else:
+        response = requests.post(
+            restore_configuration_url,
+            data=json.dumps(restore_data),
             headers=headers,
             verify=False,
-            timeout=60
+            timeout=120
         )
-        if response.status_code == 200:
-            task_result = response.json()
-            if task_result.get('state') in ['SUCCESS', 'PENDING', 'STARTED', 'FAILURE']:
-                if task_result.get('state') == 'SUCCESS':
-                    break
-                elif task_result.get('state') == 'FAILURE':
-                    result = task_result.get('result')
-                    logger.error(result)
-                    raise Exception('Restoration Failed!')
-        time.sleep(25)  # Wait time for celery
+        if response.status_code != 200:
+            raise Exception('Config restoration failed.')
+        task_id = response.json()['task_id']
+        while True:
+            task_url = 'https://' + device.collector.ip_address + '/discovery/task/{}/'.format(task_id)
+            response = requests.get(
+                task_url,
+                headers=headers,
+                verify=False,
+                timeout=60
+            )
+            if response.status_code == 200:
+                task_result = response.json()
+                if task_result.get('state') in ['SUCCESS', 'PENDING', 'STARTED', 'FAILURE']:
+                    if task_result.get('state') == 'SUCCESS':
+                        break
+                    elif task_result.get('state') == 'FAILURE':
+                        result = task_result.get('result')
+                        logger.error(result)
+                        raise Exception('Restoration Failed!')
+            time.sleep(25)  # Wait time for celery
     changes = {'action': ['{} - Restore Operation Completed.'.format(device.name)]}
     LogEntry.objects.log_create(
         restore_config_file,
@@ -349,3 +386,187 @@ def sync_model_lifecycle_dates(self):
     update_firewall_lifecycle_dates()
     update_load_balancer_lifecycle_dates()
     update_software_server_lifecycle_dates()
+
+@task_config(speed='veryfast')
+@shared_task(bind=True, soft_time_limit=1800, time_limit=3600)
+def sync_bm_server_storage(self):
+    """Daily sync task for BM server storage. Scheduled via register_bm_storage_sync_schedule."""
+    from .models import BMServer
+    logger.info("Starting BM server storage sync")
+    updated_count = 0
+    
+    for bm_server in BMServer.objects.all():
+        try:
+            server = bm_server.server
+            storage_data = None
+            
+            # Check credentials first, then monitoring
+            if server.credentials_m2m.exists():
+                storage_data = _fetch_storage_from_credentials(bm_server)
+            elif hasattr(server, 'zabbix') and server.zabbix:
+                storage_data = _fetch_storage_from_monitoring(bm_server)
+            
+            if storage_data:
+                # Preserve manual values set by UI, only update discovered keys
+                existing = server.storage_usage or {}
+                manual = existing.get('manual', {}) if isinstance(existing, dict) else {}
+                storage_data['manual'] = manual
+                server.storage_usage = storage_data
+                server.save()
+                updated_count += 1
+        except Exception as e:
+            logger.error("Failed to sync storage for BM server %s: %s", bm_server.server.name, str(e))
+            continue
+    
+    logger.info("BM server storage sync completed. Updated %d servers", updated_count)
+    return updated_count
+
+
+def _fetch_storage_from_credentials(bm_server):
+    """
+    Discover storage via SSH credentials attached to the BM server.
+    Runs 'df -BG' on the server to get disk usage in GB.
+    """
+    try:
+        server = bm_server.server
+        ssh_cred = None
+        for cred in server.credentials_m2m.all():
+            if cred.connection_type in ('SSH', 'SSH Key'):
+                ssh_cred = cred
+                break
+        
+        if not ssh_cred:
+            return None
+        
+        host = server.management_ip or server.ip_address
+        if not host:
+            return None
+        
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        
+        connect_kwargs = {
+            'hostname': host,
+            'username': ssh_cred.username,
+            'port': ssh_cred.port or 22,
+            'timeout': 30,
+            'banner_timeout': 30,
+        }
+        if ssh_cred.connection_type == 'SSH Key' and ssh_cred.key:
+            import io
+            pkey = paramiko.RSAKey.from_private_key(io.StringIO(ssh_cred.key))
+            connect_kwargs['pkey'] = pkey
+        else:
+            connect_kwargs['password'] = ssh_cred.password
+        
+        client.connect(**connect_kwargs)
+        
+        # Run df -BG to get disk usage in GB, excluding tmpfs/devtmpfs
+        stdin, stdout, stderr = client.exec_command(
+            "df -BG --output=size,used,avail,target | grep -v tmpfs | grep -v devtmpfs | tail -n +2"
+        )
+        output = stdout.read().decode('utf-8').strip()
+        client.close()
+        
+        if not output:
+            return None
+        
+        total_gb = 0.0
+        used_gb = 0.0
+        available_gb = 0.0
+        
+        for line in output.splitlines():
+            parts = line.split()
+            if len(parts) >= 3:
+                try:
+                    total_gb += float(parts[0].replace('G', ''))
+                    used_gb += float(parts[1].replace('G', ''))
+                    available_gb += float(parts[2].replace('G', ''))
+                except (ValueError, IndexError):
+                    continue
+        
+        if total_gb == 0:
+            return None
+        
+        consumed_pct = (used_gb / total_gb) * 100 if total_gb > 0 else 0
+        available_pct = (available_gb / total_gb) * 100 if total_gb > 0 else 0
+        
+        return {
+            'total': {'value': int(round(total_gb)), 'unit': 'GB'},
+            'available': {'value': int(round(available_gb)), 'unit': 'GB'},
+            'used': {'value': int(round(used_gb)), 'unit': 'GB'},
+            'consumed_percentage': {'value': round(consumed_pct, 2), 'unit': '%'},
+            'available_percentage': {'value': round(available_pct, 2), 'unit': '%'}
+        }
+    except Exception as e:
+        logger.error("Failed to fetch storage via SSH credentials for BM server %s: %s", bm_server.server.name, str(e))
+        return None
+
+
+def _fetch_storage_from_monitoring(bm_server):
+    try:
+        zabbix = bm_server.server.zabbix
+        if not zabbix:
+            return None
+        
+        storage_items = zabbix.get_items()
+        if not storage_items:
+            return None
+        
+        total_gb = None
+        available_gb = None
+        used_gb = None
+        
+        for item in storage_items:
+            key = item.get('key', '')
+            if 'vfs.fs.size' in key:
+                if 'total' in key:
+                    total_data = zabbix.api.get_last_value(key)
+                    if total_data:
+                        total_gb = float(total_data) / (1024**3)
+                elif 'free' in key:
+                    free_data = zabbix.api.get_last_value(key)
+                    if free_data:
+                        available_gb = float(free_data) / (1024**3)
+                elif 'used' in key:
+                    used_data = zabbix.api.get_last_value(key)
+                    if used_data:
+                        used_gb = float(used_data) / (1024**3)
+        
+        if total_gb and available_gb:
+            if used_gb is None:
+                used_gb = total_gb - available_gb
+            consumed_pct = (used_gb / total_gb) * 100 if total_gb > 0 else 0
+            available_pct = (available_gb / total_gb) * 100 if total_gb > 0 else 0
+            
+            return {
+                'total': {'value': round(total_gb, 2), 'unit': 'GB'},
+                'available': {'value': round(available_gb, 2), 'unit': 'GB'},
+                'used': {'value': round(used_gb, 2), 'unit': 'GB'},
+                'consumed_percentage': {'value': round(consumed_pct, 2), 'unit': '%'},
+                'available_percentage': {'value': round(available_pct, 2), 'unit': '%'}
+            }
+        return None
+    except Exception as e:
+        logger.error("Failed to fetch storage from monitoring: %s", str(e))
+        return None
+
+
+def register_bm_storage_sync_schedule():
+    """
+    Register sync_bm_server_storage as a daily PeriodicTask.
+    Call this from a migration or app ready signal.
+    """
+    from synchronize.models import IntervalSchedule, PeriodicTask
+    interval_daily, _ = IntervalSchedule.objects.get_or_create(
+        every=1,
+        period=IntervalSchedule.DAYS,
+    )
+    PeriodicTask.objects.get_or_create(
+        name='sync_bm_server_storage_daily',
+        defaults={
+            'interval': interval_daily,
+            'task': 'app.inventory.tasks.sync_bm_server_storage',
+        }
+    )
+    logger.info("BM server storage sync daily schedule registered.")

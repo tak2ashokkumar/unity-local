@@ -138,7 +138,7 @@ class Interface(models.Model):
 class DeviceModelBase(models.Model):
     power_consumption = models.IntegerField(null=True, blank=False)
     end_of_life = models.DateTimeField(null=True, blank=True)
-    end_of_service = models.DateTimeField(null=True, blank=True) # or end_of_support
+    end_of_service = models.DateTimeField(null=True, blank=True)  # or end_of_support
     end_of_extended_support = models.DateTimeField(null=True, blank=True)
     end_of_security_support = models.DateTimeField(null=True, blank=True)
 
@@ -754,7 +754,7 @@ class CustomDevice(InventoryModel, NetworkingDeviceMixin, AddressableModel, Asse
     device = GenericRelation('monitoring.DashboardDevice', object_id_field='device_id')
     device_mapping = GenericRelation('inventory.PDUSocketMappings', object_id_field='device_id')
     ip_address = models.GenericIPAddressField(null=True, blank=True)
-    snmp_community = EncryptedPasswordField(null=True) 
+    snmp_community = EncryptedPasswordField(null=True)
     datacenter = models.ForeignKey('CloudService.ColoCloud', null=True, blank=True, on_delete=models.SET_NULL)
     _zabbix = GenericRelation('zabbix.ZabbixHostCustomDeviceMap', object_id_field='device_id', for_concrete_model=False)
     # _events = GenericRelation('aiops.Event', object_id_field='device_id')
@@ -913,7 +913,7 @@ class URL(models.Model):
     response_availability = models.BooleanField(default=False, )
     string_availabilty = models.BooleanField(default=False)
     login_username = models.CharField(max_length=128, null=True)
-    login_password = EncryptedPasswordField( null=True)
+    login_password = EncryptedPasswordField(null=True)
     response_status = models.CharField(max_length=128, null=True)
     string_pattern = models.CharField(max_length=128, null=True)
 
@@ -971,7 +971,7 @@ class LoadBalancerModel(InventoryModel, NetworkingDeviceClassMixin, DeviceModelB
 
 class AbstractAPI(InventoryModel):
     username = models.CharField(max_length=256, null=True)
-    password = EncryptedPasswordField( null=True)
+    password = EncryptedPasswordField(null=True)
     api_url = models.CharField(max_length=256, null=True)
 
     class Meta:
@@ -1262,7 +1262,7 @@ class StorageDevice(InventoryModel, AssetMixin, CabinetMixin, ProxyMixin,
                     SNMPDeviceMixin, ObserviumMonitoringEnablerMixin,
                     MonitoringMethodsMixin, TagMixin, StorageDetailMixin, SyncMixin,
                     DeviceCollectorMixin, DeviceCredentialsMixin, CustomAttributeMixin,
-                     DeviceCTIMixin, RedFishModelMixin, ContentTypeMixin, SoftDeleteMixin):
+                    DeviceCTIMixin, RedFishModelMixin, ContentTypeMixin, SoftDeleteMixin):
     DEVICE_TYPE = Device.storage
     DEVICE_CATEGORY = Device.storage_device
     WATCH_RELATED_NAME = 'storage_watch'
@@ -1278,8 +1278,8 @@ class StorageDevice(InventoryModel, AssetMixin, CabinetMixin, ProxyMixin,
     is_cluster = models.BooleanField(default=False)
     host_url = models.URLField(null=True, blank=True)
     username = models.CharField(max_length=256, null=True, blank=True)
-    password = EncryptedPasswordField( null=True, blank=True)
-    purity_api_token = EncryptedPasswordField( null=True, blank=True)
+    password = EncryptedPasswordField(null=True, blank=True)
+    purity_api_token = EncryptedPasswordField(null=True, blank=True)
     purity_api_version = models.CharField(max_length=256, null=True, blank=True)
     is_purity = models.BooleanField(default=False)
     port = models.IntegerField(null=True, blank=True)
@@ -1434,7 +1434,7 @@ class StorageDevice(InventoryModel, AssetMixin, CabinetMixin, ProxyMixin,
 
     def get_related_components(self):
         return self.nodes.all()
-    
+
     @classmethod
     def get_fast_list_url(cls):
         return django_reverse('customer_fast:customer_storagedevices-list')
@@ -1454,7 +1454,17 @@ class StorageDevice(InventoryModel, AssetMixin, CabinetMixin, ProxyMixin,
     #         component.enable_snmptrap()
 
 
-class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCredentialsMixin, CustomAttributeMixin, DeviceCTIMixin, LifeCycleStageMixin, LifeCycleStageStatusMixin):
+class DatabaseServer(
+    InventoryModel,
+    MonitoringMethodsMixin,
+    TagMixin,
+    DeviceCredentialsMixin,
+    CustomAttributeMixin,
+    DeviceCTIMixin,
+    SoftDeleteMixin,
+    LifeCycleStageMixin,
+    LifeCycleStageStatusMixin
+):
     DEVICE_TYPE = Device.database
     WATCH_RELATED_NAME = 'database_server_watch'
     BMS = 'BMS'
@@ -1502,6 +1512,8 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
     end_of_security_support = models.DateTimeField(null=True, blank=True)
     end_of_extended_support = models.DateTimeField(null=True, blank=True)
     service_pack = models.CharField(max_length=50, null=True, blank=True)
+
+    objects = DeviceCommonBaseManager()
 
     def __unicode__(self):
         return self.db_instance_name
@@ -1562,13 +1574,21 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
         super(DatabaseServer, self).save(*args, **kwargs)
         self._create_relation()
 
+    def delete(self, using=None, keep_parents=False):
+        self.delete_monitoring()
+        DatabaseEntity.all_objects.filter(database_server=self).update(is_deleted=True)
+        self.is_deleted = True
+        self.save(update_fields=["is_deleted"])
+
     def _create_relation(self):
         relation = AdvancedNeighborInformation.objects.filter(customer=self.customer, source_uuid=self.device_object.uuid, target_uuid=self.uuid).first()
         if not relation:
             AdvancedNeighborInformation.objects.create(
                 customer=self.customer,
-                source_device=self.device_object, target_device=self,
-                source_uuid= self.device_object.uuid, target_uuid=self.uuid,
+                source_device=self.device_object,
+                target_device=self,
+                source_uuid=self.device_object.uuid,
+                target_uuid=self.uuid,
                 source_designation='parent'
             )
 
@@ -1588,6 +1608,12 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
                 return self.device_object.server.name
             return self.device_object.name
         return None
+
+    @property
+    def db_server_is_deleted(self):
+        if self.device_object:
+            return getattr(self.device_object, 'is_deleted', False)
+        return False
 
     @property
     def operating_system(self):
@@ -1617,12 +1643,13 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
         self.driver = data.get('driver')
         self.username = data.get('username')
         self.password = data.get('password')
+        self.service_name = data.get('service_name')
         self.database_name = data.get('service_name')
 
-        if self.connection_type == "ODBC":
-            output = self.add_odbc_details_to_collector(self.device_object.collector, data)
-            if not output:
-                raise BadRequestError("DSN already in use please try new one")
+        # if self.connection_type == "ODBC":
+        #    output = self.add_odbc_details_to_collector(self.device_object.collector, data)
+        #    if not output:
+        #        raise BadRequestError("DSN already in use please try new one")
 
         # TODO: hardcoded for now.
         # these values should be sent from the UI
@@ -1643,7 +1670,8 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
             self.zabbix.save()
         else:
             try:
-                zabbix_customer_proxy = self.customer.zabbixcustomer.proxies.get(collector=self.device_object.collector)
+                collector=self.device_object.collector or self.device_object.account.collector
+                zabbix_customer_proxy = self.customer.zabbixcustomer.proxies.get(collector=collector)
             except ObjectDoesNotExist:
                 raise BadRequestError(
                     "Collector monitoring configuration is incomplete"
@@ -1676,7 +1704,7 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
             status = self.zabbix.running_status()
             if status is not None:
                 status = str(status)
-            return status
+            return status or "1"
 
     def get_status(self):
         if self.zabbix:
@@ -1686,7 +1714,7 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
                 status = ZabbixHosts.objects.using(zabbix_db_ip).get(host_id=host_id).status
                 status = '1' if str(status) == '0' else '0'
             except Exception as e:
-                status = "-1"
+                status = "1"
             return status
 
     def get_uptime(self):
@@ -1722,7 +1750,7 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
             ssh_manager = agent.get_ssh_manager()
             success, content = ssh_manager.read_docker_file('unity-monitoring-proxy', '/etc/odbc.ini')
             if success:
-                content = content or  ''
+                content = content or ''
                 config = configparser.RawConfigParser()
                 config.optionxform = str  # Make it case-sensitive
                 config.readfp(StringIO.StringIO(content))
@@ -1750,10 +1778,10 @@ class DatabaseServer(InventoryModel, MonitoringMethodsMixin, TagMixin, DeviceCre
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         err_msg = ''
         connected = False
-        #data_source_name = data.get('data_source_name')
-        #driver = data.get('driver')
-        #port = self.port
-        #server = self.ip_address + ',' + str(port)
+        # data_source_name = data.get('data_source_name')
+        # driver = data.get('driver')
+        # port = self.port
+        # server = self.ip_address + ',' + str(port)
         try:
             ssh.connect(
                 agent.ip_address,
@@ -2137,7 +2165,7 @@ class PDU(AddressableModel, SalesforceMixin, CabinetMixin, ProxyMixin, Observium
         null=True,
         blank=True,
         verbose_name='User Name')
-    password = EncryptedPasswordField( null=True, blank=True)
+    password = EncryptedPasswordField(null=True, blank=True)
     is_allocated = models.BooleanField(default=False, verbose_name='State')
     salesforce_id = models.CharField(
         max_length=128,
@@ -2321,19 +2349,19 @@ class PDUSocketMappings(models.Model):
         return self.pdu.customer.id
 
     def save(self, *args, **kwargs):
-        # saving the same info in NeighborInformation for topology
-        # todo : remove this table and use the NeighborInformation
-        NeighborInformation.objects.get_or_create(
+        AdvancedNeighborInformation.objects.get_or_create(
             source_uuid=self.pdu.uuid,
             target_uuid=self.device_object.uuid,
-            customer=self.pdu.customer
+            customer=self.pdu.customer,
+            defaults={
+                'source_device': self.pdu,
+                'target_device': self.device_object,
+            }
         )
         return super(PDUSocketMappings, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        # saving the same info in NeighborInformation for topology
-        # todo : remove this table and use the NeighborInformation
-        NeighborInformation.objects.filter(
+        AdvancedNeighborInformation.objects.filter(
             source_uuid=self.pdu.uuid,
             target_uuid=self.device_object.uuid,
             customer=self.pdu.customer
@@ -2362,14 +2390,17 @@ class OperatingSystem(models.Model):
         ('Embedded Linux', 'Embedded Linux'),
         ('FortiOS', 'FortiOS'),
         ('FortiOS Standard', 'FortiOS Standard'),
-        ('HA FortiOS', 'HA FortiOS'),
-
+        ('HA FortiOS', 'HA FortiOS')
     )
 
     name = models.CharField(max_length=128, null=False)
     version = models.CharField(max_length=128, null=True, blank=True)
     platform_type = models.CharField(choices=OS_TYPES, max_length=50, null=False, blank=False)
     os_architecture = models.CharField(max_length=128, null=True, blank=True)
+    end_of_life = models.DateTimeField(blank=True, null=True)
+    end_of_support = models.DateTimeField(blank=True, null=True)
+    end_of_security_support = models.DateTimeField(blank=True, null=True)
+    end_of_extended_support = models.DateTimeField(blank=True, null=True)
     objects = OperatingSystemManager()
 
     def __unicode__(self):
@@ -2392,6 +2423,21 @@ class OperatingSystem(models.Model):
         s = input.replace(' ', '').lower()
         logger.debug("checking %s == %s" % (full, s))
         return full == s
+
+
+@receiver(post_save, sender=OperatingSystem)
+def sync_operating_system_lifecycle(sender, instance, **kwargs):
+    update_fields = kwargs.get("update_fields")
+    lifecycle_fields = {
+        "end_of_life",
+        "end_of_support",
+        "end_of_security_support",
+        "end_of_extended_support",
+    }
+    if update_fields and set(update_fields).issubset(lifecycle_fields):
+        return
+    from app.inventory.os_lifecycle import apply_operating_system_lifecycle
+    apply_operating_system_lifecycle(instance)
 
 
 class PowerSupplyUnitModel(models.Model):
@@ -2762,7 +2808,7 @@ class IPMIAttributes(models.Model):
         null=True,
         blank=True,
         verbose_name='User Name')
-    ipmi_password = EncryptedPasswordField( null=True, blank=True)
+    ipmi_password = EncryptedPasswordField(null=True, blank=True)
     mac_address = models.CharField(
         max_length=45,
         null=True,
@@ -2877,6 +2923,12 @@ class Server(InventoryModel, AssetMixin, UserStampModel, ComputeMixin, Nonstrict
     def org_name(self):
         return self.customer.name
 
+    @property
+    def os_category(self):
+        if self.os and getattr(self.os, "full_name", None):
+            return self.os.full_name
+        return None
+
     def get_customer(self):
         return self.customer
 
@@ -2923,7 +2975,11 @@ class Server(InventoryModel, AssetMixin, UserStampModel, ComputeMixin, Nonstrict
         try:
             mobos = self._get_mobos()
             disks = [disk for m in mobos for disk in m.disk_set.all()]
-            self.memory_mb = sum([disk.model.capacity_gb for disk in disks if disk.model is not None])
+            # self.memory_mb = sum([disk.model.capacity_gb for disk in disks if disk.model is not None])
+            self.memory_mb = sum([
+                float(str(disk.model.capacity_gb).split(' ')[0])
+                for disk in disks if disk.model is not None and disk.model.capacity_gb
+            ])
         except Server.RelationNotSpecified:
             pass
 
@@ -3095,6 +3151,12 @@ class BMServer(InventoryModel, BMCBMServerMixin, SoftDeleteMixin, LifeCycleStage
     def collector(self):
         return self.server.collector
 
+    @property
+    def os_category(self):
+        if self.os and getattr(self.os, "full_name", None):
+            return self.os.full_name
+        return None
+
     def save_controller(self, **kwargs):
         controller = None
         bmc_type = kwargs.get('bmc_type')
@@ -3123,8 +3185,9 @@ class BMServer(InventoryModel, BMCBMServerMixin, SoftDeleteMixin, LifeCycleStage
             controller.bm_server = self
             controller.ip = ip
 
-            if username is not None and password is not None:
+            if username is not None:
                 controller.username = username
+            if password is not None:
                 controller.password = password
             controller.proxy_url = proxy_url
             controller.save()
@@ -3217,20 +3280,17 @@ class BaseController(object):
         else:
             self.connect = None
 
-    def ipmi_post_request(self, action, text=False):
+    def ipmi_post_request(self, action, text=False, collector=None):
         agent = self.agent
-        url = 'https://' + agent.ip_address + '/' + action
+        coll = collector if collector else agent
+        url = 'https://{}/discovery/{}/'.format(coll.ip_address, action)
         data = {
             'ip': self.ip,
             'username': self.username,
             'password': self.password
         }
-        response = requests.post(
-            url,
-            auth=HTTPBasicAuth(agent.web_username, agent.web_password),
-            data=data,
-            verify=False
-        )
+        headers = coll.get_auth_token_headers()
+        response = requests.post(url, json=data, headers=headers, verify=False, timeout=60)
         try:
             if text:
                 return response.text
@@ -3255,7 +3315,7 @@ class BaseController(object):
         def api():
             logger.debug("BM Server Power status from Agent API")
             try:
-                return self.ipmi_post_request('ipmi_power_status')
+                return self.ipmi_post_request(action='ipmi_power_status')
             except Exception as e:
                 logger.error("Agent API connection error : %s", e)
                 pass
@@ -3264,12 +3324,13 @@ class BaseController(object):
         def agent():
             logger.debug("BM Server Power status from Pyro")
             if self.connect:
-                try:
-                    response = self.connect.ipmi_power_status(self.ip, self.password, self.username)
-                    return response
-                except self.pyro.errors.CommunicationError as ce:
-                    logger.error("Cumminication error : %s", ce)
-                    return api()
+                # try:
+                #     response = self.connect.ipmi_power_status(self.ip, self.password, self.username)
+                #     return response
+                # except self.pyro.errors.CommunicationError as ce:
+                #     logger.error("Cumminication error : %s", ce)
+                #     return api()
+                return api()
             return {"power_status": None}
 
         def local():
@@ -3284,12 +3345,12 @@ class BaseController(object):
         else:
             return local()
 
-    def power_off(self):
+    def power_off(self, collector=None):
 
         def api():
             logger.debug("BM Server Power Off from Agent API")
             try:
-                return self.ipmi_post_request('ipmi_power_off')
+                return self.ipmi_post_request(action='ipmi_power_off', collector=collector)
             except Exception as e:
                 logger.error("Agent API connection error : %s", e)
                 pass
@@ -3298,12 +3359,13 @@ class BaseController(object):
         def agent():
             logger.debug("BM Server Power off from Pyro")
             if self.connect:
-                try:
-                    response = self.connect.ipmi_power_off(self.ip, self.password, self.username)
-                    return response
-                except self.pyro.errors.CommunicationError as ce:
-                    logger.error("Cumminication error : %s", ce)
-                    return api()
+                # try:
+                #     response = self.connect.ipmi_power_off(self.ip, self.password, self.username)
+                #     return response
+                # except self.pyro.errors.CommunicationError as ce:
+                #     logger.error("Cumminication error : %s", ce)
+                #     return api()
+                return api()
             return {"power_status": None}
 
         def local():
@@ -3316,17 +3378,17 @@ class BaseController(object):
                 pstatus = self.check_status(ipmi_tool.output).get("power_status")
             return status
 
-        if self.agent:
+        if self.agent or collector:
             return agent()
         else:
             return local()
 
-    def power_on(self):
+    def power_on(self, collector=None):
 
         def api():
             logger.debug("BM Server Power On from Agent API")
             try:
-                return self.ipmi_post_request('ipmi_power_on')
+                return self.ipmi_post_request(action='ipmi_power_on', collector=collector)
             except Exception as e:
                 logger.error("Agent API connection error : %s", e)
                 pass
@@ -3335,12 +3397,13 @@ class BaseController(object):
         def agent():
             logger.debug("BM Server Power on from Pyro")
             if self.connect:
-                try:
-                    response = self.connect.ipmi_power_on(self.ip, self.password, self.username)
-                    return response
-                except self.pyro.errors.CommunicationError as ce:
-                    logger.error("Cumminication error : %s", ce)
-                    return api()
+                # try:
+                #     response = self.connect.ipmi_power_on(self.ip, self.password, self.username)
+                #     return response
+                # except self.pyro.errors.CommunicationError as ce:
+                #     logger.error("Communication error : %s", ce)
+                #     return api()
+                return api()
             return {"power_status": None}
 
         def local():
@@ -3353,17 +3416,17 @@ class BaseController(object):
                 pstatus = self.check_status(ipmi_tool.output).get("power_status")
             return status
 
-        if self.agent:
+        if self.agent or collector:
             return agent()
         else:
             return local()
 
-    def chassis_statistics(self):
+    def chassis_statistics(self, collector=None):
 
         def api():
             logger.debug("BM Server Chassis Stats from Agent API")
             try:
-                return self.ipmi_post_request('ipmi_chassis_statistics', text=True)
+                return self.ipmi_post_request(action='ipmi_chassis_statistics', text=True, collector=collector)
             except Exception as e:
                 logger.error("Agent API connection error : %s", e)
                 pass
@@ -3372,12 +3435,13 @@ class BaseController(object):
         def agent():
             logger.debug("BM Server Chassis Stats from Pyro")
             if self.connect:
-                try:
-                    response = self.connect.ipmi_chassis_statistics(self.ip, self.password, self.username)
-                    return response
-                except self.pyro.errors.CommunicationError as ce:
-                    logger.error("Cumminication error : %s", ce)
-                    return api()
+                # try:
+                #     response = self.connect.ipmi_chassis_statistics(self.ip, self.password, self.username)
+                #     return response
+                # except self.pyro.errors.CommunicationError as ce:
+                #     logger.error("Cumminication error : %s", ce)
+                #     return api()
+                return api()
             return None
 
         def local():
@@ -3389,17 +3453,17 @@ class BaseController(object):
             else:
                 return None
 
-        if self.agent:
+        if self.agent or collector:
             return agent()
         else:
             return local()
 
-    def blink(self, interval):
+    def blink(self, interval, collector=None):
 
         def api():
             logger.debug("BM Server Blinking from Agent API")
             try:
-                return self.ipmi_post_request('ipmi_blink')
+                return self.ipmi_post_request(action='ipmi_blink', collector=collector)
             except Exception as e:
                 logger.error("Agent API connection error : %s", e)
                 pass
@@ -3408,12 +3472,13 @@ class BaseController(object):
         def agent():
             logger.debug("BM Server Blinking from Pyro")
             if self.connect:
-                try:
-                    response = self.connect.ipmi_blink(self.ip, self.password, self.username, interval)
-                    return response
-                except self.pyro.errors.CommunicationError as ce:
-                    logger.error("Cumminication error : %s", ce)
-                    return api()
+                # try:
+                #     response = self.connect.ipmi_blink(self.ip, self.password, self.username, interval)
+                #     return response
+                # except self.pyro.errors.CommunicationError as ce:
+                #     logger.error("Cumminication error : %s", ce)
+                #     return api()
+                return api()
             return {"blink_status": False}
 
         def local():
@@ -3425,7 +3490,7 @@ class BaseController(object):
             else:
                 return {"blink_status": False}
 
-        if self.agent:
+        if self.agent or collector:
             return agent()
         else:
             return local()
@@ -3468,10 +3533,10 @@ class DRACController(models.Model, BaseController):
     password = EncryptedPasswordField(null=True)
     proxy_url = models.CharField(max_length=100, null=True, blank=True)
 
-    def chassis_statistics(self):
-        ipmi_tool = ipmitool(self.ip, self.password, self.username)
-        ipmi_tool.chassis_statistics("full")
-        return ipmi_tool.output
+    # def chassis_statistics(self):
+    #     ipmi_tool = ipmitool(self.ip, self.password, self.username)
+    #     ipmi_tool.chassis_statistics("full")
+    #     return ipmi_tool.output
 
     def __repr__(self):
         return u'DRAC-%s' % self.ip
@@ -3764,22 +3829,10 @@ class NeighborInformationManager(models.Manager):
 
 class NeighborInformation(models.Model):
     """
-    This model saved the neighbor information
-    for devices onboarded into unity.
+    DEPRECATED: Use topology.models.AdvancedNeighborInformation instead.
 
-    target_uuids is a JSONField. It holds alist
-    of dicts containing neighbor device attributes.
-
-    target_uuids = [
-        {
-            'ip': '10.192.0.4',
-            'hostname': 'hn1',
-            'device_type': 'switch',
-            'target_db_pk': int,
-            'target-db_uuid': str,
-            'onboarded': true
-        },
-    ]
+    Kept for backward compatibility and data migration purposes only.
+    All new code must use AdvancedNeighborInformation.
     """
 
     customer = models.ForeignKey(

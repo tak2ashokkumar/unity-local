@@ -15,6 +15,7 @@ import time
 import socket
 import logging
 import paramiko
+import tempfile
 from io import StringIO
 from django.apps import apps
 from django.conf import settings
@@ -30,12 +31,14 @@ from django.db.models import F, IntegerField
 from django.db.models.functions import Cast
 from rest_framework.decorators import detail_route, list_route
 from paramiko.ssh_exception import AuthenticationException, SSHException
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time as dt_time
 from dateutil.relativedelta import relativedelta
+from dateutil import parser as date_parser
+from django.utils import timezone
 from rest.core.exceptions import SSHServiceError
 from django.core.mail import EmailMessage
-from django.conf import settings
 from django.template.loader import get_template
+from agent.utils import decrypt
 
 # Import for PlainTextParser
 import codecs
@@ -44,13 +47,15 @@ from django.conf import settings
 
 from paramiko.transport import Transport
 Transport._preferred_kex = settings.SSH_KEX_ALGORITHMS + Transport._preferred_kex  # Updating KEX Algo
+Transport._preferred_keys = list(settings.SSH_HOST_KEY_ALGORITHMS) + [k for k in Transport._preferred_keys if k not in settings.SSH_HOST_KEY_ALGORITHMS]
+Transport._preferred_ciphers = list(settings.SSH_CIPHERS) + [c for c in Transport._preferred_ciphers if c not in settings.SSH_CIPHERS]
+Transport._preferred_macs = list(settings.SSH_MAC_ALGORITHMS) + [m for m in Transport._preferred_macs if m not in settings.SSH_MAC_ALGORITHMS]
+Transport._preferred_pubkeys = list(settings.SSH_PUBKEY_ACCEPTED_ALGORITHMS) + [p for p in Transport._preferred_pubkeys if p not in settings.SSH_PUBKEY_ACCEPTED_ALGORITHMS]
 
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import BaseParser
 
 logger = logging.getLogger(__name__)
-
-Transport._preferred_kex = settings.SSH_KEX_ALGORITHMS + Transport._preferred_kex  # Updating KEX Algo
 
 
 VM_OS_DICT = {
@@ -61,19 +66,28 @@ VM_OS_DICT = {
 
 
 class SSHManager(object):
-    def __init__(self, ip_address, username, password=None, key_path=None, port=22):
+    def __init__(self, ip_address, username, password=None, sudo_password=None, key_path=None, port=22):
         self.ip_address = ip_address
         self.username = username
         self.password = password
         self.port = port
+        self.sudo_password = sudo_password
 
         self.ssh = paramiko.SSHClient()
         self.ssh.load_system_host_keys()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         if key_path:
-            key = paramiko.RSAKey.from_private_key_file(key_path)
-            self.ssh.connect(hostname, port=port, username=username, pkey=key)
+            with open(key_path, "rb") as f:
+                key_content = f.read()
+                decrypted_key = decrypt(
+                    key_content,
+                    settings.SSH_KEY_ENCRYPTION_KEY
+                )
+            with tempfile.NamedTemporaryFile(delete=True) as tmp:
+                tmp.write(decrypted_key)
+                tmp.flush()
+                self.ssh.connect(self.ip_address, port=int(self.port), username=self.username, key_filename=tmp.name)
         elif password:
             self.ssh.connect(
                 self.ip_address,
@@ -123,9 +137,9 @@ END_ODBC"''' % (container_name, file_path, content)
             return False, stderr
 
     def execute_command(self, command, get_output=True, use_sudo=False):
-
+        password = self.password or self.sudo_password
         if use_sudo:
-            command = 'bash -c \'echo "%s" | sudo -S %s\'' % (self.password.replace('"', '\\"'), command)
+            command = 'bash -c \'echo "%s" | sudo -S %s\'' % (password.replace('"', '\\"'), command)
 
         stdin, stdout, stderr = self.ssh.exec_command(command)
 
@@ -138,7 +152,170 @@ END_ODBC"''' % (container_name, file_path, content)
         else:
             # Just execute, don't wait for output (for long-running commands)
             return None, None, None
-        
+
+
+# def _auth_on_transport(transport, username, password=None, pkey=None):
+#     if pkey:
+#         transport.auth_publickey(username, pkey)
+#         return
+
+#     def _kbi_handler(title, instructions, prompt_list):
+#         return [password for _ in prompt_list]
+
+#     try:
+#         transport.auth_interactive(username, _kbi_handler)
+#         return
+#     except AuthenticationException:
+#         raise
+#     except SSHException as e:
+#         if "No existing session" in str(e):
+#             raise
+#         logger.warning("auth_interactive failed, falling back to auth_password: %s", e)
+
+#     transport.auth_password(username, password)
+
+
+def _auth_on_transport(transport, username, password=None, pkey=None):
+    if pkey:
+        transport.auth_publickey(username, pkey)
+
+        if not transport.is_authenticated():
+            raise AuthenticationException("Public key authentication failed")
+
+        return
+
+    def _kbi_handler(title, instructions, prompt_list):
+        responses = []
+
+        for prompt, echo in prompt_list:
+            prompt_lower = prompt.lower()
+
+            if "passcode" in prompt_lower:
+                # For Duo push-based MFA
+                responses.append("push")
+
+            elif "duo" in prompt_lower:
+                responses.append("push")
+
+            elif "verification" in prompt_lower:
+                responses.append("push")
+
+            elif "push" in prompt_lower:
+                responses.append("push")
+
+            elif "password" in prompt_lower:
+                responses.append(password)
+            else:
+                # Default fallback for unknown first prompt
+                responses.append(password)
+
+        return responses
+
+    try:
+        transport.auth_interactive(username, _kbi_handler)
+
+        if transport.is_authenticated():
+            return
+
+    except AuthenticationException:
+        logger.warning("auth_interactive failed for %s, trying password-based auth", username)
+
+    except SSHException as e:
+        if "No existing session" in str(e):
+            raise
+
+        logger.warning(
+            "auth_interactive failed, falling back to auth_password: %s",
+            e
+        )
+
+    try:
+        transport.auth_password(username, password)
+        if transport.is_authenticated():
+            return
+    except AuthenticationException:
+        logger.warning("auth_password failed for %s, trying Duo append mode", username)
+
+    transport.auth_password(username, password + ",push")
+
+    if not transport.is_authenticated():
+        raise AuthenticationException("Password authentication failed")
+
+
+def _ssh_connect_with_legacy_fallback(client, hostname, port, username, password=None, pkey=None, sock=None, proxy_cmd_str=None, **kwargs):
+    if password and not pkey:
+        try:
+            if sock:
+                transport = paramiko.Transport(sock)
+            else:
+                raw = socket.create_connection((hostname, int(port)), timeout=kwargs.get("timeout", 15))
+                transport = paramiko.Transport(raw)
+
+            transport.start_client(timeout=kwargs.get("banner_timeout", 30))
+            transport.set_keepalive(30)
+            _auth_on_transport(transport, username, password=password)
+            client._transport = transport
+            return
+        except SSHException:
+            logger.warning("SSH keyboard-interactive connect failed, retrying with legacy algos for %s:%s", hostname, port)
+            if proxy_cmd_str:
+                sock = paramiko.ProxyCommand(proxy_cmd_str)
+                sock.settimeout(kwargs.get("timeout", 20))
+            elif sock is not None:
+                logger.error("SSH legacy fallback: original sock is consumed and no proxy_cmd_str provided; cannot retry for %s:%s", hostname, port)
+                raise
+
+    connect_kwargs = dict(
+        hostname=hostname,
+        port=int(port),
+        username=username,
+        look_for_keys=False,
+        **kwargs
+    )
+    if sock:
+        connect_kwargs["sock"] = sock
+    if pkey:
+        connect_kwargs["pkey"] = pkey
+    else:
+        connect_kwargs["password"] = password
+
+    try:
+        client.connect(**connect_kwargs)
+        return
+    except SSHException:
+        logger.warning("SSH connect failed, retrying with legacy algos for %s:%s", hostname, port)
+
+    if proxy_cmd_str:
+        fallback_sock = paramiko.ProxyCommand(proxy_cmd_str)
+        fallback_sock.settimeout(kwargs.get("timeout", 20))
+        transport = paramiko.Transport(fallback_sock)
+    elif sock is None:
+        raw = socket.create_connection((hostname, int(port)), timeout=kwargs.get("timeout", 15))
+        transport = paramiko.Transport(raw)
+    else:
+        logger.error("SSH legacy fallback: original sock is consumed and no proxy_cmd_str provided; cannot retry for %s:%s", hostname, port)
+        raise SSHException("ProxyCommand socket consumed by failed attempt; pass proxy_cmd_str to enable retry")
+
+    transport._preferred_kex = list(settings.SSH_KEX_ALGORITHMS) + [
+        k for k in Transport._preferred_kex if k not in settings.SSH_KEX_ALGORITHMS
+    ]
+    transport._preferred_keys = list(settings.SSH_HOST_KEY_ALGORITHMS) + [
+        k for k in Transport._preferred_keys if k not in settings.SSH_HOST_KEY_ALGORITHMS
+    ]
+    transport._preferred_ciphers = list(settings.SSH_CIPHERS) + [
+        c for c in Transport._preferred_ciphers if c not in settings.SSH_CIPHERS
+    ]
+    transport._preferred_macs = list(settings.SSH_MAC_ALGORITHMS) + [
+        m for m in Transport._preferred_macs if m not in settings.SSH_MAC_ALGORITHMS
+    ]
+    transport._preferred_pubkeys = list(settings.SSH_PUBKEY_ACCEPTED_ALGORITHMS) + [
+        p for p in Transport._preferred_pubkeys if p not in settings.SSH_PUBKEY_ACCEPTED_ALGORITHMS
+    ]
+
+    transport.start_client(timeout=kwargs.get("banner_timeout", 30))
+    _auth_on_transport(transport, username, password=password, pkey=pkey)
+    client._transport = transport
+
 
 class CommonSShAuthCheck:
 
@@ -181,9 +358,19 @@ class CommonSShAuthCheck:
                     return Response("Not a valid RSA private key file for host: %s:%s" % (hostname, port),
                                     status=status.HTTP_400_BAD_REQUEST)
 
-            logger.debug(hostname)
             agent = self.get_object().collector
-            logger.debug(agent)
+
+            if agent and not azure and getattr(agent, 'is_ztc', False) and getattr(agent, 'cert_common_name', None) and getattr(agent, 'cert_serial', None):
+                from agent.pki_client import get_certificate_status
+                cert_status = get_certificate_status(agent.cert_serial)
+                if cert_status.lower() == "active":
+                    response = {
+                        "agent_id": str(agent.uuid),
+                        "org_id": agent.customer.id,
+                        "pkey": None,
+                    }
+                    return Response(response, status=status.HTTP_200_OK)
+
             agent_conn_exists = False
             if (agent and not azure) or azure_ssh_private:
                 agent_username = agent.ssh_username
@@ -192,32 +379,32 @@ class CommonSShAuthCheck:
                 agent_server = agent.ip_address
                 destination_server = hostname
                 destination_port = port
-                sock = paramiko.ProxyCommand("sshpass -p {} ssh -o StrictHostKeyChecking=no -p {} {}@{} nc {} {}".format(
-                    agent_password, agent_port, agent_username, agent_server, destination_server, destination_port))
+                proxy_cmd_str = "sshpass -p {} ssh -o StrictHostKeyChecking=no -p {} {}@{} nc {} {}".format(
+                    agent_password, agent_port, agent_username, agent_server, destination_server, destination_port)
+                sock = paramiko.ProxyCommand(proxy_cmd_str)
                 sock.settimeout(20)
 
                 try:
                     client = paramiko.SSHClient()
                     client.load_system_host_keys()
                     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                    logger.debug("Trying connection...............")
 
                     if pkey_file:
                         private_key = StringIO(unicode(pkey_content))
                         pkobj = paramiko.RSAKey.from_private_key(private_key)
-                        client.connect(
-                            hostname=destination_server,
-                            username=username,
-                            pkey=pkobj,
-                            port=port, sock=sock, banner_timeout=30)
+                        _ssh_connect_with_legacy_fallback(
+                            client, destination_server, port, username,
+                            pkey=pkobj, sock=sock,
+                            proxy_cmd_str=proxy_cmd_str, banner_timeout=30
+                        )
                     else:
-                        client.connect(
-                            hostname=destination_server,
-                            username=username,
-                            password=password,
-                            port=port, sock=sock, banner_timeout=30)
-
-                    logger.debug(client)
+                        _ssh_connect_with_legacy_fallback(
+                            client, destination_server, port, username,
+                            password=password, sock=sock,
+                            proxy_cmd_str=proxy_cmd_str,
+                            timeout=15, banner_timeout=30,
+                            auth_timeout=60, allow_agent=False
+                        )
 
                     agent_conn_exists = True
                     changes = {
@@ -229,7 +416,6 @@ class CommonSShAuthCheck:
                         changes=json.dumps(changes),
                     )
                     client.close()
-                    logger.debug("No....Exception")
                     response = {
                         "agent_id": agent.uuid,
                         "org_id": agent.customer.id,
@@ -237,11 +423,11 @@ class CommonSShAuthCheck:
                     }
                     return Response(response, status=status.HTTP_200_OK)
                 except AuthenticationException:
-                    logger.error("AuthenticationException")
+                    logger.error("check_auth: authentication failed for %s:%s", destination_server, destination_port)
                 except SSHException:
-                    logger.error("SSHException")
+                    logger.error("check_auth: SSH error for %s:%s", destination_server, destination_port, exc_info=True)
                 except socket.error:
-                    logger.error("socket.error")
+                    logger.error("check_auth: socket error for %s:%s", destination_server, destination_port, exc_info=True)
 
             elif (not agent and not azure) or azure_ssh_public:
                 ssh = paramiko.SSHClient()
@@ -250,24 +436,15 @@ class CommonSShAuthCheck:
                     if pkey_file:
                         private_key = StringIO(unicode(pkey_content))
                         pkobj = paramiko.RSAKey.from_private_key(private_key)
-                        ssh.connect(
-                            hostname=hostname,
-                            port=int(port),
-                            username=username,
-                            pkey=pkobj,
-                            look_for_keys=False,
-                            timeout=10
+                        _ssh_connect_with_legacy_fallback(
+                            ssh, hostname, port, username,
+                            pkey=pkobj, timeout=10
                         )
                     else:
-                        ssh.connect(
-                            hostname=hostname,
-                            port=int(port),
-                            username=username,
-                            password=password,
-                            look_for_keys=False,
-                            timeout=10
+                        _ssh_connect_with_legacy_fallback(
+                            ssh, hostname, port, username,
+                            password=password, timeout=10
                         )
-                    logger.debug("Checking connection/............")
                     changes = {
                         'Xterm Access': ['Success']
                     }
@@ -277,7 +454,6 @@ class CommonSShAuthCheck:
                         changes=json.dumps(changes),
                     )
                     ssh.close()
-                    logger.debug("Connection Sucessful!!")
                     response = {
                         "agent_id": None,
                         "org_id": None,
@@ -285,14 +461,14 @@ class CommonSShAuthCheck:
                     }
                     return Response(response, status=status.HTTP_200_OK)
                 except AuthenticationException:
-                    logger.debug("AuthenticationException")
+                    logger.error("check_auth: authentication failed for %s:%s", hostname, port)
                     return Response("Username or Password did not match.", status=status.HTTP_400_BAD_REQUEST)
                 except SSHException:
-                    logger.debug("SSHException")
+                    logger.error("check_auth: SSH error for %s:%s", hostname, port, exc_info=True)
                     return Response("Could not connect to host: %s:%s" % (hostname, port),
                                     status=status.HTTP_400_BAD_REQUEST)
                 except socket.error:
-                    logger.debug("socket.error")
+                    logger.error("check_auth: socket error for %s:%s", hostname, port, exc_info=True)
                     return Response("Could not connect to host: %s:%s" % (hostname, port),
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -328,6 +504,26 @@ class ProxyLogEntry:
         except Exception as error:
             return Response("Error occcured while adding activity log : {}".format(error),
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+def parse_datetime_param(value, end_of_day=False):
+    """
+    Parse a date/datetime request parameter into a timezone-aware datetime.
+    Accepts full ISO-8601 strings carrying a UTC offset (e.g.
+    '2026-07-17T23:59:59.999+05:30', as sent by browser clients) as well as
+    plain 'YYYY-MM-DD' dates for backwards compatibility with older callers.
+    A naive result (i.e. the value had no offset) is anchored to end-of-day
+    when end_of_day is set, then made timezone-aware in the server's default
+    timezone.
+    """
+    if not value:
+        return None
+    parsed = date_parser.parse(value)
+    if timezone.is_naive(parsed):
+        if end_of_day:
+            parsed = datetime.combine(parsed.date(), dt_time.max)
+        parsed = timezone.make_aware(parsed, timezone.get_default_timezone())
+    return parsed
 
 
 def flatten(lst):
@@ -765,10 +961,29 @@ class Device(object):
     aws_vm = 'aws_vm'
 
     # Container Types
-    docker = 'docker'
-    # kubernetes = 'kubernetes'
-    kubernetes_pods = 'kubernetes_pods'
-    kubernetes_nodes = 'kubernetes_nodes'
+    docker = "docker"
+    kubernetes = "kubernetes"
+
+    # Kubernetes Components
+    kubernetes_node = "kubernetes_node"
+    kubernetes_pod = "kubernetes_pod"
+    kubernetes_container = "kubernetes_container"
+    kubernetes_namepsace = "kubernetes_namepsace"
+    kubernetes_deployment = "kubernetes_deployment"
+    kubernetes_replicaset = "kubernetes_replicaset"
+    kubernetes_daemonset = "kubernetes_daemonset"
+    kubernetes_statefulset = "kubernetes_statefulset"
+    kubernetes_service = "kubernetes_service"
+    kubernetes_persistent_volume = "kubernetes_persistent_volume"
+    kubernetes_persistent_volume_claim = "kubernetes_persistent_volume_claim"
+    kubernetes_event = "kubernetes_event"
+    kubernetes_control_plane_component = "kubernetes_control_plane_component"
+    kubernetes_storage_class = "kubernetes_storage_class"
+    kubernetes_job = "kubernetes_job"
+    kubernetes_cronjob = "kubernetes_cronjob"
+    kubernetes_resource_quota = "kubernetes_resource_quota"
+    kubernetes_hpa = "kubernetes_hpa"
+
     # ontap storage types
     ontap_storage_cluster = 'ontap_storage_cluster'
     ontap_storage_node = 'ontap_storage_node'
@@ -899,7 +1114,7 @@ class Device(object):
         },
         container: {
             docker: 'DockerManagerAccount',
-            # kubernetes: 'KubernetesAccount'
+            kubernetes: 'KubernetesAccount'
         },
         meraki: 'CiscoMerakiAccount',
         meraki_device: 'CiscoMerakiDevice',
@@ -956,9 +1171,25 @@ class Device(object):
         hyperv: 'HypervVM',
         customvm: 'VirtualMachine',
         docker: 'DockerManagerAccount',
-        # kubernetes: 'KubernetesAccount',
-        kubernetes_pods: 'KubernetesPods',
-        kubernetes_nodes: 'KubernetesNodes',
+        kubernetes: 'KubernetesAccount',
+        kubernetes_pod: 'KubernetesPods',
+        kubernetes_node: 'KubernetesNodes',
+        kubernetes_container: 'KubernetesContainers',
+        kubernetes_namepsace: 'KubernetesNamespace',
+        kubernetes_deployment: 'KubernetesDeployment',
+        kubernetes_replicaset: 'KubernetesReplicaSet',
+        kubernetes_daemonset: 'KubernetesDaemonSet',
+        kubernetes_statefulset: 'KubernetesStatefulSet',
+        kubernetes_service: 'KubernetesService',
+        kubernetes_persistent_volume: 'KubernetesPersistentVolume',
+        kubernetes_persistent_volume_claim: 'KubernetesPersistentVolumeClaim',
+        kubernetes_event: 'KubernetesEvent',
+        kubernetes_control_plane_component: 'KubernetesControlPlaneComponent',
+        kubernetes_storage_class: 'KubernetesStorageClass',
+        kubernetes_job: 'KubernetesJob',
+        kubernetes_cronjob: 'KubernetesCronJob',
+        kubernetes_resource_quota: 'KubernetesResourceQuota',
+        kubernetes_hpa: 'KubernetesHPA',
         aws_resource: 'AwsResource',
         azure_resource: 'AzureResource',
         gcp_resource: 'GCPResource',
@@ -1009,6 +1240,25 @@ class Device(object):
         vmware_cluster: 'VmwareVcenterCluster'
     }
 
+    # Maps singular DEVICE_TYPE values to the URL prefix used by the
+    # customer REST router and the monitoring API (plural form).
+    monitoring_device_type_map = {
+        switch: 'switches',
+        firewall: 'firewalls',
+        load_balancer: 'load_balancers',
+        bms: 'bm_servers',
+        hypervisor: 'servers',
+        storage: 'storagedevices',
+        database: 'database_servers',
+        mac_device: 'macdevices',
+        custom: 'customdevices',
+        pdu: 'pdus',
+        smart_pdu: 'smart_pdus',
+        sensor: 'sensors',
+        rfid_reader: 'rfid_readers',
+        vm: 'virtual_machines',
+    }
+
     observium_model_map = {
         switch: 'observium_switch',
         firewall: 'observium_firewall',
@@ -1029,7 +1279,7 @@ class Device(object):
         },
         # container: {
         #     docker: 'DockerManagerAccount',
-        #     # kubernetes: 'KubernetesAccount'
+        #     kubernetes: 'KubernetesAccount'
         # }
     }
 
@@ -1092,7 +1342,7 @@ class Device(object):
             },
             cls.container: {
                 cls.docker: 'DockerManagerAccount',
-                # cls.kubernetes: 'KubernetesAccount'
+                cls.kubernetes: 'KubernetesAccount'
             },
             cls.meraki: 'CiscoMerakiAccount',
             cls.meraki_device: 'CiscoMerakiDevice',
@@ -1165,7 +1415,7 @@ class Device(object):
         from cloud.gcp.models import GCPVirtualMachines
         from cloud.oci_cloud.models import OCIResourceVM
         from cloud.docker.models import DockerManagerAccount
-        # from cloud.kubernetes.models import KubernetesAccount
+        from cloud.kubernetes.models import KubernetesAccount
         from integ.CiscoMeraki.models import CiscoMerakiAccount, CiscoMerakiDevice, CiscoMerakiOrganization
         from integ.sdwan.models import ViptelaAccount, ViptelaDevice
         from integ.veeam.models import Veeam
@@ -1199,7 +1449,7 @@ class Device(object):
             },
             cls.container: {
                 cls.docker: DockerManagerAccount,
-                # cls.kubernetes: KubernetesAccount
+                cls.kubernetes: KubernetesAccount
             },
             cls.meraki: CiscoMerakiAccount,
             cls.meraki_device: CiscoMerakiDevice,
@@ -1243,7 +1493,7 @@ class Device(object):
         from cloud.gcp.models import GCPVirtualMachines
         from cloud.oci_cloud.models import OCIResourceVM
         from cloud.docker.models import DockerManagerAccount
-        # from cloud.kubernetes.models import KubernetesAccount
+        from cloud.kubernetes.models import KubernetesAccount
         from integ.netapp.ontap.models import (
             Cluster, Disk, Node, SVM, Shelve, Snapmirror, ClusterPeer, Aggregate, Volume, LUN, FC, Ethernet
         )
@@ -1282,9 +1532,9 @@ class Device(object):
             cls.hyperv: HypervVM,
             cls.customvm: inventory_models.VirtualMachine,
             cls.docker: DockerManagerAccount,
-            # cls.kubernetes: KubernetesAccount,
-            cls.kubernetes_nodes: KubernetesNodes,
-            cls.kubernetes_pods: KubernetesPods,
+            cls.kubernetes: KubernetesAccount,
+            cls.kubernetes_node: KubernetesNodes,
+            cls.kubernetes_pod: KubernetesPods,
             cls.aws_resource: AwsResource,
             cls.azure_resource: AzureResource,
             cls.gcp_vm: GCPVirtualMachines,
@@ -1669,14 +1919,21 @@ def send_email_notification(vc_vm_data, task_status, exception=None):
         logger.error('send_email_notification() Exception %s .' % str(e))
 
 
-def snmp_os_build(qs):
-    o = qs[0].vcenter.private_cloud.customer
-    col = o.agents.all().first()
+def snmp_os_build(qs, o=None):
+    if not o:
+        o = qs[0].vcenter.private_cloud.customer
+    col = None
+    if qs:
+        col = qs[0].collector
+    if not col:
+        col = o.agents.all().first()
     for q in qs:
         if q.connection_type == 'SNMP':
             command = 'snmpget -v 2c -c {} {} .1.3.6.1.2.1.1.1.0'.format(q.snmp_community, q.ip_address)
-            output = col.execute_over_ssh_via_agent(command)
+            output = col.execute_over_ssh_via_agent(command=command, output=True)
             try:
+                if isinstance(output, bytes):
+                    output = output.decode('utf-8', errors='replace')
                 version = output.split('Build ')[1].split(' Multi')[0]
                 q.os_build_version = version
                 q.save()
@@ -1795,6 +2052,6 @@ def os_build_update(uuid):
     bms_qs = BMServer.objects.filter(server__customer=org, server__os__platform_type__icontains='window')
     for bm in bms_qs:
         if bm.server.connection_type == 'SNMP':
-            snmp_os_build([bm.server])
+            snmp_os_build([bm.server], org)
         elif bm.server.connection_type == 'Agent':
             agent_os_build_api([bm.server])

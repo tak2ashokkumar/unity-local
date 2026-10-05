@@ -81,7 +81,6 @@ class AlertNotificationGroupSerializer(serializers.ModelSerializer):
             'updated_by',
             'updated_by_name',
             'notify',
-            'module',
         )
 
     def __init__(self, *args, **kwargs):
@@ -111,6 +110,14 @@ class AlertNotificationGroupSerializer(serializers.ModelSerializer):
         self.add_users(instance, user_emails)
 
     def validate(self, data):
+        module = data.get('module', getattr(self.instance, 'module', 'aiml'))
+        if module == 'collector':
+            notify = data.get('notify', getattr(self.instance, 'notify', None))
+            if notify is None or notify <= 0:
+                raise serializers.ValidationError({'notify': 'Enter a positive number of days.'})
+            alert_types = data.get('alert_type', getattr(self.instance, 'alert_type', []))
+            if any(alert_type not in ('cert_expiring_soon', 'cert_expired') for alert_type in alert_types):
+                raise serializers.ValidationError({'alert_type': 'Select collector certificate alert types.'})
         webhook_url = data.get('webhook_url', None)
         if webhook_url:
             try:

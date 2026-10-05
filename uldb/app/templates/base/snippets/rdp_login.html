@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>RDP — Connect</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#f5f5f5;
+  font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;color:#333;
+  display:flex;flex-direction:column;align-items:center;justify-content:center}
+.logo-wrap{margin-bottom:28px;text-align:center}
+.logo-wrap img{width:280px;background:#fff;border-radius:4px;padding:10px}
+.card{background:#fff;border:1px solid #dde1e7;border-radius:4px;
+  padding:30px 36px;width:400px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.card-title{font-size:15px;font-weight:600;color:#333;margin-bottom:20px;text-align:center}
+.field{margin-bottom:14px}
+label{display:block;font-size:11px;color:#666;margin-bottom:4px;font-weight:500}
+input[type=text],input[type=password],input[type=number]{
+  width:100%;background:#fff;border:1px solid #ccc;border-radius:3px;
+  padding:8px 10px;color:#333;font-family:inherit;font-size:13px;outline:none}
+input[type=text]:focus,input[type=password]:focus,input[type=number]:focus{
+  border-color:#f47421;box-shadow:0 0 0 2px rgba(244,116,33,0.12)}
+input[type=hidden]{display:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;margin-top:8px;padding:10px;background:#f47421;
+  border:none;border-radius:3px;color:#fff;
+  font-family:inherit;font-size:13px;font-weight:600;
+  letter-spacing:0.03em;cursor:pointer;transition:background 0.15s}
+.btn:hover{background:#d9621a}
+.error{background:#fff0f0;border:1px solid #f5c6cb;
+  border-radius:3px;padding:8px 10px;font-size:12px;color:#c0392b;margin-bottom:14px}
+.footer{font-size:11px;color:#999;margin-top:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="logo-wrap">
+  <img src="/static/images/unity-ai-logo-tm.png" alt="UnityOne AI">
+</div>
+
+<div class="card">
+  <div class="card-title">Windows Remote Desktop</div>
+
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="collector_cn" value="{{ collector_cn }}">
+
+    <div class="row2">
+      <div class="field">
+        <label>IP / Hostname</label>
+        <input type="text" name="ip" value="{{ ip }}" placeholder="10.0.0.1">
+      </div>
+      <div class="field">
+        <label>Domain</label>
+        <input type="text" name="domain" value="{{ domain }}" placeholder="corp.local">
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" name="username" value="{{ username }}" autofocus placeholder="administrator">
+      </div>
+      <div class="field">
+        <label>Port</label>
+        <input type="number" name="port" value="{{ port }}" min="1" max="65535">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" placeholder="••••••••">
+    </div>
+
+    <button type="submit" class="btn">Connect</button>
+  </form>
+
+  <div class="footer">{{ collector_cn|default:"" }}</div>
+</div>
+</body>
+</html>

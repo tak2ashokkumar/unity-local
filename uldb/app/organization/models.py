@@ -304,6 +304,16 @@ class Organization(TimeStampModel, UserStampModel, NonstrictSalesforceMixin, Mtp
     cmdb_reports_enabled = models.BooleanField(default=False)
     company = models.CharField(max_length=128, null=True, blank=True)
     is_rag_enabled = models.BooleanField(default=False)
+    # Deprecated (2026-09): push (integ/lumi/tasks.py) now fires for every
+    # org unconditionally and identifies orgs to Lumi by uuid, not these.
+    # Safe to drop in a follow-up migration.
+    is_lumi_org = models.BooleanField(default=False)
+    lumi_workspace_id = models.CharField(max_length=64, null=True, blank=True)
+    # Deprecated (2026-09): outbound signing now uses one HMAC secret shared
+    # across every org (settings.LUMI_WEBHOOK_SECRET), not this per-org one
+    # -- integ/lumi/tasks.py no longer reads it. Left in place rather than
+    # migrated out in this change; safe to drop in a follow-up migration.
+    lumi_webhook_secret = models.CharField(max_length=128, null=True, blank=True)
 
     def set_data(self, logo):
         self._logo = base64.encodestring(logo)
@@ -509,6 +519,34 @@ class Organization(TimeStampModel, UserStampModel, NonstrictSalesforceMixin, Mtp
 
         logger.error('Device with name {} not found in any of the models in org {}'.format(device_name, str(self)))
         raise BadRequestError('Device not found in Unity. Please add the device in Unity')
+
+
+class LumiOrganizationUserRole(models.Model):
+    """LUMI-specific role assigned to a UnityOne organization user."""
+
+    ROLE_CHOICES = (
+        ('estate_owner', 'Estate Owner'),
+        ('approver', 'Approver'),
+        ('noc_viewer', 'NOC Viewer'),
+        ('engineer', 'Engineer'),
+    )
+    organization = models.ForeignKey(
+        'organization.Organization',
+        related_name='lumi_user_roles',
+        on_delete=models.CASCADE,
+    )
+    user = models.OneToOneField(
+        'user2.User',
+        related_name='lumi_organization_role',
+        on_delete=models.CASCADE,
+    )
+    role = models.CharField(max_length=32, choices=ROLE_CHOICES)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'lumi_organization_user_role'
+        unique_together = (('organization', 'user'),)
 
 
 # method for updating
@@ -762,7 +800,9 @@ class AlertNotificationGroup(models.Model):
         ('end_of_life', 'End of Life'),
         ('end_of_support', 'End of Support'),
         ('success', 'Success'),
-        ('failed', 'Failed')
+        ('failed', 'Failed'),
+        ('cert_expiring_soon', 'Certificate Expiring Soon'),
+        ('cert_expired', 'Certificate Expired'),
     )
     FILTER_TYPES = (
         ('all', 'All'),
@@ -778,6 +818,7 @@ class AlertNotificationGroup(models.Model):
         ('aiml', 'AIML'),
         ('deprecation', 'Deprecation'),
         ('devops_automation', 'DevOps Automation'),
+        ('collector', 'Collector'),
     )
     uuid = models.UUIDField(default=generate_uuid, unique=True)
     group_name = models.CharField(max_length=128, db_index=True)
@@ -843,6 +884,8 @@ class OrganizationSettings(models.Model):
     auto_ticketing_severity = ArrayField(models.CharField(max_length=20), blank=True, null=True)
     auto_ticketing_delay = models.IntegerField(default=70)  # Default 70 seconds
     attach_rca_to_ticket = models.BooleanField(default=False)
+    auto_publish_condition_to_kb  = models.BooleanField(default=False)
+    is_pro_ai_enabled = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['id']

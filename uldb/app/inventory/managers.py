@@ -9,8 +9,6 @@ from django.utils import timezone
 
 from app.rbac.managers import RBACManager, RBACQuerySetMixin
 from django.contrib.contenttypes.models import ContentType
-
-
 class DeviceBaseQuerySet(RBACQuerySetMixin):
     def delete(self):
         from unity_discovery.models import (
@@ -323,40 +321,50 @@ class DeviceBaseManager(models.Manager):
                 content_type=content_type,
                 device_id=device_id,
                 name=os_name
-            ).first()
+            ).order_by('-updated_at', '-id').first()
+            if not existing_os:
+                from unity_discovery.utils import find_matching_device_os
+                os_queryset = DeviceOperatingSystem.all_objects.filter(
+                    content_type=content_type,
+                    device_id=device_id
+                ).order_by('-updated_at', '-id')
+                existing_os = find_matching_device_os(os_queryset, os_name)
             first_discovered_os = existing_os.first_discovered if existing_os else now
             last_discovered_os = now
 
-            os_obj, created = DeviceOperatingSystem.all_objects.update_or_create(
-                content_type=content_type,
-                device_id=device_id,
-                name=os_name,
-                defaults={
-                    "short_description": details.get("OS_Name_Format") or os_name,
-                    "manufacturer": details.get("OS_Manufacturer"),
-                    "model": details.get("OS_ModelVersion") or details.get("model"),
-                    "version_number": details.get("version") or details.get("OS_VersionNumber"),
-                    "build_number": details.get("OS_BuildNumber"),
-                    "build_type": details.get("OS_BuildType"),
-                    "service_pack": details.get("OS_ServicePack"),
-                    "name_format": details.get("OS_Name_Format", "OSName"),
-                    "patch_number": details.get("OS_PatchNumber"),
-                    "serial_number": details.get("SerialNumber"),
-                    "system_directory": details.get("OS_SystemDirectory"),
-                    "os_type": details.get("OS_Type") or details.get("OStype"),
-                    "market_version": details.get("OS_Market_Version"),
-                    "product_type": details.get("OS_ProductType") or details.get("OS_Product_Type"),
-                    "description": details.get("description") or os_name,
-                    "first_discovered": first_discovered_os,
-                    "last_discovered": last_discovered_os,
-                    "updated_at": now,
-                },
-            )
+            os_data = {
+                "name": os_name,
+                "short_description": details.get("OS_Name_Format") or os_name,
+                "manufacturer": details.get("OS_Manufacturer"),
+                "model": details.get("OS_ModelVersion") or details.get("model"),
+                "version_number": details.get("version") or details.get("OS_VersionNumber"),
+                "build_number": details.get("OS_BuildNumber"),
+                "build_type": details.get("OS_BuildType"),
+                "service_pack": details.get("OS_ServicePack"),
+                "name_format": details.get("OS_Name_Format", "OSName"),
+                "patch_number": details.get("OS_PatchNumber"),
+                "serial_number": details.get("SerialNumber"),
+                "system_directory": details.get("OS_SystemDirectory"),
+                "os_type": details.get("OS_Type") or details.get("OStype"),
+                "market_version": details.get("OS_Market_Version"),
+                "product_type": details.get("OS_ProductType") or details.get("OS_Product_Type"),
+                "description": details.get("description") or os_name,
+                "first_discovered": first_discovered_os,
+                "last_discovered": last_discovered_os,
+                "updated_at": now,
+                "content_type": content_type,
+                "device_id": device_id,
+            }
+            created = existing_os is None
+            os_obj = existing_os or DeviceOperatingSystem()
+            for field_name, field_value in os_data.items():
+                setattr(os_obj, field_name, field_value)
             if created:
                 os_obj.first_discovered = last_discovered_os
                 os_obj.last_discovered = last_discovered_os
             else:
                 os_obj.is_deleted = False  # Entry Found so update the obj state - This handles duplication of records
+                os_obj.last_discovered = last_discovered_os
             os_obj.save()
             not_deleted_os_ids.append(os_obj.id)
         DeviceOperatingSystem.all_objects.filter(

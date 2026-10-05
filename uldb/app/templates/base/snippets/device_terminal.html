@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{ protocol|upper }} — {{ host }}</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0c10;--surface:#0d1117;--border:#1e2230;
+  --green:#22c55e;--yellow:#eab308;--red:#ef4444;
+  --blue:#38bdf8;--purple:#a78bfa;--cyan:#22d3ee;
+  --muted:#4b5563;--text:#e2e8f0;--accent:#22c55e
+}
+html,body{width:100%;height:100%;overflow:hidden}
+body{display:flex;flex-direction:column;background:var(--bg);
+  font-family:'Consolas','Courier New',monospace;font-size:13px;color:var(--text)}
+#info-bar{background:#080b0f;border-bottom:1px solid var(--border);
+  padding:5px 14px;display:flex;align-items:center;gap:10px;
+  font-size:10px;color:var(--muted);flex-shrink:0}
+#info-bar .hl{color:var(--accent)}
+#info-bar .sep{color:var(--border)}
+#proto-badge{margin-left:auto;background:rgba(34,197,94,0.1);
+  border:1px solid rgba(34,197,94,0.2);color:var(--accent);
+  padding:2px 8px;border-radius:3px;font-size:9px;letter-spacing:0.08em;text-transform:uppercase}
+#tab-bar{background:#080b0f;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-end;padding:0 10px;gap:2px;flex-shrink:0}
+.tab{padding:5px 14px;font-size:9px;color:var(--muted);
+  border:1px solid transparent;border-bottom:none;
+  border-radius:4px 4px 0 0;cursor:pointer;
+  display:flex;align-items:center;gap:6px;position:relative;top:1px}
+.tab.active{background:var(--surface);border-color:var(--border);color:var(--text)}
+.tab-dot{width:6px;height:6px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 4px var(--accent)}
+#out{flex:1;overflow-y:auto;padding:12px 16px;background:#080b0f;
+  white-space:pre-wrap;word-wrap:break-word;line-height:1.75;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+#out::-webkit-scrollbar{width:4px}
+#out::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#input-row{border-top:1px solid var(--border);padding:9px 16px;
+  display:flex;align-items:center;background:#080b0f;flex-shrink:0}
+#prompt{display:flex;align-items:baseline;white-space:nowrap;
+  font-size:13px;flex-shrink:0;user-select:none}
+.p-user{color:#22c55e}.p-at{color:var(--muted)}.p-host{color:#38bdf8}
+.p-colon{color:var(--muted)}.p-path{color:#a78bfa}
+.p-hash{color:#22c55e;margin-right:8px}
+.p-ps{color:#818cf8}.p-pspath{color:#22d3ee}
+.p-psgt{color:#818cf8;margin-right:8px}
+#cmd{flex:1;background:transparent;border:none;outline:none;
+  font-family:'Consolas','Courier New',monospace;font-size:13px;
+  color:var(--text);caret-color:var(--accent);padding-left:6px}
+#cmd::placeholder{color:var(--muted);font-size:11px}
+#status-bar{background:#080b0f;border-top:1px solid var(--border);
+  padding:4px 14px;display:flex;align-items:center;gap:12px;
+  font-size:9px;color:var(--muted);flex-shrink:0}
+#st-dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+#st-dot.connected{background:var(--accent);box-shadow:0 0 5px var(--accent);
+  animation:dotPulse 2s ease-in-out infinite}
+#st-dot.error{background:#ef4444;box-shadow:0 0 5px #ef4444}
+#st-text.connected{color:var(--accent)}
+#st-meta{margin-left:auto;display:flex;gap:12px}
+.kbd{background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  padding:1px 5px;border-radius:3px;font-size:8px}
+#overlay{position:fixed;inset:0;background:var(--surface);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;z-index:100;transition:opacity 0.4s ease}
+#overlay.hidden{opacity:0;pointer-events:none}
+.ov-icon{font-size:28px;animation:ovPulse 1.2s ease-in-out infinite}
+.ov-title{font-size:13px;font-weight:600;
+  color:var(--text);letter-spacing:0.06em}
+.ov-host{font-size:10px;color:var(--accent)}
+.ov-bar{width:180px;height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.ov-fill{height:100%;background:linear-gradient(90deg,var(--accent),#22d3ee);
+  animation:ovFill 1.5s ease forwards}
+.ov-steps{display:flex;flex-direction:column;gap:5px;min-width:220px}
+.ov-step{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:7px;
+  opacity:0;transition:opacity 0.3s ease,transform 0.3s ease;transform:translateX(-4px)}
+.ov-step.show{opacity:1;transform:translateX(0)}
+.ov-step.ok{color:#22c55e}.ov-step.act{color:var(--accent)}
+@keyframes ovPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes ovFill{0%{width:0%}40%{width:55%}85%{width:90%}100%{width:100%}}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+</head>
+<body>
+<div id="info-bar">
+  <span id="proto-label">SSH</span>
+  <span class="sep">|</span>
+  <span class="hl">{{ host }}</span><span class="sep">:</span><span class="hl">{{ port }}</span>
+  <span class="sep">|</span>
+  <span>{{ username }}</span>
+  <span class="sep">|</span>
+  <span>{{ collector_cn }}</span>
+  <span id="proto-badge">SSH</span>
+</div>
+<div id="tab-bar">
+  <div class="tab active">
+    <div class="tab-dot" id="tab-dot"></div>
+    <span>{{ host }}</span>
+  </div>
+</div>
+<div id="out"></div>
+<div id="input-row">
+  <div id="prompt"></div>
+  <input id="cmd" type="text" autofocus autocomplete="off" spellcheck="false" placeholder="type commands here..." />
+</div>
+<div id="status-bar">
+  <div id="st-dot"></div>
+  <span id="st-text">connecting</span>
+  <span style="color:var(--border)">|</span>
+  <span id="st-size">80×30</span>
+  <div id="st-meta">
+    <span><span class="kbd">Ctrl+C</span> interrupt</span>
+    <span><span class="kbd">Ctrl+D</span> logout</span>
+    <span><span class="kbd">↑↓</span> history</span>
+    <span>via ZTC tunnel</span>
+  </div>
+</div>
+<div id="overlay">
+  <div class="ov-icon" id="ov-icon">🔐</div>
+  <div class="ov-title" id="ov-title">Establishing SSH Session</div>
+  <div class="ov-host">{{ username }}@{{ host }}:{{ port }}</div>
+  <div class="ov-bar"><div class="ov-fill"></div></div>
+  <div class="ov-steps">
+    <div class="ov-step ok">✓ ZTC tunnel connected</div>
+    <div class="ov-step ok">✓ TCP channel opened</div>
+    <div class="ov-step ok" id="ovs3">✓ Handshake complete</div>
+    <div class="ov-step act" id="ovs4">⟳ Authenticating...</div>
+  </div>
+</div>
+<script>
+var SESSION_ID   = "{{ session_id|escapejs }}";
+var COLLECTOR_CN = "{{ collector_cn|escapejs }}";
+var HOST         = "{{ host|escapejs }}";
+var PORT         = {{ port }};
+var USERNAME     = "{{ username|escapejs }}";
+var PASSWORD     = "{{ password|escapejs }}";
+var PROTOCOL     = "{{ protocol|escapejs }}";
+var SHELL        = "{{ shell|escapejs }}";
+var SESSION_TYPE = "{{ session_type|escapejs }}";
+var DATABASE     = "{{ database|escapejs }}";
+
+var isWinRM = (PROTOCOL === 'winrm');
+var isCmd = (isWinRM && SHELL === 'cmd');
+var isPowerShell = (isWinRM && SHELL === 'powershell');
+var windowsLabel = isCmd ? 'CMD' : 'PowerShell';
+
+var DB_LABELS = { postgres: 'PostgreSQL', mysql: 'MySQL', mssql: 'MSSQL', oracle: 'Oracle' };
+var DB_PROMPTS = { postgres: 'postgres> ', mysql: 'mysql> ', mssql: 'mssql> ', oracle: 'oracle> ' };
+var isDb = DB_LABELS.hasOwnProperty(PROTOCOL);
+var dbLabel = DB_LABELS[PROTOCOL];
+
+if (isDb) {
+  document.documentElement.style.setProperty('--accent', '#22d3ee');
+  document.getElementById('proto-label').textContent = dbLabel;
+  document.getElementById('proto-badge').textContent = dbLabel + ' · ' + DATABASE;
+  document.getElementById('proto-badge').style.cssText =
+    'margin-left:auto;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);' +
+    'color:#22d3ee;padding:2px 8px;border-radius:3px;font-size:9px;letter-spacing:0.08em';
+  var dbDot = document.getElementById('tab-dot');
+  dbDot.style.background = '#22d3ee'; dbDot.style.boxShadow = '0 0 4px #22d3ee';
+  document.getElementById('ov-icon').textContent = '🗄️';
+  document.getElementById('ov-title').textContent = 'Establishing Database Session';
+  document.getElementById('ovs3').textContent = '✓ Authentication complete';
+  document.getElementById('ovs4').textContent = '⟳ Opening ' + dbLabel + ' session...';
+  document.getElementById('st-meta').innerHTML =
+    '<span><span class="kbd">Ctrl+C</span> cancel</span>' +
+    '<span><span class="kbd">↑↓</span> history</span>' +
+    '<span>end statements with <span class="kbd">;</span></span>' +
+    '<span>via ZTC tunnel</span>';
+  document.title = dbLabel + ' — ' + HOST;
+} else if (isWinRM) {
+  document.documentElement.style.setProperty('--accent', '#818cf8');
+  document.getElementById('proto-label').textContent = windowsLabel;
+  document.getElementById('proto-badge').textContent = 'WinRM · ' + windowsLabel;
+  document.getElementById('proto-badge').style.cssText =
+    'margin-left:auto;background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.25);' +
+    'color:#818cf8;padding:2px 8px;border-radius:3px;font-size:9px;letter-spacing:0.08em';
+  var td = document.getElementById('tab-dot');
+  td.style.background = '#818cf8'; td.style.boxShadow = '0 0 4px #818cf8';
+  document.getElementById('ov-icon').textContent = '⚡';
+  document.getElementById('ov-title').textContent = 'Establishing WinRM Session';
+  document.getElementById('ovs3').textContent = '✓ NTLM auth complete';
+  document.getElementById('ovs4').textContent = '⟳ Starting ' + windowsLabel + '...';
+  document.getElementById('st-meta').innerHTML =
+    '<span><span class="kbd">Ctrl+C</span> break</span>' +
+    '<span><span class="kbd">↑↓</span> history</span>' +
+    '<span><span class="kbd">Tab</span> complete</span>' +
+    '<span>via ZTC tunnel</span>';
+  document.title = windowsLabel + ' — ' + HOST;
+} else {
+  document.title = 'SSH — ' + HOST;
+}
+
+var promptEl = document.getElementById('prompt');
+if (isDb) {
+  promptEl.innerHTML = '<span class="p-hash">' + (DB_PROMPTS[PROTOCOL] || 'db> ') + '</span>';
+} else if (isPowerShell) {
+  promptEl.innerHTML =
+    '<span class="p-ps">PS </span>' +
+    '<span class="p-pspath">C:\\Users\\' + USERNAME + '</span>' +
+    '<span class="p-psgt">&gt;</span>';
+} else if (isCmd) {
+  promptEl.innerHTML =
+    '<span class="p-pspath">C:\\Users\\' + USERNAME + '</span>' +
+    '<span class="p-psgt">&gt;</span>';
+} else {
+  promptEl.innerHTML =
+    '<span class="p-user">' + USERNAME + '</span>' +
+    '<span class="p-at">@</span>' +
+    '<span class="p-host">' + HOST.split('.')[0] + '</span>' +
+    '<span class="p-colon">:</span>' +
+    '<span class="p-path">~</span>' +
+    '<span class="p-hash">#</span>';
+}
+
+var proto = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+var wsurl = proto + location.host + '/webterminal/device/' + SESSION_ID + '/';
+var out = document.getElementById('out');
+var cmd = document.getElementById('cmd');
+var ws, buf = '', flushTimer = null;
+var cmdHistory = [], histIdx = -1;
+var rows = 30;
+var cols = Math.max(80, Math.floor((window.innerWidth - 32) / 8));
+var overlayHidden = false;
+
+function flush() {
+  if (buf.length > 0) {
+    out.textContent += clean(buf); buf = '';
+    out.scrollTop = out.scrollHeight;
+  }
+  flushTimer = null;
+}
+function write(s) {
+  buf += s;
+  if (!flushTimer) flushTimer = setTimeout(flush, 20);
+}
+function clean(s) {
+  return s
+    .replace(/\x1b\[\?2004[hl]/g,'')
+    .replace(/\x1b\[[0-9;]*[a-zA-Z]/g,'')
+    .replace(/\x1b\][^\x07]*\x07/g,'')
+    .replace(/\x1b[()][AB012]/g,'')
+    .replace(/\x1b[^a-zA-Z\[]/g,'')
+    .replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+}
+function setStatus(state) {
+  document.getElementById('st-dot').className = state;
+  var t = document.getElementById('st-text');
+  t.className = state; t.textContent = state;
+}
+function hideOverlay() {
+  if (!overlayHidden) {
+    overlayHidden = true;
+    document.getElementById('overlay').classList.add('hidden');
+    setStatus('connected');
+    cmd.focus();
+  }
+}
+
+document.querySelectorAll('.ov-step').forEach(function(s, i) {
+  setTimeout(function() { s.classList.add('show'); }, i * 300 + 100);
+});
+
+function connect() {
+  setStatus('connecting');
+  ws = new WebSocket(wsurl);
+  ws.onopen = function() {
+    ws.send(JSON.stringify({
+      tp: 'init',
+      data: {
+        rows: rows, cols: cols,
+        collector_cn: COLLECTOR_CN,
+        protocol: PROTOCOL,
+        shell: SHELL,
+        session_type: SESSION_TYPE || ('device_' + PROTOCOL),
+        target_host: HOST, target_port: PORT,
+        username: USERNAME, password: PASSWORD,
+        database: DATABASE
+      }
+    }));
+  };
+  ws.onmessage = function(e) {
+    // Hide overlay on first real data from server
+    hideOverlay();
+    write(e.data);
+  };
+  ws.onclose = function(e) {
+    setStatus('error');
+    write('\n[disconnected code=' + e.code + ']\n');
+  };
+  ws.onerror = function() { setStatus('error'); };
+}
+
+cmd.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    var t = cmd.value; cmd.value = ''; histIdx = -1;
+    if (t) { cmdHistory.unshift(t); if (cmdHistory.length > 200) cmdHistory.pop(); }
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({tp:'data', data:t+'\n'}));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (histIdx < cmdHistory.length-1) { histIdx++; cmd.value = cmdHistory[histIdx]; }
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (histIdx > 0) { histIdx--; cmd.value = cmdHistory[histIdx]; }
+    else { histIdx = -1; cmd.value = ''; }
+  } else if (e.ctrlKey && e.key === 'c') {
+    e.preventDefault();
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({tp:'data', data:'\u0003'}));
+  } else if (e.ctrlKey && e.key === 'd') {
+    e.preventDefault();
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({tp:'data', data:'\u0004'}));
+  } else if (e.ctrlKey && e.key === 'l') {
+    e.preventDefault(); out.textContent = '';
+  } else if (e.key === 'Tab') {
+    e.preventDefault();
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({tp:'data', data:'\t'}));
+  }
+});
+
+window.addEventListener('resize', function() {
+  cols = Math.max(80, Math.floor((window.innerWidth - 32) / 8));
+  document.getElementById('st-size').textContent = cols + '×' + rows;
+  if (ws && ws.readyState === 1)
+    ws.send(JSON.stringify({tp:'resize', data:{rows:rows, cols:cols}}));
+});
+
+document.getElementById('st-size').textContent = cols + '×' + rows;
+connect();
+</script>
+</body>
+</html>

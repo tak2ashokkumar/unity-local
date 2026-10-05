@@ -1,11 +1,11 @@
 {% extends "two_factor/_base_login.html" %}
-{% load i18n two_factor %}
+{% load i18n two_factor login_branding %}
 
 {% block content %}
 <div id="browserType">
-  <div class="row">
-     <img id="" src="/static/images/unity-ai-logo-tm.png" alt="Unity"
-      style="width:350px; background-color:#ffffff;">
+  {% login_brand request as brand %}
+  <div class="login-brand {{ brand.class }}">
+     <img class="login-brand-image" src="{{ brand.image }}" alt="{{ brand.alt }}">
   </div>
   <div class="row login-form" style="background-color: #fcf7f780">
     <form action="" method="post" role="form">{% csrf_token %}
@@ -46,11 +46,12 @@
       </p>
       {% endif %}
       {% if backup_tokens %}
-      <p>{% trans "As a last resort, you can use a backup token:" %}</p>
-      <p>
-        <button name="wizard_goto_step" type="submit" value="backup" class="btn btn-default btn-block">{% trans "Use
-          Backup Token" %}</button>
-      </p>
+      <div class="form-group text-center">
+        <p>{% trans "As a last resort, you can use a backup token:" %}</p>
+        <button name="wizard_goto_step" type="submit" value="backup" class="btn btn-default btn-block" style=" background-color: #fb9a31 !important;">
+          {% trans "Use Backup Token" %}
+        </button>
+      </div>
       {% endif %}
 
       <!-- <div style="display: flex;justify-content:space-evenly;">

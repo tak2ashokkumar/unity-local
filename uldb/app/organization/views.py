@@ -398,6 +398,7 @@ class AlertNotificationGroupViewSet(AbstractNonMetaCustomerModelViewSet):
         alert_types = self.request.query_params.getlist('alert_type', [])
         group_statuses = self.request.query_params.getlist('status', [])
         notification_modes = self.request.query_params.getlist('mode', [])
+        modules = self.request.query_params.getlist('module', [])
         filters = {
             "customer": self.request.user.org
         }
@@ -412,6 +413,8 @@ class AlertNotificationGroupViewSet(AbstractNonMetaCustomerModelViewSet):
             filters["is_enabled__in"] = group_statuses
         if notification_modes:
             filters["mode__in"] = notification_modes
+        if modules:
+            filters["module__in"] = modules
         queryset = self.queryset.filter(**filters)
         return queryset.order_by('group_name')
 
@@ -468,9 +471,11 @@ class CustomerOrganizationSettingsViewSet(AbstractNonMetaCustomerModelViewSet):
     serializer_class = CustomerOrganizationSettingsSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(
-            organization=self.request.user.org
-        )
+        org_id = self.request.query_params.get('org_id')
+        qs = self.queryset.filter(organization=self.request.user.org)
+        if org_id:
+            qs = qs.filter(organization__id=org_id)
+        return qs
 
     def update(self, request, *args, **kwargs):
         ticketing_data = request.data.pop('ticketing_instance', None)
