@@ -4,7 +4,7 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -108,6 +108,22 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit, OnDestroy
     }
     data.testing = true;
     this.agentService.testConnection(data).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      data.testing = false;
+    }, (err: HttpErrorResponse) => {
+      data.testing = false;
+    });
+  }
+
+  testCollectorConnection(data: AgentConfigurationViewData) {
+    if (data.testing) {
+      return;
+    }
+    data.testing = true;
+    this.agentService.testConnection(data).pipe(
+      switchMap(() => this.agentService.getConfiguration(data.uuid)),
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe(res => {
+      data.deplymentState = res.status;
       data.testing = false;
     }, (err: HttpErrorResponse) => {
       data.testing = false;

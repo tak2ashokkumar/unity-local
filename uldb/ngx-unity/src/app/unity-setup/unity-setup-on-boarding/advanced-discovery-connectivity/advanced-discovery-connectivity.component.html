@@ -139,6 +139,9 @@
             <td class="align-middle">{{view.certStatus}}</td>
             <td class="align-middle">{{view.certValidTill}}</td>
             <td class="align-middle">
+              <button class="action-icons mb-0 font-sm ml-1" [class]="view.testConnectionIcon" container="body"
+                [tooltip]="view.testConnectionTooltipMsg" (click)="testCollectorConnection(view)" accessControl
+                moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>
               <button class="action-icons mb-0 fas fa-network-wired font-sm ml-1" container="body"
                 tooltip="Update Management IP" (click)="openUpdateCollectorModal(view, 'ip')" accessControl
                 moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>

@@ -1913,8 +1913,6 @@
                                     </th>
                                     <th sortable-column="humidity"
                                         [sort-direction]="getPduHealthSortDirection('humidity')">Humidity (%)</th>
-                                    <th sortable-column="outlet_status"
-                                        [sort-direction]="getPduHealthSortDirection('outlet_status')">Outlet Status</th>
                                     <th sortable-column="health" [sort-direction]="getPduHealthSortDirection('health')">
                                         Health</th>
                                 </tr>
@@ -1962,9 +1960,6 @@
                                     <td class="tdw-8">
                                         <div [tooltip]="row.humidityDisplay" container="body">{{ row.humidityDisplay }}
                                         </div>
-                                    </td>
-                                    <td class="tdw-10">
-                                        <div [tooltip]="row.outletStatus" container="body">{{ row.outletStatus }}</div>
                                     </td>
                                     <td class="tdw-12">
                                         <div [tooltip]="row.healthLabel" container="body">
@@ -2126,11 +2121,16 @@
 
                 <div class="px-3 pt-1 pb-3">
                     <div class="network-dashboard-section-title text-center mb-2">Top 10 Critical Alerts</div>
-                    <div class="row no-gutters mb-1">
+                    <div class="row no-gutters mb-1 justify-content-between align-items-center">
                         <div class="col-xl-2 col-lg-2 col-md-3 col-sm-5 col-12">
                             <search-box class="d-block w-100 network-dashboard-search-box"
                                 [searchValue]="alertEventsSearch" [customClass]="'form-control-sm'"
                                 (searched)="onAlertEventsSearched($event)"></search-box>
+                        </div>
+                        <div class="col-auto mt-1 mt-sm-0">
+                            <button type="button" class="btn btn-primary btn-sm" (click)="showMoreCriticalAlerts()">
+                                Show More
+                            </button>
                         </div>
                     </div>
                     <div *ngIf="getVisibleAlertEventsRows().length; else alertEventsNoRows"

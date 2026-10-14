@@ -32,33 +32,125 @@
 
 <div class="row card" *ngIf="selectedApps?.length && form">
     <div class="row no-gutters d-flex flex-shrink-1">
-        <div class="col-3 border-right d-flex flex-column">
-            <div *ngFor="let tab of tabs; let i = index; let isLast = last" class="tab-card mb-0"
-                [ngClass]="{ 'active-tab-card': selectedTabIndex === i }" (click)="selectTab(i)"
-                style="cursor: pointer;" [style.border-bottom]="!isLast ? '1px solid #dee2e6' : 'none'">
-
-                <!-- Label -->
-                <div [ngClass]="{ 'text-primary': selectedTabIndex === i }" class="ml-2 font-lg font-500">
-                    {{ tab.label }}
+        <!-- Left Panel: Automatically expands/elongates when isElongated is true -->
+        <div [ngClass]="isElongated ? 'col-6 col-lg-7' : 'col-3'"
+            class="border-right d-flex flex-column left-panel-transition position-relative">
+            <!-- Header bar when elongated: Breadcrumb and Collapse button -->
+            <div *ngIf="isElongated"
+                class="elongated-header d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-light">
+                <div class="d-flex align-items-center text-truncate mr-2">
+                    <button *ngIf="drilldownStack.length > 0" class="btn btn-sm btn-outline-secondary mr-2 py-0 px-2"
+                        (click)="navigateBackDrilldown()" tooltip="Back">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                    <div class="text-truncate font-weight-bold font-sm">
+                        <span class="text-muted">Smartscape</span>
+                        <i class="fa fa-angle-right mx-1 text-muted"></i>
+                        <span class="text-primary text-truncate">{{ selectedDrilldownNode?.name }}</span>
+                    </div>
                 </div>
+                <button class="btn btn-sm btn-outline-secondary py-1 px-2" (click)="collapseElongatedPanel()"
+                    tooltip="Collapse to sidebar">
+                    <i class="fa fa-chevron-left mr-1"></i> <span class="font-xs">Collapse</span>
+                </button>
+            </div>
 
-                <!-- Active tab summary -->
-                <div *ngIf="selectedTabIndex === i && activeSummary" class="small mt-1 ml-2 d-flex">
-                    <span class="text-success mr-3 font-sm">Active: {{ activeSummary.active }}</span>
-                    <span class="text-muted font-sm">Inactive: {{ activeSummary.inactive }}</span>
-                    <!-- <span class="text-warning font-sm">Unknown: {{ activeSummary.unknown }}</span> -->
+            <!-- Container for the 6 Tab Rows with Elongated Lanes and SVG Overlay -->
+            <div id="lane-topology-container" class="position-relative flex-grow-1">
+                <!-- SVG Connections Overlay -->
+                <svg *ngIf="isElongated" class="lane-svg-overlay">
+                    <path *ngFor="let link of laneLinks; trackBy: trackByLink" [attr.d]="link.pathD"
+                        class="lane-svg-path" />
+                </svg>
+
+                <!-- 6 Tab Rows -->
+                <div *ngFor="let tab of tabs; let i = index; let isLast = last; trackBy: trackByTabName"
+                    class="tab-card-row mb-0 d-flex align-items-center"
+                    [ngClass]="{ 'active-tab-card': selectedTabIndex === i}" (click)="onTabRowClick(i)"
+                    [style.border-bottom]="!isLast ? '1px solid #dee2e6' : 'none'">
+
+                    <!-- Left: Tab Label & Counts -->
+                    <div class="tab-label-column d-flex flex-column justify-content-center p-3"
+                        [ngClass]="{ 'tab-label-fixed': isElongated }">
+                        <div class="d-flex align-items-center">
+                            <i [class]="tab.icon" class="mr-2"
+                                [ngClass]="selectedTabIndex === i ? 'text-primary' : 'text-muted'"></i>
+                            <div [ngClass]="{ 'text-primary': selectedTabIndex === i }"
+                                class="font-md font-weight-bold">
+                                {{ tab.label }}
+                            </div>
+                        </div>
+
+                        <!-- Active tab summary -->
+                        <div *ngIf="selectedTabIndex === i && activeSummary" class="small mt-1 d-flex">
+                            <span class="text-success mr-2 font-sm">Active: {{ activeSummary.active }}</span>
+                            <span class="text-muted font-sm">Inactive: {{ activeSummary.inactive }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Elongated Lane Nodes Area (shown when isElongated is true) -->
+                    <div *ngIf="isElongated" class="tab-lane-area flex-grow-1 d-flex align-items-center px-3 py-2"
+                        (click)="$event.stopPropagation()">
+                        <!-- If this lane has nodes -->
+                        <div *ngIf="laneNodesByLayer[tab.name]?.length"
+                            class="lane-nodes-wrapper d-flex align-items-center flex-wrap">
+                            <div *ngFor="let node of laneNodesByLayer[tab.name]; trackBy: trackByNodeUuid"
+                                [id]="'lane-node-' + node.uuid" class="lane-node-item my-1 mr-3"
+                                [ngClass]="{ 'active-node-item': node.isRoot, 'clickable-node-item': !node.isRoot }">
+
+                                <!-- Active Selected Node Card (Highlighted Blue Pill like Image 2/3) -->
+                                <div *ngIf="node.isRoot"
+                                    class="active-node-pill d-flex align-items-center px-3 py-2 rounded shadow-sm">
+                                    <span class="legend-circle mr-2 flex-shrink-0"
+                                        [ngClass]="getNodeStatusClass(node.status)"></span>
+                                    <i [class]="getNodeIconClass(node)" class="mr-2"></i>
+                                    <div class="text-truncate mr-2">
+                                        <div class="active-node-name font-weight-bold text-white text-truncate">{{
+                                            node.name }}</div>
+                                        <div class="active-node-type font-xs text-light text-truncate">{{ node.layer ||
+                                            node.type }}</div>
+                                    </div>
+                                    <button class="btn btn-sm btn-link text-white p-0 ml-1"
+                                        (click)="$event.stopPropagation(); goToApplication(node)"
+                                        tooltip="View Details">
+                                        <i class="fa fa-external-link"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Connected Neighbor Circular Node (Circle like Image 2/3) -->
+                                <div *ngIf="!node.isRoot"
+                                    class="connected-node-circle d-flex flex-column align-items-center"
+                                    (click)="$event.stopPropagation(); onLaneNodeClick(node)"
+                                    [tooltip]="node.name + ' (' + (node.layer || node.type) + ')'">
+                                    <div class="node-circle-bubble d-flex align-items-center justify-content-center shadow-sm"
+                                        [ngClass]="getNodeStatusClass(node.status)">
+                                        <i [class]="getNodeIconClass(node)"></i>
+                                    </div>
+                                    <span class="node-circle-label text-truncate mt-1">{{ node.name }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- If this lane has no nodes -->
+                        <div *ngIf="!laneNodesByLayer[tab.name]?.length"
+                            class="empty-lane-placeholder text-muted font-xs">
+                            <span class="lane-dash"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-9 px-2 d-flex flex-column h-80">
+        <!-- Right Column: Main Topology Graph Area -->
+        <div [ngClass]="isElongated ? 'col-6 col-lg-5' : 'col-9'"
+            class="px-2 d-flex flex-column h-80 main-panel-transition">
             <!-- Header row -->
             <div class="row align-items-center border-bottom py-2">
                 <div class="col d-flex align-items-center">
                     <span class="fw-bold">{{ pageTitle }}</span>
                 </div>
                 <div class="col-auto d-flex align-items-center">
-                    <form [formGroup]="nodeStatusFilterForm" *ngIf="nodeStatusFilterForm" class="d-flex">                    
+                    <form [formGroup]="nodeStatusFilterForm" *ngIf="nodeStatusFilterForm" class="d-flex">
                         <div class="m-0 form-group">
                             <!-- <label for="nodeStatus" class="form-label mb-1">Node Status</label> -->
                             <select id="nodeStatus" class="form-control form-control-sm" formControlName="nodeStatus">
@@ -73,14 +165,17 @@
                     <div class="border-start ps-3 ms-3">
                         <data-refresh-btn></data-refresh-btn>
                     </div>
-                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i class="fa fa-arrow-left"></i></button>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                            class="fa fa-arrow-left"></i></button>
                 </div>
             </div>
 
             <!-- Fill remaining height -->
             <div class="flex-grow-1 d-flex flex-column min-vh-0">
-                <app-common-topology [buId]="buId" [appIds]="selectedApps"
-                    [selectedView]="selectedView" [selectedNodeStatus]="selectedNodeStatus" (statusSummaryChange)="handleStatusSummary($event)"
+                <app-common-topology [buId]="buId" [appIds]="selectedApps" [selectedView]="selectedView"
+                    [selectedNodeStatus]="selectedNodeStatus" [isElongated]="isElongated"
+                    [activeNodeId]="selectedDrilldownNode?.uuid" (statusSummaryChange)="handleStatusSummary($event)"
+                    (nodeClicked)="onTopologyNodeClicked($event)"
                     class="flex-grow-1 d-flex flex-column min-vh-0 flex-shrink-1">
                 </app-common-topology>
             </div>

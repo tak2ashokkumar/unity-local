@@ -61,8 +61,11 @@ export class UsiOthersComponent implements OnInit, OnDestroy {
       }
 
       res.forEach(item => {
-        if (item.type?.toLowerCase() === "veeam") {
+        const itemType = item.type?.toLowerCase().replace(/[\s_-]/g, '');
+        if (itemType === 'veeam') {
           this.others.veeam.length += 1;
+        } else if (itemType === 'firewallmanagementcenter' || itemType === 'fmc') {
+          this.others.firewallManagementCenter.length += 1;
         }
         // else if (item.type?.toLowerCase() === "sdwan") {
         //   this.others.sdwan.length += 1;
@@ -79,6 +82,14 @@ export class UsiOthersComponent implements OnInit, OnDestroy {
     this.router.navigate(['veeam'], { relativeTo: this.route });
   }
 
+  goToAddFirewallManagementCenter() {
+    this.router.navigate(['firewall-management-center', 'create'], { relativeTo: this.route });
+  }
+
+  goToFirewallManagementCenterViewDetails() {
+    this.router.navigate(['firewall-management-center'], { relativeTo: this.route });
+  }
+
   // gotToAddSdwan() {
   //   this.router.navigate(['sdwan', 'create'], { relativeTo: this.route });
   // }
@@ -92,6 +103,10 @@ export class UsiOthersComponent implements OnInit, OnDestroy {
 const others = {
   'veeam': {
     'imageURL': `${environment.assetsUrl}external-brand/logos/Veeam_logo.svg`,
+    'length': 0
+  },
+  'firewallManagementCenter': {
+    'imageURL': `${environment.assetsUrl}external-brand/logos/cisco_fmc.svg`,
     'length': 0
   },
   // 'sdwan': {

@@ -80,17 +80,17 @@ export interface RemoteWebSessionLaunch {
   providedIn: 'root'
 })
 export class RemoteAccessService {
-  private readonly vcenterWebSessionsPath = '/api/remote-access/vcenter-web-sessions/';
+  private readonly webSessionsPath = '/api/remote-access/web-sessions/';
   private readonly viewerWebSessionsPath = '/remote-access/web-sessions/';
   private readonly defaultCookieExchangePath = '/api/remote-access/cookie-exchange/';
   private readonly defaultWebsocketPath = '/remote-access/ws';
 
   constructor(private http: HttpClient) { }
 
-  createVCenterWebSession(resourceId: string): Observable<RemoteWebSessionResponse> {
+  createWebSession(resourceId: string, resourceType: string): Observable<RemoteWebSessionResponse> {
     return this.http.post<RemoteWebSessionResponse>(
-      this.vcenterWebSessionsPath,
-      { resource_id: resourceId },
+      this.webSessionsPath,
+      { resource_id: resourceId, resource_type: resourceType },
       { withCredentials: true }
     );
   }
@@ -103,8 +103,8 @@ export class RemoteAccessService {
     );
   }
 
-  createVCenterWebLaunch(resourceId: string): Observable<RemoteWebSessionLaunch> {
-    return this.createVCenterWebSession(resourceId).pipe(
+  createWebLaunch(resourceId: string, resourceType: string): Observable<RemoteWebSessionLaunch> {
+    return this.createWebSession(resourceId, resourceType).pipe(
       switchMap((session: RemoteWebSessionResponse) => {
         return this.exchangeRemoteAccessCookie(session.grant, session.cookie_exchange_path).pipe(
           map((cookie: RemoteCookieExchangeResponse) => {
@@ -120,8 +120,16 @@ export class RemoteAccessService {
     );
   }
 
-  getVCenterWebSession(sessionId: string): Observable<any> {
-    return this.http.get(`${this.vcenterWebSessionsPath}${sessionId}/`, { withCredentials: true });
+  createProxmoxWebLaunch(resourceId: string): Observable<RemoteWebSessionLaunch> {
+    return this.createWebLaunch(resourceId, 'proxmox');
+  }
+
+  createStorageWebLaunch(resourceId: string): Observable<RemoteWebSessionLaunch> {
+    return this.createWebLaunch(resourceId, 'storage_device');
+  }
+
+  getWebSession(sessionId: string): Observable<any> {
+    return this.http.get(`${this.webSessionsPath}${sessionId}/`, { withCredentials: true });
   }
 
   getRemoteWebViewerSession(sessionId: string): Observable<RemoteWebViewerSession> {
@@ -131,8 +139,8 @@ export class RemoteAccessService {
     );
   }
 
-  terminateVCenterWebSession(sessionId: string, reason: string = 'viewer_closed'): Observable<any> {
-    return this.http.delete(`${this.vcenterWebSessionsPath}${sessionId}/`, {
+  terminateWebSession(sessionId: string, reason: string = 'viewer_closed'): Observable<any> {
+    return this.http.delete(`${this.webSessionsPath}${sessionId}/`, {
       body: { reason },
       withCredentials: true
     });

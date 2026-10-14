@@ -3,20 +3,35 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ORCHESTRATION_ADD_INSTANCE, ORCHESTRATION_DELETE_INSTANCE, ORCHESTRATION_EDIT_INSTANCE, TOGGLE_STATUS } from 'src/app/shared/api-endpoint.const';
 import { OrchestrationInstanceDataType } from './orchestration-integration.type';
+import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class OrchestrationIntegrationService {
 
   constructor(private http: HttpClient,
     private builder: FormBuilder,
     private tableService: TableApiServiceService) { }
 
-  getInstances(criteria: SearchCriteria): Observable<InstanceFormData[]> {
-    return this.tableService.getData<InstanceFormData[]>(ORCHESTRATION_ADD_INSTANCE(), criteria);
+  private savedCriteria: SearchCriteria | null = null;
+
+  saveCriteria(criteria: SearchCriteria): void {
+    this.savedCriteria = JSON.parse(JSON.stringify(criteria));
+  }
+
+  getSavedCriteria(): SearchCriteria | null {
+    return this.savedCriteria;
+  }
+
+  clearSavedCriteria(): void {
+    this.savedCriteria = null;
+  }
+
+  getInstances(criteria: SearchCriteria): Observable<PaginatedResult<InstanceFormData>> {
+    return this.tableService.getData<PaginatedResult<InstanceFormData>>(ORCHESTRATION_ADD_INSTANCE(), criteria);
   }
 
   convertToViewData(data: InstanceFormData[]): InstanceViewData[] {

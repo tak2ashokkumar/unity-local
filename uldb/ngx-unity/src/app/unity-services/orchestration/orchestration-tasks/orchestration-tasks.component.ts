@@ -10,9 +10,11 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { CategoryViewData, HistoryViewData, ListSummaryResModel, ListSummaryViewModel, OrchestrationTasksService, SCRIPT_CHOICES, TaskViewData } from './orchestration-tasks.service';
+import { FilterConfig, HeaderAction, SelectedFilters, SortDirection, SortEvent, StatusToggleEvent, TableColumn } from 'src/app/shared/app-generic-table/app-generic-table.type';
+import { environment } from 'src/environments/environment';
+import { LinkedTaskDependency } from './orchestration-task.type';
 
 @Component({
   selector: 'orchestration-tasks',
@@ -22,18 +24,58 @@ import { CategoryViewData, HistoryViewData, ListSummaryResModel, ListSummaryView
 })
 export class OrchestrationTasksComponent implements OnInit, OnDestroy {
 
-  currentCriteria: SearchCriteria;
+  assetsUrl = environment.assetsUrl;
+  headerActions: HeaderAction[] = [
+    { id: 'task', label: 'Create Task', icon: 'fas fa-plus', btnClass: 'ct-btn-primary' }
+  ];
+
+  columns: TableColumn[] = [
+    { key: 'taskName', label: 'Name', widthClass: 'tdw-20', sortable: true, sortField: 'name', locked: true },
+    { key: 'category', label: 'Category', widthClass: 'tdw-15', sortable: true, sortField: 'category' },
+    {
+      key: 'playbookType', label: 'Type', widthClass: 'tdw-5', align: 'center',
+      iconCell: {
+        options: {
+          'Ansible Playbook': { icon: `${this.assetsUrl}external-brand/logos/Anisble.svg`, isImage: true, label: '' },
+          'Terraform Script': { icon: `${this.assetsUrl}external-brand/logos/Terraform.svg`, isImage: true, label: '' },
+          'Bash Script': { icon: `${this.assetsUrl}external-brand/logos/Bash.svg`, isImage: true, label: '' },
+          'Python Script': { icon: `${this.assetsUrl}external-brand/logos/Python.svg`, isImage: true, label: '' },
+          'Powershell Script': { icon: `${this.assetsUrl}external-brand/logos/PowerShell.svg`, isImage: true, label: '' },
+          'Rest API': { icon: `${this.assetsUrl}external-brand/logos/Rest_Api.svg`, isImage: true, label: '' }
+        }
+      }
+    },
+    { key: 'sourceName', label: 'Source', widthClass: 'tdw-15' },
+    { key: 'targetType', label: 'Target Type', widthClass: 'tdw-10', sortable: true, sortField: 'target_type' },
+    {
+      key: 'taskStatus', label: 'Status', align: 'center', cellClass: 'status-toggle-column',
+      statusToggle: {
+        activeValue: true,
+        inactiveValue: false,
+        activeLabel: 'Enable',
+        inactiveLabel: 'Disable'
+      }
+    },
+    { key: 'actions', label: 'Actions', align: 'center', locked: true, cellClass: 'action-icons-column' }
+  ];
+
   private ngUnsubscribe = new Subject();
+  currentCriteria: SearchCriteria;
   viewData: TaskViewData[] = [];
   count: number;
-  isPageSizeAll: boolean = true;
   nonFieldErr: string = '';
-  action: 'Add' | 'Edit';
   taskModalRef: BsModalRef;
   @ViewChild('createcategory') createcategory: ElementRef;
   taskUUID: string;
   @ViewChild('confirmdelete') confirmdelete: ElementRef;
   taskDeleteModalRef: BsModalRef;
+  linkedDependencies: LinkedTaskDependency[] = [];
+  linkedDependencyGroups: { label: string; items: LinkedTaskDependency[] }[] = [];
+  private readonly linkedDependencyTypes: { type: LinkedTaskDependency['type']; label: string }[] = [
+    { type: 'workflow', label: 'Related Workflow' },
+    { type: 'auto_remediation', label: 'Related Auto Remediation' },
+    { type: 'service_catalog', label: 'Related Service Catalog' }
+  ];
   @ViewChild('history') history: ElementRef;
   viewHistoryData: HistoryViewData[] = [];
   categoryData: CategoryViewData[] = [];
@@ -45,16 +87,16 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   @ViewChild('clone') clone: ElementRef;
   taskName: string;
   listSummaryViewData: ListSummaryViewModel;
-  @ViewChild('edit') edit: ElementRef;
-  editModelRef: BsModalRef;
   editCatModalRef: BsModalRef;
   @ViewChild('editcategory') editcategory: ElementRef;
   deleteCatModalRef: BsModalRef;
   @ViewChild('deletecategory') deletecategory: ElementRef;
   catUuid: string;
   scriptChoices = SCRIPT_CHOICES;
-  categoryUuid: string
+  categoryUuid: string;
   globalReadOnlyUser = false;
+  activeSortField: string | null = null;
+  activeSortDirection: SortDirection = null;
 
   constructor(
     private router: Router,
@@ -66,19 +108,43 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
     private utilService: AppUtilityService,
     private storage: StorageService) {
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ category: null, script_type: null, target_type: null, enabled: null }] };
-    this.route.queryParamMap.subscribe((params: ParamMap) => {
-      this.currentCriteria.params[0].script_type = params.get('scriptType');
-      this.currentCriteria.params[0].target_type = params.get('target');
-      this.currentCriteria.params[0].enabled = params.get('status');
-    });
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
-      this.categoryUuid = params.get('categoryId')
+      this.categoryUuid = params.get('categoryId');
     });
+  }
+
+  get filterConfig(): FilterConfig[] {
+    return [
+      { key: 'script_type', label: 'Type', options: this.scriptChoices.map(s => ({ label: s.label, value: s.value })) },
+      {
+        key: 'target_type', label: 'Target Type', options: [
+          { label: 'Cloud', value: 'Cloud' },
+          { label: 'Host', value: 'Host' },
+          { label: 'Local', value: 'Local' }
+        ]
+      },
+      {
+        key: 'enabled', label: 'Status', options: [
+          { label: 'Enabled', value: 'Enabled' },
+          { label: 'Disabled', value: 'Disabled' }
+        ]
+      }
+    ];
+  }
+
+  get selectedFiltersForTable(): SelectedFilters {
+    const result: SelectedFilters = {};
+    const params = this.currentCriteria.params[0];
+    if (params.script_type) result['script_type'] = String(params.script_type).split(',');
+    if (params.target_type) result['target_type'] = String(params.target_type).split(',');
+    if (params.enabled) result['enabled'] = String(params.enabled).split(',');
+    return result;
   }
 
   ngOnInit() {
     this.spinner.start('main');
     this.globalReadOnlyUser = this.storage.getByKey('user', StorageType.SESSIONSTORAGE)?.active_rbac_roles?.some(r => r === 'Global Read-Only');
+    this.restoreCriteria();
     this.getListSummary();
     this.getCategoryData();
   }
@@ -88,24 +154,96 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
     this.taskModalRef?.hide();
     this.editCatModalRef?.hide();
     this.deleteCatModalRef?.hide();
-    this.editModelRef?.hide();
     this.taskDeleteModalRef?.hide();
     this.ngUnsubscribe.next();
-    this.ngUnsubscribe.complete()
+    this.ngUnsubscribe.complete();
+  }
+
+  private restoreCriteria(): void {
+    const qp = this.route.snapshot.queryParamMap;
+    this.applyQueryParamsToCriteria(qp);
+  }
+
+  private applyQueryParamsToCriteria(qp: ParamMap): void {
+    this.currentCriteria.searchValue = qp.get('search') || '';
+    this.currentCriteria.params[0].script_type = qp.get('script_type') || null;
+    this.currentCriteria.params[0].target_type = qp.get('target_type') || null;
+    this.currentCriteria.params[0].enabled = qp.get('enabled') || null;
+
+    this.currentCriteria.sortColumn = qp.get('sortColumn') || '';
+    this.currentCriteria.sortDirection = (qp.get('sortDirection') as '' | 'asc' | 'desc') || '';
+    this.activeSortField = this.currentCriteria.sortColumn || null;
+    this.activeSortDirection = (this.currentCriteria.sortDirection || null) as SortDirection;
+
+    const pageNo = qp.get('pageNo');
+    const pageSize = qp.get('pageSize');
+    this.currentCriteria.pageNo = pageNo ? +pageNo : 1;
+    this.currentCriteria.pageSize = pageSize ? +pageSize : PAGE_SIZES.DEFAULT_PAGE_SIZE;
+  }
+
+  private syncCriteriaToQueryParams(): void {
+    const params = this.currentCriteria.params[0];
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: this.currentCriteria.searchValue || null,
+        script_type: params.script_type || null,
+        target_type: params.target_type || null,
+        enabled: params.enabled || null,
+        sortColumn: this.currentCriteria.sortColumn || null,
+        sortDirection: this.currentCriteria.sortDirection || null,
+        pageNo: this.currentCriteria.pageNo !== 1 ? this.currentCriteria.pageNo : null,
+        pageSize: this.currentCriteria.pageSize !== PAGE_SIZES.DEFAULT_PAGE_SIZE ? this.currentCriteria.pageSize : null
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  onHeaderAction(id: string) {
+    if (id === 'task') this.addTask();
+  }
+
+  onStatusToggle(event: StatusToggleEvent) {
+    this.toggleStatus(event.value, event.row);
+  }
+
+  onFiltersApplied(filters: SelectedFilters) {
+    this.currentCriteria.params[0].script_type = filters['script_type']?.length ? filters['script_type'].join(',') : null;
+    this.currentCriteria.params[0].target_type = filters['target_type']?.length ? filters['target_type'].join(',') : null;
+    this.currentCriteria.params[0].enabled = filters['enabled']?.length ? filters['enabled'].join(',') : null;
+    this.currentCriteria.pageNo = 1;
+    this.onFilterChange();
+  }
+
+  refreshData() {
+    this.spinner.start('main');
+    this.getCategoryData();
   }
 
   onSorted($event: SearchCriteria) {
-    this.spinner.start('main');
     this.currentCriteria.sortColumn = $event.sortColumn;
     this.currentCriteria.sortDirection = $event.sortDirection;
     this.currentCriteria.pageNo = 1;
     this.getCategoryData();
   }
 
+  onSortChanged(event: SortEvent) {
+    this.spinner.start('main');
+    this.activeSortField = event.direction ? event.field : null;
+    this.activeSortDirection = event.direction;
+    this.currentCriteria.sortColumn = event.direction ? event.field : '';
+    this.currentCriteria.sortDirection = event.direction || '';
+    this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
+    this.getTaskData();
+  }
+
   onSearched(event: string) {
     this.spinner.start('main');
     this.currentCriteria.searchValue = event;
     this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
     this.getCategoryData();
   }
 
@@ -113,6 +251,7 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
     if (this.currentCriteria.pageNo !== pageNo) {
       this.spinner.start('main');
       this.currentCriteria.pageNo = pageNo;
+      this.syncCriteriaToQueryParams();
       this.getCategoryData();
     }
   }
@@ -121,13 +260,7 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.currentCriteria.pageSize = pageSize;
     this.currentCriteria.pageNo = 1;
-    this.getCategoryData();
-  }
-
-  refreshData(pageNo: number) {
-    this.spinner.start('main');
-    this.currentCriteria.pageNo = pageNo;
-    // this.currentCriteria.params[0].category = 'All';
+    this.syncCriteriaToQueryParams();
     this.getCategoryData();
   }
 
@@ -135,25 +268,24 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
     if (this.currentCategory !== category) {
       this.spinner.start('main');
       this.currentCategory = category;
-      this.currentCriteria.params[0].category = category;
-      this.currentCriteria.pageNo = 1;
       const selectedCategory = this.categoryData.find((cat: any) => cat.category === category);
       this.categoryUuid = selectedCategory?.uuid || '';
-      // if (category === 'All') {
-      //   this.router.navigate(['../'], { relativeTo: this.route });
-      // } else {
-      //   this.router.navigate([this.categoryUuid], { relativeTo: this.route });
-      // }
+
+      this.currentCriteria.params[0].category = category;
+      this.currentCriteria.pageNo = 1;
+
       const newUrl = this.categoryUuid ? `/services/orchestration/tasks/${this.categoryUuid}` : `/services/orchestration/tasks`;
-      this.router.navigateByUrl(newUrl);
-      this.getCategoryData()
-      this.spinner.stop('main');
+      this.router.navigate([newUrl], { queryParams: { pageNo: null }, queryParamsHandling: 'merge' }).then(() => {
+        this.getCategoryData();
+        this.spinner.stop('main');
+      });
     }
   }
 
   onFilterChange() {
     this.spinner.start('main');
     this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
     this.getTaskData();
   }
 
@@ -182,7 +314,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.orchestraionTaskService.getCategoryData().pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
       this.categoryData = this.orchestraionTaskService.convertToCategoryViewData(data.results);
-      // if (this.categoryUuid) {
       if (this.categoryUuid === 'All') {
         this.currentCriteria.params[0].category = 'All';
         this.currentCategory = 'All';
@@ -192,7 +323,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
         this.currentCriteria.params[0].category = category;
         this.currentCategory = category;
       }
-      // }
       this.getTaskData();
       this.spinner.stop('main');
     }, (err: HttpErrorResponse) => {
@@ -202,7 +332,7 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   }
 
   addTask() {
-    this.router.navigate(['category', 'create'], { relativeTo: this.route });
+    this.router.navigate(['category', 'create'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
   }
 
   cloneTask(taskName: string, uuid: string) {
@@ -232,24 +362,18 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   }
 
   editTask(task: TaskViewData) {
-    this.taskUUID = task.uuid;
-    this.editModelRef = this.modalService.show(this.edit, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
-  }
-
-  confirmEdit() {
-    this.editModelRef.hide();
     if (this.categoryUuid) {
-      this.router.navigate(['category', this.taskUUID, 'edit'], { relativeTo: this.route });
+      this.router.navigate(['category', task.uuid, 'edit'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
     } else {
-      this.router.navigate([this.taskUUID, 'edit'], { relativeTo: this.route });
+      this.router.navigate([task.uuid, 'edit'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
     }
   }
 
   executeTask(view: TaskViewData) {
     if (this.categoryUuid) {
-      this.router.navigate(['category', view.uuid, view.targetType, 'execute'], { relativeTo: this.route });
+      this.router.navigate(['category', view.uuid, view.targetType, 'execute'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
     } else {
-      this.router.navigate([view.uuid, view.targetType, 'execute'], { relativeTo: this.route });
+      this.router.navigate([view.uuid, view.targetType, 'execute'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
     }
   }
 
@@ -288,14 +412,12 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
       });
     } else {
       let obj = this.categoryForm.getRawValue();
-      console.log(this.catUuid, "catuuid")
       if (this.catUuid) {
         this.orchestraionTaskService.updateCategory(this.catUuid, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
           this.editCatModalRef.hide();
           this.spinner.stop('main');
           this.currentCategory = obj.name;
           this.currentCriteria.params[0].category = obj.name;
-          // this.getTaskData();
           this.getCategoryData();
           this.notification.success(new Notification('Category updated successfully.'));
         }, (err: HttpErrorResponse) => {
@@ -305,8 +427,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
         this.orchestraionTaskService.createCategory(obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
           this.taskModalRef.hide();
           this.spinner.stop('main');
-          // this.currentCriteria.params[0].category = 'All';
-          // this.getTaskData();
           this.getCategoryData();
           this.notification.success(new Notification('Category created successfully.'));
         }, (err: HttpErrorResponse) => {
@@ -333,7 +453,21 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
 
   deleteTask(UUID: string) {
     this.taskUUID = UUID;
-    this.taskDeleteModalRef = this.modalService.show(this.confirmdelete, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+    this.linkedDependencies = [];
+    this.linkedDependencyGroups = [];
+    this.spinner.start('main');
+    this.orchestraionTaskService.getLinkedDependencies(UUID).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      const items = Array.isArray(data) ? data : data?.workflows;
+      this.linkedDependencies = Array.isArray(items) ? items : [];
+      this.linkedDependencyGroups = this.linkedDependencyTypes
+        .map(({ type, label }) => ({ label, items: this.linkedDependencies.filter(item => item.type === type) }))
+        .filter(group => group.items.length);
+      this.spinner.stop('main');
+      this.taskDeleteModalRef = this.modalService.show(this.confirmdelete, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+    }, () => {
+      this.spinner.stop('main');
+      this.notification.error(new Notification('Unable to check linked items. Please try again.'));
+    });
   }
 
   confirmTaskDelete() {
@@ -342,7 +476,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
     this.orchestraionTaskService.deleteTask(this.taskUUID).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.spinner.stop('main');
       this.notification.success(new Notification('Task deleted successfully.'));
-      // this.getTaskData();
       this.getCategoryData();
     }, err => {
       this.spinner.stop('main');
@@ -358,7 +491,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
       this.spinner.stop('main');
       this.notification.error(new Notification('Failed to get History'));
     });
-
   }
 
   viewHistory(uuid: string) {
@@ -370,7 +502,6 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   confirmClone() {
     this.spinner.start('main');
     this.orchestraionTaskService.cloneData(this.taskUUID, this.taskName).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-      // this.getTaskData();
       this.getCategoryData();
       this.spinner.stop('main');
       this.notification.success(new Notification('Task cloned successfully'));
@@ -383,31 +514,27 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   }
 
   toggleStatus(status: boolean, view: TaskViewData) {
-    if (status === true) {
-      view['taskStatus'] = true;
-    } else {
-      view['taskStatus'] = false;
-    }
+    view['taskStatus'] = status;
     this.orchestraionTaskService.toggleStatus(view.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
     }, (err: HttpErrorResponse) => {
+      view['taskStatus'] = !status;
       this.notification.error(new Notification('Failed to change status'));
     });
   }
 
   scheduleTasks(view: TaskViewData) {
     if (this.categoryUuid) {
-      this.router.navigate(['category', view.uuid, view.targetType, 'scheduleTasks'], { relativeTo: this.route });
+      this.router.navigate(['category', view.uuid, view.targetType, 'scheduleTasks'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
     } else {
-      this.router.navigate([view.uuid, view.targetType, 'scheduleTasks'], { relativeTo: this.route });
+      this.router.navigate([view.uuid, view.targetType, 'scheduleTasks'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
     }
   }
 
   goToviewDetails(task: TaskViewData) {
     if (this.categoryUuid) {
-      this.router.navigate(['category', task.uuid, 'view'], { relativeTo: this.route });
+      this.router.navigate(['category', task.uuid, 'view'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
     } else {
-      this.router.navigate([task.uuid, 'view'], { relativeTo: this.route });
+      this.router.navigate([task.uuid, 'view'], { relativeTo: this.route, state: { taskReturnUrl: this.router.url } });
     }
   }
-
 }

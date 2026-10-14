@@ -304,3 +304,14 @@ export interface WorkflowParameterInput {
 export interface WorkflowParametersResponse {
     inputs: WorkflowParameterInput[];
 }
+
+export interface WorkflowInputParam {
+    param_name: string;
+    param_type: string;
+    default_value: any;
+}
+
+export interface WorkflowInputsResponse {
+    name: string;
+    inputs: WorkflowInputParam[];
+}

@@ -164,6 +164,10 @@ export const configDeviceTypeList: LabelValueType[] = [
     'value': 'fortinet'
   },
   {
+    'label': 'FortiWeb',
+    'value': 'fortiweb'
+  },
+  {
     'label': 'Juniper',
     'value': 'juniper'
   },

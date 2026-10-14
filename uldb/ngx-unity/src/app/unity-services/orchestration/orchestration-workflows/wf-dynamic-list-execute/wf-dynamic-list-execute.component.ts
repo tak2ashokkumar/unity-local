@@ -11,6 +11,7 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { UnityScheduleService } from 'src/app/shared/unity-schedule/unity-schedule.service';
 import { WfDynamicListExecuteService } from './wf-dynamic-list-execute.service';
 import { nodeTypes } from '../wf-dynamic-container/wf-dynamic-container.type';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'wf-dynamic-list-execute',
@@ -70,7 +71,8 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
     private utilService: AppUtilityService,
     private router: Router,
     private eRef: ElementRef,
-    private scheduleSvc: UnityScheduleService) {
+    private scheduleSvc: UnityScheduleService,
+    private location: Location) {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.workflowId = params.get('id') || params.get('workflowId');
     });
@@ -667,7 +669,8 @@ export class WfDynamicListExecuteComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['../../../'], { relativeTo: this.route });
+    // this.router.navigate(['../../../'], { relativeTo: this.route });
+    this.location.back();
   }
 
   generateUUID(): string {

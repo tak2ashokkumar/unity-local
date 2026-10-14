@@ -2,16 +2,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { ORCHESTRATION_CATEGORY, ORCHESTRATION_CLONE_TASK, ORCHESTRATION_DELETE_TASK, ORCHESTRATION_GET_TASK, ORCHESTRATION_LIST_SUMMARY, ORCHESTRATION_STATUS_TOGGLE, ORCHESTRATION_VIEW_HISTORY } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
-import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { environment } from 'src/environments/environment';
-import { CategoryDataType, OrchestrationCategoryDataType, OrchestrationHistoryDataType, OrchestrationTaskDataType } from './orchestration-task.type';
+import { CategoryDataType, LinkedDependenciesResponse, OrchestrationCategoryDataType, OrchestrationHistoryDataType, OrchestrationTaskDataType } from './orchestration-task.type';
 
 @Injectable()
 export class OrchestrationTasksService {
@@ -21,6 +19,13 @@ export class OrchestrationTasksService {
     private tableService: TableApiServiceService,
     private utilSvc: AppUtilityService,
     private appService: AppLevelService) { }
+
+  // NOTE: the previous savedCriteria/getSavedCriteria/clearSavedCriteria cache
+  // has been removed. Filter state now lives exclusively in the URL query
+  // params (see orchestration-tasks.component.ts), so behavior doesn't depend
+  // on whether this component-scoped service instance happens to survive a
+  // given navigation. Don't reintroduce an in-memory fallback here — it
+  // reopens the "filters leak in when they shouldn't" bug.
 
   convertToViewData(data: OrchestrationTaskDataType[]): TaskViewData[] {
     let viewData: TaskViewData[] = [];
@@ -160,6 +165,10 @@ export class OrchestrationTasksService {
 
   deleteTask(uuid: string) {
     return this.http.delete(ORCHESTRATION_DELETE_TASK(uuid));
+  }
+
+  getLinkedDependencies(uuid: string): Observable<LinkedDependenciesResponse> {
+    return this.http.get<LinkedDependenciesResponse>(`orchestration/tasks/${uuid}/related_items/`);
   }
 
   cloneData(uuid: string, taskName: string) {

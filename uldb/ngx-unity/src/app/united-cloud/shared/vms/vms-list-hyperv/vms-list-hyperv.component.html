@@ -57,6 +57,10 @@
             <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
           </td>
           <td class="action-icons-column">
+            <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerIcon"
+              [ngClass]="{'action-icons-disabled':!view.powerIconEnabled,'action-icons-on':view.powerStatusOn}"
+              [tooltip]="view.powerIconMsg" (click)="powerToggle(view)" accessControl moduleName="Private Cloud"
+              accessType="Manage Private Cloud" elementType="actionbtn"></button>
             <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
               [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
               (click)="consoleSameTab(view)" accessControl moduleName="Private Cloud" accessType="Remote Management"
@@ -137,6 +141,45 @@
     </div>
     <div class="card-footer">
       <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>
+<ng-template #authenticate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Please provide credentials to <strong>{{action}}</strong>
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closeAuthModal()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="authForm">
+        <div class="form-group">
+          <div class="invalid-credentials">Only authorized users are allowed to perform this action. Please provide
+            your credentials.</div>
+        </div>
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="authFormErrors.nonFieldErr">{{authFormErrors.nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="hyperv-vm-power-username">Username<em>*</em></label>
+          <input class="form-control" id="hyperv-vm-power-username" type="text" formControlName="username"
+            [ngClass]="{'is-invalid' : authFormErrors.username}">
+          <div class="invalid-feedback" *ngIf="authFormErrors.username">{{authFormErrors.username}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="hyperv-vm-power-password">Password<em>*</em></label>
+          <custom-password-field formControlName="password"
+            [options]="{id:'hyperv-vm-power-password', errors:authFormErrors.password, placeholder:'Enter Password', autocomplete:'current-password'}">
+          </custom-password-field>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="closeAuthModal()" type="button">Cancel</button>
     </div>
   </div>
 </ng-template>

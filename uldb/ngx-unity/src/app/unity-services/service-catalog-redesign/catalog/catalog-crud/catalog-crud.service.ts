@@ -2,15 +2,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { environment } from 'src/environments/environment';
-import { CatalogDatacenter, CatalogItemPayload, CatalogMeta, ConfigOption, ConfigurationField, ConfigValidator, COST_COMPONENT_ALLOWED_KEYS, CostComponent, CURRENCY_SYMBOLS, FinopsBuildingBlock, InputMapping, Policy, TaskDropdownItem, TaskParameterInput, TaskParametersResponse, WorkflowDetail, WorkflowDropdownItem, WorkflowParameterInput, WorkflowParametersResponse } from './catalog-crud.type';
+import { CatalogDatacenter, CatalogItemPayload, CatalogMeta, ConfigOption, ConfigurationField, ConfigValidator, COST_COMPONENT_ALLOWED_KEYS, CostComponent, CURRENCY_SYMBOLS, FinopsBuildingBlock, InputMapping, Policy, TaskDropdownItem, TaskParameterInput, TaskParametersResponse, WorkflowDetail, WorkflowDropdownItem, WorkflowInputsResponse, WorkflowParameterInput, WorkflowParametersResponse } from './catalog-crud.type';
 import { Observable } from 'rxjs';
 import { ORCHESTRATION_GET_TASK } from 'src/app/shared/api-endpoint.const';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { map } from 'rxjs/operators';
+import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 const BASE_URL = `/api/service_catalog/v1/catalogs/`;
 
-// Maps a cost-component key to the suffix of its size/capacity/count field,
-// since different components name that field differently (e.g. ram_size vs storage_allocated_capacity).
 const COUNT_KEY_SUFFIX_BY_COMPONENT: { [key: string]: string } = {
   ram: '_size',
   storage: '_allocated_capacity',
@@ -22,19 +22,24 @@ const COUNT_KEY_SUFFIX_BY_COMPONENT: { [key: string]: string } = {
 })
 export class CatalogCrudService {
 
-  constructor(private builder: FormBuilder, private http: HttpClient) { }
+  constructor(private builder: FormBuilder, private http: HttpClient, private tableService: TableApiServiceService) { }
 
   // ---------- HTTP ----------
 
-  getTaskData(): Observable<PaginatedResult<TaskDropdownItem>> {
-    return this.http.get<PaginatedResult<TaskDropdownItem>>(ORCHESTRATION_GET_TASK());
+  getTaskData(currentCriteria: SearchCriteria): Observable<PaginatedResult<TaskDropdownItem>> {
+    return this.tableService.getData<PaginatedResult<TaskDropdownItem>>(ORCHESTRATION_GET_TASK(), currentCriteria);
   }
 
-  getWorkflowData(triggerType: string): Observable<PaginatedResult<WorkflowDropdownItem>> {
-    const params = new HttpParams().set('trigger_type', triggerType);
-    return this.http.get<PaginatedResult<WorkflowDropdownItem>>(
-      `/rest/orchestration/agentic_workflow/`,
-      { params }
+  getWorkflowData(triggerType: string, currentCriteria: SearchCriteria): Observable<PaginatedResult<WorkflowDropdownItem>> {
+    currentCriteria.params = currentCriteria.params || [{}];
+    currentCriteria.params[0].trigger_type = triggerType;
+    return this.tableService.getData<PaginatedResult<WorkflowDropdownItem>>(`/rest/orchestration/agentic_workflow/`, currentCriteria);
+  }
+
+  // New response shape: { inputs: WorkflowInputParam[], name: string }
+  getWorkflowVersionInputs(workflowUuid: string, versionUuid: string): Observable<WorkflowInputsResponse> {
+    return this.http.get<WorkflowInputsResponse>(
+      `/rest/orchestration/agentic_workflow/${workflowUuid}/${versionUuid}/inputs/`
     );
   }
 

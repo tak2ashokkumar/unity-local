@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, from } from 'rxjs';
-import { filter, mergeMap, takeUntil } from 'rxjs/operators';
+import { filter, finalize, mergeMap, takeUntil } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { KubernetesPodType } from 'src/app/shared/SharedEntityTypes/kubernetes.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -21,6 +21,7 @@ import { UsageData, UsageStatsPercent } from '../entities/usage-data.type';
 import { CustomVirtualMachine, VCenterDataStore, VirtualMachine } from '../entities/vm.type';
 import { EsxiHypervisorUsageData, IconViewData, SummaryService, SummaryUsageViewData, SummaryViewData } from './summary.service';
 import { UnitedCloudSharedService } from '../united-cloud-shared.service';
+import { RemoteAccessService } from 'src/app/shared/remote-access/remote-access.service';
 
 @Component({
   selector: 'pc-summary',
@@ -49,6 +50,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
   vCenterDatastores: VCenterDataStore[] = [];
   hypervisorUsagedata: EsxiHypervisorUsageData[] = [];
   cloudForAPI: string = '';
+  remoteWebLaunching: boolean = false;
 
   constructor(private summaryService: SummaryService,
     private crudServie: PcCrudService,
@@ -60,7 +62,8 @@ export class SummaryComponent implements OnInit, OnDestroy {
     private appService: AppLevelService,
     private ticketService: SharedCreateTicketService,
     private notificationService: AppNotificationService,
-    private ucSharedService: UnitedCloudSharedService) {
+    private ucSharedService: UnitedCloudSharedService,
+    private remoteAccess: RemoteAccessService) {
     this.route.parent.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
     });
@@ -242,11 +245,66 @@ export class SummaryComponent implements OnInit, OnDestroy {
   }
 
   webAccessNewTab(view: IconViewData) {
+    if (this.platformType == PlatFormMapping.PROXMOX) {
+      this.openProxmoxRemoteWebAccess(view);
+      return;
+    }
     if (!view.newTabWebAccessUrl) {
       return;
     }
     this.appService.updateActivityLog(view.deviceType, view.vmId);
     window.open(view.newTabWebAccessUrl);
+  }
+
+  private openProxmoxRemoteWebAccess(view: IconViewData) {
+    if (!view?.isNewTabEnabled || this.remoteWebLaunching) {
+      return;
+    }
+    const resourceId = view.remoteWebAccess?.resource_id || view.vmId;
+    if (!resourceId) {
+      this.notificationService.error(new Notification('Unable to open Proxmox web console. Resource identifier is missing.'));
+      return;
+    }
+    const viewerWindow = this.openIsolatedViewerTab();
+    if (!viewerWindow) {
+      this.notificationService.error(new Notification('Popup blocked. Allow popups for UnityOne and try opening the web console again.'));
+      return;
+    }
+
+    this.remoteWebLaunching = true;
+    this.remoteAccess.createProxmoxWebLaunch(resourceId)
+      .pipe(
+        takeUntil(this.ngUnsubscribe),
+        finalize(() => this.remoteWebLaunching = false)
+      )
+      .subscribe(launch => {
+        if (!launch.viewerUrl) {
+          viewerWindow.close();
+          this.notificationService.error(new Notification('Remote web viewer URL was not returned by UnityOne.'));
+          return;
+        }
+        this.appService.updateActivityLog(view.deviceType, view.vmId);
+        viewerWindow.location.replace(launch.viewerUrl);
+      }, err => {
+        viewerWindow.close();
+        this.notificationService.error(new Notification(this.remoteWebErrorMessage(err)));
+      });
+  }
+
+  private openIsolatedViewerTab(): Window | null {
+    const viewerWindow = window.open('about:blank', '_blank');
+    if (viewerWindow) {
+      viewerWindow.opener = null;
+      try {
+        viewerWindow.document.title = 'Opening UnityOne Remote Web Viewer';
+        viewerWindow.document.body.innerHTML = '<div style="font-family:Arial,sans-serif;padding:24px;">Opening UnityOne Remote Web Viewer...</div>';
+      } catch (e) { }
+    }
+    return viewerWindow;
+  }
+
+  private remoteWebErrorMessage(err: any): string {
+    return err?.error?.error || err?.error?.detail || err?.message || 'Unable to create remote web session. Please try again or contact support.';
   }
 
   createTicket(data: IconViewData) {

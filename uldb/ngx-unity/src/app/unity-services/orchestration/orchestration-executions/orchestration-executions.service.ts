@@ -16,6 +16,19 @@ export class OrchestrationExecutionsService {
     private tableService: TableApiServiceService,
     private utilSvc: AppUtilityService,) { }
 
+  private savedCriteria: SearchCriteria | null = null;
+
+  saveCriteria(criteria: SearchCriteria): void {
+    this.savedCriteria = JSON.parse(JSON.stringify(criteria));
+  }
+
+  getSavedCriteria(): SearchCriteria | null {
+    return this.savedCriteria;
+  }
+
+  clearSavedCriteria(): void {
+    this.savedCriteria = null;
+  }
 
   getListSummary() {
     return this.http.get(ORCHESTRATION_EXECUTION_LIST_SUMMARY());

@@ -25,6 +25,14 @@ export interface OrchestrationTaskDataType {
     edited_by: string;
 }
 
+export interface LinkedTaskDependency {
+    type: 'workflow' | 'service_catalog' | 'auto_remediation';
+    name: string;
+    uuid: string;
+}
+
+export type LinkedDependenciesResponse = LinkedTaskDependency[] | { workflows: LinkedTaskDependency[] };
+
 export interface parameterDataType {
     param_name: string;
     param_type: string;

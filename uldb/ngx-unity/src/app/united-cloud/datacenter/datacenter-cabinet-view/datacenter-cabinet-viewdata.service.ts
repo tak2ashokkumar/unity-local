@@ -274,14 +274,20 @@ export class DatacenterCabinetViewdataService {
     return cabinetStorageDevices;
   }
 
-  private buildHPDUSocketRows(sockets: number): number[][] {
-    const rows: number[][] = [];
+  private buildHPDUSocketRows(sockets: number): Array<Array<number | null>> {
+    const rows: Array<Array<number | null>> = [];
     for (let i = 0; i < sockets; i++) {
       const row = Math.floor(i / HPDU_SOCKETS_PER_UNIT);
       if (!rows[row]) {
         rows[row] = [];
       }
       rows[row].push(i); // keep the global 0-based socket index for id/tooltip mapping
+    }
+    if (rows.length) {
+      const lastRow = rows[rows.length - 1];
+      while (lastRow.length < HPDU_SOCKETS_PER_UNIT) {
+        lastRow.push(null);
+      }
     }
     return rows;
   }

@@ -1,0 +1,533 @@
+:host ::ng-deep .pointer-link {
+    cursor: pointer;
+}
+
+:host ::ng-deep {
+
+    .filter-toolbar-control,
+    .filter-toolbar-control .form-control,
+    .filter-toolbar-control input {
+        height: 36px;
+    }
+}
+
+.filter-panel {
+    z-index: 1050;
+    width: 460px;
+    max-width: 90vw;
+}
+
+.settings-panel {
+    z-index: 1050;
+    width: 260px;
+    right: 0;
+}
+
+.settings-fields-scroll {
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.settings-section-title {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    font-weight: 700;
+    color: #9199a3;
+}
+
+.ct-field-count {
+    font-size: .68rem;
+    font-weight: 600;
+    color: #9199a3;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.enhanced-table {
+    thead th {
+        border-top: 0;
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        color: #6b7280;
+    }
+
+    tbody tr {
+        transition: background-color .12s ease;
+    }
+
+    tbody tr:hover {
+        background: #f8f9fb;
+    }
+
+    td,
+    th {
+        vertical-align: middle;
+    }
+}
+
+.ct-density-compact {
+    table.enhanced-table {
+
+        td,
+        th {
+            padding-top: .25rem;
+            padding-bottom: .25rem;
+            font-size: .78rem;
+        }
+    }
+}
+
+.ct-more-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    height: 18px;
+    border-radius: 9px;
+    background: #eef1f5;
+    color: #4b5563;
+    font-size: .68rem;
+    font-weight: 700;
+    cursor: default;
+    flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------
+   Custom buttons — intentionally not Bootstrap .btn-* classes.
+--------------------------------------------------------- */
+.ct-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 7px;
+    font-size: .76rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+    cursor: pointer;
+    outline: none;
+    transition: background-color .15s ease, box-shadow .15s ease, transform .05s ease, border-color .15s ease;
+    white-space: nowrap;
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #b7d3fb;
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: .5;
+        transform: none;
+    }
+}
+
+.ct-btn-primary {
+    background: linear-gradient(135deg, #ff9f43, #f7931e);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(247, 147, 30, .25);
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #ffab5c, #ff9f2e);
+        box-shadow: 0 2px 5px rgba(247, 147, 30, .35);
+    }
+}
+
+.ct-btn-secondary {
+    background: #eef1f5;
+    color: #4b5563;
+
+    &:hover:not(:disabled) {
+        background: #e2e6ec;
+        color: #1f2937;
+    }
+}
+
+.ct-btn-filter {
+    height: 36px;
+    background: #fff;
+    color: #4b5563;
+    border: 1.5px solid #dfe3e9;
+    padding: 0 14px;
+    font-weight: 600;
+    outline: none;
+
+    i {
+        color: #6b7280;
+    }
+
+    &:hover:not(:disabled) {
+        border-color: #c3c9d1;
+        color: #1f2937;
+        background: #fafbfc;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #b7d3fb;
+        outline-offset: 2px;
+    }
+}
+
+.ct-btn-filter.is-active {
+    background: #eaf2ff;
+    border-color: #b7d3fb;
+    color: #1d6fe0;
+    box-shadow: none;
+
+    i {
+        color: #1d6fe0;
+    }
+
+    &:hover:not(:disabled) {
+        background: #ddebff;
+        border-color: #9dc3f8;
+        box-shadow: none;
+    }
+}
+
+.ct-filter-footer {
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    padding: 10px 14px;
+}
+
+.ct-btn-apply {
+    height: 32px;
+    padding: 0 16px;
+    background: #fff;
+    color: #1d6fe0;
+    border: 1.5px solid #1d6fe0;
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+        background: #eaf2ff;
+        box-shadow: none;
+    }
+}
+
+.ct-clear-link {
+    display: inline-block;
+    padding: 2px 8px;
+
+    &.text-primary:hover {
+        color: var(--primary) !important;
+        text-decoration: underline;
+        text-decoration-color: currentColor;
+    }
+}
+
+.ct-btn-settings {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 8px;
+    background: #fff;
+    border: 1.5px solid #dfe3e9;
+    color: #6b7280;
+    outline: none;
+
+    &:hover:not(:disabled) {
+        border-color: #c3c9d1;
+        color: #1f2937;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #b7d3fb;
+        outline-offset: 2px;
+    }
+
+    &.is-active {
+        background: #eaf2ff;
+        border-color: #b7d3fb;
+        color: #1d6fe0;
+    }
+}
+
+/* Icon-only buttons (Refresh, Back) — transparent by default, soft secondary-colored
+   circle on hover. */
+.ct-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    outline: none;
+    transition: background-color .12s ease, color .12s ease;
+
+    &:hover:not(:disabled) {
+        background: #eef1f5;
+        color: #1f2937;
+    }
+
+    &:active:not(:disabled) {
+        background: #e2e6ec;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #b7d3fb;
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: .4;
+    }
+
+    i {
+        transition: transform .3s ease;
+    }
+
+    &:active i {
+        transform: rotate(180deg);
+    }
+}
+
+.ct-page-jump-input {
+    width: 52px;
+    height: 32px;
+    text-align: center;
+}
+
+.ct-btn-jump {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #4b5563;
+    border: 1.5px solid #d8dce3;
+    font-size: .78rem;
+    outline: none;
+
+    &:hover:not(:disabled) {
+        background: #f4f5f7;
+        border-color: #b7bdc9;
+        color: #1f2937;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #b7d3fb;
+        outline-offset: 2px;
+    }
+}
+
+.ct-badge-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: #eef1f5;
+    color: #4b5563;
+    font-size: .7rem;
+    font-weight: 700;
+}
+
+.ct-btn-filter.is-active .ct-badge-count {
+    background: #1d6fe0;
+    color: #fff;
+}
+
+/* Custom radio — Density options */
+.ct-radio {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #c7cbd1;
+    position: relative;
+    flex-shrink: 0;
+
+    &.checked {
+        border-color: #1d6fe0;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1d6fe0;
+        }
+    }
+}
+
+/* Custom toggle switch — Fields visibility */
+.ct-toggle {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    border-radius: 11px;
+    border: none;
+    background: #d1d5db;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color .15s ease;
+    flex-shrink: 0;
+
+    .ct-toggle-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+        transition: left .15s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &.checked {
+        background: #22a06b;
+
+        .ct-toggle-thumb {
+            left: 18px;
+        }
+
+        .ct-toggle-thumb::after {
+            content: '\2713';
+            font-size: 10px;
+            font-weight: 700;
+            color: #22a06b;
+        }
+    }
+
+    &:disabled {
+        opacity: .4;
+        cursor: not-allowed;
+    }
+}
+
+/* Built-in status toggle (Enable/Disable pill) — scoped so it can't leak into other <ul>s
+   in this component (settings panel list, pagination). */
+.ct-status-toggle {
+    ul {
+        list-style: none;
+        display: flex;
+        flex-direction: row;
+    }
+
+    ul li {
+        text-align: center;
+        background: #f0f3f5;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #c8ced3;
+
+        label {
+            border-radius: 25px;
+            text-align: center;
+            width: 100%;
+            padding: 0.25rem 0.3rem 0rem 0.5rem;
+            display: inherit;
+            color: #73818f;
+            border-color: #73818f;
+            font-size: 0.765625rem;
+            line-height: 1.5;
+            margin-bottom: 0px !important;
+
+            input {
+                visibility: hidden;
+                max-width: 0px;
+            }
+        }
+
+        label.active {
+            background-color: #378ad8 !important;
+            color: #ffffff !important;
+            padding: 0.25rem 0.7rem;
+        }
+    }
+
+    ul li:first-child {
+        border-top-left-radius: 25px;
+        border-bottom-left-radius: 25px;
+        border-right: none !important;
+    }
+
+    ul li:last-child {
+        border-top-right-radius: 25px;
+        border-bottom-right-radius: 25px;
+        border-left: none !important;
+    }
+}
+
+.ct-icon-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: currentColor;
+
+    i,
+    span {
+        color: #fff;
+    }
+
+    opacity: .92;
+}
+
+.ct-sort-icons {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 16px;
+    margin-left: 4px;
+    margin-top: 3px;
+}
+
+.ct-sort-arrow {
+    font-size: 1rem;
+    color: #c7cbd1;
+    line-height: 0;
+    margin: -1px 0;
+
+    &.active {
+        color: #1f2937;
+    }
+}

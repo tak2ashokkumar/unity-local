@@ -149,11 +149,7 @@ export class GreenItUsageComponent implements OnInit, OnDestroy {
   }
 
   dcChange() {
-    let selectedDCIds = <string[]>this.filterForm.get('data_center').value;
-    if (selectedDCIds == this.selectedFileterData.data_center) {
-      return;
-    }
-
+    const selectedDCIds = <string[]>this.filterForm.get('data_center').value;
     this.selectedFileterData.data_center = selectedDCIds;
     if (selectedDCIds.length) {
       this.filterForm.get('cabinets').reset();
@@ -166,6 +162,7 @@ export class GreenItUsageComponent implements OnInit, OnDestroy {
     } else {
       this.cabinets = [];
     }
+    this.filterData();
   }
 
   buildFilterForm() {
@@ -211,6 +208,7 @@ export class GreenItUsageComponent implements OnInit, OnDestroy {
   }
 
   filterData() {
+    this.selectedFileterData.data_center = this.filterForm.get('data_center').value || [];
     const selectedCabintIds = <string[]>this.filterForm.get('cabinets').value;
     this.selectedFileterData.cabinets = selectedCabintIds && selectedCabintIds.length ? selectedCabintIds : [];
 

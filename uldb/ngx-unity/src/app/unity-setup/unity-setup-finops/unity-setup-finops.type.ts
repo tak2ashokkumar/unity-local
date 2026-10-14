@@ -1,5 +1,10 @@
 import { DeviceMonitoringType } from "src/app/shared/SharedEntityTypes/devices-monitoring.type";
 
+export interface RelatedServiceCatalog {
+    name: string;
+    uuid: string;
+}
+
 //Building block List response type
 export interface BuildingBlockListType {
     id: number;

@@ -321,7 +321,7 @@ textarea {
   gap: 8px;
   margin-bottom: 12px;
 
-  > span {
+  >span {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -817,5 +817,18 @@ textarea {
     button {
       width: 100%;
     }
+  }
+
+  .qty-stepper-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .qty-limit-msg {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #d9534f;
+    white-space: nowrap;
   }
 }

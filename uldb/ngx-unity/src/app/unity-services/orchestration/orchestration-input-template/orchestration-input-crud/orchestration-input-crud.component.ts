@@ -10,6 +10,7 @@ import { takeUntil } from 'rxjs/operators';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'orchestration-input-crud',
@@ -39,6 +40,8 @@ export class OrchestrationInputCrudComponent implements OnInit, OnDestroy {
   taskModalRef: BsModalRef;
   @ViewChild('createcategory') createcategory: ElementRef;
 
+  private inputTemplateReturnUrl: string;
+
   constructor(private svc: OrchestrationInputCrudService,
     private router: Router,
     private route: ActivatedRoute,
@@ -46,7 +49,12 @@ export class OrchestrationInputCrudComponent implements OnInit, OnDestroy {
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
     private modalService: BsModalService,
-    private builder: FormBuilder) {
+    private builder: FormBuilder,
+    private location: Location) {
+    const navigation = this.router.getCurrentNavigation();
+    const navigationState = navigation ? navigation.extras.state : this.location.getState();
+    this.inputTemplateReturnUrl = navigationState?.['inputTemplateReturnUrl'] || '/services/orchestration/input-template';
+
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.templateId = params.get('templateId');
       this.action = this.templateId ? 'Update' : 'Create';
@@ -237,10 +245,6 @@ export class OrchestrationInputCrudComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    if (this.templateId) {
-      this.router.navigate(['../../'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['../'], { relativeTo: this.route });
-    }
+    this.router.navigateByUrl(this.inputTemplateReturnUrl);
   }
 }

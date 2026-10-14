@@ -45,7 +45,9 @@
                   [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"></button> -->
 
                 <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1" (click)="webAccessNewTab(view)"
-                  [tooltip]="view.newTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}"
+                  [tooltip]="remoteWebLaunchingUuid === view.uuid ? 'Opening Remote Web Viewer' : view.newTabTootipMessage"
+                  [disabled]="remoteWebLaunchingUuid === view.uuid"
+                  [ngClass]="{'action-icons-disabled': remoteWebLaunchingUuid === view.uuid || !view.isNewTabEnabled}"
                   accessControl moduleName="Private Cloud" accessType="Remote Management"
                   elementType="actionbtn"></button>
 

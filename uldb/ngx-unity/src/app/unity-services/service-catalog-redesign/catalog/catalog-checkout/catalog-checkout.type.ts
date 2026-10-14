@@ -50,6 +50,8 @@ export interface CartItem {
   sla: Sla;
   require_approval: boolean;
   cost_breakdown: CostBreakdown[];
+  min_quantity: number;
+  max_quantity: number;
 }
 
 export interface CartCheckoutResponse {

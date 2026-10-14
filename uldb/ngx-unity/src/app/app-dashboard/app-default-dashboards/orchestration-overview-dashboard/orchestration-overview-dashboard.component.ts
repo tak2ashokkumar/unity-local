@@ -212,7 +212,7 @@ export class OrchestrationOverviewDashboardComponent implements OnInit, OnDestro
 
   execute(data: any) {
     if (data.type === "Task") {
-      this.router.navigate(['/services/orchestration/tasks', data.taskOrWorkflowId, data.targetType, 'execute']);
+      this.router.navigate(['/services/orchestration/tasks', data.taskOrWorkflowId, data.targetType, 'execute'], { state: { taskReturnUrl: this.router.url } });
     } else {
       this.router.navigate(['/services/orchestration/workflows', data.taskOrWorkflowId, 'execute']);
     }
@@ -220,7 +220,7 @@ export class OrchestrationOverviewDashboardComponent implements OnInit, OnDestro
 
   schedule(data: UpccomingExecutionViewModel) {
     if (data.type === "Task") {
-      this.router.navigate(['/services/orchestration/tasks', data.taskOrWorkflowId, data.targetType, 'scheduleTasks']);
+      this.router.navigate(['/services/orchestration/tasks', data.taskOrWorkflowId, data.targetType, 'scheduleTasks'], { state: { taskReturnUrl: this.router.url } });
     } else {
       this.router.navigate(['/services/orchestration/workflows', data.taskOrWorkflowId, data.targetType, 'scheduleWorkflow']);
     }
@@ -228,7 +228,7 @@ export class OrchestrationOverviewDashboardComponent implements OnInit, OnDestro
 
   redirectToTaskOrWorkflowEdit(data: any) {
     if (data.type === "Task") {
-      this.router.navigate(['/services/orchestration/tasks', data.taskOrWorkflowId, 'edit']);
+      this.router.navigate(['/services/orchestration/tasks', data.taskOrWorkflowId, 'edit'], { state: { taskReturnUrl: this.router.url } });
     } else {
       this.router.navigate(['/services/orchestration/workflows', data.taskOrWorkflowId, 'edit']);
     }
@@ -237,6 +237,11 @@ export class OrchestrationOverviewDashboardComponent implements OnInit, OnDestro
   redirectToExecutionPage(data: RecentFailureViewModel) {
     if (data.type == "Task") {
       this.router.navigate(['/services/orchestration/executions', data.uuid, data.id, 'tasklogs']);
+    } else if (data.isAgentic) {
+      this.router.navigate(
+        ['/services/orchestration/workflows/dynamic-workflow', data.uuid, 'execute'],
+        { queryParams: { from: 'executions' } }
+      );
     } else {
       this.router.navigate(['/services/orchestration/executions', data.uuid, 'workflow-logs'], { queryParams: { isAdvanced: data.isAdvanced } });
     }

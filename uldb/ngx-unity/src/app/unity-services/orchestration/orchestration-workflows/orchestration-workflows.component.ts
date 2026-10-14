@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { from, Subject } from 'rxjs';
 import { Categories, HistoryViewData, ListSummaryViewModel, OrchestrationWorkflowsService, WorkflowViewData } from './orchestration-workflows.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { filter, mergeMap, takeUntil } from 'rxjs/operators';
@@ -9,7 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { ListSummaryResModel, UnityWorkflow } from './orchestration-workflows.type';
+import { ListSummaryResModel, RelatedServiceCatalog, UnityWorkflow } from './orchestration-workflows.type';
 import { CeleryTask, EntityTaskRelation } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { OrchestrationWorkflowCrudComponent } from './orchestration-workflow-crud/orchestration-workflow-crud.component';
@@ -18,14 +18,39 @@ import { cloneDeep as _clone } from 'lodash-es';
 import { AppMainService } from 'src/app/app-main/app-main.service';
 import { UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
 import { environment } from 'src/environments/environment';
+import { FilterConfig, HeaderAction, SelectedFilters, SortDirection, SortEvent, StatusToggleEvent, TableColumn } from 'src/app/shared/app-generic-table/app-generic-table.type';
 
 @Component({
   selector: 'orchestration-workflows',
   templateUrl: './orchestration-workflows.component.html',
   styleUrls: ['./orchestration-workflows.component.scss'],
-  providers: [OrchestrationWorkflowsService, OrchestrationWorkflowCrudService]
+  providers: [OrchestrationWorkflowCrudService]
 })
 export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
+
+  headerActions: HeaderAction[] = [
+    { id: 'workflow', label: 'Workflow', icon: 'fas fa-plus', btnClass: 'ct-btn-primary' }
+  ];
+
+  columns: TableColumn[] = [
+    { key: 'name', label: 'Name', widthClass: 'tdw-25', sortable: true, sortField: 'name', locked: true },
+    { key: 'categoryName', label: 'Category', widthClass: 'tdw-15', sortable: true, sortField: 'category' },
+    { key: 'trigger_type', label: 'Trigger Type', widthClass: 'tdw-15', sortable: true, sortField: 'trigger_type' },
+    { key: 'totalTask', label: 'Total Tasks', widthClass: 'tdw-10' },
+    { key: 'createdAt', label: 'Created On', widthClass: 'tdw-20' },
+    {
+      key: 'workflowStatus', label: 'Status', align: 'center', cellClass: 'status-toggle-column',
+      statusToggle: {
+        activeValue: 'Enabled',
+        inactiveValue: 'Disabled',
+        activeLabel: 'Enable',
+        inactiveLabel: 'Disable',
+        disabledField: 'taskId'
+      }
+    },
+    { key: 'actions', label: 'Actions', align: 'center', locked: true, cellClass: 'action-icons-column' }
+  ];
+
   private ngUnsubscribe = new Subject();
   currentCriteria: SearchCriteria;
   count: number = 0;
@@ -36,6 +61,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   taskModalRef: BsModalRef;
   @ViewChild('confirmdelete') confirmdelete: ElementRef;
   workflowDeleteModalRef: BsModalRef;
+  relatedServiceCatalogs: RelatedServiceCatalog[] = [];
   @ViewChild('history') history: ElementRef;
   viewHistoryData: HistoryViewData[] = [];
   @ViewChild('procsessworkflow') procsessworkflow: ElementRef;
@@ -54,6 +80,8 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   agenticIcon = `${environment.assetsUrl}external-brand/workflow/AIAgent.svg`;
   workflowIcon = `${environment.assetsUrl}external-brand/workflow/Non-agentic-black.svg`;
   globalReadOnlyUser = false;
+  activeSortField: string | null = null;
+  activeSortDirection: SortDirection = null;
 
   constructor(private svc: OrchestrationWorkflowsService,
     private crudSvc: OrchestrationWorkflowCrudService,
@@ -69,13 +97,46 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ category: null, workflow_status: null }] };
   }
 
+  get filterConfig(): FilterConfig[] {
+    const filters: FilterConfig[] = [
+      {
+        key: 'workflow_status', label: 'Status', options: [
+          { label: 'Enabled', value: 'Enabled' },
+          { label: 'Disabled', value: 'Disabled' }
+        ]
+      }
+    ];
+    // if (this.viewData.length && !this.isAgentic) {
+    //   filters.unshift({
+    //     key: 'category', label: 'Category', options: [
+    //       { label: 'Provisioning', value: 'Provisioning' },
+    //       { label: 'Integration', value: 'Integration' }
+    //     ]
+    //   });
+    // }
+    return filters;
+  }
+
+  get selectedFiltersForTable(): SelectedFilters {
+    const result: SelectedFilters = {};
+    const params = this.currentCriteria.params[0];
+    if (params.category) result['category'] = String(params.category).split(',');
+    if (params.workflow_status) result['workflow_status'] = String(params.workflow_status).split(',');
+    return result;
+  }
+
   ngOnInit(): void {
     this.spinner.start('main');
     document.addEventListener('click', (event) => this.closeDropdown(event));
     this.workflowsInProgress = this.storage.getByKey('workflowsInProgress', StorageType.SESSIONSTORAGE);
     const roles = this.storage.getByKey('user', StorageType.SESSIONSTORAGE)?.active_rbac_roles;
     this.globalReadOnlyUser = !!roles?.length && roles.every(r => r === 'Global Read-Only');
-    console.log(this.workflowsInProgress, "workflow In progress")
+    this.headerActions = [
+      { id: 'workflow', label: this.globalReadOnlyUser ? 'Try Agentic Workflow' : 'Workflow', icon: 'fas fa-plus', btnClass: 'ct-btn-primary' }
+    ];
+
+    this.restoreCriteria();
+
     this.jsonValue = {
       "workflow_name": "",
       "description": "",
@@ -115,9 +176,57 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
       this.workflowsInProgress = [];
     }
     this.resetJsonValue = this.finalJson;
-    // console.log('in oninit this.workflowsInProgress : ', this.workflowsInProgress);
     this.getSummary();
     this.getWorkflowList();
+  }
+
+  private restoreCriteria(): void {
+    const qp = this.route.snapshot.queryParamMap;
+    this.applyQueryParamsToCriteria(qp);
+  }
+
+  private applyQueryParamsToCriteria(qp: ParamMap): void {
+    this.currentCriteria.params[0].category = qp.get('category') || null;
+    this.currentCriteria.params[0].workflow_status = qp.get('workflow_status') || null;
+    this.currentCriteria.searchValue = qp.get('search') || '';
+
+    this.currentCriteria.sortColumn = qp.get('sortColumn') || '';
+    this.currentCriteria.sortDirection = (qp.get('sortDirection') as '' | 'asc' | 'desc') || '';
+    this.activeSortField = this.currentCriteria.sortColumn || null;
+    this.activeSortDirection = (this.currentCriteria.sortDirection || null) as SortDirection;
+
+    const pageNo = qp.get('pageNo');
+    const pageSize = qp.get('pageSize');
+    this.currentCriteria.pageNo = pageNo ? +pageNo : 1;
+    this.currentCriteria.pageSize = pageSize ? +pageSize : PAGE_SIZES.DEFAULT_PAGE_SIZE;
+  }
+
+  private syncCriteriaToQueryParams(): void {
+    const params = this.currentCriteria.params[0];
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        category: params.category || null,
+        workflow_status: params.workflow_status || null,
+        search: this.currentCriteria.searchValue || null,
+        sortColumn: this.currentCriteria.sortColumn || null,
+        sortDirection: this.currentCriteria.sortDirection || null,
+        pageNo: this.currentCriteria.pageNo !== 1 ? this.currentCriteria.pageNo : null,
+        pageSize: this.currentCriteria.pageSize !== PAGE_SIZES.DEFAULT_PAGE_SIZE ? this.currentCriteria.pageSize : null
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  onHeaderAction(id: string) {
+    if (id === 'workflow') {
+      this.openDynamicAgentic();
+    }
+  }
+
+  onStatusToggle(event: StatusToggleEvent) {
+    this.toggleStatus(event.index, event.value);
   }
 
   ngOnDestroy(): void {
@@ -129,9 +238,15 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  refreshData(pageNo: number) {
+  onFiltersApplied(filters: SelectedFilters) {
+    this.currentCriteria.params[0].category = filters['category']?.length ? filters['category'].join(',') : null;
+    this.currentCriteria.params[0].workflow_status = filters['workflow_status']?.length ? filters['workflow_status'].join(',') : null;
+    this.currentCriteria.pageNo = 1;
+    this.onFilterChange();
+  }
+
+  refreshData() {
     this.spinner.start('main');
-    this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ category: null, workflow_status: null }] };
     this.getWorkflowList();
   }
 
@@ -142,16 +257,29 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     this.getWorkflowList();
   }
 
+  onSortChanged(event: SortEvent) {
+    this.spinner.start('main');
+    this.activeSortField = event.direction ? event.field : null;
+    this.activeSortDirection = event.direction;
+    this.currentCriteria.sortColumn = event.direction ? event.field : '';
+    this.currentCriteria.sortDirection = event.direction || '';
+    this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
+    this.getWorkflowList();
+  }
+
   onSearched(event: string) {
     this.spinner.start('main');
     this.currentCriteria.searchValue = event;
     this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
     this.getWorkflowList();
   }
 
   pageChange(pageNo: number) {
     this.spinner.start('main');
     this.currentCriteria.pageNo = pageNo;
+    this.syncCriteriaToQueryParams();
     this.getWorkflowList();
   }
 
@@ -159,11 +287,13 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.currentCriteria.pageSize = pageSize;
     this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
     this.getWorkflowList();
   }
 
   onFilterChange() {
     this.spinner.start('main');
+    this.syncCriteriaToQueryParams();
     this.getWorkflowList();
   }
 
@@ -182,7 +312,6 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
       this.summaryViewData = this.svc.convertToSummaryViewData(data);
       this.spinner.stop('main');
     }, (err: HttpErrorResponse) => {
-      // this.spinner.stop('main');
       this.notification.error(new Notification('Failed to get Workflow Summary'));
       this.spinner.stop('main');
     });
@@ -193,14 +322,6 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
       this.count = data.count;
       this.viewData = this.svc.convertToViewData(data.results);
       this.isAgentic = this.viewData.some(v => v.is_agentic);
-      // for (const d of this.viewData) {
-      //   if (d.isCreated) {
-      //     let workflowTaskIndex = this.workflowsInProgress.findIndex(wip => wip.entityId ? (wip.entityId == d.uuid) : (wip.entityName == d.name));
-      //     if (workflowTaskIndex != -1) {
-      //       this.workflowsInProgress.splice(workflowTaskIndex, 1);
-      //     }
-      //   }
-      // }
       if (this.workflowsInProgress.length) {
         this.viewData.forEach(vd => {
           let workflowTaskInProgress = this.workflowsInProgress.find(wip => wip.entityId ? (wip.entityId == vd.uuid) : (wip.entityName == vd.name));
@@ -216,18 +337,9 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
       } else {
         this.storage.removeByKey('workflowsInProgress', StorageType.SESSIONSTORAGE);
       }
-      // if (this.workflowsInProgress.length) {
-      //   this.storage.put('workflowsInProgress', this.workflowsInProgress, StorageType.SESSIONSTORAGE);
-      //   for (const d of this.workflowsInProgress) {
-      //     this.pollToSaveWorkflow(d.taskId);
-      //   }
-      // } else {
-      //   this.storage.removeByKey('workflowsInProgress', StorageType.SESSIONSTORAGE);
-      // }
       this.spinner.stop('main');
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('main');
-      // this.notification.error(new Notification('Failed to get Workflows'));
     });
   }
 
@@ -248,7 +360,6 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
       } else {
         this.storage.removeByKey('workflowsInProgress', StorageType.SESSIONSTORAGE);
       }
-      console.log('>>>>>>>>>>>', this.viewData);
       this.notification.success(new Notification('Workflow saved.'));
       this.svc.getWorkflowList(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
         this.count = data.count;
@@ -256,10 +367,8 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
       });
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('main');
-      // this.notification.error(new Notification('Failed to save workflow. Tryagain later.'));
     })
   }
-
 
   addWorkflow() {
     this.router.navigate(['create'], { relativeTo: this.route });
@@ -270,7 +379,6 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   openAgentic() {
-    console.log(this.globalReadOnlyUser, "Read only")
     if (!this.globalReadOnlyUser) {
       this.router.navigate(['agentic-workflow'], { relativeTo: this.route })
     } else {
@@ -279,11 +387,10 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   openDynamicAgentic() {
-    this.router.navigate(['dynamic-workflow'], { relativeTo: this.route })
+    this.router.navigate(['dynamic-workflow'], { relativeTo: this.route, state: { workflowReturnUrl: this.router.url } })
   }
 
   toggleStatus(index: number, status: boolean) {
-    // this.spinner.start('main');
     if (status === true) {
       this.viewData[index]['workflowStatus'] = 'Enabled';
     } else {
@@ -304,26 +411,12 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   executeWorkflow(view: WorkflowViewData) {
-    // use view.is_agentic flag and view.trigger_type = "Manual Trigger" / "Schedule Trigger" / "Chat Trigger"
-    // to route to different components else below execute route.
-
-    // else if (view.is_agentic && view.trigger_type === "Schedule Trigger") {
-    //   this.router.navigate([view.uuid, 'schedule-trigger'], { relativeTo: this.route });
-    // } 
     if (view.is_agentic && view.trigger_type === "Chat Trigger") {
       this.chatbotSvc.onChatTrigger$.next(true);
       this.appService.$assistantData.next({ sourceName: 'workflow', apiUrl: `/api/orchestration/v1/dynamic_workflows/${view.uuid}/execute/`, entityId: view.uuid, entity: view.name });
-      // this.router.navigate([view.uuid, 'on-chat'], { relativeTo: this.route });
     } else if (view.is_agentic) {
       this.router.navigate([view.uuid, 'trigger-execute', view.trigger_type], { relativeTo: this.route });
     }
-    // else if (view.is_agentic && view.trigger_type === "Webhook Trigger") {
-    //   this.router.navigate([view.uuid, 'webhook-trigger'], { relativeTo: this.route });
-    // } else if (view.is_agentic && view.trigger_type === "ITSM Event Trigger") {
-    //   this.router.navigate([view.uuid, 'itsm-trigger'], { relativeTo: this.route });
-    // } else if (view.is_agentic && view.trigger_type === "AIML Event Trigger") {
-    //   this.router.navigate([view.uuid, 'aiml-trigger'], { relativeTo: this.route });
-    // } 
     else {
       this.router.navigate([view.uuid, 'execute'], { relativeTo: this.route });
     }
@@ -339,7 +432,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     } else if (task.isAdvanced) {
       this.router.navigate(['new-workflow', task.uuid, 'edit'], { relativeTo: this.route });
     } else if (task.is_agentic) {
-      this.router.navigate(['dynamic-workflow', task.uuid, 'edit'], { relativeTo: this.route });
+      this.router.navigate(['dynamic-workflow', task.uuid, 'edit'], { relativeTo: this.route, state: { workflowReturnUrl: this.router.url } });
     } else {
       this.router.navigate([task.uuid, 'edit'], { relativeTo: this.route });
     }
@@ -348,7 +441,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   goToviewDetails(task: WorkflowViewData) {
     this.router.navigate([
       task.is_agentic ? 'dynamic-workflow' : 'agentic-workflow', task.uuid, 'view'
-    ], { relativeTo: this.route });
+    ], { relativeTo: this.route, state: { workflowReturnUrl: this.router.url } });
   }
 
   scheduleWorkflow(view: WorkflowViewData) {
@@ -373,7 +466,16 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   deleteWorkflow(UUID: string, is_agentic: boolean) {
     this.workflowUuid = UUID;
     this.is_agentic = is_agentic;
-    this.workflowDeleteModalRef = this.modalService.show(this.confirmdelete, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+    this.relatedServiceCatalogs = [];
+    this.spinner.start('main');
+    this.svc.getRelatedServiceCatalogs(UUID, is_agentic).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      this.relatedServiceCatalogs = Array.isArray(data) ? data : [];
+      this.spinner.stop('main');
+      this.workflowDeleteModalRef = this.modalService.show(this.confirmdelete, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+    }, () => {
+      this.spinner.stop('main');
+      this.notification.error(new Notification('Unable to check linked service catalogs. Please try again.'));
+    });
   }
 
   confirmDelete() {
@@ -435,11 +537,16 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
       if (workflowTaskIndex == -1) {
         this.workflowsInProgress.push(workFlowInProgress);
       }
-      // else {
-      //   this.workflowsInProgress.splice(workflowTaskIndex, 1, workFlowInProgress);
-      // }
-      // console.log('before save this.workflowsInProgress : ', this.workflowsInProgress);
       this.storage.put('workflowsInProgress', _clone(this.workflowsInProgress), StorageType.SESSIONSTORAGE);
     }
   }
+
+  getStatusClass(item: { name: string }): string {
+    return {
+      'Success': 'text-success',
+      'Failed': 'text-danger',
+      'In Progress': 'text-primary'
+    }[item.name];
+  }
 }
+

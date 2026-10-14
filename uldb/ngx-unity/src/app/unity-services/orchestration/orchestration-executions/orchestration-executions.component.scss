@@ -130,3 +130,14 @@
 .cursor {
   cursor: pointer;
 }
+
+.summary-bar {
+  height: 4rem;
+  overflow: hidden; // no scrollbar in the bar
+}
+
+.category-popover {
+  max-height: 15rem; // fixed height, scrolls inside
+  overflow-y: auto;
+  min-width: 14rem;
+}

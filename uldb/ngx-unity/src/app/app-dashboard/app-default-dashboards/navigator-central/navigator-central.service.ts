@@ -162,6 +162,13 @@ export class NavigatorCentralService {
   }
 
   private getAlertSourceFilterOptions(response: any): UnifiedAiopsFilterOption[] {
+    const explicitOptions = this.getArrayFromPayload<any>(this.getPayloadByKeys(response, ['source_options', 'sourceOptions']));
+    if (explicitOptions.length) {
+      return explicitOptions.map(option => ({
+        value: String(option?.value || option?.name || option?.label || '').trim(),
+        label: String(option?.label || option?.name || option?.value || '').trim()
+      })).filter(option => !!option.value && !!option.label);
+    }
     const sources = this.getArrayFromPayload<any>(this.getPayloadByKeys(response, ['events_per_source', 'eventsPerSource']));
     const viewBy = this.getPayloadByKeys(response, ['view_by', 'viewBy']);
     const breakdown = this.getArrayFromPayload<any>(viewBy?.breakdown);

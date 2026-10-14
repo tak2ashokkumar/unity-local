@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { LogsResponse, LogsViewData, OrchestrationExecutionsTaskLogsService, OutputResponse, OutputViewData, TaskDetailsModel, TaskDetailsViewModel } from './orchestration-executions-task-logs.service';
@@ -22,6 +23,7 @@ export class OrchestrationExecutionsTaskLogsComponent implements OnInit {
   @ViewChild('copyContent', { static: false }) contentToCopy: ElementRef;
 
   constructor(
+    private location: Location,
     private route: ActivatedRoute,
     private router: Router,
     private taskLogsService: OrchestrationExecutionsTaskLogsService,
@@ -110,7 +112,7 @@ export class OrchestrationExecutionsTaskLogsComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['../../../'], { relativeTo: this.route })
+    this.location.back();
   }
 
 }

@@ -215,9 +215,9 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
 
   execute(data: any): void {
     if (data.type === "Task") {
-      this.router.navigate(['tasks', data.taskOrWorkflowId, data.targetType, 'execute'], { relativeTo: this.route.parent });
+      this.router.navigate(['tasks', data.taskOrWorkflowId, data.targetType, 'execute'], { relativeTo: this.route.parent, state: { taskReturnUrl: this.router.url } });
     } else if (data.triggerType && data.triggerType !== 'chat-trigger') {
-      this.router.navigate(['workflows', data.taskOrWorkflowId, data.triggerType], { relativeTo: this.route.parent });
+      this.router.navigate(['workflows', data.taskOrWorkflowId, 'trigger-execute', data.triggerType], { relativeTo: this.route.parent });
     } else if (data.triggerType === 'chat-trigger') {
       this.aiSvc.onChatTrigger$.next(true);
       this.appSvc.$assistantData.next({ sourceName: 'workflow', apiUrl: `/rest/orchestration/agentic_workflow/${data.uuid}/chat/`, entityId: data.uuid, entity: data.name });
@@ -228,7 +228,7 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
 
   schedule(data: UpccomingExecutionViewModel): void {
     if (data.type === "Task") {
-      this.router.navigate(['tasks', data.taskOrWorkflowId, data.targetType, 'scheduleTasks'], { relativeTo: this.route.parent });
+      this.router.navigate(['tasks', data.taskOrWorkflowId, data.targetType, 'scheduleTasks'], { relativeTo: this.route.parent, state: { taskReturnUrl: this.router.url } });
     } else {
       this.router.navigate(['workflows', data.taskOrWorkflowId, 'trigger-execute', 'Schedule Trigger'], { relativeTo: this.route.parent });
     }
@@ -236,15 +236,23 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
 
   redirectToTaskOrWorkflowEdit(data: any): void {
     if (data.type === "Task") {
-      this.router.navigate(['tasks', data.taskOrWorkflowId, 'edit'], { relativeTo: this.route.parent });
+      this.router.navigate(['tasks', data.taskOrWorkflowId, 'edit'], { relativeTo: this.route.parent, state: { taskReturnUrl: this.router.url } });
     } else {
-      this.router.navigate(['workflows', 'dynamic-workflow', data.taskOrWorkflowId, 'edit'], { relativeTo: this.route.parent });
+      this.router.navigate(['workflows', 'dynamic-workflow', data.taskOrWorkflowId, 'edit'], {
+        relativeTo: this.route.parent,
+        state: { workflowReturnUrl: this.router.url }
+      });
     }
   }
 
   redirectToExecutionPage(data: RecentFailureViewModel): void {
     if (data.type === "Task") {
       this.router.navigate(['executions', data.uuid, data.id, 'tasklogs'], { relativeTo: this.route.parent });
+    } else if (data.isAgentic) {
+      this.router.navigate(['workflows/dynamic-workflow', data.uuid, 'execute'], {
+        relativeTo: this.route.parent,
+        state: { workflowReturnUrl: this.router.url }
+      });
     } else {
       this.router.navigate(['executions', data.uuid, 'workflow-logs'], { relativeTo: this.route.parent, queryParams: { isAgentic: data.isAgentic } });
     }

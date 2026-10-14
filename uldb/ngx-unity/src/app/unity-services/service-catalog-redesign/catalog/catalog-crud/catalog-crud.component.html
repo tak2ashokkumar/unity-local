@@ -209,145 +209,167 @@
 
                         <div class="cfg-card" *ngFor="let cfg of configuration.controls; let i = index"
                             [formGroupName]="i">
+
                             <div class="cfg-head">
-                                <span class="tag">FIELD {{i + 1}}</span>
+                                <span class="chevron" [class.open]="isFieldOpen(i)"
+                                    (click)="toggleFieldOpen(i)">&#9656;</span>
+                                <span class="tag" (click)="toggleFieldOpen(i)" style="cursor:pointer;">FIELD {{i +
+                                    1}}</span>
                                 <div class="spacer"></div>
+
+                                <button type="button" class="reorder-btn" *ngIf="i > 0" (click)="moveFieldUp(i)"
+                                    title="Move up">
+                                    <i class="fas fa-arrow-up"></i>
+                                </button>
+                                <button type="button" class="reorder-btn" *ngIf="i < configuration.length - 1"
+                                    (click)="moveFieldDown(i)" title="Move down">
+                                    <i class="fas fa-arrow-down"></i>
+                                </button>
+
                                 <button type="button" class="kill" (click)="removeConfigField(i)">&times;</button>
                             </div>
 
-                            <div class="form-group row">
-                                <label class="col-2 text-right col-form-label">Key<em>*</em> :</label>
-                                <div class="col-4">
-                                    <input class="form-control text-dark" type="text" formControlName="key"
-                                        (blur)="onConfigKeyChange()" [class.is-invalid]="configFieldErrors[i]?.key"
-                                        placeholder="Enter key">
-                                    <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.key">
-                                        {{ configFieldErrors[i].key }}
+                            <div class="cfg-body" *ngIf="isFieldOpen(i)">
+
+                                <div class="form-group row">
+                                    <label class="col-2 text-right col-form-label">Key<em>*</em> :</label>
+                                    <div class="col-4">
+                                        <input class="form-control text-dark" type="text" formControlName="key"
+                                            (blur)="onConfigKeyChange()" [class.is-invalid]="configFieldErrors[i]?.key"
+                                            placeholder="Enter key">
+                                        <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.key">
+                                            {{ configFieldErrors[i].key }}
+                                        </div>
                                     </div>
-                                </div>
-                                <label class="col-2 text-right col-form-label">Label<em>*</em> :</label>
-                                <div class="col-4">
-                                    <input class="form-control text-dark" type="text" formControlName="label"
-                                        [class.is-invalid]="configFieldErrors[i]?.label" placeholder="Enter label">
-                                    <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.label">
-                                        {{ configFieldErrors[i].label }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-2 text-right col-form-label">Type<em>*</em> :</label>
-                                <div class="col-4">
-                                    <select class="form-control text-dark" formControlName="type"
-                                        [class.is-invalid]="configFieldErrors[i]?.type">
-                                        <option *ngFor="let t of configFieldTypes" [value]="t">{{t}}</option>
-                                    </select>
-                                    <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.type">
-                                        {{ configFieldErrors[i].type }}
-                                    </div>
-                                </div>
-                                <label class="col-2 text-right col-form-label">Unit :</label>
-                                <div class="col-4">
-                                    <input class="form-control text-dark" type="text" formControlName="unit"
-                                        placeholder="Enter unit">
-                                </div>
-                            </div>
-
-                            <div class="form-group row" *ngIf="showPlaceholder(cfg.get('type').value)">
-                                <label class="col-2 text-right col-form-label">Placeholder :</label>
-                                <div class="col-4">
-                                    <input class="form-control text-dark" type="text" formControlName="placeholder"
-                                        placeholder="Enter placeholder value">
-                                </div>
-                                <label class="col-2 text-right col-form-label">Default :</label>
-                                <div class="col-4">
-                                    <input class="form-control text-dark" type="text" formControlName="default"
-                                        placeholder="Enter default value">
-                                </div>
-                            </div>
-                            <div class="form-group row" *ngIf="!showPlaceholder(cfg.get('type').value)">
-                                <label class="col-2 text-right col-form-label">Default :</label>
-                                <div class="col-4">
-                                    <input class="form-control text-dark" type="text" formControlName="default">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-2 text-right col-form-label">Help Text :</label>
-                                <div class="col-8">
-                                    <input class="form-control text-dark" type="text" formControlName="help_text"
-                                        placeholder="Enter help text">
-                                </div>
-                            </div>
-
-                            <div class="form-group row" *ngIf="showRange(cfg.get('type').value)">
-                                <label class="col-2 text-right col-form-label">Min / Max / Step :</label>
-                                <div class="col-2"><input class="form-control text-dark" type="number"
-                                        formControlName="min" placeholder="Enter min value"></div>
-                                <div class="col-2"><input class="form-control text-dark" type="number"
-                                        formControlName="max" placeholder="Enter max value"></div>
-                                <div class="col-2"><input class="form-control text-dark" type="number"
-                                        formControlName="step" placeholder="Enter step"></div>
-                            </div>
-
-                            <div class="form-group row" *ngIf="showOptions(cfg.get('type').value)">
-                                <label class="col-2 text-right col-form-label">Options :</label>
-                                <div class="col-8 repeat-block">
-                                    <div class="repeat-row cols-2"
-                                        *ngFor="let opt of optionsArray(i).controls; let j = index"
-                                        [formGroup]="$any(opt)">
-                                        <input class="form-control text-dark" type="text" formControlName="value"
-                                            [class.is-invalid]="opt.get('value').invalid && (opt.get('value').touched || opt.get('value').dirty)"
-                                            placeholder="Enter value">
+                                    <label class="col-2 text-right col-form-label">Label<em>*</em> :</label>
+                                    <div class="col-4">
                                         <input class="form-control text-dark" type="text" formControlName="label"
-                                            placeholder="Enter label">
-                                        <button type="button" class="kill" (click)="removeOption(i, j)">&times;</button>
+                                            [class.is-invalid]="configFieldErrors[i]?.label" placeholder="Enter label">
+                                        <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.label">
+                                            {{ configFieldErrors[i].label }}
+                                        </div>
                                     </div>
-                                    <div class="text-muted small mb-2" *ngIf="!optionsArray(i).length">No options yet.
-                                    </div>
-                                    <button type="button" class="btn text-primary border-primary btn-sm"
-                                        (click)="addOption(i)">
-                                        <i class="fas fa-plus mr-1"></i> Option
-                                    </button>
                                 </div>
-                            </div>
 
-                            <div class="form-group row">
-                                <label class="col-2 text-right col-form-label">Validators :</label>
-                                <div class="col-8 repeat-block">
-                                    <div class="repeat-row cols-2"
-                                        *ngFor="let v of validatorsArray(i).controls; let j = index"
-                                        [formGroup]="$any(v)">
-                                        <select class="form-control text-dark" formControlName="type">
-                                            <option *ngFor="let vt of validatorTypes" [value]="vt">{{vt}}</option>
+                                <div class="form-group row">
+                                    <label class="col-2 text-right col-form-label">Type<em>*</em> :</label>
+                                    <div class="col-4">
+                                        <select class="form-control text-dark" formControlName="type"
+                                            [class.is-invalid]="configFieldErrors[i]?.type">
+                                            <option *ngFor="let t of configFieldTypes" [value]="t">{{t}}</option>
                                         </select>
-                                        <input class="form-control text-dark" type="text" formControlName="value"
-                                            [class.is-invalid]="v.get('value').invalid && (v.get('value').touched || v.get('value').dirty)"
-                                            placeholder="Enter value">
-                                        <button type="button" class="kill"
-                                            (click)="removeValidator(i, j)">&times;</button>
+                                        <div class="invalid-feedback d-block" *ngIf="configFieldErrors[i]?.type">
+                                            {{ configFieldErrors[i].type }}
+                                        </div>
                                     </div>
-                                    <div class="text-muted small mb-2" *ngIf="!validatorsArray(i).length">No validators
-                                        on this
-                                        field.</div>
-                                    <button type="button" class="btn text-primary border-primary btn-sm"
-                                        (click)="addValidator(i)">
-                                        <i class="fas fa-plus mr-1"></i> Validator
-                                    </button>
+                                    <label class="col-2 text-right col-form-label">Unit :</label>
+                                    <div class="col-4">
+                                        <input class="form-control text-dark" type="text" formControlName="unit"
+                                            placeholder="Enter unit">
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="form-group row">
-                                <div class="col-2"></div>
-                                <div class="col-8 d-flex" style="gap:24px;">
-                                    <label class="check-inline">
-                                        <input type="checkbox" formControlName="required"> Required
-                                    </label>
-                                    <label class="check-inline">
-                                        <input type="checkbox" formControlName="disabled"> Disabled
-                                    </label>
+                                <div class="form-group row" *ngIf="showPlaceholder(cfg.get('type').value)">
+                                    <label class="col-2 text-right col-form-label">Placeholder :</label>
+                                    <div class="col-4">
+                                        <input class="form-control text-dark" type="text" formControlName="placeholder"
+                                            placeholder="Enter placeholder value">
+                                    </div>
+                                    <label class="col-2 text-right col-form-label">Default :</label>
+                                    <div class="col-4">
+                                        <input class="form-control text-dark" type="text" formControlName="default"
+                                            placeholder="Enter default value">
+                                    </div>
                                 </div>
+                                <div class="form-group row" *ngIf="!showPlaceholder(cfg.get('type').value)">
+                                    <label class="col-2 text-right col-form-label">Default :</label>
+                                    <div class="col-4">
+                                        <input class="form-control text-dark" type="text" formControlName="default">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-2 text-right col-form-label">Help Text :</label>
+                                    <div class="col-8">
+                                        <input class="form-control text-dark" type="text" formControlName="help_text"
+                                            placeholder="Enter help text">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" *ngIf="showRange(cfg.get('type').value)">
+                                    <label class="col-2 text-right col-form-label">Min / Max / Step :</label>
+                                    <div class="col-2"><input class="form-control text-dark" type="number"
+                                            formControlName="min" placeholder="Enter min value"></div>
+                                    <div class="col-2"><input class="form-control text-dark" type="number"
+                                            formControlName="max" placeholder="Enter max value"></div>
+                                    <div class="col-2"><input class="form-control text-dark" type="number"
+                                            formControlName="step" placeholder="Enter step"></div>
+                                </div>
+
+                                <div class="form-group row" *ngIf="showOptions(cfg.get('type').value)">
+                                    <label class="col-2 text-right col-form-label">Options :</label>
+                                    <div class="col-8 repeat-block">
+                                        <div class="repeat-row cols-2"
+                                            *ngFor="let opt of optionsArray(i).controls; let j = index"
+                                            [formGroup]="$any(opt)">
+                                            <input class="form-control text-dark" type="text" formControlName="value"
+                                                [class.is-invalid]="opt.get('value').invalid && (opt.get('value').touched || opt.get('value').dirty)"
+                                                placeholder="Enter value">
+                                            <input class="form-control text-dark" type="text" formControlName="label"
+                                                placeholder="Enter label">
+                                            <button type="button" class="kill"
+                                                (click)="removeOption(i, j)">&times;</button>
+                                        </div>
+                                        <div class="text-muted small mb-2" *ngIf="!optionsArray(i).length">No options
+                                            yet.
+                                        </div>
+                                        <button type="button" class="btn text-primary border-primary btn-sm"
+                                            (click)="addOption(i)">
+                                            <i class="fas fa-plus mr-1"></i> Option
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-2 text-right col-form-label">Validators :</label>
+                                    <div class="col-8 repeat-block">
+                                        <div class="repeat-row cols-2"
+                                            *ngFor="let v of validatorsArray(i).controls; let j = index"
+                                            [formGroup]="$any(v)">
+                                            <select class="form-control text-dark" formControlName="type">
+                                                <option *ngFor="let vt of validatorTypes" [value]="vt">{{vt}}</option>
+                                            </select>
+                                            <input class="form-control text-dark" type="text" formControlName="value"
+                                                [class.is-invalid]="v.get('value').invalid && (v.get('value').touched || v.get('value').dirty)"
+                                                placeholder="Enter value">
+                                            <button type="button" class="kill"
+                                                (click)="removeValidator(i, j)">&times;</button>
+                                        </div>
+                                        <div class="text-muted small mb-2" *ngIf="!validatorsArray(i).length">No
+                                            validators
+                                            on this
+                                            field.</div>
+                                        <button type="button" class="btn text-primary border-primary btn-sm"
+                                            (click)="addValidator(i)">
+                                            <i class="fas fa-plus mr-1"></i> Validator
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-2"></div>
+                                    <div class="col-8 d-flex" style="gap:24px;">
+                                        <label class="check-inline">
+                                            <input type="checkbox" formControlName="required"> Required
+                                        </label>
+                                        <label class="check-inline">
+                                            <input type="checkbox" formControlName="disabled"> Disabled
+                                        </label>
+                                    </div>
+                                </div>
+
                             </div>
+                            <!-- end cfg-body -->
                         </div>
 
                         <button type="button" class="btn text-primary border-primary btn-sm" (click)="addConfigField()">
@@ -481,7 +503,8 @@
                                             <!-- static source -->
                                             <ng-container *ngIf="cc.get('source').value === 'Static'">
                                                 <input type="number" class="form-control text-dark mr-2"
-                                                    style="width:100px" formControlName="count" placeholder="Count">
+                                                    style="width:100px" formControlName="count" placeholder="Count"
+                                                    min="0" step="1" (keydown)="blockNegativeKey($event)">
                                                 <select class="form-control text-dark mr-2" style="width:130px"
                                                     formControlName="mapping_type">
                                                     <option value="Multiply">Multiply</option>
@@ -493,7 +516,8 @@
                                             <ng-container *ngIf="cc.get('source').value === 'Fixed'">
                                                 <input type="number" class="form-control text-dark mr-2"
                                                     style="width:100px" formControlName="count"
-                                                    placeholder="Enter price">
+                                                    placeholder="Enter price" min="0" step="0.01"
+                                                    (keydown)="blockNegativeKey($event)">
                                             </ng-container>
 
                                             <span class="ml-2">
@@ -769,18 +793,19 @@
                 </div>
 
                 <!-- ============ AUTOMATION ============ -->
-                <div class="accordion-card">
+                <div class="accordion-card automation-card">
                     <div class="accordion-head" (click)="toggleAccordion('automation')">
                         <span class="chevron" [class.open]="isOpen('automation')">&#9656;</span>
                         <span class="title">Automation</span>
                         <span class="text-muted small">What runs when the order is approved</span>
                     </div>
+
                     <div class="accordion-body automation-body" *ngIf="isOpen('automation')">
 
+                        <!-- Automation type -->
                         <div class="form-group row">
                             <label for="automation_type" class="col-2 text-right col-form-label">Automation
-                                Type<em>*</em>
-                                :</label>
+                                Type<em>*</em> :</label>
                             <div class="col-5 d-inline-block">
                                 <ul class="automation-type-toggle d-flex px-0 mb-0">
                                     <li>
@@ -799,32 +824,97 @@
                                     </li>
                                 </ul>
                                 <div class="invalid-feedback d-block" *ngIf="formErrors.automation_type">
-                                    {{formErrors.automation_type}}</div>
+                                    {{ formErrors.automation_type }}
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Task (lazy dropdown) -->
                         <div class="form-group row" *ngIf="form.get('automation_type').value == 'Task'">
-                            <label for="task" class="col-2 text-right col-form-label">Task<em>*</em> :</label>
+                            <label class="col-2 text-right col-form-label">Task<em>*</em> :</label>
                             <div class="col-3 automation-select-wrap">
-                                <select id="task" class="form-control text-dark" formControlName="task"
-                                    [class.is-invalid]="formErrors.task">
-                                    <option [value]="''" disabled>Select task</option>
-                                    <option *ngFor="let t of tasks" [value]="t.uuid">{{t.name}}</option>
-                                </select>
-                                <div class="invalid-feedback" *ngIf="formErrors.task">{{formErrors.task}}</div>
+                                <div class="automation-lazy-dropdown">
+
+                                    <button type="button" class="form-control text-dark text-left dropdown-toggle"
+                                        [class.is-invalid]="formErrors.task" [class.is-open]="taskDropdownOpen"
+                                        [class.placeholder-shown]="!selectedTaskName"
+                                        [attr.aria-expanded]="taskDropdownOpen" aria-haspopup="listbox"
+                                        (click)="toggleTaskDropdown()">
+                                        {{ selectedTaskName || 'Select task' }}
+                                    </button>
+
+                                    <div class="automation-dropdown-menu" role="listbox" *ngIf="taskDropdownOpen"
+                                        (scroll)="onTaskDropdownScroll($event)">
+
+                                        <button type="button" class="automation-dropdown-item" role="option"
+                                            *ngFor="let t of tasks" [class.active]="t.uuid === form.get('task').value"
+                                            [attr.aria-selected]="t.uuid === form.get('task').value"
+                                            (click)="selectTask(t)">
+                                            {{ t.name }}
+                                        </button>
+
+                                        <div *ngIf="loadingTasks" class="automation-dropdown-status">Loading...</div>
+
+                                        <div *ngIf="!loadingTasks && !tasks.length" class="automation-dropdown-status">
+                                            No tasks found
+                                        </div>
+
+                                        <!-- <div *ngIf="!loadingTasks && !hasMoreTasks && tasks.length"
+                                            class="automation-dropdown-status">
+                                            No more tasks
+                                        </div> -->
+                                    </div>
+                                </div>
+
+                                <div class="invalid-feedback d-block" *ngIf="formErrors.task">
+                                    {{ formErrors.task }}
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Workflow (lazy dropdown) + Version -->
                         <div class="form-group row" *ngIf="form.get('automation_type').value == 'Workflow'">
-                            <label for="workflow" class="col-2 text-right col-form-label">Workflow<em>*</em> :</label>
+                            <label class="col-2 text-right col-form-label">Workflow<em>*</em> :</label>
                             <div class="col-3 automation-select-wrap">
-                                <select id="workflow" class="form-control text-dark" formControlName="workflow"
-                                    [class.is-invalid]="formErrors.workflow">
-                                    <option [value]="''" disabled>Select workflow</option>
-                                    <option *ngFor="let w of workflows" [value]="w.uuid">{{w.w_name}}
-                                    </option>
-                                </select>
-                                <div class="invalid-feedback" *ngIf="formErrors.workflow">{{formErrors.workflow}}</div>
+                                <div class="automation-lazy-dropdown">
+
+                                    <button type="button" class="form-control text-dark text-left dropdown-toggle"
+                                        [class.is-invalid]="formErrors.workflow" [class.is-open]="workflowDropdownOpen"
+                                        [class.placeholder-shown]="!selectedWorkflowName"
+                                        [attr.aria-expanded]="workflowDropdownOpen" aria-haspopup="listbox"
+                                        (click)="toggleWorkflowDropdown()">
+                                        {{ selectedWorkflowName || 'Select workflow' }}
+                                    </button>
+
+                                    <div class="automation-dropdown-menu" role="listbox" *ngIf="workflowDropdownOpen"
+                                        (scroll)="onWorkflowDropdownScroll($event)">
+
+                                        <button type="button" class="automation-dropdown-item" role="option"
+                                            *ngFor="let w of workflows"
+                                            [class.active]="w.uuid === form.get('workflow').value"
+                                            [attr.aria-selected]="w.uuid === form.get('workflow').value"
+                                            (click)="selectWorkflow(w)">
+                                            {{ w.w_name }}
+                                        </button>
+
+                                        <div *ngIf="loadingWorkflows" class="automation-dropdown-status">Loading...
+                                        </div>
+
+                                        <div *ngIf="!loadingWorkflows && !workflows.length"
+                                            class="automation-dropdown-status">
+                                            No workflows found
+                                        </div>
+
+                                        <!-- <div *ngIf="!loadingWorkflows && !hasMoreWorkflows && workflows.length"
+                                            class="automation-dropdown-status">
+                                            No more workflows
+                                        </div> -->
+                                    </div>
+                                </div>
+
+                                <div class="invalid-feedback d-block" *ngIf="formErrors.workflow">
+                                    {{ formErrors.workflow }}
+                                </div>
                             </div>
 
                             <label for="workflow_version" class="col-2 text-right col-form-label">Version<em>*</em>
@@ -836,19 +926,21 @@
                                         {{ versionWorkflows.length ? 'Select version' : 'Select a workflow first' }}
                                     </option>
                                     <option *ngFor="let v of versionWorkflows" [value]="v.uuid">
-                                        Version {{v.version}}
+                                        Version {{ v.version }}
                                     </option>
                                 </select>
                                 <div class="invalid-feedback" *ngIf="formErrors.workflow_version">
-                                    {{formErrors.workflow_version}}</div>
+                                    {{ formErrors.workflow_version }}
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Input mapping (unchanged) -->
                         <div class="form-group row" formArrayName="input_mapping">
                             <label class="col-2 text-right col-form-label">Input Mapping :</label>
                             <div class="col-9 repeat-block automation-input-mapping">
                                 <p class="help-text">Parameters are fetched from the selected task/workflow as Fixed
-                                    values switch to
+                                    values; switch to
                                     Config to source from a configuration field instead.</p>
 
                                 <div class="repeat-row automation-mapping-row"
@@ -870,7 +962,7 @@
                                         *ngIf="m.get('mapping_type').value === 'catalog_field'"
                                         [class.is-invalid]="m.get('value').invalid && (m.get('value').touched || m.get('value').dirty)">
                                         <option [value]="''">Select a configuration key</option>
-                                        <option *ngFor="let k of getConfigKeys()" [value]="k">{{k}}</option>
+                                        <option *ngFor="let k of getConfigKeys()" [value]="k">{{ k }}</option>
                                     </select>
 
                                     <!-- Fixed: editor depends on the source param_type -->
@@ -906,6 +998,7 @@
                                             <option *ngFor="let ca of cloudAccounts" [ngValue]="ca">{{ ca.account_name
                                                 || ca.name }}</option>
                                         </select>
+
                                         <!-- Credential -->
                                         <select *ngIf="paramControlKind($any(m)) === 'credential'"
                                             class="form-control text-dark" formControlName="value"
@@ -920,19 +1013,12 @@
                                             formControlName="value" [apiFn]="searchTargets"
                                             placeholder="Search Targets">
                                         </app-auto-complete-multi>
-
                                     </ng-container>
-
-                                    <!-- <button type="button" class="kill" (click)="removeInputMapping(i)">&times;</button> -->
                                 </div>
 
                                 <div class="text-muted small mb-2" *ngIf="!inputMappings.length">
                                     Select a task or workflow to load parameters.
                                 </div>
-                                <!-- <button type="button" class="btn text-primary border-primary btn-sm"
-                                    (click)="addInputMapping()">
-                                    <i class="fas fa-plus mr-1"></i> Param
-                                </button> -->
                             </div>
                         </div>
                     </div>

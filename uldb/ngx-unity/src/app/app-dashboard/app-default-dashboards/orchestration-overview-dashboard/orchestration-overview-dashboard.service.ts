@@ -893,6 +893,7 @@ export class OrchestrationOverviewDashboardService {
       rf.taskOrWorkflowId = val.template_id;
       rf.targetType = val.target_type;
       rf.isAdvanced = val.is_advanced;
+      rf.isAgentic = val.is_agentic;
       viewData.push(rf);
     });
     return viewData;
@@ -1027,6 +1028,7 @@ export class RecentFailureViewModel {
   taskOrWorkflowId: string;
   targetType: string;
   isAdvanced: boolean;
+  isAgentic: boolean;
 }
 
 export class UpccomingExecutionViewModel {

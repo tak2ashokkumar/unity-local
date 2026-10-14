@@ -18,6 +18,7 @@ import { ConnectionsModel, OrchestrationTaskCrudDataType, inputTemplateType, par
 import { StorageType } from 'src/app/shared/app-storage/storage-type';
 import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
+import { Location } from '@angular/common';
 
 
 export const MY_NATIVE_FORMATS = {
@@ -114,6 +115,8 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
   private scriptSubscription: Subscription;
   private sourceSubscription: Subscription;
 
+  private taskReturnUrl: string;
+
   constructor(private svc: OrchestrationTasksCrudService,
     private router: Router,
     private route: ActivatedRoute,
@@ -121,7 +124,13 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
     private builder: FormBuilder,
-    private storage: StorageService) {
+    private storage: StorageService, private location: Location) {
+    const navigation = this.router.getCurrentNavigation();
+    const navigationState = navigation ? navigation.extras.state : this.location.getState();
+    this.taskReturnUrl = navigationState?.['taskReturnUrl'] || (this.route.snapshot.paramMap.get('categoryId')
+      ? '/services/orchestration/tasks/' + encodeURIComponent(this.route.snapshot.paramMap.get('categoryId'))
+      : '/services/orchestration/tasks');
+
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.taskId = params.get('taskId');
       this.action = this.taskId ? 'Update' : 'Create';
@@ -1793,12 +1802,6 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    if (this.taskId && this.categoryUuid) {
-      this.router.navigate(['../../../'], { relativeTo: this.route });
-    } else if (this.taskId && !this.categoryUuid) {
-      this.router.navigate(['../../'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['../../'], { relativeTo: this.route });
-    }
+    this.router.navigateByUrl(this.taskReturnUrl);
   }
 }

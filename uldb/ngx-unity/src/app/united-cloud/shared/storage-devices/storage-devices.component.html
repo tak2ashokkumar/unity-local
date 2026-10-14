@@ -125,6 +125,13 @@
                   </div>
                 </span> -->
 
+                <button class="action-icons mb-0 fas fa-desktop font-sm ml-1"
+                  [tooltip]="remoteWebLaunching ? 'Opening Remote Web Viewer' : view.remoteWebTooltipMessage"
+                  [disabled]="remoteWebLaunching"
+                  [ngClass]="{'action-icons-disabled': remoteWebLaunching || !view.showRemoteWebAccessButton}"
+                  (click)="remoteWebAccessNewTab(view)" accessControl moduleName="Datacenter"
+                  accessType="Remote Management" elementType="actionbtn"></button>
+
                 <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
                   [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
                   (click)="consoleSameTab(view)" accessControl moduleName="Datacenter" accessType="Remote Management"

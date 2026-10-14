@@ -75,17 +75,22 @@
                                     </div>
 
                                     <div class="oi-controls" (click)="$event.stopPropagation()">
-                                        <div class="qty-stepper">
-                                            <button type="button" class="qty-btn"
-                                                [disabled]="item.quantity <= 1 || isItemActionPending(item)"
-                                                (click)="onQuantityChange(item, -1)" aria-label="Decrease quantity">
-                                                <i class="fa fa-minus"></i>
-                                            </button>
-                                            <div class="qty-value">{{ item.quantity }}</div>
-                                            <button type="button" class="qty-btn" [disabled]="isItemActionPending(item)"
-                                                (click)="onQuantityChange(item, 1)" aria-label="Increase quantity">
-                                                <i class="fa fa-plus"></i>
-                                            </button>
+                                        <div class="qty-stepper-wrap">
+                                            <div class="qty-stepper">
+                                                <button type="button" class="qty-btn"
+                                                    [disabled]="item.quantity <= (item.min_quantity || 1) || isItemActionPending(item)"
+                                                    (click)="onQuantityChange(item, -1)" aria-label="Decrease quantity">
+                                                    <i class="fa fa-minus"></i>
+                                                </button>
+                                                <div class="qty-value">{{ item.quantity }}</div>
+                                                <button type="button" class="qty-btn"
+                                                    [disabled]="(item.max_quantity != null && item.quantity >= item.max_quantity) || isItemActionPending(item)"
+                                                    (click)="onQuantityChange(item, 1)" aria-label="Increase quantity">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                            <div class="qty-limit-msg" *ngIf="qtyLimitMsg[item.uuid]">{{
+                                                qtyLimitMsg[item.uuid] }}</div>
                                         </div>
 
                                         <div class="oi-price-block">

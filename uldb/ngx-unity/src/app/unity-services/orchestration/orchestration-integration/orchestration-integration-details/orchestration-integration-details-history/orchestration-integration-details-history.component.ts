@@ -50,7 +50,7 @@ export class OrchestrationIntegrationDetailsHistoryComponent implements OnInit, 
   }
 
   executeTask(view: PlaybookHistoryViewData) {
-    this.router.navigate(['tasks', 'integration', this.repoId, 'history', view.taskFk, 'execute'], { relativeTo: this.route.parent.parent });
+    this.router.navigate(['tasks', 'integration', this.repoId, 'history', view.taskFk, 'execute'], { relativeTo: this.route.parent.parent, state: { taskReturnUrl: this.router.url } });
   }
 
   viewDetails(data: PlaybooksViewData) {

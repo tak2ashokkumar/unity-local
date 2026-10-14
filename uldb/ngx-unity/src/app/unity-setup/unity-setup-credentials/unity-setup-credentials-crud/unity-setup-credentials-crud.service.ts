@@ -57,11 +57,15 @@ export class UnitySetupCredentialsCrudService {
       } else if (data.type == 'SSH' || data.type == 'Windows' || data.type == 'Default' || data.type == 'REDFISH') {
         form.addControl('username', new FormControl(data.username, [Validators.required]));
         form.addControl('password', new FormControl(Array(data.password?.length).fill('*').join(''), [Validators.required]));
+        if (data.type == 'SSH' || data.type == 'Windows') {
+          form.addControl('port', new FormControl(data.port, [Validators.min(0), Validators.max(65535)]));
+        }
       } else if (data.type == 'SSH Key') {
         form.addControl('username', new FormControl(data.username, [Validators.required]));
         form.addControl('key', new FormControl(data.key, [Validators.required]));
         form.addControl('password', new FormControl(Array(data.password?.length).fill('*').join(''), [Validators.required]));
         form.addControl('sudo_password', new FormControl(Array(data.sudo_password?.length).fill('*').join('')));
+        form.addControl('port', new FormControl(data.port, [Validators.min(0), Validators.max(65535)]));
       } else if (data.type == 'SNMPv3') {
         form.addControl('security_name', new FormControl(data.security_name, [Validators.required]));
         form.addControl('security_level', new FormControl(data.security_level, [Validators.required]));
@@ -209,7 +213,8 @@ export class UnitySetupCredentialsCrudService {
     },
     'port': {
       'required': 'Port selection is required',
-      'min': 'Invalid port'
+      'min': 'Invalid port',
+      'max': 'Invalid port'
     },
     'scope': {
       'required': 'Scope is required'

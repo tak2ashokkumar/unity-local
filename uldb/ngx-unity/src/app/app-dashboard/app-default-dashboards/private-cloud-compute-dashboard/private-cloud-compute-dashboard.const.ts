@@ -19,6 +19,36 @@ export const PRIVATE_CLOUD_TIME_RANGE_PARAM_MAP: { [period: string]: string } = 
   last_24_hours: 'last_24_hrs'
 };
 
+export const PRIVATE_CLOUD_DASHBOARD_HEADER_ENDPOINT = '/customer/widgets/private-cloud-dashboard-header/';
+export const PRIVATE_CLOUD_FILTERS_ENDPOINT = '/customer/widgets/private-cloud-filters/';
+export const PRIVATE_CLOUD_EXECUTIVE_SUMMARY_ENDPOINT = '/customer/widgets/executive_summary/';
+export const PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/widgets/private-cloud-infra-coverage/';
+export const PRIVATE_CLOUD_GEO_DISTRIBUTION_ENDPOINT = '/customer/widgets/private-cloud-geo-distribution/';
+export const PRIVATE_CLOUD_CAPACITY_GROWTH_ENDPOINT = '/customer/widgets/private-cloud-capacity-growth/';
+export const PRIVATE_CLOUD_HYPERVISOR_HEALTH_ENVIRONMENT_ENDPOINT = '/customer/widgets/hypervisor-health-environment-table/';
+export const PRIVATE_CLOUD_INFRASTRUCTURE_HEALTH_STATUS_ENDPOINT = '/customer/widgets/infrastructure_health_status/';
+export const PRIVATE_CLOUD_STORAGE_DATASTORES_ENDPOINT = '/customer/widgets/storage_datastores/';
+export const PRIVATE_CLOUD_NETWORK_INTERFACES_ENDPOINT = '/customer/widgets/network_interfaces/';
+export const PRIVATE_CLOUD_CLUSTER_METRICS_ENDPOINT = '/customer/widgets/cluster_metrics/';
+export const PRIVATE_CLOUD_TOP_CLUSTERS_BY_VM_COUNT_ENDPOINT = '/customer/widgets/top_clusters_by_vm_count/';
+export const PRIVATE_CLOUD_CLUSTER_COMPONENT_SUMMARY_ENDPOINT = '/customer/widgets/cluster_component_summary/';
+export const PRIVATE_CLOUD_TOP_CLUSTERS_ENDPOINT = '/customer/widgets/top_10_clusters_by_vm_count/';
+export const PRIVATE_CLOUD_CLUSTER_CAPACITY_TREND_ENDPOINT = '/customer/widgets/cluster_capacity_utilization_trend/';
+export const PRIVATE_CLOUD_PERFORMANCE_HOTSPOTS_ENDPOINT = '/customer/widgets/performance_hotspots/';
+export const PRIVATE_CLOUD_PERFORMANCE_HOTSPOTS_CHARTS_ENDPOINT = '/customer/widgets/performance_hotspots_charts/';
+export const PRIVATE_CLOUD_IDLE_DEVICES_ENDPOINT = '/customer/widgets/idle_devices/';
+export const PRIVATE_CLOUD_PERFORMANCE_WORKLOAD_INSIGHTS_ENDPOINT = '/customer/widgets/performance_workload_insights/';
+export const PRIVATE_CLOUD_NEWLY_PROVISIONED_VMS_ENDPOINT = '/customer/widgets/newly_provisioned_vms/';
+export const PRIVATE_CLOUD_NEWLY_PROVISIONED_VMS_CHARTS_ENDPOINT = '/customer/widgets/newly_provisioned_vms_charts/';
+export const PRIVATE_CLOUD_VM_BACKUP_STATUS_ENDPOINT = '/customer/widgets/vm_backup_status/';
+export const PRIVATE_CLOUD_VM_BACKUP_STATUS_CHARTS_ENDPOINT = '/customer/widgets/vm_backup_status_charts/';
+export const PRIVATE_CLOUD_HYPERVISOR_VERSION_COMPLIANCE_ENDPOINT = '/customer/widgets/hypervisor_version_compliance/';
+export const PRIVATE_CLOUD_HYPERVISOR_VERSION_COMPLIANCE_CHARTS_ENDPOINT = '/customer/widgets/hypervisor_version_compliance_charts/';
+export const PRIVATE_CLOUD_RECENT_ALERT_ENDPOINT = '/customer/widgets/recent_alert/';
+export const PRIVATE_CLOUD_AUTO_REMEDIATION_SUMMARY_ENDPOINT = '/customer/widgets/auto_remediation_summary/';
+export const PRIVATE_CLOUD_VM_PROVISIONING_SUMMARY_ENDPOINT = '/customer/widgets/vm_provisioning_summary/';
+export const PRIVATE_CLOUD_ORPHANED_DEVICES_DETAILED_ENDPOINT = '/customer/widgets/orphaned_devices_detailed/';
+
 
 //Top 10 clusters
 export const Top10ClustersByVMCount = [
@@ -981,26 +1011,6 @@ export const capacityGrowthInsightsData = {
       { "value": "None", "label": "None" }
     ]
   }
-}
-
-export const InfrastructureHealthStatus = {
-  "powerStatus": {
-    "psuNormal": 298,
-    "psuDegraded": 9,
-    "psuFailed": 3
-  },
-  "hostHealthStatus": {
-    "healthy": 298,
-    "warning": 14,
-    "critical": 6,
-    "maintenance": 3
-  },
-  "fanTemperatureSensors": {
-    "tempNormal": 301,
-    "tempWarning": 7,
-    "tempCritical": 2,
-    "fanFailed": 1
-  },
 }
 
 export const performanceWorkloadData = {

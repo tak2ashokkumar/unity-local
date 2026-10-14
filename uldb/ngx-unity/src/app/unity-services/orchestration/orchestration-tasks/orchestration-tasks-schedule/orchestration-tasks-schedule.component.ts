@@ -17,6 +17,7 @@ import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types'
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { environment } from 'src/environments/environment';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'orchestration-tasks-schedule',
@@ -95,6 +96,8 @@ export class OrchestrationTasksScheduleComponent implements OnInit, OnDestroy {
     appendToBody: true,
   };
 
+  private taskReturnUrl: string;
+
   constructor(private svc: OrchestrationTasksScheduleService,
     private router: Router,
     private route: ActivatedRoute,
@@ -105,7 +108,14 @@ export class OrchestrationTasksScheduleComponent implements OnInit, OnDestroy {
     private clientSideSearchPipe: ClientSideSearchPipe,
     private renderer: Renderer2,
     private element: ElementRef,
-    private builder: FormBuilder) {
+    private builder: FormBuilder,
+    private location: Location) {
+    const navigation = this.router.getCurrentNavigation();
+    const navigationState = navigation ? navigation.extras.state : this.location.getState();
+    this.taskReturnUrl = navigationState?.['taskReturnUrl'] || (this.route.snapshot.paramMap.get('categoryId')
+      ? '/services/orchestration/tasks/' + encodeURIComponent(this.route.snapshot.paramMap.get('categoryId'))
+      : '/services/orchestration/tasks');
+
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.taskId = params.get('taskId');
       this.targetType = params.get('targetType')?.toLowerCase();
@@ -1064,11 +1074,7 @@ export class OrchestrationTasksScheduleComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    if (this.categoryId) {
-      this.router.navigate(['../../../../'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['../../../'], { relativeTo: this.route });
-    }
+    this.router.navigateByUrl(this.taskReturnUrl);
   }
 
 }

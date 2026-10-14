@@ -33,6 +33,40 @@
             </div>
         </div>
     </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="others.firewallManagementCenter.imageURL" class="w-100"
+                            [alt]="'Firewall Management Center'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="others.firewallManagementCenter.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{others.firewallManagementCenter.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="others.firewallManagementCenter.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToFirewallManagementCenterViewDetails()"
+                                accessControl [moduleName]="'Private Cloud'" [accessType]="'View Private Cloud'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="goToAddFirewallManagementCenter()" accessControl [moduleName]="'Private Cloud'"
+                            [accessType]="'Manage Private Cloud'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- <div class="col-3">
         <div class="card round-edge equalize-card">
             <div class="card-body p-1">

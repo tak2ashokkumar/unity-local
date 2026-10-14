@@ -2,7 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ECHARTCOLORS, UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
+import { VisualMapComponent } from 'echarts/components';
+import { ECHARTCOLORS, UnityChartConfigService, UnityChartDataType, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { UNITY_FONT_FAMILY, UNITY_TEXT_DEFAULT_COLOR } from 'src/app/app-constants';
 import {
@@ -10,6 +11,10 @@ import {
   ApplicationUsageGraphResponse,
   CreditSummaryWidgetData,
   LangfuseDashboardResponse,
+  LangfuseGuardrailMetricsResponse,
+  LangfuseLlmJudgeMetricsResponse,
+  LangfuseMcpMetricsResponse,
+  LangfuseMetricsResponse,
   ModelCost,
   ModelCostSeries,
   ModelCostWidgetData,
@@ -781,4 +786,172 @@ export class TokenBillingDashboardService {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     return Math.floor((now.getTime() - startOfMonth.getTime()) / 1000);
   }
+
+  getLangfuseMetrics(orgId: number | string, fromDate: string, toDate: string): Observable<LangfuseMetricsResponse> {
+    const params = new HttpParams()
+      .set('org_id', String(orgId))
+      .set('from_date', fromDate)
+      .set('to_date', toDate);
+    return this.http.get<LangfuseMetricsResponse>('mcp/langfuse/metrics/', { params });
+  }
+
+  getLangfuseLlmJudgeMetrics(orgId: number | string, fromDate: string, toDate: string): Observable<LangfuseLlmJudgeMetricsResponse> {
+    const params = new HttpParams()
+      .set('org_id', String(orgId))
+      .set('from_date', fromDate)
+      .set('to_date', toDate);
+    return this.http.get<LangfuseLlmJudgeMetricsResponse>('mcp/langfuse/metrics/llm-judge/', { params });
+  }
+
+  getLangfuseGuardrailMetrics(orgId: number | string, fromDate: string, toDate: string): Observable<LangfuseGuardrailMetricsResponse> {
+    const params = new HttpParams()
+      .set('org_id', String(orgId))
+      .set('from_date', fromDate)
+      .set('to_date', toDate);
+    return this.http.get<LangfuseGuardrailMetricsResponse>('mcp/langfuse/metrics/guardrails/', { params });
+  }
+
+  getLangfuseMcpMetrics(orgId: number | string, fromDate: string, toDate: string): Observable<LangfuseMcpMetricsResponse> {
+    const params = new HttpParams()
+      .set('org_id', String(orgId))
+      .set('from_date', fromDate)
+      .set('to_date', toDate);
+    return this.http.get<LangfuseMcpMetricsResponse>('mcp/langfuse/metrics/mcp/', { params });
+  }
+
+  convertToBarGraphViewData(labels: string[], values: number[][], names: string[] = [], isHorizontal = false, isStacked = false): UnityChartDetails {
+    const view = new UnityChartDetails();
+    view.type = UnityChartTypes.BAR;
+    view.options = isHorizontal
+      ? this.chartConfigSvc.getDefaultHorizantalBarChartOptions()
+      : this.chartConfigSvc.getDefaultVerticalBarChartOptions();
+    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+    const series = values.map((data, index) => ({
+      name: names[index],
+      type: 'bar' as const,
+      stack: isStacked ? 'total' : undefined,
+      data,
+    }));
+    view.options = {
+      ...view.options,
+      xAxis: isHorizontal ? view.options.xAxis : { ...(view.options.xAxis as any), data: labels },
+      yAxis: isHorizontal ? { ...(view.options.yAxis as any), data: labels } : view.options.yAxis,
+      grid: {
+        ...(view.options.grid as any),
+        ...(isHorizontal ? { right: '8%' } : {}),
+        ...(names.length > 1 ? { bottom: '15%' } : {}),
+      },
+      legend: names.length > 1 ? { ...view.options.legend, data: names, bottom: 3 } : { show: false },
+      series,
+    };
+    return view;
+  }
+
+  convertToLineGraphViewData(labels: string[], values: number[][], names: string[] = [], isArea = false): UnityChartDetails {
+    const view = new UnityChartDetails();
+    view.type = UnityChartTypes.LINE;
+    view.options = this.chartConfigSvc.getDefaultLineChartOptions();
+    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.LINE);
+    view.options = {
+      ...view.options,
+      xAxis: { type: 'category', data: labels, boundaryGap: false },
+      legend: names.length > 1 ? { data: names, bottom: 0 } : undefined,
+      series: values.map((data, index) => ({
+        name: names[index],
+        type: 'line',
+        areaStyle: isArea ? {} : undefined,
+        data,
+      })),
+    };
+    return view;
+  }
+
+  convertToPieGraphViewData(data: UnityChartDataType[], isDonut = false, name = '', maxLabelLength?: number,
+    scrollLegendAfter?: number): UnityChartDetails {
+    const view = new UnityChartDetails();
+    view.type = UnityChartTypes.PIE;
+    view.options = isDonut
+      ? this.chartConfigSvc.getDefaultDonutChartOptions()
+      : this.chartConfigSvc.getDefaultPieChartOptions();
+    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
+    const series: any = {
+      ...this.chartConfigSvc.setSeriesByChartType(isDonut ? UnityChartTypes.DONUT : UnityChartTypes.PIE),
+      name,
+      data,
+    };
+    if (maxLabelLength) {
+      const truncate = (label: string) => label.length > maxLabelLength
+        ? `${label.slice(0, maxLabelLength)}...` : label;
+      series.label = { ...series.label, formatter: (params: any) => truncate(String(params.name)) };
+      view.options.legend = { ...(view.options.legend as any), formatter: (label: string) => truncate(label) };
+    }
+    view.options.series = [series];
+    if (scrollLegendAfter && data.length > scrollLegendAfter) {
+      view.options = this.chartConfigSvc.applyScrollableLegend(view.options);
+    }
+    return view;
+  }
+
+  convertToNightingaleGraphViewData(data: UnityChartDataType[]): UnityChartDetails {
+    const view = new UnityChartDetails();
+    view.type = UnityChartTypes.PIE;
+    view.options = this.chartConfigSvc.getNightingalePieChartOptions();
+    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
+    view.options.series = [{
+      ...this.chartConfigSvc.setSeriesByChartType(UnityChartTypes.NIGHTINGALE),
+      data,
+    }];
+    return view;
+  }
+
+  convertToHeatMapViewData(labels: string[], values: number[], metricName = 'Average Score', maxValue = 1,
+    maxLabelLength?: number): UnityChartDetails {
+    const view = new UnityChartDetails();
+    view.type = UnityChartTypes.HEAT_MAP;
+    view.extensions = [VisualMapComponent, ...this.chartConfigSvc.getChartExtensions(UnityChartTypes.HEAT_MAP)];
+    view.options = {
+      tooltip: {
+        position: 'top',
+        formatter: (params: any) => `${labels[params.value[0]]}<br/>${metricName}: ${params.value[2]}`,
+      },
+      grid: { left: '3%', right: '8%', top: '25%', bottom: '3%', containLabel: true },
+      xAxis: {
+        type: 'category',
+        data: labels,
+        axisLabel: {
+          interval: 0,
+          rotate: 35,
+          formatter: (value: string) => maxLabelLength && value.length > maxLabelLength
+            ? `${value.slice(0, maxLabelLength)}...` : value,
+        },
+        splitArea: { show: true },
+      },
+      yAxis: {
+        type: 'category',
+        data: [metricName],
+        splitArea: { show: true },
+      },
+      visualMap: {
+        min: 0,
+        max: maxValue || 1,
+        calculable: true,
+        orient: 'horizontal',
+        left: 'center',
+        top: 0,
+        inRange: { color: ['#e8f1fb', '#67a9cf', '#2166ac'] },
+      },
+      series: [{
+        name: metricName,
+        type: 'heatmap',
+        data: values.map((value, index) => [index, 0, value]),
+        label: {
+          show: true,
+          formatter: (params: any) => Number(params.value[2]).toFixed(2),
+        },
+        itemStyle: { borderColor: '#ffffff' },
+      }],
+    };
+    return view;
+  }
+
 }

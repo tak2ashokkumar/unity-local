@@ -3,10 +3,10 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
 import { Observable } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT } from 'src/app/app-constants';
-import { GET_AGENT_CONFIGURATIONS, TEST_AGENT_CONNECTION, UPDATE_AGENT_CONFIGURATION_IP_ADDRESS, UPDATE_AGENT_CONFIGURATION_TTL } from 'src/app/shared/api-endpoint.const';
+import { GET_AGENT_CONFIGURATION, GET_AGENT_CONFIGURATIONS, TEST_AGENT_CONNECTION, UPDATE_AGENT_CONFIGURATION_IP_ADDRESS, UPDATE_AGENT_CONFIGURATION_TTL } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -27,6 +27,10 @@ export class AdvancedDiscoveryConnectivityService {
   getConfigurations() {
     const params = new HttpParams().set('page_size', '0');
     return this.http.get<DeviceDiscoveryAgentConfigurationType[]>(GET_AGENT_CONFIGURATIONS(), { params: params });
+  }
+
+  getConfiguration(uuid: string) {
+    return this.http.get<DeviceDiscoveryAgentConfigurationType>(GET_AGENT_CONFIGURATION(uuid));
   }
 
   convertToViewData(data: DeviceDiscoveryAgentConfigurationType[]) {

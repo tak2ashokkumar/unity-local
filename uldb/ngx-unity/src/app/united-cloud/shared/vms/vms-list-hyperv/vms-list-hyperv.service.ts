@@ -1,12 +1,13 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { EMPTY, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EMPTY, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
+import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { DEVICE_DATA_BY_DEVICE_TYPE, GET_VM_LIST_BY_PLATFORM, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
-import { AppUtilityService, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, DeviceMapping, NoWhitespaceValidator, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -38,7 +39,10 @@ export class VmsListHypervService {
     a.managementIp = vm.management_ip ? vm.management_ip : 'N/A';
     a.osName = vm.os ? vm.os : 'N/A';
     a.ssrOS = vm.ssr_os;
-    a.powerStatus = vm.status == 'Running' ? 'Up' : 'Down';
+    // a.powerStatus = vm.status == 'Running' ? 'Up' : 'Down';
+    a.powerStatus = vm.status;
+    a.powerOnInProgress = !!vm.actions_in_progress?.power_on;
+    a.powerOffInProgress = !!vm.actions_in_progress?.power_off;
     a.cpucores = vm.cpu;
     a.memory = vm.memory;
     a.storage = vm.storage;
@@ -94,6 +98,38 @@ export class VmsListHypervService {
     return viewData;
   }
 
+  buildPowerAuthForm(view: HypervVMViewData): FormGroup {
+    return this.builder.group({
+      uuid: [view.uuid],
+      cloud_uuid: [view.cloudId],
+      vm_id: [view.vmId],
+      username: ['', [Validators.required, NoWhitespaceValidator]],
+      password: ['', [Validators.required, NoWhitespaceValidator]]
+    });
+  }
+
+  resetPowerAuthFormErrors(): HypervVMPowerAuthFormErrors {
+    return {
+      username: '',
+      password: '',
+      nonFieldErr: ''
+    };
+  }
+
+  readonly powerAuthValidationMessages: Record<string, Record<string, string>> = {
+    username: {
+      required: 'Username is required'
+    },
+    password: {
+      required: 'Password is required'
+    }
+  };
+
+  toggleHypervVMPower(data: HypervVMPowerTogglePayload, currentPowerStatus: boolean): Observable<CeleryTask> {
+    const endpoint = currentPowerStatus ? 'customer/hyperv/vms/power_off/' : 'customer/hyperv/vms/power_on/';
+    return this.http.post<CeleryTask>(endpoint, data);
+  }
+
   getConsoleAccessInput(deviceMapping: DeviceMapping, view: HypervVMViewData): ConsoleAccessInput {
     return { label: deviceMapping, deviceType: deviceMapping, deviceId: view.uuid, newTab: false, deviceName: view.name };
   }
@@ -128,6 +164,9 @@ export class VmsListHypervService {
 }
 
 export class HypervVMViewData {
+  private static readonly POWER_ON_STATES = ['poweredon', 'active', 'running', 'vmrunning', 'run', 'on', 'up'];
+  private static readonly POWER_OFF_STATES = ['poweredoff', 'shutoff', 'stopped', 'vmstopped', 'terminated', 'off', 'down'];
+
   constructor() { }
   uuid: string;
   vmId: string;
@@ -149,10 +188,91 @@ export class HypervVMViewData {
   newTabConsoleAccessUrl: string;
   statsTooltipMessage: string;
   tags: string[];
-  powerStatus: string;
   monitoring: DeviceMonitoringType;
   collectorUuid: string;
   isCollectorZtc: boolean;
+  private _powerStatus: string = '';
+  private _powerOnInProgress: boolean = false;
+  private _powerOffInProgress: boolean = false;
+
+  set powerStatus(status: string) {
+    this._powerStatus = status;
+  }
+
+  get powerStatus(): string {
+    if (this.powerInProgress) {
+      return this._powerOffInProgress ? 'Stopping' : 'Starting';
+    }
+    if (this.powerStatusOn) {
+      return 'Up';
+    }
+    if (this.powerStatusOff) {
+      return 'Down';
+    }
+    return 'Unknown';
+  }
+
+  set powerOnInProgress(powerOnInProgress: boolean) {
+    this._powerOnInProgress = powerOnInProgress;
+  }
+
+  set powerOffInProgress(powerOffInProgress: boolean) {
+    this._powerOffInProgress = powerOffInProgress;
+  }
+
+  get powerStatusOn(): boolean {
+    return HypervVMViewData.POWER_ON_STATES.includes(this.normalizedPowerStatus);
+  }
+
+  get powerIcon(): string {
+    return this.powerInProgress ? 'fa fa-spinner fa-spin' : 'fa-power-off';
+  }
+
+  get powerIconEnabled(): boolean {
+    return !this.powerInProgress;
+  }
+
+  get powerIconMsg(): string {
+    if (this.powerInProgress) {
+      return this._powerOffInProgress ? 'Stopping' : 'Starting';
+    }
+    if (!this.powerStatusKnown) {
+      return 'Power status unavailable';
+    }
+    return this.powerStatusOn ? 'Power Off' : 'Power On';
+  }
+
+  setPowerInProgress(): void {
+    if (this.powerStatusOn) {
+      this._powerOffInProgress = true;
+      this._powerOnInProgress = false;
+    } else {
+      this._powerOnInProgress = true;
+      this._powerOffInProgress = false;
+    }
+    this._powerStatus = '';
+  }
+
+  clearPowerInProgress(): void {
+    this._powerOnInProgress = false;
+    this._powerOffInProgress = false;
+  }
+
+  private get powerStatusOff(): boolean {
+    return HypervVMViewData.POWER_OFF_STATES.includes(this.normalizedPowerStatus);
+  }
+
+  private get powerStatusKnown(): boolean {
+    return this.powerStatusOn || this.powerStatusOff;
+  }
+
+  private get powerInProgress(): boolean {
+    return this._powerOnInProgress || this._powerOffInProgress;
+  }
+
+  private get normalizedPowerStatus(): string {
+    return this._powerStatus ? this._powerStatus.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+  }
 }
 
 
@@ -177,6 +297,21 @@ export interface HypervVMType {
   tags: string[];
   monitoring: DeviceMonitoringType;
   collector: CollectorType;
+}
+
+export interface HypervVMPowerTogglePayload {
+  uuid: string;
+  cloud_uuid: string;
+  vm_id: string;
+  username: string;
+  password: string;
+}
+
+export interface HypervVMPowerAuthFormErrors {
+  [key: string]: string;
+  username: string;
+  password: string;
+  nonFieldErr: string;
 }
 interface Cloud {
   id: number;

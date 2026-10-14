@@ -9,7 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntil } from 'rxjs/operators';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { BuildingBlockViewData } from './unity-setup-finops.type';
+import { BuildingBlockViewData, RelatedServiceCatalog } from './unity-setup-finops.type';
 
 @Component({
   selector: 'unity-setup-finops',
@@ -24,6 +24,7 @@ export class UnitySetupFinopsComponent implements OnInit, OnDestroy {
   count: number;
   viewData: BuildingBlockViewData[] = [];
   selectedView: BuildingBlockViewData;
+  relatedServiceCatalogs: RelatedServiceCatalog[] = [];
 
   @ViewChild('confirm') confirm: ElementRef;
   deleteModalRef: BsModalRef;
@@ -104,15 +105,37 @@ export class UnitySetupFinopsComponent implements OnInit, OnDestroy {
 
   delete(view: BuildingBlockViewData) {
     this.selectedView = view;
-    this.deleteModalRef = this.modalService.show(this.confirm, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+    this.relatedServiceCatalogs = [];
+    this.spinner.start('main');
+    this.svc.getRelatedServiceCatalogs(view.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      this.relatedServiceCatalogs = Array.isArray(data) ? data : [];
+
+      if (this.relatedServiceCatalogs.length) {
+        this.spinner.stop('main');
+        this.deleteModalRef = this.modalService.show(this.confirm, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+        return;
+      }
+
+      this.deleteBuildingBlock();
+    }, () => {
+      this.spinner.stop('main');
+      this.notification.error(new Notification('Unable to check linked service catalogs. Please try again.'));
+    });
   }
 
   confirmDelete() {
     this.deleteModalRef.hide();
+    this.spinner.start('main');
+    this.deleteBuildingBlock();
+  }
+
+  private deleteBuildingBlock() {
     this.svc.delete(this.selectedView.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.spinner.stop('main');
       this.refreshData(this.currentCriteria.pageNo);
       this.notification.success(new Notification('Building Block deleted successfully.'));
     }, (err: HttpErrorResponse) => {
+      this.spinner.stop('main');
       this.notification.error(new Notification('Failed to delete Building Block. Please try again.'));
     });
   }

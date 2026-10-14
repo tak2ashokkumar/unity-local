@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, Inject, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -37,7 +38,7 @@ export class OrchestrationExecutionsWorkflowLogsComponent implements OnInit, OnD
   showWorkflowWidget = true;
 
   @ViewChild('copyContent', { static: false }) contentToCopy: ElementRef;
-  constructor(private workflowLogsService: OrchestrationExecutionsWorkflowLogsService,
+  constructor(private location: Location, private workflowLogsService: OrchestrationExecutionsWorkflowLogsService,
     private route: ActivatedRoute,
     private router: Router,
     private spinner: AppSpinnerService,
@@ -241,6 +242,6 @@ export class OrchestrationExecutionsWorkflowLogsComponent implements OnInit, OnD
   }
 
   goBack() {
-    this.router.navigate(['../../'], { relativeTo: this.route });
+    this.location.back();
   }
 }

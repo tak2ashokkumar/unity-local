@@ -20,7 +20,7 @@
 
     <div class="row d-flex flex-nowrap align-items-stretch h-100 overflow-hidden m-0 p-0 params-layout"
         [class.input-panel-collapsed]="inputPanelCollapsed" *ngIf="!isSchemaLoading && !schemaLoadError">
-        <div class="side-panel position-relative h-100 overflow-hidden m-0 p-0" *ngIf="!isPromptExpanded"
+        <div class="side-panel position-relative h-100 overflow-hidden m-0 p-0"
             [class.is-collapsed]="inputPanelCollapsed"
             [style.flex-basis.px]="inputPanelCollapsed ? collapsedPanelWidth : inputPanelWidth">
             <button type="button"
@@ -223,18 +223,43 @@
                     </p>
                 </div>
 
-                <div class="mt-3 px-3 properties expanded-field-editor"
+                <div class="mt-3 px-3 properties expanded-field-editor d-flex flex-column"
                     *ngIf="isPromptExpanded && expandedField && expandedForm">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label text-muted mb-1">{{ expandedLabel }}</label>
-                        <button type="button" class="btn btn-sm field-icon-button bg-transparent shadow-none border-secondary"
+                        <button type="button"
+                            class="expand-btn d-flex align-items-center justify-content-center p-0 border-0"
                             (click)="collapsePrompt()" title="Collapse" aria-label="Collapse expanded field">
-                            <i class="fas fa-compress"></i>
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"
+                                focusable="false">
+                                <path fill-rule="evenodd"
+                                    d="M1 10.5a.5.5 0 0 1 .5.5v3.293l4.146-4.147a.5.5 0 0 1 .708.708L2.207 15H5.5a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5zM15 5.5a.5.5 0 0 1-.5-.5V1.707l-4.146 4.147a.5.5 0 0 1-.708-.708L13.793 1H10.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5z" />
+                            </svg>
                         </button>
                     </div>
-                    <textarea class="form-control text-dark" rows="18"
-                        [value]="getDisplayValue(expandedField, expandedForm)" (input)="onExpandedInput($event)"
-                        [attr.disabled]="isFieldControlDisabled(expandedField, expandedForm) ? true : null"></textarea>
+                    <div class="row mx-0 flex-fill expanded-editor-panes">
+                        <div class="col-6 pl-0 pr-2 d-flex flex-column h-100">
+                            <h6 id="expanded-markdown-input-label" class="text-muted mb-2">Input</h6>
+                            <textarea id="expanded-markdown-input" aria-labelledby="expanded-markdown-input-label"
+                                class="form-control p-3 flex-fill expanded-markdown-input" rows="18"
+                                [value]="getDisplayValue(expandedField, expandedForm)" (input)="onExpandedInput($event)"
+                                [attr.disabled]="isFieldControlDisabled(expandedField, expandedForm) ? true : null"></textarea>
+                        </div>
+                        <div class="col-6 pl-2 pr-0 d-flex flex-column h-100">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h6 id="expanded-markdown-preview-label" class="text-muted mb-2">Preview</h6>
+                            </div>
+                            <div class="border rounded p-3 overflow-auto flex-fill expanded-markdown-preview"
+                                role="region" aria-labelledby="expanded-markdown-preview-label" tabindex="0">
+                                <markdown #expandedMarkdown [data]="getExpandedPreviewMarkdown()"
+                                    (ready)="highlightExpandedPreview(expandedMarkdown.element.nativeElement)">
+                                </markdown>
+                                <p class="text-muted mb-0" *ngIf="!getDisplayValue(expandedField, expandedForm)">
+                                    Start typing to see the preview.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="invalid-feedback d-block" *ngIf="getDynamicError(formErrors, expandedField)">
                         {{ getDynamicError(formErrors, expandedField) }}
                     </div>
@@ -321,11 +346,13 @@
                                             [class.is-invalid]="getDynamicError(errors, field)" />
 
                                         <div class="input-group-append" *ngIf="nodeData?.isTool">
-                                            <button type="button" class="btn field-icon-button bg-transparent shadow-none border-secondary d-flex align-items-center"
+                                            <button type="button"
+                                                class="btn field-icon-button bg-transparent shadow-none border-secondary d-flex align-items-center"
                                                 style="height: 100%; border-radius: 0 .25rem .25rem 0;"
                                                 (click)="onAIiconClick(field, form)"
                                                 title="AI will generate this input">
-                                                <span class="ai-input-icon d-inline-block" [style.--ai-icon]="'url(' + aiIcon + ')'" aria-hidden="true"></span>
+                                                <span class="ai-input-icon d-inline-block"
+                                                    [style.--ai-icon]="'url(' + aiIcon + ')'" aria-hidden="true"></span>
                                             </button>
                                         </div>
                                     </div>
@@ -451,27 +478,39 @@
                                     </div>
                                 </div>
 
+                                <ng-template #textareaExpandButton>
+                                    <button type="button"
+                                        class="expand-btn position-absolute d-flex align-items-center justify-content-center p-0 border-0 mr-2"
+                                        (click)="expandPrompt(field, form)" title="Expand" aria-label="Expand textarea">
+                                        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"
+                                            aria-hidden="true" focusable="false">
+                                            <path fill-rule="evenodd"
+                                                d="M1 10.5a.5.5 0 0 1 .5.5v3.293l4.146-4.147a.5.5 0 0 1 .708.708L2.207 15H5.5a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5zM15 5.5a.5.5 0 0 1-.5-.5V1.707l-4.146 4.147a.5.5 0 0 1-.708-.708L13.793 1H10.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5z" />
+                                        </svg>
+                                    </button>
+                                </ng-template>
+
                                 <!-- Value mode -->
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
                                     <div class="input-group">
-                                        <textarea class="form-control text-dark" [value]="getDisplayValue(field, form)"
-                                            (input)="onNormalInput($event, field, form)" [rows]="field.rows || 3"
-                                            [attr.placeholder]="field.placeholder || ''"
-                                            [attr.disabled]="field.disabled || isFieldControlDisabled(field, form) ? true : null"
-                                            [class.is-invalid]="getDynamicError(errors, field)"></textarea>
+                                        <div class="position-relative flex-grow-1 textarea-expand-wrapper">
+                                            <textarea class="form-control text-dark pr-5 w-100"
+                                                [value]="getDisplayValue(field, form)"
+                                                (input)="onNormalInput($event, field, form)" [rows]="field.rows || 3"
+                                                [attr.placeholder]="field.placeholder || ''"
+                                                [attr.disabled]="field.disabled || isFieldControlDisabled(field, form) ? true : null"
+                                                [class.is-invalid]="getDynamicError(errors, field)"></textarea>
 
-                                        <div class="input-group-append d-flex flex-column">
+                                            <ng-container *ngTemplateOutlet="textareaExpandButton"></ng-container>
+                                        </div>
+                                        <div class="input-group-append"
+                                            *ngIf="nodeData?.isTool && isInputParamField(field)">
                                             <button type="button"
                                                 class="btn field-icon-button bg-transparent shadow-none border-secondary flex-fill d-flex align-items-center justify-content-center"
-                                                (click)="expandPrompt(field, form)" title="Expand">
-                                                <i class="fas fa-expand"></i>
-                                            </button>
-                                            <button type="button"
-                                                class="btn field-icon-button bg-transparent shadow-none border-secondary flex-fill d-flex align-items-center justify-content-center"
-                                                *ngIf="nodeData?.isTool && isInputParamField(field)"
                                                 (click)="onAIiconClick(field, form)"
                                                 title="AI will generate this input">
-                                                <span class="ai-input-icon d-inline-block" [style.--ai-icon]="'url(' + aiIcon + ')'" aria-hidden="true"></span>
+                                                <span class="ai-input-icon d-inline-block"
+                                                    [style.--ai-icon]="'url(' + aiIcon + ')'" aria-hidden="true"></span>
                                             </button>
                                         </div>
                                     </div>
@@ -479,12 +518,15 @@
 
                                 <!-- Expression mode -->
                                 <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
-                                    <textarea class="form-control text-dark text-monospace"
-                                        [value]="getDisplayValue(field, form)"
-                                        (input)="onExprInput($event, field, form)" [rows]="field.rows || 3"
-                                        placeholder="Drop expression here"
-                                        [attr.disabled]="field.disabled ? true : null"
-                                        [class.is-invalid]="getDynamicError(errors, field)"></textarea>
+                                    <div class="position-relative textarea-expand-wrapper">
+                                        <textarea class="form-control text-dark text-monospace pr-5 w-100"
+                                            [value]="getDisplayValue(field, form)"
+                                            (input)="onExprInput($event, field, form)" [rows]="field.rows || 3"
+                                            placeholder="Drop expression here"
+                                            [attr.disabled]="field.disabled ? true : null"
+                                            [class.is-invalid]="getDynamicError(errors, field)"></textarea>
+                                        <ng-container *ngTemplateOutlet="textareaExpandButton"></ng-container>
+                                    </div>
                                 </ng-container>
 
                                 <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
@@ -498,29 +540,30 @@
                                 </ng-container>
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
-                                    <select class="form-control text-dark" [formControlName]="field.control_name"
+                                    <ng-select class="dynamic-ng-select" [items]="getDynamicSelectOptions(field, form)"
+                                        bindLabel="label" bindValue="value" [formControlName]="field.control_name"
+                                        [multiple]="false" [searchable]="field.searchable !== false"
+                                        [clearable]="field.clearable !== false"
+                                        [closeOnSelect]="field.close_on_select !== false"
+                                        [searchFn]="searchDynamicOption"
+                                        [loading]="isDynamicOptionsLoading(field, form)"
+                                        [loadingText]="field.loadingText" [notFoundText]="field.noOptionsText"
                                         [compareWith]="getDynamicOptionCompareWith(field)"
+                                        [placeholder]="field.placeholder || ('Select ' + (field.label || field.control_name))"
                                         [class.is-invalid]="getDynamicError(errors, field)"
                                         (change)="onDynamicFieldChange(field, form)">
+                                        <ng-template ng-option-tmp let-item="item">
+                                            <div>{{ item.label }}</div>
+                                            <small class="text-muted" *ngIf="item.description">{{ item.description
+                                                }}</small>
+                                        </ng-template>
+                                    </ng-select>
 
-                                        <option [ngValue]="''" disabled>
-                                            {{ field.placeholder || ('Select ' + (field.label || field.control_name)) }}
-                                        </option>
-
-                                        <option *ngFor="let option of getDynamicOptions(field, form)"
-                                            [ngValue]="getDynamicOptionValue(option, field)">
-                                            {{ getDynamicOptionLabel(option, field) }}
-                                        </option>
-
-                                        <option
-                                            *ngIf="field.noOptionsText && !getDynamicOptions(field, form).length && !isDynamicOptionsLoading(field, form)"
-                                            disabled>
-                                            {{ field.noOptionsText }}
-                                        </option>
-                                    </select>
-
-                                    <div class="text-muted mt-1" *ngIf="isDynamicOptionsLoading(field, form)">
-                                        Loading options...
+                                    <div class="text-danger mt-1"
+                                        *ngIf="getDynamicOptionsError(field, form) as optionError">
+                                        {{ optionError }}
+                                        <button type="button" class="btn btn-sm btn-link p-0 ml-1"
+                                            (click)="retryDynamicOptions(field, form)">Retry</button>
                                     </div>
                                 </ng-container>
 
@@ -583,6 +626,15 @@
                                             [attr.title]="getDynamicTooltip(field)">
                                         </span>
                                     </label>
+
+                                    <div class="text-muted mb-2" *ngIf="field._formApiLoading">
+                                        Loading fields...
+                                    </div>
+
+                                    <div class="text-muted mb-2"
+                                        *ngIf="field.form_api && !field._formApiLoading && !(field.fields?.length)">
+                                        {{ getFormApiEmptyText(field, form) }}
+                                    </div>
 
                                     <ng-container *ngFor="let childField of field.fields">
                                         <ng-container
@@ -649,13 +701,35 @@
                                 </ng-container>
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
-                                    <multiselect-dropdown *ngIf="field.multiselect_properties || multiselectProperties"
-                                        [settings]="(field.multiselect_properties || multiselectProperties)"
-                                        [options]="getDynamicOptions(field, form)" class="form-control h-auto p-0"
-                                        formControlName="{{ field.control_name }}"
+                                    <ng-select class="dynamic-ng-select" [items]="getDynamicSelectOptions(field, form)"
+                                        bindLabel="label" bindValue="value" [formControlName]="field.control_name"
+                                        [multiple]="true" [searchable]="field.searchable !== false"
+                                        [clearable]="field.clearable !== false"
+                                        [closeOnSelect]="field.close_on_select === true"
+                                        [searchFn]="searchDynamicOption"
+                                        [loading]="isDynamicOptionsLoading(field, form)"
+                                        [loadingText]="field.loadingText" [notFoundText]="field.noOptionsText"
+                                        [compareWith]="getDynamicOptionCompareWith(field)"
+                                        [placeholder]="field.placeholder || ('Select ' + (field.label || field.control_name))"
                                         [class.is-invalid]="getDynamicError(errors, field)"
-                                        [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'">
-                                    </multiselect-dropdown>
+                                        (change)="onDynamicFieldChange(field, form)">
+                                        <ng-template ng-label-tmp let-item="item" let-label="label" let-clear="clear">
+                                            <span class="ng-value-label">{{ label }}</span>
+                                            <span class="ng-value-icon right" (click)="clear(item)"
+                                                aria-hidden="true">&times;</span>
+                                        </ng-template>
+                                        <ng-template ng-option-tmp let-item="item">
+                                            <div>{{ item.label }}</div>
+                                            <small class="text-muted" *ngIf="item.description">{{ item.description
+                                                }}</small>
+                                        </ng-template>
+                                    </ng-select>
+                                    <div class="text-danger mt-1"
+                                        *ngIf="getDynamicOptionsError(field, form) as optionError">
+                                        {{ optionError }}
+                                        <button type="button" class="btn btn-sm btn-link p-0 ml-1"
+                                            (click)="retryDynamicOptions(field, form)">Retry</button>
+                                    </div>
                                 </ng-container>
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'expression'">
@@ -1164,16 +1238,20 @@
                     </div>
                 </div>
 
-                <div *ngIf="!isTriggerNode() && !nodeOutput" class="output-empty text-dark">
+                <div *ngIf="!isTriggerNode() && !nodeOutput && !isChartOutputNode" class="output-empty text-dark">
                     Outputs will appear after execution.
                 </div>
 
                 <!-- ↓ ONLY THIS BLOCK IS NEW — replaces the old <pre> -->
                 <!-- <ng-container *ngIf="!isTriggerNode() && !nodeOutput"> -->
-                <div class="output-data d-flex flex-column w-100" *ngIf="nodeOutput">
+                <div class="output-data d-flex flex-column w-100" *ngIf="nodeOutput || isChartOutputNode">
 
                     <ul class="nav nav-tabs output-tabs">
-                        <li class="nav-item">
+                        <li class="nav-item" *ngIf="isChartOutputNode">
+                            <a class="nav-link" [class.active]="outputView === 'chart'"
+                                (click)="outputView = 'chart'">Chart</a>
+                        </li>
+                        <li class="nav-item" *ngIf="!outputChartData">
                             <a class="nav-link" [class.active]="outputView === 'table'"
                                 (click)="outputView = 'table'">{{ outputTabLabel }}</a>
                         </li>
@@ -1186,6 +1264,14 @@
                                 (click)="outputView = 'json'">JSON</a>
                         </li>
                     </ul>
+
+                    <div class="output-scroll-container w-100 overflow-auto" *ngIf="outputView === 'chart'">
+                        <div *ngIf="outputChartData; else noChartData" echarts [options]="outputChartData.options"
+                            [extentions]="outputChartData.extensions" [defaultHeight]="300"></div>
+                        <ng-template #noChartData>
+                            <div class="text-muted text-center p-3">No chart data available</div>
+                        </ng-template>
+                    </div>
 
                     <!-- Rendered output: table, text or empty state -->
                     <div class="output-scroll-container w-100 overflow-auto p-2" *ngIf="outputView === 'table'">

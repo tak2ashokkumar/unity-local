@@ -1,8 +1,8 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { clone as _clone } from 'lodash-es';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -14,6 +14,7 @@ import { UnityTopologyoptionsService } from 'src/app/united-view/unity-topology/
 import { DataSet, Network, Options } from 'vis-network/standalone';
 import { ServiceTopologyService } from '../service-topology.service';
 import { AppCommonTopologyService, TopologyResponse, UnityNetworkTopologyViewData, UnityNetworkTopologyViewType } from './app-common-topology.service';
+import { ConnectedNode, ConnectedNodesResponse, SmartscapeLane } from './app-common-topology.type';
 
 @Component({
   selector: 'app-common-topology',
@@ -23,13 +24,16 @@ import { AppCommonTopologyService, TopologyResponse, UnityNetworkTopologyViewDat
   encapsulation: ViewEncapsulation.None
 })
 export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy {
-  private ngUnsubscribe = new Subject();
+  private readonly ngUnsubscribe = new Subject<void>();
 
   @Input() buId: string;
   @Input() appIds: string[];
   @Input() selectedView: string;
-  @Input() selectedNodeStatus: string;  
+  @Input() selectedNodeStatus: string;
+  @Input() isElongated: boolean = false;
+  @Input() activeNodeId: string;
   @Output() statusSummaryChange = new EventEmitter<any>();
+  @Output() nodeClicked = new EventEmitter<any>();
 
   @ViewChild('visGraphContainer', { static: true })
   visGraphContainer!: ElementRef;
@@ -50,6 +54,8 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
   selectedNodes: UnityViewNetworkTopologyNode[] = [];
   selectedActiveNodes: UnityViewNetworkTopologyNode[] = [];
   private nodeById = new Map<string, UnityViewNetworkTopologyNode>();
+  private prevHighlightedNodeId: string | null = null;
+  private networkNodesDataSet: DataSet<any> | null = null;
 
   networkViewDataList: UnityNetworkTopologyViewData[] = [];
   networks: Network[] = [];
@@ -59,8 +65,9 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
   private remInPx: number;
   tooltipX = 0;
   tooltipY = 0;
+  tooltipHovered: boolean = false;
 
-  flattened; any;
+  flattened: any;
 
   constructor(private svc: AppCommonTopologyService,
     private parentSvc: ServiceTopologyService,
@@ -71,7 +78,8 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
     private spinner: AppSpinnerService,
     private storageService: StorageService,
     private refreshService: DataRefreshBtnService,
-    private utilsvc: AppUtilityService) {
+    private utilsvc: AppUtilityService,
+    private cdr: ChangeDetectorRef) {
     this.options = this.optionService.getMediumViewOptions();
     this.refreshService.refreshAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
       this.refreshData();
@@ -81,13 +89,24 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
   ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (this.buId && this.appIds && this.selectedView) {
+    const shouldReload = changes.buId || changes.appIds || changes.selectedView;
+    if (shouldReload && this.buId && this.appIds && this.selectedView) {
       this.getDeviceNetwork();
     }
-    // if (changes.selectedNodeStatus && !changes.selectedNodeStatus.firstChange ){
-    //   this.spinner.start('unity-topology');
-    //   this.drawGraph();
-    // }
+    if (changes.isElongated && !changes.isElongated.firstChange) {
+      setTimeout(() => {
+        if (this.network) {
+          if (this.activeNodeId && this.networkNodesDataSet?.get(this.activeNodeId)) {
+            this.network.focus(this.activeNodeId, { scale: 1.15, animation: true });
+          } else {
+            this.network.fit({ animation: true });
+          }
+        }
+      }, 380);
+    }
+    if (changes.activeNodeId) {
+      this.highlightNodeOnGraph(this.activeNodeId);
+    }
   }
 
   ngOnDestroy(): void {
@@ -116,10 +135,12 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
 
   destroyNetwork() {
     this.isNetworkStable = false;
+    this.prevHighlightedNodeId = null;
     if (this.network && this.network !== null) {
       this.network.destroy();
       this.network = null;
     }
+    this.networkNodesDataSet = null;
   }
 
   refreshData() {
@@ -136,6 +157,9 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
       }
       this.showGraph = true;
       switch (this.selectedView) {
+        case 'application':
+          this.flattened = res.map(r => r.application).flat();
+          break;
         case 'service':
           this.flattened = res.map(r => r.service).flat();
           break;
@@ -167,38 +191,41 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
     });
   }
 
-  drawGraph(){
-      let filteredResponse = this.flattened;
-      switch (this.selectedNodeStatus) {
-        case 'active':
-          let activeNodes = this.flattened[0].nodes.filter((n: UnityViewNetworkTopologyNode) => Number(n.status) === 1);
-          filteredResponse[0].nodes = _clone(activeNodes);
-          break;
-        case 'inactive':
-          let inActiveNodes = this.flattened[0].nodes.filter((n: UnityViewNetworkTopologyNode) => Number(n.status) === 0);
-          filteredResponse[0].nodes = _clone(inActiveNodes);
-          break;
-        case 'all':
-          break;
-      }
+  drawGraph() {
+    let filteredResponse = this.flattened;
+    switch (this.selectedNodeStatus) {
+      case 'active':
+        let activeNodes = this.flattened[0].nodes.filter((n: UnityViewNetworkTopologyNode) => Number(n.status) === 1);
+        filteredResponse[0].nodes = _clone(activeNodes);
+        break;
+      case 'inactive':
+        let inActiveNodes = this.flattened[0].nodes.filter((n: UnityViewNetworkTopologyNode) => Number(n.status) === 0);
+        filteredResponse[0].nodes = _clone(inActiveNodes);
+        break;
+      case 'all':
+        break;
+    }
 
-      this.viewDataList = this.svc.convertToViewData(filteredResponse);
+    this.viewDataList = this.svc.convertToViewData(filteredResponse);
 
-      this.nodeById.clear();
-      this.viewDataList.forEach(vd => vd.nodes.forEach(n => this.nodeById.set(n.uuid, n)));
+    this.nodeById.clear();
+    this.viewDataList.forEach(vd => vd.nodes.forEach(n => this.nodeById.set(n.uuid, n)));
 
-      // 2. merge all networks into one
-      const mergedData = this.mergeNetworks(this.viewDataList);
+    // 2. merge all networks into one
+    const mergedData = this.mergeNetworks(this.viewDataList);
 
-      // 3. cleanup old
-      this.destroyNetwork();
+    // 3. cleanup old
+    this.destroyNetwork();
 
-      // 4. draw once
-      const container = this.visGraphContainer.nativeElement;
-      this.destroyNetwork();
-      this.drawNetwork(container, mergedData);
-      // this.updateNetworkPhysics();
-      this.spinner.stop('unity-topology');
+    // 4. draw once
+    const container = this.visGraphContainer.nativeElement;
+    this.destroyNetwork();
+    this.drawNetwork(container, mergedData);
+    // this.updateNetworkPhysics();
+    this.spinner.stop('unity-topology');
+    if (this.activeNodeId) {
+      this.highlightNodeOnGraph(this.activeNodeId);
+    }
   }
 
   mergeNetworks(viewDataList: UnityNetworkTopologyViewData[]) {
@@ -259,6 +286,7 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   drawNetwork(container: HTMLElement, data: { nodes: DataSet<any>, edges: DataSet<any> }) {
+    this.networkNodesDataSet = data.nodes;
     this.network = new Network(container, data, _clone(this.options));
     this.network?.fit({ animation: true });
 
@@ -300,7 +328,6 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
 
       }
     });
-    let tooltipHovered = false;
     this.network.on('hoverNode', (params: any) => {
       const hoveredNode = this.nodeById.get(params.node);
       if (!hoveredNode) return;
@@ -309,15 +336,6 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
       this.showNodeInfo = true;
 
       setTimeout(() => {
-        // const tooltipElement = document.querySelector('.node-tooltip') as HTMLElement;
-        // if (tooltipElement) {
-        //   const x = Math.round(params.pointer.DOM.x + 12);
-        //   const y = Math.round(params.pointer.DOM.y - 12);
-
-        //   this.renderer.setStyle(tooltipElement, 'left', `${x}px`);
-        //   this.renderer.setStyle(tooltipElement, 'top', `${y}px`);
-        //   this.renderer.setStyle(tooltipElement, 'display', 'block');
-        // }
         const tooltipElement = document.querySelector('.node-tooltip') as HTMLElement;
         if (!tooltipElement) return;
         const containerRect = this.visGraphContainer.nativeElement.getBoundingClientRect();
@@ -342,17 +360,10 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
         this.renderer.setStyle(tooltipElement, 'top', `${y}px`);
         this.renderer.setStyle(tooltipElement, 'display', 'block');
       });
-      // const pos = this.network.getPositions([params.node])[params.node];
-      // const canvasPos = this.network.canvasToDOM(pos);
-
-      // this.tooltipX = canvasPos.x;
-      // this.tooltipY = canvasPos.y;
-      // this.hoveredNode = this.network.body.nodes[params.node].options;
-      // this.showNodeInfo = true;
     });
     this.network.on('blurNode', () => {
       setTimeout(() => {
-        if (!tooltipHovered) {
+        if (!this.tooltipHovered) {
           this.showNodeInfo = false;
           this.hoveredNode = null;
         }
@@ -365,7 +376,137 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
           enabled: false
         }
       });
-    })
+    });
+
+    this.network.on('click', (params: any) => {
+      if (params.nodes && params.nodes.length > 0) {
+        const clickedNodeId = params.nodes[0];
+        const node = this.nodeById.get(clickedNodeId);
+        if (node) {
+          this.showNodeInfo = false;
+          this.hoveredNode = null;
+          this.highlightNodeOnGraph(clickedNodeId);
+          const localInfo = this.getLocalConnections(clickedNodeId);
+          this.nodeClicked.emit({ node, localNodes: localInfo.nodes, localLinks: localInfo.links });
+        }
+      }
+    });
+  }
+
+  highlightNodeOnGraph(nodeId: string) {
+    if (!this.network || !this.networkNodesDataSet) return;
+
+    if (this.prevHighlightedNodeId && this.prevHighlightedNodeId !== nodeId) {
+      const prevNode = this.networkNodesDataSet.get(this.prevHighlightedNodeId);
+      if (prevNode) {
+        this.networkNodesDataSet.update({
+          id: this.prevHighlightedNodeId,
+          shadow: false,
+          size: 20,
+          borderWidth: 1
+        });
+      }
+    }
+
+    if (!nodeId) {
+      this.prevHighlightedNodeId = null;
+      return;
+    }
+
+    const targetNode = this.networkNodesDataSet.get(nodeId);
+    if (targetNode) {
+      this.prevHighlightedNodeId = nodeId;
+      this.networkNodesDataSet.update({
+        id: nodeId,
+        shadow: {
+          enabled: true,
+          color: '#007bff',
+          size: 32,
+          x: 0,
+          y: 0
+        },
+        size: 32,
+        borderWidth: 4,
+        color: {
+          border: '#007bff',
+          background: '#e8f4fd',
+          highlight: {
+            border: '#0056b3',
+            background: '#d0ebff'
+          }
+        }
+      });
+
+      try {
+        this.network.focus(nodeId, {
+          scale: 1.15,
+          animation: {
+            duration: 400,
+            easingFunction: 'easeInOutQuad'
+          }
+        });
+        this.network.selectNodes([nodeId]);
+      } catch (e) { }
+    }
+  }
+
+  getLocalConnections(nodeId: string): { nodes: any[]; links: any[] } {
+    if (!this.flattened || !this.flattened[0]) {
+      return { nodes: [], links: [] };
+    }
+    const allNodes: any[] = this.flattened[0].nodes || [];
+    const allLinks: any[] = this.flattened[0].links || [];
+
+    const nodeMap = new Map<string, any>();
+    allNodes.forEach(n => {
+      if (n && n.uuid) nodeMap.set(n.uuid, n);
+    });
+
+    const connectedNodeIds = new Set<string>();
+    connectedNodeIds.add(nodeId);
+
+    const connectedLinks: any[] = [];
+    const queue = [nodeId];
+    let depth = 0;
+    const maxDepth = 2;
+
+    while (queue.length > 0 && depth < maxDepth) {
+      const nextQueue: string[] = [];
+      for (const currId of queue) {
+        for (const link of allLinks) {
+          const src = link.source_uuid || link.source;
+          const tgt = link.target_uuid || link.target;
+          if (src === currId && tgt && nodeMap.has(tgt)) {
+            if (!connectedNodeIds.has(tgt)) {
+              connectedNodeIds.add(tgt);
+              nextQueue.push(tgt);
+            }
+            if (!connectedLinks.some(l => (l.source_uuid === src && l.target_uuid === tgt))) {
+              connectedLinks.push({ source_uuid: src, target_uuid: tgt });
+            }
+          } else if (tgt === currId && src && nodeMap.has(src)) {
+            if (!connectedNodeIds.has(src)) {
+              connectedNodeIds.add(src);
+              nextQueue.push(src);
+            }
+            if (!connectedLinks.some(l => (l.source_uuid === src && l.target_uuid === tgt))) {
+              connectedLinks.push({ source_uuid: src, target_uuid: tgt });
+            }
+          }
+        }
+      }
+      queue.length = 0;
+      queue.push(...nextQueue);
+      depth++;
+    }
+
+    const connectedNodes: any[] = [];
+    connectedNodeIds.forEach(id => {
+      const n = nodeMap.get(id);
+      if (n) connectedNodes.push(n);
+    });
+
+    return { nodes: connectedNodes, links: connectedLinks };
   }
 
   isActive(node: UnityViewNetworkTopologyNode) {
@@ -376,7 +517,6 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
 
   goToApplication(hoveredNode: any) {
     if (this.selectedView == 'host' || this.selectedView == 'physical_layer') {
-      // this.storageService.put('device', { name: hoveredNode.name, deviceType: this.utilsvc.getDeviceMappingByDeviceType(hoveredNode.device_type), configured: true, redfish: false }, StorageType.SESSIONSTORAGE);
       let baseURL = this.getBaseURL(hoveredNode);
       let url = `/${hoveredNode.uuid}/zbx/details/`;
       let deviceMapping = this.utilsvc.getDeviceMappingByDeviceType(hoveredNode.device_type);
@@ -405,7 +545,6 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
         this.storageService.put('device', { name: hoveredNode.name, deviceType: "Application Devices", configured: true }, StorageType.SESSIONSTORAGE);
         this.router.navigate(['/unitycloud/applications', hoveredNode.app_id, 'services', hoveredNode.monitored_id, 'details']);
       }
-      // this.router.navigate(['/unitycloud/applications/']);
     }
   }
 
@@ -441,6 +580,5 @@ export class AppCommonTopologyComponent implements OnInit, OnChanges, OnDestroy 
       default: return;
     }
   }
-
 
 }

@@ -15,7 +15,7 @@ import { UsageData, UsageDataValueUnitType } from '../entities/usage-data.type';
 import { CustomVirtualMachine, VirtualMachine, VCenterDataStore } from '../entities/vm.type';
 import { NutanixDataStore } from '../entities/nutanix.type';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
-import { PrivateCloudType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
+import { PrivateCloudRemoteWebAccessType, PrivateCloudType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { UnitedCloudSharedService } from '../united-cloud-shared.service';
 
 @Injectable()
@@ -111,6 +111,16 @@ export class SummaryService {
         view.newTabWebAccessUrl = data.proxy.proxy_fqdn;
         view.newTabTooltipMessage = view.isNewTabEnabled ? 'Manage In New Tab' : 'Device Not Configured';
         view.deviceType = 'vclouds/instance';
+      } else if (platFormType == PlatFormMapping.PROXMOX) {
+        view.remoteWebAccess = data.remote_web_access;
+        view.isSameTabEnabled = false;
+        view.sameTabWebAccessUrl = null;
+        view.sameTabTooltipMessage = 'Remote web access opens in a new viewer tab';
+        view.isNewTabEnabled = !!data.remote_web_access?.can_create_session;
+        view.showRemoteWebAccessButton = view.isNewTabEnabled;
+        view.newTabWebAccessUrl = null;
+        view.newTabTooltipMessage = data.remote_web_access?.message || 'Remote web access unavailable';
+        view.deviceType = 'proxmox/cluster';
       }
     } else {
       view.isSameTabEnabled = false;
@@ -210,6 +220,8 @@ export class IconViewData {
   isNewTabEnabled: boolean;
   newTabTooltipMessage: string;
   newTabWebAccessUrl: string;
+  remoteWebAccess?: PrivateCloudRemoteWebAccessType;
+  showRemoteWebAccessButton?: boolean;
 
   canChangePassword: boolean;
   deviceType: string;

@@ -138,6 +138,7 @@ import {
   PublicCloudDatabaseSummaryMetric,
   PublicCloudDatabaseMonitoredCard,
   PublicCloudDbWorkloadRowResponse,
+  PublicCloudDbWorkloadApiResponse,
   PublicCloudDbWorkloadRow,
   PublicCloudDbQueryPerformanceResponse,
   PublicCloudDbQueryItem,
@@ -1887,10 +1888,11 @@ export class PublicCloudComputeDashboardService {
   /*
    * -----Start----- Instance Provisioning Summary Widget Related -------------------
    */
-  getInstanceProvisioningTable(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudProvisioningTableResponse> {
-    return this.http.get<PublicCloudProvisioningTableResponse>(PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
+  getInstanceProvisioningTable(criteria?: PublicCloudDashboardFilterCriteria, page = 1, pageSize = 10): Observable<PublicCloudProvisioningTableResponse> {
+    let params = this.convertFiltersToApiParams(criteria);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    return this.http.get<PublicCloudProvisioningTableResponse>(PUBLIC_CLOUD_INSTANCE_PROVISIONING_SUMMARY_ENDPOINT, { params });
   }
 
   getProvisioningReachability(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudProvisioningReachability> {
@@ -1935,6 +1937,13 @@ export class PublicCloudComputeDashboardService {
         daysSinceProvisioned: this.getNumberValue(row?.days_since_provisioned)
       };
     }).filter(row => !!row.instanceName);
+  }
+
+  getProvisioningTotal(data: PublicCloudProvisioningTableResponse | PublicCloudProvisioningRowResponse[]): number {
+    if (Array.isArray(data)) {
+      return data.length;
+    }
+    return Number(data?.count || 0) || this.getProvisioningResults(data).length;
   }
 
   convertToProvisioningSummaryMetrics(data: PublicCloudProvisioningSummaryMetricsResponse): PublicCloudProvisioningSummaryMetric[] {
@@ -2159,10 +2168,14 @@ export class PublicCloudComputeDashboardService {
   /*
    * -----Start----- Database - Performance and Utilization Widget Related -------------------
    */
-  getDbWorkload(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDbWorkloadRowResponse[]> {
-    return this.http.get<PublicCloudDbWorkloadRowResponse[]>(PUBLIC_CLOUD_DB_WORKLOAD_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
+  getDbWorkload(criteria?: PublicCloudDashboardFilterCriteria, search = '', page = 1, pageSize = 10): Observable<PublicCloudDbWorkloadApiResponse> {
+    let params = this.convertFiltersToApiParams(criteria);
+    if (search) {
+      params = params.set('search', search);
+    }
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    return this.http.get<PublicCloudDbWorkloadApiResponse>(PUBLIC_CLOUD_DB_WORKLOAD_ENDPOINT, { params });
   }
 
   getDbQueryPerformance(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDbQueryPerformanceResponse> {
@@ -2171,9 +2184,9 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  convertToDbWorkloadRows(rows: PublicCloudDbWorkloadRowResponse[], queryPerf: PublicCloudDbQueryPerformanceResponse): PublicCloudDbWorkloadRow[] {
+  convertToDbWorkloadRows(data: PublicCloudDbWorkloadApiResponse, queryPerf: PublicCloudDbQueryPerformanceResponse): PublicCloudDbWorkloadRow[] {
     const engineMap = this.getDbEngineMap(queryPerf);
-    return (rows || []).map(row => {
+    return this.getDbWorkloadResults(data).map(row => {
       const cpu = this.getNumberValue(row?.cpu_usage_system_percent);
       const memory = this.getNumberValue(row?.memory_used_percent);
       const usedGb = this.getNumberValue(row?.disk_used_gb);
@@ -2201,6 +2214,20 @@ export class PublicCloudComputeDashboardService {
         uptimeLabel: this.formatDbUptime(this.getNumberValue(row?.system_uptime_seconds))
       };
     }).filter(row => !!row.name);
+  }
+
+  getDbWorkloadTotal(data: PublicCloudDbWorkloadApiResponse): number {
+    if (Array.isArray(data)) {
+      return data.length;
+    }
+    return Number(data?.count || 0) || this.getDbWorkloadResults(data).length;
+  }
+
+  private getDbWorkloadResults(data: PublicCloudDbWorkloadApiResponse): PublicCloudDbWorkloadRowResponse[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return data?.results || data?.data || data?.items || [];
   }
 
   convertToDbCacheHitOptions(data: PublicCloudDbQueryItem[]): EChartsOption {

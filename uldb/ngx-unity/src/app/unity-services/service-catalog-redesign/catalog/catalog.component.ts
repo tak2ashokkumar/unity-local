@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { catalogListViewData, CatalogService } from './catalog.service';
-import { AddToCartPayload, CartViewData, CatalogDetail, CatalogFilterChoices, CatalogFilterOption, CatalogItem, ConfigurationField, ConfigurationViewData, ModalTab, OverviewViewData, PricingViewData, RequirementsViewData, SlaViewData } from './catalog.type';
+import { AddToCartPayload, CartLineViewData, CartViewData, CatalogDetail, CatalogFilterChoices, CatalogFilterOption, CatalogItem, ConfigurationField, ConfigurationViewData, ModalTab, OverviewViewData, PricingViewData, RequirementsViewData, SlaViewData } from './catalog.type';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -63,6 +63,8 @@ export class CatalogComponent implements OnInit {
   deletingItemUuid: string | null = null;
 
   effectivePrice = 0;
+
+  editingCartLine: CartLineViewData | null = null;
 
   isLoadingMore = false;
   hasMoreData = true;
@@ -250,7 +252,7 @@ export class CatalogComponent implements OnInit {
   }
 
   /** TODO: open/close the catalog item details modal */
-  openDetailsModal(catalogItem: CatalogItem, initialTab: string = 'overview'): void {
+  openDetailsModal(catalogItem: CatalogItem, initialTab: string = 'overview', editLine: CartLineViewData | null = null): void {
     this.selectedCatalogItem = catalogItem;
     this.isDetailsModalOpen = true;
     this.isDetailLoading = true;
@@ -259,6 +261,7 @@ export class CatalogComponent implements OnInit {
     this.configurationFields = [];
     this.configForm = null;
     this.multiSelectModel = {};
+    this.editingCartLine = editLine;   // NEW
 
     this.catalogService.getCatalogDetail(catalogItem.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       (detail) => {
@@ -270,27 +273,20 @@ export class CatalogComponent implements OnInit {
         this.slaData = this.catalogService.convertToSlaData(detail);
         this.requirementsData = this.catalogService.convertToRequirementsData(detail);
 
-        // ---- NEW: build configuration form ----
         this.configurationFields = detail.configuration || [];
-        this.configForm = this.buildConfigForm(this.configurationFields);
+        // NEW: pass existing cart config as overrides when editing
+        this.configForm = this.buildConfigForm(this.configurationFields, this.editingCartLine?.configuration);
 
-        this.configurationFields = detail.configuration || [];
-        this.configForm = this.buildConfigForm(this.configurationFields);
-
-        // Calculate initial price
-        this.quantity = detail.min_quantity && detail.min_quantity > 0
-          ? detail.min_quantity
-          : 1;
+        this.quantity = this.editingCartLine
+          ? (this.editingCartLine.quantity || 1)               // NEW: prefill qty when editing
+          : (detail.min_quantity && detail.min_quantity > 0 ? detail.min_quantity : 1);
 
         this.calculateEffectivePrice();
 
         this.configForm.valueChanges
           .pipe(takeUntil(this.ngUnsubscribe))
-          .subscribe(() => {
-            this.calculateEffectivePrice();
-          });
+          .subscribe(() => this.calculateEffectivePrice());
 
-        // After the DOM renders the sections, jump to requested tab
         setTimeout(() => this.scrollToSection(initialTab));
       },
       () => {
@@ -298,6 +294,14 @@ export class CatalogComponent implements OnInit {
         this.notification.error(new Notification('Failed to load catalog details'));
       }
     );
+  }
+
+  editCartItem(line: CartLineViewData, event: Event): void {
+    event.stopPropagation();
+    this.isCartPinned = false;
+
+    const pseudoCatalogItem = { uuid: line.catalogUuid, name: line.name } as CatalogItem;
+    this.openDetailsModal(pseudoCatalogItem, 'configuration', line);
   }
 
   private readonly FREQUENCY_FACTOR = {
@@ -366,6 +370,7 @@ export class CatalogComponent implements OnInit {
     this.multiSelectModel = {};
     this.activeModalTab = 'overview';
     this.quantity = 1;
+    this.editingCartLine = null;
   }
 
   // Sidebar link click -> smooth-scroll to that section, same as scrollToSection() in JS
@@ -444,24 +449,29 @@ export class CatalogComponent implements OnInit {
 
   // ================= CONFIGURATION FORM BUILDING =================
 
-  private buildConfigForm(fields: ConfigurationField[]): FormGroup {
+  private buildConfigForm(fields: ConfigurationField[], overrides?: { [key: string]: any }): FormGroup {
     const group: { [key: string]: any } = {};
 
     fields.forEach(field => {
       const validators = this.buildFieldValidators(field);
-      let defaultValue: any = field.default ?? null;
+      const hasOverride = overrides && Object.prototype.hasOwnProperty.call(overrides, field.key);
+      let defaultValue: any = hasOverride ? overrides[field.key] : (field.default ?? null);
 
       if (field.type === 'checkbox') {
-        defaultValue = field.default === true || field.default === 'true';
+        defaultValue = hasOverride ? !!overrides[field.key] : (field.default === true || field.default === 'true');
       } else if (field.type === 'multiselect') {
-        defaultValue = Array.isArray(field.default) ? field.default : [];
+        defaultValue = hasOverride
+          ? (Array.isArray(overrides[field.key]) ? overrides[field.key] : [])
+          : (Array.isArray(field.default) ? field.default : []);
         this.multiSelectModel[field.key] = defaultValue;
       } else if (field.type === 'number' || field.type === 'range') {
-        defaultValue = field.default != null && field.default !== ''
-          ? Number(field.default)
-          : (field.min != null ? field.min : 0);
+        defaultValue = hasOverride && overrides[field.key] !== '' && overrides[field.key] != null
+          ? Number(overrides[field.key])
+          : (field.default != null && field.default !== '' ? Number(field.default) : (field.min != null ? field.min : 0));
       } else {
-        defaultValue = field.default != null ? field.default : '';
+        defaultValue = hasOverride
+          ? overrides[field.key]
+          : (field.default != null ? field.default : '');
       }
 
       group[field.key] = this.fb.control(
@@ -554,16 +564,25 @@ export class CatalogComponent implements OnInit {
       effective_price: this.effectivePrice
     };
 
+    if (this.editingCartLine) {
+      this.catalogService.updateCartItem(this.editingCartLine.uuid, payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+        () => {
+          this.notification.success(new Notification('Cart updated successfully.'));
+          this.getCart();
+          this.closeDetailsModal();
+        },
+        () => this.notification.error(new Notification('Failed to update cart item. Please try again.'))
+      );
+      return;
+    }
+
     this.catalogService.addToCart(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       () => {
         this.notification.success(new Notification('Added to cart successfully.'));
         this.getCart();
-        // this.isCartPinned = true;
         this.closeDetailsModal();
       },
-      () => {
-        this.notification.error(new Notification('Failed to add to cart. Please try again.'));
-      }
+      () => this.notification.error(new Notification('Failed to add to cart. Please try again.'))
     );
   }
 
@@ -645,5 +664,12 @@ export class CatalogComponent implements OnInit {
 
   logoUrl(item: any): string | null {
     return item?.logo || null;
+  }
+
+  toggleCheckboxField(key: string): void {
+    const control = this.configForm.get(key);
+    if (!control) return;
+    control.setValue(!control.value);
+    control.markAsTouched();
   }
 }

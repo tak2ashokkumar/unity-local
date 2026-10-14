@@ -1091,6 +1091,8 @@ export const CREATE_AZURE_VM = (accountId: string) => `customer/azure/${accountI
 
 export const GET_AGENT_CONFIGURATIONS = () => `customer/agent/config/`;
 
+export const GET_AGENT_CONFIGURATION = (uuid: string) => `customer/agent/config/${uuid}/`;
+
 export const ADD_AGENT_CONFIGURATIONS = () => `customer/agent/config/`;
 
 export const DOWNLOAD_COLLECTOR = (type: string) => `customer/agent/config/download_collector/?type=${type}`;

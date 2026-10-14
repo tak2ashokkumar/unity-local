@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
-import { BuildingBlockListType, BuildingBlockViewData } from './unity-setup-finops.type';
+import { BuildingBlockListType, BuildingBlockViewData, RelatedServiceCatalog } from './unity-setup-finops.type';
 
 @Injectable()
 export class UnitySetupFinopsService {
@@ -55,6 +55,10 @@ export class UnitySetupFinopsService {
 
   delete(uuid: string) {
     return this.http.delete(`/customer/finops/building_blocks/${uuid}/`);
+  }
+
+  getRelatedServiceCatalogs(uuid: string): Observable<RelatedServiceCatalog[]> {
+    return this.http.get<RelatedServiceCatalog[]>(`/customer/finops/building_blocks/${uuid}/related_items/`);
   }
 
 }

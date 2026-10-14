@@ -109,14 +109,14 @@ export class UsiPcIntegrationWidgetComponent implements OnInit, OnDestroy {
 
   addEsxiPvtCloud() {
     // this.crudSvc.integratePrivateCloud(ServerSidePlatFormMapping.ESXI);
-    this.router.navigate(['esxi/add'], { relativeTo: this.route });
+    this.router.navigate(['pc-esxi/add'], { relativeTo: this.route });
   }
 
   goToEsxiViewDetails() {
     if (!this.privateClouds.esxi.length) {
       return;
     }
-    this.router.navigate(['/unitycloud/devices/cloudcontrollers/']);
+    this.router.navigate(['pc-esxi'], { relativeTo: this.route });
   }
 
   addVcloudPvtCloud() {

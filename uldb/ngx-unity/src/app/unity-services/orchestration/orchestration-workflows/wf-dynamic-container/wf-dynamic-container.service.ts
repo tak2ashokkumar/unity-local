@@ -13,6 +13,7 @@ import { AppLevelService } from 'src/app/app-level.service';
 import { WorkflowLogs } from '../../orchestration-executions/orchestration-executions-workflow-logs/orchestration-executions-workflow-logs.type';
 import { WorkflowLogsViewData } from '../../orchestration-executions/orchestration-executions-workflow-logs/orchestration-executions-workflow-logs.service';
 import { ORCHESTRATION_EXECUTION_AGENTIC_WORKFLOW_OUTPUT } from 'src/app/shared/api-endpoint.const';
+import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,12 @@ export class WfDynamicContainerService {
 
   getSupportedLLMConfigs(): Observable<any> {
     return this.http.get(`/mcp/get-supported-llm-configs/?is_user_owned=true`);
+  }
+
+  getWorkflowCategories(): Observable<{ categories: string[] }> {
+    return this.http.get<{ categories: string[] }>(
+      '/api/orchestration/v1/dynamic_workflows/categories/'
+    );
   }
 
 
@@ -63,10 +70,19 @@ export class WfDynamicContainerService {
     return this.http.get<any>(`api/orchestration/v1/dynamic_workflows/${workflowId}/`);
   }
 
-  getWorkflowExecutions(workflowId: string): Observable<WorkflowExecution[]> {
-    return this.http.get<WorkflowExecution[]>(`/rest/orchestration/agentic_workflow/${workflowId}/history/`, {
-      params: new HttpParams().set('page_size', '0')
-    });
+  getWorkflowExecutions(
+    workflowId: string,
+    page: number,
+    pageSize: number
+  ): Observable<PaginatedResult<WorkflowExecution>> {
+    return this.http.get<PaginatedResult<WorkflowExecution>>(
+      `/rest/orchestration/agentic_workflow/${workflowId}/history/`,
+      {
+        params: new HttpParams()
+          .set('page', page.toString())
+          .set('page_size', pageSize.toString())
+      }
+    );
   }
 
   getWorkflowExecution(executionId: string): Observable<WorkflowExecution> {
@@ -159,12 +175,14 @@ export class WfDynamicContainerService {
       let form = this.builder.group({
         'name': [d.name, [Validators.required]],
         'description': [d.description ? d.description : ''],
+        'category': [d.category || 'Other', [Validators.required]],
       })
       return form;
     } else {
       return this.builder.group({
         'name': ['', [Validators.required]],
         'description': [''],
+        'category': ['Other', [Validators.required]],
       })
     }
   }
@@ -192,6 +210,7 @@ export class WfDynamicContainerService {
     }
     a.name = d.name;
     a.description = d.description;
+    a.category = d.category;
     return a;
   }
 

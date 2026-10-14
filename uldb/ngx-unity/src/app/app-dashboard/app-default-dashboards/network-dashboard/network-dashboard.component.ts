@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -174,6 +175,7 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     private svc: NetworkDashboardService,
     private router: Router,
     private route: ActivatedRoute,
+    private location: Location,
     private alertDetailSvc: AimlAlertDetailsService,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
@@ -241,22 +243,25 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  getNetworkOverview() {
+  getNetworkOverview(hideWhenEmpty = true) {
     this.isNetworkOverviewLoading = true;
     this.networkOverviewViewData = this.networkOverviewViewData || new NetworkOverviewViewData();
     this.startLoader(this.loaderNames.networkOverview);
     this.svc.getNetworkOverview(this.appliedFilters).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.networkOverviewViewData = this.svc.convertToNetworkOverviewViewData(res);
+      this.networkOverviewViewData = !hideWhenEmpty || this.hasMeaningfulWidgetValue(res)
+        ? this.svc.convertToNetworkOverviewViewData(res)
+        : null;
       this.isNetworkOverviewLoading = false;
       this.stopLoader(this.loaderNames.networkOverview);
     }, (_err: HttpErrorResponse) => {
+      this.networkOverviewViewData = null;
       this.isNetworkOverviewLoading = false;
       this.stopLoader(this.loaderNames.networkOverview);
       this.notification.error(new Notification('Failed to load Network Overview widget data. Try again later.'));
     });
   }
 
-  getTopConversations() {
+  getTopConversations(hideWhenEmpty = true) {
     this.isTopConversationsLoading = true;
     this.topConversationsWidgetViewData = this.topConversationsWidgetViewData || new TopConversationsWidgetViewData();
     this.startLoader(this.loaderNames.topConversations);
@@ -265,18 +270,21 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       this.getTopConversationOrdering(),
       this.topConversationsSearch
     ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.topConversationsWidgetViewData = this.svc.convertToTopConversationsViewDataFromTable(res);
+      this.topConversationsWidgetViewData = !hideWhenEmpty || this.hasMeaningfulWidgetValue(res)
+        ? this.svc.convertToTopConversationsViewDataFromTable(res)
+        : null;
       this.initializeTopConversationSortState();
       this.isTopConversationsLoading = false;
       this.stopLoader(this.loaderNames.topConversations);
     }, (_err: HttpErrorResponse) => {
+      this.topConversationsWidgetViewData = null;
       this.isTopConversationsLoading = false;
       this.stopLoader(this.loaderNames.topConversations);
       this.notification.error(new Notification('Failed to load Top 10 Conversations widget data. Try again later.'));
     });
   }
 
-  getPerformanceWorkloadInsights() {
+  getPerformanceWorkloadInsights(hideWhenEmpty = true) {
     this.isPerformanceWorkloadLoading = true;
     this.performanceWorkloadInsightsViewData = this.performanceWorkloadInsightsViewData || new PerformanceWorkloadInsightsWidgetViewData();
     this.startLoader(this.loaderNames.performanceWorkload);
@@ -285,18 +293,21 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       this.getPerformanceWorkloadOrdering(),
       this.performanceWorkloadSearch
     ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.performanceWorkloadInsightsViewData = this.svc.convertToPerformanceWorkloadViewDataFromTable(res);
+      this.performanceWorkloadInsightsViewData = !hideWhenEmpty || this.hasMeaningfulWidgetValue(res)
+        ? this.svc.convertToPerformanceWorkloadViewDataFromTable(res)
+        : null;
       this.initializePerformanceWorkloadSortState();
       this.isPerformanceWorkloadLoading = false;
       this.stopLoader(this.loaderNames.performanceWorkload);
     }, (_err: HttpErrorResponse) => {
+      this.performanceWorkloadInsightsViewData = null;
       this.isPerformanceWorkloadLoading = false;
       this.stopLoader(this.loaderNames.performanceWorkload);
       this.notification.error(new Notification('Failed to load Performance / Workload Insights widget data. Try again later.'));
     });
   }
 
-  getInterfaceHealthMetrics() {
+  getInterfaceHealthMetrics(hideWhenEmpty = true) {
     this.isInterfaceHealthMetricsLoading = true;
     this.interfaceHealthMetricsViewData = this.interfaceHealthMetricsViewData || new InterfaceHealthMetricsWidgetViewData();
     this.startLoader(this.loaderNames.interfaceHealthMetrics);
@@ -305,18 +316,21 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       this.getInterfaceHealthMetricsOrdering(),
       this.interfaceHealthMetricsSearch
     ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.interfaceHealthMetricsViewData = this.svc.convertToInterfaceHealthMetricsViewDataFromTable(res);
+      this.interfaceHealthMetricsViewData = !hideWhenEmpty || this.hasMeaningfulWidgetValue(res)
+        ? this.svc.convertToInterfaceHealthMetricsViewDataFromTable(res)
+        : null;
       this.initializeInterfaceHealthMetricsSortState();
       this.isInterfaceHealthMetricsLoading = false;
       this.stopLoader(this.loaderNames.interfaceHealthMetrics);
     }, (_err: HttpErrorResponse) => {
+      this.interfaceHealthMetricsViewData = null;
       this.isInterfaceHealthMetricsLoading = false;
       this.stopLoader(this.loaderNames.interfaceHealthMetrics);
       this.notification.error(new Notification('Failed to load Interface Health & Metrics widget data. Try again later.'));
     });
   }
 
-  getNetworkDeviceAvailability() {
+  getNetworkDeviceAvailability(hideWhenEmpty = true) {
     this.isNetworkDeviceAvailabilityLoading = true;
     this.networkDeviceAvailabilityViewData = this.networkDeviceAvailabilityViewData || new NetworkDeviceAvailabilityWidgetViewData();
     this.startLoader(this.loaderNames.networkDeviceAvailability);
@@ -342,26 +356,31 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
         emptyNetworkDeviceAvailabilityTable
       )))
     }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.networkDeviceAvailabilityViewData = this.svc.convertToNetworkDeviceAvailabilityViewDataFromTable(
-        res.chartData,
-        res.lowestAvailability
-      );
-      this.networkDeviceAvailabilityViewData = this.svc.applyNetworkDeviceAvailabilityTableData(
-        this.networkDeviceAvailabilityViewData,
-        res.tableData
-      );
+      if (!hideWhenEmpty || this.hasMeaningfulWidgetValue(res)) {
+        this.networkDeviceAvailabilityViewData = this.svc.convertToNetworkDeviceAvailabilityViewDataFromTable(
+          res.chartData,
+          res.lowestAvailability
+        );
+        this.networkDeviceAvailabilityViewData = this.svc.applyNetworkDeviceAvailabilityTableData(
+          this.networkDeviceAvailabilityViewData,
+          res.tableData
+        );
+      } else {
+        this.networkDeviceAvailabilityViewData = null;
+      }
       this.manufacturerModelLegendPage = 0;
       this.deviceTypeLegendPage = 0;
       this.isNetworkDeviceAvailabilityLoading = false;
       this.stopLoader(this.loaderNames.networkDeviceAvailability);
     }, (_err: HttpErrorResponse) => {
+      this.networkDeviceAvailabilityViewData = null;
       this.isNetworkDeviceAvailabilityLoading = false;
       this.stopLoader(this.loaderNames.networkDeviceAvailability);
       this.notification.error(new Notification('Failed to load Network Device Availability widget data. Try again later.'));
     });
   }
 
-  getEnvironmentalHealthSummary() {
+  getEnvironmentalHealthSummary(hideWhenEmpty = true) {
     this.isEnvironmentalHealthSummaryLoading = true;
     this.environmentalHealthSummaryViewData = this.environmentalHealthSummaryViewData || new EnvironmentalHealthSummaryWidgetViewData();
     this.startLoader(this.loaderNames.environmentalHealthSummary);
@@ -387,19 +406,24 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
         emptyEnvironmentalTable
       )))
     }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      const view = this.svc.convertToEnvironmentalHealthSummaryViewDataFromTable(res.chartData);
-      this.environmentalHealthSummaryViewData = this.svc.applyEnvironmentalHealthSummaryTableData(view, res.tableData);
+      if (!hideWhenEmpty || this.hasMeaningfulWidgetValue(res)) {
+        const view = this.svc.convertToEnvironmentalHealthSummaryViewDataFromTable(res.chartData);
+        this.environmentalHealthSummaryViewData = this.svc.applyEnvironmentalHealthSummaryTableData(view, res.tableData);
+      } else {
+        this.environmentalHealthSummaryViewData = null;
+      }
       this.initializeEnvironmentalHealthSummarySortState();
       this.isEnvironmentalHealthSummaryLoading = false;
       this.stopLoader(this.loaderNames.environmentalHealthSummary);
     }, (_err: HttpErrorResponse) => {
+      this.environmentalHealthSummaryViewData = null;
       this.isEnvironmentalHealthSummaryLoading = false;
       this.stopLoader(this.loaderNames.environmentalHealthSummary);
       this.notification.error(new Notification('Failed to load Environmental Health Summary widget data. Try again later.'));
     });
   }
 
-  getLoadBalancerHealth() {
+  getLoadBalancerHealth(hideWhenEmpty = true) {
     this.isLoadBalancerHealthLoading = true;
     this.loadBalancerHealthViewData = this.loadBalancerHealthViewData || new LoadBalancerHealthWidgetViewData();
     this.startLoader(this.loaderNames.loadBalancerHealth);
@@ -426,19 +450,24 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
         emptyLoadBalancerHealthTable
       )))
     }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.loadBalancerHealthViewData = this.svc.convertToLoadBalancerHealthViewDataFromTable(res.chartData);
-      this.loadBalancerHealthViewData = this.svc.applyLoadBalancerHealthTableData(this.loadBalancerHealthViewData, res.tableData);
+      if (!hideWhenEmpty || this.hasMeaningfulWidgetValue(res)) {
+        this.loadBalancerHealthViewData = this.svc.convertToLoadBalancerHealthViewDataFromTable(res.chartData);
+        this.loadBalancerHealthViewData = this.svc.applyLoadBalancerHealthTableData(this.loadBalancerHealthViewData, res.tableData);
+      } else {
+        this.loadBalancerHealthViewData = null;
+      }
       this.initializeLoadBalancerHealthSortState();
       this.isLoadBalancerHealthLoading = false;
       this.stopLoader(this.loaderNames.loadBalancerHealth);
     }, (_err: HttpErrorResponse) => {
+      this.loadBalancerHealthViewData = null;
       this.isLoadBalancerHealthLoading = false;
       this.stopLoader(this.loaderNames.loadBalancerHealth);
       this.notification.error(new Notification('Failed to load Load Balancer Health widget data. Try again later.'));
     });
   }
 
-  getPduHealth() {
+  getPduHealth(hideWhenEmpty = true) {
     this.isPduHealthLoading = true;
     this.pduHealthViewData = this.pduHealthViewData || new PduHealthWidgetViewData();
     this.startLoader(this.loaderNames.pduHealth);
@@ -463,19 +492,24 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
         emptyPduHealthTable
       )))
     }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.pduHealthViewData = this.svc.convertToPduHealthViewDataFromTable(res.chartData);
-      this.pduHealthViewData = this.svc.applyPduHealthTableData(this.pduHealthViewData, res.tableData);
+      if (!hideWhenEmpty || this.hasMeaningfulWidgetValue(res)) {
+        this.pduHealthViewData = this.svc.convertToPduHealthViewDataFromTable(res.chartData);
+        this.pduHealthViewData = this.svc.applyPduHealthTableData(this.pduHealthViewData, res.tableData);
+      } else {
+        this.pduHealthViewData = null;
+      }
       this.initializePduHealthSortState();
       this.isPduHealthLoading = false;
       this.stopLoader(this.loaderNames.pduHealth);
     }, (_err: HttpErrorResponse) => {
+      this.pduHealthViewData = null;
       this.isPduHealthLoading = false;
       this.stopLoader(this.loaderNames.pduHealth);
       this.notification.error(new Notification('Failed to load PDU Health widget data. Try again later.'));
     });
   }
 
-  getAlertEventsView() {
+  getAlertEventsView(hideWhenEmpty = true) {
     this.isAlertEventsLoading = true;
     this.alertEventsViewData = this.alertEventsViewData || new AlertEventsViewWidgetViewData();
     this.startLoader(this.loaderNames.alertEvents);
@@ -493,33 +527,41 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       alertStats: this.svc.getAlertStats(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Alert Stats data. Showing available Alert & Events data.', emptyAlertStats))),
       topCriticalAlerts: this.svc.getTopCriticalAlerts(this.appliedFilters).pipe(catchError(() => this.handleWidgetApiError('Failed to load Top 10 Critical Alerts data. Showing available Alert & Events data.', emptyTopCriticalAlerts)))
     }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.alertEventsViewData = this.svc.convertToAlertEventsViewData(
-        res.summary,
-        res.alertsBySeverity,
-        res.alertsByDeviceType,
-        res.openItsmTickets,
-        res.alertStats,
-        res.topCriticalAlerts
-      );
-      this.initializeAlertEventsSortState();
+      if (!hideWhenEmpty || this.hasMeaningfulWidgetValue(res)) {
+        this.alertEventsViewData = this.svc.convertToAlertEventsViewData(
+          res.summary,
+          res.alertsBySeverity,
+          res.alertsByDeviceType,
+          res.openItsmTickets,
+          res.alertStats,
+          res.topCriticalAlerts
+        );
+        this.initializeAlertEventsSortState();
+      } else {
+        this.alertEventsViewData = null;
+      }
       this.isAlertEventsLoading = false;
       this.stopLoader(this.loaderNames.alertEvents);
     }, (_err: HttpErrorResponse) => {
+      this.alertEventsViewData = null;
       this.isAlertEventsLoading = false;
       this.stopLoader(this.loaderNames.alertEvents);
       this.notification.error(new Notification('Failed to load Alert & Events View widget data. Try again later.'));
     });
   }
 
-  getAutoRemediationSummary() {
+  getAutoRemediationSummary(hideWhenEmpty = true) {
     this.isAutoRemediationSummaryLoading = true;
     this.autoRemediationSummaryViewData = this.autoRemediationSummaryViewData || new AutoRemediationSummaryWidgetViewData();
     this.startLoader(this.loaderNames.autoRemediationSummary);
     this.svc.getAutoRemediationSummary(this.appliedFilters).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.autoRemediationSummaryViewData = this.svc.convertToAutoRemediationSummaryViewData(res);
+      this.autoRemediationSummaryViewData = !hideWhenEmpty || this.hasMeaningfulWidgetValue(res)
+        ? this.svc.convertToAutoRemediationSummaryViewData(res)
+        : null;
       this.isAutoRemediationSummaryLoading = false;
       this.stopLoader(this.loaderNames.autoRemediationSummary);
     }, (_err: HttpErrorResponse) => {
+      this.autoRemediationSummaryViewData = null;
       this.isAutoRemediationSummaryLoading = false;
       this.stopLoader(this.loaderNames.autoRemediationSummary);
       this.notification.error(new Notification('Failed to load Auto-Remediation Summary widget data. Try again later.'));
@@ -560,18 +602,18 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   onNetworkDeviceAvailabilitySearched(value: string) {
     this.networkDeviceAvailabilitySearch = value || '';
     this.networkDeviceAvailabilityPageNo = 1;
-    this.getNetworkDeviceAvailability();
+    this.getNetworkDeviceAvailability(false);
   }
 
   onNetworkDeviceAvailabilityPageChanged(pageNo: number) {
     this.networkDeviceAvailabilityPageNo = pageNo || 1;
-    this.getNetworkDeviceAvailability();
+    this.getNetworkDeviceAvailability(false);
   }
 
   onNetworkDeviceAvailabilityPageSizeChanged(pageSize: number) {
     this.networkDeviceAvailabilityPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
     this.networkDeviceAvailabilityPageNo = 1;
-    this.getNetworkDeviceAvailability();
+    this.getNetworkDeviceAvailability(false);
   }
 
   onNetworkDeviceAvailabilityTableSorted(event: ColumnSortedEvent) {
@@ -584,7 +626,7 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortDirection: event.sortDirection
     };
     this.networkDeviceAvailabilityPageNo = 1;
-    this.getNetworkDeviceAvailability();
+    this.getNetworkDeviceAvailability(false);
   }
 
   getNetworkDeviceAvailabilitySortDirection(sortColumn: string): string {
@@ -605,18 +647,18 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   onEnvironmentalHealthSummarySearched(value: string) {
     this.environmentalHealthSummarySearch = value || '';
     this.environmentalHealthSummaryPageNo = 1;
-    this.getEnvironmentalHealthSummary();
+    this.getEnvironmentalHealthSummary(false);
   }
 
   onEnvironmentalHealthSummaryPageChanged(pageNo: number) {
     this.environmentalHealthSummaryPageNo = pageNo || 1;
-    this.getEnvironmentalHealthSummary();
+    this.getEnvironmentalHealthSummary(false);
   }
 
   onEnvironmentalHealthSummaryPageSizeChanged(pageSize: number) {
     this.environmentalHealthSummaryPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
     this.environmentalHealthSummaryPageNo = 1;
-    this.getEnvironmentalHealthSummary();
+    this.getEnvironmentalHealthSummary(false);
   }
 
   setLoadBalancerHealthViewMode(mode: 'table' | 'chart') {
@@ -626,18 +668,18 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   onLoadBalancerHealthSearched(value: string) {
     this.loadBalancerHealthSearch = value || '';
     this.loadBalancerHealthPageNo = 1;
-    this.getLoadBalancerHealth();
+    this.getLoadBalancerHealth(false);
   }
 
   onLoadBalancerHealthPageChanged(pageNo: number) {
     this.loadBalancerHealthPageNo = pageNo || 1;
-    this.getLoadBalancerHealth();
+    this.getLoadBalancerHealth(false);
   }
 
   onLoadBalancerHealthPageSizeChanged(pageSize: number) {
     this.loadBalancerHealthPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
     this.loadBalancerHealthPageNo = 1;
-    this.getLoadBalancerHealth();
+    this.getLoadBalancerHealth(false);
   }
 
   onLoadBalancerHealthTableSorted(event: ColumnSortedEvent) {
@@ -650,7 +692,7 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortDirection: event.sortDirection
     };
     this.loadBalancerHealthPageNo = 1;
-    this.getLoadBalancerHealth();
+    this.getLoadBalancerHealth(false);
   }
 
   getLoadBalancerHealthSortDirection(sortColumn: string): string {
@@ -671,18 +713,18 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
   onPduHealthSearched(value: string) {
     this.pduHealthSearch = value || '';
     this.pduHealthPageNo = 1;
-    this.getPduHealth();
+    this.getPduHealth(false);
   }
 
   onPduHealthPageChanged(pageNo: number) {
     this.pduHealthPageNo = pageNo || 1;
-    this.getPduHealth();
+    this.getPduHealth(false);
   }
 
   onPduHealthPageSizeChanged(pageSize: number) {
     this.pduHealthPageSize = pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
     this.pduHealthPageNo = 1;
-    this.getPduHealth();
+    this.getPduHealth(false);
   }
 
   onPduHealthTableSorted(event: ColumnSortedEvent) {
@@ -695,7 +737,7 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortDirection: event.sortDirection
     };
     this.pduHealthPageNo = 1;
-    this.getPduHealth();
+    this.getPduHealth(false);
   }
 
   getPduHealthSortDirection(sortColumn: string): string {
@@ -718,12 +760,12 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortColumn: event.sortColumn,
       sortDirection: event.sortDirection
     };
-    this.getTopConversations();
+    this.getTopConversations(false);
   }
 
   onTopConversationsSearched(value: string) {
     this.topConversationsSearch = value || '';
-    this.getTopConversations();
+    this.getTopConversations(false);
   }
 
   getVisibleTopConversationRows() {
@@ -746,12 +788,12 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortColumn: event.sortColumn,
       sortDirection: event.sortDirection
     };
-    this.getPerformanceWorkloadInsights();
+    this.getPerformanceWorkloadInsights(false);
   }
 
   onPerformanceWorkloadSearched(value: string) {
     this.performanceWorkloadSearch = value || '';
-    this.getPerformanceWorkloadInsights();
+    this.getPerformanceWorkloadInsights(false);
   }
 
   getVisiblePerformanceWorkloadRows() {
@@ -775,13 +817,13 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortDirection: event.sortDirection
     };
     this.interfaceHealthMetricsPageNo = 1;
-    this.getInterfaceHealthMetrics();
+    this.getInterfaceHealthMetrics(false);
   }
 
   onInterfaceHealthMetricsSearched(value: string) {
     this.interfaceHealthMetricsSearch = value || '';
     this.interfaceHealthMetricsPageNo = 1;
-    this.getInterfaceHealthMetrics();
+    this.getInterfaceHealthMetrics(false);
   }
 
   onInterfaceHealthMetricsPageChanged(pageNo: number) {
@@ -816,7 +858,7 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       sortDirection: event.sortDirection
     };
     this.environmentalHealthSummaryPageNo = 1;
-    this.getEnvironmentalHealthSummary();
+    this.getEnvironmentalHealthSummary(false);
   }
 
   getEnvironmentalHealthSummarySortDirection(sortColumn: string): string {
@@ -992,6 +1034,58 @@ export class NetworkDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     this.alertDetailSvc.showAlertDetails(uuid);
+  }
+
+  showMoreCriticalAlerts() {
+    const routeUrl = this.router.serializeUrl(this.router.createUrlTree(['/services/aiml-event-mgmt/alerts']));
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+
+  private hasMeaningfulWidgetValue(value: unknown, key = ''): boolean {
+    if (value === null || value === undefined) {
+      return false;
+    }
+
+    if (this.isNonDisplayMetricKey(key)) {
+      return false;
+    }
+
+    if (typeof value === 'number') {
+      return Number.isFinite(value) && value !== 0;
+    }
+
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (Array.isArray(value)) {
+      return value.some(item => this.hasMeaningfulWidgetValue(item));
+    }
+
+    if (typeof value === 'object') {
+      return Object.keys(value as { [key: string]: unknown })
+        .some(childKey => this.hasMeaningfulWidgetValue((value as { [key: string]: unknown })[childKey], childKey));
+    }
+
+    return false;
+  }
+
+  private isNonDisplayMetricKey(key: string): boolean {
+    return [
+      'id',
+      'uuid',
+      'next',
+      'previous',
+      'page',
+      'pageSize',
+      'filterOptions',
+      'filters',
+      'lat',
+      'long',
+      'latitude',
+      'longitude'
+    ].indexOf(key) > -1;
   }
 
   private handleWidgetApiError<T>(message: string, fallback: T) {

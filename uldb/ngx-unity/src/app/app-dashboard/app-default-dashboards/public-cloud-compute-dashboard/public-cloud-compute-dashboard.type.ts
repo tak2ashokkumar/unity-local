@@ -461,6 +461,17 @@ export interface PublicCloudDbWorkloadRowResponse {
   system_uptime_seconds?: number;
 }
 
+export interface PublicCloudDbWorkloadTableResponse {
+  count?: string | number;
+  next?: string | null;
+  previous?: string | null;
+  results?: PublicCloudDbWorkloadRowResponse[];
+  data?: PublicCloudDbWorkloadRowResponse[];
+  items?: PublicCloudDbWorkloadRowResponse[];
+}
+
+export type PublicCloudDbWorkloadApiResponse = PublicCloudDbWorkloadTableResponse | PublicCloudDbWorkloadRowResponse[];
+
 export interface PublicCloudDbWorkloadRow {
   name: string;
   engine: string;

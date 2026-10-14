@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { OrchestrationIntegrationDetailsActivitylogsService } from './orchestration-integration-details-activitylogs.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,11 +23,20 @@ export class OrchestrationIntegrationDetailsActivitylogsComponent implements OnI
   currentCriteria: SearchCriteria;
   count: number = 0;
 
-  constructor(private svc: OrchestrationIntegrationDetailsActivitylogsService,
+  private integrationDetailsReturnUrl: string;
+  private integrationReturnUrl: string;
+
+  constructor(private location: Location,
+    private svc: OrchestrationIntegrationDetailsActivitylogsService,
     private route: ActivatedRoute,
     private router: Router,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService) {
+    const navigation = this.router.getCurrentNavigation();
+    const navigationState = navigation ? navigation.extras.state : this.location.getState();
+    this.integrationDetailsReturnUrl = navigationState?.['integrationDetailsReturnUrl'] || ('/services/orchestration/integration/' + encodeURIComponent(this.route.snapshot.paramMap.get('repoId')) + '/details');
+    this.integrationReturnUrl = navigationState?.['integrationReturnUrl'] || '/services/orchestration/integration';
+
     this.route.paramMap.subscribe(params => this.scriptId = params.get('scriptId'));
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
   }
@@ -81,7 +91,7 @@ export class OrchestrationIntegrationDetailsActivitylogsComponent implements OnI
   }
 
   goBack() {
-    this.router.navigate(['../../'], { relativeTo: this.route });
+    this.router.navigateByUrl(this.integrationDetailsReturnUrl, { state: { integrationReturnUrl: this.integrationReturnUrl } });
   }
 
 }

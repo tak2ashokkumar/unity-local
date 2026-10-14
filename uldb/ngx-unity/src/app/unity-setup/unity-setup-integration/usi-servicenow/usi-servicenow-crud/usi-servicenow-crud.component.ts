@@ -3,19 +3,18 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { isString } from 'lodash-es';
-import { Subject, Subscription, from } from 'rxjs';
-import { mergeMap, takeUntil } from 'rxjs/operators';
+import { forkJoin, of, Subject, Subscription } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { ServiceNowAttribute, ServiceNowResourceType, ServicenowAccount, ServicenowAccountUnityOneDeviceType, UnityResourceType } from '../usi-servicenow.type';
+import { ServiceNowResourceType, ServicenowAccount, ServicenowAccountUnityOneDeviceType } from '../usi-servicenow.type';
 import { ServiceNowAuthTypeChoices, UnityDeviceTypeList, UsiServicenowCrudService } from './usi-servicenow-crud.service';
 import { AWSAccountType, AwsResourceDetailsType } from 'src/app/shared/SharedEntityTypes/aws.type';
 import { AzureManageAccountsType, AzureResourceDetailsType } from 'src/app/shared/SharedEntityTypes/azure.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { UnityScheduleService } from 'src/app/shared/unity-schedule/unity-schedule.service';
-import { add } from 'ngx-bootstrap/chronos';
 
 @Component({
   selector: 'usi-servicenow-crud',
@@ -38,8 +37,7 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
   activeForm: string = 'integrationForm';
   nonFieldErr: string = '';
 
-  unityDeviceTypes: ServicenowAccountUnityOneDeviceType[] = UnityDeviceTypeList;
-  publicCloudServices: UnityResourceType[] = UnityDeviceTypeList;
+  unityDeviceTypes: ServicenowAccountUnityOneDeviceType[] = UnityDeviceTypeList.map(deviceType => Object.assign({}, deviceType));
   authTypeChoices: { label: string; value: string }[] = ServiceNowAuthTypeChoices;
   serviceNowResources: ServiceNowResourceType[] = [];
   awsAccountData: AWSAccountType[] = [];
@@ -55,6 +53,7 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
   sectionOpenStates: boolean[] = [false];
 
   collectors: DeviceDiscoveryAgentConfigurationType[] = [];
+  private unityAttributesLoaded = false;
 
   constructor(private crudSvc: UsiServicenowCrudService,
     private svc: UsiServicenowCrudService,
@@ -72,7 +71,6 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.start('main');
-    this.getUnityAttributesByDeviceType();
     this.getAwsAccounts();
     this.getAzureAccounts();
     if (this.instanceId) {
@@ -398,7 +396,7 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
   getServiceNowAttributesByResourceType(resourceTypeValue: string, resourceTypeIndex?: number) {
     let instanceId = this.instanceId ? this.instanceId : (this.instanceData ? this.instanceData.uuid : null);
     let idx = this.serviceNowResources.findIndex((r: ServiceNowResourceType) => r.value == resourceTypeValue);
-    if (idx != -1 && !(this.serviceNowResources[idx].attrs && this.serviceNowResources[idx].attrs.length)) {
+    if (idx != -1 && !this.serviceNowResources[idx].attrs) {
       this.svc.getServiceNowAttributesByResource(instanceId, this.serviceNowResources[idx]).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
         this.spinner.stop('main');
         if (this.configurationForm) {
@@ -410,7 +408,42 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
     }
   }
 
+  private areServiceNowResourceAttributesLoaded(instance: ServicenowAccount): boolean {
+    return instance.resource_types.every(resourceType => {
+      const serviceNowResource = this.serviceNowResources.find(resource => resource.value == resourceType.resource_type);
+      return !serviceNowResource || !!serviceNowResource.attrs;
+    });
+  }
+
+  private loadServiceNowResourceAttributes(instance: ServicenowAccount, onComplete: () => void): void {
+    const instanceId = this.instanceId ? this.instanceId : instance.uuid;
+    const resources = instance.resource_types
+      .map(resourceType => this.serviceNowResources.find(resource => resource.value == resourceType.resource_type))
+      .filter((resource): resource is ServiceNowResourceType => !!resource && !resource.attrs);
+
+    if (!resources.length) {
+      onComplete();
+      return;
+    }
+
+    forkJoin(resources.map(resource =>
+      this.svc.getServiceNowAttributesByResource(instanceId, resource).pipe(catchError(() => { resource.attrs = []; return of(resource); }))
+    ))
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(() => onComplete());
+  }
+
   buildConfigurationForm(instance?: ServicenowAccount) {
+    if (!this.unityAttributesLoaded) {
+      this.getUnityAttributesByDeviceType(() => this.buildConfigurationForm(instance));
+      return;
+    }
+
+    if (instance && instance.resource_types && !this.areServiceNowResourceAttributesLoaded(instance)) {
+      this.loadServiceNowResourceAttributes(instance, () => this.buildConfigurationForm(instance));
+      return;
+    }
+
     this.nonFieldErr = '';
     this.configurationForm = this.svc.buildConfigurationForm(instance, this.unityDeviceTypes, this.serviceNowResources, this.allAwsResourceTypeData, this.allAzureResourceTypeData);
     this.configurationFormErrors = this.svc.resetConfigurationFormErrors();
@@ -451,22 +484,26 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
     return (this.configurationForm.get('resource_types') as FormArray).at(length).get('attribute_mapping') as FormArray;
   }
 
-  getUnityAttributesByDeviceType() {
-    from(this.unityDeviceTypes).pipe(
-      mergeMap((dt) => this.svc.getUnityAttributesByDeviceType(dt)),
-      takeUntil(this.ngUnsubscribe))
-      .subscribe(res => { },
-        err => console.log(err)
-      )
-  }
+  getUnityAttributesByDeviceType(onComplete?: () => void) {
+    if (this.unityAttributesLoaded) {
+      if (onComplete) {
+        onComplete();
+      }
+      return;
+    }
 
-  getPublicCloudServicesByCloudType() {
-    from(this.unityDeviceTypes).pipe(
-      mergeMap((dt) => this.svc.getUnityAttributesByDeviceType(dt)),
-      takeUntil(this.ngUnsubscribe))
-      .subscribe(res => { },
-        err => console.log(err)
-      )
+    forkJoin(this.unityDeviceTypes.map(deviceType =>
+      this.svc.getUnityAttributesByDeviceType(deviceType).pipe(catchError(() => { 
+        deviceType.inbound = []; 
+        deviceType.outbound = []; 
+        return of(deviceType); 
+      }))
+    )).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.unityAttributesLoaded = true;
+        if (onComplete) {
+          onComplete();
+        }
+      });
   }
 
   onSelectServiceNowResourceType(index: number, event: any) {
@@ -476,7 +513,7 @@ export class UsiServicenowCrudComponent implements OnInit, OnDestroy {
     this.addAttributeMapping(index, 0, true);
     
     let selectedResourceType = this.serviceNowResources.find(sr => sr.value == resourceType.value)
-    if(!(selectedResourceType.attrs && selectedResourceType.attrs.length)){
+    if(!selectedResourceType.attrs){
       let instanceId = this.instanceId ? this.instanceId : (this.instanceData ? this.instanceData.uuid : null);
       this.svc.getServiceNowAttributesByResource(instanceId, selectedResourceType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
         this.spinner.stop('main');

@@ -1,0 +1,280 @@
+<div class="card shadow-sm">
+
+    <!-- Row 1: count + title + actions + refresh -->
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+        <div class="d-flex align-items-center font-500">
+            <span class="badge badge-secondary badge-pill font-sm px-2">{{ count }}</span>
+            <span class="ml-2 font-lg font-weight-bold">{{ title }}</span>
+        </div>
+        <div class="d-flex align-items-center">
+            <ng-container *ngFor="let action of headerActions">
+                <button *ngIf="action.visible !== false" type="button" class="ct-btn mr-2"
+                    [ngClass]="action.btnClass || 'ct-btn-primary'" (click)="onHeaderActionClick(action.id)">
+                    <i *ngIf="action.icon" [class]="action.icon" class="mr-1"></i>{{ action.label }}
+                </button>
+            </ng-container>
+            <button class="ct-icon-btn" type="button" tooltip="Refresh" (click)="onRefresh()">
+                <i class="fas fa-sync-alt font-sm"></i>
+            </button>
+            <button *ngIf="showBackButton" class="ct-icon-btn ml-1" [tooltip]="backButtonConfig.tooltip || 'Back'"
+                type="button" (click)="onBack()">
+                <i class="fa fa-arrow-left font-sm"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body py-2">
+        <!-- Row 2: search + filter  |  settings + show -->
+        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2 position-relative">
+            <div class="d-flex align-items-center flex-wrap">
+                <div class="filter-toolbar-control">
+                    <table-search-box [searchValue]="searchValue" (searched)="onSearch($event)"></table-search-box>
+                </div>
+
+                <div #filterControl class="ml-2 position-relative" *ngIf="filters.length">
+                    <button type="button" class="ct-btn ct-btn-filter" [class.is-active]="appliedFilterCount"
+                        (click)="toggleFilterPanel()">
+                        <i class="fas fa-filter mr-1"></i>Filter
+                        <span class="ct-badge-count ml-2" *ngIf="appliedFilterCount">{{ appliedFilterCount }}</span>
+                    </button>
+
+                    <div class="card shadow filter-panel position-absolute mt-1" *ngIf="isFilterOpen"
+                        (click)="$event.stopPropagation()">
+                        <div class="row mx-0">
+                            <div class="col-4 border-right p-0">
+                                <ul class="list-unstyled mb-0 py-2">
+                                    <li *ngFor="let f of filters; trackBy: trackByFilterKey"
+                                        class="px-3 py-2 pointer-link d-flex justify-content-between align-items-center"
+                                        [class.bg-light]="activeFilterKey === f.key"
+                                        [class.text-primary]="activeFilterKey === f.key"
+                                        [class.font-weight-500]="activeFilterKey === f.key"
+                                        (click)="selectFilterCategory(f.key)">
+                                        <span class="text-truncate font-sm">{{ f.label }}</span>
+                                        <span class="ct-badge-count" *ngIf="categorySelectedCount(f.key)">{{
+                                            categorySelectedCount(f.key) }}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-8 p-0">
+                                <div class="p-2 border-bottom">
+                                    <input type="text" class="form-control form-control-sm"
+                                        [(ngModel)]="filterSearchValue" placeholder="Search {{ activeFilter?.label }}">
+                                </div>
+                                <ul class="list-unstyled mb-0 py-2" style="max-height: 220px; overflow-y: auto;">
+                                    <li class="px-3 py-1"
+                                        *ngFor="let opt of filteredOptions; trackBy: trackByOptionValue">
+                                        <label class="d-flex align-items-center mb-0 pointer-link">
+                                            <input type="checkbox" class="mr-2"
+                                                [checked]="isOptionChecked(activeFilterKey!, opt.value)"
+                                                (change)="toggleOption(activeFilterKey!, opt.value)">
+                                            <span class="font-sm">{{ opt.label }}</span>
+                                        </label>
+                                    </li>
+                                    <li class="px-3 py-2 text-muted font-sm" *ngIf="!filteredOptions.length">No options
+                                        found</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row mx-0 border-top align-items-center">
+                            <div class="col-4 border-right py-2">
+                                <a class="ct-clear-link pointer-link text-primary font-sm"
+                                    (click)="clearAllFilters()">Clear all</a>
+                            </div>
+                            <div class="col-8 py-2">
+                                <a class="ct-clear-link pointer-link text-primary font-sm"
+                                    (click)="clearActiveCategory()">Clear</a>
+                            </div>
+                        </div>
+                        <div class="ct-filter-footer d-flex justify-content-end">
+                            <button class="ct-btn ct-btn-apply" type="button" (click)="applyFilters()">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <div #settingsControl class="position-relative mr-2">
+                    <button class="ct-btn ct-btn-settings" [class.is-active]="isSettingsOpen" type="button"
+                        tooltip="View settings" (click)="toggleSettingsPanel()">
+                        <i class="fas fa-sliders-h"></i>
+                    </button>
+
+                    <div class="card shadow settings-panel position-absolute mt-1" *ngIf="isSettingsOpen"
+                        (click)="$event.stopPropagation()">
+                        <!-- <div class="p-3">
+                            <div class="settings-section-title mb-2">Density</div>
+                            <label class="d-flex align-items-center pointer-link mb-2" (click)="setDensity('default')">
+                                <span class="ct-radio mr-2" [class.checked]="density === 'default'"></span>
+                                <span class="font-sm">Default</span>
+                            </label>
+                            <label class="d-flex align-items-center pointer-link" (click)="setDensity('compact')">
+                                <span class="ct-radio mr-2" [class.checked]="density === 'compact'"></span>
+                                <span class="font-sm">Compact</span>
+                            </label>
+                        </div> -->
+
+                        <!-- <div class="border-top"></div> -->
+
+                        <div class="p-3 settings-fields-scroll">
+                            <div class="settings-section-title mb-2 d-flex justify-content-between">
+                                <span>Fields</span>
+                                <span class="ct-field-count">{{ visibleToggleableCount }}/{{ maxToggleableVisible
+                                    }}</span>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mb-2"
+                                *ngFor="let col of toggleableColumns; trackBy: trackByColumnKey">
+                                <span class="font-sm" [class.text-muted]="isColumnToggleDisabled(col.key)">{{ col.label
+                                    }}</span>
+                                <button type="button" class="ct-toggle" [class.checked]="isColumnChecked(col.key)"
+                                    [disabled]="isColumnToggleDisabled(col.key)"
+                                    (click)="toggleColumnVisibility(col.key)">
+                                    <span class="ct-toggle-thumb"></span>
+                                </button>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mb-2 text-muted"
+                                *ngFor="let col of lockedColumns; trackBy: trackByColumnKey">
+                                <span class="font-sm">{{ col.label }}</span>
+                                <span class="font-sm">Always shown</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <label class="font-sm text-muted mb-0 mr-2">Show</label>
+                <select class="form-control form-control-sm filter-toolbar-control" style="width: 75px;"
+                    [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                    <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Row 3 + 4: table -->
+        <div class="table-responsive" [class.ct-density-compact]="density === 'compact'">
+            <table class="table table-sm enhanced-table text-left mb-2">
+                <thead class="bg-light">
+                    <tr>
+                        <th *ngFor="let col of visibleColumns; trackBy: trackByColumnKey" [ngClass]="col.widthClass"
+                            [class.text-center]="col.align === 'center'">
+                            <span class="d-inline-flex align-items-center" [class.pointer-link]="col.sortable"
+                                (click)="onSortClick(col)">
+                                {{ col.label }}
+                                <span *ngIf="col.sortable" class="ct-sort-icons">
+                                    <i class="fas fa-sort-up ct-sort-arrow mb-0"
+                                        [class.active]="isColumnSorted(col) === 'asc'"></i>
+                                    <i class="fas fa-sort-down ct-sort-arrow"
+                                        [class.active]="isColumnSorted(col) === 'desc'"></i>
+                                </span>
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let row of rows; let i = index; trackBy: trackByRow" truncateText>
+                        <td *ngFor="let col of visibleColumns; trackBy: trackByColumnKey"
+                            [ngClass]="[col.widthClass || '', col.cellClass || '']"
+                            [class.text-center]="col.align === 'center'">
+
+                            <ng-container *ngIf="cellTemplateMap.has(col.key); else defaultCell">
+                                <ng-container
+                                    *ngTemplateOutlet="cellTemplateMap.get(col.key); context: { $implicit: row, index: i }"></ng-container>
+                            </ng-container>
+
+                            <ng-template #defaultCell>
+                                <ng-container [ngSwitch]="true">
+
+                                    <!-- Icon cell -->
+                                    <div class="d-flex align-items-center justify-content-center"
+                                        *ngSwitchCase="!!col.iconCell">
+                                        <ng-container *ngIf="getIconCellDisplay(row, col) as ic">
+                                            <img *ngIf="ic.isImage" [src]="ic.icon" class="mr-1"
+                                                style="width:18px;height:18px;object-fit:contain;">
+                                            <i *ngIf="!ic.isImage" [class]="ic.icon" [ngClass]="ic.colorClass"
+                                                class="mr-1 font-sm"></i>
+                                            <span *ngIf="ic.label" class="text-truncate"
+                                                [ngClass]="!col.iconCell.asBadge ? ic.colorClass : ''">{{ ic.label
+                                                }}</span>
+                                        </ng-container>
+                                    </div>
+
+                                    <!-- Status toggle cell -->
+                                    <div class="ct-status-toggle d-inline-block"
+                                        style="vertical-align: middle !important;" *ngSwitchCase="!!col.statusToggle">
+                                        <ul class="d-flex px-0 mb-0">
+                                            <li>
+                                                <label class="pointer-link" [class.active]="isStatusActive(row, col)">
+                                                    <input type="radio" [value]="true"
+                                                        (click)="onStatusToggleClick(row, i, true, col)"
+                                                        [disabled]="isStatusToggleDisabled(row, col)">
+                                                    <span class="font-sm">{{ col.statusToggle.activeLabel || 'Enable'
+                                                        }}</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link" [class.active]="isStatusInactive(row, col)">
+                                                    <input type="radio" [value]="false"
+                                                        (click)="onStatusToggleClick(row, i, false, col)"
+                                                        [disabled]="isStatusToggleDisabled(row, col)">
+                                                    <span class="font-sm">{{ col.statusToggle.inactiveLabel || 'Disable'
+                                                        }}</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Plain text cell (default) -->
+                                    <div class="text-truncate d-flex align-items-center" *ngSwitchDefault>
+                                        <ng-container *ngIf="cellDisplay(row, col) as cd">
+                                            <span class="text-truncate" [tooltip]="!cd.isArray ? cd.primary : null">{{
+                                                cd.primary }}</span>
+                                            <span class="ct-more-badge ml-1" *ngIf="cd.extra.length"
+                                                [tooltip]="cd.extraTooltip">+{{ cd.extra.length }}</span>
+                                        </ng-container>
+                                    </div>
+
+                                </ng-container>
+                            </ng-template>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center text-muted py-4" *ngIf="!rows.length">{{ emptyMessage }}</div>
+        </div>
+
+        <!-- Footer: entries  |  page-jump + pagination -->
+        <div class="row mx-0 d-flex justify-content-between align-items-center pt-2" *ngIf="rows.length">
+            <div class="font-sm text-muted">Page {{ pageNo }} of {{ totalPages }} &middot; {{ totalCount }} entries
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center mr-2">
+                    <input type="number" class="form-control form-control-sm ct-page-jump-input" min="1"
+                        [max]="totalPages" [(ngModel)]="jumpToPage" (keyup.enter)="isJumpTargetValid && jumpTo()">
+                    <button class="ct-btn ct-btn-jump ml-1" type="button" [disabled]="!isJumpTargetValid"
+                        (click)="jumpTo()" tooltip="Go to page">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" [class.disabled]="pageNo === 1">
+                            <a class="page-link" (click)="goToPage(1)">&laquo;</a>
+                        </li>
+                        <li class="page-item" [class.disabled]="pageNo === 1">
+                            <a class="page-link" (click)="goToPrev()">&lsaquo;</a>
+                        </li>
+                        <li class="page-item" *ngFor="let p of pageNumbers" [class.active]="p === pageNo">
+                            <a class="page-link" (click)="goToPage(p)">{{ p }}</a>
+                        </li>
+                        <li class="page-item" [class.disabled]="pageNo === totalPages">
+                            <a class="page-link" (click)="goToNext()">&rsaquo;</a>
+                        </li>
+                        <li class="page-item" [class.disabled]="pageNo === totalPages">
+                            <a class="page-link" (click)="goToPage(totalPages)">&raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

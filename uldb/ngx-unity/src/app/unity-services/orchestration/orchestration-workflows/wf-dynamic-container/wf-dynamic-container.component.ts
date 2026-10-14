@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, Inject, OnInit, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
 import Drawflow from 'drawflow';
 import * as dagre from 'dagre';
@@ -146,6 +146,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   private workflowGroupsLoadComplete = false;
   private workflowDetailsLoadComplete = false;
   private workflowDrawflowRendered = false;
+  private workflowCanvasReady = false;
+  private destroyed = false;
   private nodeConfigurationLoading = new Set<string>();
   backModalRef: BsModalRef;
   @ViewChild('confirmBack') confirmBack: ElementRef;
@@ -164,6 +166,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       { value: 'straight', label: 'Straight', previewPath: 'M 2 15 L 38 2' }
     ];
   private lastCanvasPointerEvent: MouseEvent | null = null;
+  private workflowReturnUrl: string;
 
   showRunHeading: boolean = true;   // controls "Run Workflow" heading vs status+stop
   private pollingUnsubscribe$ = new Subject<void>();
@@ -179,6 +182,16 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   workflowDetailsFormErrors: any;
   workflowDetailsFormValidationMessages: any;
   editWorkflowFlag = false;
+  workflowCategoryOptions: string[] = [];
+  loadingWorkflowCategories = false;
+  readonly addWorkflowCategory = (name: string) => name.trim();
+
+  onWorkflowCategoryChange(category: string): void {
+    if (category && !this.workflowCategoryOptions.includes(category)) {
+      this.workflowCategoryOptions = [category, ...this.workflowCategoryOptions];
+    }
+  }
+
   llmModelOptions: LLMModelOption[] = [
     {
       id: null,
@@ -198,8 +211,16 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   selectedExecutionOutputs: WorkflowNodeOutput[] = [];
   selectedExecutionNodes: any[] = [];
   loadingExecutions = false;
+  loadingMoreExecutions = false;
+  hasMoreExecutions = true;
+  readonly executionPageSize = 10;
+  private executionPage = 1;
 
   get isExecutionMode(): boolean { return this.workspaceMode === 'execution'; }
+  get hasNoExecutions(): boolean {
+    return this.isExecutionMode && !this.loadingExecutions &&
+      !this.workflowExecutions.length && !this.selectedExecution;
+  }
   get displayedExecutionLog(): string {
     return this.isExecutionMode ? this.selectedExecutionLogs.executionLog : this.workflowLogsViewData.executionLog;
   }
@@ -219,11 +240,19 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     private storage: StorageService,
     private svc: WfDynamicContainerService,
     private leftPanelSvc: WfDynamicLeftService,
+    private location: Location
   ) {
     this.currentCriteria = { searchValue: '', pageSize: 0 };
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
-      this.workFlowId = params.get('id');
+      if (params.has('id')) this.workFlowId = params.get('id');
     });
+    // Keep the originating listing (including filters) outside the editor URL.
+    const navigation = this.router.getCurrentNavigation();
+    const navigationState = navigation ? navigation.extras.state : this.location.getState();
+    this.workflowReturnUrl = navigationState?.['workflowReturnUrl'] ||
+      (this.route.snapshot.queryParamMap.get('from') === 'executions'
+        ? '/services/orchestration/executions'
+        : '/services/orchestration/workflows');
     this.workspaceMode = this.route.snapshot.routeConfig?.path?.endsWith('/execute') ? 'execution' : 'workflow';
     this.isViewMode = this.isExecutionMode || this.route.snapshot.routeConfig?.path?.endsWith('/view');
   }
@@ -231,6 +260,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.workflowDetailsLoadComplete = !this.workFlowId && !this.isExecutionMode;
     this.designerAvailable = !this.isExecutionMode;
+    this.loadWorkflowCategories();
     this.manageWorkflowDetails();
     this.loadLLMModelOptions();
     this.loadWorkflowGroups();
@@ -244,7 +274,6 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     if (this.isExecutionMode) {
       this.isLeftCollapsed = false;
       this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
-        this.designerAvailable = false;
         this.selectExecution({ uuid: params.get('executionId') } as WorkflowExecution);
       });
     } else if (this.workFlowId) {
@@ -256,7 +285,12 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     if (this.workspaceMode === mode) return;
     if (mode === 'workflow') {
       if (this.designerAvailable) {
-        this.router.navigate(['/services/orchestration/workflows/dynamic-workflow', this.workFlowId, 'view']);
+        if (!this.selectedExecution) {
+          this.workspaceMode = 'workflow';
+          this.isLeftCollapsed = true;
+          return;
+        }
+        this.router.navigate(['/services/orchestration/workflows/dynamic-workflow', this.workFlowId, 'view'], { state: { workflowReturnUrl: this.workflowReturnUrl } });
       }
     } else {
       this.loadWorkflowExecutions(true);
@@ -265,34 +299,63 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   toggleWorkflowMode(): void {
     if (!this.workFlowId || !this.designerAvailable) return;
-    this.router.navigate(['/services/orchestration/workflows/dynamic-workflow', this.workFlowId, this.isViewMode ? 'edit' : 'view']);
+    this.router.navigate(['/services/orchestration/workflows/dynamic-workflow', this.workFlowId, this.isViewMode ? 'edit' : 'view'], { state: { workflowReturnUrl: this.workflowReturnUrl } });
   }
 
-  loadWorkflowExecutions(openLatest = false): void {
+  loadWorkflowExecutions(openLatest = false, append = false): void {
     if (!this.workFlowId) return;
-    this.loadingExecutions = true;
-    const executionId = this.selectedExecution?.uuid;
-    this.svc.getWorkflowExecutions(this.workFlowId).pipe(
-      takeUntil(this.ngUnsubscribe), finalize(() => this.loadingExecutions = false)
+    if (append && (this.loadingExecutions || this.loadingMoreExecutions || !this.hasMoreExecutions)) return;
+
+    const page = append ? this.executionPage + 1 : 1;
+    if (append) {
+      this.loadingMoreExecutions = true;
+    } else {
+      this.loadingExecutions = true;
+      this.hasMoreExecutions = true;
+    }
+    const workflowId = this.workFlowId;
+    this.svc.getWorkflowExecutions(workflowId, page, this.executionPageSize).pipe(
+      takeUntil(this.ngUnsubscribe),
+      finalize(() => {
+        if (workflowId !== this.workFlowId) return;
+        this.loadingExecutions = false;
+        this.loadingMoreExecutions = false;
+      })
     ).subscribe({
-      next: (data: any) => {
-        if (executionId !== this.selectedExecution?.uuid) return;
+      next: data => {
+        if (workflowId !== this.workFlowId) return;
         this.designerAvailable = true;
-        this.workflowExecutions = Array.isArray(data) ? data : data?.results || [];
+        const executions = data.results || [];
+        this.workflowExecutions = append
+          ? [...this.workflowExecutions, ...executions]
+          : executions;
+        this.executionPage = page;
+        this.hasMoreExecutions = !!data.next;
         if (openLatest) {
           if (this.workflowExecutions.length) {
             this.router.navigate(
               ['/services/orchestration/workflows/dynamic-workflow', this.workflowExecutions[0].uuid, 'execute'],
-              { queryParamsHandling: 'preserve' }
+              { state: { workflowReturnUrl: this.workflowReturnUrl } }
             );
           } else {
-            this.notification.error(new Notification('No workflow executions available'));
+            this.workspaceMode = 'execution';
+            this.selectedExecution = undefined;
+            this.selectedExecutionInputs = undefined;
+            this.selectedExecutionLogs = new WorkflowLogsViewData();
+            this.selectedExecutionOutputs = [];
+            this.selectedExecutionNodes = [];
+            this.selectedConnection = null;
+            this.isLeftCollapsed = true;
+            this.isRightCollapsed = true;
+            this.bottomActiveTab = 'logs';
           }
         }
       },
       error: (error: HttpErrorResponse) => {
-        if (executionId !== this.selectedExecution?.uuid) return;
-        if (error.status === 404) {
+        if (workflowId !== this.workFlowId) return;
+        if (append && error.status === 404) {
+          this.hasMoreExecutions = false;
+        } else if (error.status === 404) {
           this.designerAvailable = false;
           this.workflowExecutions = this.selectedExecution ? [this.selectedExecution] : [];
         } else {
@@ -302,11 +365,26 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     });
   }
 
+  trackExecutionByUuid(_index: number, execution: WorkflowExecution): string {
+    return execution.uuid;
+  }
+
+  onExecutionScroll(event: Event): void {
+    if (!this.workflowExecutions.length || this.loadingExecutions ||
+      this.loadingMoreExecutions || !this.hasMoreExecutions) return;
+
+    const element = event.target as HTMLElement;
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 10;
+    if (!atBottom) return;
+
+    this.loadWorkflowExecutions(false, true);
+  }
+
   selectExecution(execution: WorkflowExecution): void {
     if (execution.uuid !== this.route.snapshot.paramMap.get('executionId')) {
       this.router.navigate(
         ['/services/orchestration/workflows/dynamic-workflow', execution.uuid, 'execute'],
-        { queryParamsHandling: 'preserve' }
+        { state: { workflowReturnUrl: this.workflowReturnUrl } }
       );
       return;
     }
@@ -320,11 +398,22 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       next: (data: any) => {
         if (this.selectedExecution?.uuid === data.uuid) {
           this.selectedExecution = { ...data, execution_status: data.status, user: data.executed_by };
+          const workflowChanged = this.workFlowId !== data.workflow;
           this.workFlowId = data.workflow;
-          this.workflowExecutions = [this.selectedExecution];
-          this.loadWorkflowExecutions();
+          if (workflowChanged || !this.workflowExecutions.length) {
+            this.designerAvailable = false;
+            this.workflowExecutions = [this.selectedExecution];
+            this.loadWorkflowExecutions();
+          } else {
+            // Preserve the loaded pages and scroll position when switching runs.
+            this.workflowExecutions = this.workflowExecutions.map(item =>
+              item.uuid === data.uuid ? this.selectedExecution : item
+            );
+          }
           this.selectedExecutionNodes = data.nodes_execution || [];
           this.workflowDrawflowRendered = false;
+          this.workflowCanvasReady = false;
+          this.isLoadingWorkflow = true;
           this.getWorkflowDetails({
             ...data,
             name: data.workflow_name,
@@ -335,6 +424,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         }
       },
       error: () => {
+        if (this.selectedExecution?.uuid !== execution.uuid) return;
         this.workflowDetailsLoadComplete = true;
         this.updateInitialLoadingState();
         this.notification.error(new Notification('Failed to load execution details'));
@@ -359,6 +449,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       });
   }
 
+  formatExecutionDuration(duration: string): string {
+    if (!duration) return '-';
+    return duration.includes(':') ? this.svc.formatDuration(duration) : this.svc.formatDuration(`00:00:${duration}`);
+  }
+
   private getNodeExecutionData(nodeId: number): any {
     if (this.isExecutionMode && this.selectedExecution) {
       const nodeDetails = this.selectedExecutionNodes.find(
@@ -370,13 +465,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
       return {
         ...(nodeDetails || {}),
-        duration: nodeDetails?.duration
-          ? this.svc.formatDuration(
-            String(nodeDetails.duration).includes(':')
-              ? nodeDetails.duration
-              : `00:00:${nodeDetails.duration}`
-          )
-          : '',
+        duration: nodeDetails?.duration ? this.formatExecutionDuration(nodeDetails.duration) : '',
         ...(nodeOutput ? { output_data: nodeOutput.output } : {})
       };
     }
@@ -478,11 +567,15 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   ngOnDestroy() {
+    this.destroyed = true;
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     this.leftPanelSvc.clearWorkflowGroupsCache();
-    this.maximizeLeftPanel();
-    document.body.classList.remove('wf-page');
+    const destination = this.router.getCurrentNavigation()?.finalUrl?.toString() || this.router.url;
+    if (!destination.includes('/orchestration/workflows/dynamic-workflow/')) {
+      this.maximizeLeftPanel();
+      document.body.classList.remove('wf-page');
+    }
     this.pollingUnsubscribe$.next();
     this.pollingUnsubscribe$.complete();
     this.executionLogPollingUnsubscribe$.next();
@@ -713,12 +806,13 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   private updateInitialLoadingState(): void {
     this.isLoadingWorkflow = !(
-      this.workflowGroupsLoadComplete && this.workflowDetailsLoadComplete
+      this.workflowGroupsLoadComplete && this.workflowDetailsLoadComplete &&
+      (!this.workFlowData || this.workflowCanvasReady)
     );
 
-    if (!this.isLoadingWorkflow && this.workFlowId) {
+    if (this.workflowGroupsLoadComplete && this.workflowDetailsLoadComplete && this.workFlowId) {
       this.renderLoadedWorkflow();
-      if (!this.isExecutionMode) this.validateAgentToolConfigurations();
+      if (!this.isLoadingWorkflow && !this.isExecutionMode) this.validateAgentToolConfigurations();
     }
   }
 
@@ -761,7 +855,10 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       this.triggerNode?.config?.properties || {}
     );
 
-    this.waitForEditorAndImport(drawflowData, true);
+    this.waitForEditorAndImport(drawflowData, true, () => {
+      this.workflowCanvasReady = true;
+      this.updateInitialLoadingState();
+    });
     this.editor.on('import', () => {
       this.nodeDetailsArr.forEach(node => {
         this.syncNodeUI(getId(node?.node_id));
@@ -1622,9 +1719,24 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         );
 
 
+      const existingConfig = existingNode?.config || {};
       const mergedConfig = {
+        ...existingConfig,
         ...response,
-        ...existingNode?.config
+        // Saved workflows can contain the form schema that existed when they
+        // were created. Always prefer the freshly fetched schema so additions
+        // such as the select/multiselect variants also appear on old forms.
+        // The saved values themselves remain in properties/settings below.
+        tabs: response?.tabs?.length ? response.tabs : (existingConfig.tabs || []),
+        ...(existingConfig.properties !== undefined
+          ? { properties: existingConfig.properties }
+          : {}),
+        ...(existingConfig.settings !== undefined
+          ? { settings: existingConfig.settings }
+          : {}),
+        ...(existingConfig.config !== undefined
+          ? { config: existingConfig.config }
+          : {})
       };
 
       this.updateNodeById(
@@ -2810,7 +2922,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     );
     const isTool = requestedAsTool || !!this.selectedNode?.tool_id || this.selectedNode?.isTool === true;
     const configurationEndpoint = this.getNodeConfigurationEndpoint(this.selectedNode);
-    const isSchemaLoading = !!configurationEndpoint && !this.selectedNode?.config?.tabs?.length;
+    const configurationRequestKey = this.getNodeConfigurationRequestKey(numericNodeId, isTool);
+    const isSchemaLoading = !!configurationEndpoint && (
+      this.nodeConfigurationLoading.has(configurationRequestKey) ||
+      !this.selectedNode?.config?.tabs?.length
+    );
 
     if (isSchemaLoading) {
       this.selectedNode.endpoint = configurationEndpoint;
@@ -3906,11 +4022,12 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     };
   }
 
-  waitForEditorAndImport(drawflowData: any, fitAfterImport: boolean = false) {
+  waitForEditorAndImport(drawflowData: any, fitAfterImport: boolean = false, onComplete?: () => void) {
     const container = this.drawflowContainer?.nativeElement;
     console.log(container, "container")
 
     const tryImport = () => {
+      if (this.destroyed) return;
       if (container && container.offsetWidth > 0 && container.offsetHeight > 0) {
         try {
           this.editor.clear();
@@ -4000,6 +4117,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
           }
         } catch (err) {
           console.error('Error during editor.import():', err);
+        } finally {
+          onComplete?.();
         }
       } else {
         // Wait one more frame
@@ -4102,7 +4221,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     ).subscribe(res => {
       this.workflowDetailsForm.patchValue({
         name: res.name,
-        description: res.description
+        description: res.description,
+        category: res.category
       });
       this.workFlowViewData = this.svc.convertToWorkflowPopupViewData(res);
       this.workFlowData = {
@@ -4358,7 +4478,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         this.workFlowId = savedWorkflowId;
         this.isWorkflowSaved = true;
 
-        this.router.navigate([savedWorkflowId, 'view'], { relativeTo: this.route }).catch(() => {
+        this.router.navigate([savedWorkflowId, 'view'], { relativeTo: this.route, state: { workflowReturnUrl: this.workflowReturnUrl } }).catch(() => {
           this.isWorkflowSaved = false;
           this.notification.error(new Notification('Workflow was created, but the edit view could not be loaded.'));
         });
@@ -4494,7 +4614,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     return true;
   }
 
-  buildWorkflowPayload(workflowMeta: { name: string, description: string }, nodeDetailsArr: any[], connections: any[]) {
+  buildWorkflowPayload(workflowMeta: { name: string, description: string, category: string }, nodeDetailsArr: any[], connections: any[]) {
     console.log(nodeDetailsArr, "node details arr build ")
     console.log(this.savedWorkflowVarsData)
     this.nodeDetailsArr.forEach(node => {
@@ -4514,6 +4634,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       ...this.workflowVarsData,
       // variables: [],
       ...this.savedWorkflowVarsData?.workflowVarsForm,
+      category: workflowMeta?.category || "",
 
       nodes: nodeDetailsArr.map(node => {
         const baseNode = {
@@ -5160,6 +5281,18 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private loadWorkflowCategories(): void {
+    this.loadingWorkflowCategories = true;
+    this.svc.getWorkflowCategories().pipe(
+      takeUntil(this.ngUnsubscribe),
+      finalize(() => this.loadingWorkflowCategories = false)
+    ).subscribe(response => {
+      const categories = response.categories || [];
+      const addedCategories = this.workflowCategoryOptions.filter(category => !categories.includes(category));
+      this.workflowCategoryOptions = [...addedCategories, ...categories];
+    });
+  }
+
   openWorkflowModal(action?: string) {
     action === 'edit' ? this.editWorkflowFlag = true : this.editWorkflowFlag = false;
     setTimeout(() => {
@@ -5177,9 +5310,13 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       this.workflowDetailsForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
         .subscribe((data: any) => { this.workflowDetailsFormErrors = this.utilSvc.validateForm(this.workflowDetailsForm, this.workflowDetailsFormValidationMessages, this.workflowDetailsFormErrors); });
     } else {
+      const workflowDetails = this.workflowDetailsForm.getRawValue();
       if (this.workFlowId) {
         let payload = {
-          workflow_data: this.workflowDetailsForm.getRawValue(),
+          workflow_data: {
+            ...workflowDetails,
+            category: workflowDetails.category
+          },
           update_meta: true
         }
         this.svc.saveWorkFlow(payload, this.workFlowId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
@@ -5189,7 +5326,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
           this.notification.error(new Notification('Failed to create Workflow'));
         });
       }
-      this.workFlowViewData = this.svc.convertToWorkflowPopupViewData(this.workflowDetailsForm.getRawValue());
+      this.workFlowViewData = this.svc.convertToWorkflowPopupViewData(workflowDetails);
       // this.initializeWorkflowParamsForm();
       this.modalRef.hide();
     }
@@ -5199,7 +5336,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   onCloseWorkFlowDetails() {
     this.modalRef.hide();
     if (!this.editWorkflowFlag) {
-      this.router.navigate(['../'], { relativeTo: this.route });
+      this.navigateToWorkflowList();
     }
   }
 
@@ -5220,18 +5357,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   private navigateToWorkflowList(): void {
-    if (this.isExecutionMode && this.route.snapshot.queryParamMap.get('from') === 'executions') {
-      this.router.navigate(['/services/orchestration/executions']);
-      return;
-    }
-
-    if (this.workFlowId) {
-      this.router.navigate(['../../../'], { relativeTo: this.route });
-    } else if (this.isViewMode) {
-      this.router.navigate(['../../'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['../'], { relativeTo: this.route });
-    }
+    this.router.navigateByUrl(this.workflowReturnUrl);
   }
 
 

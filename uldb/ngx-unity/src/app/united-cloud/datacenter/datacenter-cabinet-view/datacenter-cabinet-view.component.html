@@ -229,9 +229,12 @@
                                 <span class="hpdu_row" *ngFor="let row of device.hPDUSocketRows">
                                   <img class="hpdu_start" [src]="device.hPDUStartImgURL" alt="" />
 
-                                  <img class="hpdu_single_socket" *ngFor="let k of row"
+                                  <ng-container *ngFor="let k of row">
+                                    <img class="hpdu_single_socket" *ngIf="k !== null"
                                     id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
                                     [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip" />
+                                    <span class="hpdu_empty_socket" *ngIf="k === null"></span>
+                                  </ng-container>
 
                                   <img class="hpdu_end" [src]="device.hPDUEndImgURL" alt="" />
                                 </span>
@@ -419,9 +422,12 @@
                                 <span class="hpdu_row" *ngFor="let row of device.hPDUSocketRows">
                                   <img class="hpdu_start" [src]="device.hPDUStartImgURL" alt="" />
 
-                                  <img class="hpdu_single_socket" *ngFor="let k of row"
+                                  <ng-container *ngFor="let k of row">
+                                    <img class="hpdu_single_socket" *ngIf="k !== null"
                                     id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
                                     [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip" />
+                                    <span class="hpdu_empty_socket" *ngIf="k === null"></span>
+                                  </ng-container>
 
                                   <img class="hpdu_end" [src]="device.hPDUEndImgURL" alt="" />
                                 </span>
@@ -612,9 +618,12 @@
                                     <span class="hpdu_row" *ngFor="let row of device.hPDUSocketRows">
                                       <img class="hpdu_start" [src]="device.hPDUStartImgURL" alt="" />
 
-                                      <img class="hpdu_single_socket" *ngFor="let k of row"
+                                      <ng-container *ngFor="let k of row">
+                                        <img class="hpdu_single_socket" *ngIf="k !== null"
                                         id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
                                         [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip" />
+                                        <span class="hpdu_empty_socket" *ngIf="k === null"></span>
+                                      </ng-container>
 
                                       <img class="hpdu_end" [src]="device.hPDUEndImgURL" alt="" />
                                     </span>
@@ -683,9 +692,12 @@
                                     <span class="hpdu_row" *ngFor="let row of device.hPDUSocketRows">
                                       <img class="hpdu_start" [src]="device.hPDUStartImgURL" alt="" />
 
-                                      <img class="hpdu_single_socket" *ngFor="let k of row"
+                                      <ng-container *ngFor="let k of row">
+                                        <img class="hpdu_single_socket" *ngIf="k !== null"
                                         id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
                                         [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip" />
+                                        <span class="hpdu_empty_socket" *ngIf="k === null"></span>
+                                      </ng-container>
 
                                       <img class="hpdu_end" [src]="device.hPDUEndImgURL" alt="" />
                                     </span>

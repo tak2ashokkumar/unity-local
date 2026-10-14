@@ -1440,6 +1440,13 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="account-metrics-pagination-row">
+                        <div>Show {{provisioningPageSize}} | {{provisioningRows.length ? ((provisioningPageNo - 1) * provisioningPageSize) + 1 : 0}}-{{((provisioningPageNo - 1) * provisioningPageSize) + provisioningRows.length}} of {{provisioningTotal}}</div>
+                        <table-pager [compact]="true" [pageNo]="provisioningPageNo"
+                            [pageSize]="provisioningPageSize"
+                            [totalCount]="provisioningTotal"
+                            (pageChange)="provisioningPageChange($event)"></table-pager>
+                    </div>
                 </ng-container>
             </ng-container>
             <ng-template #provisioningChartView>

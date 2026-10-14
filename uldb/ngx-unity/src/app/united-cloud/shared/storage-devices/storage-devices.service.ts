@@ -9,6 +9,7 @@ import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
+import { PrivateCloudRemoteWebAccessType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
@@ -58,6 +59,9 @@ export class StorageDevicesService {
       a.monitoring = s.monitoring;
       a.tags = s.tags;
       a.redfish = s.redfish;
+      a.remoteWebAccess = s.remote_web_access;
+      a.showRemoteWebAccessButton = !!s.remote_web_access?.can_create_session;
+      a.remoteWebTooltipMessage = s.remote_web_access?.message || 'Remote web access unavailable';
 
       a.editBtnTooltipMsg = 'Edit';
       a.deleteBtnTooltipMsg = 'Delete';
@@ -229,6 +233,9 @@ export class StorageDeviceViewData {
   newTabWebAccessUrl: string;
   newTabConsoleAccessUrl: string;
   newTabTootipMessage: string;
+  remoteWebAccess?: PrivateCloudRemoteWebAccessType;
+  remoteWebTooltipMessage: string = 'Remote web access unavailable';
+  showRemoteWebAccessButton: boolean = false;
 
   monitoring: DeviceMonitoringType;
 

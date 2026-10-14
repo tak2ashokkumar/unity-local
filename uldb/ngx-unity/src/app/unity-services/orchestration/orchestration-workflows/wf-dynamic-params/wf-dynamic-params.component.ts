@@ -43,11 +43,12 @@ import { queryBuilderClassNames } from 'src/app/unity-setup/unity-setup-notifica
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CONDITION_SUB_FIELDS_CONFIG, CONDITION_VALIDATION_MESSAGES, DATA_TYPE_OPTIONS, DataType, DynamicFieldMeta, getDefaultOperator, getValueInputKind, isGroupComplete, normalizeDataType, OPERATORS_BY_DATA_TYPE, resolveEndpointTemplate, SelectOption } from './condition-builder.constants';
 import { environment } from 'src/environments/environment';
+import { OrchestrationExecutionsWorkflowLogsService } from '../../orchestration-executions/orchestration-executions-workflow-logs/orchestration-executions-workflow-logs.service';
 @Component({
   selector: 'wf-dynamic-params',
   templateUrl: './wf-dynamic-params.component.html',
   styleUrls: ['./wf-dynamic-params.component.scss'],
-  providers: [WfDynamicParamsService, AimlRulesService],
+  providers: [WfDynamicParamsService, AimlRulesService, OrchestrationExecutionsWorkflowLogsService],
 })
 export class WfDynamicParamsComponent implements OnInit {
 
@@ -134,8 +135,10 @@ export class WfDynamicParamsComponent implements OnInit {
 
   initialValues: Record<string, any> = {};
   private subscriptions: Subscription[] = [];
-  dynamicOptionStore: Record<string, Array<{ label: string; value: any }>> = {};
+  dynamicOptionStore: Record<string, any[]> = {};
   dynamicOptionLoading: Record<string, boolean> = {};
+  dynamicOptionErrors: Record<string, string> = {};
+  private selectOptionViews = new WeakMap<DynamicField, { source: any[]; options: any[] }>();
 
   queryBuilderConfig: QueryBuilderConfig;
   queryBuilderClassNames: QueryBuilderClassNames = queryBuilderClassNames;
@@ -146,6 +149,10 @@ export class WfDynamicParamsComponent implements OnInit {
   allowCollapse: boolean = false;
   persistValueOnFieldChange: boolean = false;
   onSave!: (data: any, modalState?: any) => void;
+
+  expandedHighlightSource: string | null = null;
+  expandedPreviewMarkdown = '';
+  expandedPreviewTokens: { marker: string; text: string; className: string }[] = [];
 
   @ViewChild('nameInput') nameInput!: ElementRef;
   expandedNodes = new Set<any>();
@@ -168,7 +175,9 @@ export class WfDynamicParamsComponent implements OnInit {
   //
 
 
-  outputView: 'table' | 'tree' | 'json' = 'table';
+  outputView: 'table' | 'tree' | 'json' | 'chart' = 'table';
+  outputChartData: any;
+  isChartOutputNode = false;
   outputKind: 'empty' | 'text' | 'array' | 'object' = 'empty';
   outputValue: any;
   outputStringValue = '';
@@ -210,6 +219,7 @@ export class WfDynamicParamsComponent implements OnInit {
     private titleCasePipe: TitleCasePipe,
     private http: HttpClient,
     private scheduleSvc: UnityScheduleService,
+    private workflowLogsService: OrchestrationExecutionsWorkflowLogsService,
   ) { }
 
   ngOnInit(): void {
@@ -1463,9 +1473,58 @@ export class WfDynamicParamsComponent implements OnInit {
     this.refreshFormErrors();
   }
 
+  getExpandedPreviewMarkdown(): string {
+    const value = String(this.getDisplayValue(this.expandedField, this.expandedForm) ?? '');
+    if (value === this.expandedHighlightSource) return this.expandedPreviewMarkdown;
+    this.expandedHighlightSource = value;
+    this.expandedPreviewTokens = [];
+    // Protect Jinja from Markdown interpreting underscores, asterisks or HTML.
+    let prefix = 'WFJINJATOKEN';
+    while (value.includes(prefix)) prefix += 'X';
+    const jinja = /\{\{[\s\S]*?\}\}|\{%[\s\S]*?%\}|\{#[\s\S]*?#\}/g;
+    this.expandedPreviewMarkdown = value.replace(jinja, (text: string) => {
+      const className = text.startsWith('{%') ? 'ph-s' : text.startsWith('{#') ? 'ph-c' : 'ph-x';
+      const marker = `${prefix}${this.expandedPreviewTokens.length}END`;
+      this.expandedPreviewTokens.push({ marker, text, className });
+      return marker;
+    });
+    return this.expandedPreviewMarkdown;
+  }
+
+  highlightExpandedPreview(root: HTMLElement): void {
+    const doc = root.ownerDocument;
+    const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes: Text[] = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+    for (const node of nodes) {
+      let remaining = node.data;
+      const fragment = doc.createDocumentFragment();
+      let matched = false;
+      while (remaining) {
+        const token = this.expandedPreviewTokens
+          .filter(item => remaining.includes(item.marker))
+          .sort((a, b) => remaining.indexOf(a.marker) - remaining.indexOf(b.marker))[0];
+        if (!token) break;
+        matched = true;
+        const index = remaining.indexOf(token.marker);
+        fragment.appendChild(doc.createTextNode(remaining.slice(0, index)));
+        const chip = doc.createElement('span');
+        chip.className = token.className;
+        chip.textContent = token.text;
+        fragment.appendChild(chip);
+        remaining = remaining.slice(index + token.marker.length);
+      }
+      if (matched) {
+        fragment.appendChild(doc.createTextNode(remaining));
+        node.parentNode?.replaceChild(fragment, node);
+      }
+    }
+  }
+
   loadDynamicSchema(apiSchema: ApiSchema, values: Record<string, any> = {}): void {
     this.dynamicOptionStore = {};
     this.dynamicOptionLoading = {};
+    this.dynamicOptionErrors = {};
     this.initialValues = values || {};
     this.dynamicSchema = this.normalizeSchema(apiSchema);
 
@@ -1481,8 +1540,11 @@ export class WfDynamicParamsComponent implements OnInit {
     this.initializeDynamicOptions();
     (this.dynamicSchema?.tabs || []).forEach(tab => {
       this.walkFieldContexts(this.nodeForm, tab.fields || [], (field, form) => {
-        if (field.type === 'filter' && field.form_api && !field.form_api.depends_on?.trim()) {
-          this.loadFormApiForField(field, form); // ← console.logs field.form_data immediately
+        if (field.form_api && (
+          this.getDynamicFieldType(field) === 'group' ||
+          (field.type === 'filter' && !field.form_api.depends_on?.trim())
+        )) {
+          this.loadFormApiForField(field, form);
         }
       });
     });
@@ -1518,6 +1580,7 @@ export class WfDynamicParamsComponent implements OnInit {
   private normalizeFields(fields: ApiField[]): DynamicField[] {
     const flatFields = ((fields || []) as any[]).flat(Infinity) as ApiField[];
     return flatFields.map((field: ApiField) => {
+      const searchable = this.getSearchableSetting(field);
       const normalized: DynamicField = {
         control_name: field.key || '',
         type: this.normalizeFieldType(field.type, field.fields),
@@ -1531,7 +1594,9 @@ export class WfDynamicParamsComponent implements OnInit {
         add_button_label: field.add_label,
         min_items: field.min_items,
         options: field.options || [],
-        multiselect_properties: field.multiselect_properties,
+        multiselect_properties: searchable === undefined
+          ? field.multiselect_properties
+          : { ...this.multiselectProperties, ...field.multiselect_properties, enableSearch: searchable },
         options_api: field.options_api || null,
         form_api: field.form_api || null,
         show_add_remove: field.show_add_remove ?? true,
@@ -1542,13 +1607,28 @@ export class WfDynamicParamsComponent implements OnInit {
         width: field.width ?? 'full',
         fields: field.fields?.length ? this.normalizeFields(field.fields) : undefined,
         condition_type: field.condition_type,   // <-- add
-        min_conditions: field.min_conditions
+        min_conditions: field.min_conditions,
+        searchable,
+        clearable: field.clearable ?? true,
+        close_on_select: field.close_on_select ?? field.multiselect_properties?.closeOnSelect,
+        noOptionsText: field.no_options_text || `No ${field.label || this.prettify(field.key || 'options')} found`,
+        loadingText: field.loading_text || `Loading ${field.label || this.prettify(field.key || 'options')}...`
       };
       return normalized;
     });
   }
 
   private normalizeFieldType(type?: string, childFields?: ApiField[]): string {
+    const normalizedType = (type || '').toLowerCase().replace(/-/g, '_');
+
+    if (['single_select', 'searchable_select', 'dynamic_select', 'dynamic_searchable_select'].includes(normalizedType)) {
+      return 'select';
+    }
+
+    if (['multi_select', 'searchable_multi_select', 'searchable_multiselect', 'dynamic_multi_select', 'dynamic_multiselect', 'dynamic_searchable_multi_select', 'dynamic_searchable_multiselect'].includes(normalizedType)) {
+      return 'multiselect';
+    }
+
     if (type === 'textarea') {
       return 'text_area';
     }
@@ -1566,6 +1646,23 @@ export class WfDynamicParamsComponent implements OnInit {
     }
 
     return childFields?.length ? 'array' : 'text';
+  }
+
+  private getSearchableSetting(field: ApiField): boolean | undefined {
+    if (field.searchable !== undefined) return field.searchable;
+    const type = (field.type || '').toLowerCase().replace(/-/g, '_');
+    if (type.includes('searchable')) return true;
+    if (['single_select', 'dynamic_select', 'multi_select', 'dynamic_multi_select', 'dynamic_multiselect'].includes(type)) {
+      return false;
+    }
+
+    // Legacy multiselect schemas expressed this through the old dropdown
+    // settings object rather than the top-level searchable flag.
+    if (type === 'multiselect') {
+      return field.multiselect_properties?.enableSearch ?? true;
+    }
+
+    return type === 'select' ? false : undefined;
   }
 
   private normalizeValidators(validators: any): any {
@@ -1687,7 +1784,7 @@ export class WfDynamicParamsComponent implements OnInit {
 
     if (type === 'group') {
       if (!form.get(field.control_name)) {
-        const groupValue = this.initialValues?.[field.control_name];
+        const groupValue = this.getInitialSchemaFieldValue(field.control_name);
         const group = this.createFieldGroup(field.fields || [], groupValue);
         if (field.disabled === true) {
           group.disable({ emitEvent: false });
@@ -1915,6 +2012,24 @@ export class WfDynamicParamsComponent implements OnInit {
   }
 
   private normalizeDynamicFieldStoredValue(field: DynamicField, value: any): any {
+    const fieldType = this.getDynamicFieldType(field);
+    if (fieldType === 'select') {
+      const selectedValue = Array.isArray(value) ? value[0] : value;
+      return this.getDynamicOptionValue(selectedValue, field);
+    }
+
+    if (fieldType === 'multiselect') {
+      // Expression mode intentionally stores its template as a scalar string.
+      if (!Array.isArray(value) && this.isExpressionValue(value)) {
+        return value;
+      }
+      if (value === undefined || value === null || value === '') {
+        return [];
+      }
+      const selectedValues = Array.isArray(value) ? value : [value];
+      return selectedValues.map(item => this.getDynamicOptionValue(item, field));
+    }
+
     const configuredValueKey = field.options_api?.value_key;
     if (!Array.isArray(configuredValueKey)) {
       return value;
@@ -2141,6 +2256,29 @@ export class WfDynamicParamsComponent implements OnInit {
     return Array.isArray(field?.options) ? field.options : [];
   }
 
+  getDynamicSelectOptions(field: DynamicField, form?: FormGroup): any[] {
+    const source = this.getDynamicOptions(field, form);
+    const cached = this.selectOptionViews.get(field);
+    if (cached?.source === source) {
+      return cached.options;
+    }
+
+    const options = source.map(option => ({
+      label: this.getDynamicOptionLabel(option, field),
+      value: this.getDynamicOptionValue(option, field),
+      searchValue: option?.searchValue ?? this.readPath(option, field.options_api?.search_key || ''),
+      description: option?.description,
+      disabled: option?.disabled === true
+    }));
+    this.selectOptionViews.set(field, { source, options });
+    return options;
+  }
+
+  searchDynamicOption(term: string, option: any): boolean {
+    const searchValue = option?.searchValue ?? option?.label ?? '';
+    return String(searchValue).toLocaleLowerCase().includes(String(term || '').toLocaleLowerCase());
+  }
+
   isDynamicOptionsLoading(field: DynamicField, form?: FormGroup): boolean {
     if (!field.options_api || !form) {
       return false;
@@ -2150,9 +2288,20 @@ export class WfDynamicParamsComponent implements OnInit {
     return !!this.dynamicOptionLoading[cacheKey];
   }
 
+  getDynamicOptionsError(field: DynamicField, form?: FormGroup): string {
+    if (!field.options_api || !form) return '';
+    return this.dynamicOptionErrors[this.getDynamicOptionsCacheKey(field, form)] || '';
+  }
+
+  retryDynamicOptions(field: DynamicField, form: FormGroup): void {
+    const cacheKey = this.getDynamicOptionsCacheKey(field, form);
+    delete this.dynamicOptionErrors[cacheKey];
+    this.loadOptionsForField(field, form, true);
+  }
+
   getDynamicOptionValue(option: any, field?: DynamicField): any {
     if (option === null || option === undefined || typeof option !== 'object') {
-      return option;
+      return option ?? '';
     }
 
     if (field?.options_api) {
@@ -2171,6 +2320,9 @@ export class WfDynamicParamsComponent implements OnInit {
 
       const valueKey = configuredValueKey?.trim();
       if (!valueKey) {
+        // Legacy dynamic fields with an empty/missing value_key store the
+        // complete API object. Stringifying it breaks restored selections and
+        // changes the payload sent when an old form is saved again.
         return option;
       }
 
@@ -2284,7 +2436,7 @@ export class WfDynamicParamsComponent implements OnInit {
         if (form !== targetForm) {
           return;
         }
-        if (field.type === 'select' && field.options_api?.depends_on === changedControlName) {
+        if (['select', 'multiselect'].includes(this.getDynamicFieldType(field)) && field.options_api?.depends_on === changedControlName) {
           const isVisible = this.evaluateVisibleWhen(field.visible_when, form);
           if (isVisible) {
             this.loadOptionsForField(field, form);
@@ -2322,7 +2474,7 @@ export class WfDynamicParamsComponent implements OnInit {
     });
   }
 
-  private loadOptionsForField(field: DynamicField, form: FormGroup): void {
+  private loadOptionsForField(field: DynamicField, form: FormGroup, force = false): void {
     const endpoint = this.resolveDynamicEndpoint(field, form);
     const cacheKey = this.getDynamicOptionsCacheKey(field, form);
     const control = form.get(field.control_name);
@@ -2333,7 +2485,7 @@ export class WfDynamicParamsComponent implements OnInit {
     }
 
     // ← Check service cache first, skip API call if already loaded
-    const cached = this.containerSvc.getOptionCache(cacheKey);
+    const cached = force ? null : this.containerSvc.getOptionCache(cacheKey);
     if (cached) {
       const options = this.mapDynamicOptions(cached, field);
       this.dynamicOptionStore[cacheKey] = options;
@@ -2346,6 +2498,7 @@ export class WfDynamicParamsComponent implements OnInit {
     }
 
     this.dynamicOptionLoading[cacheKey] = true;
+    delete this.dynamicOptionErrors[cacheKey];
     const valueBeforeLoad = control?.value;
 
     this.fetchDynamicOptions(field, form, endpoint).subscribe({
@@ -2353,12 +2506,14 @@ export class WfDynamicParamsComponent implements OnInit {
         this.containerSvc.setOptionCache(cacheKey, items);
         this.dynamicOptionStore[cacheKey] = items;
         this.dynamicOptionLoading[cacheKey] = false;
+        delete this.dynamicOptionErrors[cacheKey];
         this.reconcileDynamicOptionValue(field, form, items, valueBeforeLoad);
       },
       error: () => {
         this.containerSvc.setOptionCache(cacheKey, []);
         this.dynamicOptionStore[cacheKey] = [];
         this.dynamicOptionLoading[cacheKey] = false;
+        this.dynamicOptionErrors[cacheKey] = 'Unable to load options.';
       }
     });
   }
@@ -2390,33 +2545,120 @@ export class WfDynamicParamsComponent implements OnInit {
 
     const dependsValue = form.get(dependsOn)?.value;
     if (dependsValue === undefined || dependsValue === null || dependsValue === '') {
+      if (this.getDynamicFieldType(field) === 'group') {
+        this.replaceDynamicGroupFields(field, form, []);
+      }
       return; // nothing selected yet, don't call
+    }
+
+    if (this.getDynamicFieldType(field) === 'group' &&
+      field._formApiLoadedFor === dependsValue && field.fields) {
+      return;
     }
 
     const endpoint = this.resolveFormApiEndpoint(field, form);
     if (!endpoint) return;
 
-    this.http.get<any>(endpoint).subscribe({
-      next: (response) => console.log(`form_api response for ${field.control_name}:`, response),
-      error: (err) => console.error(`form_api error for ${field.control_name}:`, err)
+    if (this.getDynamicFieldType(field) === 'group' &&
+      field._formApiLoadedFor !== undefined && field._formApiLoadedFor !== dependsValue) {
+      this.replaceDynamicGroupFields(field, form, []);
+    }
+    field._formApiLoading = true;
+    field._formApiLoadedFor = dependsValue;
+    this.http.get<any>(endpoint).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: (response) => {
+        if (field._formApiLoadedFor !== dependsValue) return;
+        if (this.getDynamicFieldType(field) === 'group') {
+          const fields = Array.isArray(response) ? response : (response?.results || response?.data || []);
+          this.replaceDynamicGroupFields(field, form, this.normalizeFields(fields));
+          // form_api fields do not exist when the schema's first option-loading
+          // pass runs. Hydrate API-backed children after inserting the group.
+          this.initializeDynamicOptions();
+        }
+        field._formApiLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        if (field._formApiLoadedFor !== dependsValue) return;
+        if (this.getDynamicFieldType(field) === 'group') {
+          this.replaceDynamicGroupFields(field, form, []);
+        }
+        field._formApiLoadedFor = undefined;
+        field._formApiLoading = false;
+        this.cdr.detectChanges();
+      }
     });
+  }
+
+  private replaceDynamicGroupFields(
+    field: DynamicField,
+    parentForm: FormGroup,
+    fields: DynamicField[]
+  ): void {
+    const currentGroup = parentForm.get(field.control_name) as FormGroup;
+    const initialGroupValue = this.getInitialSchemaFieldValue(field.control_name);
+    const currentGroupValue = currentGroup?.getRawValue?.() || {};
+    const currentValue = {
+      ...(initialGroupValue && typeof initialGroupValue === 'object' ? initialGroupValue : {}),
+      ...(currentGroupValue && typeof currentGroupValue === 'object' ? currentGroupValue : {})
+    };
+
+    field.fields = fields;
+    const replacement = this.createFieldGroup(fields, currentValue);
+    if (field.disabled === true || this.isViewMode) {
+      replacement.disable({ emitEvent: false });
+    }
+    parentForm.setControl(field.control_name, replacement);
+    this.restoreFieldModes(replacement, fields);
+    this.ensureFieldValidationState(field);
+    this.refreshFormErrors();
+  }
+
+  private getInitialSchemaFieldValue(controlName: string): any {
+    return this.initialValues?.[controlName] ??
+      this.initialValues?.properties?.[controlName] ??
+      this.initialValues?.settings?.[controlName];
   }
 
   private loadDependentFormApiForFormGroup(targetForm: FormGroup, changedControlName: string): void {
     (this.dynamicSchema?.tabs || []).forEach(tab => {
       this.walkFieldContexts(this.nodeForm, tab.fields || [], (field, form) => {
         if (form !== targetForm) return;
-        if (field.type === 'filter' || field.type === 'condition' && field.form_api?.depends_on === changedControlName) {
-          this.loadFormApiForField(field, form);   // ← itsm_table changed → fires this
+        const supportsDependentFormApi = field.type === 'filter' ||
+          field.type === 'condition' || this.getDynamicFieldType(field) === 'group';
+        if (supportsDependentFormApi && field.form_api?.depends_on === changedControlName) {
+          this.loadFormApiForField(field, form);
         }
       });
     });
   }
 
+  hasFormApiDependencyValue(field: DynamicField, form: FormGroup): boolean {
+    const dependsOn = field.form_api?.depends_on;
+    if (!dependsOn) return true;
+    const value = form.get(dependsOn)?.value;
+    return value !== undefined && value !== null && value !== '';
+  }
+
+  getFormApiEmptyText(field: DynamicField, form: FormGroup): string {
+    if (this.hasFormApiDependencyValue(field, form)) {
+      return 'No fields are configured for the selected value.';
+    }
+    return `Select ${this.prettify(field.form_api?.depends_on || 'a value')} to load fields.`;
+  }
+
   private fetchDynamicOptions(field: DynamicField, form: FormGroup, endpoint: string): Observable<any[]> {
-    return this.http.get<any>(endpoint).pipe(
-      map(response => this.extractAndMapOptions(response, field)),
-      catchError(() => of([]))
+    const config = field.options_api;
+    const request = config?.method === 'POST'
+      ? this.http.post<any>(endpoint, config.static_params || {})
+      : this.http.get<any>(endpoint, { params: this.toHttpParams(config?.static_params) });
+    return request.pipe(map(response => this.extractAndMapOptions(response, field)));
+  }
+
+  private toHttpParams(values?: Record<string, any>): HttpParams {
+    return Object.entries(values || {}).reduce(
+      (params, [key, value]) => value === undefined || value === null ? params : params.set(key, String(value)),
+      new HttpParams()
     );
   }
 
@@ -2520,8 +2762,23 @@ export class WfDynamicParamsComponent implements OnInit {
   }
 
   private getDynamicOptionIdentity(value: any, field?: DynamicField): any {
+    if (typeof value === 'string' && /^[\[{]/.test(value.trim())) {
+      try {
+        return this.getDynamicOptionIdentity(JSON.parse(value), field);
+      } catch {
+        // The value is an ordinary string that only resembles JSON.
+      }
+    }
+
     if (value === null || value === undefined || typeof value !== 'object') {
       return value;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(value, 'label') && Object.prototype.hasOwnProperty.call(value, 'value')) {
+      value = value.value;
+      if (value === null || value === undefined || typeof value !== 'object') {
+        return value;
+      }
     }
 
     const configuredValueKey = field?.options_api?.value_key;
@@ -2606,6 +2863,7 @@ export class WfDynamicParamsComponent implements OnInit {
 
   private mapDynamicOptions(items: any[], field: DynamicField): any[] {
     const labelKey = field.options_api?.label_key || 'label';
+    const searchKey = field.options_api?.search_key?.trim();
     const configuredValueKey = field.options_api?.value_key;
     const valueKeys = Array.isArray(configuredValueKey)
       ? this.normalizeDynamicValueKeys(configuredValueKey)
@@ -2639,11 +2897,12 @@ export class WfDynamicParamsComponent implements OnInit {
         // select-like controls store the option's value through ngValue.
         return this.getDynamicFieldType(field) === 'target_search'
           ? value
-          : { label, value };
+          : { label, value, searchValue: searchKey ? this.readPath(item, searchKey) : label };
       }
 
       return {
         label,
+        searchValue: searchKey ? this.readPath(item, searchKey) : label,
         value:
           this.readPath(item, valueKey) ??
           item.value ??
@@ -3540,6 +3799,43 @@ export class WfDynamicParamsComponent implements OnInit {
     const ro = nodeOutput && typeof nodeOutput === 'object' && 'raw_output' in nodeOutput ? nodeOutput.raw_output
       : nodeOutput && typeof nodeOutput === 'object' && 'output' in nodeOutput ? nodeOutput.output : nodeOutput;
     this.outputValue = ro;
+    this.outputChartData = undefined;
+    const nodeType = String(this.nodeData?.node_type ?? '').trim().toLowerCase();
+    this.isChartOutputNode = nodeType === 'chart' || nodeType === 'chart task';
+    if (this.isChartOutputNode) {
+      let chartOutput = nodeOutput;
+      // Live and saved executions can wrap the chart in multiple output objects.
+      for (let i = 0; i < 5 && chartOutput != null; i++) {
+        if (chartOutput?.chart_type) break;
+        const next = chartOutput?.output ?? chartOutput?.raw_output ?? chartOutput;
+        const parsed = this.workflowLogsService.getChartOutput(next);
+        if (parsed === chartOutput) break;
+        chartOutput = parsed;
+      }
+      const configuredChart = this.realTimeData?.config?.properties ?? this.nodeData?.config?.properties;
+      const chartData = this.normalizeChartData(chartOutput) ?? this.normalizeChartData(configuredChart);
+      if (chartData) {
+        switch (chartData.chart_type) {
+          case 'BAR':
+            this.outputChartData = this.workflowLogsService.convertToBarChartData(chartData);
+            break;
+          case 'PIE':
+            this.outputChartData = this.workflowLogsService.convertToPieChartData(chartData);
+            break;
+          case 'LINE':
+            this.outputChartData = this.workflowLogsService.convertToLineChartData(chartData);
+            break;
+          case 'AREA':
+            this.outputChartData = this.workflowLogsService.convertToAreaChartData(chartData);
+            break;
+        }
+      }
+    }
+    if (this.outputChartData && this.outputView === 'table') {
+      this.outputView = 'chart';
+    } else if (!this.outputChartData && this.outputView === 'chart') {
+      this.outputView = 'table';
+    }
     this.outputError = nodeOutput?.error ?? this.realTimeData?.error ?? '';
     this.outputKind = ro == null || typeof ro === 'string' && !ro.trim() || typeof ro === 'object' && !Object.keys(ro).length
       ? 'empty' : typeof ro === 'string' ? 'text' : Array.isArray(ro) ? 'array' : typeof ro === 'object' ? 'object' : 'text';
@@ -3552,6 +3848,38 @@ export class WfDynamicParamsComponent implements OnInit {
     } else {
       this.outputTreeNodes = [];
     }
+  }
+
+  private normalizeChartData(data: any): any | null {
+    const chartType = String(data?.chart_type || '').toUpperCase();
+    if (!['BAR', 'PIE', 'LINE', 'AREA'].includes(chartType)) return null;
+
+    const xValues = this.chartValues(data.x_values);
+    const yValues = this.chartValues(data.y_values);
+    if (!xValues?.length || !yValues?.length || xValues.length !== yValues.length) return null;
+
+    return {
+      ...data,
+      chart_type: chartType,
+      x_values: xValues,
+      y_values: yValues.map(value => Number.isFinite(Number(value)) ? Number(value) : value)
+    };
+  }
+
+  private chartValues(value: any): any[] | null {
+    if (Array.isArray(value)) return value;
+    if (typeof value !== 'string' || !value.trim() || value.includes('{{')) return null;
+
+    const trimmed = value.trim();
+    if (trimmed.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(trimmed.replace(/'/g, '"'));
+        return Array.isArray(parsed) ? parsed : null;
+      } catch {
+        return null;
+      }
+    }
+    return trimmed.split(',').map(item => item.trim()).filter(Boolean);
   }
 
   // ── isTriggerNode helper (deduplicates long *ngIf) ────────

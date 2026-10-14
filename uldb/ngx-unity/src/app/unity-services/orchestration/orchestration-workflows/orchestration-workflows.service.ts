@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
@@ -9,10 +9,10 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
-import { ListSummaryResModel, OrchestrationHistoryDataType, WorkflowType } from './orchestration-workflows.type';
+import { ListSummaryResModel, OrchestrationHistoryDataType, RelatedServiceCatalog, WorkflowType } from './orchestration-workflows.type';
 // import { ListSummaryViewModel } from '../orchestration-tasks/orchestration-tasks.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class OrchestrationWorkflowsService {
   constructor(private tableService: TableApiServiceService,
     private http: HttpClient,
@@ -69,14 +69,13 @@ export class OrchestrationWorkflowsService {
     summary.totalWorkflow = res.total;
     summary.status = status;
     summary.categories = categories;
-    // listSummaryViewData.remainingCategories = remainingCategories;
     summary.executionStatus = executionStatus;
 
     return summary;
   }
 
   getWorkflowList(criteria: SearchCriteria): Observable<PaginatedResult<WorkflowType>> {
-    return this.tableService.getData<PaginatedResult<WorkflowType>>(`/rest/orchestration/agentic_workflow/`, criteria);
+    return this.tableService.getData<PaginatedResult<WorkflowType>>(`/api/orchestration/v1/dynamic_workflows/`, criteria);
   }
 
   convertToViewData(data: WorkflowType[]): WorkflowViewData[] {
@@ -118,9 +117,16 @@ export class OrchestrationWorkflowsService {
     }
   }
 
+  getRelatedServiceCatalogs(uuid: string, agentic_flag: boolean): Observable<RelatedServiceCatalog[]> {
+    if (!agentic_flag) {
+      return of([]);
+    }
+    return this.http.get<RelatedServiceCatalog[]>(`/api/orchestration/v1/dynamic_workflows/${uuid}/related_items/`);
+  }
+
   deleteWorkflow(uuid: string, agentic_flag: boolean) {
     if (agentic_flag) {
-      return this.http.delete(`rest/orchestration/agentic_workflow/${uuid}/`);
+      return this.http.delete(`/api/orchestration/v1/dynamic_workflows/${uuid}/`);
     } else {
       return this.http.delete(`/orchestration/workflows/${uuid}/`);
     }

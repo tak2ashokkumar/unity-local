@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { OrchestrationIntegrationDetailsCrudService, ScriptType } from './orchestration-integration-details-crud.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -31,13 +32,22 @@ export class OrchestrationIntegrationDetailsCrudComponent implements OnInit {
   fileToUpload: File;
   nonFieldErr: string = '';
   action: string;
-  constructor(private svc: OrchestrationIntegrationDetailsCrudService,
+  private integrationDetailsReturnUrl: string;
+  private integrationReturnUrl: string;
+
+  constructor(private location: Location,
+    private svc: OrchestrationIntegrationDetailsCrudService,
     private router: Router,
     private route: ActivatedRoute,
     private utilService: AppUtilityService,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
   ) {
+    const navigation = this.router.getCurrentNavigation();
+    const navigationState = navigation ? navigation.extras.state : this.location.getState();
+    this.integrationDetailsReturnUrl = navigationState?.['integrationDetailsReturnUrl'] || ('/services/orchestration/integration/' + encodeURIComponent(this.route.snapshot.paramMap.get('repoId')) + '/details');
+    this.integrationReturnUrl = navigationState?.['integrationReturnUrl'] || '/services/orchestration/integration';
+
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.scriptId = params.get('scriptId');
       this.repoId = params.get('repoId');
@@ -198,10 +208,6 @@ export class OrchestrationIntegrationDetailsCrudComponent implements OnInit {
   }
 
   goBack() {
-    if (this.scriptId) {
-      this.router.navigate(['../../'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['../'], { relativeTo: this.route });
-    }
+    this.router.navigateByUrl(this.integrationDetailsReturnUrl, { state: { integrationReturnUrl: this.integrationReturnUrl } });
   }
 }

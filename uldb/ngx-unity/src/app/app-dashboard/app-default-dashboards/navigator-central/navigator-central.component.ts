@@ -2090,17 +2090,32 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     return 'exec-hero-card-compact';
   }
 
+  getExecFirstRowHeroCards(view: UnifiedAiopsExecutiveView): UnifiedAiopsExecStatusCard[] {
+    const cards = view?.heroCards || [];
+    if (!this.shouldMoveExecBareMetalToNextRow(cards)) {
+      return cards;
+    }
+    return cards.filter(card => !this.isExecHeroCard(card, 'bare_metal'));
+  }
+
+  getExecNextRowBareMetalCard(view: UnifiedAiopsExecutiveView): UnifiedAiopsExecStatusCard | null {
+    const cards = view?.heroCards || [];
+    if (!this.shouldMoveExecBareMetalToNextRow(cards)) {
+      return null;
+    }
+    return cards.find(card => this.isExecHeroCard(card, 'bare_metal')) || null;
+  }
+
   getExecHeroTotalsGridClass(view: UnifiedAiopsExecutiveView): string {
-    return this.getExecHeroSpanClass(this.getExecHeroGridSpans(view)[0] || 12);
+    return this.getExecHeroSpanClass(this.getExecHeroGridSpans(this.getExecFirstRowHeroCards(view))[0] || 12);
   }
 
   getExecHeroCardGridClass(view: UnifiedAiopsExecutiveView, index: number): string {
-    return this.getExecHeroSpanClass(this.getExecHeroGridSpans(view)[index + 1] || 2);
+    return this.getExecHeroSpanClass(this.getExecHeroGridSpans(this.getExecFirstRowHeroCards(view))[index + 1] || 2);
   }
 
-  private getExecHeroGridSpans(view: UnifiedAiopsExecutiveView): number[] {
-    const cards = view?.heroCards || [];
-    const weights = [2, ...cards.map(card => this.getExecHeroCardWeight(card))];
+  private getExecHeroGridSpans(cards: UnifiedAiopsExecStatusCard[]): number[] {
+    const weights = [2, ...(cards || []).map(card => this.getExecHeroCardWeight(card))];
     if (!weights.length) {
       return [12];
     }
@@ -2139,6 +2154,16 @@ export class NavigatorCentralComponent implements OnInit, OnDestroy {
     }
 
     return spans;
+  }
+
+  private shouldMoveExecBareMetalToNextRow(cards: UnifiedAiopsExecStatusCard[]): boolean {
+    return (cards || []).some(card => this.isExecHeroCard(card, 'private_cloud')) &&
+      (cards || []).some(card => this.isExecHeroCard(card, 'public_cloud')) &&
+      (cards || []).some(card => this.isExecHeroCard(card, 'bare_metal'));
+  }
+
+  private isExecHeroCard(card: UnifiedAiopsExecStatusCard, key: string): boolean {
+    return card?.key === key;
   }
 
   private getExecHeroCardWeight(card: UnifiedAiopsExecStatusCard): number {

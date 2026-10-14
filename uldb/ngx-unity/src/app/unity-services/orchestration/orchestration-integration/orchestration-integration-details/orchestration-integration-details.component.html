@@ -1,237 +1,122 @@
-<div class="col-12 px-0" *ngIf="listSummaryViewData">
-    <div class="row mt--3">
-        <div class="col-2 p-0 pr-1">
-            <div class="card mb-0">
-                <div class="card-body py-2 my-1">
-                    <div class="card-title mb-0">Repo Name</div>
-                    <span class="text-primary text-value-sm text-truncate d-block"
+<div class="row mt--3" *ngIf="listSummaryViewData">
+    <div class="col-12 p-0">
+        <div class="card mb-0">
+            <div class="card-body summary-bar d-flex align-items-stretch p-0 px-3">
+
+                <!-- Repo Name (truncates, full name in tooltip) -->
+                <div class="summary-repo d-flex flex-column justify-content-center pr-4">
+                    <div class="small text-uppercase text-muted font-weight-bold">Repo Name</div>
+                    <span class="summary-num text-value-sm font-weight-bold text-truncate d-block"
                         [tooltip]="listSummaryViewData.repoName">{{listSummaryViewData.repoName}}</span>
                 </div>
+
+                <!-- Total Scripts -->
+                <div class="flex-shrink-0 d-flex flex-column justify-content-center px-4 border-left">
+                    <div class="small text-uppercase text-muted font-weight-bold">Total Scripts</div>
+                    <div>
+                        <span
+                            class="summary-num text-value-sm font-weight-bold">{{listSummaryViewData.totalScripts}}</span>
+                    </div>
+                </div>
+
+                <!-- By Script Type (icon + count) -->
+                <div class="flex-shrink-0 d-flex flex-column justify-content-center px-4 border-left">
+                    <div class="small text-uppercase text-muted font-weight-bold">By Script Type</div>
+                    <div class="d-flex align-items-center">
+                        <span class="d-inline-flex align-items-center mr-3"
+                            *ngFor="let type of listSummaryViewData?.byScriptType">
+                            <span class="mr-1" [tooltip]="type.tooltipMessage">
+                                <img [src]="type?.icon" alt="" height="18">
+                            </span>
+                            <span class="summary-num text-value-sm font-weight-bold pointer-link">{{type?.count}}</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- By Type -->
+                <div class="flex-shrink-0 d-flex flex-column justify-content-center pl-4 border-left">
+                    <div class="small text-uppercase text-muted font-weight-bold">By Type</div>
+                    <div class="d-flex align-items-center">
+                        <span class="mr-3 text-nowrap">
+                            <span class="small text-muted mr-1">Default</span>
+                            <span
+                                class="summary-num text-value-sm font-weight-bold pointer-link">{{listSummaryViewData.byType.default}}</span>
+                        </span>
+                        <span class="mr-3 text-nowrap">
+                            <span class="small text-muted mr-1">Custom</span>
+                            <span
+                                class="summary-num text-value-sm font-weight-bold pointer-link">{{listSummaryViewData.byType.custom}}</span>
+                        </span>
+                    </div>
+                </div>
+
             </div>
         </div>
-        <div class="col-2 px-1">
-            <div class="card mb-0">
-                <div class="card-body py-2 my-1">
-                    <div class="card-title mb-0">Total Scripts</div>
-                    <span class="text-primary text-value-sm">{{listSummaryViewData.totalScripts}}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-4 px-1">
-            <div class="card mb-0">
-                <div class="card-body py-2 my-1">
-                    <div class="card-title mb-0">By Script Type</div>
-                    <!-- <div class="row">
-                        <div class="col-12 d-flex flex-column">
-                            <div class="row m-0 p-0">
-                                <span *ngFor="let type of listSummaryViewData.byScriptType; let i=index">
-                                    <span class="mr-1" [tooltip]="type.tooltipMessage"
-                                        [ngClass]="{'ml-1': i === 1 || i === 2}"><img [src]="type?.icon" alt=""></span>
-                                    <span class="text-primary mr-2 text-value-sm pointer-link">{{type?.count}}</span>
-                                    <span class="border border-secondary mb-5 mr-2"
-                                        *ngIf="i !== listSummaryViewData?.byScriptType.length-1"></span>
-                                </span>
-                            </div>
+
+        <div class="col-12 mt-2 p-0">
+            <app-generic-table [title]="'Scripts'" [count]="count" [headerActions]="headerActions"
+                (headerActionClick)="onHeaderAction($event)" (refresh)="refreshData()" [showBackButton]="true"
+                [backButtonConfig]="{tooltip: 'Back'}" (back)="goBack()" [searchValue]="currentCriteria.searchValue"
+                (searched)="onSearched($event)" [filters]="filterConfig" [selectedFilters]="selectedFiltersForTable"
+                (filtersApplied)="onFiltersApplied($event)" [pageSize]="currentCriteria.pageSize"
+                (pageSizeChange)="pageSizeChange($event)" [columns]="columns" [data]="viewData"
+                [pageNo]="currentCriteria.pageNo" [totalCount]="count" (pageChange)="pageChange($event)"
+                (sortChanged)="onSortChanged($event)" [activeSortField]="activeSortField"
+                [activeSortDirection]="activeSortDirection" emptyMessage="No associated data found.">
+
+                <ng-template ctCellFor="actions" let-view let-i="index">
+                    <button class="action-icons mb-0 fas fa-eye font-sm ml-1" tooltip="View Details"
+                        (click)="viewDetails(view)" [disabled]="view.type == 'Default'" [ngClass]="{
+                            'action-icons-disabled': view.type == 'Default', 
+                            'action-icons-enabled': view.type != 'Default'
+                          }" accessControl moduleName="DevOps Automation" accessType="View Scripts"
+                        elementType="actionbtn">
+                    </button>
+                    <button class="action-icons mb-0 fas fa-copy font-sm ml-1" tooltip="Clone"
+                        (click)="cloneScript(view.name,view.uuid)" [disabled]="view.type == 'Default'" [ngClass]="{
+                            'action-icons-disabled': view.type == 'Default', 
+                            'action-icons-enabled': view.type != 'Default'
+                          }" accessControl moduleName="DevOps Automation" accessType="Manage Scripts"
+                        elementType="actionbtn">
+                    </button>
+                    <button class="action-icons mb-0 fas fa-clipboard-list font-sm ml-1" tooltip="Activity Logs"
+                        (click)="goToActivityLogs(view)" [disabled]="view.type == 'Default'" [ngClass]="{
+                            'action-icons-disabled': view.type == 'Default', 
+                            'action-icons-enabled': view.type != 'Default'
+                          }">
+                    </button>
+                    <span dropdown placement="bottom right" container="body" [isDisabled]="view.type == 'Default'">
+                        <button id="button-container" class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                            data-toggle="dropdown" aria-controls="icons-dropdown-container" dropdownToggle
+                            (click)="false" [tooltip]="'More Actions'" container="body" [ngClass]="{
+                                'action-icons-disabled': view.type == 'Default', 
+                                'action-icons-enabled': view.type != 'Default'
+                              }"></button>
+                        <div container="body" id="icons-dropdown-container"
+                            class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                            aria-labelledby="button-container">
+                            <button class="action-icons mt-1 mb-1 fas fa-pencil-alt font-sm" (click)="editScript(view)"
+                                [tooltip]="'Edit'" container="body" [disabled]="view.type == 'Default'" [ngClass]="{
+                                    'action-icons-disabled': view.type == 'Default', 
+                                    'action-icons-enabled': view.type != 'Default'
+                                  }" accessControl moduleName="DevOps Automation" accessType="Manage Scripts"
+                                elementType="actionbtn"></button>
+                            <button class="action-icons mt-1 mb-2 far fa-trash-alt font-sm"
+                                (click)="deleteScript(view.uuid)" [tooltip]="'Delete'" container="body"
+                                [disabled]="view.type == 'Default'" [ngClass]="{
+                                    'action-icons-disabled': view.type == 'Default', 
+                                    'action-icons-enabled': view.type != 'Default'
+                                  }" accessControl moduleName="DevOps Automation" accessType="Manage Scripts"
+                                elementType="actionbtn"></button>
+                            <button class="action-icons fas fa-download mt-1 mb-2" tooltip="Download" container="body"
+                                (click)="downloadScript(view.uuid)" [disabled]="view.type == 'Default'" [ngClass]="{
+                                    'action-icons-disabled': view.type == 'Default', 
+                                    'action-icons-enabled': view.type != 'Default'
+                                  }"></button>
                         </div>
-                    </div> -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="row m-0 p-0">
-                                <span class="m-0 p-0 d-flex align-items-center" style="height: 26px;"
-                                    *ngFor="let type of listSummaryViewData?.byScriptType; let i=index">
-                                    <span class="mr-1" [tooltip]="type.tooltipMessage"><img class="mt--1"
-                                            [src]="type?.icon" alt="" style="height:20px"></span>
-                                    <span class="text-primary mr-2 text-value-sm pointer-link">{{type?.count}}</span>
-                                    <span *ngIf="i !== listSummaryViewData?.byScriptType.length-1"
-                                        class="border border-secondary mr-2" style="height: 20px;"></span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-4 pl-1 pr-0">
-            <div class="card mb-0">
-                <div class="card-body py-2 my-1">
-                    <div class="">By Type</div>
-                    <div class="d-flex">
-                        <div>Default :<span
-                                class="text-primary mx-2 text-value-sm pointer-link">{{listSummaryViewData.byType.default}}</span>
-                        </div>
-                        <span class="border border-secondary mr-2"></span>
-                        <div>Custom :<span
-                                class="text-primary ml-2 text-value-sm pointer-link">{{listSummaryViewData.byType.custom}}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mt-2">
-        <div class="col p-0">
-            <div class="card">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center pl-0 py-2">
-                    <div class="d-flex justify-content-between ml-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-left align-middle"><span
-                                    class="badge badge-secondary font-sm">{{count}}</span>&nbsp;<span
-                                    class="font-lg font-500">Scripts
-                                </span></span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-end">
-                        <button class="btn btn-warning btn-sm rounded-pill px-3" (click)="goToCreate()" accessControl
-                            moduleName="DevOps Automation" accessType="Manage Scripts" elementType="btn">
-                            <i class="fas fa-plus mr-1"></i>&nbsp;Add Script</button>
-                        <data-refresh-btn class="mr-2" [page]="currentCriteria.pageNo"
-                            (refresh)="refreshData($event)"></data-refresh-btn>
-                        <button class="btn btn-pill btn-warning btn-sm" (click)="goBack()" tooltip="Back">
-                            <i class="fa fa-arrow-left"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body pt-2">
-                    <div class="row pb-2 d-flex justify-content-between">
-                        <div class="col-2">
-                            <search-box [searchValue]="currentCriteria.searchValue"
-                                (searched)="onSearched($event)"></search-box>
-                        </div>
-                        <div class="col-5 d-flex justify-content-end">
-                            <div class="mr-3">
-                                <select class="form-control" type="text" [(ngModel)]="currentCriteria.params[0].type"
-                                    (ngModelChange)="onFilterChange()">
-                                    <option [value]="''">Select Type</option>
-                                    <option [value]="'default'">Default</option>
-                                    <option [value]="'custom'">Custom</option>
-                                </select>
-                            </div>
-                            <div class="mr-3">
-                                <select class="form-control" type="text"
-                                    [(ngModel)]="currentCriteria.params[0].script_type"
-                                    (ngModelChange)="onFilterChange()">
-                                    <option [value]="''">Script Type</option>
-                                    <option [value]="script.value" *ngFor="let script of scriptChoices">{{script.label}}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="mt-1">
-                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
-                                    [isAllEnabled]="isPageSizeAll"
-                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
-                            </div>
-                        </div>
-                    </div>
-                    <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Script Type</th>
-                                <th>Description</th>
-                                <th>Created On</th>
-                                <th>Created By</th>
-                                <!-- <th>Updated On</th>
-                                <th>Updated By</th> -->
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let view of viewData" truncateText>
-                                <td class="tdw-20">
-                                    <div [tooltip]="view.name">{{view.name}}</div>
-                                </td>
-                                <td class="tdw-10">
-                                    <div [tooltip]="view.type">{{view.type}}</div>
-                                </td>
-                                <td class="tdw-15">
-                                    <div [tooltip]="view.scriptType">{{view.scriptType}}</div>
-                                </td>
-                                <td class="tdw-15">
-                                    <div [tooltip]="view.description">{{view.description}}</div>
-                                </td>
-                                <td class="tdw-10">
-                                    <div [tooltip]="view.createdAt">{{view.createdAt}}</div>
-                                </td>
-                                <td class="tdw-10">
-                                    <div [tooltip]="view.createdByName">{{view.createdByName}}</div>
-                                </td>
-                                <!-- <td class="tdw-10">
-                                    <div [tooltip]="view.updatedAt">{{view.updatedAt}}</div>
-                                </td>
-                                <td class="tdw-10">
-                                    <div [tooltip]="view.editedBy">{{view.editedBy}}</div>
-                                </td> -->
-                                <td class="action-icons-column tdw-20 text-center">
-                                    <button class="action-icons mb-0 fas fa-eye font-sm ml-1" tooltip="View Details"
-                                        (click)="viewDetails(view)" [disabled]="view.type == 'Default'" [ngClass]="{
-                                            'action-icons-disabled': view.type == 'Default', 
-                                            'action-icons-enabled': view.type != 'Default'
-                                          }" accessControl moduleName="DevOps Automation" accessType="View Scripts"
-                                        elementType="actionbtn">
-                                    </button>
-                                    <button class="action-icons mb-0 fas fa-copy font-sm ml-1" tooltip="Clone"
-                                        (click)="cloneScript(view.name,view.uuid)" [disabled]="view.type == 'Default'"
-                                        [ngClass]="{
-                                            'action-icons-disabled': view.type == 'Default', 
-                                            'action-icons-enabled': view.type != 'Default'
-                                          }" accessControl moduleName="DevOps Automation" accessType="Manage Scripts"
-                                        elementType="actionbtn">
-                                    </button>
-                                    <button class="action-icons mb-0 fas fa-clipboard-list font-sm ml-1"
-                                        tooltip="Activity Logs" (click)="goToActivityLogs(view)"
-                                        [disabled]="view.type == 'Default'" [ngClass]="{
-                                            'action-icons-disabled': view.type == 'Default', 
-                                            'action-icons-enabled': view.type != 'Default'
-                                          }">
-                                    </button>
-                                    <span dropdown placement="bottom right" container="body"
-                                        [isDisabled]="view.type == 'Default'">
-                                        <button id="button-container"
-                                            class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
-                                            data-toggle="dropdown" aria-controls="icons-dropdown-container"
-                                            dropdownToggle (click)="false" [tooltip]="'More Actions'" container="body"
-                                            [ngClass]="{
-                                                'action-icons-disabled': view.type == 'Default', 
-                                                'action-icons-enabled': view.type != 'Default'
-                                              }"></button>
-                                        <div container="body" id="icons-dropdown-container"
-                                            class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
-                                            aria-labelledby="button-container">
-                                            <button class="action-icons mt-1 mb-1 fas fa-pencil-alt font-sm"
-                                                (click)="editScript(view)" [tooltip]="'Edit'" container="body"
-                                                [disabled]="view.type == 'Default'" [ngClass]="{
-                                                    'action-icons-disabled': view.type == 'Default', 
-                                                    'action-icons-enabled': view.type != 'Default'
-                                                  }" accessControl moduleName="DevOps Automation"
-                                                accessType="Manage Scripts" elementType="actionbtn"></button>
-                                            <button class="action-icons mt-1 mb-2 far fa-trash-alt font-sm"
-                                                (click)="deleteScript(view.uuid)" [tooltip]="'Delete'" container="body"
-                                                [disabled]="view.type == 'Default'" [ngClass]="{
-                                                    'action-icons-disabled': view.type == 'Default', 
-                                                    'action-icons-enabled': view.type != 'Default'
-                                                  }" accessControl moduleName="DevOps Automation"
-                                                accessType="Manage Scripts" elementType="actionbtn"></button>
-                                            <button class="action-icons fas fa-download mt-1 mb-2" tooltip="Download"
-                                                container="body" (click)="downloadScript(view.uuid)"
-                                                [disabled]="view.type == 'Default'" [ngClass]="{
-                                                    'action-icons-disabled': view.type == 'Default', 
-                                                    'action-icons-enabled': view.type != 'Default'
-                                                  }"></button>
-                                        </div>
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
-                        [totalCount]="count"></table-entries>
-                    <table-pager *ngIf="viewData?.length" [pageNo]="currentCriteria.pageNo"
-                        [pageSize]="currentCriteria.pageSize" [totalCount]="count"
-                        (pageChange)="pageChange($event)"></table-pager>
-                    <div class="text-center text-muted" *ngIf="!viewData?.length">No associated data found.</div>
-                </div>
-            </div>
+                    </span>
+                </ng-template>
+            </app-generic-table>
         </div>
     </div>
 </div>
@@ -239,21 +124,52 @@
 <ng-template #confirmdelete>
     <div class="card mb-0">
         <div class="card-header">
-            Confirm delete
+            Delete Script?
             <div class="card-header-actions">
-                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
-                    <i class="fas fa-times"></i>
-                </a>
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()"><i
+                        class="fas fa-times"></i></a>
             </div>
         </div>
         <div class="card-body">
-            This script will be deleted. Are you sure you want to delete?
+            <ng-container *ngIf="linkedTasks.length; else noLinkedTasks">
+                <p>This script is currently used by {{linkedTasks.length}} {{linkedTasks.length === 1 ? 'task' :
+                    'tasks'}}. Deleting the script will unlink it from {{linkedTasks.length === 1 ? 'this task'
+                    : 'these
+                    tasks'}}. The {{linkedTasks.length === 1 ? 'task itself will' : 'tasks themselves will'}}
+                    not be
+                    deleted.</p>
+                <div class="linked-tasks-list mb-3">
+                    <div class="font-weight-bold">Related Task ({{linkedTasks.length}})</div>
+                    <ul class="mb-1">
+                        <li *ngFor="let task of linkedTasks | slice:0:(showAllLinkedTasks ? linkedTasks.length : 5)">
+                            {{task.name}}</li>
+                    </ul>
+                    <button *ngIf="linkedTasks.length > 5 && !showAllLinkedTasks" class="btn btn-link btn-sm p-0"
+                        type="button" (click)="showAllLinkedTasks = true">View
+                        all</button>
+                </div>
+                <div class="alert alert-warning mb-0" role="alert">
+                    <div class="font-weight-bold">Warning</div>
+                    The related tasks may no longer be executable until another script is configured.
+                </div>
+            </ng-container>
+            <ng-template #noLinkedTasks>
+                Are you sure you want to delete this script?
+            </ng-template>
         </div>
         <div class="card-footer">
-            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
-                (click)="confirmScriptDelete()">Yes</button>
-            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
-                type="button">No</button>
+            <ng-container *ngIf="linkedTasks.length; else noLinkedTaskButtons">
+                <button class="btn btn-sm btn-danger pull-right ml-1" type="button"
+                    (click)="confirmScriptDelete()">Force Delete</button>
+                <button class="btn btn-sm btn-success pull-right" type="button"
+                    (click)="confirmDeleteModalRef.hide()">Cancel</button>
+            </ng-container>
+            <ng-template #noLinkedTaskButtons>
+                <button class="btn btn-sm btn-danger pull-right ml-1" type="button"
+                    (click)="confirmScriptDelete()">Yes</button>
+                <button class="btn btn-sm btn-success pull-right" type="button"
+                    (click)="confirmDeleteModalRef.hide()">No</button>
+            </ng-template>
         </div>
     </div>
 </ng-template>
@@ -263,9 +179,8 @@
         <div class="card-header">
             Script details
             <div class="card-header-actions">
-                <a class="card-header-action btn-close" (click)="playbookViewModalRef.hide()">
-                    <i class="fas fa-times"></i>
-                </a>
+                <a class="card-header-action btn-close" (click)="playbookViewModalRef.hide()"><i
+                        class="fas fa-times"></i></a>
             </div>
         </div>
         <div class="card-body">
@@ -305,9 +220,7 @@
         <div class="card-header">
             Clone task
             <div class="card-header-actions">
-                <a class="card-header-action btn-close" (click)="cloneModalRef.hide()">
-                    <i class="fas fa-times"></i>
-                </a>
+                <a class="card-header-action btn-close" (click)="cloneModalRef.hide()"><i class="fas fa-times"></i></a>
             </div>
         </div>
         <div class="card-body">

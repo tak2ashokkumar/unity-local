@@ -7,6 +7,7 @@ import { DeviceIconService, OnboardedDownColors, OnboardedNotUPNotDownColors, On
 import { UnityViewNetworkTopology, UnityViewNetworkTopologyLink, UnityViewNetworkTopologyNode } from 'src/app/shared/SharedEntityTypes/network-topology.type';
 import { UnityTopologydataService } from 'src/app/united-view/unity-topology/unity-topologydata.service';
 import { Data, DataSet, Edge, Node } from 'vis-network/standalone';
+import { ConnectedNodesResponse } from './app-common-topology.type';
 
 @Injectable()
 export class AppCommonTopologyService {
@@ -28,8 +29,15 @@ export class AppCommonTopologyService {
     return this.http.get<TopologyResponse[]>(`/apm/topology/app_service_topology_details/`, { params });
   }
 
+  getNodeMap(serviceId: string, nodeId: string): Observable<ConnectedNodesResponse> {
+    let params = new HttpParams()
+      .set('service_id', serviceId)
+      .set('node_id', nodeId);
+    return this.http.get<ConnectedNodesResponse>(`/apm/topology/app_topology_node_map/`, { params });
+  }
+
   getNodesandEdges(data: UnityViewNetworkTopology): { nodes: UnityViewNetworkTopologyNode[], links: UnityViewNetworkTopologyLink[] } {
-    let nodes = data.nodes.filter((value, index, self) =>
+    let nodes = data?.nodes?.filter((value, index, self) =>
       index === self.findIndex((t) => (t.uuid === value.uuid))
     )
     nodes.map(n => {
@@ -178,6 +186,7 @@ export interface UnityNetworkTopologyNodeViewData extends UnityViewNetworkTopolo
 
 export interface TopologyResponse {
   app_name: string | null;
+  application?: UnityViewNetworkTopology[];
   service?: UnityViewNetworkTopology[];
   component?: UnityViewNetworkTopology[];
   process?: UnityViewNetworkTopology[];

@@ -245,12 +245,24 @@ $cabinet_unit-border-color: #181a1f;
         }
         img.hpdu_start {
           width: 5%;
+          box-sizing: border-box;
         }
         img.hpdu_single_socket {
           width: 10%;
+          box-sizing: border-box;
+        }
+        .hpdu_empty_socket {
+          display: inline-block;
+          width: 10%;
+          height: 13px;
+          background-color: #e9e9e9;
+          border: 1px solid #bcbcbc;
+          box-sizing: border-box;
+          vertical-align: top;
         }
         img.hpdu_end {
           width: 15%;
+          box-sizing: border-box;
         }
       }
     }

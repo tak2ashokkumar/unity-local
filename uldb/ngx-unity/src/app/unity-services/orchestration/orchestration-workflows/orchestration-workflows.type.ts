@@ -1,3 +1,8 @@
+export interface RelatedServiceCatalog {
+    name: string;
+    uuid: string;
+}
+
 export interface UnityWorkflow {
     uuid?: string;
     category?: string;

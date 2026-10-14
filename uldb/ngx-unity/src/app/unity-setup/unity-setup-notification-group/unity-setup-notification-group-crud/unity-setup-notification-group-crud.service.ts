@@ -382,7 +382,8 @@ export const deviceTypes = [
   { 'name': 'Vcloud' },
   { 'name': 'HyperV' },
   { 'name': 'Openstack' },
-  { 'name': 'Custom VM' }
+  { 'name': 'Custom VM' },
+  { 'name': 'Database'}
 ];
 
 export const typesOptions: AlertTypeListDataType[] = [

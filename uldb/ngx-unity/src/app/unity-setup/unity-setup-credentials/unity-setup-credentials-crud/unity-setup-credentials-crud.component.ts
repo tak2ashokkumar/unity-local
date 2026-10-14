@@ -334,6 +334,8 @@ export class UnitySetupCredentialsCrudComponent implements OnInit, OnDestroy {
       { name: 'key', control: new FormControl('', [Validators.required]) },
       { name: 'password', control: new FormControl('', [Validators.required]) },
       { name: 'sudo_password', control: new FormControl('') },
+      // Optional: devices whose SSH listens on a non-default port (blank = 22).
+      { name: 'port', control: new FormControl(null, [Validators.min(0), Validators.max(65535)]) },
       { name: 'device_mapping', control: new FormControl(false) },
     ]);
   }
@@ -368,6 +370,10 @@ export class UnitySetupCredentialsCrudComponent implements OnInit, OnDestroy {
       this.addFormControls([{ name: 'device_mapping', control: new FormControl(false) }]);
     } else {
       this.removeFormControls(['device_mapping']);
+    }
+    // Optional connection port for SSH / Windows (WinRM); blank = 22 / 5985.
+    if (type == 'SSH' || type == 'Windows') {
+      this.addFormControls([{ name: 'port', control: new FormControl(null, [Validators.min(0), Validators.max(65535)]) }]);
     }
   }
 

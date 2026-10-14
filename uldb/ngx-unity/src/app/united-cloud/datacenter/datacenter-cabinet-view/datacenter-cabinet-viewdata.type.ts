@@ -202,7 +202,7 @@ export class DatacenterCabinetUnitDevice extends DatacenterCabinetViewDevice {
   rearView: string;
   hPDUStartImgURL?: string;
   hPDUSingleSocketImgURL?: string;
-  hPDUSocketRows: number[][] = []; // horizontal PDU sockets grouped into rows of 8 (one row per cabinet unit)
+  hPDUSocketRows: Array<Array<number | null>> = []; // horizontal PDU sockets grouped into rows of 8 (null marks an empty socket slot)
   hPDUEndImgURL?: string;
   vPDUStartImgURL?: string;
   vPDUSingleSocketImgURL?: string;

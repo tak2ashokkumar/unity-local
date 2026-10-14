@@ -25,6 +25,7 @@ export class CatalogCheckoutComponent implements OnInit {
   checkout: CartCheckoutResponse = null;
   expandedItemUuid: string = null;
   itemActions: { [uuid: string]: boolean } = {};
+  qtyLimitMsg: { [uuid: string]: string } = {};
   private initializedExpansion = false;
 
   form: FormGroup;
@@ -67,6 +68,7 @@ export class CatalogCheckoutComponent implements OnInit {
       .subscribe(
         (res: CartCheckoutResponse) => {
           this.checkout = res;
+          this.qtyLimitMsg = {};  
           if (!this.initializedExpansion && res.items?.length) {
             this.expandedItemUuid = res.items[0].uuid;
             this.initializedExpansion = true;
@@ -136,8 +138,28 @@ export class CatalogCheckoutComponent implements OnInit {
   }
 
   onQuantityChange(item: CartItem, delta: number): void {
+    if (this.isItemActionPending(item)) {
+      return;
+    }
+
+    const min = item.min_quantity ?? 1;
+    const max = item.max_quantity ?? Infinity;
     const quantity = item.quantity + delta;
-    if (quantity < 1 || this.isItemActionPending(item)) {
+
+    // Clear any previous message for this item before re-checking
+    this.qtyLimitMsg[item.uuid] = '';
+
+    if (delta < 0 && quantity < min) {
+      this.qtyLimitMsg[item.uuid] = `Minimum quantity is ${min}.`;
+      return;
+    }
+
+    if (delta > 0 && quantity > max) {
+      this.qtyLimitMsg[item.uuid] = `Maximum quantity is ${max}.`;
+      return;
+    }
+
+    if (quantity < 1) {
       return;
     }
 

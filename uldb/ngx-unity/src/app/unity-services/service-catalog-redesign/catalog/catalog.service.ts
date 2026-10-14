@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AddToCartPayload, CartResponse, CartViewData, CatalogDetail, CatalogFilterChoices, CatalogItem, CategoryOption, ConfigurationViewData, ExploreTab, FilterCategory, ModalTab, OverviewViewData, PricingViewData, RequirementsViewData, SlaViewData } from './catalog.type';
+import { AddToCartPayload, CartLineViewData, CartResponse, CartViewData, CatalogDetail, CatalogFilterChoices, CatalogItem, CategoryOption, ConfigurationViewData, ExploreTab, FilterCategory, ModalTab, OverviewViewData, PricingViewData, RequirementsViewData, SlaViewData } from './catalog.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -180,23 +180,32 @@ export class CatalogService {
   }
 
   convertToCartViewData(cart: CartResponse): CartViewData {
+    const lines: CartLineViewData[] = (cart.items || []).map(item => ({
+      uuid: item.uuid,
+      catalogUuid: item.catalog_item?.uuid,
+      name: item.catalog_item?.name,
+      category: item.catalog_item?.category,
+      platform: item.catalog_item?.platform,
+      quantity: item.quantity,
+      unitPrice: Number(item.rate),
+      lineTotal: item.amount,
+      isError: !!item.is_error,
+      configuration: item.configuration || {}
+    }));
+
     return {
       totalItems: cart.total_items || 0,
       subtotal: cart.subtotal || 0,
       tax: cart.tax || 0,
       grandTotal: cart.grand_total || 0,
       currency: cart.currency || CatalogService.DEFAULT_CURRENCY,
-      lines: (cart.items || []).map(item => ({
-        uuid: item.uuid,
-        catalogUuid: item.catalog_item?.uuid,
-        name: item.catalog_item?.name,
-        category: item.catalog_item?.category,
-        platform: item.catalog_item?.platform,
-        quantity: item.quantity,
-        unitPrice: Number(item.rate),
-        lineTotal: item.amount
-      }))
+      lines,
+      hasError: lines.some(l => l.isError)
     };
+  }
+
+  updateCartItem(itemUuid: string, payload: AddToCartPayload): Observable<any> {
+    return this.http.patch<any>(`/api/service_catalog/v1/cart_items/${itemUuid}/`, payload);
   }
 
   getCart(): Observable<CartResponse> {

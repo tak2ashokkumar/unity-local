@@ -4,13 +4,13 @@
     font-size: 95%;
 }
 
-ul {
+.task-filters {
     list-style: none;
     display: flex;
     flex-direction: row;
 }
 
-ul li {
+.task-filters li {
     text-align: center;
     background: #f0f3f5;
     cursor: pointer;
@@ -47,20 +47,16 @@ ul li {
 
 }
 
-ul li:first-child {
+.task-filters li:first-child {
     border-top-left-radius: 25px;
     border-bottom-left-radius: 25px;
     border-right: none !important;
 }
 
-ul li:last-child {
+.task-filters li:last-child {
     border-top-right-radius: 25px;
     border-bottom-right-radius: 25px;
     border-left: none !important;
-}
-
-.text-align-center {
-    text-align: center;
 }
 
 .showIcons {
@@ -114,6 +110,11 @@ ul li:last-child {
     width: 100%;
 }
 
+.linked-dependencies-list {
+    max-height: 12rem;
+    overflow-y: scroll;
+}
+
 .task-type-item {
     display: inline-flex;
     align-items: center;
@@ -121,4 +122,47 @@ ul li:last-child {
     width: auto;
     max-width: none;
     margin-right: 0.5rem;
+}
+
+.category-panel {
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+        flex: 0 0 auto;
+    }
+
+    &__title {
+        letter-spacing: .03em;
+    }
+
+    &__list {
+        flex: 1 1 auto;
+        min-height: 0; // needed so overflow-auto actually scrolls inside a flex column
+    }
+}
+
+.category-item {
+    cursor: pointer;
+    transition: background-color .15s ease-in-out;
+
+    &__icons {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity .15s ease-in-out;
+
+        &--visible {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+}
+
+.summary-bar {
+    height: 4rem; 
+    overflow-x: auto; 
+}
+
+.summary-num {
+    color: #475467;
 }

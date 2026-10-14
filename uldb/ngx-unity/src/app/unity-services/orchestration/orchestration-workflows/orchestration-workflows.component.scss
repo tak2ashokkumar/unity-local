@@ -1,10 +1,10 @@
-ul {
+.status-toggle-column ul {
   list-style: none;
   display: flex;
   flex-direction: row;
 }
 
-ul li {
+.status-toggle-column ul li {
   text-align: center;
   background: #f0f3f5;
   cursor: pointer;
@@ -28,26 +28,22 @@ ul li {
       visibility: hidden;
       max-width: 0px;
     }
-
   }
-
 
   label.active {
     background-color: #378ad8 !important;
     color: #ffffff !important;
     padding: 0.25rem 0.7rem;
   }
-
-
 }
 
-ul li:first-child {
+.status-toggle-column ul li:first-child {
   border-top-left-radius: 25px;
   border-bottom-left-radius: 25px;
   border-right: none !important;
 }
 
-ul li:last-child {
+.status-toggle-column ul li:last-child {
   border-top-right-radius: 25px;
   border-bottom-right-radius: 25px;
   border-left: none !important;
@@ -63,6 +59,15 @@ ul li:last-child {
   // color: blue;
 }
 
+// ---- NEW: summary bar ----
+.summary-bar {
+  height: 4rem;
+  overflow-x: auto;
+}
+
+.summary-num {
+  color: #475467;
+}
 
 .summary-row {
   display: flex;
@@ -115,4 +120,9 @@ ul li:last-child {
   white-space: nowrap;
   margin-right: 0.5rem;
   margin-bottom: 0.25rem;
+}
+
+.related-service-catalogs-list {
+  max-height: 8rem;
+  overflow-y: scroll;
 }

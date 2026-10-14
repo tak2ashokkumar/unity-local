@@ -1,24 +1,34 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { Subject, Subscription, from, interval } from 'rxjs';
-import { mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { Observable, Subject, Subscription, from, interval } from 'rxjs';
+import { switchMap, mergeMap, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { AppLevelService } from 'src/app/app-level.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageType } from 'src/app/shared/app-storage/storage-type';
 import { StorageService } from 'src/app/shared/app-storage/storage.service';
-import { CRUDActionTypes, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, CRUDActionTypes, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { HYPERV_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
+import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
+import { TaskError, TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { environment } from 'src/environments/environment';
 import { DevicePopoverData } from '../../devices-popover/device-popover-data';
 import { VmsTagsCrudService } from '../vms-tags-crud/vms-tags-crud.service';
 import { VmsService } from '../vms.service';
-import { HypervVMViewData, VmsListHypervService } from './vms-list-hyperv.service';
+import { HypervVMPowerAuthFormErrors, HypervVMPowerTogglePayload, HypervVMViewData, VmsListHypervService } from './vms-list-hyperv.service';
+
+enum HypervPowerAction {
+  POWER_ON = 'Power on',
+  POWER_OFF = 'Power off'
+}
 
 @Component({
   selector: 'vms-list-hyperv',
@@ -42,9 +52,16 @@ export class VmsListHypervComponent implements OnInit {
   info: HypervVMViewData;
   @ViewChild('serverinfo') serverinfo: ElementRef;
   modalRef: BsModalRef;
+  @ViewChild('authenticate') authenticate: ElementRef;
+  authModalRef: BsModalRef;
+  authForm: FormGroup;
+  authFormErrors: HypervVMPowerAuthFormErrors;
+  authValidationMessages: Record<string, Record<string, string>>;
+  action: HypervPowerAction;
 
   constructor(private router: Router,
     private route: ActivatedRoute,
+    private appService: AppLevelService,
     private vmsService: VmsService,
     private ticketService: SharedCreateTicketService,
     private hyperVService: VmsListHypervService,
@@ -52,6 +69,7 @@ export class VmsListHypervComponent implements OnInit {
     private modalService: BsModalService,
     private storageService: StorageService,
     private spinnerService: AppSpinnerService,
+    private utilService: AppUtilityService,
     private tagsCrudService: VmsTagsCrudService,
     private notification: AppNotificationService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
@@ -78,7 +96,14 @@ export class VmsListHypervComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.modalRef?.hide();
+    if (this.modalRef) {
+      this.modalRef.hide();
+      this.modalRef = null;
+    }
+    if (this.authModalRef) {
+      this.authModalRef.hide();
+      this.authModalRef = null;
+    }
     this.spinnerService.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -225,6 +250,14 @@ export class VmsListHypervComponent implements OnInit {
     this.modalRef = this.modalService.show(this.serverinfo, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
   }
 
+  powerToggle(view: HypervVMViewData): void {
+    if (!view.powerIconEnabled) {
+      return;
+    }
+    this.action = view.powerStatusOn ? HypervPowerAction.POWER_OFF : HypervPowerAction.POWER_ON;
+    this.buildAuthForm(view);
+  }
+
   consoleSameTab(view: HypervVMViewData) {
     if (!view.isSameTabEnabled) {
       return;
@@ -257,5 +290,115 @@ export class VmsListHypervComponent implements OnInit {
 
   updateTags(view: HypervVMViewData) {
     this.tagsCrudService.updateTags({ vmId: view.uuid, tags: view.tags, vmType: PlatFormMapping.HYPER_V });
+  }
+
+  private buildAuthForm(view: HypervVMViewData): void {
+    this.authForm = this.hyperVService.buildPowerAuthForm(view);
+    this.authFormErrors = this.hyperVService.resetPowerAuthFormErrors();
+    this.authValidationMessages = this.hyperVService.powerAuthValidationMessages;
+    if (this.subscription && !this.subscription.closed) {
+      this.subscription.unsubscribe();
+    }
+    this.authModalRef = this.modalService.show(this.authenticate, Object.assign({}, { class: '', keyboard: false, ignoreBackdropClick: true }));
+  }
+
+  onSubmit(): void {
+    if (this.authForm.invalid) {
+      this.authFormErrors = this.hyperVService.resetPowerAuthFormErrors();
+      this.authFormErrors = this.utilService.validateForm(this.authForm, this.authValidationMessages, this.authFormErrors);
+      if (this.subscription && !this.subscription.closed) {
+        this.subscription.unsubscribe();
+      }
+      this.subscription = this.authForm.valueChanges.subscribe(() => {
+        this.authFormErrors = this.utilService.validateForm(this.authForm, this.authValidationMessages, this.authFormErrors);
+      });
+      return;
+    }
+    this.spinnerService.start('main');
+    this.authFormErrors = this.hyperVService.resetPowerAuthFormErrors();
+    this.handlePower(this.authForm.getRawValue());
+  }
+
+  closeAuthModal(): void {
+    this.authModalRef?.hide();
+    if (this.subscription && !this.subscription.closed) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  private handlePower(data: HypervVMPowerTogglePayload): void {
+    const index = this.viewData.map(view => view.uuid).indexOf(data.uuid);
+    if (index == -1) {
+      this.closeAuthModal();
+      this.spinnerService.stop('main');
+      this.notification.error(new Notification('Something went wrong!! Please try again.'));
+      return;
+    }
+    const powerStatusOn = this.viewData[index].powerStatusOn;
+    this.hyperVService.toggleHypervVMPower(data, powerStatusOn).pipe(
+      switchMap((res: CeleryTask) => {
+        this.viewData[index].setPowerInProgress();
+        return this.pollForTask(res);
+      }),
+      take(1),
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe((status: TaskStatus) => {
+      if (status.result['error']) {
+        this.notification.error(new Notification(status.result['error']));
+      } else {
+        const action = powerStatusOn ? 'off' : 'on';
+        this.notification.success(new Notification(`VM powered ${action} successfully`));
+      }
+      this.getVms();
+    }, (err: HttpErrorResponse | TaskError | Error) => {
+      this.clearPowerInProgress(data.uuid);
+      this.handlePowerError(err);
+    });
+  }
+
+  private pollForTask(res: CeleryTask): Observable<TaskStatus> {
+    if (res.task_id) {
+      this.closeAuthModal();
+      this.spinnerService.stop('main');
+      this.notification.success(new Notification('Request is being processed. Status will be updated shortly'));
+      return this.appService.pollForTask(res.task_id, 3, 200).pipe(take(1));
+    }
+    throw new Error('Something went wrong !... Please try again later');
+  }
+
+  private clearPowerInProgress(uuid: string): void {
+    const index = this.viewData.map(view => view.uuid).indexOf(uuid);
+    if (index != -1) {
+      this.viewData[index].clearPowerInProgress();
+    }
+  }
+
+  private handlePowerError(error: HttpErrorResponse | TaskError | Error): void {
+    if (error instanceof HttpErrorResponse) {
+      const err = error.error;
+      this.authFormErrors = this.hyperVService.resetPowerAuthFormErrors();
+      if (err?.detail) {
+        this.authFormErrors.nonFieldErr = err.detail;
+      } else if (err && typeof err == 'object') {
+        for (const field in err) {
+          if (field in this.authForm.controls) {
+            const fieldError = err[field];
+            this.authFormErrors[field] = Array.isArray(fieldError) ? fieldError[0] : fieldError;
+          }
+        }
+      } else {
+        this.closeAuthModal();
+        this.notification.error(new Notification('Something went wrong!! Please try again.'));
+      }
+    } else if (error instanceof TaskError) {
+      this.notification.warning(new Notification('Request is taking longer than usual. Please refresh after sometime'));
+    } else if (error instanceof Error && error.message) {
+      this.closeAuthModal();
+      this.notification.error(new Notification(error.message));
+    } else {
+      this.closeAuthModal();
+      this.notification.error(new Notification('Something went wrong!! Please try again.'));
+    }
+    this.spinnerService.stop('main');
   }
 }

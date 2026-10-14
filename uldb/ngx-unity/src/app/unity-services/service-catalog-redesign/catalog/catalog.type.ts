@@ -286,6 +286,7 @@ export interface CartItemApi {
     rate: string;
     amount: number;
     configuration: any;
+    is_error: boolean;
 }
 
 export interface CartResponse {
@@ -307,6 +308,8 @@ export interface CartLineViewData {
     quantity: number;
     unitPrice: number;
     lineTotal: number;
+    isError: boolean;                    
+    configuration: { [key: string]: any }; 
 }
 
 export interface CartViewData {
@@ -315,5 +318,6 @@ export interface CartViewData {
     tax: number;
     grandTotal: number;
     currency: string;
+    hasError: boolean;
     lines: CartLineViewData[];
 }

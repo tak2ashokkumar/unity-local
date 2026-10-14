@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { InstanceFormData, InstanceViewData, OrchestrationIntegrationService } from './orchestration-integration.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -11,16 +11,27 @@ import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/s
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { FormGroup } from '@angular/forms';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
+import { SortDirection, SortEvent, TableColumn } from 'src/app/shared/app-generic-table/app-generic-table.type';
 
 @Component({
   selector: 'orchestration-integration',
   templateUrl: './orchestration-integration.component.html',
-  styleUrls: ['./orchestration-integration.component.scss'],
-  providers: [OrchestrationIntegrationService]
+  styleUrls: ['./orchestration-integration.component.scss']
 })
 export class OrchestrationIntegrationComponent implements OnInit, OnDestroy {
+
+  columns: TableColumn[] = [
+    { key: 'instanceName', label: 'Name', widthClass: 'tdw-20', sortable: true, sortField: 'name', locked: true },
+    { key: 'instanceType', label: 'Type', widthClass: 'tdw-15', sortable: true, sortField: 'type' },
+    { key: 'instanceStatus', label: 'Status', widthClass: 'tdw-15', sortable: true, sortField: 'status' },
+    { key: 'instanceDescription', label: 'Description', widthClass: 'tdw-25', sortable: true, sortField: 'description' },
+    { key: 'instanceConnectivity', label: 'Connectivity', align: 'center', widthClass: 'tdw-10' },
+    { key: 'actions', label: 'Actions', align: 'center', locked: true, cellClass: 'action-icons-column' }
+  ];
+
   private ngUnsubscribe = new Subject();
   viewData: InstanceViewData[] = [];
+  count = 0;
   currentCriteria: SearchCriteria;
   instance: any;
   nonFieldErr: string = '';
@@ -35,8 +46,8 @@ export class OrchestrationIntegrationComponent implements OnInit, OnDestroy {
   integrationValidationMessages: any;
   confirmMsg: string;
   confirmDeleteMsg: string;
-
-
+  activeSortField: string | null = null;
+  activeSortDirection: SortDirection = null;
 
   constructor(
     private orchestraionIntegrationService: OrchestrationIntegrationService,
@@ -46,20 +57,52 @@ export class OrchestrationIntegrationComponent implements OnInit, OnDestroy {
     private utilService: AppUtilityService,
     private modalService: BsModalService,
     private router: Router) {
-    this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.ZERO };
-
+    this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
   }
 
   ngOnInit() {
     this.spinner.start("main");
-    this.getInstanceData()
+    this.restoreCriteria();
+    this.getInstanceData();
   }
 
   ngOnDestroy() {
     this.instanceModalRef?.hide();
     this.confirmModalRef?.hide();
     this.ngUnsubscribe.next();
-    this.ngUnsubscribe.complete()
+    this.ngUnsubscribe.complete();
+  }
+
+  private restoreCriteria(): void {
+    const qp = this.route.snapshot.queryParamMap;
+    this.applyQueryParamsToCriteria(qp);
+  }
+
+  private applyQueryParamsToCriteria(qp: ParamMap): void {
+    this.currentCriteria.searchValue = qp.get('search') || '';
+    this.currentCriteria.sortColumn = qp.get('sortColumn') || '';
+    this.currentCriteria.sortDirection = (qp.get('sortDirection') as '' | 'asc' | 'desc') || '';
+    this.activeSortField = this.currentCriteria.sortColumn || null;
+    this.activeSortDirection = (this.currentCriteria.sortDirection || null) as SortDirection;
+    const pageNo = qp.get('pageNo');
+    const pageSize = qp.get('pageSize');
+    this.currentCriteria.pageNo = pageNo ? +pageNo : 1;
+    this.currentCriteria.pageSize = pageSize ? +pageSize : PAGE_SIZES.DEFAULT_PAGE_SIZE;
+  }
+
+  private syncCriteriaToQueryParams(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: this.currentCriteria.searchValue || null,
+        sortColumn: this.currentCriteria.sortColumn || null,
+        sortDirection: this.currentCriteria.sortDirection || null,
+        pageNo: this.currentCriteria.pageNo !== 1 ? this.currentCriteria.pageNo : null,
+        pageSize: this.currentCriteria.pageSize !== PAGE_SIZES.DEFAULT_PAGE_SIZE ? this.currentCriteria.pageSize : null
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   onSorted($event: SearchCriteria) {
@@ -69,15 +112,50 @@ export class OrchestrationIntegrationComponent implements OnInit, OnDestroy {
     this.getInstanceData();
   }
 
+  onSortChanged(event: SortEvent) {
+    this.spinner.start('main');
+    this.activeSortField = event.direction ? event.field : null;
+    this.activeSortDirection = event.direction;
+    this.currentCriteria.sortColumn = event.direction ? event.field : '';
+    this.currentCriteria.sortDirection = event.direction || '';
+    this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
+    this.getInstanceData();
+  }
+
   onSearched(event: string) {
     this.currentCriteria.searchValue = event;
     this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
+    this.getInstanceData();
+  }
+
+  pageChange(pageNo: number) {
+    if (this.currentCriteria.pageNo !== pageNo) {
+      this.spinner.start('main');
+      this.currentCriteria.pageNo = pageNo;
+      this.syncCriteriaToQueryParams();
+      this.getInstanceData();
+    }
+  }
+
+  pageSizeChange(pageSize: number) {
+    this.spinner.start('main');
+    this.currentCriteria.pageSize = pageSize;
+    this.currentCriteria.pageNo = 1;
+    this.syncCriteriaToQueryParams();
+    this.getInstanceData();
+  }
+
+  refreshData() {
+    this.spinner.start('main');
     this.getInstanceData();
   }
 
   getInstanceData() {
     this.orchestraionIntegrationService.getInstances(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
-      this.viewData = this.orchestraionIntegrationService.convertToViewData(data);
+      this.count = data.count;
+      this.viewData = this.orchestraionIntegrationService.convertToViewData(data.results);
       this.spinner.stop('main');
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('main');
@@ -125,8 +203,7 @@ export class OrchestrationIntegrationComponent implements OnInit, OnDestroy {
   }
 
   goToviewDetails(view: any) {
-    this.router.navigate([view.uuid, 'details'], { relativeTo: this.route });
-
+    this.router.navigate([view.uuid, 'details'], { relativeTo: this.route, state: { integrationReturnUrl: this.router.url } });
   }
 
   togglestatus(view: InstanceViewData) {
@@ -199,5 +276,4 @@ export class OrchestrationIntegrationComponent implements OnInit, OnDestroy {
       }
     }
   }
-
 }

@@ -204,7 +204,7 @@ export class OrchestrationExecutionsWorkflowLogsService {
     return normalizedType === 'chart' || normalizedType === 'chart task';
   }
 
-  private getChartOutput(output: any): any {
+  getChartOutput(output: any): any {
     // Agentic output wraps the chart payload in { status, output, error }.
     // Legacy chart tasks can return the chart payload directly as a string.
     const chartOutput = output?.output ?? output;

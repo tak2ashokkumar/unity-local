@@ -1,14 +1,19 @@
-interface CloudController {
+import { PrivateCloudRemoteWebAccessType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
+
+export interface CloudController {
     name: string;
     uuid: string;
     platform_type: string;
     proxy: CloudControllerProxy;
-    hypervisors: Hypervisors[]
+    hypervisors: Hypervisors[];
+    remote_web_access?: PrivateCloudRemoteWebAccessType;
 }
-interface Hypervisors {
+
+export interface Hypervisors {
     name: string;
 }
-interface CloudControllerProxy {
+
+export interface CloudControllerProxy {
     proxy_fqdn: string;
-    same_tab: Boolean;
+    same_tab: boolean;
 }

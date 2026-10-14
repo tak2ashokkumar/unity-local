@@ -78,7 +78,7 @@ export interface ApiField {
   disabled?: any;
   add_label?: string;
   min_items?: number;
-  options?: Array<{ label: string; value: any }>;
+  options?: Array<{ label: string; value: any; description?: string; disabled?: boolean }>;
   options_api?: ApiOptionsApi;
   form_api?: ApiOptionsApi;
   validators?: any;
@@ -91,6 +91,11 @@ export interface ApiField {
   clear_on_hide?: boolean;
   condition_type?: 'STATIC' | 'DYNAMIC';
   min_conditions?: number;
+  searchable?: boolean;
+  clearable?: boolean;
+  close_on_select?: boolean;
+  no_options_text?: string;
+  loading_text?: string;
 }
 export interface ApiTab {
   id: string;
@@ -127,7 +132,7 @@ export interface DynamicField {
   disabled?: any;
   add_button_label?: string;
   min_items?: number;
-  options?: Array<{ label: string; value: any }>;
+  options?: Array<{ label: string; value: any; description?: string; disabled?: boolean }>;
   options_api?: DynamicOptionsApi | null;
   form_api?: DynamicOptionsApi | null;
   form_data?: any;
@@ -147,6 +152,13 @@ export interface DynamicField {
   key?: string;
   condition_type?: 'STATIC' | 'DYNAMIC';
   min_conditions?: number;
+  _formApiLoading?: boolean;
+  _formApiLoadedFor?: any;
+  searchable?: boolean;
+  clearable?: boolean;
+  close_on_select?: boolean;
+  noOptionsText?: string;
+  loadingText?: string;
 }
 
 export interface DynamicTab {
@@ -167,6 +179,7 @@ interface ApiOptionsApi {
   query_param?: string;
   static_params?: Record<string, any>;
   label_key?: string;
+  search_key?: string;
   value_key?: string | string[];
   data_path?: string;
 }
@@ -181,6 +194,7 @@ interface DynamicOptionsApi {
   query_param?: string;
   static_params?: Record<string, any>;
   label_key?: string;
+  search_key?: string;
   value_key?: string | string[];
   data_path?: string;
 }
@@ -391,6 +405,134 @@ export const manualData = {
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "select_tests",
+      "label": "Select Tests",
+      "fields": [
+        {
+          "key": "static_single_select",
+          "type": "select",
+          "label": "Static Single Select",
+          "placeholder": "Select priority",
+          "help_text": "Single select with static options and no search.",
+          "searchable": false,
+          "default": "MEDIUM",
+          "options": [
+            { "label": "Low", "value": "LOW" },
+            { "label": "Medium", "value": "MEDIUM" },
+            { "label": "High", "value": "HIGH", "description": "Requires immediate attention" },
+            { "label": "Unavailable", "value": "UNAVAILABLE", "disabled": true }
+          ],
+          "validators": [{ "type": "required" }]
+        },
+        {
+          "key": "static_searchable_single_select",
+          "type": "select",
+          "label": "Static Searchable Single Select",
+          "placeholder": "Search for a server",
+          "help_text": "Single select with static searchable options.",
+          "searchable": true,
+          "options": [
+            { "label": "web-prod-01", "value": "web-prod-01" },
+            { "label": "api-prod-01", "value": "api-prod-01" },
+            { "label": "worker-prod-01", "value": "worker-prod-01" }
+          ]
+        },
+        {
+          "key": "dynamic_single_select",
+          "type": "select",
+          "label": "Dynamic Single Select",
+          "placeholder": "Select a cloud account",
+          "help_text": "Single select loaded from an API without search.",
+          "searchable": false,
+          "options_api": {
+            "depends_on": "",
+            "endpoint": "/customer/cloud_fast/?page_size=0",
+            "method": "GET",
+            "label_key": "name",
+            "value_key": "uuid",
+            "data_path": ""
+          }
+        },
+        {
+          "key": "dynamic_searchable_single_select",
+          "type": "select",
+          "label": "Dynamic Searchable Single Select",
+          "placeholder": "Search cloud accounts",
+          "help_text": "Single select loaded from an API with client-side search.",
+          "searchable": true,
+          "options_api": {
+            "depends_on": "",
+            "endpoint": "/customer/cloud_fast/?page_size=0",
+            "method": "GET",
+            "label_key": "name",
+            "search_key": "name",
+            "value_key": "uuid",
+            "data_path": ""
+          }
+        },
+        {
+          "key": "static_multiselect",
+          "type": "multiselect",
+          "label": "Static Multi Select",
+          "placeholder": "Select notification channels",
+          "help_text": "Multiple select with static options and no search.",
+          "searchable": false,
+          "default": ["SLACK", "EMAIL"],
+          "options": [
+            { "label": "Slack", "value": "SLACK" },
+            { "label": "Email", "value": "EMAIL" },
+            { "label": "Microsoft Teams", "value": "TEAMS" }
+          ]
+        },
+        {
+          "key": "static_searchable_multiselect",
+          "type": "multiselect",
+          "label": "Static Searchable Multi Select",
+          "placeholder": "Search target servers",
+          "help_text": "Multiple select with static searchable options.",
+          "searchable": true,
+          "options": [
+            { "label": "web-prod-01", "value": "web-prod-01" },
+            { "label": "api-prod-01", "value": "api-prod-01" },
+            { "label": "worker-prod-01", "value": "worker-prod-01" }
+          ]
+        },
+        {
+          "key": "dynamic_multiselect",
+          "type": "multiselect",
+          "label": "Dynamic Multi Select",
+          "placeholder": "Select cloud accounts",
+          "help_text": "Multiple select loaded from an API without search.",
+          "searchable": false,
+          "options_api": {
+            "depends_on": "",
+            "endpoint": "/customer/cloud_fast/?page_size=0",
+            "method": "GET",
+            "label_key": "name",
+            "value_key": "uuid",
+            "data_path": ""
+          }
+        },
+        {
+          "key": "dynamic_searchable_multiselect",
+          "type": "multiselect",
+          "label": "Dynamic Searchable Multi Select",
+          "placeholder": "Search cloud accounts",
+          "help_text": "Multiple select loaded from an API with client-side search.",
+          "searchable": true,
+          "options_api": {
+            "depends_on": "",
+            "endpoint": "/customer/cloud_fast/?page_size=0",
+            "method": "GET",
+            "label_key": "name",
+            "search_key": "name",
+            "value_key": "uuid",
+            "data_path": ""
+          }
         }
       ]
     }

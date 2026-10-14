@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { getCurrencySymbol } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { CATALOG_ACCORDION_SECTIONS, CatalogAccordionSection, CatalogDatacenter, CatalogItemPayload, CatalogMeta, CONFIG_FIELD_TYPES, COST_COMPONENT_ALLOWED_KEYS, CostComponent, FinopsBuildingBlock, FREQUENCY_FACTOR, FREQUENCY_OPTIONS, normalizeParamType, OPTION_TYPES, ParamControlKind, PLACEHOLDER_TYPES, POLICY_TYPES, RANGE_TYPES, SUPPORT_LEVELS, TaskDropdownItem, VALIDATOR_TYPES, WorkflowDropdownItem, WorkflowVersion } from './catalog-crud.type';
@@ -13,6 +13,7 @@ import { Observable, of, Subject } from 'rxjs';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { CatalogService } from '../catalog.service';
+import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 
 @Component({
   selector: 'catalog-crud',
@@ -49,12 +50,38 @@ export class CatalogCrudComponent implements OnInit {
   accordionSections = CATALOG_ACCORDION_SECTIONS;
   tasks: TaskDropdownItem[] = [];
   workflows: WorkflowDropdownItem[] = [];
+  taskDropdownOpen = false;
+  workflowDropdownOpen = false;
+  loadingTasks = false;
+  loadingWorkflows = false;
+  hasMoreTasks = true;
+  hasMoreWorkflows = true;
+  private selectedTaskItem: TaskDropdownItem | null = null;
+  private selectedWorkflowItem: WorkflowDropdownItem | null = null;
   versionWorkflows: WorkflowVersion[] = [];
   private activeAutomationType: 'Task' | 'Workflow' = 'Task';
   private automationMappings: { Task: any[]; Workflow: any[] } = { Task: [], Workflow: [] };
   private automationMappingsInitialized: { Task: boolean; Workflow: boolean } = {
     Task: false,
     Workflow: false
+  };
+
+  taskCurrentCriteria: SearchCriteria = {
+    sortColumn: '',
+    sortDirection: '',
+    searchValue: '',
+    pageNo: 1,
+    pageSize: 10,
+    params: [{}]
+  };
+
+  workflowCurrentCriteria: SearchCriteria = {
+    sortColumn: '',
+    sortDirection: '',
+    searchValue: '',
+    pageNo: 1,
+    pageSize: 10,
+    params: [{}]
   };
 
   finopsOptions: FinopsBuildingBlock;
@@ -74,6 +101,7 @@ export class CatalogCrudComponent implements OnInit {
   datacenterOptions: { value: string, label: string }[] = [];
   selectedDatacenters: string[] = [];
   configFieldErrors: { key: string; label: string; type: string }[] = [];
+  openConfigFieldIndexes = new Set<number>();
 
   private readonly FIELD_SECTION_MAP: { [key: string]: CatalogAccordionSection } = {
     name: 'descriptive',
@@ -191,24 +219,13 @@ export class CatalogCrudComponent implements OnInit {
       (meta) => { this.meta = meta; },
       () => { /* dropdowns stay empty on failure */ }
     );
-    this.svc.getTaskData().pipe(takeUntil(this.ngUnsubscribe)).subscribe(
-      (tasks) => { this.tasks = tasks.results; },
-      () => { /* task dropdown stays empty on failure */ }
-    );
-    this.svc.getWorkflowData("Manual Trigger").pipe(takeUntil(this.ngUnsubscribe)).subscribe(
-      (workflows) => { this.workflows = workflows.results; },
-      () => { /* workflow dropdown stays empty on failure */ }
-    );
+    this.loadTasks(true);
+    this.loadWorkflows(true);
     this.loadingFinops = true;
     this.svc.getFinopsBuildingBlocks().pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       (res) => {
         this.finopsOptions = res;
         this.loadingFinops = false;
-
-        // const currentFinops = this.form?.get('finops_block')?.value;
-        // if (currentFinops) {
-        //   this.onFinopsChange(currentFinops, { preserveExisting: true });
-        // }
       },
       () => { this.loadingFinops = false; }
     );
@@ -222,6 +239,158 @@ export class CatalogCrudComponent implements OnInit {
       (res) => { this.credentials = res.results || res || []; },
       () => { /* stays empty on failure */ }
     );
+  }
+
+  private loadTasks(reset = false): void {
+    if (this.loadingTasks) { return; }
+    if (reset) {
+      this.taskCurrentCriteria.pageNo = 1;
+      this.tasks = [];
+      this.hasMoreTasks = true;
+    } else if (!this.hasMoreTasks) {
+      return;
+    }
+    this.requestTasks(false);
+  }
+
+  private loadMoreTasks(): void {
+    if (this.loadingTasks || !this.hasMoreTasks) { return; }
+    this.taskCurrentCriteria.pageNo++;
+    this.requestTasks(true);
+  }
+
+  private requestTasks(isNextPage: boolean): void {
+    this.loadingTasks = true;
+    this.svc.getTaskData(this.taskCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      const results = res?.results || [];
+      this.tasks = isNextPage ? [...this.tasks, ...results] : results;
+      this.hasMoreTasks = this.tasks.length < (res?.count || 0);
+      this.loadingTasks = false;
+      this.ensureSelectedTaskLoaded();
+    },
+      () => {
+        // roll back so the next scroll retries the same page
+        if (isNextPage) { this.taskCurrentCriteria.pageNo--; }
+        this.loadingTasks = false;
+      }
+    );
+  }
+
+  private loadWorkflows(reset = false): void {
+    if (this.loadingWorkflows) { return; }
+    if (reset) {
+      this.workflowCurrentCriteria.pageNo = 1;
+      this.workflows = [];
+      this.hasMoreWorkflows = true;
+    } else if (!this.hasMoreWorkflows) {
+      return;
+    }
+    this.requestWorkflows(false);
+  }
+
+  private loadMoreWorkflows(): void {
+    if (this.loadingWorkflows || !this.hasMoreWorkflows) { return; }
+    this.workflowCurrentCriteria.pageNo++;
+    this.requestWorkflows(true);
+  }
+
+  private requestWorkflows(isNextPage: boolean): void {
+    this.loadingWorkflows = true;
+    this.svc.getWorkflowData('Manual Trigger', this.workflowCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      const results = res?.results || [];
+      this.workflows = isNextPage ? [...this.workflows, ...results] : results;
+      this.hasMoreWorkflows = this.workflows.length < (res?.count || 0);
+      this.loadingWorkflows = false;
+      this.ensureSelectedWorkflowLoaded();
+    },
+      () => {
+        if (isNextPage) { this.workflowCurrentCriteria.pageNo--; }
+        this.loadingWorkflows = false;
+      }
+    );
+  }
+
+  onTaskDropdownScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 5) {
+      this.loadMoreTasks();
+    }
+  }
+
+  onWorkflowDropdownScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 5) {
+      this.loadMoreWorkflows();
+    }
+  }
+
+  toggleTaskDropdown(): void {
+    this.taskDropdownOpen = !this.taskDropdownOpen;
+    this.workflowDropdownOpen = false;
+  }
+
+  toggleWorkflowDropdown(): void {
+    this.workflowDropdownOpen = !this.workflowDropdownOpen;
+    this.taskDropdownOpen = false;
+  }
+
+  selectTask(task: TaskDropdownItem): void {
+    const ctrl = this.form.get('task');
+    this.selectedTaskItem = task;
+    ctrl.setValue(task.uuid);
+    ctrl.markAsTouched();
+    this.taskDropdownOpen = false;
+  }
+
+  selectWorkflow(workflow: WorkflowDropdownItem): void {
+    const ctrl = this.form.get('workflow');
+    this.selectedWorkflowItem = workflow;
+    ctrl.setValue(workflow.uuid);
+    ctrl.markAsTouched();
+    this.workflowDropdownOpen = false;
+  }
+
+  private ensureSelectedTaskLoaded(): void {
+    const uuid = this.form?.get('task')?.value;
+    if (uuid && this.hasMoreTasks && !this.tasks.some(t => t.uuid === uuid)) {
+      this.loadMoreTasks();
+    }
+  }
+
+  private ensureSelectedWorkflowLoaded(): void {
+    const uuid = this.form?.get('workflow')?.value;
+    if (uuid && this.hasMoreWorkflows && !this.workflows.some(w => w.uuid === uuid)) {
+      this.loadMoreWorkflows();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.automation-lazy-dropdown')) {
+      this.taskDropdownOpen = false;
+      this.workflowDropdownOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.taskDropdownOpen = false;
+    this.workflowDropdownOpen = false;
+  }
+
+  get selectedTaskName(): string {
+    const uuid = this.form?.get('task')?.value;
+    if (!uuid) { return ''; }
+    return this.tasks.find(t => t.uuid === uuid)?.name
+      || (this.selectedTaskItem?.uuid === uuid ? this.selectedTaskItem.name : '');
+  }
+
+  get selectedWorkflowName(): string {
+    const uuid = this.form?.get('workflow')?.value;
+    if (!uuid) { return ''; }
+    return this.workflows.find(w => w.uuid === uuid)?.w_name
+      || (this.selectedWorkflowItem?.uuid === uuid ? this.selectedWorkflowItem.w_name : '');
   }
 
   searchTargets = (query: string): Observable<any[]> => {
@@ -266,6 +435,7 @@ export class CatalogCrudComponent implements OnInit {
 
     if (this.form.get('workflow')) {
       this.bindWorkflowValueChanges();
+      this.bindWorkflowVersionValueChanges();
     }
     if (this.activeAutomationType === 'Workflow') {
       this.initWorkflowVersionIfNeeded();
@@ -322,9 +492,8 @@ export class CatalogCrudComponent implements OnInit {
       this.logoPreviewUrl = null;
       this.logoFileName = null;
     }
-
-    // this.form.get('currency')?.setValue('EUR', { emitEvent: false });
-    // this.form.get('currency')?.disable({ emitEvent: false });
+    this.ensureSelectedTaskLoaded();
+    this.ensureSelectedWorkflowLoaded();
   }
 
   private bindTaskValueChanges(): void {
@@ -437,6 +606,7 @@ export class CatalogCrudComponent implements OnInit {
   addConfigField(): void {
     this.guardAndAdd(this.configuration, () => {
       this.configuration.push(this.svc.buildConfigFieldGroup());
+      this.openConfigFieldIndexes.add(this.configuration.length - 1);
       this.refreshAllMappingOptions();
       this.refreshCostComponentConfigOptions();
     });
@@ -584,7 +754,53 @@ export class CatalogCrudComponent implements OnInit {
       return;
     }
     this.loadWorkflowVersions(uuid, '');
-    this.loadWorkflowParameters(uuid);
+  }
+
+  private bindWorkflowVersionValueChanges(): void {
+    this.form.get('workflow_version').valueChanges
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((versionUuid) => this.onWorkflowVersionChange(versionUuid));
+  }
+
+  onWorkflowVersionChange(versionUuid: string): void {
+    const workflowUuid = this.form.get('workflow').value;
+
+    this.automationMappings.Workflow = [];
+    this.automationMappingsInitialized.Workflow = false;
+    if (this.activeAutomationType === 'Workflow') { this.setInputMappings([]); }
+
+    if (!workflowUuid || !versionUuid) {
+      this.automationMappingsInitialized.Workflow = true;
+      return;
+    }
+    this.loadWorkflowVersionInputs(workflowUuid, versionUuid);
+  }
+
+  private loadWorkflowVersionInputs(workflowUuid: string, versionUuid: string, options: { preserveExisting?: boolean } = {}): void {
+    this.svc.getWorkflowVersionInputs(workflowUuid, versionUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      // guard against stale responses if the user changed selection meanwhile
+      if (this.form.get('workflow').value !== workflowUuid ||
+        this.form.get('workflow_version').value !== versionUuid) {
+        return;
+      }
+      const existing = options.preserveExisting ? this.inputMappings.getRawValue() : [];
+      const mappings = (res.inputs || []).map((input) => {
+        const saved = existing.find((e: any) => e.param_name === input.param_name);
+        return saved || {
+          param_name: input.param_name,
+          param_type: input.param_type,
+          mapping_type: 'static',
+          value: input.default_value
+        };
+      });
+      this.automationMappings.Workflow = mappings;
+      this.automationMappingsInitialized.Workflow = true;
+      if (this.activeAutomationType === 'Workflow') {
+        this.setInputMappings(mappings);
+      }
+    },
+      () => { this.automationMappingsInitialized.Workflow = true; }
+    );
   }
 
   private loadWorkflowParameters(uuid: string): void {
@@ -630,6 +846,9 @@ export class CatalogCrudComponent implements OnInit {
     if (!workflowCtrl || !versionCtrl || !workflowCtrl.value) { return; }
     const existingVersion = versionCtrl.value;
     this.loadWorkflowVersions(workflowCtrl.value, existingVersion);
+    if (existingVersion) {
+      this.loadWorkflowVersionInputs(workflowCtrl.value, existingVersion, { preserveExisting: true });
+    }
   }
 
   paramControlKind(mappingGroup: FormGroup): ParamControlKind {
@@ -1017,5 +1236,57 @@ export class CatalogCrudComponent implements OnInit {
       this.form.get('sla.provisioning_time'),
       this.formValidationMessages.provisioning_time
     );
+  }
+
+  isFieldOpen(i: number): boolean {
+    return this.openConfigFieldIndexes.has(i);
+  }
+
+  toggleFieldOpen(i: number): void {
+    if (this.openConfigFieldIndexes.has(i)) {
+      this.openConfigFieldIndexes.delete(i);
+    } else {
+      this.openConfigFieldIndexes.add(i);
+    }
+  }
+
+  // ================= CONFIG FIELD REORDER (UP/DOWN) =================
+
+  moveFieldUp(i: number): void {
+    if (i <= 0) return;
+    this.swapConfigFields(i, i - 1);
+  }
+
+  moveFieldDown(i: number): void {
+    if (i >= this.configuration.length - 1) return;
+    this.swapConfigFields(i, i + 1);
+  }
+
+  private swapConfigFields(from: number, to: number): void {
+    const arr = this.configuration; // existing FormArray getter
+    const control = arr.at(from);
+    arr.removeAt(from);
+    arr.insert(to, control);
+
+    if (this.configFieldErrors) {
+      const tmp = this.configFieldErrors[from];
+      this.configFieldErrors[from] = this.configFieldErrors[to];
+      this.configFieldErrors[to] = tmp;
+    }
+
+    // keep expanded/collapsed state attached to the field that moved, not the index
+    const openFrom = this.openConfigFieldIndexes.has(from);
+    const openTo = this.openConfigFieldIndexes.has(to);
+    this.openConfigFieldIndexes.delete(from);
+    this.openConfigFieldIndexes.delete(to);
+    if (openFrom) this.openConfigFieldIndexes.add(to);
+    if (openTo) this.openConfigFieldIndexes.add(from);
+  }
+
+  blockNegativeKey(event: KeyboardEvent): void {
+    // Block '-' and 'e' (scientific notation can also produce weirdness)
+    if (event.key === '-' || event.key === 'Minus') {
+      event.preventDefault();
+    }
   }
 }

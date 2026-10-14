@@ -20,6 +20,11 @@ export interface ScriptDataType {
     is_default: boolean;
 }
 
+export interface LinkedTask {
+    name: string;
+    uuid: string;
+}
+
 export interface ScriptType {
     count: number;
     name: string;

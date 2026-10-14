@@ -28,9 +28,13 @@ export class UsiServicenowCrudService {
         map((res: ServicenowAccountUnityOneDeviceType) => {
           if (res) {
             // unityDeviceType.attrs = res;
-            unityDeviceType.inbound = res.inbound.sort((a, b) => a.label.localeCompare(b.label));
-            unityDeviceType.outbound = res.outbound.sort((a, b) => a.label.localeCompare(b.label));
+
+            const inbound = res.inbound || [];
+            const outbound = res.outbound || [];
+            unityDeviceType.inbound = inbound.slice().sort((a, b) => a.label.localeCompare(b.label));
+            unityDeviceType.outbound = outbound.slice().sort((a, b) => a.label.localeCompare(b.label));
           }
+
           return unityDeviceType;
         })
       );
@@ -69,15 +73,15 @@ export class UsiServicenowCrudService {
     return this.http.get(`customer/cmdb-attributes/?uuid=${instanceId}&resource=${resource.value}`, { headers: Handle404Header })
       .pipe(
         map((response: ServiceNowAttributeType[]) => {
+          let attrs: UnityResourceType[] = [];
           if (response && response.length) {
             let snAttrs = response.getFirst().attributes;
-            let attrs: UnityResourceType[] = [];
             snAttrs.map(snAttr => {
               let a: UnityResourceType = { label: snAttr, value: snAttr };
               attrs.push(a);
             })
-            resource.attrs = attrs;
           }
+          resource.attrs = attrs;
           return resource;
         })
       );
@@ -223,7 +227,7 @@ export class UsiServicenowCrudService {
                 resource.attribute_mapping.map(mapping => this.builder.group({
                   'unity_attr': [mapping.unity_attr, [Validators.required]],
                   'servicenow_attr': [mapping.servicenow_attr, [Validators.required]],
-                  'inbound': [mapping.inbound]
+                  'inbound': [this.coerceBoolean(mapping.inbound)]
                 }))
               )
             })
@@ -253,6 +257,10 @@ export class UsiServicenowCrudService {
         'existing_data_sync': [false]
       })
     }
+  }
+
+  private coerceBoolean(value: boolean | string): boolean {
+    return value === true || value === 'true' || value === 'True';
   }
 
   getCloudRresourceName(index: number, formGroup: FormGroup, unityDeviceData: string[], allAwsResourceTypeData: AwsResourceDetailsType[][], allAzureResourceTypeData: AzureResourceDetailsType[][]) {

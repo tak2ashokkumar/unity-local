@@ -114,6 +114,7 @@ import { OrchestrationAgenticWorkflowManualTriggerComponent } from './orchestrat
 import { OrchestrationAgenticWorkflowScheduleTriggerComponent } from './orchestration/orchestration-workflows/orchestration-agentic-workflow-schedule-trigger/orchestration-agentic-workflow-schedule-trigger.component';
 import { OrchestrationWorkflowsOnChatComponent } from './orchestration/orchestration-workflows/orchestration-workflows-on-chat/orchestration-workflows-on-chat.component';
 import { MarkdownModule } from 'ngx-markdown';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { AiAgentsComponent } from './ai-agents/ai-agents.component';
 import { AiAgentsNetworkAgentComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent.component';
 import { AiAgentsFinopsAgentComponent } from './ai-agents/ai-agents-finops-agent/ai-agents-finops-agent.component';
@@ -404,6 +405,7 @@ export const MY_NATIVE_FORMATS = {
     EchartsxModule,
     TokenBillingModule,
     MarkdownModule,
+    NgSelectModule,
     CollapseModule,
 
   ],

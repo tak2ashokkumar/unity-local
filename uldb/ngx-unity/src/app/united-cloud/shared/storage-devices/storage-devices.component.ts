@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, from, interval } from 'rxjs';
-import { mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { finalize, mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -24,6 +24,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
+import { RemoteAccessService } from 'src/app/shared/remote-access/remote-access.service';
 
 @Component({
   selector: 'storage-devices',
@@ -47,6 +48,7 @@ export class StorageDevicesComponent implements OnInit, OnDestroy {
   selectedAll: boolean = false;
   @ViewChild('bulkEditModel') bulkEditModel: ElementRef;
   fields: BulkUpdateFieldType[] = [];
+  remoteWebLaunching: boolean = false;
 
   constructor(private storageDevicesService: StorageDevicesService,
     private usiOntapCrudSvc: UsiOntapCrudService,
@@ -61,7 +63,8 @@ export class StorageDevicesComponent implements OnInit, OnDestroy {
     private ticketService: SharedCreateTicketService,
     private termService: FloatingTerminalService,
     private modalService: BsModalService,
-    private notificationService: AppNotificationService,) {
+    private notificationService: AppNotificationService,
+    private remoteAccess: RemoteAccessService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
       this.inDevicesPage = this.pcId ? false : true;
@@ -256,6 +259,57 @@ export class StorageDevicesComponent implements OnInit, OnDestroy {
     }
     this.appService.updateActivityLog('storage', view.deviceId);
     window.open(view.newTabWebAccessUrl);
+  }
+
+  remoteWebAccessNewTab(view: StorageDeviceViewData): void {
+    if (!view?.showRemoteWebAccessButton || this.remoteWebLaunching) {
+      return;
+    }
+    const resourceId = view.remoteWebAccess?.resource_id || view.deviceId;
+    if (!resourceId) {
+      this.notificationService.error(new Notification('Unable to open storage web console. Resource identifier is missing.'));
+      return;
+    }
+    const viewerWindow = this.openIsolatedViewerTab();
+    if (!viewerWindow) {
+      this.notificationService.error(new Notification('Popup blocked. Allow popups for UnityOne and try opening the web console again.'));
+      return;
+    }
+
+    this.remoteWebLaunching = true;
+    this.remoteAccess.createStorageWebLaunch(resourceId)
+      .pipe(
+        takeUntil(this.ngUnsubscribe),
+        finalize(() => this.remoteWebLaunching = false)
+      )
+      .subscribe(launch => {
+        if (!launch.viewerUrl) {
+          viewerWindow.close();
+          this.notificationService.error(new Notification('Remote web viewer URL was not returned by UnityOne.'));
+          return;
+        }
+        this.appService.updateActivityLog('storage', view.deviceId);
+        viewerWindow.location.replace(launch.viewerUrl);
+      }, err => {
+        viewerWindow.close();
+        this.notificationService.error(new Notification(this.remoteWebErrorMessage(err)));
+      });
+  }
+
+  private openIsolatedViewerTab(): Window | null {
+    const viewerWindow = window.open('about:blank', '_blank');
+    if (viewerWindow) {
+      viewerWindow.opener = null;
+      try {
+        viewerWindow.document.title = 'Opening UnityOne Remote Web Viewer';
+        viewerWindow.document.body.innerHTML = '<div style="font-family:Arial,sans-serif;padding:24px;">Opening UnityOne Remote Web Viewer...</div>';
+      } catch (e) { }
+    }
+    return viewerWindow;
+  }
+
+  private remoteWebErrorMessage(err: any): string {
+    return err?.error?.error || err?.error?.detail || err?.message || 'Unable to create remote web session. Please try again or contact support.';
   }
 
   consoleNewTab(view: StorageDeviceViewData) {

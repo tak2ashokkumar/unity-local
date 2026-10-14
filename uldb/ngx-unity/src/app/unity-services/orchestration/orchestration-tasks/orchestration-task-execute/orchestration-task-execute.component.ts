@@ -16,6 +16,7 @@ import { CloudNameType } from './orchestration-task-execute.type';
 import { isString } from 'lodash-es';
 import { InputTemplateModel } from '../../orchestration-input-template/orchestration-input-template.service';
 import { environment } from 'src/environments/environment';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'orchestration-task-execute',
@@ -100,6 +101,8 @@ export class OrchestrationTaskExecuteComponent implements OnInit, OnDestroy {
     appendToBody: true,
   };
 
+  private taskReturnUrl: string;
+
   constructor(private taskExecuteSvc: OrchestrationTaskExecuteService,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
@@ -109,7 +112,16 @@ export class OrchestrationTaskExecuteComponent implements OnInit, OnDestroy {
     private clientSideSearchPipe: ClientSideSearchPipe,
     private renderer: Renderer2,
     private element: ElementRef,
+    private location: Location
   ) {
+    const navigation = this.router.getCurrentNavigation();
+    const navigationState = navigation ? navigation.extras.state : this.location.getState();
+    this.taskReturnUrl = navigationState?.['taskReturnUrl'] || (this.route.snapshot.paramMap.get('repoId')
+      ? '/services/orchestration/integration/' + encodeURIComponent(this.route.snapshot.paramMap.get('repoId')) + '/details'
+      : (this.route.snapshot.paramMap.get('categoryId')
+        ? '/services/orchestration/tasks/' + encodeURIComponent(this.route.snapshot.paramMap.get('categoryId'))
+        : '/services/orchestration/tasks'));
+
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.uuid = params.get('taskId');
       this.targetType = params.get('targetType')?.toLowerCase();
@@ -941,14 +953,7 @@ export class OrchestrationTaskExecuteComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    console.log(this.categoryUuid, "cat uuid")
-    if (this.router.url.includes('history')) {
-      this.router.navigate([`../../../../../../integration/${this.repoId}/details/history`], { relativeTo: this.route });
-    } else if (this.categoryUuid) {
-      this.router.navigate(['../../../../'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['../../../'], { relativeTo: this.route });
-    }
+    this.router.navigateByUrl(this.taskReturnUrl);
   }
 
   toggleDropdown(event: Event) {

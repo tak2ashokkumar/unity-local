@@ -40,8 +40,7 @@ import { UsiPureStorageCrudComponent } from './usi-pure-storage-crud/usi-pure-st
     UnityDevicesCustomAttributesCrudComponent,
     UsiOntapCrudComponent,
     UsiOntapCrudNewComponent,
-    UsiPureStorageCrudComponent,
-
+    UsiPureStorageCrudComponent
   ],
   exports: [
     CabinetCrudComponent,
@@ -58,8 +57,7 @@ import { UsiPureStorageCrudComponent } from './usi-pure-storage-crud/usi-pure-st
     UnityDevicesCustomAttributesCrudComponent,
     UsiOntapCrudComponent,
     UsiOntapCrudNewComponent,
-    UsiPureStorageCrudComponent,
-
+    UsiPureStorageCrudComponent
   ]
 })
 export class AppSharedCrudModule { }

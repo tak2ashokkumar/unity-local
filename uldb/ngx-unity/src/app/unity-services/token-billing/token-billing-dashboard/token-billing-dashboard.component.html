@@ -28,18 +28,15 @@
         </div>
     </div>
 </div>
-
 <!-- ── Row 1: Tokens | Model Cost | Traces (credit) ───────────────────────── -->
-<div class="row my-3">
+<div class="row mt-3 mb-2">
 
     <!-- Token Summary panel -->
-    <div class="col-4 pr-1">
-        <div class="card round-edge h-100 token-billing-card token-billing-summary-card">
+    <div class="col-4">
+        <div class="card round-edge h-100 mb-0">
             <app-spinner [name]="tokenSummaryData.loader"></app-spinner>
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-baseline mb-2">
-                    <span class="font-weight-500 font-lg">Tokens</span>
-                </div>
+            <div class="card-header bg-white font-weight-bold py-2">Tokens</div>
+            <div class="card-body p-3 mt-2">
                 <div class="row text-center mb-2">
                     <div class="col-4 border-right">
                         <div class="text-muted font-xs">Sum Total Tokens</div>
@@ -60,13 +57,12 @@
                         </div>
                     </div>
                 </div>
-                <ng-container *ngIf="tokenSummaryData.donutChart">
+                <ng-container *ngIf="tokenSummaryData?.donutChart">
                     <div echarts [options]="tokenSummaryData.donutChart.options"
-                        [extentions]="tokenSummaryData.donutChart.extensions" [defaultHeight]="220"
-                        class="chart-slot chart-slot-top"></div>
+                        [extentions]="tokenSummaryData.donutChart.extensions" [defaultHeight]="230"></div>
                 </ng-container>
-                <div *ngIf="!isDashboardLoading && !tokenSummaryData.donutChart"
-                    class="chart-slot chart-slot-top d-flex justify-content-center align-items-center">
+                <div *ngIf="isDashboardLoading || !(tokenSummaryData?.donutChart)"
+                    class="text-center text-muted py-5">
                     No data available.
                 </div>
             </div>
@@ -74,17 +70,17 @@
     </div>
 
     <!-- Model Cost table -->
-    <div class="col-4 px-1">
-        <div class="card round-edge h-100 token-billing-card token-billing-summary-card">
+    <div class="col-4">
+        <div class="card round-edge h-100 mb-0">
             <app-spinner [name]="modelCostData.loader"></app-spinner>
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+                <span class="font-weight-bold">Model Cost</span>
+                <span>
+                    <span class="font-weight-bold text-dark">{{formatCost(tokenSummaryData.totalCostUsd)}}</span>
+                    <span class="text-muted small ml-1">Total Cost</span>
+                </span>
+            </div>
             <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-baseline mb-2">
-                    <span class="font-weight-500 font-lg">Model Cost</span>
-                    <span>
-                        <span class="font-weight-bold text-dark font-lg-xl">{{formatCost(tokenSummaryData.totalCostUsd)}}</span>
-                        <span class="text-muted font-xs ml-1">Total Cost</span>
-                    </span>
-                </div>
                 <div class="table-responsive model-cost-table-wrapper">
                     <table class="table table-sm mb-0 model-cost-table">
                         <thead>
@@ -100,7 +96,7 @@
                                 <td>{{formatTokens(row.total_tokens)}}</td>
                                 <td class="text-right">{{formatRowCost(row.total_cost_usd)}}</td>
                             </tr>
-                            <tr *ngIf="!isDashboardLoading && !modelCostData.rows.length">
+                            <tr *ngIf="isDashboardLoading || !(modelCostData?.rows?.length)">
                                 <td colspan="3" class="text-center text-muted">No data available.</td>
                             </tr>
                         </tbody>
@@ -111,13 +107,11 @@
     </div>
 
     <!-- Traces (credit) panel -->
-    <div class="col-4 pl-1">
-        <div class="card round-edge h-100 token-billing-card token-billing-summary-card">
+    <div class="col-4">
+        <div class="card round-edge h-100 mb-0">
             <app-spinner [name]="creditSummaryData.loader"></app-spinner>
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-baseline mb-2">
-                    <span class="font-weight-500 font-lg">Credits</span>
-                </div>
+            <div class="card-header bg-white font-weight-bold py-2">Credits</div>
+            <div class="card-body p-3 mt-2">
                 <div class="row text-center mb-2">
                     <div class="col-4 border-right">
                         <div class="text-muted font-xs">Total Credit</div>
@@ -138,13 +132,12 @@
                         </div>
                     </div>
                 </div>
-                <ng-container *ngIf="creditSummaryData.donutChart">
+                <ng-container *ngIf="creditSummaryData?.donutChart">
                     <div echarts [options]="creditSummaryData.donutChart.options"
-                        [extentions]="creditSummaryData.donutChart.extensions" [defaultHeight]="220"
-                        class="chart-slot chart-slot-top"></div>
+                        [extentions]="creditSummaryData.donutChart.extensions" [defaultHeight]="230"></div>
                 </ng-container>
-                <div *ngIf="!isDashboardLoading && !creditSummaryData.donutChart"
-                    class="chart-slot chart-slot-top d-flex justify-content-center align-items-center">
+                <div *ngIf="isDashboardLoading || !(creditSummaryData?.donutChart)"
+                    class="text-center text-muted py-5">
                     No data available.
                 </div>
             </div>
@@ -157,73 +150,39 @@
 <div class="row mb-2">
 
     <!-- Usage by application -->
-    <div class="col-6 pr-1">
-        <div class="card round-edge h-100 token-billing-card token-billing-chart-card">
+    <div class="col-6">
+        <div class="card round-edge h-100 mb-0">
             <app-spinner [name]="usageByAppData.loader"></app-spinner>
-            <div class="card-body p-3 chart-panel-body"
-                [ngClass]="{'d-flex justify-content-center align-items-center': !isDashboardLoading && !usageByAppData.chartData}">
-                <div *ngIf="usageByAppData.chartData"
-                    class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="font-weight-500 font-lg">Usage by Application</span>
-                </div>
-                <ng-container *ngIf="usageByAppData.chartData">
+            <div class="card-header bg-white font-weight-bold py-2">Usage by Application</div>
+            <div class="card-body p-0 mt-2">
+                <ng-container *ngIf="usageByAppData?.chartData">
                     <div echarts [options]="usageByAppData.chartData.options"
-                        [extentions]="usageByAppData.chartData.extensions" [defaultHeight]="230"
-                        class="chart-slot chart-slot-main"></div>
+                        [extentions]="usageByAppData.chartData.extensions" [defaultHeight]="230"></div>
                 </ng-container>
-                <div *ngIf="!isDashboardLoading && !usageByAppData.chartData">No data available.</div>
+                <div *ngIf="isDashboardLoading || !(usageByAppData?.chartData)"
+                    class="text-center text-muted py-5">No data available.</div>
             </div>
         </div>
     </div>
 
     <!-- Model Cost Usage panel -->
-    <div class="col-6 pl-1">
-        <div class="card round-edge h-100 token-billing-card token-billing-chart-card">
+    <div class="col-6">
+        <div class="card round-edge h-100 mb-0">
             <app-spinner [name]="modelUsageData.loader"></app-spinner>
-            <div class="card-body p-3 chart-panel-body"
-                [ngClass]="{'d-flex justify-content-center align-items-center': !isDashboardLoading && !modelUsageData.chartData}">
-
-                <!-- Card header row -->
-                <div *ngIf="modelUsageData.chartData"
-                    class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="font-weight-500 font-lg">Model Cost Usage</span>
-                    <div class="d-flex align-items-center">
-                        <span class="font-weight-bold text-dark font-lg-xl mr-1">
-                            {{formatCost(modelUsageData.totalCostUsd)}}
-                        </span>
-                        <span class="text-muted font-xs mr-3">Total Cost</span>
-                        <!-- Model multi-select dropdown -->
-                        <span dropdown #modelFilterDropdown="bs-dropdown" placement="bottom right" container="body"
-                            [insideClick]="true" (isOpenChange)="onFilterDropdownOpenChange('model', $event)"
-                            class="tb-graph-filter-dropdown">
-                            <button id="model-filter-dropdown-toggle"
-                                class="btn btn-sm btn-light border text-dark dropdown-toggle" type="button"
-                                data-toggle="dropdown" aria-controls="model-filter-dropdown-menu" dropdownToggle>
-                                {{modelUsageData.selectedModels.length}} Selected
-                            </button>
-                            <div id="model-filter-dropdown-menu"
-                                class="dropdown-menu dropdown-menu-right tb-graph-filter-menu p-2" *dropdownMenu
-                                aria-labelledby="model-filter-dropdown-toggle">
-                                <div *ngFor="let m of modelUsageData.allModels" class="form-check mb-1">
-                                    <input class="form-check-input" type="checkbox"
-                                        [id]="'model-cb-' + m"
-                                        [checked]="isModelSelected(m)"
-                                        (change)="toggleModel(m)">
-                                    <label class="form-check-label font-xs"
-                                        [for]="'model-cb-' + m">{{m}}</label>
-                                </div>
-                            </div>
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Chart -->
-                <ng-container *ngIf="modelUsageData.chartData">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+                <span class="font-weight-bold">Model Cost Usage</span>
+                <span>
+                    <span class="font-weight-bold text-dark">{{formatCost(modelUsageData.totalCostUsd)}}</span>
+                    <span class="text-muted small ml-1">Total Cost</span>
+                </span>
+            </div>
+            <div class="card-body p-0 mt-2">
+                <ng-container *ngIf="modelUsageData?.chartData">
                     <div echarts [options]="modelUsageData.chartData.options"
-                        [extentions]="modelUsageData.chartData.extensions" [defaultHeight]="230"
-                        class="chart-slot chart-slot-main"></div>
+                        [extentions]="modelUsageData.chartData.extensions" [defaultHeight]="230"></div>
                 </ng-container>
-                <div *ngIf="!isDashboardLoading && !modelUsageData.chartData">No data available.</div>
+                <div *ngIf="isDashboardLoading || !(modelUsageData?.chartData)"
+                    class="text-center text-muted py-5">No data available.</div>
             </div>
         </div>
     </div>
@@ -232,52 +191,761 @@
 <!-- ── Row 3: Model token usage(per-user stacked area chart) — full width ────── -->
 <div class="row mb-2">
     <div class="col-12">
-        <div class="card round-edge token-billing-card token-billing-chart-card">
+        <div class="card round-edge mb-0">
             <app-spinner [name]="modelTokenUsageData.loader"></app-spinner>
-            <div class="card-body p-3 chart-panel-body"
-                [ngClass]="{'d-flex justify-content-center align-items-center': !isDashboardLoading && !modelTokenUsageData.chartData}">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+                <span class="font-weight-bold">Model Token Usage</span>
+                <span>
+                    <span class="font-weight-bold text-dark">{{formatTokens(modelTokenUsageData.totalTokens)}}</span>
+                    <span class="text-muted small ml-1">Total Token</span>
+                </span>
+            </div>
+            <div class="card-body p-0 mt-2">
+                <ng-container *ngIf="modelTokenUsageData?.chartData">
+                    <div echarts [options]="modelTokenUsageData.chartData.options"
+                        [extentions]="modelTokenUsageData.chartData.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isDashboardLoading || !(modelTokenUsageData?.chartData)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Card header row -->
-                <div *ngIf="modelTokenUsageData.chartData"
-                    class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="font-weight-500 font-lg">Model Token Usage</span>
-                    <div class="d-flex align-items-center">
-                        <span class="font-weight-bold text-dark font-lg-xl mr-1">
-                            {{formatTokens(modelTokenUsageData.totalTokens)}}
-                        </span>
-                        <span class="text-muted font-xs mr-3">Total Token</span>
-                        <!-- User multi-select dropdown -->
-                        <span dropdown #userFilterDropdown="bs-dropdown" placement="bottom right" container="body"
-                            [insideClick]="true" (isOpenChange)="onFilterDropdownOpenChange('user', $event)"
-                            class="tb-graph-filter-dropdown">
-                            <button id="user-filter-dropdown-toggle"
-                                class="btn btn-sm btn-light border text-dark dropdown-toggle" type="button"
-                                data-toggle="dropdown" aria-controls="user-filter-dropdown-menu" dropdownToggle>
-                                {{modelTokenUsageData.selectedUsers.length}} Selected
-                            </button>
-                            <div id="user-filter-dropdown-menu"
-                                class="dropdown-menu dropdown-menu-right tb-graph-filter-menu p-2" *dropdownMenu
-                                aria-labelledby="user-filter-dropdown-toggle">
-                                <div *ngFor="let u of modelTokenUsageData.allUsers" class="form-check mb-1">
-                                    <input class="form-check-input" type="checkbox"
-                                        [id]="'user-cb-' + u"
-                                        [checked]="isUserSelected(u)"
-                                        (change)="toggleUser(u)">
-                                    <label class="form-check-label font-xs"
-                                        [for]="'user-cb-' + u">{{u}}</label>
-                                </div>
-                            </div>
-                        </span>
+<div class="row mb-2">
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">End-to-End Response Time</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.endToEndResponseTime"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.endToEndResponseTime">
+                    <div echarts [options]="langfuseGraphData.endToEndResponseTime.options"
+                        [extentions]="langfuseGraphData.endToEndResponseTime.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.endToEndResponseTime)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Time to First Token</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.timeToFirstToken"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.timeToFirstToken">
+                    <div echarts [options]="langfuseGraphData.timeToFirstToken.options"
+                        [extentions]="langfuseGraphData.timeToFirstToken.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.timeToFirstToken)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Tokens per Request</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.tokensPerRequest"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.tokensPerRequest">
+                    <div echarts [options]="langfuseGraphData.tokensPerRequest.options"
+                        [extentions]="langfuseGraphData.tokensPerRequest.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.tokensPerRequest)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-6">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Latency Percentiles</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.latencyPercentiles"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.latencyPercentiles">
+                    <div echarts [options]="langfuseGraphData.latencyPercentiles.options"
+                        [extentions]="langfuseGraphData.latencyPercentiles.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.latencyPercentiles)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Tool Call Latency</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.toolCallLatency"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.toolCallLatency">
+                    <div echarts [options]="langfuseGraphData.toolCallLatency.options"
+                        [extentions]="langfuseGraphData.toolCallLatency.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.toolCallLatency)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Cost per 1K Tokens</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.costPer1kTokens"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.costPer1kTokens">
+                    <div echarts [options]="langfuseGraphData.costPer1kTokens.options"
+                        [extentions]="langfuseGraphData.costPer1kTokens.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.costPer1kTokens)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Inter-token Latency</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.interTokenLatency"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.interTokenLatency">
+                    <div echarts [options]="langfuseGraphData.interTokenLatency.options"
+                        [extentions]="langfuseGraphData.interTokenLatency.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.interTokenLatency)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Token Consumption by LLM Response</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.tokenConsumptionByLlmResponse"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.tokenConsumptionByLlmResponse">
+                    <div echarts [options]="langfuseGraphData.tokenConsumptionByLlmResponse.options"
+                        [extentions]="langfuseGraphData.tokenConsumptionByLlmResponse.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.tokenConsumptionByLlmResponse)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Expensive Users vs Token Consumption</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.expensiveUsersVsTokenConsumption"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.expensiveUsersVsTokenConsumption">
+                    <div echarts [options]="langfuseGraphData.expensiveUsersVsTokenConsumption.options"
+                        [extentions]="langfuseGraphData.expensiveUsersVsTokenConsumption.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.expensiveUsersVsTokenConsumption)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Expensive LLM Calls vs Token Consumption</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.expensiveLlmCallsVsTokenConsumption"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.expensiveLlmCallsVsTokenConsumption">
+                    <div echarts [options]="langfuseGraphData.expensiveLlmCallsVsTokenConsumption.options"
+                        [extentions]="langfuseGraphData.expensiveLlmCallsVsTokenConsumption.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.expensiveLlmCallsVsTokenConsumption)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-3">
+        <div class="card h-100 equalize-card mb-0">
+            <div class="card-body p-3">
+                <app-spinner [name]="metricLoaders.langfuse.agentCostPerTask"></app-spinner>
+                <div class="text-muted small mb-1">Agent Cost per Task</div>
+                <ng-container *ngIf="langfuseMetricsData">
+                    <div class="h4 font-weight-bold mb-2">
+                        {{formatCost(langfuseMetricsData.agent_cost_per_task.average_cost_per_task_usd)}} USD
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Total Cost: {{formatCost(langfuseMetricsData.agent_cost_per_task.total_cost_usd)}}</span>
+                        <span>Tasks: {{langfuseMetricsData.agent_cost_per_task.task_count}}</span>
+                    </div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !langfuseMetricsData"
+                    class="text-center text-muted py-3">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card h-100 equalize-card mb-0">
+            <div class="card-body p-3">
+                <app-spinner [name]="metricLoaders.langfuse.numberOfLlmCalls"></app-spinner>
+                <div class="text-muted small mb-1">Number of LLM Calls</div>
+                <div *ngIf="langfuseMetricsData" class="h4 font-weight-bold mb-0">
+                    {{langfuseMetricsData.number_of_llm_calls.count}}
+                </div>
+                <div *ngIf="isLangfuseMetricsLoading || !langfuseMetricsData"
+                    class="text-center text-muted py-3">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card h-100 equalize-card mb-0">
+            <div class="card-body p-3">
+                <app-spinner [name]="metricLoaders.langfuse.costPerRequest"></app-spinner>
+                <div class="text-muted small mb-1">Cost per Request</div>
+                <ng-container *ngIf="langfuseMetricsData">
+                    <div class="h4 font-weight-bold mb-2">
+                        {{formatCost(langfuseMetricsData.cost_per_request.average_cost_per_request_usd)}} USD
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Total Cost: {{formatCost(langfuseMetricsData.cost_per_request.total_cost_usd)}}</span>
+                        <span>Requests: {{langfuseMetricsData.cost_per_request.request_count}}</span>
+                    </div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !langfuseMetricsData"
+                    class="text-center text-muted py-3">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card h-100 equalize-card mb-0">
+            <div class="card-body p-3">
+                <app-spinner [name]="metricLoaders.langfuse.throughput"></app-spinner>
+                <div class="text-muted small mb-2">Throughput</div>
+                <div *ngIf="langfuseMetricsData" class="d-flex justify-content-between">
+                    <div>
+                        <div class="h5 font-weight-bold mb-0">
+                            {{langfuseMetricsData.throughput.tokens_per_second | number:'1.3-6'}}
+                        </div>
+                        <div class="small text-muted">Tokens/sec</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="h5 font-weight-bold mb-0">
+                            {{langfuseMetricsData.throughput.requests_per_second | number:'1.3-6'}}
+                        </div>
+                        <div class="small text-muted">Requests/sec</div>
                     </div>
                 </div>
+                <div *ngIf="isLangfuseMetricsLoading || !langfuseMetricsData"
+                    class="text-center text-muted py-3">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Chart -->
-                <ng-container *ngIf="modelTokenUsageData.chartData">
-                    <div echarts [options]="modelTokenUsageData.chartData.options"
-                        [extentions]="modelTokenUsageData.chartData.extensions" [defaultHeight]="230"
-                        class="chart-slot chart-slot-main"></div>
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Steps by Session</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.stepsBySession"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.stepsBySession">
+                    <div echarts [options]="langfuseGraphData.stepsBySession.options"
+                        [extentions]="langfuseGraphData.stepsBySession.extensions" [defaultHeight]="230"></div>
                 </ng-container>
-                <div *ngIf="!isDashboardLoading && !modelTokenUsageData.chartData">No data available.</div>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.stepsBySession)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-6">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Steps per Task Distribution</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.stepsPerTaskDistribution"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.stepsPerTaskDistribution">
+                    <div echarts [options]="langfuseGraphData.stepsPerTaskDistribution.options"
+                        [extentions]="langfuseGraphData.stepsPerTaskDistribution.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.stepsPerTaskDistribution)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="row h-100 mx-0">
+            <div class="col-4 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.langfuse.costPerSuccessfulCompletion"></app-spinner>
+                        <div class="text-muted small mb-1">Cost per Successful Completion</div>
+                        <ng-container *ngIf="langfuseMetricsData?.cost_per_successful_completion">
+                            <div class="h4 font-weight-bold mb-2">
+                                {{formatCost(langfuseMetricsData.cost_per_successful_completion.cost_per_successful_completion_usd)}} USD
+                            </div>
+                            <div class="small text-muted">
+                                Successful completions: {{langfuseMetricsData.cost_per_successful_completion.successful_completion_count}}
+                            </div>
+                        </ng-container>
+                        <div *ngIf="isLangfuseMetricsLoading || !(langfuseMetricsData?.cost_per_successful_completion)"
+                            class="text-center text-muted py-4">No data available.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.langfuse.abModelComparison"></app-spinner>
+                        <div class="text-muted small mb-1">A/B Model Comparison</div>
+                        <ng-container *ngIf="langfuseMetricsData?.ab_model_comparison">
+                            <div class="h4 font-weight-bold mb-2">
+                                {{langfuseMetricsData.ab_model_comparison.average_score | number:'1.2-4'}}
+                            </div>
+                            <div class="small text-muted">
+                                Samples: {{langfuseMetricsData.ab_model_comparison.sample_count}}
+                            </div>
+                        </ng-container>
+                        <div *ngIf="isLangfuseMetricsLoading || !(langfuseMetricsData?.ab_model_comparison)"
+                            class="text-center text-muted py-4">No data available.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.langfuse.embeddingDriftCentroid"></app-spinner>
+                        <div class="text-muted small mb-1">Embedding Drift Centroid</div>
+                        <ng-container *ngIf="langfuseMetricsData?.embedding_drift_centroid">
+                            <div class="h4 font-weight-bold mb-2">
+                                {{langfuseMetricsData.embedding_drift_centroid.average_score | number:'1.2-4'}}
+                            </div>
+                            <div class="small text-muted">
+                                Samples: {{langfuseMetricsData.embedding_drift_centroid.sample_count}}
+                            </div>
+                        </ng-container>
+                        <div *ngIf="isLangfuseMetricsLoading || !(langfuseMetricsData?.embedding_drift_centroid)"
+                            class="text-center text-muted py-4">No data available.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.langfuse.cacheHitRate"></app-spinner>
+                        <div class="text-muted small mb-1">Cache Hit Rate</div>
+                        <ng-container *ngIf="langfuseMetricsData?.cache_hit_rate">
+                            <div class="h5 font-weight-bold mb-1">
+                                {{langfuseMetricsData.cache_hit_rate.value | number:'1.0-4'}}
+                            </div>
+                            <div class="small text-muted">
+                                Count: {{langfuseMetricsData.cache_hit_rate.sample_count | number:'1.0-0'}}
+                            </div>
+                        </ng-container>
+                        <div *ngIf="isLangfuseMetricsLoading || !(langfuseMetricsData?.cache_hit_rate)"
+                            class="text-center text-muted py-3">No data available.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.langfuse.semanticCacheHitRate"></app-spinner>
+                        <div class="text-muted small mb-1">Semantic Cache Hit Rate</div>
+                        <ng-container *ngIf="langfuseMetricsData?.semantic_cache_hit_rate">
+                            <div class="h5 font-weight-bold mb-1">
+                                {{langfuseMetricsData.semantic_cache_hit_rate.value == null
+                                ? 'N/A' : langfuseMetricsData.semantic_cache_hit_rate.value}}
+                            </div>
+                            <div class="small text-muted">
+                                Count: {{langfuseMetricsData.semantic_cache_hit_rate.sample_count | number:'1.0-0'}}
+                            </div>
+                        </ng-container>
+                        <div *ngIf="isLangfuseMetricsLoading || !(langfuseMetricsData?.semantic_cache_hit_rate)"
+                            class="text-center text-muted py-3">No data available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Trace Success / Failure Rates</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.traceSuccessFailureRates"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.traceSuccessFailureRates">
+                    <div echarts [options]="langfuseGraphData.traceSuccessFailureRates.options"
+                        [extentions]="langfuseGraphData.traceSuccessFailureRates.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.traceSuccessFailureRates)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Total Token Consumption</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.totalTokenConsumption"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.totalTokenConsumption">
+                    <div echarts [options]="langfuseGraphData.totalTokenConsumption.options"
+                        [extentions]="langfuseGraphData.totalTokenConsumption.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.totalTokenConsumption)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Task Completion Rate</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.taskCompletionRate"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.taskCompletionRate">
+                    <div echarts [options]="langfuseGraphData.taskCompletionRate.options"
+                        [extentions]="langfuseGraphData.taskCompletionRate.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.taskCompletionRate)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-6">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Cost per User</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.costPerUser"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.costPerUser">
+                    <div echarts [options]="langfuseGraphData.costPerUser.options"
+                        [extentions]="langfuseGraphData.costPerUser.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.costPerUser)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Span Kind Operation Count</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.spanKindOperationCount"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.spanKindOperationCount">
+                    <div echarts [options]="langfuseGraphData.spanKindOperationCount.options"
+                        [extentions]="langfuseGraphData.spanKindOperationCount.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.spanKindOperationCount)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Monthly LLM Spend</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.monthlyLlmSpend"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.monthlyLlmSpend">
+                    <div echarts [options]="langfuseGraphData.monthlyLlmSpend.options"
+                        [extentions]="langfuseGraphData.monthlyLlmSpend.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.monthlyLlmSpend)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Inference Error Rate</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.inferenceErrorRate"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.inferenceErrorRate">
+                    <div echarts [options]="langfuseGraphData.inferenceErrorRate.options"
+                        [extentions]="langfuseGraphData.inferenceErrorRate.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.inferenceErrorRate)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Token Waste Ratio</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.langfuse.tokenWasteRatio"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.tokenWasteRatio">
+                    <div echarts [options]="langfuseGraphData.tokenWasteRatio.options"
+                        [extentions]="langfuseGraphData.tokenWasteRatio.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLangfuseMetricsLoading || !(langfuseGraphData?.tokenWasteRatio)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-2">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">LLM Judge Average Scores</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.llmJudge.averageScores"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.llmJudgeAverageScores">
+                    <div echarts [options]="langfuseGraphData.llmJudgeAverageScores.options"
+                        [extentions]="langfuseGraphData.llmJudgeAverageScores.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isLlmJudgeMetricsLoading || !(langfuseGraphData?.llmJudgeAverageScores)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="langfuseMcpMetricsData" class="row mb-2">
+    <div class="col-4">
+        <div class="row h-100 mx-0">
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.mcp.toolCostPerCall"></app-spinner>
+                        <div class="text-muted font-sm-xs">Tool Cost per Call</div>
+                        <div class="h5 font-weight-bold mb-2">
+                            {{formatCost(langfuseMcpMetricsData.mcp_tool_cost_per_call.cost_per_tool_call_usd)}} USD
+                        </div>
+                        <div class="d-flex">
+                            <div class="mr-3">
+                                <div class="font-sm-xs text-muted">Calls</div>
+                                <h6 class="font-weight-bold mb-0">
+                                    {{langfuseMcpMetricsData.mcp_tool_cost_per_call.tool_call_count}}
+                                </h6>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="font-sm-xs text-muted">Total</div>
+                                <h6 class="font-weight-bold mb-0">
+                                    {{formatCost(langfuseMcpMetricsData.mcp_tool_cost_per_call.total_cost_usd)}} USD
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.mcp.resultCorrectness"></app-spinner>
+                        <div class="text-muted font-sm-xs">Result Correctness</div>
+                        <div class="h5 font-weight-bold mb-2">
+                            {{langfuseMcpMetricsData.mcp_result_correctness.value | number:'1.0-3'}}%
+                        </div>
+                        <div class="font-sm-xs text-muted">Count</div>
+                        <h6 class="font-weight-bold mb-0">
+                            {{langfuseMcpMetricsData.mcp_result_correctness.sample_count}}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.mcp.argumentSchemaValidity"></app-spinner>
+                        <div class="text-muted font-sm-xs">Argument Schema Validity</div>
+                        <div class="h5 font-weight-bold mb-2">
+                            {{langfuseMcpMetricsData.mcp_argument_schema_validity_rate.value | number:'1.0-3'}}%
+                        </div>
+                        <div class="font-sm-xs text-muted">Count</div>
+                        <h6 class="font-weight-bold mb-0">
+                            {{langfuseMcpMetricsData.mcp_argument_schema_validity_rate.sample_count}}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.mcp.toolRetryRate"></app-spinner>
+                        <div class="text-muted font-sm-xs">Tool Retry Rate</div>
+                        <div class="h5 font-weight-bold mb-2">
+                            {{langfuseMcpMetricsData.mcp_tool_retry_rate.value | number:'1.0-3'}}%
+                        </div>
+                        <div class="font-sm-xs text-muted">Count</div>
+                        <h6 class="font-weight-bold mb-0">
+                            {{langfuseMcpMetricsData.mcp_tool_retry_rate.sample_count}}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card round-edge h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">MCP Tool Call Success Rate</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.mcp.toolCallSuccessRate"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.mcpToolCallSuccessRate">
+                    <div echarts [options]="langfuseGraphData.mcpToolCallSuccessRate.options"
+                        [extentions]="langfuseGraphData.mcpToolCallSuccessRate.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isMcpMetricsLoading || !(langfuseGraphData?.mcpToolCallSuccessRate)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card round-edge h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">MCP Tool Call Latency</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.mcp.toolCallLatency"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.mcpToolCallLatency">
+                    <div echarts [options]="langfuseGraphData.mcpToolCallLatency.options"
+                        [extentions]="langfuseGraphData.mcpToolCallLatency.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isMcpMetricsLoading || !(langfuseGraphData?.mcpToolCallLatency)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="langfuseMcpMetricsData" class="row mb-2">
+    <div class="col-4">
+        <div class="card round-edge h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">MCP Tool Coverage</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.mcp.toolCoverage"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.mcpToolCoverage">
+                    <div echarts [options]="langfuseGraphData.mcpToolCoverage.options"
+                        [extentions]="langfuseGraphData.mcpToolCoverage.extensions" [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isMcpMetricsLoading || !(langfuseGraphData?.mcpToolCoverage)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card round-edge h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">MCP Tool Utilization</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.mcp.toolUtilization"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.mcpToolUtilization">
+                    <div echarts [options]="langfuseGraphData.mcpToolUtilization.options"
+                        [extentions]="langfuseGraphData.mcpToolUtilization.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isMcpMetricsLoading || !(langfuseGraphData?.mcpToolUtilization)"
+                    class="text-center text-muted py-5">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="row h-100 mx-0">
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.mcp.serverAvailability"></app-spinner>
+                        <div class="text-muted font-sm-xs">Server Availability</div>
+                        <div class="h5 font-weight-bold mb-2">
+                            {{langfuseMcpMetricsData.mcp_server_availability_uptime.value | number:'1.0-3'}}%
+                        </div>
+                        <div class="font-sm-xs text-muted">Count</div>
+                        <h6 class="font-weight-bold mb-0">
+                            {{langfuseMcpMetricsData.mcp_server_availability_uptime.sample_count}}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.mcp.redundantCallRate"></app-spinner>
+                        <div class="text-muted font-sm-xs">Redundant Call Rate</div>
+                        <div class="h5 font-weight-bold mb-2">
+                            {{langfuseMcpMetricsData.mcp_redundant_unnecessary_call_rate.value | number:'1.0-3'}}%
+                        </div>
+                        <div class="font-sm-xs text-muted">Count</div>
+                        <h6 class="font-weight-bold mb-0">
+                            {{langfuseMcpMetricsData.mcp_redundant_unnecessary_call_rate.sample_count}}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.mcp.toolSelectionAccuracy"></app-spinner>
+                        <div class="text-muted font-sm-xs">Tool Selection Accuracy</div>
+                        <div class="h5 font-weight-bold mb-2">
+                            {{langfuseMcpMetricsData.mcp_tool_selection_accuracy.value | number:'1.0-3'}}%
+                        </div>
+                        <div class="font-sm-xs text-muted">Count</div>
+                        <h6 class="font-weight-bold mb-0">
+                            {{langfuseMcpMetricsData.mcp_tool_selection_accuracy.sample_count}}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 d-flex p-1">
+                <div class="card round-edge flex-fill mb-0">
+                    <div class="card-body p-3">
+                        <app-spinner [name]="metricLoaders.mcp.toolCallErrorRate"></app-spinner>
+                        <div class="text-muted font-sm-xs">Tool Call Error Rate</div>
+                        <div class="h5 font-weight-bold mb-2">
+                            {{langfuseMcpMetricsData.mcp_tool_call_error_rate.value | number:'1.0-3'}}%
+                        </div>
+                        <div class="font-sm-xs text-muted">Count</div>
+                        <h6 class="font-weight-bold mb-0">
+                            {{langfuseMcpMetricsData.mcp_tool_call_error_rate.sample_count}}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isMcpMetricsLoading || !langfuseMcpMetricsData" class="row mb-2">
+    <div class="col-12">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">MCP Metrics</div>
+            <div class="card-body text-center text-muted py-5">
+                <app-spinner [name]="metricLoaders.mcp.fallback"></app-spinner>
+                No data available.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-2">
+        <div class="card h-100 mb-0">
+            <div class="card-header bg-white font-weight-bold py-2">Guardrail Average Scores</div>
+            <div class="card-body p-0 mt-2">
+                <app-spinner [name]="metricLoaders.guardrail.averageScores"></app-spinner>
+                <ng-container *ngIf="langfuseGraphData?.guardrailAverageScores">
+                    <div echarts [options]="langfuseGraphData.guardrailAverageScores.options"
+                        [extentions]="langfuseGraphData.guardrailAverageScores.extensions"
+                        [defaultHeight]="230"></div>
+                </ng-container>
+                <div *ngIf="isGuardrailMetricsLoading || !(langfuseGraphData?.guardrailAverageScores)"
+                    class="text-center text-muted py-5">No data available.</div>
             </div>
         </div>
     </div>

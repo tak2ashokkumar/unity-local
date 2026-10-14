@@ -2,6 +2,7 @@ import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-m
 import { SNMPCrudType } from './snmp-crud.type';
 import { DatacenterInDevice } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { DeviceInterface } from 'src/app/shared/SharedEntityTypes/inventory-attributes.type';
+import { PrivateCloudRemoteWebAccessType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { UnityCredentialsFast } from 'src/app/shared/SharedEntityTypes/unity-credentials.type';
 
 export interface StorageDevice extends SNMPCrudType {
@@ -62,6 +63,7 @@ export interface StorageDevice extends SNMPCrudType {
     collector: CollectorType;
     custom_attribute_data?: { [key: string]: any }
     redfish: boolean;
+    remote_web_access?: PrivateCloudRemoteWebAccessType;
 }
 
 export interface StorageManufacturer {

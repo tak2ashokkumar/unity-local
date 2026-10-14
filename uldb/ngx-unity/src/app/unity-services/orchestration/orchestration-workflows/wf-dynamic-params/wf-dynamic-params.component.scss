@@ -374,6 +374,95 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 0 0 3px rgba(55, 138, 216, 0.12);
 }
 
+// Dynamic selects — match the local Bootstrap form controls.
+:host ::ng-deep .dynamic-ng-select {
+  font-size: 13px;
+
+  .ng-select-container {
+    min-height: calc(1.5em + 0.75rem + 2px);
+    color: var(--unity-input-text, #{$text-dark});
+    background: var(--unity-input-bg, #{$bg});
+    border-color: var(--unity-input-border, #{$border});
+    border-radius: 8px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  &.ng-select-focused>.ng-select-container,
+  &.ng-select-opened>.ng-select-container {
+    border-color: var(--unity-input-border-focus, #{$blue});
+    box-shadow: 0 0 0 3px var(--unity-focus-ring, rgba(55, 138, 216, 0.12));
+  }
+
+  &.is-invalid>.ng-select-container {
+    border-color: var(--unity-input-border-invalid, #dc3545);
+  }
+
+  &.ng-select-disabled>.ng-select-container {
+    color: var(--unity-input-disabled-text, #6c757d);
+    background: var(--unity-input-disabled-bg, #e9ecef);
+  }
+
+  .ng-placeholder,
+  .ng-clear-wrapper,
+  .ng-arrow-wrapper {
+    color: var(--unity-input-placeholder, #{$text-muted});
+  }
+
+  // Use the same themed chevron as the native select for every ng-select variant.
+  .ng-arrow-wrapper {
+    width: 25px;
+    padding-right: 5px;
+    color: var(--unity-input-placeholder, #{$text-muted});
+
+    &::before {
+      content: "\f078";
+      font-family: "Font Awesome 5 Free";
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .ng-arrow {
+      display: none;
+    }
+  }
+
+  &.ng-select-multiple .ng-value-container .ng-value {
+    color: var(--unity-color-primary, #{$blue-dark});
+    background: var(--unity-color-primary-light, #e7f1ff);
+    border-radius: 5px;
+
+    .ng-value-label {
+      padding: 1px 5px;
+    }
+
+    .ng-value-icon.right {
+      border-right: 0;
+      border-left: 1px solid var(--unity-color-primary-border, #b8dbff);
+    }
+  }
+
+  .ng-dropdown-panel {
+    overflow: hidden;
+    color: var(--unity-dropdown-text, #{$text-dark});
+    background: var(--unity-dropdown-bg, #{$bg});
+    border-color: var(--unity-dropdown-border, #{$border});
+    border-radius: 8px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+
+    .ng-option {
+      padding: 8px 10px;
+      color: inherit;
+      background: transparent;
+
+      &.ng-option-marked { background: var(--unity-dropdown-item-hover, #{$surface}); }
+      &.ng-option-selected { background: var(--unity-dropdown-item-active, #e7f1ff); }
+      &.ng-option-disabled { color: var(--unity-text-disabled, #adb5bd); }
+    }
+
+    small { display: block; font-size: 11px; line-height: 1.3; }
+  }
+}
+
 .field-mode-toggle {
   font-size: 10px;
   line-height: 1;
@@ -771,4 +860,72 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
   background-color: currentColor;
   -webkit-mask: var(--ai-icon) center / contain no-repeat;
   mask: var(--ai-icon) center / contain no-repeat;
+}
+
+.textarea-expand-wrapper {
+  min-width: 0;
+}
+
+.expand-btn {
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--bs-secondary-color, #6c757d);
+  cursor: pointer;
+
+  &:focus,
+  &:active {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--unity-focus-ring, rgba(55, 138, 216, 0.12));
+  }
+
+  &:hover {
+    background-color: var(--bs-secondary-bg, #e9ecef);
+    color: var(--bs-body-color, #212529);
+  }
+}
+
+.expanded-editor-panes {
+  min-height: 240px;
+}
+
+.expanded-markdown-input,
+.expanded-markdown-preview {
+  min-height: 0;
+  font: inherit;
+  background: var(--unity-input-bg, #{$bg});
+  color: var(--unity-input-text, #23282c);
+}
+
+.expanded-markdown-input {
+  resize: none;
+}
+
+.expanded-markdown-preview {
+  overflow-wrap: anywhere;
+}
+
+// The preview spans are created after Markdown renders, outside Angular scoping.
+:host ::ng-deep {
+  .expanded-markdown-preview {
+    .ph-x, .ph-s, .ph-c { border-radius: 3px; }
+    .ph-x { color: #2454d6; background: rgba(36, 84, 214, .12); }
+    .ph-s { color: #7b3fc4; background: rgba(123, 63, 196, .12); }
+    .ph-c { color: #5f6b7a; background: rgba(120, 130, 150, .18); font-style: italic; }
+  }
+}
+
+:host-context(body.theme-dark) ::ng-deep {
+  .expanded-markdown-preview {
+    .ph-x { color: #9db4ff; background: rgba(124, 156, 255, .16); }
+    .ph-s { color: #c7a6ff; background: rgba(170, 120, 255, .18); }
+    .ph-c { color: #9aa5b4; }
+  }
 }

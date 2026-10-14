@@ -3,7 +3,7 @@ import { NodeDataModel, OrchestrationWorkflowMetadata, UnityWorkflowViewData } f
 import { Subject } from 'rxjs';
 import Drawflow from 'drawflow';
 import { cloneDeep as _clone, has } from 'lodash-es';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -119,7 +119,8 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit, O
     private router: Router,
     private route: ActivatedRoute,
     private storage: StorageService,
-    private svc: OrchestrationAgenticWorkflowContainerService
+    private svc: OrchestrationAgenticWorkflowContainerService,
+    private location: Location
   ) {
     this.currentCriteria = { searchValue: '', pageSize: 0 };
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
@@ -3464,13 +3465,14 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit, O
   }
 
   goBack() {
-    if (this.workFlowId) {
-      this.router.navigate(['../../../'], { relativeTo: this.route });
-    } else if (this.isViewMode) {
-      this.router.navigate(['../../'], { relativeTo: this.route });
-    } else {
-      this.router.navigate(['../'], { relativeTo: this.route });
-    }
+    // if (this.workFlowId) {
+    //   this.router.navigate(['../../../'], { relativeTo: this.route });
+    // } else if (this.isViewMode) {
+    //   this.router.navigate(['../../'], { relativeTo: this.route });
+    // } else {
+    //   this.router.navigate(['../'], { relativeTo: this.route });
+    // }
+    this.location.back();
   }
 
   changeZoom(direction: number) {

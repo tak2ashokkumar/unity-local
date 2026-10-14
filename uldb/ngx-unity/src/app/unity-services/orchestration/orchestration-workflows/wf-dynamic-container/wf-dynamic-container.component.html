@@ -71,10 +71,12 @@
           <div class="workspace-shell position-relative w-100 overflow-hidden">
 
             <!-- MAIN CANVAS -->
-            <div class="drawflow-canvas position-absolute">
+            <div class="drawflow-canvas position-absolute"
+              [style.visibility]="isLoadingWorkflow || hasNoExecutions ? 'hidden' : 'visible'"
+              [attr.aria-hidden]="isLoadingWorkflow || hasNoExecutions">
               <div class="flex-grow-1 drawflow-canvas position-absolute">
                 <div #drawflowContainer id="dynamic-drawflow" (dragover)="allowDrop($event)" (drop)="drop($event)">
-                  <div class="center-text-container text-center" *ngIf="emptyCanvas">
+                  <div class="center-text-container text-center" *ngIf="emptyCanvas && !isExecutionMode">
                     <i class="fas fa-bolt mb-2 d-block" style="font-size: 1.4rem; opacity: 0.4;"></i>
                     Add a Trigger to define the starting point of the workflow
                   </div>
@@ -113,6 +115,13 @@
             </div>
 
 
+            <div *ngIf="hasNoExecutions"
+              class="d-flex flex-column align-items-center justify-content-center h-100 px-4 text-center text-muted"
+              role="status" aria-live="polite">
+              <p class="font-weight-bold mb-2">No executions are available for this workflow yet.</p>
+              <p class="mb-0">Run the workflow from the Designer to view execution details.</p>
+            </div>
+
             <!-- =========================
      LEFT PANEL
 ========================= -->
@@ -141,25 +150,37 @@
                 <wf-dynamic-left *ngIf="!isExecutionMode" [workflowGroups]="workflowGroups" (dragStart)="onDragStart($event)"
                   [hasTriggerNode]="hasTriggerNode">
                 </wf-dynamic-left>
-                <div *ngIf="isExecutionMode" class="list-group list-group-flush">
-                  <div *ngIf="loadingExecutions" class="p-3 text-center text-muted">
+                <div *ngIf="isExecutionMode" class="h-100 overflow-auto"
+                  (scroll)="onExecutionScroll($event)">
+                  <div *ngIf="loadingExecutions && !workflowExecutions.length" class="p-3 text-center text-muted">
                     <i class="fas fa-spinner fa-spin mr-1"></i> Loading executions...
                   </div>
                   <div *ngIf="!loadingExecutions && !workflowExecutions.length" class="p-3 text-center text-muted">
-                    No executions found
+                    No executions are available for this workflow yet.
                   </div>
-                  <button *ngFor="let execution of workflowExecutions" type="button"
-                    class="execution-list-item list-group-item list-group-item-action"
-                    [class.active]="selectedExecution?.uuid === execution.uuid"
-                    (click)="selectExecution(execution)">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span class="font-weight-bold text-truncate">{{execution.run_id}}</span>
-                      <i [ngClass]="getStatusFaClass(execution.execution_status)"></i>
+                  <div *ngIf="workflowExecutions.length"
+                    class="list-group list-group-flush">
+                    <button *ngFor="let execution of workflowExecutions; trackBy: trackExecutionByUuid" type="button"
+                      class="execution-list-item list-group-item list-group-item-action"
+                      [class.active]="selectedExecution?.uuid === execution.uuid"
+                      (click)="selectExecution(execution)">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <span class="font-weight-bold text-truncate">{{execution.run_id}}</span>
+                        <i [ngClass]="getStatusFaClass(execution.execution_status)"></i>
+                      </div>
+                      <small class="d-flex justify-content-between"
+                        [class.text-muted]="selectedExecution?.uuid !== execution.uuid">
+                        <span>{{execution.start_time | date:'medium'}}</span>
+                        <span>Duration : {{formatExecutionDuration(execution.duration)}}</span>
+                      </small>
+                      <small class="d-block" [class.text-muted]="selectedExecution?.uuid !== execution.uuid">
+                        Executed by - {{execution.user || '-'}}
+                      </small>
+                    </button>
+                    <div *ngIf="loadingMoreExecutions" class="p-3 text-center text-muted">
+                      <i class="fas fa-spinner fa-spin mr-1"></i> Loading executions...
                     </div>
-                    <small [class.text-muted]="selectedExecution?.uuid !== execution.uuid">
-                      {{execution.start_time | date:'medium'}}
-                    </small>
-                  </button>
+                  </div>
                 </div>
               </div>
 
@@ -204,8 +225,8 @@
                 <span class="font-xs-sm mx-1">{{ isViewMode ? 'Run' : 'Test' }}</span>
               </button>
 
-              <button *ngIf="isExecutionMode && hasNode" class="btn btn-sm btn-primary font-500"
-                type="button" (click)="run()" [disabled]="!designerAvailable || erroredNodesCount > 0 || selectedExecutionInputs === undefined">
+              <button *ngIf="isExecutionMode" class="btn btn-sm btn-primary font-500"
+                type="button" (click)="run()" [disabled]="!selectedExecution || !hasNode || !designerAvailable || erroredNodesCount > 0 || selectedExecutionInputs === undefined">
                 <i class="fas fa-redo mr-1"></i>
                 <span class="font-xs-sm mx-1">Re-Run</span>
               </button>
@@ -350,13 +371,13 @@
 
                     <!-- Show placeholder if no logs -->
                     <ng-template #noLogs>
-                      <p *ngIf="isWorkflowExecuting; else executionNotStarted" class="text-muted small mb-0">
+                      <p *ngIf="!isExecutionMode && isWorkflowExecuting; else executionNotStarted" class="text-muted small mb-0">
                         <i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>
                         Execution started. Waiting for logs...
                       </p>
                       <ng-template #executionNotStarted>
                         <p class="text-muted small mb-0">
-                          Execution logs will appear here.
+                          {{ hasNoExecutions ? 'No execution logs are available. Run the workflow from the Designer to generate logs.' : 'Execution logs will appear here.' }}
                         </p>
                       </ng-template>
                     </ng-template>
@@ -451,7 +472,7 @@
         {{editWorkflowFlag ? 'Update Workflow' : 'Create Workflow'}}
       </h5>
       <p class="small text-muted mb-0 mt-1">
-        {{editWorkflowFlag ? 'Update the workflow name and description.' : 'Add a name and description to get started.'}}
+        {{editWorkflowFlag ? 'Update the workflow details.' : 'Add workflow details to get started.'}}
       </p>
     </div>
     <button class="close ml-3" type="button" aria-label="Close" (click)="onCloseWorkFlowDetails()">
@@ -478,7 +499,7 @@
         </div>
       </div>
 
-      <div class="form-group mb-0">
+      <div class="form-group">
         <label for="description" class="font-weight-bold text-dark">
           Description <span class="small font-weight-normal text-muted">(optional)</span>
         </label>
@@ -489,6 +510,24 @@
         <div id="workflow-description-error" class="invalid-feedback"
           *ngIf="workflowDetailsFormErrors.description">
           {{workflowDetailsFormErrors.description}}
+        </div>
+      </div>
+
+      <div class="form-group mb-0">
+        <label for="workflow-category" class="font-weight-bold text-dark">
+          Category <span class="text-danger" aria-hidden="true">*</span>
+        </label>
+        <ng-select id="workflow-category" class="workflow-category-select" formControlName="category"
+          [items]="workflowCategoryOptions" [addTag]="addWorkflowCategory"
+          (change)="onWorkflowCategoryChange($event)"
+          addTagText="Use category" [loading]="loadingWorkflowCategories" [clearable]="false"
+          placeholder="Select Category"
+          [class.is-invalid]="workflowDetailsFormErrors.category"
+          [attr.aria-invalid]="!!workflowDetailsFormErrors.category"
+          [attr.aria-describedby]="workflowDetailsFormErrors.category ? 'workflow-category-error' : null">
+        </ng-select>
+        <div id="workflow-category-error" class="invalid-feedback" *ngIf="workflowDetailsFormErrors.category">
+          {{workflowDetailsFormErrors.category}}
         </div>
       </div>
     </div>

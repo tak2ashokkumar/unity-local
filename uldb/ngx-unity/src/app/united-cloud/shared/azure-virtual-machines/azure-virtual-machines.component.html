@@ -60,11 +60,8 @@
           <td>
             <div [tooltip]="view.managementIp">{{view.managementIp || 'N/A'}}</div>
           </td>
-          <td>
-            <div *ngFor="let item of view.tags | keyvalue">
-              {{item.key}}:{{item.value}}<br>
-            </div>
-            <div *ngIf="!view.tags">N/A</div>
+          <td class="tdw-17">
+            <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
           </td>
           <td class="action-icons-column">
             <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerStatusIcon"
@@ -121,6 +118,20 @@
     <div class="text-center text-muted py-4" *ngIf="!filteredViewData.length">No VMs available in your account.</div>
   </div>
 </div>
+
+<ng-template #tagsList let-tags="tags">
+  <div class="text-truncate" [popoverContext]="{ tags: tags }" [popover]="tagsTooltipTmpl"
+    triggers="mouseenter:mouseleave" placement="top" container="body" *ngIf="tags">
+    <span *ngFor="let item of tags | keyvalue">{{item.key}}:{{item.value}} </span>
+  </div>
+  <div *ngIf="!tags">N/A</div>
+</ng-template>
+
+<ng-template #tagsTooltipTmpl let-tags="tags">
+  <div class="font-weight-bold">
+    <div *ngFor="let item of tags | keyvalue">{{item.key}}:{{item.value}}</div>
+  </div>
+</ng-template>
 
 <ng-template #deleteAzureVm>
   <div class="card mb-0">

@@ -19,7 +19,7 @@ export class OrchestrationInputTemplateService {
   ) { }
 
   getTemplateData(criteria: SearchCriteria): Observable<PaginatedResult<InputTemplateModel>> {
-    return this.tableService.getData<PaginatedResult<InputTemplateModel>>(ORCHESTRATION_INPUT_TEMPLATE (), criteria);
+    return this.tableService.getData<PaginatedResult<InputTemplateModel>>(ORCHESTRATION_INPUT_TEMPLATE(), criteria);
   }
 
   cloneData(uuid: string, name: string) {
@@ -28,18 +28,17 @@ export class OrchestrationInputTemplateService {
     };
     return this.http.post(ORCHESTRATION_INPUT_TEMPLATE_CLONE(uuid), req);
   }
-  
+
   toggleStatus(uuid: string) {
     return this.http.get(ORCHESTRATION_INPUT_TEMPLATE_STATUS_TOGGLE(uuid));
   }
-  
+
   deleteData(uuid: string) {
     return this.http.delete(ORCHESTRATION_INPUT_TEMPLATE_DELETE(uuid));
   }
 }
-
 export class InputTemplateModel {
-  name: string; 
+  name: string;
   category: string;
   description: string;
   input_type: string;

@@ -197,6 +197,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   databasePerformancePageSize = 10;
   databasePerformanceSearch = '';
   databasePerformanceView: 'table' | 'chart' = 'table';
+  databaseQueryPerformance: any = {};
   dbCacheHitOptions: EChartsOption = {};
   dbLatencyOptions: EChartsOption = {};
   dbResponseTimeOptions: EChartsOption = {};
@@ -236,6 +237,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   costSummaryMetrics: PublicCloudCostSummaryMetric[] = [];
   autoRemediationSummary: PublicCloudAutoRemediationSummaryViewData = null;
   provisioningRows: PublicCloudProvisioningRow[] = [];
+  provisioningTotal = 0;
+  provisioningPageNo = 1;
+  provisioningPageSize = 10;
   provisioningSort: PublicCloudSortState = { key: 'daysSinceProvisioned', direction: 'asc' };
   provisioningView: 'table' | 'chart' = 'table';
   provisioningSummaryMetrics: PublicCloudProvisioningSummaryMetric[] = [];
@@ -330,6 +334,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.databasePerformancePageNo = 1;
     this.recentAlertsPageNo = 1;
     this.costOptimizationPageNo = 1;
+    this.provisioningPageNo = 1;
     this.updateAppliedFilterCriteria();
     this.loadData();
   }
@@ -457,6 +462,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.databasePerformancePageNo = 1;
     this.recentAlertsPageNo = 1;
     this.costOptimizationPageNo = 1;
+    this.provisioningPageNo = 1;
     this.accountSubscriptionProjectMetricsSearch = '';
     this.platformOptions = [];
     this.regionOptions = [];
@@ -925,21 +931,15 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   getDatabasePerformance(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.clearDatabasePerformanceViewData();
     this.widgetLoading.databasePerformance = true;
-    // The workload endpoint returns the full list; search + pagination are applied client-side here.
     // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
     this.loadWidget(this.loaderNames.databasePerformance, forkJoin({
-      workload: this.svc.getDbWorkload(filterFormOutput).pipe(catchError(() => of([]))),
+      workload: this.svc.getDbWorkload(filterFormOutput, this.databasePerformanceSearch, this.databasePerformancePageNo, this.databasePerformancePageSize).pipe(catchError(() => of(null))),
       queryPerf: this.svc.getDbQueryPerformance(filterFormOutput).pipe(catchError(() => of(null)))
     }), data => {
       const queryPerf: any = data.queryPerf || {};
-      const search = this.databasePerformanceSearch.toLowerCase().trim();
-      const filtered = search
-        ? (data.workload || []).filter(row => String(row?.name || '').toLowerCase().indexOf(search) > -1)
-        : (data.workload || []);
-      this.databasePerformanceTotal = filtered.length;
-      const startIndex = (this.databasePerformancePageNo - 1) * this.databasePerformancePageSize;
-      const pageRows = filtered.slice(startIndex, startIndex + this.databasePerformancePageSize);
-      this.databasePerformanceRows = this.svc.convertToDbWorkloadRows(pageRows, queryPerf);
+      this.databaseQueryPerformance = queryPerf;
+      this.databasePerformanceRows = this.svc.convertToDbWorkloadRows(data.workload, queryPerf);
+      this.databasePerformanceTotal = this.svc.getDbWorkloadTotal(data.workload);
       this.dbCacheHitOptions = this.svc.convertToDbCacheHitOptions(queryPerf.top_cache_hit_ratio);
       this.dbLatencyOptions = this.svc.convertToDbLatencyOptions(queryPerf.top_latency);
       this.dbResponseTimeOptions = this.svc.convertToDbResponseTimeOptions(queryPerf.top_response_time);
@@ -958,7 +958,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   onDatabasePerformanceSearch(event: Event) {
     this.databasePerformanceSearch = String((event.target as HTMLInputElement)?.value || '');
     this.databasePerformancePageNo = 1;
-    this.getDatabasePerformance(this.appliedFilterCriteria);
+    this.getDatabasePerformanceTableRows(this.appliedFilterCriteria);
   }
 
   databasePerformancePageChange(pageNo: number) {
@@ -966,12 +966,27 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     this.databasePerformancePageNo = pageNo;
-    this.getDatabasePerformance(this.appliedFilterCriteria);
+    this.getDatabasePerformanceTableRows(this.appliedFilterCriteria);
+  }
+
+  // Re-fetches ONLY the paginated table endpoint (search / page change); chart endpoints are filter-scoped.
+  private getDatabasePerformanceTableRows(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.widgetLoading.databasePerformance = true;
+    this.loadWidget(this.loaderNames.databasePerformance,
+      this.svc.getDbWorkload(filterFormOutput, this.databasePerformanceSearch, this.databasePerformancePageNo, this.databasePerformancePageSize),
+      data => {
+        this.databasePerformanceRows = this.svc.convertToDbWorkloadRows(data, this.databaseQueryPerformance);
+        this.databasePerformanceTotal = this.svc.getDbWorkloadTotal(data);
+      }, () => {
+        this.databasePerformanceRows = [];
+        this.databasePerformanceTotal = 0;
+      }, () => this.widgetLoading.databasePerformance = false);
   }
 
   private clearDatabasePerformanceViewData() {
     this.databasePerformanceRows = [];
     this.databasePerformanceTotal = 0;
+    this.databaseQueryPerformance = {};
     this.dbCacheHitOptions = {};
     this.dbLatencyOptions = {};
     this.dbResponseTimeOptions = {};
@@ -1212,13 +1227,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.widgetLoading.instanceProvisioning = true;
     // Each source rescues itself so one dead endpoint drops only its own part, not the whole widget.
     this.loadWidget(this.loaderNames.instanceProvisioning, forkJoin({
-      table: this.svc.getInstanceProvisioningTable(filterFormOutput).pipe(catchError(() => of(null))),
+      table: this.svc.getInstanceProvisioningTable(filterFormOutput, this.provisioningPageNo, this.provisioningPageSize).pipe(catchError(() => of(null))),
       reachability: this.svc.getProvisioningReachability(filterFormOutput).pipe(catchError(() => of(null))),
       byProvider: this.svc.getProvisionedByProvider(filterFormOutput).pipe(catchError(() => of(null))),
       recently: this.svc.getRecentlyProvisioned(filterFormOutput).pipe(catchError(() => of(null))),
       metrics: this.svc.getProvisioningSummaryMetrics(filterFormOutput).pipe(catchError(() => of(null)))
     }), data => {
       this.provisioningRows = this.sortRows(this.svc.convertToProvisioningRows(data.table), this.provisioningSort);
+      this.provisioningTotal = this.svc.getProvisioningTotal(data.table);
       this.provisioningSummaryMetrics = this.svc.convertToProvisioningSummaryMetrics(data.metrics);
       this.provisioningReachabilityOptions = this.svc.convertToProvisioningReachabilityOptions(data.reachability);
       this.provisioningReachabilityLegend = this.svc.convertToProvisioningReachabilityLegend(data.reachability);
@@ -1238,8 +1254,31 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.provisioningRows = this.sortRows(this.provisioningRows, this.provisioningSort);
   }
 
+  provisioningPageChange(pageNo: number) {
+    if (this.provisioningPageNo === pageNo) {
+      return;
+    }
+    this.provisioningPageNo = pageNo;
+    this.getInstanceProvisioningTableRows(this.appliedFilterCriteria);
+  }
+
+  // Re-fetches ONLY the paginated table endpoint (page change); chart endpoints are filter-scoped.
+  private getInstanceProvisioningTableRows(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.widgetLoading.instanceProvisioning = true;
+    this.loadWidget(this.loaderNames.instanceProvisioning,
+      this.svc.getInstanceProvisioningTable(filterFormOutput, this.provisioningPageNo, this.provisioningPageSize),
+      data => {
+        this.provisioningRows = this.sortRows(this.svc.convertToProvisioningRows(data), this.provisioningSort);
+        this.provisioningTotal = this.svc.getProvisioningTotal(data);
+      }, () => {
+        this.provisioningRows = [];
+        this.provisioningTotal = 0;
+      }, () => this.widgetLoading.instanceProvisioning = false);
+  }
+
   private clearProvisioningViewData() {
     this.provisioningRows = [];
+    this.provisioningTotal = 0;
     this.provisioningSummaryMetrics = [];
     this.provisioningReachabilityOptions = {};
     this.provisioningReachabilityLegend = [];

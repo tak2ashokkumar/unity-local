@@ -901,10 +901,10 @@ export class OrchestrationSummaryService {
 
   formatTriggerType(triggerType: string): string {
     const triggerTypeMap = {
-      'Manual Trigger': 'manual-trigger',
-      'Schedule Trigger': 'schedule-trigger',
-      'AIML Event Trigger': 'aiml-trigger',
-      'ITSM Event Trigger': 'itsm-trigger',
+      'Manual Trigger': 'Manual Trigger',
+      'Schedule Trigger': 'Schedule Trigger',
+      'AIML Event Trigger': 'Aiml Trigger',
+      'ITSM Event Trigger': 'Itsm Trigger',
       'Chat Trigger': 'chat-trigger'
     };
 
@@ -1087,3 +1087,4 @@ export enum ChartNames {
   EXECUTIONS_BY_SUCCESS_RATE = 'Executions By Success Rate',
   EXECUTIONS_BY_EFFICIENCY = 'Executions By Efficiency',
 }
+

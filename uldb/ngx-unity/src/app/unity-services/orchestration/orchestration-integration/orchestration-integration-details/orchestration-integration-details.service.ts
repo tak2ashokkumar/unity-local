@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { OrchestrationViewDetailDataType, Results, ScriptDataType } from './orchestration-integration-details.type';
+import { LinkedTask, OrchestrationViewDetailDataType, Results, ScriptDataType } from './orchestration-integration-details.type';
 import { ORCHESTRATION_VIEW_DETAILS } from 'src/app/shared/api-endpoint.const';
 import { environment } from 'src/environments/environment';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
@@ -11,7 +11,7 @@ import { AppLevelService } from 'src/app/app-level.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class OrchestrationIntegrationDetailsService {
 
   constructor(private builder: FormBuilder,
@@ -19,6 +19,20 @@ export class OrchestrationIntegrationDetailsService {
     private tableService: TableApiServiceService,
     private utilSvc: AppUtilityService,
     private appService: AppLevelService) { }
+
+  private savedCriteriaByRepo: Record<string, SearchCriteria> = {};
+
+  saveCriteria(repoId: string, criteria: SearchCriteria): void {
+    this.savedCriteriaByRepo[repoId] = JSON.parse(JSON.stringify(criteria));
+  }
+
+  getSavedCriteria(repoId: string): SearchCriteria | null {
+    return this.savedCriteriaByRepo[repoId] || null;
+  }
+
+  clearSavedCriteria(repoId: string): void {
+    delete this.savedCriteriaByRepo[repoId];
+  }
 
   getDetails(repoId: string, criteria: SearchCriteria): Observable<any> {
     // return this.http.get<any>(`/orchestration/scripts/${repoId}/get_repo_playbook/`);
@@ -38,6 +52,10 @@ export class OrchestrationIntegrationDetailsService {
 
   deleteScript(uuid: string) {
     return this.http.delete(`/orchestration/scripts/${uuid}/`);
+  }
+
+  getRelatedItems(uuid: string): Observable<LinkedTask[]> {
+    return this.http.get<LinkedTask[]>(`/orchestration/scripts/${uuid}/related_items/`);
   }
 
   convertToViewData(data: ScriptDataType[]) {

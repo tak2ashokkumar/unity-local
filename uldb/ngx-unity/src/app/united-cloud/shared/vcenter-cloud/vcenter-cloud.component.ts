@@ -175,7 +175,8 @@ export class VcenterCloudComponent implements OnInit, OnDestroy {
     }
 
     this.remoteWebLaunching = true;
-    this.remoteAccess.createVCenterWebLaunch(resourceId)
+    const resourceType = view.remoteWebAccess?.resource_type || 'vcenter';
+    this.remoteAccess.createWebLaunch(resourceId, resourceType)
       .pipe(
         takeUntil(this.ngUnsubscribe),
         finalize(() => this.remoteWebLaunching = false)

@@ -97,6 +97,8 @@ import { UsiNutanixDiscovedDevicesComponent } from './usi-nutanix/usi-nutanix-di
 import { UsiNutanixComponent } from './usi-nutanix/usi-nutanix.component';
 import { UsiOntapWidgetComponent } from './usi-ontap-widget/usi-ontap-widget.component';
 import { UsiOthersComponent } from './usi-others/usi-others.component';
+import { UsioFirewallManagementCenterCrudComponent } from './usi-others/usio-firewall-management-center/usio-firewall-management-center-crud/usio-firewall-management-center-crud.component';
+import { UsioFirewallManagementCenterComponent } from './usi-others/usio-firewall-management-center/usio-firewall-management-center.component';
 import { UsioSdwanCrudComponent } from './usi-others/usio-sdwan/usio-sdwan-crud/usio-sdwan-crud.component';
 import { UsioSdwanComponent } from './usi-others/usio-sdwan/usio-sdwan.component';
 import { UsioVeeamBackupVmsComponent } from './usi-others/usio-veeam/usio-veeam-backups/usio-veeam-backup-vms/usio-veeam-backup-vms.component';
@@ -156,6 +158,8 @@ import { UsiUnityoneItsmComponent } from './usi-unityone-itsm/usi-unityone-itsm.
 import { UsiVaultsCrudComponent } from './usi-vaults/usi-vaults-crud/usi-vaults-crud.component';
 import { UsiVaultsCyberarcComponent } from './usi-vaults/usi-vaults-cyberarc/usi-vaults-cyberarc.component';
 import { UsiVaultsComponent } from './usi-vaults/usi-vaults.component';
+import { PrivateCloudEsxiComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi.component';
+import { PrivateCloudEsxiCrudComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi-crud/private-cloud-esxi-crud.component';
 
 @NgModule({
   declarations: [
@@ -269,6 +273,8 @@ import { UsiVaultsComponent } from './usi-vaults/usi-vaults.component';
     UsioVeeamCrudComponent,
     UsioVeeamBackupsComponent,
     UsioVeeamBackupVmsComponent,
+    UsioFirewallManagementCenterComponent,
+    UsioFirewallManagementCenterCrudComponent,
     UsiBmcHelixConfigurationCrudComponent,
     UsioSdwanComponent,
     UsioSdwanCrudComponent,
@@ -288,6 +294,8 @@ import { UsiVaultsComponent } from './usi-vaults/usi-vaults.component';
     UsiVaultsCyberarcComponent,
     UsiUnityoneItsmComponent,
     UsiUnityoneItsmCrudComponent,
+    PrivateCloudEsxiComponent,
+    PrivateCloudEsxiCrudComponent,
     UsiContainersComponent,
     UsiContainersListComponent,
     UsiContainersKubernetesCrudComponent,

@@ -1,212 +1,95 @@
 <div class="row mt--3" *ngIf="listSummaryViewData && tableData">
-  <div class="execution-summary-row">
+  <div class="col-12 p-0">
+    <!-- Execution summary: compact bar. Replace the old <div class="execution-summary-row"> block. -->
+    <div class="card mb-0">
+      <div class="card-body summary-bar d-flex align-items-stretch p-0 px-3">
 
-    <!-- Execution -->
-    <div class="execution-summary-col execution-col-total pr-1">
-      <div class="card mb-0 equalize-card">
-        <div class="card-body execution-card-body py-2 my-1">
-
-          <div class="card-title mb-0">Execution</div>
-
-          <div class="pb">
-            <div class="summary-inline">
-
-              <div class="summary-icon-item" *ngFor="let val of listSummaryViewData?.total">
-
-                <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage">
-                </span>
-
-                <span class="text-primary text-value-xs">
-                  {{val.count}}
-                </span>
-
-              </div>
-
-            </div>
+        <!-- Execution -->
+        <div class="d-flex flex-column justify-content-center pr-4">
+          <div class="small text-uppercase text-muted font-weight-bold">Execution</div>
+          <div class="d-flex align-items-center">
+            <span class="d-inline-flex align-items-center mr-3 text-nowrap"
+              *ngFor="let val of listSummaryViewData?.total">
+              <span class="fa mr-1" [ngClass]="val.icon" [tooltip]="val.tooltipMessage"></span>
+              <span class="text-value-sm font-weight-bold pointer-link"
+                [ngClass]="getStatusClass(val) || 'summary-num'">{{val.count}}</span>
+            </span>
           </div>
-
         </div>
-      </div>
-    </div>
 
-    <!-- Type -->
-    <div class="execution-summary-col execution-col-type px-1">
-      <div class="card mb-0 equalize-card">
-        <div class="card-body execution-card-body py-2 my-1">
+        <!-- Type: Task | Workflow -->
+        <div class="d-flex flex-column justify-content-center px-4 border-left">
+          <div class="small text-uppercase text-muted font-weight-bold">Type</div>
+          <div class="d-flex align-items-center text-nowrap">
+            <span class="small text-muted mr-2">Task</span>
+            <span class="d-inline-flex align-items-center mr-3" *ngFor="let val of listSummaryViewData?.type?.task">
+              <span class="fa mr-1" [ngClass]="val.icon" [tooltip]="val.tooltipMessage"></span>
+              <span class="text-value-sm font-weight-bold pointer-link"
+                [ngClass]="getStatusClass(val) || 'summary-num'">{{val.count}}</span>
+            </span>
 
-          <div class="card-title mb-0">Type</div>
-
-          <div class="type-container">
-
-            <!-- Task -->
-            <div class="type-section">
-              <div class="text-muted text-xs mr-2">Task</div>
-
-              <div class="summary-inline">
-
-                <div class="summary-icon-item" *ngFor="let val of listSummaryViewData?.type?.task">
-
-                  <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage">
-                  </span>
-
-                  <span class="text-primary text-value-xs">
-                    {{val.count}}
-                  </span>
-
-                </div>
-
-              </div>
-            </div>
-
-            <!-- Divider -->
-            <div class="type-divider">
-              <span class="border border-secondary"></span>
-            </div>
-
-            <!-- Workflow -->
-            <div class="type-section">
-              <div class="text-muted text-xs mr-2">Workflow</div>
-
-              <div class="summary-inline">
-
-                <div class="summary-icon-item" *ngFor="let val of listSummaryViewData?.type?.workflow">
-
-                  <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage">
-                  </span>
-
-                  <span class="text-primary text-value-xs">
-                    {{val.count}}
-                  </span>
-
-                </div>
-
-              </div>
-            </div>
-
+            <span class="border-left pl-3 ml-1 small text-muted mr-2">Workflow</span>
+            <span class="d-inline-flex align-items-center mr-3" *ngFor="let val of listSummaryViewData?.type?.workflow">
+              <span class="fa mr-1" [ngClass]="val.icon" [tooltip]="val.tooltipMessage"></span>
+              <span class="text-value-sm font-weight-bold pointer-link"
+                [ngClass]="getStatusClass(val) || 'summary-num'">{{val.count}}</span>
+            </span>
           </div>
-
         </div>
-      </div>
-    </div>
 
-    <!-- Category -->
-    <div class="execution-summary-col execution-col-category pl-1">
-      <div class="card mb-0 equalize-card">
-        <div class="card-bod execution-card-body py-2 my-1">
-
-          <div class="card-title mb-0">Category</div>
-
-          <div class="category-container">
-
-            <div class="category-item" *ngFor="let cat of listSummaryViewData?.categories;let i=index">
-
-              <div class="category-content">
-
-                <div class="text-muted text-value-xs mr-2">
-                  {{cat.category}}
-                </div>
-
-                <div class="summary-inline">
-
-                  <div class="summary-icon-item" *ngFor="let stat of cat.status">
-
-                    <span class="fa mr-1" [tooltip]="" [ngClass]="stat.icon" [tooltip]="stat.tooltipMessage">
-                    </span>
-
-                    <span class="text-primary text-value-xs">
-                      {{stat.count}}
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div class="category-divider" *ngIf="i<2">
-                <span class="border border-secondary"></span>
-              </div>
-
-              <span *ngIf="i>=2 && listSummaryViewData?.remainingCategories?.length"
-                class="badge users-count mt-3 text-primary" [popover]="popTemplate" container="body"
-                [outsideClick]="true">
-
-                {{listSummaryViewData?.remainingCategories?.length}}
-
+        <!-- Category (+N popover kept) -->
+        <div class="d-flex flex-column justify-content-center pl-4 border-left">
+          <div class="small text-uppercase text-muted font-weight-bold">Category</div>
+          <div class="d-flex align-items-center text-nowrap">
+            <ng-container *ngFor="let cat of (listSummaryViewData?.categories | slice:0:2); let i = index">
+              <span class="small text-muted mr-2" [ngClass]="{'border-left pl-3 ml-1': i > 0}">{{cat.category}}</span>
+              <span class="d-inline-flex align-items-center mr-3" *ngFor="let stat of cat.status">
+                <span class="fa mr-1" [ngClass]="stat.icon" [tooltip]="stat.tooltipMessage"></span>
+                <span class="text-value-sm font-weight-bold pointer-link"
+                  [ngClass]="getStatusClass(stat) || 'summary-num'">{{stat.count}}</span>
               </span>
-
-            </div>
-
+            </ng-container>
+            <!-- everything after the first 2 categories lives in this popover -->
+            <span *ngIf="popoverCategories?.length"
+              class="badge users-count text-primary ml-1 d-inline-flex align-items-center justify-content-center"
+              [popover]="popTemplate" container="body" [outsideClick]="true">{{popoverCategories.length}}</span>
           </div>
-
         </div>
+
       </div>
     </div>
 
-  </div>
-  <div class="col-12 mt-2 p-0">
-    <div class="card">
-      <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
-        <div class="d-flex justify-content-center align-items-center font-500">
-          <span class="badge badge-secondary font-sm">{{count}}</span>
-          <span class="ml-1 font-lg">Executions</span>
-        </div>
-        <div class="d-flex justify-content-end align-items-center">
-          <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
-        </div>
-      </div>
-      <div class="card-body py-2">
-        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
-          <div class="w-25">
-            <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
-          </div>
-          <div>
-            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
-              (pageSizeChange)="pageSizeChange($event)" [isAllEnabled]="isPageSizeAll"
-              [isLargeSize]="true"></table-page-size>
-          </div>
-        </div>
-        <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
-          <thead class="bg-light">
-            <tr>
-              <th>ID</th>
-              <th>Template Name</th>
-              <th>Type</th>
-              <th>Category</th>
-              <th>Started On</th>
-              <th>Executed By</th>
-              <th>Duration</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let data of tableData" truncateText>
-              <td class="text-primary pointer-link tdw-15 cursor" (click)="navigateToLogs(data)">{{data.id}}</td>
-              <td class="tdw-20">
-                <div class="text-truncate" [class.text-primary]="data.type === 'Workflow' || data.type === 'Agentic'"
-                  [class.pointer-link]="data.type === 'Workflow' || data.type === 'Agentic'"
-                  [class.cursor]="data.type === 'Workflow' || data.type === 'Agentic'" [tooltip]="data.templateName"
-                  (click)="navigateToWorkflow(data)">{{data.templateName}}</div>
-              </td>
-              <td>{{data.type}}</td>
-              <td>{{data.category}}</td>
-              <td>{{data.startTime}}</td>
-              <td>{{data.createdBy}}</td>
-              <td>{{data.duration}}</td>
-              <td class="text-center">
-                <span class="fa" [tooltip]="" [ngClass]="data.statusIcon" [tooltip]="data.tooltipMessage"></span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
-          [totalCount]="count"></table-entries>
-        <table-pager *ngIf="tableData?.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
-          [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
-        <div *ngIf="!tableData?.length" class="d-flex py-5 justify-content-center align-items-center">
-          No Executions available.
+    <!-- Popover: fixed height, scrolls when the list is long -->
+    <ng-template #popTemplate>
+      <div class="category-popover">
+        <div class="d-flex align-items-center text-nowrap py-1 border-bottom" *ngFor="let cat of popoverCategories">
+          <span class="small text-muted mr-3 flex-grow-1">{{cat.category}}</span>
+          <span class="d-inline-flex align-items-center ml-3" *ngFor="let stat of cat.status">
+            <span class="fa mr-1" [ngClass]="stat.icon" [tooltip]="stat.tooltipMessage"></span>
+            <span class="text-value-sm font-weight-bold"
+              [ngClass]="getStatusClass(stat) || 'summary-num'">{{stat.count}}</span>
+          </span>
         </div>
       </div>
+    </ng-template>
+
+    <div class="col-12 mt-2 p-0">
+      <app-generic-table [title]="'Executions'" [count]="count" [searchValue]="currentCriteria.searchValue"
+        (searched)="onSearched($event)" (refresh)="refreshData()" [filters]="filterConfig"
+        [selectedFilters]="selectedFiltersForTable" (filtersApplied)="onFiltersApplied($event)"
+        [pageSize]="currentCriteria.pageSize" (pageSizeChange)="pageSizeChange($event)" [columns]="columns"
+        [data]="tableData" [pageNo]="currentCriteria.pageNo" [totalCount]="count" (pageChange)="pageChange($event)"
+        (sortChanged)="onSortChanged($event)" [activeSortField]="activeSortField"
+        [activeSortDirection]="activeSortDirection" emptyMessage="No Executions available.">
+
+        <ng-template ctCellFor="id" let-data let-i="index">
+          <span class="text-primary pointer-link cursor" (click)="navigateToLogs(data)">{{data.id}}</span>
+        </ng-template>
+
+        <ng-template ctCellFor="statusIcon" let-data let-i="index">
+          <span class="fa" [ngClass]="data.statusIcon" [tooltip]="data.tooltipMessage"></span>
+        </ng-template>
+      </app-generic-table>
     </div>
   </div>
 </div>
@@ -218,7 +101,7 @@
         <div class="row">
           <div class="col-12 text-muted text-value-xs mr-2">{{cat.category}}</div>
           <div class="col-4" *ngFor="let stat of cat.status">
-            <span class="fa mr-1" [tooltip]="" [ngClass]="stat.icon"></span>
+            <span class="fa mr-1" [ngClass]="stat.icon"></span>
             <span class="text-primary text-value-xs">{{stat.count}}</span>
           </div>
         </div>

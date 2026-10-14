@@ -18,6 +18,11 @@ $tab-active-bg: rgba(55, 138, 216, 0.08);
 $tab-hover-bg: rgba(92, 104, 115, 0.07);
 $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
+::ng-deep .workflow-category-select.ng-select.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
+    border-color: #ced4da;
+    box-shadow: none;
+}
+
 // ─── Page Shell ──────────────────────────────────────────────────────────────
 .wf-page-container {
     background: $surface-alt;
@@ -27,8 +32,7 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     position: absolute;
     inset: 0;
     z-index: 200;
-    background: rgba(247, 248, 249, 0.78);
-    backdrop-filter: blur(2px);
+    background: $surface-alt;
 }
 
 .workflow-save-status {

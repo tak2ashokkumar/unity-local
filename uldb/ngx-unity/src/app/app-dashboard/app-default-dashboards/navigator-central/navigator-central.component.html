@@ -110,10 +110,26 @@
                                     *ngTemplateOutlet="execStatusLine; context: { card: view.totals }"></ng-container>
                             </div>
                         </div>
-                        <ng-container *ngFor="let card of view.heroCards; let i = index; trackBy: trackByIndex">
+                        <ng-container *ngFor="let card of getExecFirstRowHeroCards(view); let i = index; trackBy: trackByIndex">
                             <ng-container
                                 *ngTemplateOutlet="execHeroCard; context: { card: card, gridClass: getExecHeroCardGridClass(view, i) }"></ng-container>
                         </ng-container>
+                    </div>
+
+                    <div class="exec-group exec-group-bare-metal" *ngIf="getExecNextRowBareMetalCard(view) as bareMetalCard">
+                        <div class="exec-group-title">
+                            <i [ngClass]="bareMetalCard.iconClass" [style.color]="bareMetalCard.iconColor"></i>
+                            <span>{{bareMetalCard.label}}</span>
+                        </div>
+                        <div class="exec-card-count exec-hero-count">
+                            <span class="exec-count-value">{{bareMetalCard.monitored}}</span>
+                            <span class="exec-count-total">/ {{bareMetalCard.discovered}} {{bareMetalCard.unit}}</span>
+                        </div>
+                        <div class="exec-group-row" *ngIf="bareMetalCard.subCards.length">
+                            <ng-container *ngFor="let sub of bareMetalCard.subCards; trackBy: trackByIndex">
+                                <ng-container *ngTemplateOutlet="execCard; context: { card: sub, compactStatus: true }"></ng-container>
+                            </ng-container>
+                        </div>
                     </div>
 
                     <div class="exec-group" [ngClass]="'exec-group-' + group.key"
