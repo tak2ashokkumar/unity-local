@@ -1,0 +1,266 @@
+{% load i18n two_factor %}
+{% comment %}
+  Cerne login page - single self-contained file (styles + template).
+  Loaded by core/login.html when the host resolves to the 'cerne' theme.
+  Uses the real two_factor wizard form so auth (incl. 2FA) works unchanged.
+{% endcomment %}
+<style>
+  /* ====================== Cerne login theme ====================== */
+  .login-theme-cerne{
+    --brand:#635bff;
+    --brand-hover:#4c43f5;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;background:#20344a;overflow:hidden;
+    font-family:Roboto,"Helvetica Neue",Arial,Helvetica,sans-serif;
+    color:#4a4a4a;
+  }
+
+  .login-theme-cerne .stage{
+    position:fixed;left:50%;top:50%;
+    width:1888px;height:900px;
+    transform:translate(-50%,-50%) scale(var(--s,1));
+    transform-origin:center center;
+  }
+  .login-theme-cerne .stage>img.bg{width:1888px;height:900px;display:block}
+
+  .login-theme-cerne .card{
+    position:absolute;left:721px;top:176px;
+    width:440px;height:566px;
+  }
+  .login-theme-cerne .card-head{
+    height:115px;background:#fff;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .login-theme-cerne .card-head img{width:270px;height:auto;display:block}
+
+  .login-theme-cerne .panel{
+    height:451px;
+    background:rgba(255,255,255,.44);
+    padding:50px 50px 0;
+    margin:0;border:0;border-radius:0;box-shadow:none;
+    text-align:center;
+  }
+
+  .login-theme-cerne .panel h1{
+    margin:0 0 18px;text-align:center;
+    font-size:16px;font-weight:700;color:var(--brand);
+    display:block;padding:0;
+  }
+
+  /* real wizard fields -> mock field styling */
+  .login-theme-cerne .cerne-form .form-group{margin:0 0 16px}
+  .login-theme-cerne .cerne-form label{display:none}
+  .login-theme-cerne .cerne-form .form-control,
+  .login-theme-cerne #id_auth-username,
+  .login-theme-cerne #id_auth-password,
+  .login-theme-cerne #id_token-otp_token,
+  .login-theme-cerne #id_backup-otp_token{
+    width:338px;height:50px;
+    background:rgba(255,255,255,.45);
+    border:0;border-radius:3px;box-shadow:none;
+    font:400 16px/1 inherit;color:#333;
+    padding:0 14px;margin:0 auto;display:block;
+  }
+  .login-theme-cerne .cerne-form .form-control::placeholder{color:#7d7d7d}
+  .login-theme-cerne .cerne-form .form-control:hover{background:rgba(255,255,255,.58)}
+  .login-theme-cerne .cerne-form .form-control:focus{
+    outline:none;background:rgba(255,255,255,.78);
+    box-shadow:0 0 0 2px rgba(99,91,255,.55);
+  }
+
+  .login-theme-cerne .btn,
+  .login-theme-cerne .cerne-login,
+  .login-theme-cerne .cerne-azure{
+    width:338px;height:49px;margin:0 auto;
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    background:var(--brand);color:#fff;
+    border:0;border-radius:3px;cursor:pointer;
+    font:400 19px/1 inherit;text-transform:none;
+    transition:background .15s;
+  }
+  .login-theme-cerne .btn svg{width:20px;height:20px;flex:none}
+  .login-theme-cerne .cerne-login:hover{background:var(--brand-hover)}
+  .login-theme-cerne .cerne-azure{margin-top:0;background:#4545ff}
+  .login-theme-cerne .cerne-azure:hover{background:#3737e6}
+
+  .login-theme-cerne .forgot{
+    display:block;margin:16px auto;
+    text-align:center;font-size:15px;font-weight:700;
+    color:#fff;text-decoration:underline;
+    text-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  .login-theme-cerne .forgot:hover,
+  .login-theme-cerne .forgot:focus{color:#fff;text-decoration:underline}
+  .login-theme-cerne .rule{
+    width:338px;height:1px;margin:14px auto;
+    background:rgba(255,255,255,.85);border:0;
+  }
+  .login-theme-cerne .cerne-azure-err{display:none;margin-top:12px;color:#cc0000}
+  .login-theme-cerne .cerne-azure-err .error_msg{color:#cc0000}
+
+  .login-theme-cerne .cerne-form div[style*="-9999px"]{position:absolute}
+
+  /* ---------- small screens ---------- */
+  @media (max-width:760px), (max-height:620px){
+    body{
+      overflow:auto;display:flex;align-items:center;justify-content:center;padding:26px 16px;
+      background:url("{{ theme.assets.bg_mobile }}") 50% 50%/cover no-repeat fixed #20344a;
+    }
+    .login-theme-cerne .stage{position:static;width:100%;height:auto;transform:none;display:flex;justify-content:center}
+    .login-theme-cerne .stage>img.bg{display:none}
+    .login-theme-cerne .card{position:static;width:100%;max-width:400px;height:auto}
+    .login-theme-cerne .card-head{height:104px}
+    .login-theme-cerne .card-head img{width:64%}
+    .login-theme-cerne .panel{height:auto;padding:22px 26px 28px}
+    .login-theme-cerne .cerne-form .form-control,
+    .login-theme-cerne .btn,
+    .login-theme-cerne .rule{width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){.login-theme-cerne *{transition:none!important}}
+</style>
+
+<div class="login-theme-cerne">
+  <div class="stage" id="cerne-stage">
+    <img class="bg" alt="" src="{{ theme.assets.bg }}">
+
+    <main class="card" id="browserType">
+      <div class="card-head">
+        <img src="{{ theme.brand.image }}" alt="{{ theme.brand.alt }}">
+      </div>
+
+      <div class="panel">
+        <h1>{{ theme.title }}</h1>
+
+        <form action="" method="post" role="form" class="cerne-form">{% csrf_token %}
+          {% if wizard.steps.current == 'token' %}
+            {% if device.method == 'call' %}
+            <p>{% blocktrans %}We are calling your phone right now, please enter the digits you hear.{% endblocktrans %}</p>
+            {% elif device.method == 'sms' %}
+            <p>{% blocktrans %}We sent you a text message, please enter the tokens we sent.{% endblocktrans %}</p>
+            {% else %}
+            <p>{% blocktrans %}Please enter the tokens generated by your token generator.{% endblocktrans %}</p>
+            {% endif %}
+          {% elif wizard.steps.current == 'backup' %}
+            <p>{% blocktrans %}Use this form for entering backup tokens for logging in. These tokens have been generated for you to print and keep safe. Please enter one of these backup tokens to login to your account.{% endblocktrans %}</p>
+          {% endif %}
+
+          {% include "two_factor/_wizard_forms.html" %}
+
+          {# hidden submit button to enable [enter] key #}
+          <div style="margin-left: -9999px"><input id="id_auth-login-hidden" type="submit" value="" /></div>
+
+          {% if other_devices %}
+          <p>{% trans "Or, alternatively, use one of your backup phones:" %}</p>
+          {% for other in other_devices %}
+          <button name="challenge_device" value="{{ other.persistent_id }}" class="btn btn-default btn-block" type="submit">{{ other|device_action }}</button>
+          {% endfor %}
+          {% endif %}
+          {% if backup_tokens %}
+          <button name="wizard_goto_step" type="submit" value="backup" class="btn btn-default btn-block" style="background-color:#fb9a31 !important;">{% trans "Use Backup Token" %}</button>
+          {% endif %}
+
+          <button type="submit" id="id_auth_login" class="btn cerne-login">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            {% trans "LOGIN" %}
+          </button>
+        </form>
+
+        <a class="forgot" href="" data-toggle="modal" data-target="#myModal">Forgot Password? Click Here</a>
+
+        {% if theme.azure %}
+        <hr class="rule">
+        <button type="button" id="azure_ad_login_btn" class="btn cerne-azure">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Azure AD
+        </button>
+        <div class="cerne-azure-err" id="azure_ad_login_err_msg_div">
+          <strong class="error_msg"></strong>
+        </div>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Forgot-Password modal -->
+<div class="modal fade" id="myModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content" style="width: 700px; margin: auto; top:180px;">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" id="closePassword">&times;</button>
+        <span class="modal-title" style="color: gray;"> Please enter registered Email address, to reset password.</span>
+      </div>
+      <div class="modal-form">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <div class="form-group ">
+            <span class="col-xs-8 col-sm-8 col-md-8 col-lg-8" id="email_container">
+              <input name="email" id="email" placeholder="Enter your email address" required="required" class="form-control" type="text" />
+            </span>
+            <span class="errormsg" id="email_err_msg" style="float:left;padding-top:9px;"> </span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer modal-buttons">
+        <button class="btn btn-cancel" data-dismiss="modal" type="button">Close</button>
+        <button class="btn btn-default" type="button" id="forgetPassword"> Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    // Scale the fixed stage to cover the viewport (desktop immersive bg).
+    var stage = document.getElementById('cerne-stage');
+    function fit(){
+      if (!stage) return;
+      stage.style.setProperty('--s', Math.max(window.innerWidth/1888, window.innerHeight/900));
+    }
+    fit();
+    window.addEventListener('resize', fit);
+    window.addEventListener('orientationchange', fit);
+
+    // Give the real wizard fields the mock placeholders.
+    var u = document.getElementById('id_auth-username');
+    var p = document.getElementById('id_auth-password');
+    if (u) { u.setAttribute('placeholder', 'Email address'); u.setAttribute('autocomplete', 'username'); }
+    if (p) { p.setAttribute('placeholder', 'Password'); p.setAttribute('autocomplete', 'current-password'); }
+
+    // Unsupported-browser notice (parity with default login).
+    if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) {
+      var card = document.getElementById('browserType');
+      if (card) {
+        card.innerHTML = '<div class="panel"><strong style="font-size:17px">UnityOne currently does not support Internet Explorer. Please use Chrome, Firefox or Safari.</strong></div>';
+      }
+    }
+
+    // Forgot-password reset (jQuery is loaded by the base shell).
+    if (window.jQuery) {
+      jQuery(function ($) {
+        $('#myModal').on('hidden.bs.modal', function () {
+          $('#email').val(''); $('#email_err_msg').text('').removeClass('successmsg');
+          $('#email').css('border-color', '#dfdfdf'); $('#email_container').show(); $('#forgetPassword').show();
+        });
+        $('#forgetPassword').click(function () {
+          if ($('#email').val() == '') { $('#email_err_msg').text(' ( Please enter a valid email id )'); $('#email').css('border-color', 'red'); return; }
+          var email = $('#email').val().trim().toLowerCase(); $('#email').val(email);
+          $.ajax({ type: 'POST', url: '/rest/password/forget_password/', dataType: 'json', data: { email: email },
+            success: function (data) { $('#email_container').hide(); $('#forgetPassword').hide(); $('#email_err_msg').addClass('successmsg').text(data.message); },
+            error: function (data) { $('#email_err_msg').text(data.responseJSON.error); } });
+        });
+
+        {% if theme.azure %}
+        // Azure AD sign-in.
+        $('#azure_ad_login_err_msg_div').hide();
+        $('#azure_ad_login_btn').click(function () {
+          $.ajax({ url: '/azure/login/', type: 'GET',
+            success: function (data) { $('#azure_ad_login_err_msg_div').hide(); window.location.replace(data); },
+            error: function (xhr) { $('#azure_ad_login_err_msg_div .error_msg').text(xhr.responseText); $('#azure_ad_login_err_msg_div').show(); setTimeout(function(){ $('#azure_ad_login_err_msg_div').hide(); }, 2500); } });
+        });
+        {% endif %}
+      });
+    }
+  })();
+</script>

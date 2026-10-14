@@ -1,6 +1,30 @@
 {% extends "two_factor/_base_login.html" %}
 {% load i18n two_factor login_branding %}
 
+{% comment %}
+  Main login page: checks the domain and loads the matching portal page.
+  - DEFAULT theme (template = None) keeps the original page exactly:
+    the _base_login style plus the default content block below.
+  - Any other theme is ONE self-contained file (its own <style> + markup)
+    under app/templates/two_factor/themes/ (see login_branding.LOGIN_THEMES).
+
+  NOTE: the theme is resolved INSIDE each block on purpose - template tags
+  placed outside a block in an extending template are not executed by Django.
+{% endcomment %}
+{% block style %}
+  {% login_theme request as theme %}
+  {% if theme.template %}{# themed pages carry their own <style> inline #}{% else %}{{ block.super }}{% endif %}
+{% endblock %}
+
+{% block content_wrapper %}
+  {% login_theme request as theme %}
+  {% if theme.template %}
+    {% include theme.template %}
+  {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 <div id="browserType">
   {% login_brand request as brand %}
