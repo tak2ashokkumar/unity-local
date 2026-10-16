@@ -39,7 +39,8 @@
             <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
                 <div class="dropdown-header text-center"><strong>Account</strong></div>
                 <!-- <a class="dropdown-item" routerLink="/welcomepage"><i class="far fa-newspaper"></i> Welcome Page</a> -->
-                <a class="dropdown-item" routerLink="/administration/usermgmt/profile"><i class="fa fa-user"></i>Profile Settings</a>
+                <a class="dropdown-item" routerLink="/administration/usermgmt/profile"><i class="fa fa-user"></i>Profile
+                    Settings</a>
                 <a class="dropdown-item" (click)="logout()" *ngIf="!user.isImpersonated"><i class="fa fa-lock"></i>
                     Logout</a>
                 <a class="dropdown-item text-danger" (click)="stopImpersonating()" *ngIf="user.isImpersonated"><i

@@ -85,27 +85,32 @@
                         <div class="row">
                             <div class="col-12 p-0" [ngClass]="l ? 'mb-0' : 'mb-2'"
                                 *ngFor="let tenant of group.tenants; let l=last;">
-                                <button type="button" class="btn btn-block border text-left font-sm py-1"
-                                    [class.custom-bg-blue]="tenant.uuid == selectedTenantId"
-                                    (click)="gotoTenant(tenant.uuid)">
-                                    <div class="d-flex align-items-center">
-                                        <img *ngIf="tenant.logo; else noTenantLogo" class="tenant-logo-thumb mt-1 mr-2"
-                                            [src]="tenant.logo" alt="logo">
-                                        <ng-template #noTenantLogo>
-                                            <span class="tenant-logo-thumb mt-1 mr-1 tenant-logo-placeholder"
-                                                aria-label="No logo">
-                                                <!-- <i class="fa-image fas font-4xl text-gray-200"></i> -->
-                                            </span>
-                                        </ng-template>
-                                        <span class="flex-grow-1">{{tenant.name}}</span>
-                                        <button class="action-icons fas fa-eye font-sm"
+                                <div class="tenant-row">
+                                    <button type="button" class="btn btn-block border text-left font-sm py-1 tenant-select"
+                                        [class.custom-bg-blue]="tenant.uuid == selectedTenantId"
+                                        (click)="gotoTenant(tenant.uuid)">
+                                        <div class="d-flex align-items-center">
+                                            <img *ngIf="tenant.logo; else noTenantLogo" class="tenant-logo-thumb mt-1 mr-2"
+                                                [src]="tenant.logo" alt="logo">
+                                            <ng-template #noTenantLogo>
+                                                <span class="tenant-logo-thumb mt-1 mr-1 tenant-logo-placeholder"
+                                                    aria-label="No logo">
+                                                    <!-- <i class="fa-image fas font-4xl text-gray-200"></i> -->
+                                                </span>
+                                            </ng-template>
+                                            <span class="flex-grow-1">{{tenant.name}}</span>
+                                        </div>
+                                    </button>
+                                    <span class="tenant-impersonate">
+                                        <button type="button" class="action-icons fas fa-eye font-sm"
+                                            [attr.aria-label]="'Impersonate ' + tenant.name"
                                             [tooltip]="tenant.is_tenant_active ? 'Manage Tenant': 'Tenant is disabled'"
                                             [disabled]="tenant.is_tenant_active ? false : true"
                                             [ngClass]="{'action-icons-disabled':tenant.is_tenant_active ? false : true}"
                                             (click)="impersonateTenant(tenant)" accessControl moduleName="Impersonation"
                                             accessType="write" elementType="btn"></button>
-                                    </div>
-                                </button>
+                                    </span>
+                                </div>
                             </div>
                             <div class="col-12 text-center py-4" *ngIf="!group.tenants.length">
                                 <span class="font-sm text-muted">No Tenants added.</span>

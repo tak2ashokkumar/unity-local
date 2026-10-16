@@ -2,6 +2,21 @@
     background-color: #d8ecff;
 }
 
+.tenant-row {
+    position: relative;
+}
+
+.tenant-select {
+    padding-right: 3rem;
+}
+
+.tenant-impersonate {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 .tenant-logo-thumb {
     height: 30px;
     width: 30px;

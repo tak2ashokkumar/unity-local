@@ -1,15 +1,35 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { MTPTicketInstance } from 'src/app/shared/SharedEntityTypes/ticket-mgmt.type';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
 export class MtpAdministrationIntegrationsService {
 
+  private readonly integrationKeyMap: Record<string, keyof typeof integrationsMap> = {
+    'Azure AD': 'azureAd',
+    'ServiceNow': 'serviceNow',
+  };
+
   constructor(private http: HttpClient,
     private builder: FormBuilder,) { }
+
+  getIntegrations(): Observable<IntegrationType[]> {
+    return this.http.get<IntegrationType[]>(`/customer/mtp/integrations/`);
+  }
+
+  convertToIntegrationsViewData(data: IntegrationType[]): IntegrationMapType {
+    data.forEach(d => {
+      const key = this.integrationKeyMap[d.integration_type];
+
+      if (key) {
+        integrationsMap[key].count = d.count;
+      }
+    });
+    return integrationsMap;
+  }
 
   getInstance() {
     return this.http.get<MTPTicketInstance[]>(`/customer/mtp_dynamics_crm/instances/?page_size=0`);
@@ -101,4 +121,27 @@ export interface MSDynamicsCRMType {
   user: number;
   access_type: string;
   crm_account_uuid: string;
+}
+
+export interface IntegrationType {
+  count: number;
+  integration_type: string;
+}
+
+export interface IntegrationMapType {
+  azureAd: IntegrationConfigType;
+  serviceNow: IntegrationConfigType;
+}
+export interface IntegrationConfigType {
+  count: number;
+}
+
+
+export const integrationsMap: IntegrationMapType = {
+  'azureAd': {
+    'count': 0
+  },
+  'serviceNow': {
+    'count': 0
+  }
 }

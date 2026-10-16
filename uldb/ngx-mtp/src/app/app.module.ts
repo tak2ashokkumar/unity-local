@@ -30,6 +30,7 @@ import { UserInfoService } from './shared/user-info.service';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { MtpMaintenanceCrudComponent } from './mtp-maintenance-crud/mtp-maintenance-crud.component';
 import { MtpMaintenanceComponent } from './mtp-maintenance/mtp-maintenance.component';
+import { NoPermissionsComponent } from './no-permissions/no-permissions.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -48,6 +49,7 @@ export function useMapFactory(service: MapService) { return () => service.loadMa
     MtpActivityLogsComponent,
     MtpMaintenanceCrudComponent,
     MtpMaintenanceComponent,
+    NoPermissionsComponent,
   ],
   imports: [
     BrowserModule,

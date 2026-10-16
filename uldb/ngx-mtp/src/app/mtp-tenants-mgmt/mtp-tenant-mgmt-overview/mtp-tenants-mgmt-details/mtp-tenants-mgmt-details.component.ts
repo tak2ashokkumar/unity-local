@@ -1,17 +1,17 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { MapService } from 'src/app/map.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
+import { MTPSubscription } from 'src/app/shared/SharedEntityTypes/subscriptions.type';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { MtpTenantsMgmtDetailsService, TenantUserListViewData } from './mtp-tenants-mgmt-details.service';
-import { takeUntil } from 'rxjs/operators';
-import { Notification } from 'src/app/shared/app-notification/notification.type';
-import { MTPSubscription } from 'src/app/shared/SharedEntityTypes/subscriptions.type';
-import { HttpErrorResponse } from '@angular/common/http';
-import { MapService } from 'src/app/map.service';
 
 @Component({
   selector: 'mtp-tenants-mgmt-details',
@@ -64,9 +64,9 @@ export class MtpTenantsMgmtDetailsComponent implements OnInit {
   userView: TenantUserListViewData;
   subscription: number;
   moduleId: number;
-  constructor(public mapService: MapService,
-    private router: Router,
+  constructor(private router: Router,
     private route: ActivatedRoute,
+    public mapService: MapService,
     private modalService: BsModalService,
     private notification: AppNotificationService,
     private spinner: AppSpinnerService,

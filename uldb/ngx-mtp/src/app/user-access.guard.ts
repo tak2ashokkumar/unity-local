@@ -33,7 +33,11 @@ export class UserAccessGuard implements CanActivate, CanActivateChild {
     } else {
       return true;
     }
-    let accessableModules = Object.keys(this.user.userPermissions);
+    let accessableModules = Object.keys(this.user.userPermissions || {});
+    if (!accessableModules.length) {
+      this.router.navigate(['/no-permissions']);
+      return false;
+    }
     if (accessableModules.find(m => m == MTPModules.DASHBOARD)) {
       this.router.navigate(['/dashboard']);
     } else {

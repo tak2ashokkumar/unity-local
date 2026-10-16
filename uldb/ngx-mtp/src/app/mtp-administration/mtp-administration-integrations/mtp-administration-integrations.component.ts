@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { MSDynamicsCRMType, MtpAdministrationIntegrationsService } from './mtp-administration-integrations.service';
+import { IntegrationMapType, MSDynamicsCRMType, MtpAdministrationIntegrationsService } from './mtp-administration-integrations.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AppUtilityService, CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
@@ -24,6 +24,9 @@ import { ServicenowCrudService } from './servicenow-crud/servicenow-crud.service
 })
 export class MtpAdministrationIntegrationsComponent implements OnInit {
   private ngUnsubscribe = new Subject();
+
+  integrations: IntegrationMapType;
+
   crmImageUrl = `${environment.assetsUrl}external-brand/ms-dynamic-crm.svg`;
   azureImageURL: string = `${environment.assetsUrl}external-brand/azure.svg`;
   azureADImageURL: string = `${environment.assetsUrl}external-brand/azure-ad.svg`;
@@ -47,8 +50,15 @@ export class MtpAdministrationIntegrationsComponent implements OnInit {
     private snCrudSvc: ServicenowCrudService) { }
 
   ngOnInit(): void {
+    this.getIntegrations();
     setTimeout(() => {
       this.getInstance();
+    })
+  }
+
+  getIntegrations() {
+    this.svc.getIntegrations().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.integrations = this.svc.convertToIntegrationsViewData(res);
     })
   }
 

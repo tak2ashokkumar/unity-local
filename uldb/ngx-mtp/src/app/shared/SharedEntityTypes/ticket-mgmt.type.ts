@@ -150,6 +150,56 @@ export interface MTPTicketsByResponseTimeData {
     one_day: number;
 }
 
+export interface ServiceNowChoices {
+    name: string;
+    label: string;
+    value: string;
+    element: string;
+}
+
+export interface MTPServiceNowDisplayValueType {
+    display_value: string;
+    value: string;
+}
+
+export interface MTPServiceNowTicketType {
+    sys_class_name?: MTPServiceNowDisplayValueType;
+    sys_updated_on?: MTPServiceNowDisplayValueType;
+    task_effective_number?: MTPServiceNowDisplayValueType;
+    number?: MTPServiceNowDisplayValueType;
+    state?: MTPServiceNowDisplayValueType;
+    priority?: MTPServiceNowDisplayValueType;
+    opened_at?: MTPServiceNowDisplayValueType;
+    resolved_at?: MTPServiceNowDisplayValueType;
+    short_description?: MTPServiceNowDisplayValueType;
+    description?: MTPServiceNowDisplayValueType;
+    urgency?: MTPServiceNowDisplayValueType;
+    severity?: MTPServiceNowDisplayValueType;
+    impact?: MTPServiceNowDisplayValueType;
+    sys_id?: MTPServiceNowDisplayValueType;
+    collaborators?: MTPServiceNowDisplayValueType;
+    watch_list?: MTPServiceNowDisplayValueType;
+    ticket_type: string;
+}
+
+export interface MTPServiceNowAttachmentsType {
+    file_name: string;
+    download_link: string;
+    sys_id: string;
+}
+
+export interface MTPServiceNowComments {
+    value: MTPServiceNowDisplayValueType;
+    sys_created_on: MTPServiceNowDisplayValueType;
+    sys_created_by: MTPServiceNowDisplayValueType;
+}
+
+export interface MTPServiceNowWorklogs {
+    value: MTPServiceNowDisplayValueType;
+    sys_created_on: MTPServiceNowDisplayValueType;
+    sys_created_by: MTPServiceNowDisplayValueType;
+}
+
 export interface MTPTicketType {
     attribute_uuid: string;
     display_name: string;
@@ -171,4 +221,23 @@ export interface MTPTicketStatusType extends MTPTicketType {
 }
 
 export interface MTPTicketStage extends MTPTicketType {
+}
+
+export interface ITSMTypeOption {
+    label: string;
+    value: string;
+}
+
+export interface TicketTypeOption {
+    label: string;
+    value: string;
+}
+
+export type TicketStatusOption = MTPTicketStatusType | ServiceNowChoices;
+export type TicketPriorityOption = MTPTicketPriorityType | ServiceNowChoices;
+
+export interface MTPServiceNowTicketContext {
+    tenantId: string;
+    sysId: string;
+    ticketType: string;
 }

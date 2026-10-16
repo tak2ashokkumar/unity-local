@@ -5,15 +5,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment';
 import { environment } from 'src/environments/environment';
 import { PaginatedResult } from '../shared/SharedEntityTypes/paginated.type';
-import { CRMTenant } from '../shared/SharedEntityTypes/tenants.type';
-import { MTPTicket, MTPTicketChartData, MTPTicketPriorityType, MTPTicketStatusType, MTPTicketsByPriorityData, MTPTicketsByResponseTimeData, MTPTicketsByStatusReasonData, MTPTicketsByTenantData } from '../shared/SharedEntityTypes/ticket-mgmt.type';
-import { AppUtilityService, DateRange, NoWhitespaceValidator, UnityTimeDuration, incidantTicketStatusTypes } from '../shared/app-utility/app-utility.service';
-import { ChartConfigService, NON_RELATED_COLOR_CODES, UnityChartData } from '../shared/chart-config.service';
-import { SearchCriteria } from '../shared/table-functionality/search-criteria';
+import { TenantListData } from '../shared/SharedEntityTypes/tenants.type';
+import { MTPServiceNowTicketType, MTPTicket, MTPTicketPriorityType, MTPTicketStatusType, ServiceNowChoices } from '../shared/SharedEntityTypes/ticket-mgmt.type';
+import { AppUtilityService, DateRange, NoWhitespaceValidator, UnityTimeDuration } from '../shared/app-utility/app-utility.service';
+import { PAGE_SIZES, SearchCriteria } from '../shared/table-functionality/search-criteria';
 import { TableApiServiceService } from '../shared/table-functionality/table-api-service.service';
-import { GET_MTP_TICKET_PRIORITIES, GET_MTP_TICKET_STATUS, SYNC_MTP_TICKET_ATTRIBUTES } from '../shared/api-endpoint.const';
-import { Observable, forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { DOWNLOAD_SERVICE_NOW_TENANT_REPORT, GET_MTP_TICKET_PRIORITIES, GET_MTP_TICKET_STATUS, GET_SERVICE_NOW_TENANT_REPORT, GET_SERVICE_NOW_TENANT_TICKET_PRIORITIES, GET_SERVICE_NOW_TENANT_TICKETS, GET_SERVICE_NOW_TENANT_TICKET_STATES, GET_TENANTS, SYNC_MTP_TICKET_ATTRIBUTES } from '../shared/api-endpoint.const';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class MtpTicketMgmtService {
@@ -21,37 +20,51 @@ export class MtpTicketMgmtService {
   constructor(private http: HttpClient,
     private builder: FormBuilder,
     private util: AppUtilityService,
-    private chartConfigService: ChartConfigService,
     private tableService: TableApiServiceService,) { }
 
-  getCRMTenants(instanceId: string) {
-    return this.http.get<CRMTenant[]>(`/customer/mtp_dynamics_crm/instances/${instanceId}/crmtenants/?page_size=0`);
+  getTenants(): Observable<TenantListData> {
+    return this.http.get<TenantListData>(GET_TENANTS());
   }
 
   getTicketStatus(instanceId: string): Observable<MTPTicketStatusType[]> {
     return this.http.get<MTPTicketStatusType[]>(GET_MTP_TICKET_STATUS(instanceId));
   }
 
+  getServiceNowTicketStatus(tenantUuid: string, ticketType: string): Observable<ServiceNowChoices[]> {
+    return this.http.get<ServiceNowChoices[]>(GET_SERVICE_NOW_TENANT_TICKET_STATES(tenantUuid, ticketType));
+  }
+
+  getTicketStatusByITSMType(instanceId: string, itsmType: string, tenantUuid?: string, ticketType?: string): Observable<MTPTicketStatusType[] | ServiceNowChoices[]> {
+    if (itsmType == 'servicenow') {
+      return this.getServiceNowTicketStatus(tenantUuid, ticketType);
+    }
+    return this.getTicketStatus(instanceId);
+  }
+
   getPriorities(instanceId: string): Observable<MTPTicketPriorityType[]> {
     return this.http.get<MTPTicketPriorityType[]>(GET_MTP_TICKET_PRIORITIES(instanceId));
   }
 
-  getDropdownData(instanceId: string): Observable<{ tenants: CRMTenant[], status: MTPTicketStatusType[], priorities: MTPTicketPriorityType[] }> {
-    return forkJoin({
-      tenants: this.getCRMTenants(instanceId).pipe(catchError(error => of(undefined))),
-      status: this.getTicketStatus(instanceId).pipe(catchError(error => of(undefined))),
-      priorities: this.getPriorities(instanceId).pipe(catchError(error => of(undefined))),
-    })
+  getServiceNowTicketPriorities(tenantUuid: string, ticketType: string): Observable<ServiceNowChoices[]> {
+    return this.http.get<ServiceNowChoices[]>(GET_SERVICE_NOW_TENANT_TICKET_PRIORITIES(tenantUuid, ticketType));
+  }
+
+  getTicketPriorityByITSMType(instanceId: string, itsmType: string, tenantUuid?: string, ticketType?: string): Observable<MTPTicketPriorityType[] | ServiceNowChoices[]> {
+    if (itsmType == 'servicenow') {
+      return this.getServiceNowTicketPriorities(tenantUuid, ticketType);
+    }
+    return this.getPriorities(instanceId);
   }
 
   buildForm(dateRange: DateRange): FormGroup {
     return this.builder.group({
-      'status': [''],
-      'priority': [''],
-      'period': [UnityTimeDuration.LAST_WEEK, [Validators.required]],
+      'status': ['all'],
+      'priority': ['all'],
       'tenant': [''],
-      'from': [{ value: new Date(dateRange.from), disabled: true }, [Validators.required, NoWhitespaceValidator]],
-      'to': [{ value: new Date(dateRange.to), disabled: true }, [Validators.required, NoWhitespaceValidator]],
+      'itsm_type': [{ value: '', disabled: true }],
+      'ticket_type': ['all'],
+      'from': [new Date(dateRange.from), [Validators.required, NoWhitespaceValidator]],
+      'to': [new Date(dateRange.to), [Validators.required, NoWhitespaceValidator]],
     }, { validators: this.util.dateRangeValidator('from', 'to') });
   }
 
@@ -68,20 +81,70 @@ export class MtpTicketMgmtService {
     }
   }
 
-  getTickets(instanceId: string, criteria: SearchCriteria, formData: any) {
+  getDynamicCRMTickets(instanceId: string, criteria: SearchCriteria, formData: any) {
     let params: HttpParams = this.tableService.getWithParam(criteria);
     params = params.append('start_date', moment(formData.from).toISOString());
     params = params.append('end_date', moment(formData.to).toISOString());
+
     if (formData.tenant) {
       params = params.append('tenant', formData.tenant);
     }
-    if (formData.status) {
+    if (formData.ticket_type && formData.ticket_type != 'all') {
+      params = params.append('ticket_type', formData.ticket_type);
+    }
+    if (formData.status && formData.status != 'all') {
       params = params.append('status', formData.status);
     }
-    if (formData.priority) {
+    if (formData.priority && formData.priority != 'all') {
       params = params.append('priority', formData.priority);
     }
-    return this.http.get<PaginatedResult<MTPTicket>>(`/customer/mtp_dynamics_crm/instances/${instanceId}/tickets/`, { params: params })
+
+    return this.http.get<PaginatedResult<MTPTicket>>(`/customer/mtp_dynamics_crm/instances/${instanceId}/tickets/`, { params: params });
+  }
+
+  getServiceNowTickets(criteria: SearchCriteria, formData: any): Observable<PaginatedResult<MTPServiceNowTicketType>> {
+    let params = new HttpParams();
+    const pageNo = criteria.pageNo || 1;
+    const pageSize = criteria.pageSize || PAGE_SIZES.DEFAULT_PAGE_SIZE;
+    const searchValue = criteria.params && criteria.params[0] ? criteria.params[0]['search_key'] : '';
+    const ordering = this.getServiceNowOrdering(criteria.sortColumn, criteria.sortDirection);
+
+    params = params.set('tenant', formData.tenant);
+    params = params.set('page_size', pageSize.toString());
+    params = params.set('offset', ((pageNo - 1) * pageSize).toString());
+    params = params.set('start_date', moment(formData.from).format('YYYY-MM-DD'));
+    params = params.set('end_date', moment(formData.to).format('YYYY-MM-DD'));
+
+    if (formData.ticket_type && formData.ticket_type != 'all') {
+      params = params.set('ticket_type', formData.ticket_type);
+    }
+    if (searchValue) {
+      params = params.set('search', searchValue.trim());
+    }
+    if (formData.status && formData.status != 'all') {
+      params = params.set('state', formData.status);
+    }
+    if (formData.priority && formData.priority != 'all') {
+      params = params.set('priority', formData.priority);
+    }
+    if (ordering) {
+      params = params.set('ordering', ordering);
+    }
+
+    return this.http.get<PaginatedResult<MTPServiceNowTicketType>>(GET_SERVICE_NOW_TENANT_TICKETS(), { params })
+      .pipe(map((res: PaginatedResult<MTPServiceNowTicketType>) => {
+        return {
+          ...res,
+          count: Number(res.count || 0)
+        };
+      }));
+  }
+
+  getTicketsByITSMType(instanceId: string, criteria: SearchCriteria, formData: any): Observable<PaginatedResult<MTPTicket> | PaginatedResult<MTPServiceNowTicketType>> {
+    if (formData.itsm_type == 'servicenow') {
+      return this.getServiceNowTickets(criteria, formData);
+    }
+    return this.getDynamicCRMTickets(instanceId, criteria, formData);
   }
 
   convertToViewData(tickets: MTPTicket[]): MTPTicketViewData[] {
@@ -118,126 +181,82 @@ export class MtpTicketMgmtService {
     return viewData;
   }
 
-  getChartData(instanceId: string, criteria: SearchCriteria, formData: any) {
-    let params: HttpParams = this.tableService.getWithParam(criteria);
-    params = params.append('start_date', moment(formData.from).toISOString());
-    params = params.append('end_date', moment(formData.to).toISOString());
-    if (formData.tenant) {
-      params = params.append('tenant', formData.tenant);
+  convertServiceNowToViewData(tickets: MTPServiceNowTicketType[]): MTPServiceNowTicketViewData[] {
+    let viewData: MTPServiceNowTicketViewData[] = [];
+    let datePipe = new DatePipe(environment.dateLocateForAngularDatePipe);
+
+    tickets.map((ticket: MTPServiceNowTicketType) => {
+      let a = new MTPServiceNowTicketViewData();
+      a.ticketId = ticket.task_effective_number ? ticket.task_effective_number.display_value : ticket.number ? ticket.number.display_value : 'N/A';
+      a.ticketType = this.getServiceNowTicketType(a.ticketId);
+      a.sysId = ticket.sys_id ? ticket.sys_id.value : '';
+      a.shortDescription = ticket.short_description ? ticket.short_description.display_value : 'N/A';
+      a.state = ticket.state ? ticket.state.display_value : 'N/A';
+      a.priority = ticket.priority ? ticket.priority.display_value : 'N/A';
+      a.description = ticket.description ? ticket.description.display_value : 'N/A';
+      a.openedAt = ticket.opened_at && ticket.opened_at.value ? datePipe.transform(ticket.opened_at.value.replace(/\s/g, 'T'), environment.unityDateFormat) : 'N/A';
+      a.updatedOn = ticket.sys_updated_on && ticket.sys_updated_on.value ? datePipe.transform(ticket.sys_updated_on.value.replace(/\s/g, 'T'), environment.unityDateFormat) : 'N/A';
+      a.resolution = ticket.resolved_at && ticket.resolved_at.value
+        ? datePipe.transform(ticket.resolved_at.value.replace(/\s/g, 'T'), environment.unityDateFormat)
+        : a.state;
+      viewData.push(a);
+    });
+
+    return viewData;
+  }
+
+  private getServiceNowTicketType(ticketId: string): string {
+    if (!ticketId) {
+      return '';
     }
-    return this.http.get<MTPTicketChartData>(`/customer/mtp_dynamics_crm/instances/${instanceId}/tickets/get_graph_data/`, { params: params })
+
+    const normalizedTicketId = ticketId.toUpperCase();
+
+    if (normalizedTicketId.startsWith('CHG')) {
+      return 'change_request';
+    }
+
+    if (normalizedTicketId.startsWith('INC')) {
+      return 'incident';
+    }
+
+    if (normalizedTicketId.startsWith('PRB')) {
+      return 'problem';
+    }
+
+    return '';
   }
 
-  convertToTicketsByStatusChartData(data: MTPTicketsByStatusReasonData): UnityChartData {
-    let a: UnityChartData = new UnityChartData();
-    a.type = 'doughnut';
-    a.legend = true;
-    Object.keys(data).forEach((s) => {
-      a.lables.push(s);
-    });
-    let pc: string[] = [];
-    a.lables.forEach((lb, index) => {
-      a.piedata.push(data[<string>lb]);
-      pc.push(NON_RELATED_COLOR_CODES[index]);
-    });
-    a.colors.push({ backgroundColor: pc });
-    a.options = this.chartConfigService.getDefaultPieChartOptions();
-    a.options.legend.position = 'right';
-    a.options.legend.labels = {
-      boxWidth: 25, padding: 5, usePointStyle: false,
-      generateLabels: (chart: Chart) => this.chartConfigService.getLegendLabels(chart, 30)
-    };
-    return a;
-  }
+  private getServiceNowOrdering(sortColumn: string, sortDirection: '' | 'asc' | 'desc'): string {
+    if (!sortColumn) {
+      return '';
+    }
 
-  convertToTicketsByPriorityChartData(data: MTPTicketsByPriorityData): UnityChartData {
-    let a: UnityChartData = new UnityChartData();
-    a.type = 'doughnut';
-    a.legend = true;
-    Object.keys(data).map(p => {
-      a.lables.push(p);
-    });
-    let pc: string[] = [];
-    a.lables.forEach((lb, index) => {
-      a.piedata.push(data[<string>lb]);
-      switch (<string>lb) {
-        case 'Critical': pc.push('#CC0000'); break;
-        case 'High': pc.push('#FF8800'); break;
-        case 'Normal': pc.push('#0B69C2'); break;
-        case 'Low': pc.push('#0CBB70'); break;
-      }
-      if (index > 3) {
-        pc.push(NON_RELATED_COLOR_CODES[index - 3 - 1]);
-      }
-    })
-    a.colors.push({ backgroundColor: pc });
-    a.options = this.chartConfigService.getDefaultPieChartOptions();
-    a.options.legend.position = 'right';
-    a.options.legend.labels = {
-      boxWidth: 25, padding: 10, usePointStyle: true,
-      generateLabels: (chart: Chart) => this.chartConfigService.getLegendLabels(chart, 30)
-    };
-    return a;
-  }
+    const allowedFields = ['state', 'priority', 'opened_at', 'sys_updated_on'];
+    if (allowedFields.indexOf(sortColumn) === -1) {
+      return '';
+    }
 
-  convertToTicketsByTenantData(data: MTPTicketsByTenantData): UnityChartData {
-    let a: UnityChartData = new UnityChartData();
-    a.type = 'doughnut';
-    a.legend = true;
-    Object.keys(data).map(k => {
-      a.lables.push(k);
-    })
-    let pc: string[] = [];
-    a.lables.forEach((lb, index) => {
-      a.piedata.push(data[<string>lb]);
-      pc.push(NON_RELATED_COLOR_CODES[index]);
-    });
-    a.colors.push({ backgroundColor: pc });
-    a.options = this.chartConfigService.getDefaultPieChartOptions();
-    a.options.legend.position = 'right';
-    a.options.legend.labels = {
-      boxWidth: 25, padding: 2, usePointStyle: false,
-      generateLabels: (chart: Chart) => this.chartConfigService.getLegendLabels(chart, 30)
-    };
-    return a;
-  }
-
-  convertToOpenTicketsByResponseTimeChartData(data: MTPTicketsByResponseTimeData): UnityChartData {
-    let a: UnityChartData = new UnityChartData();
-    a.type = 'doughnut';
-    a.legend = true;
-    Object.keys(data).map(k => {
-      a.lables.push(k);
-    })
-    let pc: string[] = [];
-    a.lables.forEach((lb, index) => {
-      a.piedata.push(data[<string>lb]);
-      switch (<string>lb) {
-        case 'greaterthan_month': pc.push('#CC0000'); break;
-        case 'one_month': pc.push('#FF8800'); break;
-        case 'one_week': pc.push('#0B69C2'); break;
-        case 'one_day': pc.push('#0CBB70'); break;
-      }
-    });
-    a.colors.push({ backgroundColor: pc });
-    a.options = this.chartConfigService.getDefaultPieChartOptions();
-    a.options.legend.position = 'right';
-    a.options.legend.labels = {
-      boxWidth: 25, padding: 10, usePointStyle: true,
-      generateLabels: (chart: Chart) => this.chartConfigService.getLegendLabels(chart, 30)
-    };
-    return a;
+    return sortDirection === 'desc' ? `-${sortColumn}` : sortColumn;
   }
 
   syncAttributes(instanceId: string) {
     return this.http.post(SYNC_MTP_TICKET_ATTRIBUTES(instanceId), null);
   }
 
-  downloadReport(instanceId: string, formData: any) {
+  downloadDynamicCRMReport(instanceId: string, formData: any) {
     let params = new HttpParams().set('page', 1).set('page_size', 10);
     params = params.append('start_date', moment(formData.from).toISOString());
     params = params.append('end_date', moment(formData.to).toISOString());
     return this.http.get<{ data: string }>(`/customer/mtp_dynamics_crm/instances/${instanceId}/tickets/download_report/`, { params: params });
+  }
+
+  downloadServiceNowReport(tenantUuid: string, fileType: string = 'csv') {
+    return this.http.get<{ data: string }>(DOWNLOAD_SERVICE_NOW_TENANT_REPORT(tenantUuid, fileType));
+  }
+
+  getServiceNowReportUrl(fileName: string, fileType: string = 'csv') {
+    return GET_SERVICE_NOW_TENANT_REPORT(fileName, fileType);
   }
 }
 
@@ -266,6 +285,19 @@ export class MTPTicketViewData {
   resolutionTime: string;
   resolutionTimeClass: string;
   nextSLA: string;
+}
+
+export class MTPServiceNowTicketViewData {
+  ticketId: string;
+  ticketType: string;
+  sysId: string;
+  shortDescription: string;
+  state: string;
+  priority: string;
+  description: string;
+  openedAt: string;
+  updatedOn: string;
+  resolution: string;
 }
 
 export enum MS_DYNAMICS_TICKET_TYPE {

@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
-import { GET_AZURE_ACCOUNTS } from 'src/app/shared/api-endpoint.const';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { AzureAccountsType } from './azure-details.type';
@@ -14,7 +13,7 @@ export class AzureDetailsService {
     private tableService: TableApiServiceService) { }
 
   getAccounts(criteria: SearchCriteria): Observable<PaginatedResult<AzureAccountsType>> {
-    return this.tableService.getData<PaginatedResult<AzureAccountsType>>(GET_AZURE_ACCOUNTS(), criteria);
+    return this.tableService.getData<PaginatedResult<AzureAccountsType>>(`customer/mtp/azure_ad_accounts/`, criteria);
   }
 
   convertToViewdata(accounts: AzureAccountsType[]): AzureAccountsViewData[] {

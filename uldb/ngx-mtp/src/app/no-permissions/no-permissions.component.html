@@ -1,0 +1,42 @@
+<section class="access-denied-page">
+  <div class="access-denied-shell">
+    <div class="access-denied-identity">
+      <span class="access-denied-status">
+        <i class="fa fa-lock" aria-hidden="true"></i>
+      </span>
+      <span class="access-denied-kicker">Access restricted</span>
+    </div>
+
+    <div class="access-denied-content">
+      <div class="access-denied-main">
+        <h1>User doesn't have any permissions to view this portal.</h1>
+        <p>
+          Your account is authenticated, but no MTP permissions are currently assigned to this user.
+          Please contact your administrator to assign the required portal access.
+        </p>
+      </div>
+
+      <div class="access-denied-summary" aria-label="Account access summary">
+        <div class="summary-row">
+          <span>Organization</span>
+          <strong>{{ organizationName }}</strong>
+        </div>
+        <div class="summary-row" *ngIf="userEmail">
+          <span>User</span>
+          <strong>{{ userEmail }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Status</span>
+          <strong>No permissions assigned</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="access-denied-actions">
+      <button type="button" class="btn btn-primary" (click)="logout()">
+        <i class="fa fa-sign-out-alt" aria-hidden="true"></i>
+        Logout
+      </button>
+    </div>
+  </div>
+</section>

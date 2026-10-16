@@ -7,6 +7,7 @@ import { UserAccessGuard } from './user-access.guard';
 import { MTPModules } from './app-level.service';
 import { MtpMaintenanceCrudComponent } from './mtp-maintenance-crud/mtp-maintenance-crud.component';
 import { MtpMaintenanceComponent } from './mtp-maintenance/mtp-maintenance.component';
+import { NoPermissionsComponent } from './no-permissions/no-permissions.component';
 
 export const routes: Routes = [
   {
@@ -85,6 +86,15 @@ export const routes: Routes = [
             title: 'Activity Logs'
           }
         },
+      },
+      {
+        path: 'no-permissions',
+        component: NoPermissionsComponent,
+        data: {
+          breadcrumb: {
+            title: 'Access Restricted'
+          }
+        }
       },
       {
         path: '',

@@ -37,10 +37,12 @@
                                 margin-left: -15px;" />
                             </div>
                             <div class="col-6">
-                                <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
-                                    [tooltip]="'View Details'" (click)="goToViewDetails()" accessControl
-                                    moduleName="Integration Management" accessType="write" elementType="btn">
-                                </button>
+                                <ng-container *ngIf="integrations?.azureAd?.count">
+                                    <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                        [tooltip]="'View Details'" (click)="goToViewDetails()" accessControl
+                                        moduleName="Integration Management" accessType="write" elementType="btn">
+                                    </button>
+                                </ng-container>
                                 <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right"
                                     [tooltip]="'Integrate'" (click)="addAzureAccount()" accessControl
                                     moduleName="Integration Management" accessType="write" elementType="btn">
@@ -60,10 +62,12 @@
                                 max-height: -webkit-fill-available;" />
                             </div>
                             <div class="col-6">
-                                <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
-                                    [tooltip]="'View Details'" (click)="goToServiceNowViewDetails()" accessControl
-                                    moduleName="Integration Management" accessType="write" elementType="btn">
-                                </button>
+                                <ng-container *ngIf="integrations?.serviceNow?.count">
+                                    <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                        [tooltip]="'View Details'" (click)="goToServiceNowViewDetails()" accessControl
+                                        moduleName="Integration Management" accessType="write" elementType="btn">
+                                    </button>
+                                </ng-container>
                                 <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right"
                                     [tooltip]="'Integrate'" (click)="addServiceNowAccount()" accessControl
                                     moduleName="Integration Management" accessType="write" elementType="btn">

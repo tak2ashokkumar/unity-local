@@ -84,7 +84,7 @@ export class MtpAimlMgmtService {
     a.conditions = data.total.condition_count;
     a.noiseReductionPercentage = data.total.noise_reduction;
     a.correlationPercentage = data.total.correlation_reduction;
-    a.eventReductionPercentage = data.total.event_count ? Math.round(((data.total.event_count - data.total.condition_count) / data.total.event_count) * 100) : 0;
+    a.eventReductionPercentage = data.total.event_count ? ((data.total.event_count - data.total.condition_count) / data.total.event_count) * 100 : 0;
     return a;
   }
 

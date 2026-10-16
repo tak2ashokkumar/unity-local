@@ -1,0 +1,176 @@
+<div class="card mb-2">
+  <div class="card-body py-3">
+    <div class="row align-items-center">
+      <div class="col-md-9">
+        <p class="mb-2">For urgent support requests, please contact us via :</p>
+        <div class="d-flex flex-column flex-md-row font-sm">
+          <div class="mr-md-4 mb-2 mb-md-0">
+            <i class="far fa-envelope text-success mr-1"></i>
+            Email :
+            <a href="mailto:support@unityonecloud.com" class="text-decoration-none">support@unityonecloud.com</a>
+          </div>
+          <div>
+            <i class="fa fa-phone text-success mr-1"></i>
+            Phone :
+            <span class="pr-2 border-right">1-415-349-2102</span>
+            <span class="pl-2">Toll-free : 1-888-853-7733</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 text-md-right mt-2 mt-md-0">
+        <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        <button class="btn btn-pill btn-warning btn-sm ml-2" type="button" (click)="goBack()" tooltip="Back">
+          <i class="fa fa-arrow-left"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-header bg-transparent py-3">
+    <div class="row">
+      <div class="col-12 font-sm mb-1 d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+          <span *ngIf="details.displayType">
+            <span class="text-primary fa-sm"><i class="fas fa-angle-double-left"></i></span>
+            <span class="mx-2 text-muted font-weight-bold">{{details.displayType}}</span>
+            <span class="text-primary fa-sm"><i class="fas fa-angle-double-right"></i></span>
+          </span>
+          <span *ngIf="details.ticketId" class="ml-0 ml-md-4" tooltip="Ticket Number">
+            <span class="text-primary"><i class="fas fa-ticket-alt"></i></span>
+            <span class="ml-2 text-muted">{{details.ticketId}}</span>
+          </span>
+        </div>
+        <span class="text-muted mt-2 mt-md-0">{{details.openedAt}}</span>
+      </div>
+      <div class="col-12">
+        <h4 class="card-title d-inline font-lg mb-0">{{details.shortDescription}}</h4>
+      </div>
+    </div>
+    <div class="row font-sm mt-3">
+      <div class="col-md-3 mb-2">
+        State - <small class="text-muted">{{details.state}}</small>
+      </div>
+      <div class="col-md-3 mb-2">
+        Impact - <small class="text-muted">{{details.impact}}</small>
+      </div>
+      <div class="col-md-3 mb-2">
+        Urgency - <small class="text-muted">{{details.urgency}}</small>
+      </div>
+      <div class="col-md-3 mb-2">
+        Priority - <small class="text-muted">{{details.priority}}</small>
+      </div>
+      <div class="col-md-3 mb-2">
+        Severity - <small class="text-muted">{{details.severity}}</small>
+      </div>
+      <div class="col-md-3 mb-2">
+        Updated On - <small class="text-muted">{{details.updatedOn}}</small>
+      </div>
+      <div class="col-md-3 mb-2">
+        Resolved On - <small class="text-muted">{{details.resolvedAt}}</small>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="ticket-description" [innerHTML]="details.description"></div>
+    <div class="mt-3">
+      <a *ngFor="let attachment of attachments" [href]="attachment.downloadLink" target="_blank"
+        class="btn btn-primary btn-sm mr-1 mb-1" accessControl moduleName="Ticket Management" accessType="write"
+        elementType="btn">
+        {{attachment.fileName}} <i class="fa fa-download ml-1"></i>
+      </a>
+      <div class="text-muted font-sm" *ngIf="!attachments.length">No attachments available.</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+    <strong>Comments <span *ngIf="comments.length">- ({{comments.length}})</span></strong>
+    <button type="button" class="btn btn-sm btn-primary" (click)="reply()" *ngIf="!commentForm" accessControl
+      moduleName="Ticket Management" accessType="write" elementType="btn">
+      <i class="fas fa-reply mr-1"></i> Reply
+    </button>
+  </div>
+  <div class="card-body py-2">
+    <div class="row border-bottom" *ngIf="commentForm">
+      <div class="col-12 mb-2">
+        <form [formGroup]="commentForm">
+          <div class="form-group">
+            <label for="comments">Post New Comment<em>*</em></label>
+            <textarea class="form-control" id="comments" name="comments" rows="5" formControlName="comments"
+              [ngClass]="{'is-invalid' : formErrors.comments}" placeholder="Add your comment here"></textarea>
+            <div class="invalid-feedback" *ngIf="formErrors.comments">{{formErrors.comments}}</div>
+          </div>
+          <div class="form-group d-flex justify-content-end">
+            <button class="btn btn-sm btn-success ml-1" type="button" (click)="onSubmit()">Post</button>
+            <button class="btn btn-sm btn-danger" type="button" (click)="cancelComment()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 text-center mb-2" *ngIf="commentPostedLoader">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+      </div>
+      <div class="col-12" *ngIf="!commentPostedLoader && !comments.length">
+        <div class="text-muted py-3">No comments available.</div>
+      </div>
+      <div class="col-12" *ngIf="comments.length">
+        <div class="row" *ngFor="let comment of comments; let last = last" [ngClass]="{'border-bottom': !last}">
+          <div class="col-12">
+            <strong class="card-title mb-0">{{comment.createdBy}} - </strong>
+            <small class="text-muted">{{comment.createdOn}}</small>
+          </div>
+          <div class="col-12 mb-2 comment-value" [innerHTML]="comment.value"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-2">
+  <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+    <strong>Worklogs <span *ngIf="worklogs.length">- ({{worklogs.length}})</span></strong>
+    <button type="button" class="btn btn-sm btn-primary" (click)="addWorklog()" *ngIf="!worklogForm" accessControl
+      moduleName="Ticket Management" accessType="write" elementType="btn">
+      <i class="fas fa-plus mr-1"></i> Add Work Note
+    </button>
+  </div>
+  <div class="card-body py-2">
+    <div class="row border-bottom" *ngIf="worklogForm">
+      <div class="col-12 mb-2">
+        <form [formGroup]="worklogForm">
+          <div class="form-group">
+            <label for="work_notes">Post New Work Note<em>*</em></label>
+            <textarea class="form-control" id="work_notes" name="work_notes" rows="5" formControlName="work_notes"
+              [ngClass]="{'is-invalid' : worklogFormErrors.work_notes}" placeholder="Add your work note here"></textarea>
+            <div class="invalid-feedback" *ngIf="worklogFormErrors.work_notes">{{worklogFormErrors.work_notes}}</div>
+          </div>
+          <div class="form-group d-flex justify-content-end">
+            <button class="btn btn-sm btn-success ml-1" type="button" (click)="onSubmitWorklog()">Post</button>
+            <button class="btn btn-sm btn-danger" type="button" (click)="cancelWorklog()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 text-center mb-2" *ngIf="worklogPostedLoader">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+      </div>
+      <div class="col-12" *ngIf="!worklogPostedLoader && !worklogs.length">
+        <div class="text-muted py-3">No worklogs available.</div>
+      </div>
+      <div class="col-12" *ngIf="worklogs.length">
+        <div class="row" *ngFor="let worklog of worklogs; let last = last" [ngClass]="{'border-bottom': !last}">
+          <div class="col-12">
+            <strong class="card-title mb-0">{{worklog.createdBy}} - </strong>
+            <small class="text-muted">{{worklog.createdOn}}</small>
+          </div>
+          <div class="col-12 mb-2 comment-value" [innerHTML]="worklog.value"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

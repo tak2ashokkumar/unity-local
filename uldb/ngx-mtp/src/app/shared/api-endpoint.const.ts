@@ -158,6 +158,32 @@ export const ADD_SERVICE_NOW = () => `customer/mtp/servicenow/`;
 
 export const EDIT_SERVICE_NOW = (serviceNowId: string) => `customer/mtp/servicenow/${serviceNowId}/`;
 
+export const GET_SERVICE_NOW_TENANT_TICKET_STATES = (tenantUuid: string, ticketType: string) => `/customer/mtp/servicenow/get_tenant_ticket_states/?tenant=${tenantUuid}&ticket_type=${ticketType}`;
+
+export const GET_SERVICE_NOW_TENANT_TICKET_PRIORITIES = (tenantUuid: string, ticketType: string) => `/customer/mtp/servicenow/get_tenant_ticket_priorities/?tenant=${tenantUuid}&ticket_type=${ticketType}`;
+
+export const GET_SERVICE_NOW_TENANT_TICKETS = () => `/customer/mtp/servicenow/get_tenant_tickets/`;
+
+export const GET_SERVICE_NOW_TENANT_TICKET_BY_ID = (tenantUuid: string, ticketId: string, ticketType: string) => `/customer/mtp/servicenow/get_tenant_ticket/?tenant=${tenantUuid}&ticket_id=${ticketId}&ticket_type=${ticketType}`;
+
+export const GET_SERVICE_NOW_TENANT_ATTACHMENTS_BY_TICKET_ID = (tenantUuid: string, ticketId: string) => `/customer/mtp/servicenow/get_tenant_attachments/?tenant=${tenantUuid}&ticket_id=${ticketId}`;
+
+export const GET_SERVICE_NOW_TENANT_COMMENTS_BY_TICKET_ID = (tenantUuid: string, ticketId: string) => `/customer/mtp/servicenow/get_tenant_comments/?tenant=${tenantUuid}&ticket_id=${ticketId}`;
+
+export const PUT_SERVICE_NOW_TENANT_TICKET_COMMENT = (tenantUuid: string, ticketType: string, ticketId: string) => `/customer/mtp/servicenow/add_tenant_comments/?tenant=${tenantUuid}&ticket_type=${ticketType}&ticket_id=${ticketId}`;
+
+export const GET_SERVICE_NOW_TENANT_WORKLOGS_BY_TICKET_ID = (tenantUuid: string, ticketId: string) => `/customer/mtp/servicenow/get_tenant_worklogs/?tenant=${tenantUuid}&ticket_id=${ticketId}`;
+
+export const PUT_SERVICE_NOW_TENANT_WORKLOG = (tenantUuid: string, ticketType: string, ticketId: string) => `/customer/mtp/servicenow/add_tenant_worklog/?tenant=${tenantUuid}&ticket_type=${ticketType}&ticket_id=${ticketId}`;
+
+export const DOWNLOAD_SERVICE_NOW_TENANT_REPORT = (tenantUuid: string, fileType: string) => `/customer/mtp/servicenow/download_tenant_report/?tenant=${tenantUuid}&file_type=${fileType}`;
+
+export const GET_SERVICE_NOW_TENANT_REPORT = (fileName: string, fileType: string) => `/customer/mtp/servicenow/get_tenant_report/?file_name=${fileName}&file_type=${fileType}`;
+
+export const CREATE_SERVICE_NOW_TENANT_TICKET = (tenantUuid: string, ticketType: string) => `/customer/mtp/servicenow/create_tenant_ticket/?tenant=${tenantUuid}&ticket_type=${ticketType}`;
+
+export const PUT_SERVICE_NOW_TENANT_TICKET = (tenantUuid: string, ticketType: string, ticketId: string) => `/customer/mtp/servicenow/update_tenant_ticket/?tenant=${tenantUuid}&ticket_type=${ticketType}&ticket_id=${ticketId}`;
+
 export const GET_TEANT_USER_GROUPS = () => `customer/mtp/mtp_group_roles/`;
 
 export const GET_DATACENTER_FAST = () => `customer/colo_cloud_fast/`;
