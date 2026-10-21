@@ -82,8 +82,8 @@ export const PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG: Array<{ key: PublicCloudInvento
 
 export const PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG: Record<PublicCloudProviderDistributionKey, { name: string, color: string }> = {
   aws: { name: 'AWS', color: '#ff8a00' },
-  azure: { name: 'Azure', color: '#1683d8' },
-  gcp: { name: 'GCP', color: '#5b80f5' },
+  azure: { name: 'Azure', color: '#0078d4' },
+  gcp: { name: 'GCP', color: '#34a853' },
   oci: { name: 'OCI', color: '#d34b35' }
 };
 
@@ -114,8 +114,8 @@ export const PUBLIC_CLOUD_UTILIZATION_SERIES_CONFIG: Array<{ key: 'compute' | 'd
 
 // Compute Instance Count by Os Type donut segments.
 export const PUBLIC_CLOUD_OS_TYPE_CONFIG: Array<{ key: 'linux' | 'windows' | 'other', label: string, color: string }> = [
-  { key: 'linux', label: 'Linux', color: '#2f6fed' },
-  { key: 'windows', label: 'Windows', color: '#6c5ce7' },
+  { key: 'linux', label: 'Linux', color: '#fcc624' },
+  { key: 'windows', label: 'Windows', color: '#00a4ef' },
   { key: 'other', label: 'Other/Unknown', color: '#c9cdd3' }
 ];
 

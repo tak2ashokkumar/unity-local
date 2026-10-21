@@ -469,7 +469,20 @@ export class PublicCloudComputeDashboardService {
     }));
     return {
       color: PUBLIC_CLOUD_UTILIZATION_SERIES_CONFIG.map(config => config.color),
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        // Compute and Storage are % used; Database Count is a plain count.
+        formatter: (params: any) => {
+          const rows = params || [];
+          const title = rows.length ? rows[0].axisValue : '';
+          const body = rows.map((row: any) => {
+            const value = row.seriesName === 'Database Count' ? this.formatNumber(row.value) : `${this.formatNumber(row.value)}%`;
+            return `${row.marker} ${row.seriesName}: ${value}`;
+          }).join('<br/>');
+          return `${title}<br/>${body}`;
+        }
+      },
       legend: { show: false },
       grid: { left: 34, right: 12, top: 16, bottom: 24 },
       xAxis: {

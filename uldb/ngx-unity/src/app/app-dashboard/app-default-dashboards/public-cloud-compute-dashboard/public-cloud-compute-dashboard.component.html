@@ -256,18 +256,22 @@
         <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasPublicCloudCoverage">
             <div class="d-flex align-items-center">
                 <span class="mb-0">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources</span>
-                <div class="btn-group ml-3" role="group" aria-label="Sort public cloud resources">
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="publicCloudCoverageSortOrder === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="onPublicCloudCoverageSortChange('asc')">A-Z</button>
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="publicCloudCoverageSortOrder === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="onPublicCloudCoverageSortChange('desc')">Z-A</button>
-                </div>
+                <i class="fas fa-info-circle inventory-info-icon mt-1"
+                    [tooltip]="'Resource inventory grouped by category (Compute, Platform Services, Other Services) and cloud provider.'"
+                    container="body"></i>
             </div>
-            <i class="fas fa-info-circle inventory-info-icon"
-                [tooltip]="'Resource inventory grouped by category (Compute, Platform Services, Other Services) and cloud provider.'"
-                container="body"></i>
+            <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3" role="group" aria-label="Sort public cloud resources">
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="publicCloudCoverageSortOrder === 'asc'"
+                    (click)="onPublicCloudCoverageSortChange('asc')">
+                    A-Z
+                </button>
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="publicCloudCoverageSortOrder === 'desc'"
+                    (click)="onPublicCloudCoverageSortChange('desc')">
+                    Z-A
+                </button>
+            </div>
         </div>
         <div class="dashboard-card public-coverage-card" *ngIf="hasPublicCloudCoverage">
             <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
@@ -330,22 +334,22 @@
         <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasAccountSubscriptionProjectMetrics">
             <div class="d-flex align-items-center">
                 <span class="mb-0">Account - Subscription - Project Metrics</span>
-                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch account metrics view">
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="accountSubscriptionProjectMetricsView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setAccountSubscriptionProjectMetricsView('table')" [tooltip]="'Table View'" container="body">
-                        <i class="fas fa-table"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="accountSubscriptionProjectMetricsView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setAccountSubscriptionProjectMetricsView('chart')" [tooltip]="'Chart View'" container="body">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                </div>
+                <i class="fas fa-info-circle inventory-info-icon mt-1"
+                    [tooltip]="'Covers AWS Accounts, Azure Subscriptions, GCP Projects & OCI Compartments'"
+                    container="body"></i>
             </div>
-            <i class="fas fa-info-circle inventory-info-icon"
-                [tooltip]="'Covers AWS Accounts, Azure Subscriptions, GCP Projects & OCI Compartments'"
-                container="body"></i>
+            <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3" role="group" aria-label="Switch account metrics view">
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="accountSubscriptionProjectMetricsView === 'table'"
+                    (click)="setAccountSubscriptionProjectMetricsView('table')">
+                    Table View
+                </button>
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="accountSubscriptionProjectMetricsView === 'chart'"
+                    (click)="setAccountSubscriptionProjectMetricsView('chart')">
+                    Chart View
+                </button>
+            </div>
         </div>
         <div class="dashboard-card account-metrics-card" *ngIf="hasAccountSubscriptionProjectMetrics">
             <app-spinner [name]="loaderNames.accountSubscriptionProjectMetrics" [width]="0"></app-spinner>
@@ -361,12 +365,13 @@
                         <table class="table table-sm database-metric-table account-metrics-table mb-0">
                             <thead>
                                 <tr>
-                                    <th>Provider <i class="fas fa-sort ml-1"></i></th>
-                                    <th>Account / Subscription / Project <i class="fas fa-sort ml-1"></i></th>
-                                    <th>Region <i class="fas fa-sort ml-1"></i></th>
-                                    <th class="text-center">Instance Count <i class="fas fa-sort ml-1"></i></th>
-                                    <th>vCPU Usage <i class="fas fa-info-circle text-muted"></i> <i class="fas fa-sort ml-1"></i></th>
-                                    <th class="text-right">Est. Monthly Cost <i class="fas fa-sort ml-1"></i></th>
+                                    <th class="tdw-9">Provider <i class="fas fa-sort ml-1"></i></th>
+                                    <th class="tdw-24">Account / Subscription / Project <i class="fas fa-sort ml-1"></i></th>
+                                    <th class="tdw-10 text-center">Region <i class="fas fa-sort ml-1"></i></th>
+                                    <th class="tdw-9 text-center">Instance Count <i class="fas fa-sort ml-1"></i></th>
+                                    <th class="tdw-32">vCPU Usage <i class="fas fa-info-circle inventory-info-icon"
+                                        [tooltip]="'Total vCPU provisioned vs. vCPU currently in use across the compute instances in this account.'" container="body"></i> <i class="fas fa-sort ml-1"></i></th>
+                                    <th class="tdw-16 text-right">Est. Monthly Cost <i class="fas fa-sort ml-1"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -377,7 +382,7 @@
                                     <td class="tdw-24">
                                         <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.account">{{row.account}}</button>
                                     </td>
-                                    <td class="tdw-10">{{row.region}}</td>
+                                    <td class="tdw-10 text-center">{{row.region}}</td>
                                     <td class="tdw-9 text-center">{{row.instanceCount}}</td>
                                     <td class="tdw-32">
                                         <div class="account-vcpu-total">Total vCPU: {{row.totalVcpu | number:'1.0-1'}}</div>
@@ -404,22 +409,34 @@
             <ng-template #accountMetricsChartView>
                 <div class="account-metrics-chart-grid">
                     <div class="account-metrics-chart-panel">
-                        <div class="capacity-chart-title">Compute Instance by Account</div>
+                        <div class="capacity-chart-title">Compute Instance by Account
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Number of compute instances per account / subscription / project.'" container="body"></i>
+                        </div>
                         <div echarts [options]="accountSubscriptionProjectInstanceOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectInstanceOptions)"></div>
                         <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectInstanceOptions)">No data available</div>
                     </div>
                     <div class="account-metrics-chart-panel">
-                        <div class="capacity-chart-title">Est. Monthly Cost by Account</div>
+                        <div class="capacity-chart-title">Est. Monthly Cost by Account
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Estimated monthly compute cost per account / subscription / project.'" container="body"></i>
+                        </div>
                         <div echarts [options]="accountSubscriptionProjectCostOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectCostOptions)"></div>
                         <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectCostOptions)">No data available</div>
                     </div>
                     <div class="account-metrics-chart-panel">
-                        <div class="capacity-chart-title">vCPU Utilization by Account</div>
+                        <div class="capacity-chart-title">vCPU Utilization by Account
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Average vCPU utilization (%) per account / subscription / project.'" container="body"></i>
+                        </div>
                         <div echarts [options]="accountSubscriptionProjectVcpuOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectVcpuOptions)"></div>
                         <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectVcpuOptions)">No data available</div>
                     </div>
                     <div class="account-metrics-chart-panel">
-                        <div class="capacity-chart-title">Cost Efficiency ($/Compute Instance) by Account</div>
+                        <div class="capacity-chart-title">Cost Efficiency ($/Compute Instance) by Account
+                            <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Estimated monthly cost divided by the number of compute instances, per account.'" container="body"></i>
+                        </div>
                         <div echarts [options]="accountSubscriptionProjectEfficiencyOptions" class="account-metrics-chart" *ngIf="hasChartData(accountSubscriptionProjectEfficiencyOptions)"></div>
                         <div class="widget-no-data" *ngIf="!hasChartData(accountSubscriptionProjectEfficiencyOptions)">No data available</div>
                     </div>
@@ -433,22 +450,22 @@
         <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasCapacityPerformance">
             <div class="d-flex align-items-center">
                 <span class="mb-0">Capacity and Performance</span>
-                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch capacity view">
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="capacityPerformanceView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setCapacityPerformanceView('table')" [tooltip]="'Table View'" container="body">
-                        <i class="fas fa-table"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="capacityPerformanceView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setCapacityPerformanceView('chart')" [tooltip]="'Chart View'" container="body">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                </div>
+                <i class="fas fa-info-circle inventory-info-icon mt-1"
+                    [tooltip]="'Per-instance capacity and performance: status, CPU usage, disk IOPS/throughput, network throughput, 30-day CPU trend and 90-day forecast.'"
+                    container="body"></i>
             </div>
-            <i class="fas fa-info-circle inventory-info-icon"
-                [tooltip]="'Per-instance capacity and performance: status, CPU usage, disk IOPS/throughput, network throughput, 30-day CPU trend and 90-day forecast.'"
-                container="body"></i>
+            <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3" role="group" aria-label="Switch capacity view">
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="capacityPerformanceView === 'table'"
+                    (click)="setCapacityPerformanceView('table')">
+                    Table View
+                </button>
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="capacityPerformanceView === 'chart'"
+                    (click)="setCapacityPerformanceView('chart')">
+                    Chart View
+                </button>
+            </div>
         </div>
         <div class="dashboard-card account-metrics-card" *ngIf="hasCapacityPerformance">
             <app-spinner [name]="loaderNames.capacityPerformance" [width]="0"></app-spinner>
@@ -613,22 +630,22 @@
         <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasStorageVolumesDisks">
             <div class="d-flex align-items-center">
                 <span class="mb-0">Storage &ndash; Volumes / Disks</span>
-                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch storage view">
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="storageVolumesView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setStorageVolumesView('table')" [tooltip]="'Table View'" container="body">
-                        <i class="fas fa-table"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="storageVolumesView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setStorageVolumesView('chart')" [tooltip]="'Chart View'" container="body">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                </div>
+                <i class="fas fa-info-circle inventory-info-icon mt-1"
+                    [tooltip]="'Per-volume storage inventory across all cloud providers: attached instance, volume type, provisioned size, disk IOPS/throughput and IOPS tier.'"
+                    container="body"></i>
             </div>
-            <i class="fas fa-info-circle inventory-info-icon"
-                [tooltip]="'Per-volume storage inventory across all cloud providers: attached instance, volume type, provisioned size, disk IOPS/throughput and IOPS tier.'"
-                container="body"></i>
+            <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3" role="group" aria-label="Switch storage view">
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="storageVolumesView === 'table'"
+                    (click)="setStorageVolumesView('table')">
+                    Table View
+                </button>
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="storageVolumesView === 'chart'"
+                    (click)="setStorageVolumesView('chart')">
+                    Chart View
+                </button>
+            </div>
         </div>
         <div class="dashboard-card account-metrics-card" *ngIf="hasStorageVolumesDisks">
             <app-spinner [name]="loaderNames.storageVolumesDisks" [width]="0"></app-spinner>
@@ -725,9 +742,9 @@
             </ng-template>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasPublicCloudDatabase">
+        <div class="d-flex align-items-center section-title" *ngIf="hasPublicCloudDatabase">
             <span class="mb-0">Public Cloud Database</span>
-            <i class="fas fa-info-circle inventory-info-icon"
+            <i class="fas fa-info-circle inventory-info-icon mt-1"
                 [tooltip]="'Executive KPIs & performance across relational, NoSQL and managed database services'"
                 container="body"></i>
         </div>
@@ -769,22 +786,22 @@
         <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasDatabasePerformance">
             <div class="d-flex align-items-center">
                 <span class="mb-0">Database &ndash; Performance and Utilization</span>
-                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch database view">
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="databasePerformanceView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setDatabasePerformanceView('table')" [tooltip]="'Table View'" container="body">
-                        <i class="fas fa-table"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="databasePerformanceView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setDatabasePerformanceView('chart')" [tooltip]="'Chart View'" container="body">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                </div>
+                <i class="fas fa-info-circle inventory-info-icon mt-1"
+                    [tooltip]="'Per-database performance and resource utilization across relational, NoSQL and managed databases.'"
+                    container="body"></i>
             </div>
-            <i class="fas fa-info-circle inventory-info-icon"
-                [tooltip]="'Per-database performance and resource utilization across relational, NoSQL and managed databases.'"
-                container="body"></i>
+            <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3" role="group" aria-label="Switch database view">
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="databasePerformanceView === 'table'"
+                    (click)="setDatabasePerformanceView('table')">
+                    Table View
+                </button>
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="databasePerformanceView === 'chart'"
+                    (click)="setDatabasePerformanceView('chart')">
+                    Chart View
+                </button>
+            </div>
         </div>
         <div class="dashboard-card account-metrics-card" *ngIf="hasDatabasePerformance">
             <app-spinner [name]="loaderNames.databasePerformance" [width]="0"></app-spinner>
@@ -917,26 +934,26 @@
             </ng-template>
         </div>
 
-        <div class="d-flex align-items-start section-title" *ngIf="hasCostOptimization">
-            <div class="d-flex align-items-center flex-shrink-0">
-                <span class="mb-0">Cost &amp; Optimization Opportunities</span>
-                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch cost view">
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="costOptimizationView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setCostOptimizationView('table')" [tooltip]="'Table View'" container="body">
-                        <i class="fas fa-table"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="costOptimizationView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setCostOptimizationView('chart')" [tooltip]="'Chart View'" container="body">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                </div>
+        <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasCostOptimization">
+            <div class="d-flex align-items-center flex-grow-1 mr-3">
+                <span class="mb-0 flex-shrink-0">Cost &amp; Optimization Opportunities</span>
+                <i class="fas fa-info-circle inventory-info-icon flex-shrink-0 mt-1"
+                    [tooltip]="'FinOps rightsizing and idle-resource savings opportunities for compute instances / VMs across all cloud providers.'"
+                    container="body"></i>
+                <div class="cost-optimization-subtitle">FinOps &ndash; rightsizing &amp; idle-resource savings identified this cycle (Compute Instances / VMs only) &middot; Cost figures use each provider's native billing data where available (e.g., AWS Cost Explorer), with modeled estimates applied otherwise.</div>
             </div>
-            <div class="cost-optimization-subtitle flex-grow-1">FinOps &ndash; rightsizing &amp; idle-resource savings identified this cycle (Compute Instances / VMs only) &middot; Native cost-metric collection confirmed for AWS (Cost Explorer); Azure/GCP/OCI figures are estimated pending confirmation of an equivalent native billing metric.</div>
-            <i class="fas fa-info-circle inventory-info-icon flex-shrink-0"
-                [tooltip]="'FinOps rightsizing and idle-resource savings opportunities for compute instances / VMs across all cloud providers.'"
-                container="body"></i>
+            <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3 flex-shrink-0" role="group" aria-label="Switch cost view">
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="costOptimizationView === 'table'"
+                    (click)="setCostOptimizationView('table')">
+                    Table View
+                </button>
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="costOptimizationView === 'chart'"
+                    (click)="setCostOptimizationView('chart')">
+                    Chart View
+                </button>
+            </div>
         </div>
         <div class="dashboard-card account-metrics-card" *ngIf="hasCostOptimization">
             <app-spinner [name]="loaderNames.costOptimization" [width]="0"></app-spinner>
@@ -1165,26 +1182,26 @@
         <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasRecentAlerts">
             <div class="d-flex align-items-center">
                 <span class="mb-0">Recent Alerts &ndash; Critical / Warning / Info</span>
+                <i class="fas fa-info-circle inventory-info-icon mt-1"
+                    [tooltip]="'Recent Critical / Warning / Info alerts across all cloud providers, with severity, provider, alert detail and how long ago each was raised.'"
+                    container="body"></i>
                 <button type="button" class="header-link-icon ml-2" (click)="openRecentAlerts()"
                     [tooltip]="'Open linked page'" container="body">
                     <i class="fas fa-link"></i>
                 </button>
-                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch alerts view">
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="recentAlertsView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setRecentAlertsView('table')" [tooltip]="'Table View'" container="body">
-                        <i class="fas fa-table"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="recentAlertsView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setRecentAlertsView('chart')" [tooltip]="'Chart View'" container="body">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                </div>
             </div>
-            <i class="fas fa-info-circle inventory-info-icon"
-                [tooltip]="'Recent Critical / Warning / Info alerts across all cloud providers, with severity, provider, alert detail and how long ago each was raised.'"
-                container="body"></i>
+            <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3" role="group" aria-label="Switch alerts view">
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="recentAlertsView === 'table'"
+                    (click)="setRecentAlertsView('table')">
+                    Table View
+                </button>
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="recentAlertsView === 'chart'"
+                    (click)="setRecentAlertsView('chart')">
+                    Chart View
+                </button>
+            </div>
         </div>
         <div class="dashboard-card account-metrics-card" *ngIf="hasRecentAlerts">
             <app-spinner [name]="loaderNames.recentAlerts" [width]="0"></app-spinner>
@@ -1302,7 +1319,8 @@
                 <div class="auto-remediation-main">
                     <div class="auto-remediation-outcomes">
                         <div class="auto-remediation-widget-title">
-                            Run Outcomes <i class="fas fa-info-circle text-muted"></i>
+                            Run Outcomes <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'Share of auto-remediation runs that succeeded vs. failed over the selected period.'" container="body"></i>
                         </div>
                         <div class="auto-remediation-outcome-body">
                             <div class="auto-remediation-donut" [style.background]="autoRemediationSummary.donutGradient">
@@ -1319,7 +1337,8 @@
                     </div>
                     <div class="auto-remediation-actions">
                         <div class="auto-remediation-widget-title">
-                            Most Frequent Actions <i class="fas fa-info-circle text-muted"></i>
+                            Most Frequent Actions <i class="fas fa-info-circle inventory-info-icon"
+                                [tooltip]="'The most frequently executed auto-remediation actions, by run count.'" container="body"></i>
                         </div>
                         <div class="auto-remediation-action-list">
                             <div class="auto-remediation-action-row"
@@ -1352,22 +1371,22 @@
         <div class="d-flex align-items-center justify-content-between section-title" *ngIf="hasInstanceProvisioning">
             <div class="d-flex align-items-center">
                 <span class="mb-0">Instance Provisioning Summary</span>
-                <div class="btn-group account-metrics-view-toggle ml-3" role="group" aria-label="Switch provisioning view">
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="provisioningView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setProvisioningView('table')" [tooltip]="'Table View'" container="body">
-                        <i class="fas fa-table"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm"
-                        [ngClass]="provisioningView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
-                        (click)="setProvisioningView('chart')" [tooltip]="'Chart View'" container="body">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                </div>
+                <i class="fas fa-info-circle inventory-info-icon mt-1"
+                    [tooltip]="'Newly provisioned instances across all cloud providers: provider, region, account, type, environment, status and provisioning recency.'"
+                    container="body"></i>
             </div>
-            <i class="fas fa-info-circle inventory-info-icon"
-                [tooltip]="'Newly provisioned instances across all cloud providers: provider, region, account, type, environment, status and provisioning recency.'"
-                container="body"></i>
+            <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3" role="group" aria-label="Switch provisioning view">
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="provisioningView === 'table'"
+                    (click)="setProvisioningView('table')">
+                    Table View
+                </button>
+                <button type="button" class="public-cloud-view-toggle-btn"
+                    [class.public-cloud-view-toggle-btn--active]="provisioningView === 'chart'"
+                    (click)="setProvisioningView('chart')">
+                    Chart View
+                </button>
+            </div>
         </div>
         <div class="dashboard-card account-metrics-card" *ngIf="hasInstanceProvisioning">
             <app-spinner [name]="loaderNames.instanceProvisioning" [width]="0"></app-spinner>

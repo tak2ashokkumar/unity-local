@@ -1218,10 +1218,28 @@ button.legend-link {
   margin-left: 8px;
 }
 
-.account-metrics-view-toggle {
-  .btn {
-    min-width: 36px;
-  }
+// Rounded segmented view/sort toggle, matching the Private Cloud Dashboard look.
+.public-cloud-view-toggle {
+  padding: 2px;
+  border: 1px solid #c7d2dd;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.public-cloud-view-toggle-btn {
+  min-width: 92px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #68798a;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.public-cloud-view-toggle-btn--active {
+  background: #2f86de;
+  color: #ffffff;
 }
 
 .account-metrics-card {
