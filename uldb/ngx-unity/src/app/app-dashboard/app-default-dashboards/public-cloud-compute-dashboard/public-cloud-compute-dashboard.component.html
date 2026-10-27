@@ -370,7 +370,7 @@
                                     <th class="tdw-10 text-center">Region <i class="fas fa-sort ml-1"></i></th>
                                     <th class="tdw-9 text-center">Instance Count <i class="fas fa-sort ml-1"></i></th>
                                     <th class="tdw-32">vCPU Usage <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Total vCPU provisioned vs. vCPU currently in use across the compute instances in this account.'" container="body"></i> <i class="fas fa-sort ml-1"></i></th>
+                                        [tooltip]="'Total vCPU provisioned vs. vCPU currently in use across the compute instances in this account.'" placement="bottom" container="body"></i> <i class="fas fa-sort ml-1"></i></th>
                                     <th class="tdw-16 text-right">Est. Monthly Cost <i class="fas fa-sort ml-1"></i></th>
                                 </tr>
                             </thead>
@@ -380,7 +380,7 @@
                                         <span class="account-provider-pill" [ngClass]="'account-provider-' + row.provider.toLowerCase()">{{row.provider}}</span>
                                     </td>
                                     <td class="tdw-24">
-                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.account">{{row.account}}</button>
+                                        <button type="button" class="btn btn-link p-0 table-link text-left" [tooltip]="row.account">{{row.account}}</button>
                                     </td>
                                     <td class="tdw-10 text-center">{{row.region}}</td>
                                     <td class="tdw-9 text-center">{{row.instanceCount}}</td>
@@ -483,29 +483,29 @@
                                 <tr>
                                     <th>Instance</th>
                                     <th>Status <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Green = Running, Orange = Idle (powered on, low utilization), Red = Stopped.'" container="body"></i></th>
+                                        [tooltip]="'Green = Running, Orange = Idle (powered on, low utilization), Red = Stopped.'" placement="bottom" container="body"></i></th>
                                     <th>Provider</th>
                                     <th>Region</th>
                                     <th>Type</th>
                                     <th>OS</th>
                                     <th>CPU Usage <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Green: below 50% (healthy) - Orange: 50-85% (elevated) - Red: above 85% (critical). Natively reported by all four providers.'" container="body"></i></th>
+                                        [tooltip]="'Green: below 50% (healthy) - Orange: 50-85% (elevated) - Red: above 85% (critical). Natively reported by all four providers.'" placement="bottom" container="body"></i></th>
                                     <th>Memory Usage <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Memory in use vs available on the instance. Green: below 50% - Orange: 50-85% - Red: above 85%.'" container="body"></i></th>
+                                        [tooltip]="'Memory in use vs available on the instance. Green: below 50% - Orange: 50-85% - Red: above 85%.'" placement="bottom" container="body"></i></th>
                                     <th>Disk IOPS/Throughput <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Read/write operations and throughput, natively reported by all four providers.'" container="body"></i></th>
+                                        [tooltip]="'Read/write operations and throughput, natively reported by all four providers.'" placement="bottom" container="body"></i></th>
                                     <th>Network Throughput <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Green: normal traffic - Orange: elevated - Red: sustained high throughput, worth investigating.'" container="body"></i></th>
+                                        [tooltip]="'Green: normal traffic - Orange: elevated - Red: sustained high throughput, worth investigating.'" placement="bottom" container="body"></i></th>
                                     <th>30-Day CPU Trend <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Sparkline of the last 6 CPU samples over the past 30 days. Line color: green = trending down, red = trending up.'" container="body"></i></th>
+                                        [tooltip]="'Sparkline of the last 6 CPU samples over the past 30 days. Line color: green = trending down, red = trending up.'" placement="bottom" container="body"></i></th>
                                     <th>90-Day Forecast <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Projected CPU utilization 90 days out based on the recent trend. Red = projected to increase, Green = projected to decrease.'" container="body"></i></th>
+                                        [tooltip]="'Projected CPU utilization 90 days out based on the recent trend. Red = projected to increase, Green = projected to decrease.'" placement="bottom" container="body"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of capacityPerformanceRows; trackBy: trackByIndex">
                                     <td class="capacity-instance">
-                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.name">{{row.name}}</button>
+                                        <button type="button" class="btn btn-link p-0 table-link text-left" [tooltip]="row.name">{{row.name}}</button>
                                     </td>
                                     <td>
                                         <span class="capacity-status"><i [ngClass]="row.statusIconClass"></i>{{row.statusLabel}}</span>
@@ -528,8 +528,10 @@
                                         <div class="progress-track">
                                             <div class="progress-fill" [ngClass]="getStatusClass(row.memoryTone)" [style.width.%]="row.memoryPct"></div>
                                         </div>
-                                        <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.memoryTone)">{{row.memoryLabel}}</div>
-                                        <div class="capacity-mem-available">Avail: {{row.availableMemory}}</div>
+                                        <div class="capacity-cpu-label d-flex justify-content-between" [ngClass]="getStatusClass(row.memoryTone)">
+                                            <span>{{row.memoryLabel}}</span>
+                                            <span class="capacity-mem-available">Avail: {{row.availableMemory}}</span>
+                                        </div>
                                     </td>
                                     <td>
                                         <div class="capacity-disk-iops">{{row.diskIops}}</div>
@@ -658,7 +660,7 @@
                 </div>
                 <ng-container *ngIf="storageVolumesRows.length; else storageNoData">
                     <div class="capacity-table-scroll">
-                        <table class="table table-sm database-metric-table capacity-table mb-0">
+                        <table class="table table-sm database-metric-table mb-0">
                             <thead>
                                 <tr>
                                     <th>Attached Instance</th>
@@ -666,25 +668,31 @@
                                     <th>Volume Type</th>
                                     <th>Size (GB)</th>
                                     <th>Disk IOPS/Throughput <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Provisioned disk IOPS and throughput per volume, natively reported by each provider.'" container="body"></i></th>
+                                        [tooltip]="'Provisioned disk IOPS and throughput per volume, natively reported by each provider.'" placement="bottom" container="body"></i></th>
                                     <th>IOPS Tier</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of storageVolumesRows; trackBy: trackByIndex">
-                                    <td class="capacity-instance">
-                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.attachedInstance">{{row.attachedInstance}}</button>
+                                <tr *ngFor="let row of storageVolumesRows; trackBy: trackByIndex" truncateText>
+                                    <td class="tdw-26">
+                                        <button type="button" class="btn btn-link p-0 table-link text-left" [tooltip]="row.attachedInstance">{{row.attachedInstance}}</button>
                                     </td>
-                                    <td>
-                                        <span class="account-provider-pill" [ngClass]="'account-provider-' + row.providerKey">{{row.provider}}</span>
+                                    <td class="tdw-12">
+                                        <div><span class="account-provider-pill" [ngClass]="'account-provider-' + row.providerKey">{{row.provider}}</span></div>
                                     </td>
-                                    <td>{{row.volumeType}}</td>
-                                    <td>{{row.sizeLabel}}</td>
-                                    <td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="row.volumeType">{{row.volumeType}}</div>
+                                    </td>
+                                    <td class="tdw-11">
+                                        <div [tooltip]="row.sizeLabel">{{row.sizeLabel}}</div>
+                                    </td>
+                                    <td class="tdw-20">
                                         <div class="capacity-disk-iops">{{row.diskIops}}</div>
                                         <div class="capacity-disk-throughput" *ngIf="row.diskThroughput">{{row.diskThroughput}}</div>
                                     </td>
-                                    <td>{{row.iopsTier}}</td>
+                                    <td class="tdw-16">
+                                        <div [tooltip]="row.iopsTier">{{row.iopsTier}}</div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -750,7 +758,7 @@
         </div>
         <div class="dashboard-card inventory-card database-summary-card" *ngIf="hasPublicCloudDatabase">
             <app-spinner [name]="loaderNames.publicCloudDatabase" [width]="0"></app-spinner>
-            <div class="summary-metrics" *ngIf="hasDatabaseSummary">
+            <div class="summary-metrics" *ngIf="databaseSummaryMetrics.length">
                 <div class="summary-metric" *ngFor="let metric of databaseSummaryMetrics; trackBy: trackByIndex">
                     <div class="metric-label">{{metric.label}}<i class="fas fa-info-circle inventory-info-icon"
                         *ngIf="metric.info" [tooltip]="metric.info" container="body"></i></div>
@@ -814,56 +822,62 @@
                 </div>
                 <ng-container *ngIf="databasePerformanceRows.length; else databasePerformanceNoData">
                     <div class="capacity-table-scroll">
-                        <table class="table table-sm database-metric-table capacity-table mb-0">
+                        <table class="table table-sm database-metric-table mb-0">
                             <thead>
                                 <tr>
                                     <th>Database</th>
                                     <th>Engine</th>
                                     <th>CPU Usage <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Green: below 50% (healthy) - Orange: 50-85% (elevated) - Red: above 85% (critical).'" container="body"></i></th>
+                                        [tooltip]="'Green: below 50% (healthy) - Orange: 50-85% (elevated) - Red: above 85% (critical).'" placement="bottom" container="body"></i></th>
                                     <th>Memory Used <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Percentage of memory in use on the database host.'" container="body"></i></th>
+                                        [tooltip]="'Percentage of memory in use on the database host.'" placement="bottom" container="body"></i></th>
                                     <th>Storage Used <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Used vs provisioned disk capacity for the database.'" container="body"></i></th>
+                                        [tooltip]="'Used vs provisioned disk capacity for the database.'" placement="bottom" container="body"></i></th>
                                     <th>Disk Utilization <i class="fas fa-info-circle inventory-info-icon"
-                                        [tooltip]="'Percentage of time the disk is busy servicing I/O.'" container="body"></i></th>
+                                        [tooltip]="'Percentage of time the disk is busy servicing I/O.'" placement="bottom" container="body"></i></th>
                                     <th>Disk IOPS</th>
                                     <th>Uptime</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of databasePerformanceRows; trackBy: trackByIndex">
-                                    <td class="capacity-instance">
-                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.name">{{row.name}}</button>
+                                <tr *ngFor="let row of databasePerformanceRows; trackBy: trackByIndex" truncateText>
+                                    <td class="tdw-16">
+                                        <button type="button" class="btn btn-link p-0 table-link text-left" [tooltip]="row.name">{{row.name}}</button>
                                     </td>
-                                    <td>{{row.engine || 'NA'}}</td>
-                                    <td class="capacity-cpu-cell">
-                                        <div class="progress-track">
+                                    <td class="tdw-12">
+                                        <div [tooltip]="row.engine || 'NA'">{{row.engine || 'NA'}}</div>
+                                    </td>
+                                    <td class="tdw-13">
+                                        <div class="progress-track db-bar-offset">
                                             <div class="progress-fill" [ngClass]="getStatusClass(row.cpuTone)" [style.width.%]="row.cpuPct"></div>
                                         </div>
                                         <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.cpuTone)">{{row.cpuLabel}}</div>
                                     </td>
-                                    <td class="capacity-cpu-cell">
-                                        <div class="progress-track">
+                                    <td class="tdw-13">
+                                        <div class="progress-track db-bar-offset">
                                             <div class="progress-fill" [ngClass]="getStatusClass(row.memoryTone)" [style.width.%]="row.memoryPct"></div>
                                         </div>
                                         <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.memoryTone)">{{row.memoryLabel}}</div>
                                     </td>
-                                    <td class="capacity-cpu-cell">
+                                    <td class="tdw-14">
                                         <div class="db-storage-total">{{row.storageTotalLabel}}</div>
                                         <div class="progress-track">
                                             <div class="progress-fill" [ngClass]="getStatusClass(row.storageTone)" [style.width.%]="row.storagePct"></div>
                                         </div>
                                         <div class="db-storage-used">{{row.storageUsedLabel}}</div>
                                     </td>
-                                    <td class="capacity-cpu-cell">
-                                        <div class="progress-track">
+                                    <td class="tdw-12">
+                                        <div class="progress-track db-bar-offset">
                                             <div class="progress-fill" [ngClass]="getStatusClass(row.diskUtilizationTone)" [style.width.%]="row.diskUtilizationPct"></div>
                                         </div>
                                         <div class="capacity-cpu-label" [ngClass]="getStatusClass(row.diskUtilizationTone)">{{row.diskUtilizationLabel}}</div>
                                     </td>
-                                    <td>{{row.diskIops}}</td>
-                                    <td>{{row.uptimeLabel}}</td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.diskIops">{{row.diskIops}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="row.uptimeLabel">{{row.uptimeLabel}}</div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -985,13 +999,13 @@
                                     <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'cpuPct'"
                                         (click)="sortCostOptimization('cpuPct')">
                                         CPU Utilization <i class="fas fa-info-circle inventory-info-icon"
-                                            [tooltip]="'Average CPU utilization; low values flag rightsizing or idle candidates.'" container="body"></i>
+                                            [tooltip]="'Average CPU utilization; low values flag rightsizing or idle candidates.'" placement="bottom" container="body"></i>
                                         <i [ngClass]="getSortIconClass(costOptimizationSort, 'cpuPct')"></i>
                                     </th>
                                     <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'action'"
                                         (click)="sortCostOptimization('action')">
                                         Recommended Action <i class="fas fa-info-circle inventory-info-icon"
-                                            [tooltip]="'Rightsize = reduce vCPU on over-provisioned instances; Stop / Terminate Idle = shut down or remove idle instances.'" container="body"></i>
+                                            [tooltip]="'Rightsize = reduce vCPU on over-provisioned instances; Stop / Terminate Idle = shut down or remove idle instances.'" placement="bottom" container="body"></i>
                                         <i [ngClass]="getSortIconClass(costOptimizationSort, 'action')"></i>
                                     </th>
                                     <th class="sortable-th" [class.sort-active]="costOptimizationSort.key === 'savings'"
@@ -1009,8 +1023,8 @@
                                     <td class="tdw-9">
                                         <div><span class="account-provider-pill" [ngClass]="'account-provider-' + row.providerKey">{{row.provider}}</span></div>
                                     </td>
-                                    <td class="tdw-11" [tooltip]="row.region">{{row.region}}</td>
-                                    <td class="tdw-15" [tooltip]="row.type">{{row.type}}</td>
+                                    <td class="tdw-11"><div [tooltip]="row.region">{{row.region}}</div></td>
+                                    <td class="tdw-15"><div [tooltip]="row.type">{{row.type}}</div></td>
                                     <td class="tdw-22">
                                         <div class="progress-track">
                                             <div class="progress-fill" [ngClass]="getStatusClass(row.cpuTone)" [style.width.%]="row.cpuPct"></div>
@@ -1224,7 +1238,7 @@
                                     <th class="sortable-th" [class.sort-active]="recentAlertsSort.key === 'severity'"
                                         (click)="sortRecentAlerts('severity')">
                                         Severity <i class="fas fa-info-circle inventory-info-icon"
-                                            [tooltip]="'Critical = red, Warning = amber, Info = blue.'" container="body"></i>
+                                            [tooltip]="'Critical = red, Warning = amber, Info = blue.'" placement="bottom" container="body"></i>
                                         <i [ngClass]="getSortIconClass(recentAlertsSort, 'severity')"></i>
                                     </th>
                                     <th class="sortable-th" [class.sort-active]="recentAlertsSort.key === 'provider'"
@@ -1243,18 +1257,20 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let alert of recentAlerts; trackBy: trackByIndex" truncateText>
-                                    <td class="tdw-27">
+                                    <td class="tdw-25">
                                         <button type="button" class="btn btn-link p-0 table-link text-left"
                                             [tooltip]="alert.instanceName" (click)="showAlertDetails(alert)">{{alert.instanceName}}</button>
                                     </td>
-                                    <td class="tdw-13">
+                                    <td class="tdw-10">
                                         <div><span class="alert-severity" [ngClass]="alert.severityClass">{{alert.severityLabel}}</span></div>
                                     </td>
-                                    <td class="tdw-13">
+                                    <td class="tdw-10">
                                         <div><span class="account-provider-pill" [ngClass]="'account-provider-' + alert.providerKey">{{alert.provider}}</span></div>
                                     </td>
-                                    <td class="tdw-31" [tooltip]="alert.alert">{{alert.alert}}</td>
-                                    <td class="tdw-16">{{alert.raised}}</td>
+                                    <td class="tdw-40">
+                                        <div [tooltip]="alert.alert">{{alert.alert}}</div>
+                                    </td>
+                                    <td class="tdw-15">{{alert.raised}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1423,7 +1439,7 @@
                                     <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'statusLabel'"
                                         (click)="sortProvisioning('statusLabel')">
                                         Status <i class="fas fa-info-circle inventory-info-icon"
-                                            [tooltip]="'Green = Running, Orange = Idle (powered on, low utilization), Red = Stopped.'" container="body"></i>
+                                            [tooltip]="'Green = Running, Orange = Idle (powered on, low utilization), Red = Stopped.'" placement="bottom" container="body"></i>
                                         <i [ngClass]="getSortIconClass(provisioningSort, 'statusLabel')"></i>
                                     </th>
                                     <th class="sortable-th" [class.sort-active]="provisioningSort.key === 'provisionedDate'"
@@ -1439,14 +1455,14 @@
                             <tbody>
                                 <tr *ngFor="let row of provisioningRows; trackBy: trackByIndex" truncateText>
                                     <td class="tdw-14">
-                                        <button type="button" class="btn btn-link p-0 table-link" [tooltip]="row.instanceName">{{row.instanceName}}</button>
+                                        <button type="button" class="btn btn-link p-0 table-link text-left" [tooltip]="row.instanceName">{{row.instanceName}}</button>
                                     </td>
                                     <td class="tdw-9">
                                         <span class="account-provider-pill" [ngClass]="'account-provider-' + row.providerKey">{{row.provider}}</span>
                                     </td>
-                                    <td class="tdw-11" [tooltip]="row.region">{{row.region}}</td>
-                                    <td class="tdw-17" [tooltip]="row.account">{{row.account}}</td>
-                                    <td class="tdw-13" [tooltip]="row.type">{{row.type}}</td>
+                                    <td class="tdw-11"><div [tooltip]="row.region">{{row.region}}</div></td>
+                                    <td class="tdw-17"><div [tooltip]="row.account">{{row.account}}</div></td>
+                                    <td class="tdw-13"><div [tooltip]="row.type">{{row.type}}</div></td>
                                     <td class="tdw-11">
                                         <span class="provisioning-env" [ngClass]="row.environmentClass">{{row.environment}}</span>
                                     </td>

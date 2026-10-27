@@ -22,25 +22,25 @@ export class PublicCloudOciSummaryService {
     private appService: AppLevelService) { }
 
   getAccountDetails(): Observable<OciAccountType[]> {
-    let params: HttpParams = new HttpParams().set('page_size', 0);
-    return this.http.get<OciAccountType[]>(`/customer/managed/oci/account/`, { params: params });
+    const params: HttpParams = new HttpParams().set('page_size', 0);
+    return this.http.get<OciAccountType[]>(`/customer/managed/oci/accounts/`, { params: params });
   }
 
   getServiceAndResourceDetails(criteria: SearchCriteria): Observable<ResourceDetailsType[]> {
-    return this.tableService.getData<ResourceDetailsType[]>(`/customer/managed/oci/account/resource_count_by_type/`, criteria);
+    return this.tableService.getData<ResourceDetailsType[]>(`/customer/managed/oci/accounts/resource_count_by_type/`, criteria);
   }
 
   deleteOciAccount(ociAccountId: string): Observable<string> {
-    return this.http.delete<string>(`/customer/managed/oci/account/${ociAccountId}`);
+    return this.http.delete<string>(`/customer/managed/oci/accounts/${ociAccountId}`);
   }
 
   syncNow(accountId: string) {
-    return this.http.get<CeleryTask>(`/customer/managed/oci/account/${accountId}/run_now/`)
+    return this.http.get<CeleryTask>(`/customer/managed/oci/accounts/${accountId}/run_now/`)
       .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 5, 25).pipe(take(1))), take(1));
   }
 
   getScheduleHistory(criteria: SearchCriteria, ociAccountId: string): Observable<PaginatedResult<OciAccountScheduleHistory>> {
-    return this.tableService.getData(`/customer/managed/oci/account/${ociAccountId}/schedule_history/`, criteria).pipe(
+    return this.tableService.getData(`/customer/managed/oci/accounts/${ociAccountId}/schedule_history/`, criteria).pipe(
       map((res: PaginatedResult<OciAccountScheduleHistory>) => {
         res.results = res.results.map(history => {
           history.completed_at = history.completed_at ? this.utilSvc.toUnityOneDateFormat(history.completed_at) : null;
@@ -91,20 +91,20 @@ export class PublicCloudOciSummaryService {
       totalEvent = totalEvent + s.alert_count.event_count;
       view.currentMonthCost.amount = Math.round(s.current_month_cost ? s.current_month_cost.amount : 0);
       totalCost = Math.round(totalCost + (s.current_month_cost ? s.current_month_cost.amount : 0));
-      // view.monitoring.configured = s.monitoring.configured;
-      // view.monitoring.enabled = s.monitoring.enabled;
-      // view.monitoring.observium = s.monitoring.observium;
-      // view.monitoring.zabbix = s.monitoring.zabbix;
-      // if (!view.monitoring.configured) {
-      //   view.statsTooltipMessage = 'Configure monitoring';
-      // }
-      // if (view.monitoring.configured) {
-      //   if (!view.monitoring.enabled) {
-      //     view.statsTooltipMessage = 'Enable monitoring';
-      //   } else {
-      //     view.statsTooltipMessage = 'Oracle account statistics';
-      //   }
-      // }
+      view.monitoring.configured = s.monitoring.configured;
+      view.monitoring.enabled = s.monitoring.enabled;
+      view.monitoring.observium = s.monitoring.observium;
+      view.monitoring.zabbix = s.monitoring.zabbix;
+      if (!view.monitoring.configured) {
+        view.statsTooltipMessage = 'Configure monitoring';
+      }
+      if (view.monitoring.configured) {
+        if (!view.monitoring.enabled) {
+          view.statsTooltipMessage = 'Enable monitoring';
+        } else {
+          view.statsTooltipMessage = 'Oracle account statistics';
+        }
+      }
       viewData.accountDetails.push(view);
     })
     viewData.totalResources = totalResources;

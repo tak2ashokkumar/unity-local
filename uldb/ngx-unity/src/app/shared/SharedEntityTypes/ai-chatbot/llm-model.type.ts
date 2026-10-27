@@ -9,6 +9,8 @@ export interface AILLMModel {
     endpoint_url: string;
     context_window: null;
     is_default: boolean;
+    primary_model?: boolean;
+    secondary_model?: boolean;
     created_at: string;
     updated_at: string;
 

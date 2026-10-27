@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { Terminal } from 'xterm';
 // import { fit } from 'xterm/lib/addons/fit/fit';
 import { WSSHClient, WSOption } from './WSSHClient';
@@ -17,6 +17,8 @@ import { FitAddon } from 'xterm-addon-fit';
 export class AppXtermComponent implements OnInit, OnDestroy {
   //To connect to WSSH
   @Input() input: TerminalInput;
+  @Output() statsLoaded = new EventEmitter<any>();
+  private statsTimer: any;
   term: Terminal;
   wsClient: WSSHClient;
   private ngUnsubscribe = new Subject();
@@ -56,8 +58,28 @@ export class AppXtermComponent implements OnInit, OnDestroy {
     if (this.input) {
       this.ngUnsubscribe.next();
       this.ngUnsubscribe.complete();
+      this.stopStatsPolling();
       this.term.dispose();
       this.wsClient.close();
+    }
+  }
+
+  private startStatsPolling() {
+    if (!this.isNewTab() || this.statsTimer) {
+      return;
+    }
+    const request = () => this.wsClient.requestStats();
+    this.statsTimer = setTimeout(() => {
+      request();
+      this.statsTimer = setInterval(request, 15000);
+    }, 3000);
+  }
+
+  private stopStatsPolling() {
+    if (this.statsTimer) {
+      clearTimeout(this.statsTimer);
+      clearInterval(this.statsTimer);
+      this.statsTimer = null;
     }
   }
 
@@ -70,6 +92,7 @@ export class AppXtermComponent implements OnInit, OnDestroy {
   initTerminal() {
     this.currentCommand = '';
     this.exitCommandSent = false;
+    this.stopStatsPolling();
     this.term = new Terminal({ cursorBlink: true });
     this.term.loadAddon(this.fitAddon);
     this.term.open(document.getElementById('terminal'));
@@ -96,9 +119,15 @@ export class AppXtermComponent implements OnInit, OnDestroy {
 
     this.wsClient.onMessage.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.term.write(res);
+      this.startStatsPolling();
+    });
+
+    this.wsClient.onStats.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.statsLoaded.emit(res);
     });
 
     this.wsClient.onClose.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.stopStatsPolling();
       this.term.write("\rconnection closed\r\n");
       if (!this.exitCommandSent) {
         this.term.write("Enter Y to reconnect...\r\n");

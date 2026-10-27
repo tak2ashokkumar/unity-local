@@ -156,6 +156,12 @@
                             (click)="false" [tooltip]="'More Actions'" container="body"></button>
                         <div id="icons-dropdown-container" class="dropdown-menu dropdown-menu-right text-center mt-2"
                             *dropdownMenu aria-labelledby="button-container">
+                            <button class="action-icons mb-0 fas fa-copy font-sm ml-1 mt-1" tooltip="Clone Workflow"
+                                aria-label="Clone Workflow" (click)="cloneWorkflow(view)"
+                                [ngClass]="view.taskId || !view.isCreated ? 'action-icons-disabled' : 'action-icons'"
+                                [disabled]="!!view.taskId || !view.isCreated" accessControl
+                                moduleName="DevOps Automation" accessType="Manage Workflow" elementType="actionbtn"
+                                container="body"></button>
                             <button class="action-icons mb-0 fas fa-calendar-alt font-sm ml-1"
                                 tooltip="Schedule Workflow" *ngIf="!view.is_agentic"
                                 [ngClass]="view.taskId || view.workflowStatus === 'Disabled' || view.categoryName === 'Integration' ? 'action-icons-disabled' : 'action-icons'"

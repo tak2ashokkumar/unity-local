@@ -15,10 +15,10 @@ export class DeviceInterfaceCrudService {
     private builder: FormBuilder,
     private utilSvc: AppUtilityService) { }
 
-  private addTargetDeviceAnnouncedSource = new Subject<{ uuid: string, deviceType: DeviceMapping, name: string, description: string }>();
+  private addTargetDeviceAnnouncedSource = new Subject<{ uuid: string, deviceType: DeviceMapping, interfaceUuid?: string, name: string, description: string }>();
   addTagetDeviceAnnounced$ = this.addTargetDeviceAnnouncedSource.asObservable();
 
-  addTargetDeviceForInterface(interfaceData: { uuid: string, deviceType: DeviceMapping, name: string, description: string }) {
+  addTargetDeviceForInterface(interfaceData: { uuid: string, deviceType: DeviceMapping, interfaceUuid?: string, name: string, description: string }) {
     this.addTargetDeviceAnnouncedSource.next(interfaceData);
   }
 
@@ -62,8 +62,11 @@ export class DeviceInterfaceCrudService {
     }
   }
 
-  addTargetDevice(interfaceData: { uuid: string, deviceType: DeviceMapping, name: string, description: string }, obj: TargetDeviceFormDataType) {
-    return this.http.post(ADD_TARGET_DEVICE_FOR_INTERFACE_BY_DEVICE_TYPE(interfaceData.deviceType, interfaceData.uuid), obj);
+  addTargetDevice(interfaceData: { uuid: string, deviceType: DeviceMapping, interfaceUuid?: string, name: string, description: string }, obj: TargetDeviceFormDataType) {
+    return this.http.post(ADD_TARGET_DEVICE_FOR_INTERFACE_BY_DEVICE_TYPE(interfaceData.deviceType, interfaceData.uuid), {
+      ...obj,
+      source_interface_uuid: interfaceData.interfaceUuid
+    });
   }
 }
 

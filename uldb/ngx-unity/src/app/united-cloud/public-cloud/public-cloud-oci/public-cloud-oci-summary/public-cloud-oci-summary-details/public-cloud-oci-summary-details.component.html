@@ -78,8 +78,8 @@
                             (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
                     </div>
                     <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button"
-                        (click)="selectedResourceName == 'Buckets' ? createBucket() : createVm()"
-                        *ngIf="selectedResourceName == 'Instances' || selectedResourceName == 'Buckets'"
+                        (click)="selectedResourceName == 'Object Storage Buckets' ? createBucket() : createVm()"
+                        *ngIf="selectedResourceName == 'Compute Instances' || selectedResourceName == 'Object Storage Buckets'"
                         tooltip="Create Instance" accessControl moduleName="Public Cloud"
                         accessType="Manage Public Cloud" elementType="btn"><i class="fas fa-plus"></i></button>
                     <button class="btn btn-pill btn-warning btn-sm ml-2" (click)="goBack()" tooltip="Back">
@@ -112,14 +112,14 @@
                     <thead class="bg-light">
                         <tr>
                             <th>Name</th>
-                            <th *ngIf="selectedResourceName == 'Instances'">Status</th>
+                            <th *ngIf="selectedResourceName == 'Compute Instances'">Status</th>
                             <th>Type</th>
                             <th>Account Name</th>
                             <!-- <th>Service</th> -->
                             <th>Location</th>
-                            <th *ngIf="selectedResourceName == 'Instances'">Tags</th>
+                            <th *ngIf="selectedResourceName == 'Compute Instances'">Tags</th>
                             <th class="action-icons-column"
-                                *ngIf="selectedResourceName == 'Instances' || selectedResourceName == 'Buckets'">
+                                *ngIf="allowedStatsResources.includes(selectedResourceName)">
                                 Action
                             </th>
                         </tr>
@@ -131,7 +131,7 @@
                                     (click)="goToResource(view)">
                                     {{view.name}}</div>
                             </td>
-                            <td *ngIf="selectedResourceName == 'Instances'">
+                            <td *ngIf="selectedResourceName == 'Compute Instances'">
                                 <shared-device-status [status]="view.powerStatus"></shared-device-status>
                             </td>
                             <td>
@@ -146,17 +146,36 @@
                             <td>
                                 <div>{{view.location}}</div>
                             </td>
-                            <td *ngIf="selectedResourceName == 'Instances'">
+                            <td *ngIf="selectedResourceName == 'Compute Instances'">
                                 <div *ngFor="let item of view.tags | keyvalue">
                                     {{item.key}}:{{item.value}}<br>
                                 </div>
                                 <div *ngIf="!view.tags">N/A</div>
                             </td>
-                            <td class="action-icons-column" *ngIf="selectedResourceName == 'Instances'">
+                            <td class="action-icons-column"
+                                *ngIf="allowedStatsResources.includes(selectedResourceName) && selectedResourceName != 'Compute Instances' && selectedResourceName != 'Object Storage Buckets'">
+                                <button class="action-icons mb-0 font-sm ml-1"
+                                    [ngClass]="{'action-icons-disabled':  !view.isStatsEnabled}"
+                                    (click)="goToStats(view)"
+                                    [tooltip]="view.statsTooltipMessage" container="body"
+                                    accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                    elementType="actionbtn">
+                                    <i class="fas fa-chart-line"></i>
+                                </button>
+                            </td>
+                            <td class="action-icons-column" *ngIf="selectedResourceName == 'Compute Instances'">
                                 <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerStatusIcon"
                                     [ngClass]="{'action-icons-on':view.powerStatusOn, 'action-icons-disabled':!view.isPowerIconEnabled}"
                                     [tooltip]="view.powerTooltipMessage" (click)="powerToggle(view)" accessControl
                                     moduleName="Public Cloud" accessType="Manage Public Cloud" elementType="actionbtn">
+                                </button>
+                                <button class="action-icons mb-0 font-sm ml-1"
+                                    [ngClass]="{'action-icons-disabled':  !view.isStatsEnabled}"
+                                    (click)="goToStats(view)"
+                                    [tooltip]="view.statsTooltipMessage" container="body"
+                                    accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                    elementType="actionbtn">
+                                    <i class="fas fa-chart-line"></i>
                                 </button>
                                 <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.terminateIcon"
                                     [ngClass]="{'action-icons-disabled':!view.isTerminateIconEnabled}"
@@ -170,10 +189,18 @@
                                     [ngClass]="{'action-icons-disabled':!view.isCreateTicketIconEnabled}"
                                     [tooltip]="view.createTicketTooltipMessage" (click)="createTicket(view)"></button>
                             </td>
-                            <td class="action-icons-column" *ngIf="selectedResourceName == 'Buckets'">
+                            <td class="action-icons-column" *ngIf="selectedResourceName == 'Object Storage Buckets'">
                                 <span>
                                     <button class="action-icons mb-0 fa fa-list-ul font-sm ml-1" tooltip="Show Files"
                                         (click)="goToInventory(view)"></button>
+                                    <button class="action-icons mb-0 font-sm ml-1"
+                                        [ngClass]="{'action-icons-disabled':  !view.isStatsEnabled}"
+                                        (click)="goToStats(view)"
+                                        [tooltip]="view.statsTooltipMessage" container="body"
+                                        accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                        elementType="actionbtn">
+                                        <i class="fas fa-chart-line"></i>
+                                    </button>
                                     <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
                                         (click)="deleteBucket(view)" accessControl moduleName="Public Cloud"
                                         accessType="Manage Public Cloud" elementType="actionbtn"></button>

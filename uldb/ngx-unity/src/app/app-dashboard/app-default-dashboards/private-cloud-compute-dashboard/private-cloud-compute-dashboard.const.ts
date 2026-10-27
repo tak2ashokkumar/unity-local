@@ -6,6 +6,9 @@ import { PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, Priva
 // PRIVATE_CLOUD_TIME_RANGE_PARAM_MAP (see convertFiltersToParams).
 export const PRIVATE_CLOUD_TIME_RANGE_DEFAULT = 'last_30_days';
 
+
+
+
 export const PRIVATE_CLOUD_TIME_RANGE_OPTIONS: DateRangeOption[] = [
   { label: 'Last 24 Hours', value: 'last_24_hours' },
   { label: 'Last 7 Days', value: 'last_7_days' },

@@ -3,6 +3,13 @@ export interface OtherDevice {
     tags: string[];
     uuid: string;
     name: string;
+    url?: string;
+    cred?: string;
+    credentials?: string;
+    is_local_credential?: boolean;
+    login_username?: string;
+    login_password?: string;
+    port?: number;
     description: string;
     type: string;
     uptime_robot_id: string;
@@ -20,6 +27,20 @@ export interface OtherDevice {
     polling_interval_sec: number;
     updated_at: string;
     custom_attribute_data?: { [key: string]: any }
+    remote_web_access?: OtherDeviceRemoteWebAccess;
+}
+
+export interface OtherDeviceRemoteWebAccess {
+    supported: boolean;
+    resource_type: string;
+    resource_id: string;
+    web_access_enabled: boolean;
+    has_permission: boolean;
+    collector_associated: boolean;
+    collector_state: string;
+    collector_state_allows_session: boolean;
+    can_create_session: boolean;
+    message: string;
 }
 export interface OtherDeviceCustomer {
     url: string;
@@ -97,5 +118,3 @@ export interface Reason {
     code: string;
     detail: string;
 }
-
-

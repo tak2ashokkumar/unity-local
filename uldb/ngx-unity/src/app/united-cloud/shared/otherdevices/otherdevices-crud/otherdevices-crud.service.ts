@@ -4,11 +4,12 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
+import { GET_ADVANCED_DISCOVERY_CREDENTIALS, GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { OtherDevice } from '../../entities/other-device.type';
+import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 
 @Injectable()
 export class OtherdevicesCrudService {
@@ -24,6 +25,11 @@ export class OtherdevicesCrudService {
   getCollectors() {
     const params = new HttpParams().set('page_size', '0');
     return this.http.get<DeviceDiscoveryAgentConfigurationType[]>(GET_AGENT_CONFIGURATIONS(), { params: params });
+  }
+
+  getCredentials(): Observable<DeviceDiscoveryCredentials[]> {
+    const params = new HttpParams().set('page_size', '0');
+    return this.http.get<DeviceDiscoveryCredentials[]>(GET_ADVANCED_DISCOVERY_CREDENTIALS(), { params: params });
   }
 
   getUrlsFormGroup(url: UrlsDataType) {
@@ -71,6 +77,25 @@ export class OtherdevicesCrudService {
         'custom_attribute_data': [d.custom_attribute_data],
         // 'urls': data.urls && data.is_monitoring ? this.builder.array(data.urls.map(url => this.getUrlsFormGroup(url))) : [],
       })
+      if (d.type === 'Web Console') {
+        form.get('description').setValidators([Validators.required, NoWhitespaceValidator]);
+        form.get('description').updateValueAndValidity();
+        form.addControl('url', new FormControl(d.url, [Validators.required, NoWhitespaceValidator, RxwebValidators.url()]));
+        form.addControl('port', new FormControl(d.port || 443, [Validators.min(1), Validators.max(65535)]));
+        const credentialType = d.is_local_credential ? 'local' : (d.login_username || d.login_password ? 'my_cred' : '');
+        form.addControl('cred', new FormControl(credentialType));
+        if (credentialType === 'my_cred') {
+          form.addControl('login_username', new FormControl(d.login_username, Validators.required));
+          form.addControl('login_password', new FormControl('', Validators.required));
+        } else if (credentialType === 'local') {
+          form.addControl('credentials', new FormControl(d.credentials || '', Validators.required));
+        }
+        form.removeControl('polling_interval_min');
+        form.removeControl('polling_interval_sec');
+        form.removeControl('is_monitoring');
+        form.removeControl('custom_attribute_data');
+        return form;
+      }
       if (d.is_monitoring) {
         form.addControl('urls', this.builder.array(d.urls.map(url => this.getUrlsFormGroup(url))))
       }
@@ -108,6 +133,12 @@ export class OtherdevicesCrudService {
     return {
       'type': '',
       'name': '',
+      'url': '',
+      'cred': '',
+      'credentials': '',
+      'login_username': '',
+      'login_password': '',
+      'port': '',
       'tag': '',
       'polling_interval_min': '',
       'polling_interval_sec': '',
@@ -141,6 +172,19 @@ export class OtherdevicesCrudService {
     },
     'name': {
       'required': 'Name is required'
+    },
+    'url': {
+      'required': 'URL is required',
+      'url': 'URL is invalid'
+    },
+    'credentials': {
+      'required': 'Credentials Selection is required'
+    },
+    'login_username': {
+      'required': 'Username is required'
+    },
+    'login_password': {
+      'required': 'password is required'
     },
     'polling_interval_min': {
       'min': 'Enter a valid time',
@@ -199,6 +243,13 @@ export interface OtherDeviceDataType {
   tags: string[];
   uuid: string;
   name: string;
+  url?: string;
+  cred?: string;
+  credentials?: string;
+  is_local_credential?: boolean;
+  login_username?: string;
+  login_password?: string;
+  port?: number;
   polling_interval_min: number,
   polling_interval_sec: number,
   description: string;

@@ -101,6 +101,10 @@
                                     </button>
                                     <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body"
                                         tooltip="History" (click)="getScheduleHistory(view)"></button>
+                                    <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1"
+                                        (click)="goToStats(view)" [tooltip]="view.statsTooltipMessage" accessControl
+                                        moduleName="Monitoring" accessType="View Monitoring" elementType="actionbtn">
+                                    </button>
                                     <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
                                         tooltip="Manage by creating support ticket" (click)="createTicket(view)">
                                     </button>

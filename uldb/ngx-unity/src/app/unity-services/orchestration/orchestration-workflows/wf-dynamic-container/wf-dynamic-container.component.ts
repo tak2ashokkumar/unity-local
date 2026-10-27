@@ -63,6 +63,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   @ViewChild('rightResizer') rightResizer!: ElementRef;
   @ViewChild('bottomResizer') bottomResizer!: ElementRef;
 
+  private cloneWorkflowId: string;
   wfName: string = 'Untitled';
   isEditingWorkflowName = false;
   private workflowNameBeforeEdit = this.wfName;
@@ -217,6 +218,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   private executionPage = 1;
 
   get isExecutionMode(): boolean { return this.workspaceMode === 'execution'; }
+  get isCanvasHidden(): boolean {
+    return this.isLoadingWorkflow || (this.isExecutionMode && !this.selectedExecution);
+  }
   get hasNoExecutions(): boolean {
     return this.isExecutionMode && !this.loadingExecutions &&
       !this.workflowExecutions.length && !this.selectedExecution;
@@ -249,6 +253,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     // Keep the originating listing (including filters) outside the editor URL.
     const navigation = this.router.getCurrentNavigation();
     const navigationState = navigation ? navigation.extras.state : this.location.getState();
+    this.cloneWorkflowId = !this.workFlowId ? navigationState?.['cloneWorkflowId'] : null;
     this.workflowReturnUrl = navigationState?.['workflowReturnUrl'] ||
       (this.route.snapshot.queryParamMap.get('from') === 'executions'
         ? '/services/orchestration/executions'
@@ -258,7 +263,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.workflowDetailsLoadComplete = !this.workFlowId && !this.isExecutionMode;
+    this.workflowDetailsLoadComplete = !this.workFlowId && !this.cloneWorkflowId && !this.isExecutionMode;
     this.designerAvailable = !this.isExecutionMode;
     this.loadWorkflowCategories();
     this.manageWorkflowDetails();
@@ -276,7 +281,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
         this.selectExecution({ uuid: params.get('executionId') } as WorkflowExecution);
       });
-    } else if (this.workFlowId) {
+    } else if (this.workFlowId || this.cloneWorkflowId) {
       this.getWorkflowDetails();
     }
   }
@@ -679,8 +684,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             data-model-id="${optionModelId}"
             role="option" aria-selected="${isSelected}"
             ${this.isViewMode
-              ? 'disabled aria-disabled="true"'
-              : `onclick="window.selectWorkflowModel(${nodeId}, this, event)"`}
+          ? 'disabled aria-disabled="true"'
+          : `onclick="window.selectWorkflowModel(${nodeId}, this, event)"`}
             onmousedown="event.stopPropagation()">
           <span class="workflow-model-icon-wrap">
             <img class="workflow-model-icon" src="${image}" alt="" loading="eager"/>
@@ -707,8 +712,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         <button type="button" class="workflow-model-trigger"
             aria-haspopup="listbox" aria-expanded="false"
             ${this.isViewMode
-              ? 'disabled aria-disabled="true" title="Model is read-only in view mode"'
-              : `onclick="window.toggleWorkflowModelDropdown(${nodeId}, this, event)"`}
+        ? 'disabled aria-disabled="true" title="Model is read-only in view mode"'
+        : `onclick="window.toggleWorkflowModelDropdown(${nodeId}, this, event)"`}
             onmousedown="event.stopPropagation()">
           <span class="workflow-model-icon-wrap">
             <img class="workflow-model-icon" src="${this.escapeHtml(selectedModel.image)}" alt="" loading="eager"/>
@@ -810,7 +815,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       (!this.workFlowData || this.workflowCanvasReady)
     );
 
-    if (this.workflowGroupsLoadComplete && this.workflowDetailsLoadComplete && this.workFlowId) {
+    if (this.workflowGroupsLoadComplete && this.workflowDetailsLoadComplete && (this.workFlowId || this.cloneWorkflowId)) {
       this.renderLoadedWorkflow();
       if (!this.isLoadingWorkflow && !this.isExecutionMode) this.validateAgentToolConfigurations();
     }
@@ -2322,8 +2327,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
                 <img class="memory-icon memory-brain-icon"
                     data-enabled="${memoryEnabled}"
                     ${this.isViewMode
-                      ? 'aria-disabled="true" title="Memory is read-only in view mode"'
-                      : `onclick="window.toggleMemoryIcon(${nodeId}, this)"`}
+          ? 'aria-disabled="true" title="Memory is read-only in view mode"'
+          : `onclick="window.toggleMemoryIcon(${nodeId}, this)"`}
                     src="${environment.assetsUrl}external-brand/workflow/dynamic/Brain.svg"
                     loading="eager"/>
               </div>
@@ -3622,7 +3627,10 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
           session_id: uuid
         }
       }),
-      name: this.wfName,
+      name: this.workflowDetailsForm?.get('name')?.value
+        || this.workFlowViewData?.name
+        || this.workFlowData?.name
+        || this.wfName,
       ...this.workflowVarsData,
       description: "Description"
     };
@@ -4211,7 +4219,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   getWorkflowDetails(executionSnapshot?: any) {
-    const details$ = executionSnapshot ? of(executionSnapshot) : this.svc.getWorkflowDetails(this.workFlowId);
+    const details$ = executionSnapshot ? of(executionSnapshot) : this.svc.getWorkflowDetails(this.workFlowId || this.cloneWorkflowId);
     details$.pipe(
       takeUntil(this.ngUnsubscribe),
       finalize(() => {
@@ -4219,6 +4227,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         this.updateInitialLoadingState();
       })
     ).subscribe(res => {
+      if (this.cloneWorkflowId && !executionSnapshot) {
+        res = { ...res, name: `${res.name} (Copy)` };
+        delete res.uuid;
+        delete res.id;
+      }
       this.workflowDetailsForm.patchValue({
         name: res.name,
         description: res.description,
@@ -4301,6 +4314,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       });
 
       this.connectionList = this.mapConnectionsForEditApi(_clone(this.workFlowData?.connections));
+    }, (err: HttpErrorResponse) => {
+      this.notification.error(new Notification('Failed to load workflow. Please try again.'));
     });
   }
   private updateNodeStatusIcon(nodeId: number, hasErrors: boolean, tooltip?: string) {
@@ -5276,7 +5291,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.workflowDetailsForm = this.svc.buildWorkflowDetailsForm(this.workFlowViewData);
     this.workflowDetailsFormErrors = this.svc.resetWorkflowDetailsFormErrors();
     this.workflowDetailsFormValidationMessages = this.svc.workflowDetailsFormValidationMessages;
-    if (!this.workFlowId && !this.isExecutionMode) {
+    if (!this.workFlowId && !this.cloneWorkflowId && !this.isExecutionMode) {
       this.openWorkflowModal();
     }
   }
@@ -5359,6 +5374,4 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   private navigateToWorkflowList(): void {
     this.router.navigateByUrl(this.workflowReturnUrl);
   }
-
-
 }

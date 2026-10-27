@@ -2265,6 +2265,9 @@
 
 .sankey-chart {
   height: 300px;
+  // The source chart receives a larger inline height when it has many source nodes. Without this,
+  // the panel's flex layout shrinks it back to 520px and no vertical overflow is created.
+  flex: 0 0 auto;
 }
 
 .sankey-empty {

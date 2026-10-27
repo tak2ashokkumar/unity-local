@@ -155,6 +155,22 @@
               </tag-input-dropdown>
             </tag-input>
           </div>
+          <div class="form-group col-12">
+            <div class="form-check checkbox">
+              <input class="form-check-input" id="management_box" (click)="managementFormCheck()" type="checkbox"
+                [checked]="managementEnabled">
+              <label class="form-check-label" for="management_box">Activate management web console</label>
+            </div>
+          </div>
+          <div class="form-group col-6" *ngIf="managementEnabled">
+            <label class="form-col-form-label">Web URL<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2"
+              [tooltip]="'URL to access the PDU (http or https, optional port)\nEx: https://example.domain.com:8443'" container="body"
+              containerClass="info-multi-line"></i>
+            <input id="backend_url" class="form-control" type="text" formControlName="backend_url"
+              [class.is-invalid]="pduFormErrors.backend_url">
+            <div class="invalid-feedback" *ngIf="pduFormErrors.backend_url">{{pduFormErrors.backend_url}}</div>
+          </div>
           <!-- <div class="form-group col-12">
             <div class="form-check checkbox">
               <input class="form-check-input" id="monitoring_box" (click)="monitoringFormCheck()" type="checkbox"

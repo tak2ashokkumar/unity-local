@@ -9,7 +9,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
-import { AppUtilityService, CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, CRUDActionTypes, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { ORACLE_ACCOUNT_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
@@ -70,6 +70,8 @@ export class PublicCloudOciSummaryComponent implements OnInit, OnDestroy {
     defaultTitle: 'Select Subscriptions',
   };
 
+  allowedStatsResources: string[] = [];
+
   constructor(private router: Router,
     private route: ActivatedRoute,
     private modalService: BsModalService,
@@ -114,7 +116,7 @@ export class PublicCloudOciSummaryComponent implements OnInit, OnDestroy {
     this.scheduleHistoryCurrentCriteria.pageNo = 1;
     this.getScheduleHistory();
   }
-  
+
   onFilterChange() {
     this.getServiceAndResourceDetails();
   }
@@ -208,6 +210,25 @@ export class PublicCloudOciSummaryComponent implements OnInit, OnDestroy {
   //   }
   // }
 
+  goToStats(view: AccountDetailsViewData) {
+    this.saveCriteria();
+    this.storageService.put('device', {
+      name: view.accountName, deviceType: DeviceMapping.OCI_ACCOUNTS,
+      configured: view.monitoring.configured, uuid: view.uuid
+    }, StorageType.SESSIONSTORAGE);
+    if (view.monitoring.zabbix) {
+      if (view.monitoring.configured && view.monitoring.enabled) {
+        this.router.navigate([view.uuid, 'zbx', 'monitoring-graphs'], { relativeTo: this.route });
+      } else {
+        this.router.navigate([view.uuid, 'zbx', 'configure'], { relativeTo: this.route });
+      }
+    }
+  }
+
+  saveCriteria() {
+    this.storageService.put('criteria', { criteria: this.currentCriteria, deviceType: DeviceMapping.OCI_ACCOUNTS }, StorageType.SESSIONSTORAGE)
+  }
+
   createTicket(view: AccountDetailsViewData) {
     this.ticketService.createTicket({
       subject: TICKET_SUBJECT(view.accountName, view.accountName), metadata: ORACLE_ACCOUNT_TICKET_METADATA(view.accountName)
@@ -252,10 +273,10 @@ export class PublicCloudOciSummaryComponent implements OnInit, OnDestroy {
       this.scheduleHistoryView = view;
     }
     this.svc.getScheduleHistory(this.scheduleHistoryCurrentCriteria, this.scheduleHistoryView.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.scheduleHistoryCount = res.count; 
+      this.scheduleHistoryCount = res.count;
       this.scheduleHistory = this.svc.convertToHistoryViewData(res.results);
       this.spinner.stop('main');
-      if(view) {
+      if (view) {
         this.modalRef = this.modalService.show(this.scheduleHistoryRef, { class: 'modal-lg', keyboard: true, ignoreBackdropClick: true });
       }
     }, err => {

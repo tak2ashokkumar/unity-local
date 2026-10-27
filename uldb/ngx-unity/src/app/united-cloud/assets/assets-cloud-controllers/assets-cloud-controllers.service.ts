@@ -30,7 +30,7 @@ export class CloudControllersService {
       a.uuid = s.uuid;
       a.remoteWebAccess = s.remote_web_access;
       if (this.user.isManagementEnabled || a.platformType != PlatFormMapping.CUSTOM) {
-        if (this.isVCenterPlatform(a.platformType)) {
+        if (this.isRemoteWebPlatform(a.platformType)) {
           a.isSameTabEnabled = false;
           a.sameTabWebAccessUrl = null;
           a.sameTabTootipMessage = 'Open web console';
@@ -62,8 +62,10 @@ export class CloudControllersService {
     return viewData;
   }
 
-  private isVCenterPlatform(platformType: PlatFormMapping): boolean {
-    return platformType === PlatFormMapping.VMWARE || platformType === PlatFormMapping.UNITED_PRIVATE_CLOUD_VCENTER;
+  private isRemoteWebPlatform(platformType: PlatFormMapping): boolean {
+    return platformType === PlatFormMapping.VMWARE
+      || platformType === PlatFormMapping.UNITED_PRIVATE_CLOUD_VCENTER
+      || platformType === PlatFormMapping.HYPER_V;
   }
 }
 

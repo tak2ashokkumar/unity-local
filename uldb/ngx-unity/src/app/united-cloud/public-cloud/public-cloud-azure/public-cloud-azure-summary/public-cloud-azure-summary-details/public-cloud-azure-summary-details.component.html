@@ -190,7 +190,7 @@
                                     class="action-icons mb-0 font-sm ml-1"
                                     [ngClass]="{'action-icons-disabled': (selectedResourceName !== 'Virtual Machines') && !view.isStatsEnabled}"
                                     (click)="(selectedResourceName !== 'Virtual Machines' && !view.isStatsEnabled) ? null : goToStats(view)"
-                                    [tooltip]="view.isStatsEnabled ? view.statsTooltipMessage : ''" container="body"
+                                    [tooltip]="view.statsTooltipMessage" container="body"
                                     accessControl moduleName="Monitoring" accessType="View Monitoring"
                                     elementType="actionbtn">
                                     <i class="fas fa-chart-line"></i>

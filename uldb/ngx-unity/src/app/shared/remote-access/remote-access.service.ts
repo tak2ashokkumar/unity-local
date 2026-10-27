@@ -153,14 +153,15 @@ export class RemoteAccessService {
     });
   }
 
-  remoteWebSocketUrl(websocketPath?: string): string {
+  remoteWebSocketUrl(websocketPath?: string, sessionId?: string): string {
     const path = websocketPath || this.defaultWebsocketPath;
+    const query = sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : '';
     if (/^wss?:\/\//i.test(path)) {
-      return path;
+      return `${path}${query}`;
     }
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-    return `${protocol}//${window.location.host}${normalizedPath}`;
+    return `${protocol}//${window.location.host}${normalizedPath}${query}`;
   }
 
   absoluteUrl(url: string): string {

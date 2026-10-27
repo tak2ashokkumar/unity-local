@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
-import { FEATURE_NOT_ENABLED_MESSAGE } from 'src/app/app-constants';
+import { FEATURE_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
 import { AppLevelService } from 'src/app/app-level.service';
 import { CABINET_DEVIECS_BY_CABINET_ID, CHECK_PDU_AUTHENTICATION, DEVICE_DATA_BY_DEVICE_TYPE, PDU_SOCKET_MAPPING, PUDS_BY_DATACENTER_ID, RECYCLE_PDU, UPDATE_PDU_MAPPING, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
@@ -11,6 +11,8 @@ import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
+import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
+import { PrivateCloudRemoteWebAccessType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
@@ -55,10 +57,21 @@ export class DatacenterPdusService {
         a.deviceStatus = this.utilService.getDeviceStatus(d.status);
       }
 
+      a.remoteWebAccess = d.remote_web_access;
+      a.showRemoteWebAccessButton = !!d.remote_web_access?.can_create_session;
+      a.remoteWebTooltipMessage = d.remote_web_access?.message || 'Remote web access unavailable';
+
       if (this.user.isManagementEnabled) {
+        a.consoleHost = d.management_ip || d.ip_address || null;
+        a.newTabConsoleAccessUrl = a.consoleHost ? VM_CONSOLE_CLIENT() : null;
+        a.isNewTabEnabled = !!(a.newTabConsoleAccessUrl || a.showRemoteWebAccessButton);
+        a.newTabTootipMessage = a.isNewTabEnabled ? 'Remote Access' : 'Remote Access Not Configured';
+
         a.recycleIconEnabled = d.ip_address ? true : false;
         a.recycleIconTooltip = d.ip_address ? 'Recycle' : FEATURE_NOT_ENABLED_MESSAGE();
       } else {
+        a.newTabTootipMessage = FEATURE_NOT_ENABLED_MESSAGE();
+        a.isNewTabEnabled = false;
         a.recycleIconEnabled = false;
         a.recycleIconTooltip = FEATURE_NOT_ENABLED_MESSAGE();
       }
@@ -243,6 +256,17 @@ export class DatacenterPdusService {
     return this.http.post<string>(CHECK_PDU_AUTHENTICATION(pdu.id), data);
   }
 
+  getConsoleAccessInput(device: PDUViewData): ConsoleAccessInput {
+    return {
+      label: DeviceMapping.PDU,
+      deviceType: DeviceMapping.PDU,
+      deviceId: device.pduId,
+      newTab: false,
+      deviceName: device.name,
+      managementIp: device.consoleHost
+    };
+  }
+
   recyclePDU(pdu: PDUViewData, data: PDUSocketRecycleType) {
     return this.http.post<CeleryTask>(RECYCLE_PDU(pdu.pduId), data)
       .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 4).pipe(take(1))), take(1));
@@ -273,6 +297,13 @@ export class PDUViewData {
   cabinetId: string;
   statsTooltipMessage: string;
   deviceStatus: string;
+  isNewTabEnabled: boolean;
+  newTabTootipMessage: string;
+  consoleHost: string;
+  newTabConsoleAccessUrl: string;
+  remoteWebAccess?: PrivateCloudRemoteWebAccessType;
+  showRemoteWebAccessButton: boolean;
+  remoteWebTooltipMessage: string;
 
   serialNumber: string;
   usableAmps: number;

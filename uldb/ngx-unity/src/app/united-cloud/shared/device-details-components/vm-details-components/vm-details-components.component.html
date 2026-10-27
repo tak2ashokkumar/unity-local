@@ -268,6 +268,8 @@
                                     <th>Type</th>
                                     <th>Item</th>
                                     <th>Last Scan Date</th>
+                                    <th>Target Devices</th>
+                                    <th>Target Interface</th>
                                     <th>Description</th>
                                 </tr>
                             </thead>
@@ -285,6 +287,22 @@
                                     <td>{{ view.type }}</td>
                                     <td>{{ view.item }}</td>
                                     <td>{{ view.lastScanDate }}</td>
+                                    <td>
+                                        <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                            [tooltip]="view.remoteDevices?.target_device" *ngIf="view.remoteDevices"
+                                            (click)="goToTargetDeviceDetails(view.remoteDevices)">{{view.remoteDevices?.target_device
+                                            || 'NA'}}</button>
+                                        <button class="action-icons fas fa-plus"
+                                            [ngClass]="{'action-icons-disabled':!view.name || !view.description}"
+                                            [tooltip]="getTooltipMsgForAddTargetDevice(view)"
+                                            [disabled]="!view.name || !view.description" *ngIf="!view.remoteDevices"
+                                            (click)="addTargetDevice(view)" accessControl moduleName="Monitoring"
+                                            accessType="Manage Monitoring" elementType="actionbtn"></button>
+                                    </td>
+                                    <td>
+                                        <div [tooltip]="view.remoteDevices?.interfaces?.description">
+                                            {{view.remoteDevices?.interfaces?.description || 'NA'}}</div>
+                                    </td>
                                     <td>{{ view.description }}</td>
                                 </tr>
                             </tbody>
@@ -307,6 +325,7 @@
             </div>
         </div>
     </div>
+    <device-interface-crud (onCrud)="onCrud($event)"></device-interface-crud>
 </ng-template>
 
 

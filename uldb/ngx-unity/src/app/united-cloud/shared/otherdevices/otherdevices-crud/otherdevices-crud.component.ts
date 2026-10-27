@@ -14,6 +14,8 @@ import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity
 import { OtherDevice } from '../../entities/other-device.type';
 import { cloneDeep as _clone } from 'lodash-es'
 import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { RxwebValidators } from '@rxweb/reactive-form-validators';
+import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 
 @Component({
   selector: 'otherdevices-crud',
@@ -33,6 +35,7 @@ export class OtherdevicesCrudComponent implements OnInit, OnDestroy {
   nonFieldErr: string = '';
   tagsAutocompleteItems: string[] = [];
   collectors: DeviceDiscoveryAgentConfigurationType[] = [];
+  credentialList: DeviceDiscoveryCredentials[] = [];
 
   constructor(private svc: OtherdevicesCrudService,
     private caSvc: UnityDevicesCustomAttributesCrudService,
@@ -49,6 +52,7 @@ export class OtherdevicesCrudComponent implements OnInit, OnDestroy {
     });
     this.getTags();
     this.getCollectors();
+    this.getCredentials();
   }
 
   ngOnInit(): void {
@@ -83,6 +87,15 @@ export class OtherdevicesCrudComponent implements OnInit, OnDestroy {
     });
   }
 
+  getCredentials() {
+    this.svc.getCredentials().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.credentialList = res;
+    }, err => {
+      this.credentialList = [];
+      this.notification.error(new Notification('Error while fetching credentials. Please try again!!'));
+    });
+  }
+
   getInstanceDetails() {
     this.svc.getInstanceDetails(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.instanceData = res;
@@ -103,6 +116,28 @@ export class OtherdevicesCrudComponent implements OnInit, OnDestroy {
       }
     }
     this.otherDevicesForm = _clone(form);
+    if (this.deviceId) {
+      this.otherDevicesForm.get('type').disable();
+    }
+    this.otherDevicesForm.get('type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((type: string) => {
+      this.configureCategoryFields(type);
+    });
+    if (this.isWebConsole) {
+      this.handleCredentialSubscription();
+      this.spinner.stop('main');
+      return;
+    }
+    this.handleMonitoringSubscription();
+    if (form.value.is_monitoring) {
+      for (let i = 0; i < this.urls.length; i++) {
+        let formGroup = <FormGroup>this.urls.at(i);
+        this.handleSubscriptions(formGroup);
+      }
+    }
+    this.spinner.stop('main');
+  }
+
+  handleMonitoringSubscription() {
     this.otherDevicesForm.get('is_monitoring').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: boolean) => {
       if (val) {
         let fg = this.svc.buildUrls();
@@ -113,13 +148,60 @@ export class OtherdevicesCrudComponent implements OnInit, OnDestroy {
         this.otherDevicesForm.removeControl('urls');
       }
     });
-    if (form.value.is_monitoring) {
-      for (let i = 0; i < this.urls.length; i++) {
-        let formGroup = <FormGroup>this.urls.at(i);
-        this.handleSubscriptions(formGroup);
+  }
+
+  get isWebConsole(): boolean {
+    return this.otherDevicesForm && this.otherDevicesForm.get('type').value === 'Web Console';
+  }
+
+  configureCategoryFields(type: string) {
+    if (type === 'Web Console') {
+      this.otherDevicesForm.addControl('url', new FormControl('', [Validators.required, NoWhitespaceValidator, RxwebValidators.url()]));
+      this.otherDevicesForm.addControl('port', new FormControl(443, [Validators.min(1), Validators.max(65535)]));
+      this.otherDevicesForm.addControl('cred', new FormControl(''));
+      this.handleCredentialSubscription();
+      this.otherDevicesForm.removeControl('polling_interval_min');
+      this.otherDevicesForm.removeControl('polling_interval_sec');
+      this.otherDevicesForm.removeControl('is_monitoring');
+      this.otherDevicesForm.removeControl('urls');
+      this.otherDevicesForm.removeControl('custom_attribute_data');
+    } else {
+      this.otherDevicesForm.removeControl('url');
+      this.otherDevicesForm.removeControl('cred');
+      this.otherDevicesForm.removeControl('credentials');
+      this.otherDevicesForm.removeControl('login_username');
+      this.otherDevicesForm.removeControl('login_password');
+      this.otherDevicesForm.removeControl('port');
+      this.otherDevicesForm.addControl('polling_interval_min', new FormControl(null, [Validators.min(0), Validators.max(59)]));
+      this.otherDevicesForm.addControl('polling_interval_sec', new FormControl(null, [Validators.min(0), Validators.max(59)]));
+      if (!this.otherDevicesForm.get('is_monitoring')) {
+        this.otherDevicesForm.addControl('is_monitoring', new FormControl(false));
+        this.handleMonitoringSubscription();
       }
+      this.otherDevicesForm.addControl('custom_attribute_data', new FormControl(null));
     }
-    this.spinner.stop('main');
+  }
+
+  handleCredentialSubscription() {
+    this.otherDevicesForm.get('cred').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
+      if (val == 'local') {
+        this.otherDevicesForm.addControl('credentials', new FormControl('', Validators.required));
+        this.otherDevicesForm.removeControl('login_username');
+        this.otherDevicesForm.removeControl('login_password');
+      } else if (val == 'my_cred') {
+        this.otherDevicesForm.removeControl('credentials');
+        this.otherDevicesForm.addControl('login_username', new FormControl('', Validators.required));
+        this.otherDevicesForm.addControl('login_password', new FormControl('', Validators.required));
+      } else {
+        this.otherDevicesForm.removeControl('credentials');
+        this.otherDevicesForm.removeControl('login_username');
+        this.otherDevicesForm.removeControl('login_password');
+      }
+    });
+  }
+
+  clearCredential() {
+    this.otherDevicesForm.get('cred').setValue('');
   }
 
   handleSubscriptions(formGroup: FormGroup) {
@@ -191,17 +273,34 @@ export class OtherdevicesCrudComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    this.caSvc.submit();
-    if (this.otherDevicesForm.invalid || this.caSvc.isInvalid()) {
+    if (!this.isWebConsole) {
+      this.caSvc.submit();
+    }
+    if (this.otherDevicesForm.invalid || (!this.isWebConsole && this.caSvc.isInvalid())) {
       this.otherDevicesFormErrors = this.utilService.validateForm(this.otherDevicesForm, this.otherDevicesValidationMessages, this.otherDevicesFormErrors);
       this.otherDevicesForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: any) => {
         this.otherDevicesFormErrors = this.utilService.validateForm(this.otherDevicesForm, this.otherDevicesValidationMessages, this.otherDevicesFormErrors);
-        this.caSvc.submit();
+        if (!this.isWebConsole) {
+          this.caSvc.submit();
+        }
       });
     } else {
       this.spinner.start('main');
       let obj = this.otherDevicesForm.getRawValue();
-      const fd = Object.assign({}, obj, { polling_interval_min: obj.polling_interval_min ? obj.polling_interval_min : 0 }, { polling_interval_sec: obj.polling_interval_sec ? obj.polling_interval_sec : 0 }, { 'custom_attribute_data': this.caSvc.getFormData() });
+      let fd;
+      if (this.isWebConsole) {
+        const credentialType = obj.cred;
+        delete obj.cred;
+        fd = Object.assign({}, obj, {
+          is_local_credential: credentialType === 'local',
+          credentials: credentialType === 'local' ? obj.credentials : null,
+          login_username: credentialType === 'my_cred' ? obj.login_username : null,
+          login_password: credentialType === 'my_cred' ? obj.login_password : null,
+          custom_attribute_data: {}
+        });
+      } else {
+        fd = Object.assign({}, obj, { polling_interval_min: obj.polling_interval_min ? obj.polling_interval_min : 0 }, { polling_interval_sec: obj.polling_interval_sec ? obj.polling_interval_sec : 0 }, { 'custom_attribute_data': this.caSvc.getFormData() });
+      }
 
       if (this.deviceId) {
         this.svc.updateDevice(fd, this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {

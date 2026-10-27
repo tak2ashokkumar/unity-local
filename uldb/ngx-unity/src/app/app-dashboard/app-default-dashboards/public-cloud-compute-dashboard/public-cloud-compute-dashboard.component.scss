@@ -252,9 +252,17 @@
   gap: 6px;
 }
 
-.dashboard-card+.section-title {
+// Section separation is owned by each section's own top-level wrapper (its header), never by
+// inner card content or by content-dependent adjacency. This keeps the gaps correct while a
+// widget is still loading and when a neighbouring section is conditionally hidden. Inner
+// elements only render their data and must not add margins to separate from other sections.
+.dashboard-content > .section-title {
   margin-top: 1rem;
   margin-bottom: 0.3rem;
+}
+
+.dashboard-content > :first-child {
+  margin-top: 0;
 }
 
 .dashboard-card {
@@ -679,8 +687,9 @@
 
 .capacity-cpu-label {
   margin-top: 3px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .db-storage-total {
@@ -697,6 +706,13 @@
   line-height: 14px;
 }
 
+// Database table: the Storage Used cell carries a "Total:" label (line-height 14px) above its
+// bar. Reserve that same height above the CPU / Memory / Disk Utilization bars so all four bars
+// line up, even though those three have no total value to show.
+.db-bar-offset {
+  margin-top: 14px;
+}
+
 .capacity-disk-iops {
   color: #333f4a;
 }
@@ -708,7 +724,9 @@
 
 .capacity-mem-available {
   color: #7c8796;
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 .capacity-network {

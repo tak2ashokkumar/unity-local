@@ -40,6 +40,7 @@ export class UserProfileAddModelService {
         'api_key': ['', []],
         'endpoint_url': [data.endpoint_url],
         'description': [data.description],
+        'model_priority': [data.primary_model ? 'primary' : 'secondary'],
       });
       if (selectedModel) {
         form.get('model_and_provider').setValue(selectedModel);
@@ -54,6 +55,7 @@ export class UserProfileAddModelService {
         'api_key': ['', [Validators.required, NoWhitespaceValidator]],
         'endpoint_url': [''],
         'description': [''],
+        'model_priority': ['secondary'],
       });
       return form;
     }

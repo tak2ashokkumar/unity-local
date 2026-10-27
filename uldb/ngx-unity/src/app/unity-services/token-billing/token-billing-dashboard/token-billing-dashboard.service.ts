@@ -15,6 +15,7 @@ import {
   LangfuseLlmJudgeMetricsResponse,
   LangfuseMcpMetricsResponse,
   LangfuseMetricsResponse,
+  LangfuseRagMetricsResponse,
   ModelCost,
   ModelCostSeries,
   ModelCostWidgetData,
@@ -811,6 +812,14 @@ export class TokenBillingDashboardService {
     return this.http.get<LangfuseGuardrailMetricsResponse>('mcp/langfuse/metrics/guardrails/', { params });
   }
 
+  getLangfuseRagMetrics(orgId: number | string, fromDate: string, toDate: string): Observable<LangfuseRagMetricsResponse> {
+    const params = new HttpParams()
+      .set('org_id', String(orgId))
+      .set('from_date', fromDate)
+      .set('to_date', toDate);
+    return this.http.get<LangfuseRagMetricsResponse>('mcp/langfuse/metrics/rag/', { params });
+  }
+
   getLangfuseMcpMetrics(orgId: number | string, fromDate: string, toDate: string): Observable<LangfuseMcpMetricsResponse> {
     const params = new HttpParams()
       .set('org_id', String(orgId))
@@ -905,7 +914,7 @@ export class TokenBillingDashboardService {
   }
 
   convertToHeatMapViewData(labels: string[], values: number[], metricName = 'Average Score', maxValue = 1,
-    maxLabelLength?: number): UnityChartDetails {
+    maxLabelLength = 16): UnityChartDetails {
     const view = new UnityChartDetails();
     view.type = UnityChartTypes.HEAT_MAP;
     view.extensions = [VisualMapComponent, ...this.chartConfigSvc.getChartExtensions(UnityChartTypes.HEAT_MAP)];

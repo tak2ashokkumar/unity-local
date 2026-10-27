@@ -246,7 +246,11 @@ export class SummaryComponent implements OnInit, OnDestroy {
 
   webAccessNewTab(view: IconViewData) {
     if (this.platformType == PlatFormMapping.PROXMOX) {
-      this.openProxmoxRemoteWebAccess(view);
+      this.openRemoteWebAccess(view, 'proxmox', 'Proxmox');
+      return;
+    }
+    if (this.platformType == PlatFormMapping.HYPER_V) {
+      this.openRemoteWebAccess(view, 'hyperv', 'Hyper-V');
       return;
     }
     if (!view.newTabWebAccessUrl) {
@@ -256,13 +260,13 @@ export class SummaryComponent implements OnInit, OnDestroy {
     window.open(view.newTabWebAccessUrl);
   }
 
-  private openProxmoxRemoteWebAccess(view: IconViewData) {
+  private openRemoteWebAccess(view: IconViewData, resourceType: string, label: string) {
     if (!view?.isNewTabEnabled || this.remoteWebLaunching) {
       return;
     }
     const resourceId = view.remoteWebAccess?.resource_id || view.vmId;
     if (!resourceId) {
-      this.notificationService.error(new Notification('Unable to open Proxmox web console. Resource identifier is missing.'));
+      this.notificationService.error(new Notification('Unable to open ' + label + ' web console. Resource identifier is missing.'));
       return;
     }
     const viewerWindow = this.openIsolatedViewerTab();
@@ -272,7 +276,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
     }
 
     this.remoteWebLaunching = true;
-    this.remoteAccess.createProxmoxWebLaunch(resourceId)
+    this.remoteAccess.createWebLaunch(resourceId, view.remoteWebAccess?.resource_type || resourceType)
       .pipe(
         takeUntil(this.ngUnsubscribe),
         finalize(() => this.remoteWebLaunching = false)

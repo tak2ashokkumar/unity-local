@@ -20,8 +20,8 @@
                                             <td>
                                                 <p class="mb-2">Virtualization Platform</p>
                                             </td>
-                                            <td>
-                                                <p class="mb-2">Hypervisors</p>
+                                            <td class="w-15">
+                                                <p class="mb-2">Hosts</p>
                                             </td>
                                             <td>
                                                 <p class="mb-2">Virtual Machines</p>
@@ -45,8 +45,8 @@
                                             <td>
                                                 <p class="mb-0">
                                                     <i class="fa fa-fw fa-lg text-danger"
-                                                        [ngClass]="iconMapping.HYPERVISOR"></i>
-                                                    <span class="ml-1">{{privateCloud?.hypervisors?.length}}</span>
+                                                        [ngClass]="iconMapping.HOST"></i>
+                                                    <span class="ml-1">{{privateCloud?.nutanix?.host?.total}}</span>
                                                 </p>
                                             </td>
                                             <td>

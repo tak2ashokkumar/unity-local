@@ -18,6 +18,6 @@
   <app-spinner [name]="'main'"></app-spinner>
   <main class="main">
     <check-auth></check-auth>
-    <console-access (inputLoaded)="menuInput($event)"></console-access>
+    <console-access (inputLoaded)="menuInput($event)" (statsLoaded)="menuStats($event)"></console-access>
   </main>
 </div>

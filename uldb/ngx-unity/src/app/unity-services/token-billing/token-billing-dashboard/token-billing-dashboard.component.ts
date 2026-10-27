@@ -16,6 +16,7 @@ import {
   LangfuseLlmJudgeMetricsResponse,
   LangfuseMcpMetricsResponse,
   LangfuseMetricsResponse,
+  LangfuseRagMetricsResponse,
   ModelCostWidgetData,
   ModelUsageWidgetData,
   TokenSummaryWidgetData,
@@ -66,6 +67,7 @@ export class TokenBillingDashboardComponent implements OnInit, AfterViewInit, On
   isLangfuseMetricsLoading = true;
   isLlmJudgeMetricsLoading = true;
   isGuardrailMetricsLoading = true;
+  isRagMetricsLoading = true;
   isMcpMetricsLoading = true;
   metricLoaders = {
     langfuse: {
@@ -79,17 +81,8 @@ export class TokenBillingDashboardComponent implements OnInit, AfterViewInit, On
       tokenConsumptionByLlmResponse: 'tokenConsumptionByLlmResponse',
       expensiveUsersVsTokenConsumption: 'expensiveUsersVsTokenConsumption',
       expensiveLlmCallsVsTokenConsumption: 'expensiveLlmCallsVsTokenConsumption',
-      agentCostPerTask: 'agentCostPerTask',
-      numberOfLlmCalls: 'numberOfLlmCalls',
-      costPerRequest: 'costPerRequest',
-      throughput: 'throughput',
       stepsBySession: 'stepsBySession',
       stepsPerTaskDistribution: 'stepsPerTaskDistribution',
-      costPerSuccessfulCompletion: 'costPerSuccessfulCompletion',
-      abModelComparison: 'abModelComparison',
-      embeddingDriftCentroid: 'embeddingDriftCentroid',
-      cacheHitRate: 'cacheHitRate',
-      semanticCacheHitRate: 'semanticCacheHitRate',
       traceSuccessFailureRates: 'traceSuccessFailureRates',
       totalTokenConsumption: 'totalTokenConsumption',
       taskCompletionRate: 'taskCompletionRate',
@@ -101,25 +94,19 @@ export class TokenBillingDashboardComponent implements OnInit, AfterViewInit, On
     },
     llmJudge: { averageScores: 'llmJudgeAverageScores' },
     guardrail: { averageScores: 'guardrailAverageScores' },
+    rag: { averageScores: 'ragAverageScores' },
     mcp: {
-      toolCostPerCall: 'mcpToolCostPerCall',
-      resultCorrectness: 'mcpResultCorrectness',
-      argumentSchemaValidity: 'mcpArgumentSchemaValidity',
-      toolRetryRate: 'mcpToolRetryRate',
       toolCallSuccessRate: 'mcpToolCallSuccessRate',
       toolCallLatency: 'mcpToolCallLatency',
       toolCoverage: 'mcpToolCoverage',
       toolUtilization: 'mcpToolUtilization',
-      serverAvailability: 'mcpServerAvailability',
-      redundantCallRate: 'mcpRedundantCallRate',
-      toolSelectionAccuracy: 'mcpToolSelectionAccuracy',
-      toolCallErrorRate: 'mcpToolCallErrorRate',
       fallback: 'mcpMetricsFallback',
     },
   };
   langfuseMetricsData: LangfuseMetricsResponse;
   langfuseLlmJudgeMetricsData: LangfuseLlmJudgeMetricsResponse;
   langfuseGuardrailMetricsData: LangfuseGuardrailMetricsResponse;
+  langfuseRagMetricsData: LangfuseRagMetricsResponse;
   langfuseMcpMetricsData: LangfuseMcpMetricsResponse;
   langfuseGraphData: { [key: string]: UnityChartDetails } = {};
 
@@ -172,6 +159,7 @@ export class TokenBillingDashboardComponent implements OnInit, AfterViewInit, On
     this.getLangfuseMetrics(range.fromDate, range.toDate);
     this.getLangfuseLlmJudgeMetrics(range.fromDate, range.toDate);
     this.getLangfuseGuardrailMetrics(range.fromDate, range.toDate);
+    this.getLangfuseRagMetrics(range.fromDate, range.toDate);
     this.getLangfuseMcpMetrics(range.fromDate, range.toDate);
 
     const prevSelectedModels = this.modelUsageData.selectedModels.length ? this.modelUsageData.selectedModels : undefined;
@@ -558,6 +546,48 @@ export class TokenBillingDashboardComponent implements OnInit, AfterViewInit, On
     this.langfuseGraphData = {
       ...this.langfuseGraphData,
       guardrailAverageScores: averageScores.length ? this.svc.convertToHeatMapViewData(
+        averageScores.map(item => item.name),
+        averageScores.map(item => Number(item.value)),
+      ) : null,
+    };
+  }
+
+  getLangfuseRagMetrics(fromDate: string, toDate: string): void {
+    this.isRagMetricsLoading = true;
+    this.langfuseRagMetricsData = null;
+    Object.values(this.metricLoaders.rag).forEach(loader => this.spinner.start(loader));
+    this.svc.getLangfuseRagMetrics(this.userInfo.userOrgId, fromDate, toDate)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(
+        res => {
+          this.isRagMetricsLoading = false;
+          Object.values(this.metricLoaders.rag).forEach(loader => this.spinner.stop(loader));
+          this.manageRagMetricsData(res);
+        },
+        (err: HttpErrorResponse) => {
+          this.isRagMetricsLoading = false;
+          Object.values(this.metricLoaders.rag).forEach(loader => this.spinner.stop(loader));
+          this.langfuseRagMetricsData = null;
+          this.notification.error(new Notification('Failed to load RAG metrics. Please try again.'));
+        },
+      );
+  }
+
+  manageRagMetricsData(res: LangfuseRagMetricsResponse): void {
+    this.langfuseRagMetricsData = res;
+    const averageScores = [
+      { name: 'Grounding', value: res.grounding_score?.average_score },
+      { name: 'Context Relevance', value: res.context_relevance_score?.average_score },
+      { name: 'Retrieval Precision', value: res.retrieval_precision?.average_score },
+      { name: 'Context Recall', value: res.context_recall?.average_score },
+      { name: 'Context Precision', value: res.context_precision?.average_score },
+      { name: 'Retrieval Recall', value: res.retrieval_recall?.average_score },
+      { name: 'Chunk Utilization', value: res.chunk_utilization?.average_score },
+    ].filter(item => item.value !== undefined && item.value !== null);
+
+    this.langfuseGraphData = {
+      ...this.langfuseGraphData,
+      ragAverageScores: averageScores.length ? this.svc.convertToHeatMapViewData(
         averageScores.map(item => item.name),
         averageScores.map(item => Number(item.value)),
       ) : null,

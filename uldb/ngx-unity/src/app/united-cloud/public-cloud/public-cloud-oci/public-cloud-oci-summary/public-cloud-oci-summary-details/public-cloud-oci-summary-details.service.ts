@@ -33,7 +33,7 @@ export class PublicCloudOciSummaryDetailsService {
 
   getOciSubscriptionDetails(): Observable<OciAccountType[]> {
     let params: HttpParams = new HttpParams().set('page_size', 0);
-    return this.http.get<OciAccountType[]>(`customer/managed/oci/account/`, { params: params });
+    return this.http.get<OciAccountType[]>(`customer/managed/oci/accounts/`, { params: params });
   }
 
   createTaskAndPoll(accountId: string): Observable<TaskStatus> {
@@ -47,7 +47,7 @@ export class PublicCloudOciSummaryDetailsService {
   }
 
   getResourceDetails(): Observable<ResourceDetailsType[]> {
-    return this.http.get<ResourceDetailsType[]>(`customer/managed/oci/account/resource_count_by_type/`);
+    return this.http.get<ResourceDetailsType[]>(`customer/managed/oci/accounts/resource_count_by_type/`);
   }
 
   getLocation(): Observable<{ display: string; value: string }[]> {
@@ -150,13 +150,13 @@ export class PublicCloudOciSummaryDetailsService {
       // data.publicIp = account.public_ip;
       // data.instanceType = account.instance_type;
       data = this.updateIconStatus(data, account.status);
-      // data.monitoring = account.monitoring;
+      data.monitoring = account.monitoring;
 
       if (data.monitoring && !data.monitoring.configured) {
         data.statsTooltipMessage = 'Monitoring not configured';
         data.isStatsEnabled = false;
       } else {
-        data.statsTooltipMessage = 'VM Statistics';
+        data.statsTooltipMessage = `${data.resourceType} Statistics`;
         data.isStatsEnabled = true;
       }
 

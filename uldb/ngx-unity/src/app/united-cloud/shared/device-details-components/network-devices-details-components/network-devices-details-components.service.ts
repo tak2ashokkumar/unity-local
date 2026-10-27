@@ -4,6 +4,7 @@ import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
+import { RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { NetworkDevicesDetailsHardwareData, NetworkDevicesDetailsInterfaceData, NetworkDevicesDetailsIPAddress, NetworkDevicesDetailsMacData, NetworkDevicesDetailsOSData } from './network-devices-details-components.type';
@@ -94,6 +95,7 @@ export class NetworkDevicesDetailsComponentsService {
       a.permanentAddress = d.PermanentAddress;
       a.portType = d.PortType;
       a.company = d.Company;
+      a.remoteDevices = d.RemoteDevices;
       viewData.push(a);
     })
     return viewData;
@@ -211,6 +213,7 @@ export class NetworkDeviceInterfacesViewData {
   permanentAddress: string;
   portType: string;
   company: string;
+  remoteDevices: RemoteDevicesType;
 }
 
 export class NetworkDeviceOSViewData {

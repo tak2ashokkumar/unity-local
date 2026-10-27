@@ -470,7 +470,8 @@ export class PublicCloudComputeDashboardService {
     return {
       color: PUBLIC_CLOUD_UTILIZATION_SERIES_CONFIG.map(config => config.color),
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         // Compute and Storage are % used; Database Count is a plain count.
         formatter: (params: any) => {
@@ -527,7 +528,8 @@ export class PublicCloudComputeDashboardService {
     return {
       color: points.map(point => point.color),
       tooltip: {
-        trigger: 'item',
+        appendToBody: true,
+trigger: 'item',
         formatter: (params: any) => params?.data?.tooltipLabel || ''
       },
       title: {
@@ -624,7 +626,8 @@ export class PublicCloudComputeDashboardService {
     return {
       animation: false,
       tooltip: {
-        trigger: 'item',
+        appendToBody: true,
+trigger: 'item',
         confine: true,
         backgroundColor: '#ffffff',
         borderColor: '#e2e7ec',
@@ -1175,7 +1178,8 @@ export class PublicCloudComputeDashboardService {
 
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: '{b}: {c}'
       },
@@ -1384,7 +1388,8 @@ export class PublicCloudComputeDashboardService {
       color: chartRows.map(row => this.getAccountSubscriptionProviderColor(row.provider)),
       // Title is rendered as an HTML header above the chart (see template) so it stays visible in the no-data state.
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' }
       },
       legend: legendName ? {
@@ -1533,7 +1538,7 @@ export class PublicCloudComputeDashboardService {
       data: item.data || []
     }));
     return {
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      tooltip: { appendToBody: true, trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: { show: false },
       grid: { left: 34, right: 12, top: 16, bottom: 24 },
       xAxis: { type: 'category', data: data?.labels || [], axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
@@ -1557,7 +1562,7 @@ export class PublicCloudComputeDashboardService {
       return {};
     }
     return {
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      tooltip: { appendToBody: true, trigger: 'axis', axisPointer: { type: 'shadow' } },
       grid: { left: 34, right: 12, top: 16, bottom: 24 },
       xAxis: { type: 'category', data: bands.map(band => band.label), axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
       yAxis: { type: 'value', min: 0, splitLine: { lineStyle: { color: '#eef1f4' } }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#5c6c82', fontSize: 11 } },
@@ -1574,7 +1579,8 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];
@@ -1613,7 +1619,7 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       color: ['#2f6fed'],
-      tooltip: { trigger: 'axis' },
+      tooltip: { appendToBody: true, trigger: 'axis' },
       legend: { show: false },
       grid: { left: 36, right: 16, top: 12, bottom: 24 },
       xAxis: { type: 'category', boundaryGap: false, data: labels, axisTick: { show: false }, axisLine: { lineStyle: { color: '#dce2e7' } }, axisLabel: { color: '#5c6c82', fontSize: 10 } },
@@ -1774,7 +1780,8 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];
@@ -1804,7 +1811,8 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];
@@ -1832,7 +1840,8 @@ export class PublicCloudComputeDashboardService {
     return {
       color: tiers.map(tier => this.getStorageTierColor(tier.performance_tier)),
       tooltip: {
-        trigger: 'item',
+        appendToBody: true,
+trigger: 'item',
         formatter: (params: any) => `${params?.name}: ${this.formatNumber(params?.value)} volumes`
       },
       title: {
@@ -1976,7 +1985,8 @@ export class PublicCloudComputeDashboardService {
     return {
       color: ['#3bb273', '#e5484d'],
       tooltip: {
-        trigger: 'item',
+        appendToBody: true,
+trigger: 'item',
         formatter: (params: any) => `${params?.name}: ${this.formatNumber(params?.value)}`
       },
       series: [{
@@ -2009,7 +2019,8 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];
@@ -2054,7 +2065,8 @@ export class PublicCloudComputeDashboardService {
     const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return {
       tooltip: {
-        trigger: 'item',
+        appendToBody: true,
+trigger: 'item',
         formatter: (params: any) => `${params?.data?.name}: ${params?.value?.[0] || ''}`
       },
       grid: { left: 90, right: 110, top: 16, bottom: 28 },
@@ -2295,7 +2307,7 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       color: ['#2f6fed'],
-      tooltip: { trigger: 'axis' },
+      tooltip: { appendToBody: true, trigger: 'axis' },
       grid: { left: 44, right: 16, top: 12, bottom: 26 },
       xAxis: {
         type: 'category',
@@ -2348,7 +2360,8 @@ export class PublicCloudComputeDashboardService {
     const items = (points || []).slice().reverse();
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];
@@ -2466,7 +2479,8 @@ export class PublicCloudComputeDashboardService {
     return {
       color: (data || []).map(item => item.color),
       tooltip: {
-        trigger: 'item',
+        appendToBody: true,
+trigger: 'item',
         formatter: (params: any) => `${params.name}<br/>Count: ${params.data.count}<br/>${params.data.percentage}%`
       },
       legend: {
@@ -2696,7 +2710,7 @@ export class PublicCloudComputeDashboardService {
     const total = this.getNumberValue(data?.total) || points.reduce((sum, point) => sum + point.value, 0);
     return {
       color: points.map(point => this.getAlertSeverityChartColor(point.key)),
-      tooltip: { trigger: 'item', formatter: (params: any) => `${params?.name}: ${this.formatNumber(params?.value)}` },
+      tooltip: { appendToBody: true, trigger: 'item', formatter: (params: any) => `${params?.name}: ${this.formatNumber(params?.value)}` },
       title: {
         text: this.formatNumber(total),
         subtext: 'Alerts',
@@ -2733,7 +2747,8 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];
@@ -2758,7 +2773,8 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];
@@ -2944,7 +2960,7 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       color: [PUBLIC_CLOUD_COST_SPEND_COLOR, PUBLIC_CLOUD_COST_SAVINGS_COLOR],
-      tooltip: { trigger: 'item', formatter: (params: any) => `${params?.name}: ${this.formatCostCurrency(params?.value)}` },
+      tooltip: { appendToBody: true, trigger: 'item', formatter: (params: any) => `${params?.name}: ${this.formatCostCurrency(params?.value)}` },
       title: {
         text: this.formatCostCurrency(spend),
         left: 'center',
@@ -2980,7 +2996,8 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];
@@ -3008,7 +3025,8 @@ export class PublicCloudComputeDashboardService {
     }
     return {
       tooltip: {
-        trigger: 'axis',
+        appendToBody: true,
+trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: (params: any) => {
           const row = params && params[0];

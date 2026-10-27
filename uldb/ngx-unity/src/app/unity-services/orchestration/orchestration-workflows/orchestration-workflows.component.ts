@@ -9,7 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { ListSummaryResModel, RelatedServiceCatalog, UnityWorkflow } from './orchestration-workflows.type';
+import { ListSummaryResModel, RelatedServiceCatalog, UnityWorkflow, WorkflowFilterOption } from './orchestration-workflows.type';
 import { CeleryTask, EntityTaskRelation } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { OrchestrationWorkflowCrudComponent } from './orchestration-workflow-crud/orchestration-workflow-crud.component';
@@ -37,7 +37,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     { key: 'categoryName', label: 'Category', widthClass: 'tdw-15', sortable: true, sortField: 'category' },
     { key: 'trigger_type', label: 'Trigger Type', widthClass: 'tdw-15', sortable: true, sortField: 'trigger_type' },
     { key: 'totalTask', label: 'Total Tasks', widthClass: 'tdw-10' },
-    { key: 'createdAt', label: 'Created On', widthClass: 'tdw-20' },
+    { key: 'createdAt', label: 'Created On', widthClass: 'tdw-20', sortable: true, sortField: 'created_at' },
     {
       key: 'workflowStatus', label: 'Status', align: 'center', cellClass: 'status-toggle-column',
       statusToggle: {
@@ -94,34 +94,21 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     private appService: AppMainService,
     private chatbotSvc: UnityChatbotService
   ) {
-    this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ category: null, workflow_status: null }] };
+    this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ category: null, workflow_status: null, trigger_type: null }] };
   }
 
-  get filterConfig(): FilterConfig[] {
-    const filters: FilterConfig[] = [
-      {
-        key: 'workflow_status', label: 'Status', options: [
-          { label: 'Enabled', value: 'Enabled' },
-          { label: 'Disabled', value: 'Disabled' }
-        ]
-      }
-    ];
-    // if (this.viewData.length && !this.isAgentic) {
-    //   filters.unshift({
-    //     key: 'category', label: 'Category', options: [
-    //       { label: 'Provisioning', value: 'Provisioning' },
-    //       { label: 'Integration', value: 'Integration' }
-    //     ]
-    //   });
-    // }
-    return filters;
-  }
+  filterConfig: FilterConfig[] = [
+    { key: 'category', label: 'Category', options: [] },
+    { key: 'workflow_status', label: 'Status', options: [] },
+    { key: 'trigger_type', label: 'Trigger Type', options: [] }
+  ];
 
   get selectedFiltersForTable(): SelectedFilters {
     const result: SelectedFilters = {};
     const params = this.currentCriteria.params[0];
     if (params.category) result['category'] = String(params.category).split(',');
     if (params.workflow_status) result['workflow_status'] = String(params.workflow_status).split(',');
+    if (params.trigger_type) result['trigger_type'] = String(params.trigger_type).split(',');
     return result;
   }
 
@@ -177,6 +164,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     }
     this.resetJsonValue = this.finalJson;
     this.getSummary();
+    this.getFilterOptions();
     this.getWorkflowList();
   }
 
@@ -188,6 +176,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   private applyQueryParamsToCriteria(qp: ParamMap): void {
     this.currentCriteria.params[0].category = qp.get('category') || null;
     this.currentCriteria.params[0].workflow_status = qp.get('workflow_status') || null;
+    this.currentCriteria.params[0].trigger_type = qp.get('trigger_type') || null;
     this.currentCriteria.searchValue = qp.get('search') || '';
 
     this.currentCriteria.sortColumn = qp.get('sortColumn') || '';
@@ -208,6 +197,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
       queryParams: {
         category: params.category || null,
         workflow_status: params.workflow_status || null,
+        trigger_type: params.trigger_type || null,
         search: this.currentCriteria.searchValue || null,
         sortColumn: this.currentCriteria.sortColumn || null,
         sortDirection: this.currentCriteria.sortDirection || null,
@@ -241,6 +231,7 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
   onFiltersApplied(filters: SelectedFilters) {
     this.currentCriteria.params[0].category = filters['category']?.length ? filters['category'].join(',') : null;
     this.currentCriteria.params[0].workflow_status = filters['workflow_status']?.length ? filters['workflow_status'].join(',') : null;
+    this.currentCriteria.params[0].trigger_type = filters['trigger_type']?.length ? filters['trigger_type'].join(',') : null;
     this.currentCriteria.pageNo = 1;
     this.onFilterChange();
   }
@@ -317,6 +308,25 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
     });
   }
 
+  getFilterOptions() {
+    this.svc.getFilterOptions().pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      const optionsByFilter: Record<string, WorkflowFilterOption[]> = {
+        category: data.filters.category,
+        workflow_status: data.filters.workflow_status,
+        trigger_type: data.filters.trigger_type
+      };
+      this.filterConfig = this.filterConfig.map(config => ({
+        ...config,
+        options: (optionsByFilter[config.key] || []).map(option => ({
+          label: option.key,
+          value: option.value
+        }))
+      }));
+    }, () => {
+      this.notification.error(new Notification('Failed to get Workflow Filter Options'));
+    });
+  }
+
   getWorkflowList() {
     this.svc.getWorkflowList(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
       this.count = data.count;
@@ -372,6 +382,14 @@ export class OrchestrationWorkflowsComponent implements OnInit, OnDestroy {
 
   addWorkflow() {
     this.router.navigate(['create'], { relativeTo: this.route });
+  }
+
+  cloneWorkflow(workflow: WorkflowViewData) {
+    if (this.globalReadOnlyUser || workflow.taskId || !workflow.isCreated) return;
+    this.router.navigate(['dynamic-workflow'], {
+      relativeTo: this.route,
+      state: { cloneWorkflowId: workflow.uuid, workflowReturnUrl: this.router.url }
+    });
   }
 
   newWorkflow() {

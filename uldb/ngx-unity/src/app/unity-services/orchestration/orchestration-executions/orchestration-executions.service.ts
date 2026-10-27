@@ -34,8 +34,12 @@ export class OrchestrationExecutionsService {
     return this.http.get(ORCHESTRATION_EXECUTION_LIST_SUMMARY());
   }
 
+  getFilterOptions(): Observable<ExecutionFilterOptions> {
+    return this.http.get<ExecutionFilterOptions>('/api/orchestration/v1/workflow_execution/filter_meta/');
+  }
+
   getFullList(criteria: SearchCriteria): Observable<PaginatedResult<ResultsModel>> {
-    return this.tableService.getData<PaginatedResult<ResultsModel>>(ORCHESTRATION_EXECUTION_FULL_LIST(), criteria);
+    return this.tableService.getData<PaginatedResult<ResultsModel>>('/api/orchestration/v1/workflow_execution/full_list/', criteria);
   }
 
   getExecutionWorkflow(executionId: string, isAgentic: boolean): Observable<ExecutionWorkflowModel> {
@@ -208,6 +212,7 @@ interface CountNameModel {
 interface CountIconModel {
   count: number;
   icon: string;
+  tooltipMessage: string;
 }
 
 export interface TableDataResponseModel {
@@ -250,4 +255,17 @@ export class TableViewModel {
   uuid: string;
   is_advanced: boolean;
   is_agentic: boolean;
+}
+
+export interface ExecutionFilterOption {
+  key: string;
+  value: string;
+}
+
+export interface ExecutionFilterOptions {
+  filters: {
+    execution_status: ExecutionFilterOption[];
+    category: ExecutionFilterOption[];
+    type: ExecutionFilterOption[];
+  };
 }

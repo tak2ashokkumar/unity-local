@@ -154,6 +154,9 @@ export class UserProfileAddModelComponent implements OnInit, OnDestroy {
     }
     this.form.removeControl('model_and_provider');
     let obj = Object.assign({}, this.form.getRawValue());
+    obj.primary_model = obj.model_priority === 'primary';
+    obj.secondary_model = obj.model_priority === 'secondary';
+    delete obj.model_priority;
     if (this.form.invalid) {
       this.formErrors = this.utilService.validateForm(this.form, this.formValidationMessages, this.formErrors);
       console.log('errors : ', this.formErrors);

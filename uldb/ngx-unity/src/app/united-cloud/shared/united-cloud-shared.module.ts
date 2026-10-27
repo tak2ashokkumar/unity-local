@@ -364,6 +364,8 @@ import { VmsListNutanixComponent } from './vms/vms-list-nutanix/vms-list-nutanix
 import { ZabbixEventsComponent } from './zabbix-events/zabbix-events.component';
 import { ZabbixGraphsComponent } from './zabbix-graphs/zabbix-graphs.component';
 import { ZabbixTriggerScriptsComponent } from './zabbix-trigger-scripts/zabbix-trigger-scripts.component';
+import { OciZabbixComponent } from './oci-zabbix/oci-zabbix.component';
+import { ZabbixOciMonitoringConfigComponent } from './oci-zabbix/zabbix-oci-monitoring-config/zabbix-oci-monitoring-config.component';
 /**
  * Change format according to need
  */
@@ -686,6 +688,8 @@ export const MY_NATIVE_FORMATS = {
     BaremetalDetailsComponentsComponent,
     StorageDetailsComponentsComponent,
     VmDetailsComponentsComponent,
+    OciZabbixComponent,
+    ZabbixOciMonitoringConfigComponent,
   ],
   imports: [
     AppCoreModule,

@@ -774,7 +774,7 @@ export class DeviceDetailsComponentsComponent implements OnInit, OnChanges, OnDe
   }
 
   addTargetDevice(inf: InterfaceDetailsType) {
-    this.interfaceCrudSvc.addTargetDeviceForInterface({ uuid: this.deviceId, deviceType: this.deviceType, name: inf.name, description: inf.description });
+    this.interfaceCrudSvc.addTargetDeviceForInterface({ uuid: this.deviceId, deviceType: this.deviceType, interfaceUuid: inf.uuid, name: inf.name, description: inf.description });
   }
 
   onCrud(event: { type: CRUDActionTypes }) {

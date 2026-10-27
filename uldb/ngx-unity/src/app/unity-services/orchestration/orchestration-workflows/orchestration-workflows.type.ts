@@ -143,3 +143,15 @@ export interface ChatHistoryData {
     status?: 'Running' | 'Success' | 'Failed';
 }
 
+export interface WorkflowFilterOption {
+    key: string;
+    value: string;
+}
+
+export interface WorkflowFilterOptions {
+    filters: {
+        category: WorkflowFilterOption[];
+        workflow_status: WorkflowFilterOption[];
+        trigger_type: WorkflowFilterOption[];
+    };
+}

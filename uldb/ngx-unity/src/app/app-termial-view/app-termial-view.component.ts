@@ -40,16 +40,68 @@ export class AppTermialViewComponent implements OnInit, OnDestroy {
     this.changes.disconnect();
   }
 
+  private input: ConsoleAccessInput;
+  private stats: any;
+  private lastStatsAt: Date;
+
   menuInput(input: ConsoleAccessInput) {
-    this.navItems = [
-      {
-        name: `Device Name : ${input.deviceName}`,
-        title: true
-      },
-      {
-        name: `Ip Address : ${input.managementIp}`,
-        title: true
+    this.input = input;
+    this.buildNavItems();
+  }
+
+  menuStats(msg: any) {
+    if (msg && msg.ok) {
+      this.stats = msg.stats;
+      this.lastStatsAt = new Date();
+    } else if (!this.stats) {
+      this.stats = { unavailable: true };
+    }
+    this.buildNavItems();
+  }
+
+  private buildNavItems() {
+    if (!this.input) {
+      return;
+    }
+    const items: any[] = [
+      { name: `Device Name : ${this.input.deviceName}`, title: true },
+      { name: `Ip Address : ${this.input.managementIp}`, title: true }
+    ];
+    const stats = this.stats;
+    if (stats && stats.unavailable) {
+      items.push({ name: 'Stats : Not available', title: true });
+    } else if (stats) {
+      if (stats.cpu_percent !== undefined) {
+        items.push({ name: `CPU : ${stats.cpu_percent}%`, title: true });
       }
-    ]
+      if (stats.memory) {
+        items.push({
+          name: `RAM : ${this.formatKb(stats.memory.used_kb)} / ${this.formatKb(stats.memory.total_kb)} (${stats.memory.percent}%)`,
+          title: true
+        });
+      }
+      for (const disk of (stats.disks || [])) {
+        items.push({
+          name: `Storage ${disk.mount} : ${this.formatKb(disk.used_kb)} / ${this.formatKb(disk.total_kb)} (${disk.percent}%)`
+            + (disk.avail_kb !== undefined ? ` · ${this.formatKb(disk.avail_kb)} free` : ''),
+          title: true
+        });
+      }
+      if (stats.load_avg) {
+        items.push({ name: `Load Avg : ${stats.load_avg.join(' / ')}`, title: true });
+      }
+      if (this.lastStatsAt) {
+        items.push({ name: `Stats updated : ${this.lastStatsAt.toLocaleTimeString()}`, title: true });
+      }
+    }
+    this.navItems = items;
+  }
+
+  private formatKb(kb: number): string {
+    const gb = kb / (1024 * 1024);
+    if (gb >= 1) {
+      return `${gb.toFixed(2)} GB`;
+    }
+    return `${Math.round(kb / 1024)} MB`;
   }
 }

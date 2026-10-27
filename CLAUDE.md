@@ -214,6 +214,20 @@ Listing standard:
     choosing it. Valid example: a table with a conditional column (*ngIf) where the column
     count varies, so equal-split adapts automatically. (reference: firewalls - Cloud column
     is conditional)
+  - EVERY card-fitting table uses a column-sizing directive - it is not optional. (Exception: a
+    deliberately WIDE, horizontally-scrolling table - a fixed min-width wider than the card with
+    more columns than can fit, e.g. the Capacity table's min-width:1200px - cannot fit its columns
+    to the card, so the directives do not apply and it scrolls instead; state the reason when you
+    build one.) The directive only works when each <td>'s content sits in a CHILD ELEMENT:
+    * Put the cell text AND any [tooltip] on an inner element (<div>/<span>/<button>), NEVER bare
+      on the <td>:  `<td class="tdw-20"><div [tooltip]="row.x">{{row.x}}</div></td>`  - NOT
+      `<td class="tdw-20" [tooltip]="row.x">{{row.x}}</td>`. truncateText truncates the td's FIRST
+      child and toggles custom-tooltip-hide from THAT child's overflow, so a bare-<td> tooltip is
+      never suppressed (it shows even with no truncation) and injects as a row-level sibling,
+      shifting the columns while it is open.
+    * Keep cell [tooltip]s INLINE - do NOT add container="body" to them. custom-tooltip-hide is a
+      descendant selector, so it can only hide a tooltip that renders inside the cell.
+      (container="body" is for standalone header icons / controls that are NOT under the directive.)
   Tag fixed columns so the directive excludes them from width distribution:
   checkbox-column, action-icons-column (and status-toggle-column for truncateText).
 
@@ -274,6 +288,14 @@ Dashboard standard:
   onSuccess, onError, loadingKey?) helper (start loader + optional loading flag; takeUntil +
   finalize to stop/clear; subscribe) instead of repeating start/finalize/stop per method.
   (reference: unified-aiops-command-centre)
+- SECTION SEPARATION is owned by each section's own top-level wrapper (the header/title row, or a
+  header-less section wrapper like an orphaned-widgets grid), NEVER by inner card content or by
+  content-dependent adjacency selectors (do NOT rely on `.dashboard-card + .section-title`). The
+  gaps must not change while a widget is loading/empty or when a neighbouring section is hidden by
+  *ngIf. Put a consistent margin-top on the section wrapper
+  (e.g. `.dashboard-content > .section-title { margin-top: 1rem }`) and zero the first child;
+  header-less section wrappers carry their own top margin (mt-3). Inner elements render only their
+  data and add no inter-section margins.
 - The SERVICE converts raw API -> chart configs (convertToXChartData -> UnityChartDetails /
   echarts options). The component holds only view-model state.
 - Chart-click drill-down: bind (chartInit)/(click) -> navigate with queryParams (goToX).
@@ -314,6 +336,10 @@ reason - see the Listing "column-sizing directive" rule above) AND a trackBy on 
 - Do not redesign UI unless requested.
 - Use existing global classes as priority; if explicitly needed prefer scoped class changes.
 - Avoid global style changes unless necessary.
+- SECTION SPACING (dashboards): the vertical gap between sections lives on the section's own
+  top-level wrapper (its header), not on inner elements, and must NOT depend on sibling adjacency
+  (avoid `.dashboard-card + .section-title`). This keeps spacing stable while a widget loads and
+  when a section is conditionally hidden.
 
 ## Mock Data
 - Do not move mock APIs inside Angular apps.

@@ -20,6 +20,7 @@ export class ConsoleAccessComponent implements OnInit, OnDestroy {
   termData: TerminalInput = null;
   private ngUnsubscribe = new Subject();
   @Output() inputLoaded = new EventEmitter<ConsoleAccessInput>();
+  @Output() statsLoaded = new EventEmitter<any>();
 
   closed: boolean = false;
 

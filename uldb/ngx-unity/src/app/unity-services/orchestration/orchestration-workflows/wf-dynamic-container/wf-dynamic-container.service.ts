@@ -94,7 +94,7 @@ export class WfDynamicContainerService {
     let url = '';
     if (workflowId) {
       if (obj.update_meta) {
-        url = `rest/orchestration/agentic_workflow/${workflowId}/?update_meta=true`;
+        url = `api/orchestration/v1/dynamic_workflows/${workflowId}/?update_meta=true`;
         return this.http.put(url, obj.workflow_data);
       } else {
         url = `api/orchestration/v1/dynamic_workflows/${workflowId}/`;

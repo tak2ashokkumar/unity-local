@@ -23,18 +23,19 @@
                     <select id="type" class="form-control" type="text" formControlName="type"
                         [class.is-invalid]="otherDevicesFormErrors.type">
                         <option [value]="'URL'" selected>URL</option>
+                        <option [value]="'Web Console'">Web Console</option>
                     </select>
                     <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.type">
                         {{otherDevicesFormErrors.type}}</div>
                 </div>
-                <div class="col-4 form-group">
+                <div class="form-group" [ngClass]="isWebConsole ? 'col-3' : 'col-4'">
                     <label class="form-col-form-label">Name<em>*</em></label>
                     <input id="name" class="form-control" type="text" formControlName="name" placeholder="Enter Name"
                         [class.is-invalid]="otherDevicesFormErrors.name">
                     <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.name">
                         {{otherDevicesFormErrors.name}}</div>
                 </div>
-                <div class="col-2 form-group">
+                <div class="col-2 form-group" *ngIf="!isWebConsole">
                     <label class="form-col-form-label">Polling Interval</label>
                     <div class="row">
                         <div class="col-6 pr-0">
@@ -53,7 +54,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-4 form-group" formGroupName="collector">
+                <div class="col-3 form-group" *ngIf="isWebConsole">
+                    <label class="form-col-form-label">URL<em>*</em></label>
+                    <input id="url" class="form-control" type="text" formControlName="url" placeholder="Enter URL"
+                        [class.is-invalid]="otherDevicesFormErrors.url">
+                    <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.url">
+                        {{otherDevicesFormErrors.url}}</div>
+                </div>
+                <div class="col-1 form-group" *ngIf="isWebConsole">
+                    <label class="form-col-form-label">Port</label>
+                    <input id="port" class="form-control" type="number" min="1" formControlName="port"
+                        placeholder="Enter Port">
+                </div>
+                <div class="form-group" [ngClass]="isWebConsole ? 'col-3' : 'col-4'" formGroupName="collector">
                     <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
                     <select id="collectorid" class="form-control" formControlName="uuid"
                         [class.is-invalid]="otherDevicesFormErrors.collector.uuid">
@@ -64,7 +77,7 @@
                     <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.collector">
                         {{otherDevicesFormErrors.collector.uuid}}</div>
                 </div>
-                <unity-devices-custom-attributes-crud [deviceType]="deviceType" [deviceAttrs]="otherDevicesForm?.get('custom_attribute_data')?.value" class="w-100"></unity-devices-custom-attributes-crud>
+                <unity-devices-custom-attributes-crud *ngIf="!isWebConsole" [deviceType]="deviceType" [deviceAttrs]="otherDevicesForm?.get('custom_attribute_data')?.value" class="w-100"></unity-devices-custom-attributes-crud>
                 <div class="col-6 form-group">
                     <label class="form-col-form-label">Tag</label>
                     <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
@@ -80,8 +93,53 @@
                     <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.description">
                         {{otherDevicesFormErrors.description}}</div>
                 </div>
+                <div class="col-6 form-group" *ngIf="isWebConsole">
+                    <label class="form-col-form-label mb-2">Credentials</label>
+                    <div class="row align-items-start mx-0">
+                        <div class="col-auto custom-control custom-radio mt-2">
+                            <input id="local_radio" type="radio" class="custom-control-input" value="local" formControlName="cred">
+                            <label class="custom-control-label" for="local_radio">Local</label>
+                        </div>
+                        <div class="col-4" *ngIf="otherDevicesForm.get('cred')?.value == 'local'">
+                            <div class="d-flex align-items-center">
+                                <select id="credentials" class="form-control text-dark" formControlName="credentials"
+                                    [ngClass]="{'is-invalid' : otherDevicesFormErrors.credentials}">
+                                    <option value="" disabled>Select Credential</option>
+                                    <option *ngFor="let cred of credentialList" [value]="cred.uuid"> {{cred.name}}</option>
+                                </select>
+                                <button type="button" class="btn btn-link text-danger p-0 ml-2" (click)="clearCredential()"
+                                    aria-label="Clear credential" tooltip="Clear credential">
+                                    <i class="far fa-times-circle" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.credentials">
+                                {{otherDevicesFormErrors.credentials}}
+                            </div>
+                        </div>
+                        <div class="col-auto custom-control custom-radio mt-2 ml-3">
+                            <input id="my_credential_radio" type="radio" class="custom-control-input" value="my_cred"
+                                formControlName="cred">
+                            <label class="custom-control-label" for="my_credential_radio">My Credential</label>
+                        </div>
+                        <div class="col" *ngIf="otherDevicesForm.get('cred')?.value == 'my_cred'">
+                                <input id="login_username" class="form-control text-dark" type="text" formControlName="login_username"
+                                    [class.is-invalid]="otherDevicesFormErrors.login_username" placeholder="Enter Username">
+                            <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.login_username">
+                                {{otherDevicesFormErrors.login_username}}
+                            </div>
+                        </div>
+                        <div class="col" *ngIf="otherDevicesForm.get('cred').value == 'my_cred'">
+                            <custom-password-field formControlName="login_password"
+                                [options]="{errors:otherDevicesFormErrors.login_password, placeholder:'Enter Password'}"
+                                [isDisabled]="otherDevicesForm.get('login_password').disabled"></custom-password-field>
+                            <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.login_password">
+                                {{otherDevicesFormErrors.login_password}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="row mt--4">
+            <div class="row mt-3" *ngIf="!isWebConsole">
                 <div class="col-12">
                     <label class="d-inline-block">Monitoring Configuration :</label>
                     <div class="d-inline-block ml-2">
@@ -104,7 +162,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mx-0 mt-4 bordered-container font-xs-sm" *ngIf="otherDevicesForm.controls.is_monitoring.value">
+            <div class="row mx-0 mt-4 bordered-container font-xs-sm" *ngIf="!isWebConsole && otherDevicesForm.controls.is_monitoring.value">
                 <div class="col pb-2 px-0 border rounded position-relative">
                     <div class="bg-white position-absolute section-name-one text-muted font-sm">Monitoring Configuration
                     </div>
@@ -282,7 +340,8 @@
         </form>
     </div>
     <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
-        <button class="btn btn-primary" type="button" (click)="onSubmit()">Submit</button>
+        <button class="btn btn-primary" type="button" (click)="onSubmit()" accessControl moduleName="Datacenter"
+            accessType="Manage Datacenter" elementType="btn">Submit</button>
         <button class="btn btn-outline-danger ml-3" type="button" (click)="goBack()">Back</button>
     </div>
 </div>

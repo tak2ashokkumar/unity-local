@@ -49,6 +49,7 @@ import { LeftPanelRouteAccessGuard } from '../shared/app-guards/left-panel-route
 import { TokenBillingComponent } from './token-billing/token-billing.component';
 import { TokenBillingDashboardComponent } from './token-billing/token-billing-dashboard/token-billing-dashboard.component';
 import { TokenBillingTracingComponent } from './token-billing/token-billing-tracing/token-billing-tracing.component';
+import { TokenBillingAgentsComponent } from './token-billing/token-billing-agents/token-billing-agents.component';
 
 const routes: Routes = [
   {
@@ -76,6 +77,11 @@ const routes: Routes = [
       {
         path: 'tracing',
         component: TokenBillingTracingComponent,
+        data: { title: 'Token Billing' },
+      },
+      {
+        path: 'agents',
+        component: TokenBillingAgentsComponent,
         data: { title: 'Token Billing' },
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

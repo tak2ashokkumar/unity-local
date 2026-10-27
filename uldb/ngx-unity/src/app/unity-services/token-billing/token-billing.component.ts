@@ -32,4 +32,5 @@ export class TokenBillingComponent implements OnInit, OnDestroy {
 const TOKEN_BILLING_TABS: TabData[] = [
   { name: 'Dashboard', url: '/services/token-billing/dashboard' },
   { name: 'Tracing',   url: '/services/token-billing/tracing' },
+  { name: 'Agents',    url: '/services/token-billing/agents' },
 ];

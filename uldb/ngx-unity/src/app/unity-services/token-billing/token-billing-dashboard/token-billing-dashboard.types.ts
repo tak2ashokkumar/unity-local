@@ -453,7 +453,7 @@ interface LangfuseScoreMetric {
   source: string;
   from_date: string;
   to_date: string;
-  percentage: number;
+  percentage?: number;
   max_score: number;
 }
 
@@ -497,6 +497,21 @@ export interface LangfuseGuardrailMetricsResponse {
   jailbreak_prompt_injection_rate?: LangfuseScoreMetric;
   bias_fairness_score?: LangfuseScoreMetric;
   source?: string;
+}
+
+export interface LangfuseRagMetricsResponse {
+  time_window: {
+    from_date: string;
+    to_date: string;
+  };
+  grounding_score?: LangfuseScoreMetric;
+  context_relevance_score?: LangfuseScoreMetric;
+  retrieval_precision?: LangfuseScoreMetric;
+  context_recall?: LangfuseScoreMetric;
+  retrieval_latency_ms?: LangfuseScoreMetric;
+  context_precision?: LangfuseScoreMetric;
+  retrieval_recall?: LangfuseScoreMetric;
+  chunk_utilization?: LangfuseScoreMetric;
 }
 
 interface LangfuseMcpRateMetric {
@@ -556,4 +571,72 @@ export interface LangfuseMcpMetricsResponse {
   mcp_tool_call_error_rate: LangfuseMcpRateMetric & {
     by_type: { [key: string]: number };
   };
+}
+
+interface LangfuseAgentScoreMetric extends LangfuseScoreMetric {
+  agent: string;
+  agent_tags: string[];
+}
+
+export interface LangfuseAgentMetrics {
+  agent: string;
+  agent_tags: string[];
+  regression_rate_post_update?: LangfuseAgentScoreMetric;
+  hallucination_rate?: LangfuseAgentScoreMetric;
+  error_recovery_self_correction_rate?: LangfuseAgentScoreMetric;
+  agent_loop_stuck_detection?: LangfuseAgentScoreMetric;
+  faithfulness_score?: LangfuseAgentScoreMetric;
+  answer_completeness?: LangfuseAgentScoreMetric;
+  factual_accuracy_score?: LangfuseAgentScoreMetric;
+  answer_relevancy_trend?: LangfuseAgentScoreMetric;
+  format_compliance_rate?: LangfuseAgentScoreMetric;
+  relevance_score?: LangfuseAgentScoreMetric;
+  agent_cost_per_task?: {
+    average_cost_per_task_usd: number;
+    total_cost_usd: number;
+    task_count: number;
+    unit: string;
+  };
+  steps_per_task?: {
+    by_session: Array<{ session_id: string; steps: number }>;
+    total_steps: number;
+    avg_steps: number;
+    task_count: number;
+  };
+  tool_call_success_rate?: {
+    sample_count: number;
+    value: number | null;
+    successful_call_count: number;
+    failed_call_count: number;
+  };
+  end_to_end_agent_latency?: {
+    p50_ms: number;
+    p95_ms: number;
+    p99_ms: number;
+    min_ms: number;
+    avg_ms: number;
+    max_ms: number;
+    request_count: number;
+    unit: string;
+  };
+  tool_call_latency?: {
+    tool_latencies: Array<{
+      [key: string]: string | number;
+      tool: string;
+      p50_ms: number;
+      p95_ms: number;
+      p99_ms: number;
+      avg_ms: number;
+    }>;
+  };
+}
+
+export interface LangfuseAgentsMetricsResponse {
+  time_window: {
+    from_date: string;
+    to_date: string;
+  };
+  source: string;
+  dropdown_menu: string[];
+  agents: { [agent: string]: LangfuseAgentMetrics };
 }

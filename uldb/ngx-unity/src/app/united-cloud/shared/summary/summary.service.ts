@@ -121,6 +121,16 @@ export class SummaryService {
         view.newTabWebAccessUrl = null;
         view.newTabTooltipMessage = data.remote_web_access?.message || 'Remote web access unavailable';
         view.deviceType = 'proxmox/cluster';
+      } else if (platFormType == PlatFormMapping.HYPER_V) {
+        view.remoteWebAccess = data.remote_web_access;
+        view.isSameTabEnabled = false;
+        view.sameTabWebAccessUrl = null;
+        view.sameTabTooltipMessage = 'Remote web access opens in a new viewer tab';
+        view.isNewTabEnabled = !!data.remote_web_access?.can_create_session;
+        view.showRemoteWebAccessButton = view.isNewTabEnabled;
+        view.newTabWebAccessUrl = null;
+        view.newTabTooltipMessage = data.remote_web_access?.message || 'Remote web access unavailable';
+        view.deviceType = 'hyperv';
       }
     } else {
       view.isSameTabEnabled = false;

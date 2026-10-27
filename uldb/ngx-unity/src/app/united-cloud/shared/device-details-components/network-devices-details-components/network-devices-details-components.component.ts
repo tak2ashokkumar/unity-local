@@ -2,11 +2,15 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, CRUDActionTypes, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { NetworkDeviceHWComponentsViewData, NetworkDeviceIPAddressViewData, NetworkDeviceInterfacesViewData, NetworkDeviceMacAddressViewData, NetworkDeviceOSViewData, NetworkDevicesDetailsComponentsService } from './network-devices-details-components.service';
 import { NetworkDevicesDetailsComponents } from './network-devices-details-components.type';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
+import { DeviceInterfaceCrudService } from 'src/app/app-shared-crud/device-interface-crud/device-interface-crud.service';
+import { RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
+import { Router } from '@angular/router';
+import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 
 @Component({
   selector: 'network-devices-details-components',
@@ -32,7 +36,11 @@ export class NetworkDevicesDetailsComponentsComponent implements OnInit, OnDestr
 
   constructor(private svc: NetworkDevicesDetailsComponentsService,
     private spinner: AppSpinnerService,
-    private refreshService: DataRefreshBtnService) {
+    private refreshService: DataRefreshBtnService,
+    private interfaceCrudSvc: DeviceInterfaceCrudService,
+    private utilSvc: AppUtilityService,
+    private router: Router,
+    private storage: StorageService) {
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.refreshService.refreshAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
       setTimeout(() => {
@@ -134,6 +142,56 @@ export class NetworkDevicesDetailsComponentsComponent implements OnInit, OnDestr
       default:
         this.getIpAddressData();
         break;
+    }
+  }
+
+  goToTargetDeviceDetails(remoteDevice: RemoteDevicesType): void {
+    if (!remoteDevice.target_device_type || !remoteDevice.target_device_uuid) {
+      return;
+    }
+    const deviceMapping = this.utilSvc.getDeviceMappingByDeviceType(remoteDevice.target_device_type);
+    const isMonitoringConfigured: boolean = remoteDevice.target_device_monitoring?.configured;
+    const baseURL = this.utilSvc.getDeviceBaseURL(remoteDevice);
+    const url = `/${remoteDevice.target_device_uuid}/zbx/details/`;
+
+    this.router.navigateByUrl(baseURL, { skipLocationChange: true }).then(() => {
+      if (baseURL.includes('devices') || baseURL.includes('datacenter')) {
+        if (deviceMapping === DeviceMapping.DB_SERVER) {
+          this.storage.put('device', { name: remoteDevice.target_device, deviceType: deviceMapping, configured: isMonitoringConfigured, monitoringEnabled: remoteDevice.target_device_monitoring.enabled }, StorageType.SESSIONSTORAGE);
+        } else if (deviceMapping === DeviceMapping.BARE_METAL_SERVER) {
+          this.storage.put('device', { name: remoteDevice.target_device, deviceType: deviceMapping, configured: isMonitoringConfigured, uuid: remoteDevice.target_device_uuid }, StorageType.SESSIONSTORAGE);
+        } else {
+          this.storage.put('device', { name: remoteDevice.target_device, deviceType: deviceMapping, configured: isMonitoringConfigured }, StorageType.SESSIONSTORAGE);
+          if (deviceMapping === DeviceMapping.MERAKI_DEVICE) {
+            this.storage.put('meraki', { name: remoteDevice.target_account_name, deviceType: DeviceMapping.MERAKI_ACCOUNT }, StorageType.SESSIONSTORAGE);
+            this.storage.put('merakiOrganization', { name: remoteDevice.target_organization_name, deviceType: DeviceMapping.MERAKI_ORG }, StorageType.SESSIONSTORAGE);
+          } else if (deviceMapping === DeviceMapping.VIPTELA_DEVICE) {
+            this.storage.put('viptela', { name: remoteDevice.target_account_name, deviceType: DeviceMapping.VIPTELA_ACCOUNT }, StorageType.SESSIONSTORAGE);
+          }
+        }
+      }
+      this.router.navigate([`${baseURL}${url}`]);
+    });
+  }
+
+  getTooltipMsgForAddTargetDevice(inf: NetworkDeviceInterfacesViewData): string {
+    if (!inf.name && !inf.description) {
+      return 'Interface Name and Description are required';
+    } else if (!inf.name) {
+      return 'Interface Name is required';
+    } else if (!inf.description) {
+      return 'Interface Description is required';
+    }
+    return 'Add Target Device';
+  }
+
+  addTargetDevice(inf: NetworkDeviceInterfacesViewData): void {
+    this.interfaceCrudSvc.addTargetDeviceForInterface({ uuid: this.deviceId, deviceType: this.deviceType, interfaceUuid: inf.tokenId, name: inf.name, description: inf.description });
+  }
+
+  onCrud(event: { type: CRUDActionTypes }): void {
+    if (event.type === CRUDActionTypes.ADD) {
+      this.getInterfaceData();
     }
   }
 }

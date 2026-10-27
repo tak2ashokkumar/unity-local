@@ -4,7 +4,7 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, from, interval } from 'rxjs';
-import { filter, mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { filter, finalize, mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -20,6 +20,8 @@ import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/s
 import { environment } from 'src/environments/environment';
 import { OtherDevice, OtherDeviceUrl } from '../entities/other-device.type';
 import { OtherDevicesSummaryViewData, OtherDevicesViewData, OtherdevicesService } from './otherdevices.service';
+import { RemoteAccessService } from 'src/app/shared/remote-access/remote-access.service';
+import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 
 @Component({
   selector: 'otherdevices',
@@ -47,6 +49,22 @@ export class OtherdevicesComponent implements OnInit, OnDestroy {
   nonFieldErr: string = '';
   tagsAutocompleteItems: string[] = [];
   summaryData: OtherDevicesSummaryViewData;
+  remoteWebLaunching: boolean = false;
+  categoryList: string[] = ['URL', 'Web Console', 'NA'];
+  categorySettings: IMultiSelectSettings = {
+    isSimpleArray: true,
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block',
+    dynamicTitleMaxItems: 1,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    appendToBody: true
+  };
+  categoryTexts: IMultiSelectTexts = {
+    defaultTitle: 'Select Category'
+  };
 
   @ViewChild('deleteModel') deleteModel: ElementRef;
   @ViewChild('bulkDeleteModel') bulkDeleteModel: ElementRef;
@@ -70,14 +88,95 @@ export class OtherdevicesComponent implements OnInit, OnDestroy {
     private storageService: StorageService,
     private utilService: AppUtilityService,
     private ticketService: SharedCreateTicketService,
+    private remoteAccess: RemoteAccessService,
   ) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
-      this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ 'uuid': this.pcId }] };
+      this.currentCriteria = {
+        sortColumn: '',
+        sortDirection: '',
+        searchValue: '',
+        pageNo: 1,
+        pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE,
+        params: [{ 'uuid': this.pcId }],
+        multiValueParam: { type: [...this.categoryList] }
+      };
     });
     this.termService.isOpenAnnounced$.pipe(tap(res => this.poll = res),
       switchMap(res => interval(environment.pollingInterval).pipe(takeWhile(() => this.poll), takeUntil(this.ngUnsubscribe))),
       takeUntil(this.ngUnsubscribe)).subscribe(x => this.getDevices());
+  }
+
+  remoteWebAccessNewTab(view: OtherDevicesViewData): void {
+    if (!view?.showRemoteWebAccessButton || this.remoteWebLaunching) {
+      return;
+    }
+    const resourceId = view.remoteWebAccess?.resource_id || view.deviceId;
+    if (!resourceId) {
+      this.notification.error(new Notification('Unable to open web console. Resource identifier is missing.'));
+      return;
+    }
+    const viewerWindow = this.openIsolatedViewerTab();
+    if (!viewerWindow) {
+      this.notification.error(new Notification('Popup blocked. Allow popups for UnityOne and try opening the web console again.'));
+      return;
+    }
+
+    this.remoteWebLaunching = true;
+    const resourceType = view.remoteWebAccess?.resource_type || 'customdevice';
+    this.remoteAccess.createWebLaunch(resourceId, resourceType)
+      .pipe(
+        takeUntil(this.ngUnsubscribe),
+        finalize(() => this.remoteWebLaunching = false)
+      )
+      .subscribe(launch => {
+        if (!launch.viewerUrl) {
+          viewerWindow.close();
+          this.notification.error(new Notification('Remote web viewer URL was not returned by UnityOne.'));
+          return;
+        }
+        this.appService.updateActivityLog('servers', view.deviceId);
+        viewerWindow.location.replace(launch.viewerUrl);
+      }, err => {
+        viewerWindow.close();
+        this.notification.error(new Notification(this.remoteWebErrorMessage(err)));
+      });
+  }
+
+  testConnection(view: OtherDevicesViewData): void {
+    if (!view?.deviceId || view.type !== 'Web Console') {
+      return;
+    }
+    this.spinnerService.start('main');
+    this.otherDevicesService.testConnection(view.deviceId)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((res: any) => {
+        this.spinnerService.stop('main');
+        if (Number(res?.status) === 1) {
+          this.notification.success(new Notification('Connection successful.'));
+        } else {
+          this.notification.error(new Notification('Connection failed.'));
+        }
+      }, (err: HttpErrorResponse) => {
+        this.spinnerService.stop('main');
+        this.notification.error(new Notification(err.error?.error || 'Unable to test the connection.'));
+      });
+  }
+
+  private openIsolatedViewerTab(): Window | null {
+    const viewerWindow = window.open('about:blank', '_blank');
+    if (viewerWindow) {
+      viewerWindow.opener = null;
+      try {
+        viewerWindow.document.title = 'Opening UnityOne Remote Web Viewer';
+        viewerWindow.document.body.innerHTML = '<div style="font-family:Arial,sans-serif;padding:24px;">Opening UnityOne Remote Web Viewer...</div>';
+      } catch (e) { }
+    }
+    return viewerWindow;
+  }
+
+  private remoteWebErrorMessage(err: any): string {
+    return err?.error?.error || err?.error?.detail || err?.message || 'Unable to create remote web session. Please try again or contact support.';
   }
 
   ngOnInit() {
@@ -106,6 +205,12 @@ export class OtherdevicesComponent implements OnInit, OnDestroy {
 
   onSearched(event: string) {
     this.currentCriteria.searchValue = event;
+    this.currentCriteria.pageNo = 1;
+    this.getDevices();
+  }
+
+  onCategoryFilterChange() {
+    this.spinnerService.start('main');
     this.currentCriteria.pageNo = 1;
     this.getDevices();
   }
@@ -165,7 +270,7 @@ export class OtherdevicesComponent implements OnInit, OnDestroy {
   }
 
   getDeviceData() {
-    from(this.viewData).pipe(filter(device => device.type != 'URL'),
+    from(this.viewData).pipe(filter(device => device.type != 'URL' && device.type != 'Web Console'),
       mergeMap((e) => this.otherDevicesService.getDeviceData(e)),
       takeUntil(this.ngUnsubscribe))
       .subscribe(res => { },

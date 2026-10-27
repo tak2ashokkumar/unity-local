@@ -93,7 +93,7 @@ export class PublicCloudAzureSummaryDetailsComponent implements OnInit, OnDestro
   virtualNetworks: AzureVirtalNetwork[] = [];
   virtualNetworkSubnets: AzureVirtalNetworkSubnet[] = [];
   vnet: string;
-  allowedStatsResources = ['Virtual Machines', 'Storage Accounts', 'Flexible Servers', 'Servers/Databases', 'Database Accounts'];
+  allowedStatsResources = ['Virtual Machines', 'Storage Accounts', 'Flexible Servers', 'Servers/Databases', 'Database Accounts', 'Virtual Machine Scale Sets'];
 
 
   accountDetailsSettings: IMultiSelectSettings = {

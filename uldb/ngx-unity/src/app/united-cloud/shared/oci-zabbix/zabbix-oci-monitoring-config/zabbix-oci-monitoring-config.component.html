@@ -1,0 +1,122 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded-0">
+            <div class="card-body">
+                <form [formGroup]="form" *ngIf="form">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-4">
+                            <label class="form-col-form-label" for="user_ocid">User ID<em>*</em></label>
+                            <input id="user_ocid" class="form-control" formControlName="user_ocid" type="text"
+                                [class.is-invalid]="formErrors.user_ocid">
+                            <div class="invalid-feedback" *ngIf="formErrors.user_ocid">{{formErrors.user_ocid}}</div>
+                        </div>
+
+                        <div class="form-group col-4">
+                            <label class="form-col-form-label" for="tenancy_ocid">Tenancy ID<em>*</em></label>
+                            <input id="tenancy_ocid" class="form-control" formControlName="tenancy_ocid" type="text"
+                                [class.is-invalid]="formErrors.tenancy_ocid">
+                            <div class="invalid-feedback" *ngIf="formErrors.tenancy_ocid">{{formErrors.tenancy_ocid}}</div>
+                        </div>
+
+                        <div class="form-group col-4">
+                            <label class="form-col-form-label" for="region">Region<em>*</em></label>
+                            <multiselect-dropdown id="region" [options]="regions" [settings]="regionSettings"
+                                class="form-control p-0" style="height:auto;" formControlName="region"
+                                [ngClass]="{'is-invalid' : formErrors.region}"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.region">{{formErrors.region}}</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-4">
+                            <label class="form-col-form-label" for="fingerprint">Fingerprint<em>*</em></label>
+                            <input id="fingerprint" class="form-control" formControlName="fingerprint" type="text"
+                                [class.is-invalid]="formErrors.fingerprint">
+                            <div class="invalid-feedback" *ngIf="formErrors.fingerprint">{{formErrors.fingerprint}}</div>
+                        </div>
+
+                        <div class="form-group col-4">
+                            <label class="form-col-form-label" for="file-pem-input">Private Key<em>*</em></label>
+                            <input id="file-pem-input" class="form-control" name="file-pem-input" type="file"
+                                accept=".pem" [ngClass]="{'is-invalid' : formErrors.key_content}"
+                                (change)="handlePrivateKeyInput($event.target.files)">
+                            <div class="invalid-feedback" *ngIf="formErrors.key_content">{{formErrors.key_content}}</div>
+                        </div>
+
+                        <div class="form-group col-4" formGroupName="collector">
+                            <label class="form-col-form-label" for="collectoruuid">Collector<em>*</em></label>
+                            <select id="collectoruuid" class="form-control" formControlName="uuid"
+                                [class.is-invalid]="formErrors.collector.uuid">
+                                <option value="" disabled>Select Collector</option>
+                                <option *ngFor="let collector of collectors" [value]="collector.uuid">
+                                    {{collector.name}}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.collector.uuid">
+                                {{formErrors.collector.uuid}}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer bg-transparent border-top-0">
+                <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                    [disabled]="form && form.pristine" (click)="confirmMonitoringConfig()"
+                    accessControl moduleName="Monitoring" accessType="Manage Monitoring" elementType="btn">
+                    Activate Monitoring
+                </button>
+
+                <button class="btn btn-sm btn-warning pull-right ml-1" type="button" *ngIf="monitoringDetails"
+                    [disabled]="form && form.pristine" (click)="buildForm()">
+                    Reset
+                </button>
+
+                <button class="btn btn-sm btn-danger pull-right ml-1" type="button" *ngIf="monitoringDetails"
+                    (click)="deleteMonitoringConfig()" accessControl moduleName="Monitoring"
+                    accessType="Manage Monitoring" elementType="btn">
+                    Delete
+                </button>
+
+                <button class="btn btn-sm btn-primary pull-right ml-1" type="button"
+                    *ngIf="monitoring && monitoring.configured && !monitoring.enabled"
+                    (click)="toggleMonitoring()" accessControl moduleName="Monitoring"
+                    accessType="Manage Monitoring" elementType="btn">
+                    Enable
+                </button>
+
+                <button class="btn btn-sm btn-primary pull-right ml-1" type="button"
+                    *ngIf="monitoring && monitoring.configured && monitoring.enabled"
+                    (click)="toggleMonitoring()" accessControl moduleName="Monitoring"
+                    accessType="Manage Monitoring" elementType="btn">
+                    Disable
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This monitoring configuration will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteConfig()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="confirmDeleteModalRef.hide()">No</button>
+        </div>
+    </div>
+</ng-template>

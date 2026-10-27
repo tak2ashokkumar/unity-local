@@ -85,6 +85,7 @@ import {
   UnifiedAiopsExecutiveTotals,
   UnifiedAiopsExecutiveView,
   UnifiedAiopsPrivateCloudGeoLegendItem,
+  UnifiedAiopsPrivateCloudGeoResourceRow,
   UnifiedAiopsPrivateCloudGeoSite,
   UnifiedAiopsPrivateCloudGeoSummary,
   UnifiedAiopsPrivateCloudGeoView,
@@ -1436,7 +1437,7 @@ export class NavigatorCentralService {
     const resourceRows = (site.resourceRows || []).map(resource => `
       <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
         <span style="display:flex;align-items:center;gap:8px;color:#5b6671;">
-          <i class="${resource.iconClass}" style="width:14px;text-align:center;font-size:12px;color:${resource.iconColor};"></i>${this.escapeTooltipText(resource.label)}
+          <i class="${resource.iconClass}" style="width:14px;text-align:center;font-size:12px;color:${resource.iconColor};"></i>${this.escapeTooltipText(this.getPrivateCloudGeoResourceLabel(site, resource))}
         </span>
         <span style="font-weight:600;color:${neutralValueColor};">${this.formatNumber(resource.count)}</span>
       </div>`).join('');
@@ -1456,6 +1457,13 @@ export class NavigatorCentralService {
       ${resourceRows ? '<div style="border-top:1px solid #e8edf1;margin:6px 0;"></div>' : ''}
       ${resourceRows}
     </div>`;
+  }
+
+  private getPrivateCloudGeoResourceLabel(site: UnifiedAiopsPrivateCloudGeoSite, resource: UnifiedAiopsPrivateCloudGeoResourceRow): string {
+    if (site?.platformKey === 'vmware' && resource?.key === 'hypervisor') {
+      return 'Hypervisors';
+    }
+    return resource?.label || '';
   }
   /*
    * ******End ****** Private Cloud Geo Distribution Widget Related ********************

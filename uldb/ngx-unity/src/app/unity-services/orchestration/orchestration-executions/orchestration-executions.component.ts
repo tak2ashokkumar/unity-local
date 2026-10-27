@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ListSummaryModel, ListSummaryViewModel, OrchestrationExecutionsService, TableViewModel } from './orchestration-executions.service';
+import { ListSummaryModel, ListSummaryViewModel, OrchestrationExecutionsService, TableViewModel, ExecutionFilterOption } from './orchestration-executions.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -22,7 +22,7 @@ export class OrchestrationExecutionsComponent implements OnInit, OnDestroy {
     { key: 'templateName', label: 'Template Name', widthClass: 'tdw-20', sortable: true, sortField: 'template_name', locked: true },
     { key: 'type', label: 'Type', widthClass: 'tdw-10', sortable: true, sortField: 'type' },
     { key: 'category', label: 'Category', widthClass: 'tdw-10', sortable: true, sortField: 'category' },
-    { key: 'startTime', label: 'Started On', widthClass: 'tdw-15' },
+    { key: 'startTime', label: 'Started On', widthClass: 'tdw-15', sortable: true, sortField: 'start_time' },
     { key: 'createdBy', label: 'Executed By', widthClass: 'tdw-10', sortable: true, sortField: 'created_by' },
     { key: 'duration', label: 'Duration', widthClass: 'tdw-10' },
     { key: 'statusIcon', label: 'Status', align: 'center' },
@@ -36,20 +36,17 @@ export class OrchestrationExecutionsComponent implements OnInit, OnDestroy {
   activeSortField: string | null = null;
   activeSortDirection: SortDirection = null;
 
-  get filterConfig(): FilterConfig[] {
-    return [
-      {
-        key: 'type', label: 'Type', options: [
-          { label: 'Task', value: 'task' },
-          { label: 'Agentic', value: 'agentic' }
-        ]
-      }
-    ];
-  }
+  filterConfig: FilterConfig[] = [
+    { key: 'execution_status', label: 'Status', options: [] },
+    { key: 'category', label: 'Category', options: [] },
+    { key: 'type', label: 'Type', options: [] }
+  ];
 
   get selectedFiltersForTable(): SelectedFilters {
     const result: SelectedFilters = {};
     const params = this.currentCriteria.params[0];
+    if (params.execution_status) result['execution_status'] = String(params.execution_status).split(',');
+    if (params.category) result['category'] = String(params.category).split(',');
     if (params.type) result['type'] = String(params.type).split(',');
     return result;
   }
@@ -61,13 +58,14 @@ export class OrchestrationExecutionsComponent implements OnInit, OnDestroy {
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
   ) {
-    this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ type: null }] };
+    this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ execution_status: null, category: null, type: null }] };
   }
 
   ngOnInit(): void {
     this.spinner.start('main');
     this.restoreCriteria();
     this.getListSummary();
+    this.getFilterOptions();
     this.getFullList();
   }
 
@@ -83,6 +81,8 @@ export class OrchestrationExecutionsComponent implements OnInit, OnDestroy {
   }
 
   private applyQueryParamsToCriteria(qp: ParamMap): void {
+    this.currentCriteria.params[0].execution_status = qp.get('execution_status') || null;
+    this.currentCriteria.params[0].category = qp.get('category') || null;
     this.currentCriteria.params[0].type = qp.get('type') || null;
     this.currentCriteria.searchValue = qp.get('search') || '';
     this.currentCriteria.sortColumn = qp.get('sortColumn') || '';
@@ -100,6 +100,8 @@ export class OrchestrationExecutionsComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
+        execution_status: params.execution_status || null,
+        category: params.category || null,
         type: params.type || null,
         search: this.currentCriteria.searchValue || null,
         sortColumn: this.currentCriteria.sortColumn || null,
@@ -121,6 +123,8 @@ export class OrchestrationExecutionsComponent implements OnInit, OnDestroy {
   }
 
   onFiltersApplied(filters: SelectedFilters) {
+    this.currentCriteria.params[0].execution_status = filters['execution_status']?.length ? filters['execution_status'].join(',') : null;
+    this.currentCriteria.params[0].category = filters['category']?.length ? filters['category'].join(',') : null;
     this.currentCriteria.params[0].type = filters['type']?.length ? filters['type'].join(',') : null;
     this.currentCriteria.pageNo = 1;
     this.onFilterChange();
@@ -174,6 +178,25 @@ export class OrchestrationExecutionsComponent implements OnInit, OnDestroy {
     });
   }
 
+  getFilterOptions() {
+    this.orchestrationExecutionService.getFilterOptions().pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      const optionsByFilter: Record<string, ExecutionFilterOption[]> = {
+        execution_status: data.filters.execution_status,
+        category: data.filters.category,
+        type: data.filters.type
+      };
+      this.filterConfig = this.filterConfig.map(config => ({
+        ...config,
+        options: (optionsByFilter[config.key] || []).map(option => ({
+          label: option.key,
+          value: option.value
+        }))
+      }));
+    }, () => {
+      this.notification.error(new Notification('Failed to get Execution Filter Options'));
+    });
+  }
+
   getFullList() {
     this.orchestrationExecutionService.getFullList(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
       this.count = data.count;
@@ -223,12 +246,12 @@ export class OrchestrationExecutionsComponent implements OnInit, OnDestroy {
       });
   }
 
-  getStatusClass(item: { name: string }): string {
+  getStatusClass(item: { tooltipMessage: string }): string {
     return {
       'Success': 'text-success',
       'Failed': 'text-danger',
       'In Progress': 'text-primary'
-    }[item.name];
+    }[item.tooltipMessage];
   }
 
   get popoverCategories(): any[] {

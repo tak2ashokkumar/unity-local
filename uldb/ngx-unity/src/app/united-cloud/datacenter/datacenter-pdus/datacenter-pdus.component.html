@@ -58,6 +58,27 @@
             <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
           </td>
           <td class="action-icons-column">
+            <span dropdown placement="bottom right" container="body">
+              <button id="pdu-access-button-{{view.pduId}}" class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
+                data-toggle="dropdown" [disabled]="!view.isNewTabEnabled" aria-controls="pdu-access-menu-{{view.pduId}}"
+                dropdownToggle (click)="false" [tooltip]="view.newTabTootipMessage" container="body"
+                [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}" accessControl moduleName="Datacenter"
+                accessType="Remote Management" elementType="actionbtn" aria-label="Remote Access"></button>
+              <div id="pdu-access-menu-{{view.pduId}}" class="dropdown-menu dropdown-menu-right" *dropdownMenu
+                aria-labelledby="pdu-access-button-{{view.pduId}}">
+                <button type="button" class="dropdown-item"
+                  [title]="view.newTabConsoleAccessUrl ? 'Open SSH in a new tab' : 'Management IP or IP Address is not configured'"
+                  [ngClass]="view.newTabConsoleAccessUrl?'text-primary':'text-secondary disabled'"
+                  [disabled]="!view.newTabConsoleAccessUrl" (click)="cliAccessNewTab(view)">
+                  <span class="fas fa-terminal mr-2"></span>CLI Access
+                </button>
+                <button type="button" class="dropdown-item" [title]="view.remoteWebTooltipMessage"
+                  [ngClass]="view.showRemoteWebAccessButton && !remoteWebLaunching?'text-primary':'text-secondary disabled'"
+                  [disabled]="!view.showRemoteWebAccessButton || remoteWebLaunching" (click)="remoteWebAccessNewTab(view)">
+                  <span class="fas fa-desktop mr-2"></span>Web Console
+                </button>
+              </div>
+            </span>
             <button class="action-icons mb-0 fa fa-recycle font-sm ml-1" [tooltip]="view.recycleIconTooltip"
               (click)="showRecycleDetails(view)" [ngClass]="{'action-icons-disabled':!view.recycleIconEnabled}"
               accessControl moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn">

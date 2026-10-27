@@ -7,7 +7,7 @@ import { EChartsOption } from 'echarts';
 import moment from 'moment';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, FaIconMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { executiveSummaryData, PRIVATE_CLOUD_AUTO_REMEDIATION_SUMMARY_ENDPOINT, PRIVATE_CLOUD_CAPACITY_GROWTH_ENDPOINT, PRIVATE_CLOUD_CLUSTER_CAPACITY_TREND_ENDPOINT, PRIVATE_CLOUD_CLUSTER_COMPONENT_SUMMARY_ENDPOINT, PRIVATE_CLOUD_CLUSTER_METRICS_ENDPOINT, PRIVATE_CLOUD_DASHBOARD_HEADER_ENDPOINT, PRIVATE_CLOUD_EXECUTIVE_SUMMARY_ENDPOINT, PRIVATE_CLOUD_FILTERS_ENDPOINT, PRIVATE_CLOUD_GEO_DISTRIBUTION_ENDPOINT, PRIVATE_CLOUD_HYPERVISOR_HEALTH_ENVIRONMENT_ENDPOINT, PRIVATE_CLOUD_HYPERVISOR_VERSION_COMPLIANCE_CHARTS_ENDPOINT, PRIVATE_CLOUD_HYPERVISOR_VERSION_COMPLIANCE_ENDPOINT, PRIVATE_CLOUD_IDLE_DEVICES_ENDPOINT, PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT, PRIVATE_CLOUD_INFRASTRUCTURE_HEALTH_STATUS_ENDPOINT, PRIVATE_CLOUD_NETWORK_INTERFACES_ENDPOINT, PRIVATE_CLOUD_NEWLY_PROVISIONED_VMS_CHARTS_ENDPOINT, PRIVATE_CLOUD_NEWLY_PROVISIONED_VMS_ENDPOINT, PRIVATE_CLOUD_ORPHANED_DEVICES_DETAILED_ENDPOINT, PRIVATE_CLOUD_PERFORMANCE_HOTSPOTS_CHARTS_ENDPOINT, PRIVATE_CLOUD_PERFORMANCE_HOTSPOTS_ENDPOINT, PRIVATE_CLOUD_PERFORMANCE_WORKLOAD_INSIGHTS_ENDPOINT, PRIVATE_CLOUD_RECENT_ALERT_ENDPOINT, PRIVATE_CLOUD_STORAGE_DATASTORES_ENDPOINT, PRIVATE_CLOUD_TIME_RANGE_DEFAULT, PRIVATE_CLOUD_TIME_RANGE_PARAM_MAP, PRIVATE_CLOUD_TOP_CLUSTERS_BY_VM_COUNT_ENDPOINT, PRIVATE_CLOUD_TOP_CLUSTERS_ENDPOINT, PRIVATE_CLOUD_VM_BACKUP_STATUS_CHARTS_ENDPOINT, PRIVATE_CLOUD_VM_BACKUP_STATUS_ENDPOINT, PRIVATE_CLOUD_VM_PROVISIONING_SUMMARY_ENDPOINT, VmDensityPerHostChartColors } from './private-cloud-compute-dashboard.const';
@@ -1025,7 +1025,8 @@ export class PrivateCloudComputeDashboardService {
       .map(key => ({
         key,
         label: this.getPrivateCloudInventoryResourceLabel(key),
-        count: resources[key] || 0
+        count: resources[key] || 0,
+        ...this.getPrivateCloudInventoryResourceIcon(key)
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
   }
@@ -1078,6 +1079,34 @@ export class PrivateCloudComputeDashboardService {
     return labels[key] || key.split('_').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
   }
 
+  private getPrivateCloudInventoryResourceIcon(key: string): { iconClass: string; iconColor: string } {
+    const icons: { [key: string]: { iconClass: string; iconColor: string } } = {
+      baremetal: { iconClass: FaIconMapping.BARE_METAL_SERVER, iconColor: '#ff4545' },
+      clusters: { iconClass: FaIconMapping.CLUSTER, iconColor: '#22a6eb' },
+      custom: { iconClass: FaIconMapping.OTHER_DEVICES, iconColor: '#6c757d' },
+      database: { iconClass: FaIconMapping.DATABASE, iconColor: '#3032b4' },
+      datastores: { iconClass: FaIconMapping.DATASTORE, iconColor: '#3032b4' },
+      disks: { iconClass: FaIconMapping.DISK, iconColor: '#3032b4' },
+      distributed_switches: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+      firewall: { iconClass: FaIconMapping.FIREWALL, iconColor: '#e56717' },
+      hosts: { iconClass: FaIconMapping.HOST, iconColor: '#f2b53f' },
+      hypervisor: { iconClass: FaIconMapping.HYPERVISOR, iconColor: '#f2b53f' },
+      load_balancer: { iconClass: FaIconMapping.LOAD_BALANCER, iconColor: '#a66829' },
+      mac_device: { iconClass: FaIconMapping.MAC_MINI, iconColor: '#6c757d' },
+      networks: { iconClass: FaIconMapping.NETWORKS, iconColor: '#009688' },
+      port_groups: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+      servers: { iconClass: FaIconMapping.HOST, iconColor: '#f2b53f' },
+      storage: { iconClass: FaIconMapping.STORAGE_DEVICE, iconColor: '#3032b4' },
+      storage_containers: { iconClass: FaIconMapping.STORAGE_CONTAINERS, iconColor: '#3032b4' },
+      storage_pools: { iconClass: FaIconMapping.STORAGE_POOLS, iconColor: '#3032b4' },
+      switch: { iconClass: FaIconMapping.SWITCH, iconColor: '#009688' },
+      virtual_disks: { iconClass: FaIconMapping.DISK, iconColor: '#3032b4' },
+      vm: { iconClass: FaIconMapping.VIRTUAL_MACHINE, iconColor: '#22a6eb' }
+    };
+
+    return icons[key] || { iconClass: FaIconMapping.OTHER_DEVICES, iconColor: '#6c757d' };
+  }
+
   private getPrivateCloudInventoryAccentClass(key: string): string {
     const accentClasses: { [key: string]: string } = {
       vmware: 'private-cloud-inventory-card--vmware',
@@ -1101,7 +1130,7 @@ export class PrivateCloudComputeDashboardService {
       totalPrivateClouds: data?.total_private_clouds || cells.length,
       totalDatacenters: data?.total_datacenters || this.getUniqueDatacenterCount(cells),
       totalResources: data?.total_resources || cells.reduce((total, cell) => total + cell.totalResources, 0),
-      totalAlerts: data?.total_alerts || cells.reduce((total, cell) => total + cell.totalAlerts, 0),
+      totalAlerts: data?.total_alerts ?? data?.totalAlerts ?? cells.reduce((total, cell) => total + cell.totalAlerts, 0),
       platforms: this.convertToPrivateCloudGeoPlatformOptions(cells),
       cells
     };
@@ -1145,7 +1174,7 @@ export class PrivateCloudComputeDashboardService {
     return normalizedItems.map((entry, index) => {
       const item = entry.item;
       const summary = item?.resources?.summary || {};
-      const alerts = item?.alert_segregation || {};
+      const alerts = item?.alert_segregation || item?.alertSegregation || {};
       const datacenterName = typeof item?.datacenter === 'string'
         ? item.datacenter
         : item?.datacenter?.name;
@@ -1163,7 +1192,7 @@ export class PrivateCloudComputeDashboardService {
         color: this.getPrivateCloudGeoPlatformColor(entry.platform, index),
         value: [layout[index].x, layout[index].y, layout[index].width, layout[index].height],
         totalResources: entry.totalResources,
-        totalAlerts: Number(item?.total_alerts || 0),
+        totalAlerts: Number(item?.total_alerts ?? item?.totalAlerts ?? 0),
         critical: Number(alerts.critical || 0),
         warning: Number(alerts.warning || 0),
         info: Number(alerts.info || 0),
@@ -1220,10 +1249,20 @@ export class PrivateCloudComputeDashboardService {
           const cell = cells[params.dataIndex];
           const start = api.coord([cell.value[0], cell.value[1]]);
           const end = api.coord([cell.value[0] + cell.value[2], cell.value[1] + cell.value[3]]);
-          const width = end[0] - start[0];
-          const height = end[1] - start[1];
-          const centerX = start[0] + width / 2;
-          const centerY = start[1] + height / 2;
+          const baseWidth = end[0] - start[0];
+          const baseHeight = end[1] - start[1];
+          const minCellWidth = 116;
+          const minCellHeight = 76;
+          const chartX = params.coordSys?.x || 0;
+          const chartY = params.coordSys?.y || 0;
+          const chartRight = chartX + (params.coordSys?.width || 0);
+          const chartBottom = chartY + (params.coordSys?.height || 0);
+          const width = Math.max(baseWidth, minCellWidth);
+          const height = Math.max(baseHeight, minCellHeight);
+          const x = Math.min(Math.max(start[0], chartX), Math.max(chartRight - width, chartX));
+          const y = Math.min(Math.max(start[1], chartY), Math.max(chartBottom - height, chartY));
+          const centerX = x + width / 2;
+          const centerY = y + height / 2;
           const labelWidth = Math.max(width - 12, 18);
           const platformResourceLabel = this.getPrivateCloudGeoTruncatedLabel(`${cell.platformLabel} Resources`, labelWidth);
           const valueFontSize = Math.max(14, Math.min(26, Math.round(height * 0.28)));
@@ -1231,7 +1270,7 @@ export class PrivateCloudComputeDashboardService {
 
           const children: any[] = [{
             type: 'rect',
-            shape: { x: start[0], y: start[1], width, height },
+            shape: { x, y, width, height },
             style: { fill: cell.color, opacity: cell.dimmed ? 0.28 : 1, stroke: '#ffffff', lineWidth: 2 }
           }];
 
@@ -1241,8 +1280,8 @@ export class PrivateCloudComputeDashboardService {
               silent: true,
               style: {
                 text: cell.cloudName || cell.name,
-                x: start[0] + 10,
-                y: start[1] + 10,
+                x: x + 10,
+                y: y + 10,
                 fill: '#ffffff',
                 opacity: cell.dimmed ? 0.45 : 1,
                 font: '600 11px Arial',
@@ -1311,42 +1350,69 @@ export class PrivateCloudComputeDashboardService {
       return '';
     }
 
-    const row = (label: string, value: number | string, color = '#ffffff') => `
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:22px;height:26px;">
-        <span style="color:#d4d9df;">${label}</span>
-        <span style="font-weight:700;color:${color};">${value}</span>
+    const severityColors = {
+      critical: '#cc0000',
+      warning: '#ff8800',
+      info: '#378ad8'
+    };
+    const neutralIconColor = '#a9b4bf';
+    const neutralValueColor = '#ffffff';
+    const row = (icon: string, iconColor: string, label: string, value: number, valueColor = neutralValueColor) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#d4d9df;">
+          <i class="fa ${icon}" style="width:14px;text-align:center;font-size:12px;color:${iconColor};"></i>${label}
+        </span>
+        <span style="font-weight:600;color:${valueColor};">${this.formatNumber(value)}</span>
       </div>`;
+    const textRow = (icon: string, iconColor: string, label: string, value: string, valueColor = neutralValueColor) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#d4d9df;">
+          <i class="fa ${icon}" style="width:14px;text-align:center;font-size:12px;color:${iconColor};"></i>${label}
+        </span>
+        <span style="font-weight:600;color:${valueColor};">${value}</span>
+      </div>`;
+    const resourceRows = (cell.deviceResources || []).map(resource => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;height:23px;">
+        <span style="display:flex;align-items:center;gap:8px;color:#d4d9df;">
+          <i class="${resource.iconClass}" style="width:14px;text-align:center;font-size:12px;color:${resource.iconColor};"></i>${this.escapeTooltipText(resource.label)}
+        </span>
+        <span style="font-weight:600;color:${neutralValueColor};">${this.formatNumber(resource.value)}</span>
+      </div>`).join('');
 
-    return `<div style="min-width:224px;padding:11px 12px;font:12px/1.4 Arial;color:#ffffff;">
-      <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;margin-bottom:8px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:${cell.color};display:inline-block;"></span>${cell.name} DC - ${cell.platformLabel}
+    return `<div style="min-width:216px;padding:11px 13px;font:12px/1.4 Arial;color:#ffffff;">
+      <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:#ffffff;margin-bottom:8px;">
+        <span style="width:9px;height:9px;border-radius:50%;background:${cell.color};display:inline-block;"></span>${this.escapeTooltipText(cell.cloudName || cell.name)}
       </div>
-      ${row('Platform Type', cell.platformLabel)}
-      ${row('Datacenter', cell.datacenter)}
-      <div style="border-top:1px solid #4b5563;margin:7px 0;"></div>
-      ${row('Total Resources', this.formatNumber(cell.totalResources))}
-      <div style="border-top:1px solid #4b5563;margin:7px 0;"></div>
-      ${(cell.deviceResources || []).map(item => row(item.label, this.formatNumber(item.value))).join('')}
+      ${textRow('fa-sitemap', neutralIconColor, 'Platform Type', this.escapeTooltipText(cell.platformLabel))}
+      ${textRow('fa-building-o', neutralIconColor, 'Datacenter', this.escapeTooltipText(cell.datacenter))}
+      <div style="border-top:1px solid #4b5563;margin:6px 0;"></div>
+      ${row('fa-th-large', '#3aa76d', 'Total Resources', cell.totalResources)}
+      ${row('fa-bell', '#378ad8', 'Total Alerts', cell.totalAlerts)}
+      ${row('fa-times-circle', severityColors.critical, 'Critical Alerts', cell.critical, severityColors.critical)}
+      ${row('fa-exclamation-triangle', severityColors.warning, 'Warning Alerts', cell.warning, severityColors.warning)}
+      ${row('fa-info-circle', severityColors.info, 'Information Alerts', cell.info, severityColors.info)}
+      ${resourceRows ? '<div style="border-top:1px solid #4b5563;margin:6px 0;"></div>' : ''}
+      ${resourceRows}
     </div>`;
   }
 
-  private getPrivateCloudGeoDeviceResources(item: any, summary: any): Array<{ label: string; value: number }> {
+  private getPrivateCloudGeoDeviceResources(item: any, summary: any): Array<{ label: string; value: number; iconClass: string; iconColor: string }> {
     return [
-      { label: 'VMs', value: Number(summary.vm ?? item?.vms ?? 0) },
-      { label: 'Hypervisors', value: Number(summary.hypervisor ?? item?.hypervisors ?? 0) },
-      { label: 'Baremetal Servers', value: Number(summary.baremetal_server ?? item?.baremetal ?? 0) },
-      { label: 'Firewalls', value: Number(item?.firewalls || 0) },
-      { label: 'Load Balancers', value: Number(item?.load_balancers || 0) },
-      { label: 'Storage', value: Number(item?.storage || 0) },
-      { label: 'Switches', value: Number(item?.switches || 0) },
-      { label: 'Databases', value: Number(item?.databases || 0) },
-      { label: 'Mac Devices', value: Number(item?.mac_devices || 0) },
-      { label: 'Custom Devices', value: Number(item?.custom_devices || 0) },
-      { label: 'Clusters', value: Number(item?.clusters || 0) },
-      { label: 'Datastores', value: Number(item?.datastores || 0) },
-      { label: 'Networks', value: Number(summary.network ?? item?.networks ?? 0) },
-      { label: 'Distributed Switches', value: Number(item?.distributed_switches || 0) },
-      { label: 'Port Groups', value: Number(item?.port_groups || 0) }
+      { label: 'VMs', value: Number(summary.vm ?? item?.vms ?? 0), iconClass: 'fa fa-desktop', iconColor: '#3a8dde' },
+      { label: 'Hyper-V Hosts', value: Number(summary.hypervisor ?? item?.hypervisors ?? 0), iconClass: 'fa fa-server', iconColor: '#f5a31a' },
+      { label: 'Baremetal Servers', value: Number(summary.baremetal_server ?? item?.baremetal ?? 0), iconClass: 'fa fa-server', iconColor: '#6f5df6' },
+      { label: 'Firewalls', value: Number(item?.firewalls || 0), iconClass: 'fa fa-shield', iconColor: '#e94851' },
+      { label: 'Load Balancers', value: Number(item?.load_balancers || 0), iconClass: 'fa fa-random', iconColor: '#15a5b8' },
+      { label: 'Storage', value: Number(item?.storage || 0), iconClass: 'fa fa-database', iconColor: '#3fb374' },
+      { label: 'Switches', value: Number(item?.switches || 0), iconClass: 'fa fa-sitemap', iconColor: '#7b72d9' },
+      { label: 'Databases', value: Number(item?.databases || 0), iconClass: 'fa fa-database', iconColor: '#087bd3' },
+      { label: 'Mac Devices', value: Number(item?.mac_devices || 0), iconClass: 'fa fa-laptop', iconColor: '#6c757d' },
+      { label: 'Custom Devices', value: Number(item?.custom_devices || 0), iconClass: 'fa fa-cube', iconColor: '#6c757d' },
+      { label: 'Clusters', value: Number(item?.clusters || 0), iconClass: 'fa fa-cubes', iconColor: '#56bf45' },
+      { label: 'Datastores', value: Number(item?.datastores || 0), iconClass: 'fa fa-hdd-o', iconColor: '#20a77a' },
+      { label: 'Networks', value: Number(summary.network ?? item?.networks ?? 0), iconClass: 'fa fa-share-alt', iconColor: '#3a8dde' },
+      { label: 'Distributed Switches', value: Number(item?.distributed_switches || 0), iconClass: 'fa fa-exchange', iconColor: '#7b72d9' },
+      { label: 'Port Groups', value: Number(item?.port_groups || 0), iconClass: 'fa fa-square-o', iconColor: '#f5a31a' }
     ].filter(resource => resource.value > 0);
   }
 
@@ -1366,6 +1432,15 @@ export class PrivateCloudComputeDashboardService {
       + Number(item?.networks || 0)
       + Number(item?.distributed_switches || 0)
       + Number(item?.port_groups || 0);
+  }
+
+  private escapeTooltipText(value: string | number): string {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   private normalizePrivateCloudGeoPlatform(platformType: string): string {
@@ -3057,7 +3132,7 @@ export class PrivateCloudComputeDashboardService {
   ): EChartsOption {
     return {
       tooltip: { trigger: 'axis' },
-      grid: { top: 12, right: 28, bottom: 24, left: 95 },
+      grid: { top: 12, right: 56, bottom: 24, left: 95 },
       xAxis: { type: 'value', min: 0, max },
       yAxis: {
         type: 'category',
@@ -4437,8 +4512,18 @@ export class PrivateCloudComputeDashboardService {
 
     return {
       tooltip: { trigger: 'axis' },
-      grid: { top: 26, right: 20, bottom: 34, left: 42 },
-      xAxis: { type: 'category', data: rows.map(row => row.label), axisTick: { show: false } },
+      grid: { top: 26, right: 20, bottom: 56, left: 42 },
+      xAxis: {
+        type: 'category',
+        data: rows.map(row => row.label),
+        axisTick: { show: false },
+        axisLabel: {
+          interval: 0,
+          rotate: 18,
+          margin: 14,
+          hideOverlap: false
+        }
+      },
       yAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { color: '#edf1f5' } } },
       series: [{
         type: 'bar',

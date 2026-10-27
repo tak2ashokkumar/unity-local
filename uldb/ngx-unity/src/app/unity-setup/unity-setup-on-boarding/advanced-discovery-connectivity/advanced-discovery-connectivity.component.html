@@ -142,6 +142,15 @@
               <button class="action-icons mb-0 font-sm ml-1" [class]="view.testConnectionIcon" container="body"
                 [tooltip]="view.testConnectionTooltipMsg" (click)="testCollectorConnection(view)" accessControl
                 moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>
+              <button class="action-icons mb-0 fas fa-map-pin font-sm ml-1" container="body" tooltip="Ping"
+                (click)="openNWConnectionPopup(view, 'ping')" accessControl moduleName="UnityCollector"
+                accessType="Manage UnityCollector" elementType="actionbtn"></button>
+              <button class="action-icons mb-0 fas fa-anchor font-sm ml-1" container="body" tooltip="Telnet"
+                (click)="openNWConnectionPopup(view, 'telnet')" accessControl moduleName="UnityCollector"
+                accessType="Manage UnityCollector" elementType="actionbtn"></button>
+              <button class="action-icons mb-0 fas fa-route font-sm ml-1" container="body" tooltip="Traceroute"
+                (click)="openNWConnectionPopup(view, 'traceroute')" accessControl moduleName="UnityCollector"
+                accessType="Manage UnityCollector" elementType="actionbtn"></button>
               <button class="action-icons mb-0 fas fa-network-wired font-sm ml-1" container="body"
                 tooltip="Update Management IP" (click)="openUpdateCollectorModal(view, 'ip')" accessControl
                 moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>

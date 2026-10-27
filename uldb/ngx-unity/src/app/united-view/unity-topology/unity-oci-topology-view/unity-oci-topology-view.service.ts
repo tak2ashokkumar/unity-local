@@ -22,7 +22,7 @@ export class UnityOciTopologyViewService {
 
     getDeviceNetwork(accountId: string): Observable<OciTopologyType> {
       // return this.http.get<AzureTopologyType>(GET_DUMMY_JSON());
-      return this.http.get<OciTopologyType>(`/customer/managed/oci/account/${accountId}/topology/`);
+      return this.http.get<OciTopologyType>(`/customer/managed/oci/accounts/${accountId}/topology/`);
     }
   
     getNodesandEdges(data: OciTopologyType): { nodes: UnityOciTopologyNode[], links: UnityOciTopologyLink[] } {

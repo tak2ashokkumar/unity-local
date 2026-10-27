@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
@@ -9,8 +9,8 @@ import { AppLevelService } from 'src/app/app-level.service';
 import { AppNotificationService } from '../../shared/app-notification/app-notification.service';
 import { Notification } from '../../shared/app-notification/notification.type';
 import { AppSpinnerService } from '../../shared/app-spinner/app-spinner.service';
-import { AppUtilityService, CRUDActionTypes, PDUTypes } from '../../shared/app-utility/app-utility.service';
-import { PDUCrudFormData, PduCrudService } from './pdu-crud.service';
+import { AppUtilityService, CRUDActionTypes, NoWhitespaceValidator, PDUTypes } from '../../shared/app-utility/app-utility.service';
+import { PDU_WEB_URL_PATTERN, PDUCrudFormData, PduCrudService } from './pdu-crud.service';
 import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from './pdu-crud.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 
@@ -28,6 +28,8 @@ export class PduCrudComponent implements OnInit, OnDestroy {
   nonFieldErr: string = '';
   action: 'Add' | 'Edit';
   monitoringEnabled: boolean = false;
+  managementEnabled: boolean = false;
+  backUpdata: { backend_url: string } = { backend_url: '' };
 
   @ViewChild('pduFormRef') pduFormRef: ElementRef;
   pduModelRef: BsModalRef;
@@ -142,10 +144,22 @@ export class PduCrudComponent implements OnInit, OnDestroy {
   //   this.monitoringEnabled = !this.monitoringEnabled;
   // }
 
+  managementFormCheck() {
+    if (!this.managementEnabled) {
+      this.pduForm.addControl('backend_url', new FormControl(this.backUpdata.backend_url, [NoWhitespaceValidator, Validators.required, Validators.pattern(PDU_WEB_URL_PATTERN)]));
+    } else {
+      this.backUpdata.backend_url = this.pduForm.controls.backend_url ? this.pduForm.controls.backend_url.value : '';
+      this.pduForm.removeControl('backend_url');
+    }
+    this.managementEnabled = !this.managementEnabled;
+  }
+
   buildAddEditForm(pduId: string, isBillingCRUD: boolean) {
     this.crudService.createPDUForm(pduId, isBillingCRUD).pipe(takeUntil(this.ngUnsubscribe)).subscribe(form => {
       this.pduForm = form;
       this.monitoringEnabled = this.pduForm.controls.snmp_community ? true : false;
+      this.managementEnabled = this.pduForm.controls.backend_url ? true : false;
+      this.backUpdata.backend_url = this.pduForm.controls.backend_url ? this.pduForm.controls.backend_url.value : '';
       this.pduFormErrors = this.crudService.resetPduFormErrors();
       this.pduFormValidationMessages = this.crudService.pduValidationMessages;
       if (pduId) {

@@ -44,8 +44,7 @@
 }
 
 .viewer-metrics,
-.viewer-actions,
-.viewer-capabilities {
+.viewer-actions {
   align-items: center;
   display: flex;
   gap: 8px;
@@ -80,8 +79,7 @@
 }
 
 .viewer-icon-button,
-.viewer-end-button,
-.viewer-capability {
+.viewer-end-button {
   align-items: center;
   border: 1px solid #465260;
   border-radius: 4px;
@@ -106,31 +104,14 @@
 }
 
 .viewer-icon-button:hover:not(:disabled),
-.viewer-end-button:hover:not(:disabled),
-.viewer-capability:hover:not(:disabled) {
+.viewer-end-button:hover:not(:disabled) {
   filter: brightness(1.12);
 }
 
 .viewer-icon-button:disabled,
-.viewer-end-button:disabled,
-.viewer-capability:disabled {
+.viewer-end-button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
-}
-
-.viewer-capabilities {
-  background: #151b22;
-  border-bottom: 1px solid #29313b;
-  min-height: 40px;
-  padding: 5px 12px;
-}
-
-.viewer-capability {
-  background: #202935;
-  color: #dce5ef;
-  font-size: 11px;
-  gap: 6px;
-  padding: 0 10px;
 }
 
 .viewer-error {
@@ -143,6 +124,7 @@
 .viewer-viewport {
   align-items: center;
   background: #07090c;
+  cursor: default;
   display: flex;
   flex: 1 1 auto;
   justify-content: center;
@@ -154,10 +136,11 @@
 }
 
 .viewer-viewport-disabled {
-  cursor: default;
+  cursor: not-allowed;
 }
 
 .viewer-frame {
+  cursor: inherit;
   height: 100%;
   max-height: 100%;
   max-width: 100%;
@@ -208,10 +191,6 @@
   .viewer-actions {
     justify-content: flex-start;
   }
-
-  .viewer-capabilities {
-    overflow-x: auto;
-  }
 }
 
 .viewer-keyboard-capture {
@@ -229,4 +208,74 @@
   margin: 0;
   padding: 0;
   white-space: nowrap;
+}
+
+.viewer-context-menu {
+  background: #1f2730;
+  border: 1px solid #465260;
+  border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 4px 0;
+  position: absolute;
+  z-index: 10;
+}
+
+.viewer-context-menu button {
+  background: transparent;
+  border: 0;
+  color: #e5edf7;
+  font-size: 12px;
+  padding: 7px 14px;
+  text-align: left;
+}
+
+.viewer-context-menu button:hover {
+  background: #2f3c4b;
+}
+
+.viewer-tabs {
+  background: #151b22;
+  border-bottom: 1px solid #29313b;
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 4px 8px 0;
+}
+
+.viewer-tab {
+  align-items: center;
+  background: #202935;
+  border-radius: 4px 4px 0 0;
+  color: #b8c0cc;
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  max-width: 220px;
+  min-width: 100px;
+  padding: 6px 8px 6px 12px;
+}
+
+.viewer-tab-active {
+  background: #2f3c4b;
+  color: #fff;
+}
+
+.viewer-tab-title {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer-tab-close {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1;
 }

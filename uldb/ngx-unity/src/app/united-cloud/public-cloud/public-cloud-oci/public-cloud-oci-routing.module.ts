@@ -9,6 +9,8 @@ import { PublicCloudOciSummaryDetailsComponent } from './public-cloud-oci-summar
 import { PublicCloudOciSummaryBucketFilesComponent } from './public-cloud-oci-summary/public-cloud-oci-summary-details/public-cloud-oci-summary-bucket-files/public-cloud-oci-summary-bucket-files.component';
 import { UsiPublicCloudOracleCrudComponent } from 'src/app/unity-setup/unity-setup-integration/usi-public-cloud-oracle/usi-public-cloud-oracle-crud/usi-public-cloud-oracle-crud.component';
 import { UsiPublicCloudOracleResourceDataComponent } from 'src/app/unity-setup/unity-setup-integration/usi-public-cloud-oracle/usi-public-cloud-oracle-resource-data/usi-public-cloud-oracle-resource-data.component';
+import { ZABBIX_OCI_ACCOUNT_ROUTES } from '../../shared/oci-zabbix/oci-zabbix-routing.const';
+import { OciZabbixComponent } from '../../shared/oci-zabbix/oci-zabbix.component';
 
 export const oci_routes: Routes = [
   {
@@ -40,6 +42,28 @@ export const oci_routes: Routes = [
         stepbackCount: 0
       }
     }
+  },
+  {
+    path: ':deviceid/zbx',
+    component: OciZabbixComponent,
+    data: {
+      breadcrumb: {
+        title: 'OCI',
+        stepbackCount: 1
+      }
+    },
+    children: ZABBIX_OCI_ACCOUNT_ROUTES
+  },
+  {
+    path: 'services/:resourceId/:deviceid/zbx',
+    component: OciZabbixComponent,
+    data: {
+      breadcrumb: {
+        title: 'OCI',
+        stepbackCount: 1
+      }
+    },
+    children: ZABBIX_OCI_ACCOUNT_ROUTES
   },
   {
     path: 'services/:serviceId/:instanceId/resources/:resourceId',

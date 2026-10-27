@@ -1,3 +1,5 @@
+import { DeviceMonitoringType } from "src/app/shared/SharedEntityTypes/devices-monitoring.type";
+
 export interface OciResourceDetail {
     id: number;
     uuid: string;
@@ -9,9 +11,10 @@ export interface OciResourceDetail {
     icon_path: string;
     account_uuid: string;
     tags: Tags;
+    monitoring?: DeviceMonitoringType;
 }
 
-interface Tags{
+interface Tags {
     [key: string]: string;
 }
 

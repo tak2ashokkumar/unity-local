@@ -11,6 +11,9 @@ import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit 
 import { UserInfoService } from '../../shared/user-info.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 
+// http:// and https:// are accepted; a bare host gets https:// added by the server.
+export const PDU_WEB_URL_PATTERN = /^(https?:\/\/)?[^\s\/:]+(:\d{1,5})?(\/\S*)?$/i;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -92,6 +95,9 @@ export class PduCrudService {
             'annual_escalation': [pd.annual_escalation, [Validators.min(0), Validators.max(100)]],
             'tags': [pd.tags.filter(tg => tg)]
           });
+          if (pd.backend_url) {
+            form.addControl('backend_url', this.builder.control(pd.backend_url, [Validators.required, NoWhitespaceValidator, Validators.pattern(PDU_WEB_URL_PATTERN)]));
+          }
           // Size is derived from sockets (horizontal) or fixed at 1 (vertical); never user-edited.
           form.get('size').disable();
           this.applySocketMax(form, pd.pdu_type);
@@ -178,6 +184,7 @@ export class PduCrudService {
       'size': '',
       'sockets': '',
       'management_ip': '',
+      'backend_url': '',
       'cost': '',
       'annual_escalation': '',
       'collector': {
@@ -228,6 +235,10 @@ export class PduCrudService {
     'management_ip': {
       'ip': 'Invalid IP'
     },
+    'backend_url': {
+      'required': 'Web URL is required',
+      'pattern': 'Enter a valid http:// or https:// URL, e.g. https://10.1.1.1:8443'
+    },
     'cost': {
       'min': 'Cost should be in positive values'
     },
@@ -263,6 +274,7 @@ export class PDUCrudFormData {
   size: number;
   sockets: number;
   management_ip: string;
+  backend_url?: string;
   collector: {
     uuid: string;
   }

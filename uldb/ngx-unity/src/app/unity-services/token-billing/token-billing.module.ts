@@ -10,12 +10,15 @@ import { TokenBillingDashboardComponent } from './token-billing-dashboard/token-
 import { TokenBillingDashboardService } from './token-billing-dashboard/token-billing-dashboard.service';
 import { TokenBillingTracingComponent } from './token-billing-tracing/token-billing-tracing.component';
 import { TokenBillingTracingService } from './token-billing-tracing/token-billing-tracing.service';
+import { TokenBillingAgentsComponent } from './token-billing-agents/token-billing-agents.component';
+import { TokenBillingAgentsService } from './token-billing-agents/token-billing-agents.service';
 
 @NgModule({
   declarations: [
     TokenBillingComponent,
     TokenBillingDashboardComponent,
     TokenBillingTracingComponent,
+    TokenBillingAgentsComponent,
   ],
   imports: [
     AppCoreModule,
@@ -27,6 +30,7 @@ import { TokenBillingTracingService } from './token-billing-tracing/token-billin
   providers: [
     TokenBillingDashboardService,
     TokenBillingTracingService,
+    TokenBillingAgentsService,
   ],
 })
 export class TokenBillingModule { }

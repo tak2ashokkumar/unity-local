@@ -19,6 +19,7 @@ export interface DeviceDataType {
 }
 
 export interface InterfaceDetailsType {
+    uuid: string;
     status: string;
     description: string;
     remote_devices: RemoteDevicesType;

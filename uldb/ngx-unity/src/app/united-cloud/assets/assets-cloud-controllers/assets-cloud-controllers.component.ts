@@ -97,8 +97,8 @@ export class AssetsCloudControllersComponent implements OnInit {
   }
 
   webAccessNewTab(view: CloudControllerViewData) {
-    if (this.isVCenterPlatform(view.platformType)) {
-      this.openVCenterWebConsole(view);
+    if (this.isRemoteWebPlatform(view.platformType)) {
+      this.openRemoteWebConsole(view);
       return;
     }
     if (!view.newTabWebAccessUrl) {
@@ -108,13 +108,13 @@ export class AssetsCloudControllersComponent implements OnInit {
     window.open(view.newTabWebAccessUrl);
   }
 
-  private openVCenterWebConsole(view: CloudControllerViewData): void {
+  private openRemoteWebConsole(view: CloudControllerViewData): void {
     if (!view?.isNewTabEnabled || this.remoteWebLaunchingUuid === view.uuid) {
       return;
     }
     const resourceId = view.remoteWebAccess?.resource_id || view.uuid;
     if (!resourceId) {
-      this.notification.error(new Notification('Unable to open vCenter web console. Resource identifier is missing.'));
+      this.notification.error(new Notification('Unable to open ' + this.remoteWebLabel(view.platformType) + ' web console. Resource identifier is missing.'));
       return;
     }
     const viewerWindow = this.openIsolatedViewerTab();
@@ -124,7 +124,7 @@ export class AssetsCloudControllersComponent implements OnInit {
     }
 
     this.remoteWebLaunchingUuid = view.uuid;
-    const resourceType = view.remoteWebAccess?.resource_type || 'vcenter';
+    const resourceType = view.remoteWebAccess?.resource_type || (view.platformType === PlatFormMapping.HYPER_V ? 'hyperv' : 'vcenter');
     this.remoteAccess.createWebLaunch(resourceId, resourceType)
       .pipe(
         takeUntil(this.ngUnsubscribe),
@@ -136,7 +136,7 @@ export class AssetsCloudControllersComponent implements OnInit {
           this.notification.error(new Notification('Remote web viewer URL was not returned by UnityOne.'));
           return;
         }
-        this.appService.updateActivityLog('vcenter', view.uuid);
+        this.appService.updateActivityLog(view.platformType === PlatFormMapping.HYPER_V ? 'hyperv' : 'vcenter', view.uuid);
         viewerWindow.location.replace(launch.viewerUrl);
       }, err => {
         viewerWindow.close();
@@ -160,8 +160,14 @@ export class AssetsCloudControllersComponent implements OnInit {
     return err?.error?.error || err?.error?.detail || err?.message || 'Unable to create remote web session. Please try again or contact support.';
   }
 
-  private isVCenterPlatform(platformType: PlatFormMapping): boolean {
-    return platformType === PlatFormMapping.VMWARE || platformType === PlatFormMapping.UNITED_PRIVATE_CLOUD_VCENTER;
+  private isRemoteWebPlatform(platformType: PlatFormMapping): boolean {
+    return platformType === PlatFormMapping.VMWARE
+      || platformType === PlatFormMapping.UNITED_PRIVATE_CLOUD_VCENTER
+      || platformType === PlatFormMapping.HYPER_V;
+  }
+
+  private remoteWebLabel(platformType: PlatFormMapping): string {
+    return platformType === PlatFormMapping.HYPER_V ? 'Hyper-V' : 'vCenter';
   }
 
   createTicket(data: CloudControllerViewData) {

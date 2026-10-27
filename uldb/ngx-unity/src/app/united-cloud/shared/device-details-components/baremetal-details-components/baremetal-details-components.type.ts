@@ -1,3 +1,5 @@
+import { RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
+
 export interface BaremetalDeviceDetailsIpAddressType {
     Name: string;
     ShortDescription: string;
@@ -81,6 +83,7 @@ export interface BaremetalDeviceDetailsInterfaceType {
     SystemClassId: string;
     MarkAsDeleted: string;
     SystemName: string;
+    RemoteDevices: RemoteDevicesType;
 }
 
 export interface BaremetalDeviceDetailsOSType {

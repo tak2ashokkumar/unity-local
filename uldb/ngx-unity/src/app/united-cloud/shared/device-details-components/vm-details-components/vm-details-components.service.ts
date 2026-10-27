@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
 import { Observable } from 'rxjs';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
@@ -118,6 +119,7 @@ export class VmDetailsComponentsService {
       view.portType = d.PortType;
       view.speed = d.Speed;
       view.company = d.Company;
+      view.remoteDevices = d.RemoteDevices;
 
       viewData.push(view);
     });
@@ -307,6 +309,7 @@ export class InterfaceViewData {
   portType: string;
   speed: string;
   company: string;
+  remoteDevices: RemoteDevicesType;
 }
 
 

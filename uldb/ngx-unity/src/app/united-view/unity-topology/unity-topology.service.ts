@@ -21,7 +21,7 @@ export class UnityTopologyService {
   }
 
   getOciAccounts(): Observable<OCIAccount[]> {
-    return this.http.get<OCIAccount[]>(`/customer/managed/oci/account/`, { params: { page_size: 0, discover_dependency: true } });
+    return this.http.get<OCIAccount[]>(`/customer/managed/oci/accounts/`, { params: { page_size: 0, discover_dependency: true } });
   }
 
   getGcpAccounts(): Observable<GCPAccountType[]> {

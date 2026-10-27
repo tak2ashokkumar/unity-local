@@ -7,6 +7,7 @@ import { BaremetalDeviceDetailsCpuProcessorsType, BaremetalDeviceDetailsFileSyst
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
+import { RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
 
 @Injectable()
 export class BaremetalDetailsComponentsService {
@@ -146,6 +147,7 @@ export class BaremetalDetailsComponentsService {
       view.company = d.Company;
       view.shortDescription = d.ShortDescription;
       view.description = d.Description;
+      view.remoteDevices = d.RemoteDevices;
       viewData.push(view);
     })
     return viewData;
@@ -333,6 +335,7 @@ export class InterfaceViewData {
   company: string;
   shortDescription: string;
   description: string;
+  remoteDevices: RemoteDevicesType;
 }
 
 export class ProductViewData {

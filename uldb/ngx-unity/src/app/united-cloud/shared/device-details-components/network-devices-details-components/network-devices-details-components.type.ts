@@ -1,3 +1,5 @@
+import { RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
+
 export interface NetworkDevicesDetailsComponents {
     device_uuid: string;
     device_name: string;
@@ -70,6 +72,7 @@ export interface NetworkDevicesDetailsInterfaceData {
     SystemClassId: string;
     MarkAsDeleted: string;
     SystemName: string;
+    RemoteDevices: RemoteDevicesType;
 }
 export interface NetworkDevicesDetailsMacData {
     TokenId: string;

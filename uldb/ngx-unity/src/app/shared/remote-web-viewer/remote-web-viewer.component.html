@@ -30,27 +30,12 @@
     </div>
   </div>
 
-  <div class="viewer-capabilities">
-    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('clipboard')">
-      <i class="fas fa-clipboard"></i>
-      <span>Clipboard</span>
-    </button>
-    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('upload')">
-      <i class="fas fa-upload"></i>
-      <span>Upload</span>
-    </button>
-    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('download')">
-      <i class="fas fa-download"></i>
-      <span>Download</span>
-    </button>
-    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('printing')">
-      <i class="fas fa-print"></i>
-      <span>Print</span>
-    </button>
-    <button class="viewer-capability" type="button" [disabled]="!capabilityEnabled('recording')">
-      <i class="fas fa-record-vinyl"></i>
-      <span>Recording</span>
-    </button>
+  <div class="viewer-tabs" *ngIf="tabs.length > 1">
+    <div class="viewer-tab" *ngFor="let tab of tabs; let i = index"
+      [class.viewer-tab-active]="tab.active" (click)="switchTab(i)" [title]="tab.title">
+      <span class="viewer-tab-title">{{tab.title}}</span>
+      <button type="button" class="viewer-tab-close" (click)="closeTab(i, $event)" title="Close tab">&times;</button>
+    </div>
   </div>
 
   <div class="viewer-error" *ngIf="errorMessage">
@@ -59,6 +44,7 @@
 
   <div #viewport class="viewer-viewport" tabindex="0"
     [class.viewer-viewport-disabled]="!canSendInput"
+    [style.cursor]="canSendInput ? remoteCursor : 'not-allowed'"
     (mousedown)="onMouseEvent($event, 'mousedown')"
     (mouseup)="onMouseEvent($event, 'mouseup')"
     (mousemove)="onMouseEvent($event, 'mousemove')"
@@ -71,10 +57,22 @@
       autocapitalize="off"
       spellcheck="false"
       tabindex="0"
-      aria-hidden="true"
+      aria-label="Remote keyboard input"
       (keydown)="onKeyboardEvent($event, 'keydown')"
       (keyup)="onKeyboardEvent($event, 'keyup')"
       (paste)="onPasteEvent($event)"></textarea>
+    <div class="viewer-context-menu" *ngIf="contextMenu"
+      [style.left.px]="contextMenu.x" [style.top.px]="contextMenu.y"
+      (mousedown)="$event.stopPropagation()" (mouseup)="$event.stopPropagation()"
+      (mousemove)="$event.stopPropagation()" (contextmenu)="$event.stopPropagation(); $event.preventDefault()">
+      <button type="button" *ngIf="contextMenu.link" (click)="contextOpenLinkInNewTab()">Open link in new tab</button>
+      <button type="button" *ngIf="contextMenu.link" (click)="contextOpenLink()">Open link in this tab</button>
+      <button type="button" *ngIf="contextMenu.link" (click)="contextCopy(contextMenu.link)">Copy link address</button>
+      <button type="button" *ngIf="contextMenu.text" (click)="contextCopy(contextMenu.text)">Copy selected text</button>
+      <button type="button" (click)="contextNav('back')">Back</button>
+      <button type="button" (click)="contextNav('forward')">Forward</button>
+      <button type="button" (click)="contextNav('reload')">Reload</button>
+    </div>
     <img *ngIf="frameUrl" class="viewer-frame" [src]="frameUrl" alt="Remote browser display" draggable="false">
     <pre *ngIf="!frameUrl && textFrame" class="viewer-text">{{textFrame}}</pre>
     <div *ngIf="!frameUrl && !textFrame" class="viewer-empty">

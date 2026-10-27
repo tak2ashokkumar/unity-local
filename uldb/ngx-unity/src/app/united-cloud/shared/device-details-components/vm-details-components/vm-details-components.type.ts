@@ -1,3 +1,5 @@
+import { RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
+
 export interface IpAddressData {
   Name: string;
   ShortDescription: string;
@@ -34,6 +36,7 @@ export interface InterfaceData {
   PortType: string;
   Speed: string;
   Company: string;
+  RemoteDevices: RemoteDevicesType;
 }
 
 export interface MacData {

@@ -342,7 +342,7 @@
     <ng-contaner *ngIf="showDatabases">
         <ng-container *ngTemplateOutlet="databaseDetails"></ng-container>
     </ng-contaner>
-    <device-interface-crud (onCrud)="onCrud($event)"></device-interface-crud>
+    <device-interface-crud *ngIf="!hideOldInterfacesTab" (onCrud)="onCrud($event)"></device-interface-crud>
 </ng-container>
 
 <ng-template #networkDevicesTabsContentRef>

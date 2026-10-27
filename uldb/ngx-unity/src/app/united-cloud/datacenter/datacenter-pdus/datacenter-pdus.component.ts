@@ -3,17 +3,20 @@ import { FormArray, FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, from, interval } from 'rxjs';
-import { mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { finalize, mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { AppLevelService } from 'src/app/app-level.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageType } from 'src/app/shared/app-storage/storage-type';
 import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { CRUDActionTypes, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { PDU_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { DeviceZabbixEmailNotificationService } from 'src/app/shared/device-zabbix-email-notification/device-zabbix-email-notification.service';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { PduCrudService } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.service';
+import { RemoteAccessService } from 'src/app/shared/remote-access/remote-access.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { DevicePopoverData } from 'src/app/united-cloud/shared/devices-popover/device-popover-data';
@@ -47,6 +50,7 @@ export class DatacenterPdusComponent implements OnInit, OnDestroy {
   poll: boolean = false;
   currentCriteria: SearchCriteria;
   count: number = 0;
+  remoteWebLaunching: boolean = false;
 
   selectedPDU: PDUViewData = new PDUViewData();
   pduRecycleAuthForm: FormGroup;
@@ -57,6 +61,7 @@ export class DatacenterPdusComponent implements OnInit, OnDestroy {
   validationMessages: any;
   constructor(private router: Router,
     private route: ActivatedRoute,
+    private appService: AppLevelService,
     private storageService: StorageService,
     private ticketService: SharedCreateTicketService,
     private modalService: BsModalService,
@@ -66,7 +71,8 @@ export class DatacenterPdusComponent implements OnInit, OnDestroy {
     private pduRecycleService: PduRecycleService,
     private crudService: PduCrudService,
     private zabbixAlertConfig: DeviceZabbixEmailNotificationService,
-    private termService: FloatingTerminalService) {
+    private termService: FloatingTerminalService,
+    private remoteAccess: RemoteAccessService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.dcId = params.get('dcId');
       this.inDatacenterPage = this.dcId ? false : true;
@@ -182,6 +188,69 @@ export class DatacenterPdusComponent implements OnInit, OnDestroy {
   showInfo(view: PDUViewData) {
     this.info = view;
     this.modalRef = this.modalService.show(this.deviceinfo, Object.assign({}, { keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  cliAccessNewTab(view: PDUViewData) {
+    if (!view.newTabConsoleAccessUrl) {
+      return;
+    }
+    const obj: ConsoleAccessInput = this.pduService.getConsoleAccessInput(view);
+    obj.newTab = true;
+    this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
+    this.appService.updateActivityLog('pdus', view.pduId);
+    window.open(view.newTabConsoleAccessUrl);
+  }
+
+  remoteWebAccessNewTab(view: PDUViewData): void {
+    if (!view?.showRemoteWebAccessButton || this.remoteWebLaunching) {
+      return;
+    }
+    const resourceId = view.remoteWebAccess?.resource_id || view.pduId;
+    if (!resourceId) {
+      this.notificationService.error(new Notification('Unable to open PDU web console. Resource identifier is missing.'));
+      return;
+    }
+    const viewerWindow = this.openIsolatedViewerTab();
+    if (!viewerWindow) {
+      this.notificationService.error(new Notification('Popup blocked. Allow popups for UnityOne and try opening the web console again.'));
+      return;
+    }
+
+    this.remoteWebLaunching = true;
+    const resourceType = view.remoteWebAccess?.resource_type || 'pdu';
+    this.remoteAccess.createWebLaunch(resourceId, resourceType)
+      .pipe(
+        takeUntil(this.ngUnsubscribe),
+        finalize(() => this.remoteWebLaunching = false)
+      )
+      .subscribe(launch => {
+        if (!launch.viewerUrl) {
+          viewerWindow.close();
+          this.notificationService.error(new Notification('Remote web viewer URL was not returned by UnityOne.'));
+          return;
+        }
+        this.appService.updateActivityLog('pdus', view.pduId);
+        viewerWindow.location.replace(launch.viewerUrl);
+      }, err => {
+        viewerWindow.close();
+        this.notificationService.error(new Notification(this.remoteWebErrorMessage(err)));
+      });
+  }
+
+  private openIsolatedViewerTab(): Window | null {
+    const viewerWindow = window.open('about:blank', '_blank');
+    if (viewerWindow) {
+      viewerWindow.opener = null;
+      try {
+        viewerWindow.document.title = 'Opening UnityOne Remote Web Viewer';
+        viewerWindow.document.body.innerHTML = '<div style="font-family:Arial,sans-serif;padding:24px;">Opening UnityOne Remote Web Viewer...</div>';
+      } catch (e) { }
+    }
+    return viewerWindow;
+  }
+
+  private remoteWebErrorMessage(err: any): string {
+    return err?.error?.error || err?.error?.detail || err?.message || 'Unable to create remote web session. Please try again or contact support.';
   }
 
   mapSocket(view: PDUViewData) {

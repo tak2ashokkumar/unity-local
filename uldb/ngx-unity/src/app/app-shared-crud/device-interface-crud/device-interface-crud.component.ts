@@ -27,7 +27,7 @@ export class DeviceInterfaceCrudComponent implements OnInit, OnDestroy {
   targetDeviceFormData: TargetDeviceFormDataType;
 
   nonFieldErr: string = '';
-  interfaceData: { uuid: string, deviceType: DeviceMapping, name: string, description: string };
+  interfaceData: { uuid: string, deviceType: DeviceMapping, interfaceUuid?: string, name: string, description: string };
   devices: DeviceDataType[] = [];
   interfaceDetails: InterfaceDetailsType[] = [];
 
@@ -68,12 +68,20 @@ export class DeviceInterfaceCrudComponent implements OnInit, OnDestroy {
 
   handleTargetDeviceFormSubscriptions() {
     this.targetDeviceForm.get('device_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((deviceType: string) => {
+      this.targetDeviceForm.get('remote_device').setValue('', { emitEvent: false });
+      this.targetDeviceForm.get('remote_interface').setValue('', { emitEvent: false });
+      this.interfaceDetails = [];
       this.targetDeviceFormData = this.targetDeviceForm.getRawValue();
       this.getDevicesByDeviceType();
     });
     this.targetDeviceForm.get('remote_device').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((remoteDevice: DeviceDataType) => {
+      this.targetDeviceForm.get('remote_interface').setValue('', { emitEvent: false });
       this.targetDeviceFormData = this.targetDeviceForm.getRawValue();
-      this.getInterfaceDetails();
+      if (remoteDevice && remoteDevice.uuid) {
+        this.getInterfaceDetails();
+      } else {
+        this.interfaceDetails = [];
+      }
     });
   }
 
@@ -93,13 +101,20 @@ export class DeviceInterfaceCrudComponent implements OnInit, OnDestroy {
 
   handleError(err: any) {
     this.targetDeviceFormErrors = this.interfaceCrudSvc.resetTargetDeviceFormErrors();
-    if (err.non_field_errors) {
+    if (err && err.non_field_errors) {
       this.nonFieldErr = err.non_field_errors[0];
+    } else if (err && (err.error || err.detail)) {
+      this.nonFieldErr = err.error || err.detail;
     } else if (err) {
+      let hasFieldError = false;
       for (const field in err) {
-        if (field in this.targetDeviceForm) {
-          this.targetDeviceForm[field] = err[field][0];
+        if (this.targetDeviceFormErrors.hasOwnProperty(field)) {
+          this.targetDeviceFormErrors[field] = Array.isArray(err[field]) ? err[field][0] : err[field];
+          hasFieldError = true;
         }
+      }
+      if (!hasFieldError) {
+        this.nonFieldErr = 'Something went wrong. Please try again.';
       }
     } else {
       this.targetDeviceModalRef.hide();

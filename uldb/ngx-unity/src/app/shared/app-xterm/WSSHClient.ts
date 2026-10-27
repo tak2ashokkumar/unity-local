@@ -26,6 +26,9 @@ export class WSSHClient {
 
     private connection: WebSocket;
     private wsOptions: WSOption;
+    private keepaliveInterval: any;
+    private lastActivityAt = Date.now();
+    private static readonly MAX_IDLE_MS = 15 * 60 * 1000;
 
     private openEvent = new Subject<any>();
     onOpen: Observable<any> = this.openEvent.asObservable();
@@ -38,6 +41,9 @@ export class WSSHClient {
 
     private messageEvent = new Subject<any>();
     onMessage: Observable<any> = this.messageEvent.asObservable();
+
+    private statsEvent = new Subject<any>();
+    onStats: Observable<any> = this.statsEvent.asObservable();
 
     constructor(options: WSOption) {
         this.wsOptions = options;
@@ -73,10 +79,29 @@ export class WSSHClient {
             return;
         }
         this.connection.onopen = (evt: Event) => {
+            this.lastActivityAt = Date.now();
+            this.keepaliveInterval = setInterval(() => {
+                if (!this.connection || this.connection.readyState !== WebSocket.OPEN) {
+                    return;
+                }
+                if (Date.now() - this.lastActivityAt >= WSSHClient.MAX_IDLE_MS) {
+                    this.close();
+                    return;
+                }
+                this.connection.send(JSON.stringify({ tp: 'ping' }));
+            }, 30000);
             this.openEvent.next();
         };
 
         this.connection.onmessage = (evt: MessageEvent) => {
+            try {
+                const msg = JSON.parse(evt.data);
+                if (msg.tp === 'pong') return;
+                if (msg.tp === 'stats') {
+                    this.statsEvent.next(msg);
+                    return;
+                }
+            } catch (_) {}
             this.messageEvent.next(evt.data);
         };
 
@@ -109,11 +134,22 @@ export class WSSHClient {
         this.connection.send(JSON.stringify({ tp: 'resize', data: data }));
     }
 
+    requestStats() {
+        if (this.connection && this.connection.readyState === WebSocket.OPEN) {
+            this.connection.send(JSON.stringify({ tp: 'stats' }));
+        }
+    }
+
     sendClientData(data: any) {
+        this.lastActivityAt = Date.now();
         this.connection.send(JSON.stringify({ tp: 'client', data: data }));
     }
 
     close() {
+        if (this.keepaliveInterval) {
+            clearInterval(this.keepaliveInterval);
+            this.keepaliveInterval = null;
+        }
         this.connection.close();
     }
 }

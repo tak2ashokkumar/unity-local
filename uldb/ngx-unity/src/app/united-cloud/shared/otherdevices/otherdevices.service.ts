@@ -13,7 +13,7 @@ import { TableApiServiceService } from 'src/app/shared/table-functionality/table
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { OtherDevicePopoverData } from '../devices-popover/device-popover-data';
-import { OtherDevice, OtherDeviceMonitoring, OtherDeviceSummary, OtherDeviceSummaryData, OtherDeviceUrl } from '../entities/other-device.type';
+import { OtherDevice, OtherDeviceMonitoring, OtherDeviceRemoteWebAccess, OtherDeviceSummary, OtherDeviceSummaryData, OtherDeviceUrl } from '../entities/other-device.type';
 
 @Injectable()
 export class OtherdevicesService {
@@ -63,6 +63,9 @@ export class OtherdevicesService {
       a.popUrlList = s.urls.length > 1 ? s.urls.slice(1) : null;
       a.tags = s.tags.filter(tg => tg);
       a.monitoring = s.monitoring;
+      a.remoteWebAccess = s.remote_web_access;
+      a.showRemoteWebAccessButton = !!s.remote_web_access?.can_create_session;
+      a.remoteWebAccessTooltip = s.remote_web_access?.message || 'Remote web access unavailable';
       a.isSelected = false;
       a.isOpen = false;
       viewData.push(a);
@@ -223,6 +226,10 @@ export class OtherdevicesService {
   update(data: OtherDevicesBulkUpdateData) {
     return this.http.put<OtherDevicesBulkUpdateData>(`/customer/customdevices/multi_update/`, data);
   }
+
+  testConnection(uuid: string) {
+    return this.http.post(`/customer/customdevices/${uuid}/test_connection/`, {});
+  }
 }
 
 export class OtherDevicesViewData {
@@ -257,6 +264,9 @@ export class OtherDevicesViewData {
   ipAddress: string;
 
   statsTooltipMessage: string;
+  remoteWebAccess?: OtherDeviceRemoteWebAccess;
+  showRemoteWebAccessButton: boolean = false;
+  remoteWebAccessTooltip: string;
   constructor() { }
 }
 

@@ -72,8 +72,10 @@
 
             <!-- MAIN CANVAS -->
             <div class="drawflow-canvas position-absolute"
-              [style.visibility]="isLoadingWorkflow || hasNoExecutions ? 'hidden' : 'visible'"
-              [attr.aria-hidden]="isLoadingWorkflow || hasNoExecutions">
+              [style.visibility]="isCanvasHidden ? 'hidden' : 'visible'"
+              [style.opacity]="isCanvasHidden ? 0 : 1"
+              [style.pointer-events]="isCanvasHidden ? 'none' : 'auto'"
+              [attr.aria-hidden]="isCanvasHidden">
               <div class="flex-grow-1 drawflow-canvas position-absolute">
                 <div #drawflowContainer id="dynamic-drawflow" (dragover)="allowDrop($event)" (drop)="drop($event)">
                   <div class="center-text-container text-center" *ngIf="emptyCanvas && !isExecutionMode">

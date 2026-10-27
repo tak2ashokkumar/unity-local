@@ -9,7 +9,7 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
-import { ListSummaryResModel, OrchestrationHistoryDataType, RelatedServiceCatalog, WorkflowType } from './orchestration-workflows.type';
+import { ListSummaryResModel, OrchestrationHistoryDataType, RelatedServiceCatalog, WorkflowFilterOptions, WorkflowType } from './orchestration-workflows.type';
 // import { ListSummaryViewModel } from '../orchestration-tasks/orchestration-tasks.service';
 
 @Injectable({ providedIn: 'root' })
@@ -76,6 +76,10 @@ export class OrchestrationWorkflowsService {
 
   getWorkflowList(criteria: SearchCriteria): Observable<PaginatedResult<WorkflowType>> {
     return this.tableService.getData<PaginatedResult<WorkflowType>>(`/api/orchestration/v1/dynamic_workflows/`, criteria);
+  }
+
+  getFilterOptions(): Observable<WorkflowFilterOptions> {
+    return this.http.get<WorkflowFilterOptions>('/api/orchestration/v1/dynamic_workflows/filter_meta/');
   }
 
   convertToViewData(data: WorkflowType[]): WorkflowViewData[] {

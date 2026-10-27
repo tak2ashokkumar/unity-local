@@ -95,7 +95,7 @@
                             [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
                             (click)="webAccessSameTab(view)"></button> -->
 
-                          <button *ngIf="view && (platformType != platFormMapping?.PROXMOX || view.showRemoteWebAccessButton)"
+                          <button *ngIf="view && ((platformType != platFormMapping?.PROXMOX && platformType != platFormMapping?.HYPER_V) || view.showRemoteWebAccessButton)"
                             class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
                             [tooltip]="remoteWebLaunching ? 'Opening Remote Web Viewer' : view.newTabTooltipMessage"
                             [disabled]="remoteWebLaunching"

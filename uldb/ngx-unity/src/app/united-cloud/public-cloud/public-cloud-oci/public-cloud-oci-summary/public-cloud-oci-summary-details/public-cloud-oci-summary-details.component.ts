@@ -133,6 +133,8 @@ export class PublicCloudOciSummaryDetailsComponent implements OnInit, OnDestroy 
     defaultTitle: 'Select Location',
   };
 
+  allowedStatsResources: string[] = ['Compute Instances','Autonomous Databases (Serverless)','Object Storage Buckets','Virtual Cloud Networks','Block Volumes','Boot Volumes'];
+
   constructor(private svc: PublicCloudOciSummaryDetailsService,
     private router: Router,
     private route: ActivatedRoute,
@@ -456,6 +458,21 @@ export class PublicCloudOciSummaryDetailsComponent implements OnInit, OnDestroy 
       this.selectedViewData.terminateTooltipMessage = 'Terminate';
       this.notification.error(new Notification('Terminating ' + this.selectedViewData.name + ' Failed. Please try again later.'));
     });
+  }
+
+  goToStats(view: OciResourcesViewData) {
+    if (!view.isStatsEnabled) {
+      return;
+    }
+    this.storageService.put('device', {
+      name: view.name, deviceType: DeviceMapping.OCI_RESOURCES,
+      configured: view.monitoring.configured, uuid: view.uuid
+    }, StorageType.SESSIONSTORAGE);
+    if (view.monitoring.zabbix) {
+      if (view.monitoring.configured) {
+        this.router.navigate([view.uuid, 'zbx', 'monitoring-graphs'], { relativeTo: this.route });
+      }
+    }
   }
 
   createTicket(data: OciResourcesViewData) {

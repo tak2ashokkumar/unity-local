@@ -1,6 +1,7 @@
 import { DeviceMonitoringType } from "src/app/shared/SharedEntityTypes/devices-monitoring.type";
 import { DataCenterCabinet } from "../../shared/entities/datacenter-cabinet.type";
 import { CabinetFast } from 'src/app/shared/SharedEntityTypes/cabinet.type';
+import { PrivateCloudRemoteWebAccessType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 
 export interface PDU {
     id: number;
@@ -28,6 +29,7 @@ export interface PDU {
     power_circuit_id: string;
     snmp_community: string;
     management_ip: string;
+    backend_url?: string;
     cost: number;
     annual_escalation: number;
     co2_emission_value: number;
@@ -54,6 +56,7 @@ export interface PDU {
     end_of_service: string;
     uptime: string;
     collector: CollectorType;
+    remote_web_access?: PrivateCloudRemoteWebAccessType;
 }
 
 export interface PDUManufacturer {

@@ -383,7 +383,7 @@
 
 <ng-template #vmCapacityTrendForecastPopoverTmpl>
     <div class="private-cloud-table-header-popover-content">
-        <div>Total VM count for the last 3 months (<span class="font-weight-bold">Actual</span>) and a projection for the next 12 months (<span class="font-weight-bold">Forecast</span>).</div>
+        <div>Total VM count for the last 11 months (<span class="font-weight-bold">Actual</span>) and a projection for the next 12 months (<span class="font-weight-bold">Forecast</span>).</div>
         <div>The forecast compounds the average month-on-month growth rate observed in the actual months shown.</div>
     </div>
 </ng-template>
@@ -764,7 +764,11 @@
                             <div class="list-group list-group-flush private-cloud-inventory-resource-list">
                                 <div class="list-group-item d-flex align-items-center justify-content-between py-2"
                                     *ngFor="let resource of card.resources; trackBy: trackByIndex">
-                                    <span class="text-primary">{{resource.label}}</span>
+                                    <span class="d-flex align-items-center text-primary">
+                                        <i class="fa mr-2" [ngClass]="resource.iconClass"
+                                            [style.color]="resource.iconColor" *ngIf="resource.iconClass"></i>
+                                        <span>{{resource.label}}</span>
+                                    </span>
                                     <span class="font-weight-bold">{{resource.count | number}}</span>
                                 </div>
                             </div>
@@ -854,7 +858,6 @@
                                 <ng-container
                                     *ngTemplateOutlet="privateCloudTableInfoIconTmpl; context: { popoverTmpl: topHostsByStorageUtilizationPopoverTmpl }"></ng-container>
                             </span>
-                            <span>{{densityHostVm?.desnityHostRows?.length || 0}} hosts</span>
                         </div>
                         <div class="card-body position-relative capacity-growth-host-body d-flex flex-column">
                             <app-spinner [name]="topHostsByVmDensityLoader" [width]="0"></app-spinner>
@@ -960,7 +963,6 @@
                                 <ng-container
                                     *ngTemplateOutlet="privateCloudTableInfoIconTmpl; context: { popoverTmpl: topHostsByVmDensityPopoverTmpl }"></ng-container>
                             </span>
-                            <span>{{topHostsByVmDensity?.length || 0}} hosts</span>
                         </div>
                         <div class="card-body position-relative capacity-growth-host-body d-flex flex-column">
                             <app-spinner [name]="densityHostVm.loader" [width]="0"></app-spinner>
@@ -3027,7 +3029,7 @@
             <app-spinner [name]="vmBackupStatusChartLoader" [width]="0"></app-spinner>
             <div class="card-header bg-white py-2 px-3">
                 <div class="d-flex align-items-center justify-content-between flex-wrap">
-                    <div class="font-500 font-lg">VM Backup Status (Veeam)</div>
+                    <div class="font-500 font-lg">VM Backup Status</div>
                     <div class="private-cloud-view-toggle d-inline-flex align-items-center" role="group"
                         aria-label="VM backup status view toggle">
                         <button type="button" class="private-cloud-view-toggle-btn"

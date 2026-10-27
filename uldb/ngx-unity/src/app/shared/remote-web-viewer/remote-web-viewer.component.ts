@@ -22,6 +22,8 @@ type RemoteWebViewerState =
   'failed' |
   'access_denied';
 
+const MOUSE_MOVE_INTERVAL_MS = 33;
+
 @Component({
   selector: 'remote-web-viewer',
   templateUrl: './remote-web-viewer.component.html',
@@ -47,12 +49,18 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
   isConnected = false;
   isClosing = false;
   isFullscreen = false;
+  remoteCursor = 'default';
+  tabs: { title: string; active: boolean }[] = [];
+  contextMenu: { x: number; y: number; link: string; text: string } = null;
 
   private ws: WebSocket;
   private session: RemoteWebViewerSession;
   private sessionSub: Subscription;
   private closeSub: Subscription;
   private resizeTimer: any;
+  private moveTimer: any = null;
+  private pendingMove: any = null;
+  private lastMoveSentAt = 0;
   private durationTimer: any;
   private idleTimer: any;
   private heartbeatTimer: any;
@@ -168,12 +176,13 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
     this.sendCloseFrame('viewer_closed');
     this.unsubscribeClose();
     this.closeSub = this.remoteAccess.terminateRemoteWebViewerSession(this.sessionId, 'viewer_closed')
-      .subscribe(() => {
-        this.setState('terminated');
-        this.connectionStatus = 'Terminated';
-        this.closeSocket();
-        window.close();
-      }, () => {
+      .subscribe(() => this.finishSession(), (err: any) => {
+        const status = err && err.status;
+        if (status === 401 || status === 403 || status === 404 || status === 409 || status === 410) {
+          // The session is already gone or no longer belongs to this tab: nothing left to terminate.
+          this.finishSession();
+          return;
+        }
         this.setState('failed');
         this.errorMessage = 'Unable to terminate the remote web session. Please refresh status or contact support.';
         this.connectionStatus = 'Termination failed';
@@ -181,8 +190,18 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
       });
   }
 
+  private finishSession(): void {
+    this.setState('terminated');
+    this.connectionStatus = 'Terminated';
+    this.closeSocket();
+    window.close();
+    // Browsers only let a script close tabs it opened; otherwise tell the user it is safe to close.
+    this.errorMessage = '';
+    this.connectionStatus = 'Session ended. You can close this tab.';
+  }
+
   openInNewTab(): void {
-    window.open(window.location.href, '_blank');
+    this.sendInput({ type: 'nav', action: 'new_tab' });
   }
 
   toggleFullscreen(): void {
@@ -210,6 +229,7 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
       return;
     }
     this.markInputActivity();
+    this.contextMenu = null;
     this.sendInput({
       type: 'keyboard',
       event: eventType,
@@ -257,7 +277,10 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
     }
     const rect = this.viewport.nativeElement.getBoundingClientRect();
     this.markInputActivity();
-    this.sendInput({
+    if (eventType === 'mousedown') {
+      this.contextMenu = null;
+    }
+    const payload = {
       type: 'mouse',
       event: eventType,
       x: this.clamp(Math.round(event.clientX - rect.left), 0, Math.round(rect.width)),
@@ -270,9 +293,82 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
       ctrlKey: event.ctrlKey,
       metaKey: event.metaKey,
       shiftKey: event.shiftKey
-    });
+    };
+    if (eventType === 'mousemove') {
+      const now = Date.now();
+      if (now - this.lastMoveSentAt < MOUSE_MOVE_INTERVAL_MS) {
+        this.pendingMove = payload;
+        if (!this.moveTimer) {
+          this.moveTimer = setTimeout(() => this.flushPendingMove(), MOUSE_MOVE_INTERVAL_MS);
+        }
+        event.preventDefault();
+        return;
+      }
+      this.lastMoveSentAt = now;
+    } else {
+      this.clearPendingMove();
+    }
+    this.sendInput(payload);
     this.focusViewport();
     event.preventDefault();
+  }
+
+  private flushPendingMove(): void {
+    this.moveTimer = null;
+    if (this.pendingMove && this.canSendInput) {
+      this.lastMoveSentAt = Date.now();
+      this.sendInput(this.pendingMove);
+    }
+    this.pendingMove = null;
+  }
+
+  private clearPendingMove(): void {
+    clearTimeout(this.moveTimer);
+    this.moveTimer = null;
+    this.pendingMove = null;
+  }
+
+  contextNav(action: 'back' | 'forward' | 'reload'): void {
+    this.contextMenu = null;
+    this.sendInput({ type: 'nav', action });
+    this.focusViewport();
+  }
+
+  contextOpenLinkInNewTab(): void {
+    const link = this.contextMenu && this.contextMenu.link;
+    this.contextMenu = null;
+    if (link) {
+      this.sendInput({ type: 'nav', action: 'new_tab', url: link });
+    }
+    this.focusViewport();
+  }
+
+  switchTab(index: number): void {
+    this.contextMenu = null;
+    this.sendInput({ type: 'nav', action: 'switch_tab', index });
+    this.focusViewport();
+  }
+
+  closeTab(index: number, event: Event): void {
+    event.stopPropagation();
+    this.sendInput({ type: 'nav', action: 'close_tab', index });
+  }
+
+  contextOpenLink(): void {
+    const link = this.contextMenu && this.contextMenu.link;
+    this.contextMenu = null;
+    if (link) {
+      this.sendInput({ type: 'nav', action: 'goto', url: link });
+    }
+    this.focusViewport();
+  }
+
+  contextCopy(text: string): void {
+    this.contextMenu = null;
+    if (text && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+    this.focusViewport();
   }
 
   onWheel(event: WheelEvent): void {
@@ -320,7 +416,7 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
     this.connectionStatus = 'Opening secure viewer channel';
     this.setState(this.state === 'reconnecting' ? 'reconnecting' : 'waiting_collector');
 
-    this.ws = new WebSocket(this.remoteAccess.remoteWebSocketUrl(this.session && this.session.websocket_path));
+    this.ws = new WebSocket(this.remoteAccess.remoteWebSocketUrl(this.session && this.session.websocket_path, this.sessionId));
     this.ws.binaryType = 'blob';
 
     this.ws.onopen = () => {
@@ -397,7 +493,18 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
       this.connectionStatus = 'Expired';
       return;
     }
-    this.fail(serverMessage || 'Unable to validate the remote web session.');
+    if (statusCode === 409) {
+      this.setState('terminated');
+      this.errorMessage = serverMessage || 'Remote web session was closed.';
+      this.connectionStatus = 'Closed';
+      return;
+    }
+    if (!statusCode || statusCode >= 500) {
+      // Network blip or server restart: keep retrying inside the reconnect grace period.
+      this.scheduleReconnect('Unable to reach UnityOne. Retrying...');
+      return;
+    }
+    this.fail((serverMessage || 'Unable to validate the remote web session.') + ' (HTTP ' + statusCode + ')');
   }
 
   private handleMessage(data: any): void {
@@ -438,6 +545,27 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
 
     if (payload.type === 'vcenter_web_close' || payload.type === 'ra_close' || payload.type === 'session_failed') {
       this.handleCloseMessage(payload);
+      return;
+    }
+
+    if (payload.type === 'web_console_tabs') {
+      this.tabs = Array.isArray(payload.tabs) ? payload.tabs : [];
+      setTimeout(() => this.sendViewportResize(), 0);
+      return;
+    }
+
+    if (payload.type === 'web_console_context') {
+      this.contextMenu = {
+        x: Number(payload.x) || 0,
+        y: Number(payload.y) || 0,
+        link: payload.link || '',
+        text: payload.text || ''
+      };
+      return;
+    }
+
+    if (payload.type === 'web_console_cursor' && payload.cursor) {
+      this.remoteCursor = payload.cursor;
       return;
     }
 
@@ -614,6 +742,7 @@ export class RemoteWebViewerComponent implements OnInit, OnDestroy {
 
   private clearTimers(): void {
     clearTimeout(this.resizeTimer);
+    clearTimeout(this.moveTimer);
     clearTimeout(this.reconnectTimer);
     clearInterval(this.durationTimer);
     clearInterval(this.idleTimer);

@@ -200,6 +200,7 @@ export const CHECK_AUTH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/check_auth/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `rest/openstack/migration/${deviceId}/check_auth/`
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/check_auth/`;
+        case DeviceMapping.PDU: return `customer/pdus/${deviceId}/check_auth/`;
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/check_auth/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI: return `rest/vmware_vms/${deviceId}/check_auth/`;
@@ -224,6 +225,7 @@ export const CONSOLE_ACCESS_DETAILS_BY_DEVICE_TYPE = (deviceType: DeviceMapping,
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `rest/openstack/migration/${deviceId}/details/`
         // case DeviceMapping.OTHER_DEVICES: return `customer/bm_servers/${deviceId}/check_auth`;
+        case DeviceMapping.PDU: return `customer/pdus/${deviceId}/`;
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI: return `customer/vmware_vms/${deviceId}/get_vm_details/`;
@@ -1951,7 +1953,7 @@ export const SYNC_ALL_MAC_MINIS = () => `customer/macdevices/sync_mac_devices/`;
 
 export const GET_ALL_DEVICES_TAGS = () => `customer/tags/?page_size=0`;
 
-export const GET_OCI_ACOUNTS = () => `customer/managed/oci/account/`;
+export const GET_OCI_ACOUNTS = () => `customer/managed/oci/accounts/`;
 
 export const GET_OCI_REGIONS = () => `${environment.staticData}oci-data/oci-regions.json`;
 
@@ -1965,7 +1967,7 @@ export const DELETE_OCI_ACCOUNT = (uuid: string) => `customer/oci/account/${uuid
 
 export const SYNC_OCI_VMS_BY_ACCOUNT_ID = (uuid: string) => `customer/oci/account/${uuid}/vm_sync/`;
 
-export const SYNC_ALL_OCI_VMS = () => `/customer/managed/oci/account/all_vm_sync/`;
+export const SYNC_ALL_OCI_VMS = () => `/customer/managed/oci/accounts/all_vm_sync/`;
 
 export const GET_OCI_VMS = () => `customer/managed/oci/instances/`;
 
@@ -1977,31 +1979,31 @@ export const OCI_VMS_TERMINATE_BY_VM_ID = (uuid: string) => `customer/managed/oc
 
 export const OCI_VMS_CREATE = () => `customer/managed/oci/instances/`;
 
-export const OCI_COMPARTMENTS_BY_ACCOUNT_ID = (uuid: string) => `customer/managed/oci/account/${uuid}/get_compartments/`;
+export const OCI_COMPARTMENTS_BY_ACCOUNT_ID = (uuid: string) => `customer/managed/oci/accounts/${uuid}/get_compartments/`;
 
-export const OCI_REGIONS_BY_ACCOUNT_ID = (uuid: string) => `customer/managed/oci/account/${uuid}/get_subscribed_regions/`;
+export const OCI_REGIONS_BY_ACCOUNT_ID = (uuid: string) => `customer/managed/oci/accounts/${uuid}/get_subscribed_regions/`;
 
 export const OCI_USERS_BY_ACCOUNT_ID = (uuid: string) => `customer/oci/account/${uuid}/get_users/`;
 
-export const OCI_AVAILABLILITY_DOMAIN_BY_ACCOUNT_ID = (uuid: string, compartmentId: string) => `customer/managed/oci/account/${uuid}/get_ads/?compartment_id=${compartmentId}`;
+export const OCI_AVAILABLILITY_DOMAIN_BY_ACCOUNT_ID = (uuid: string, compartmentId: string) => `customer/managed/oci/accounts/${uuid}/get_ads/?compartment_id=${compartmentId}`;
 
-export const OCI_SHAPE_BY_ACCOUNT_ID = (uuid: string, compartmentId: string) => `customer/managed/oci/account/${uuid}/get_shapes/?compartment_id=${compartmentId}`;
+export const OCI_SHAPE_BY_ACCOUNT_ID = (uuid: string, compartmentId: string) => `customer/managed/oci/accounts/${uuid}/get_shapes/?compartment_id=${compartmentId}`;
 
-export const OCI_SUBNET_BY_ACCOUNT_ID = (uuid: string, compartmentId: string) => `customer/managed/oci/account/${uuid}/get_subnets/?compartment_id=${compartmentId}`;
+export const OCI_SUBNET_BY_ACCOUNT_ID = (uuid: string, compartmentId: string) => `customer/managed/oci/accounts/${uuid}/get_subnets/?compartment_id=${compartmentId}`;
 
-export const OCI_IMAGE_BY_ACCOUNT_ID = (uuid: string, compartmentId: string, shape: string) => `customer/managed/oci/account/${uuid}/get_images/?compartment_id=${compartmentId}&shape=${shape}`;
+export const OCI_IMAGE_BY_ACCOUNT_ID = (uuid: string, compartmentId: string, shape: string) => `customer/managed/oci/accounts/${uuid}/get_images/?compartment_id=${compartmentId}&shape=${shape}`;
 
 export const OCI_BUCKETS_BY_ACCOUNT_ID = (OCIAccountUUID: string) => `customer/oci/account/${OCIAccountUUID}/get_buckets/`;
 
-export const CREATE_OCI_BUCKET = (OCIAccountUUID: string) => `customer/managed/oci/account/${OCIAccountUUID}/create_bucket/`;
+export const CREATE_OCI_BUCKET = (OCIAccountUUID: string) => `customer/managed/oci/accounts/${OCIAccountUUID}/create_bucket/`;
 
-export const DELETE_OCI_BUCKET = (OCIAccountUUID: string) => `customer/managed/oci/account/${OCIAccountUUID}/delete_bucket/`;
+export const DELETE_OCI_BUCKET = (OCIAccountUUID: string) => `customer/managed/oci/accounts/${OCIAccountUUID}/delete_bucket/`;
 
-export const LIST_OCI_BUCKET_FILES = (OCIAccountUUID: string, bucketName: string) => `customer/managed/oci/account/${OCIAccountUUID}/list_files/?bucket_name=${bucketName}`;
+export const LIST_OCI_BUCKET_FILES = (OCIAccountUUID: string, bucketName: string) => `customer/managed/oci/accounts/${OCIAccountUUID}/list_files/?bucket_name=${bucketName}`;
 
-export const UPLOAD_FILE_TO_OCI_BUCKET = (OCIAccountUUID: string) => `customer/managed/oci/account/${OCIAccountUUID}/upload_file/`;
+export const UPLOAD_FILE_TO_OCI_BUCKET = (OCIAccountUUID: string) => `customer/managed/oci/accounts/${OCIAccountUUID}/upload_file/`;
 
-export const DELETE_FILE_FROM_OCI_BUCKET = (OCIAccountUUID: string) => `customer/managed/oci/account/${OCIAccountUUID}/delete_file/`;
+export const DELETE_FILE_FROM_OCI_BUCKET = (OCIAccountUUID: string) => `customer/managed/oci/accounts/${OCIAccountUUID}/delete_file/`;
 
 export const GET_OCI_CLOUD_DATA = (cloudId: number) => `/customer/cloud_data/${cloudId}/oci_data/`;
 
@@ -2097,6 +2099,8 @@ export const MONITORING_CONFIGURATION_BY_DEVICE_TYPE = (deviceType: DeviceMappin
         case DeviceMapping.AWS_ACCOUNTS: return `customer/managed/aws/accounts/${deviceId}/monitoring/`;
         case DeviceMapping.AWS_RESOURCES: return `customer/managed/aws/resources/${deviceId}/monitoring/`;
         case DeviceMapping.GCP_ACCOUNTS: return `customer/managed/gcp/accounts/${deviceId}/monitoring/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/`;
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `/customer/managed/azure/resources/${deviceId}/monitoring/`;
@@ -2136,6 +2140,8 @@ export const TOGGLE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, devi
         case DeviceMapping.AZURE_ACCOUNTS: return `customer/managed/azure/accounts/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.GCP_ACCOUNTS: return `customer/managed/gcp/accounts/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.AWS_ACCOUNTS: return `customer/managed/aws/accounts/${deviceId}/monitoring/${action}/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/${action}/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `/customer/managed/azure/resources/${deviceId}/monitoring/${action}/`;
@@ -2197,6 +2203,8 @@ export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, 
         case DeviceMapping.AZURE_ACCOUNTS: return `/customer/managed/azure/accounts/${deviceId}/`;
         case DeviceMapping.AWS_ACCOUNTS: return `/customer/managed/aws/accounts/${deviceId}/`;
         case DeviceMapping.GCP_ACCOUNTS: return `/customer/managed/gcp/accounts/${deviceId}/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/`;
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `/customer/managed/azure/resources/${deviceId}/`;
@@ -2309,6 +2317,8 @@ export const ZABBIX_DEVICE_GRAPHS = (deviceType: DeviceMapping, deviceId: string
         case DeviceMapping.AWS_ACCOUNTS: return `/customer/managed/aws/accounts/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/graphs/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/graphs/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/graphs/`;
@@ -2355,6 +2365,8 @@ export const MANAGE_ZABBIX_DEVICE_GRAPH = (deviceType: DeviceMapping, deviceId: 
         case DeviceMapping.AWS_ACCOUNTS: return `customer/managed/aws/accounts/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/graphs/${graphId}/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/graphs/${graphId}/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/graphs/${graphId}/`;
@@ -2399,6 +2411,8 @@ export const ZABBIX_DEVICE_GRAPH_IMAGE = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.AWS_ACCOUNTS: return `customer/managed/aws/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/graph_image/${graphId}/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/graph_image/${graphId}/`;
@@ -2444,6 +2458,8 @@ export const ZABBIX_DEVICE_GRAPH_ITEMS = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.AWS_ACCOUNTS: return `/customer/managed/aws/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/items/`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/items/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/items/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/items/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/items/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/items/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/items/`;
@@ -2489,6 +2505,8 @@ export const ZABBIX_DEVICE_GRAPH_NUMBERIC_ITEMS = (deviceType: DeviceMapping, de
         case DeviceMapping.AWS_ACCOUNTS: return `/customer/managed/aws/accounts/${deviceId}/monitoring/numeric_items/`
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/items/`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/numeric_items/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/numeric_items/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/items/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/items/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/items/`;
@@ -2556,6 +2574,8 @@ export const TRIGGERS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: str
         case DeviceMapping.GCP_ACCOUNTS: return `customer/managed/gcp/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/resources/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
@@ -3873,6 +3893,8 @@ export const ZABBIX_DEVICE_EVENTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
         case DeviceMapping.AWS_ACCOUNTS: return `customer/managed/aws/accounts/${deviceId}/monitoring/events/`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/events/`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/events/`;
+        case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/events/`;
+        case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/events/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/events/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/events/`;
         case DeviceMapping.DOCKER_CONTAINER: return `customer/docker/containers/${deviceId}/monitoring/events/`;

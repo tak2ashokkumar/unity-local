@@ -141,6 +141,8 @@ export interface PrivateCloudInventoryResourceViewData {
   key: string;
   label: string;
   count: number;
+  iconClass?: string;
+  iconColor?: string;
 }
 
 export interface PrivateCloudGeoDistributionResponse {
@@ -148,6 +150,9 @@ export interface PrivateCloudGeoDistributionResponse {
   total_datacenters: number;
   total_resources: number;
   total_alerts?: number;
+  totalAlerts?: number;
+  alert_segregation?: PrivateCloudGeoAlertSegregation;
+  alertSegregation?: PrivateCloudGeoAlertSegregation;
   private_clouds: PrivateCloudGeoDistributionItem[];
 }
 
@@ -162,7 +167,9 @@ export interface PrivateCloudGeoDistributionItem {
   lat?: string;
   long?: string;
   total_alerts?: number;
+  totalAlerts?: number;
   alert_segregation?: PrivateCloudGeoAlertSegregation;
+  alertSegregation?: PrivateCloudGeoAlertSegregation;
   resources?: PrivateCloudGeoResources;
   vms?: number;
   hypervisors?: number;
@@ -241,7 +248,7 @@ export interface PrivateCloudGeoDistributionCell {
   firewall: number;
   loadBalancer: number;
   storage: number;
-  deviceResources: Array<{ label: string; value: number }>;
+  deviceResources: Array<{ label: string; value: number; iconClass: string; iconColor: string }>;
   dimmed?: boolean;
 }
 
