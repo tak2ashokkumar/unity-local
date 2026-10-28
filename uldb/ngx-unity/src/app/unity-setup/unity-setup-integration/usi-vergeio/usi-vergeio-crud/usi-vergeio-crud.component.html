@@ -1,0 +1,120 @@
+<div class="container-fluid mt-4">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <span class="font-lg font-500">{{action}} VergeIO Account</span>
+                        <button class="btn btn-pill btn-warning pull-right btn-sm" type="button" container="body"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <form *ngIf="credentialForm" [formGroup]="credentialForm">
+                            <div class="form-group" *ngIf="nonFieldErr">
+                                <div class="invalid-credentials">{{nonFieldErr}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 form-group">
+                                    <label for="name" class="form-col-form-label">Account Name<em>*</em></label>
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        placeholder="Enter Account Name"
+                                        [class.is-invalid]="credentialFormErrors.name">
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.name">
+                                        {{credentialFormErrors.name}}</div>
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="hostname" class="form-col-form-label">Host Name<em>*</em></label>
+                                    <input id="hostname" class="form-control" type="text" formControlName="hostname"
+                                        placeholder="Enter Host Name"
+                                        [class.is-invalid]="credentialFormErrors.hostname">
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.hostname">
+                                        {{credentialFormErrors.hostname}}</div>
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="port" class="form-col-form-label">Port<em>*</em></label>
+                                    <input id="port" class="form-control" type="number" formControlName="port"
+                                        placeholder="Enter Port" [class.is-invalid]="credentialFormErrors.port">
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.port">
+                                        {{credentialFormErrors.port}}</div>
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="username" class="form-col-form-label">User Name<em>*</em></label>
+                                    <input id="username" class="form-control" type="text" formControlName="username"
+                                        placeholder="Enter User Name"
+                                        [class.is-invalid]="credentialFormErrors.username">
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.username">
+                                        {{credentialFormErrors.username}}</div>
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="password" class="form-col-form-label">Password<em
+                                            *ngIf="action === 'Add'">*</em></label>
+                                    <input id="password" class="form-control" type="password"
+                                        formControlName="password"
+                                        [placeholder]="action === 'Edit' ? 'Leave blank to keep unchanged' : 'Enter Password'"
+                                        [class.is-invalid]="credentialFormErrors.password">
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.password">
+                                        {{credentialFormErrors.password}}</div>
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="collector" class="form-col-form-label">Collector<em>*</em></label>
+                                    <select id="collector" name="collector" class="form-control"
+                                        formControlName="collector"
+                                        [ngClass]="{'is-invalid': credentialFormErrors.collector}">
+                                        <option [value]="''" disabled>Select Collector</option>
+                                        <option *ngFor="let collector of collectorList" [ngValue]="collector">
+                                            {{collector.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.collector">
+                                        {{credentialFormErrors.collector}}</div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col d-flex align-items-center justify-content-start">
+                                    <div class="w-20">
+                                        <input id="enabled" class="ut-checkbox" type="checkbox"
+                                            formControlName="enabled">
+                                        <label for="enabled" class="primary mb-0">Enabled</label>
+                                    </div>
+                                    <div class="w-20">
+                                        <input id="is_managed" class="ut-checkbox" type="checkbox"
+                                            formControlName="is_managed">
+                                        <label for="is_managed" class="primary mb-0">Manage Account</label>
+                                    </div>
+                                    <div class="w-20">
+                                        <input id="verify_ssl" class="ut-checkbox" type="checkbox"
+                                            formControlName="verify_ssl">
+                                        <label for="verify_ssl" class="primary mb-0">Verify SSL</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="row mx-0" *ngIf="testResult">
+                            <div class="col-12 px-0">
+                                <div class="alert py-2 mb-0"
+                                    [ngClass]="testResult.success ? 'alert-success' : 'alert-danger'">
+                                    <i class="fas mr-1"
+                                        [ngClass]="testResult.success ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                                    {{testResult.message}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-end align-items-center">
+                        <button class="btn btn-sm btn-primary mr-auto" type="button" (click)="testConnection()"
+                            [disabled]="testing" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="btn">
+                            <i class="fas fa-plug mr-1" [ngClass]="{'fa-spin': testing}"></i>
+                            {{testing ? 'Testing...' : 'Test Connection'}}
+                        </button>
+                        <button class="btn btn-sm btn-danger ml-1" type="button" (click)="goBack()">Cancel</button>
+                        <button class="btn btn-sm btn-success ml-1" type="button" (click)="onSubmit()"
+                            [disabled]="!connectionTested"
+                            [tooltip]="!connectionTested ? 'Run Test Connection successfully to enable Save' : ''"
+                            container="body">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

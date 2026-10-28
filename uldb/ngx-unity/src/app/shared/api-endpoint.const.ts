@@ -111,6 +111,50 @@ export const NUTANIX_STORAGE_POOLS = (pcId: string) => `/customer/nutanix/${pcId
 
 export const NUTANIX_DISCOVERY_LIST = (pcId: string) => `/customer/nutanix/${pcId}/discovery/`;
 
+/**
+ * VergeIO private cloud endpoints.
+ * Accounts live under their own namespace (customer/vergeio/accounts/) - same
+ * shape as the vCenter integration (list/create/get/update/delete), with
+ * VergeIO specific verbs for connection check, sync, discovery and VM actions.
+ */
+export const VERGEIO_ACCOUNTS = () => `customer/vergeio/accounts/`;
+
+export const VERGEIO_ACCOUNT_BY_ID = (accountId: string) => `customer/vergeio/accounts/${accountId}/`;
+
+export const VERGEIO_CHECK_CONNECTION = (accountId: string) => `customer/vergeio/accounts/${accountId}/check_connection/`;
+
+// Collection-level connection check for validating credentials before the
+// account exists (Add flow). The credentials are sent in the request body.
+export const VERGEIO_CHECK_CONNECTION_NEW = () => `customer/vergeio/accounts/check_connection/`;
+
+export const VERGEIO_SYNC = (accountId: string) => `customer/vergeio/accounts/${accountId}/sync/`;
+
+export const VERGEIO_COMPONENT_SUMMARY = (accountId: string) => `customer/vergeio/accounts/${accountId}/component_summary/`;
+
+export const VERGEIO_DISCOVERY = (accountId: string) => `customer/vergeio/accounts/${accountId}/discovery/`;
+
+export const VERGEIO_PROVISION_VM = (accountId: string) => `customer/vergeio/accounts/${accountId}/provision_vm/`;
+
+export const VERGEIO_VIRTUAL_MACHINES = () => `customer/vergeio/virtual_machines/`;
+
+export const VERGEIO_VM_SUMMARY = () => `customer/vergeio/virtual_machines/summary/`;
+
+export const VERGEIO_VM_ACTION = (vmId: string) => `customer/vergeio/virtual_machines/${vmId}/actions/`;
+
+export const VERGEIO_OPERATION = (operationId: string) => `customer/vergeio/operations/${operationId}/`;
+
+export const VERGEIO_VM_MONITORING = (vmId: string) => `customer/vergeio/virtual_machines/${vmId}/monitoring/`;
+
+export const VERGEIO_VM_MONITORING_START = (vmId: string) => `customer/vergeio/virtual_machines/${vmId}/monitoring/start/`;
+
+export const VERGEIO_VM_MONITORING_STOP = (vmId: string) => `customer/vergeio/virtual_machines/${vmId}/monitoring/stop/`;
+
+export const VERGEIO_VM_MONITORING_STATUS = (vmId: string) => `customer/vergeio/virtual_machines/${vmId}/monitoring/status/`;
+
+export const VERGEIO_VM_MONITORING_METRICS = (vmId: string) => `customer/vergeio/virtual_machines/${vmId}/monitoring/metrics/`;
+
+export const VERGEIO_VM_MONITORING_ALERTS = (vmId: string) => `customer/vergeio/virtual_machines/${vmId}/monitoring/alerts/`;
+
 export const LIST_USER = () => `customer/organizationusers/`;
 
 export const USER_CARRIER_LIST = () => `customer/carrier_data/?page_size=0`;
@@ -202,6 +246,7 @@ export const CHECK_AUTH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/check_auth/`;
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/check_auth/`;
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/check_auth/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/check_auth/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI: return `rest/vmware_vms/${deviceId}/check_auth/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/check_auth/`;
@@ -2089,6 +2134,7 @@ export const MONITORING_CONFIGURATION_BY_DEVICE_TYPE = (deviceType: DeviceMappin
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/`;
@@ -2131,6 +2177,7 @@ export const TOGGLE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, devi
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/${action}/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/${action}/`;
@@ -2194,6 +2241,7 @@ export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, 
         case DeviceMapping.PDU: return PDU_UPDATE(deviceId);//This is to get from `customer/servers/{uuid}` 
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/`;
@@ -2232,6 +2280,7 @@ export const ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, dev
         case DeviceMapping.MAC_MINI: return `/customer/macdevices/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.DB_SERVER: return `customer/database_servers/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/device_data/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/device_data/`;
@@ -2267,6 +2316,7 @@ export const ZABBIX_DEVICE_ALERTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/alerts/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/alerts/`;
@@ -2303,6 +2353,7 @@ export const ZABBIX_DEVICE_GRAPHS = (deviceType: DeviceMapping, deviceId: string
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/graphs/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/graphs/`;
@@ -2352,6 +2403,7 @@ export const MANAGE_ZABBIX_DEVICE_GRAPH = (deviceType: DeviceMapping, deviceId: 
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/graphs/${graphId}/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/graphs/${graphId}/`;
@@ -2398,6 +2450,7 @@ export const ZABBIX_DEVICE_GRAPH_IMAGE = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/graph_image/${graphId}/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/graph_image/${graphId}/`;
@@ -2445,6 +2498,7 @@ export const ZABBIX_DEVICE_GRAPH_ITEMS = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/items/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/items/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/items/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/items/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/items/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/items/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/items/`;
@@ -2492,6 +2546,7 @@ export const ZABBIX_DEVICE_GRAPH_NUMBERIC_ITEMS = (deviceType: DeviceMapping, de
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/numeric_items/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/numeric_items/`;
@@ -2537,6 +2592,7 @@ export const ZABBIX_SENSOR_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, dev
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/sensor_data/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/sensor_data/`;
@@ -2562,6 +2618,7 @@ export const TRIGGERS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: str
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.DB_SERVER: return `customer/database_servers/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
@@ -2786,6 +2843,7 @@ export const ZABBIX_DEVICE_GRAPH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, de
         case DeviceMapping.DB_SERVER: return `customer/database_servers/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.ESXI: return `customer/vmware/esxi_vms/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
@@ -3008,6 +3066,7 @@ export const DEVICE_BY_ID = (deviceType: DeviceMapping, deviceId: string) => {
         case DeviceMapping.OTHER_DEVICES: return `customer/bm_servers/${deviceId}/`;
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `/rest/vmware/migrate/${deviceId}/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `rest/openstack/migration/${deviceId}/`;
         case DeviceMapping.VCLOUD: return `rest/openstack/migration/${deviceId}/`;
         case DeviceMapping.HYPER_V: return `/customer/hyperv/vms/${deviceId}/`;
@@ -3351,6 +3410,7 @@ export const DEVICE_UPTIME_BY_DEVICE_ID = (deviceType: DeviceMapping, uuid: stri
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/uptime/`;
         case DeviceMapping.PDU: return `customer/pdus/${uuid}/uptime/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${uuid}/uptime/`
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${uuid}/uptime/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/openstack/${uuid}/uptime/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/${uuid}/uptime/`;
         case DeviceMapping.ESXI: return `customer/esxi_vms/${uuid}/uptime/`;
@@ -3753,6 +3813,7 @@ export const DEVICE_SERIAL_NUMBER_BY_DEVICE_TYPE = (deviceType: DeviceMapping, d
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${deviceId}/serial_number/`;
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/serial_number/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `/rest/vmware/migrate/${deviceId}/serial_number/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/serial_number/`;
         case DeviceMapping.HYPER_V: return `/customer/hyperv/vms/${deviceId}/serial_number/`;
         case DeviceMapping.ESXI: return `/rest/vmware/esxi_vms/${deviceId}/serial_number/`;
         case DeviceMapping.CUSTOM_VIRTUAL_MACHINE: return `rest/customer/virtual_machines/${deviceId}/serial_number/`;
@@ -3782,6 +3843,7 @@ export const GET_CONFIGURED_DEVICES = () => `/customer/fast/monitored_devices`;
 export const UPDATE_VM_DETAILS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `/rest/vmware/migrate/${deviceId}/update_vm_details/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/update_vm_details/`;
         case DeviceMapping.HYPER_V: return `/customer/hyperv/vms/${deviceId}/`;
         default: console.error('Invalid device type : ', deviceType);
     }
@@ -3880,6 +3942,7 @@ export const ZABBIX_DEVICE_EVENTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/monitoring/events/`;
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/${deviceId}/monitoring/events/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `rest/vmware/migrate/${deviceId}/monitoring/events/`;
+        case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/monitoring/events/`;
         case DeviceMapping.VCLOUD: return `customer/vclouds/virtual_machines/${deviceId}/monitoring/events/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/monitoring/events/`;
         case DeviceMapping.ESXI: return `rest/vmware/esxi_vms/${deviceId}/monitoring/events/`;

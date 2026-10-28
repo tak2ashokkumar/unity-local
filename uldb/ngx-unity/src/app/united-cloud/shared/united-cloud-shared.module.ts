@@ -361,6 +361,7 @@ import { VcenterZabbixComponent } from './vcenter-cloud/vcenter-zabbix/vcenter-z
 import { ZabbixVcenterMonitoringConfigComponent } from './vcenter-cloud/vcenter-zabbix/zabbix-vcenter-monitoring-config/zabbix-vcenter-monitoring-config.component';
 import { NutanixVmsDetailsComponent } from './vms/vms-list-nutanix/nutanix-vms-details/nutanix-vms-details.component';
 import { VmsListNutanixComponent } from './vms/vms-list-nutanix/vms-list-nutanix.component';
+import { VmsListVergeioComponent } from './vms/vms-list-vergeio/vms-list-vergeio.component';
 import { ZabbixEventsComponent } from './zabbix-events/zabbix-events.component';
 import { ZabbixGraphsComponent } from './zabbix-graphs/zabbix-graphs.component';
 import { ZabbixTriggerScriptsComponent } from './zabbix-trigger-scripts/zabbix-trigger-scripts.component';
@@ -628,6 +629,7 @@ export const MY_NATIVE_FORMATS = {
     NutanixStoragePoolsComponent,
     NutanixStoragePoolsDetailsComponent,
     VmsListNutanixComponent,
+    VmsListVergeioComponent,
     NutanixVmsDetailsComponent,
     NutanixVirtualDisksComponent,
     NutanixVirtualDisksDetailsComponent,

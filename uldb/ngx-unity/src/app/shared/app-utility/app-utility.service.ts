@@ -98,6 +98,7 @@ export class AppUtilityService {
       case 'GCP': return PlatFormMapping.GCP;
       case 'United Private Cloud vCenter': return PlatFormMapping.UNITED_PRIVATE_CLOUD_VCENTER;
       case 'Nutanix': return PlatFormMapping.NUTANIX;
+      case 'VergeIO': return PlatFormMapping.VERGEIO;
       default: return null;
     }
   }
@@ -135,6 +136,7 @@ export class AppUtilityService {
       case 'United_private_cloud_vcenter': return DeviceMapping.UNITED_PRIVATE_CLOUD_VCENTER;
       case 'custom': return DeviceMapping.OTHER_DEVICES;
       case 'nutanix': return DeviceMapping.NUTANIX_VIRTUAL_MACHINE;
+      case 'vergeio': return DeviceMapping.VERGEIO_VIRTUAL_MACHINE;
       case 'sdwan': return DeviceMapping.SDWAN_ACCOUNTS;
       case 'sdwan_device': return DeviceMapping.SDWAN_DEVICES;
       case 'viptela': return DeviceMapping.VIPTELA_ACCOUNT;
@@ -283,6 +285,8 @@ export class AppUtilityService {
         return `${environment.assetsUrl}external-brand/logos/hyper-v.svg`;
       case ServerSidePlatFormMapping.NUTANIX:
         return `${environment.assetsUrl}external-brand/logos/nutanix.svg`;
+      case ServerSidePlatFormMapping.VERGEIO:
+        return `${environment.assetsUrl}external-brand/logos/vergeio.svg`;
       case ServerSidePlatFormMapping.CUSTOM:
         return;
       // return `${environment.assetsUrl}external-brand/logos/Customs.svg`;
@@ -708,6 +712,7 @@ export enum DeviceMapping {
   G3_KVM = 'UnitedPrivateCloud - KVM',
   NUTANIX_ACCOUNT = 'Nutanix',
   NUTANIX_VIRTUAL_MACHINE = 'Nutanix VM',
+  VERGEIO_VIRTUAL_MACHINE = 'VergeIO VM',
   //NUTANIX_VM = 'Virtual Machine',
   CUSTOM_VIRTUAL_MACHINE = 'Custom VM',
   VIRTUAL_MACHINE = 'Virtual Machine',
@@ -894,6 +899,7 @@ export enum PlatFormMapping {
   HYPER_V = 'Hyper-V',
   CUSTOM = 'Custom',
   NUTANIX = 'Nutanix',
+  VERGEIO = 'VergeIO',
   OPENSTACK = 'Openstack',
   OPENSTACKClOUD = 'OpenStack',
   PROXMOX = 'Proxmox',
@@ -915,7 +921,8 @@ export enum ServerSidePlatFormMapping {
   HYPER_V = 'Hyperv',
   ESXI = 'ESXi',
   UNITED_PRIVATE_CLOUD_VCENTER = 'United Private Cloud vCenter',
-  NUTANIX = 'Nutanix'
+  NUTANIX = 'Nutanix',
+  VERGEIO = 'VergeIO'
 }
 
 export enum BMServerPlatFormMapping {

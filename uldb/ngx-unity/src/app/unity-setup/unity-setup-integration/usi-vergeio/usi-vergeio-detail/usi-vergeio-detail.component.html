@@ -1,0 +1,143 @@
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card round-edge border-top-0">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex align-items-center font-500">
+                            <span class="font-lg">{{account?.name || 'VergeIO'}}</span>
+                            <span class="ml-2 text-muted font-sm" *ngIf="account?.hostname">{{account.hostname}}</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button class="btn btn-pill btn-warning pull-right btn-sm" type="button" container="body"
+                                (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                            </button>
+                            <data-refresh-btn [page]="currentCriteria.pageNo"
+                                (refresh)="refreshData($event)"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <!-- Component summary tiles -->
+                        <div class="row mx-0">
+                            <div class="col-md-2 col-4 mb-3" *ngFor="let tile of summaryTiles">
+                                <div class="card round-edge h-100 mb-0">
+                                    <div class="card-body p-2 d-flex align-items-center">
+                                        <span class="fas {{tile.icon}} fa-lg text-primary mr-2"></span>
+                                        <div class="d-flex flex-column">
+                                            <span class="font-lg font-500">{{tile.value}}</span>
+                                            <span class="font-xs text-muted">{{tile.label}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VM power-state breakdown -->
+                        <div class="row mx-0 mb-2" *ngIf="summary?.vm_details">
+                            <div class="col-12 d-flex align-items-center font-sm">
+                                <span class="mr-3"><span class="fas fa-circle text-success mr-1"></span>Up:
+                                    {{summary.vm_details.vm_up}}</span>
+                                <span class="mr-3"><span class="fas fa-circle text-danger mr-1"></span>Down:
+                                    {{summary.vm_details.vm_down}}</span>
+                                <span class="mr-3"><span class="fas fa-circle text-muted mr-1"></span>Unknown:
+                                    {{summary.vm_details.vm_unknown}}</span>
+                                <span class="font-500">Total: {{summary.vm_details.vm_count}}</span>
+                            </div>
+                        </div>
+
+                        <!-- Virtual machines -->
+                        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                            <div class="d-flex justify-content-start align-items-center font-500">
+                                <span class="badge badge-secondary font-sm">{{vmCount}}</span>
+                                <span class="ml-1 font-md">Virtual Machines</span>
+                            </div>
+                            <div class="d-flex justify-content-end align-items-center">
+                                <div class="mr-2">
+                                    <search-box [searchValue]="currentCriteria.searchValue"
+                                        (searched)="onSearched($event)"></search-box>
+                                </div>
+                                <table-page-size *ngIf="vmViewData.length" [currentPageSize]="currentCriteria.pageSize"
+                                    [totalCount]="vmCount" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                        <table class="table table-sm text-left">
+                            <thead class="bg-light">
+                                <th class="tdw-25">Name</th>
+                                <th class="tdw-15 text-center">Power State</th>
+                                <th class="tdw-15">Cluster</th>
+                                <th class="tdw-15">Host</th>
+                                <th class="tdw-10 text-center">vCPU</th>
+                                <th class="tdw-10 text-center">RAM (MB)</th>
+                                <th class="action-icons-column text-center">Actions</th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let vm of vmViewData; trackBy: trackByUuid" truncateText>
+                                    <td class="tdw-25">
+                                        <div [tooltip]="vm.name">{{vm.name}}</div>
+                                    </td>
+                                    <td class="tdw-15 text-center">
+                                        <span class="{{vm.powerStateClass}}">{{vm.powerState}}</span>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="vm.clusterId">{{vm.clusterId}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="vm.hostId">{{vm.hostId}}</div>
+                                    </td>
+                                    <td class="tdw-10 text-center">
+                                        <div>{{vm.cpuCores}}</div>
+                                    </td>
+                                    <td class="tdw-10 text-center">
+                                        <div>{{vm.ram}}</div>
+                                    </td>
+                                    <td class="action-icons-column text-center">
+                                        <button class="action-icons mb-0 fas fa-heartbeat font-sm ml-1" container="body"
+                                            tooltip="Monitoring" (click)="openMonitoring(vm)" accessControl
+                                            moduleName="Private Cloud" accessType="View Private Cloud"
+                                            elementType="actionbtn">
+                                        </button>
+                                        <!-- VM power operations are OUT OF SCOPE per DCIM-1411: hidden via
+                                             powerActionsEnabled (code retained for a future ticket). -->
+                                        <ng-container *ngIf="powerActionsEnabled">
+                                            <button class="action-icons mb-0 fas fa-play font-sm ml-1" container="body"
+                                                tooltip="Power On" (click)="powerAction(vm, 'power_on')"
+                                                [ngClass]="{'action-icons-disabled': vm.actionInProgress}" accessControl
+                                                moduleName="Private Cloud" accessType="Manage Private Cloud"
+                                                elementType="actionbtn">
+                                            </button>
+                                            <button class="action-icons mb-0 fas fa-stop font-sm ml-1" container="body"
+                                                tooltip="Power Off" (click)="powerAction(vm, 'power_off')"
+                                                [ngClass]="{'action-icons-disabled': vm.actionInProgress}" accessControl
+                                                moduleName="Private Cloud" accessType="Manage Private Cloud"
+                                                elementType="actionbtn">
+                                            </button>
+                                            <button class="action-icons mb-0 fas fa-redo font-sm ml-1" container="body"
+                                                [tooltip]="vm.actionInProgress ? 'In Progress' : 'Restart'"
+                                                (click)="powerAction(vm, 'restart')"
+                                                [ngClass]="{'action-icons-disabled fa-spin': vm.actionInProgress}"
+                                                accessControl moduleName="Private Cloud" accessType="Manage Private Cloud"
+                                                elementType="actionbtn">
+                                            </button>
+                                        </ng-container>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries *ngIf="vmViewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="vmCount"></table-entries>
+                        <table-pager *ngIf="vmViewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="vmCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!vmViewData.length">No virtual machines
+                            available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #monitoring>
+    <usi-vergeio-vm-monitoring *ngIf="selectedVm" [vmId]="selectedVm.uuid" [vmName]="selectedVm.name"
+        (close)="monitoringRef.hide()"></usi-vergeio-vm-monitoring>
+</ng-template>

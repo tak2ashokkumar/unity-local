@@ -95,17 +95,17 @@ export class PrivateCloudComponent implements OnInit, OnDestroy {
 
   showDeviceTab(tab: TabData, res: PrivateCloudType): boolean {
     switch (tab.url) {
-      case 'alldevices': return res['nutanix'] ? false : true;
+      case 'alldevices': return res['nutanix'] || this.isVergeioCloud(res) ? false : true;
       case 'switches': return res['switch'] ? res['switch'].length ? true : false : false;
       case 'firewalls': return res['firewall'] ? res['firewall'].length ? true : false : false;
       case 'loadbalancers': return res['load_balancer'] ? res['load_balancer'].length ? true : false : false;
       case 'hypervisors': return res['hypervisors'] ? res['hypervisors'].length ? true : false : false;
       case 'bmservers': return res['bm_server'] ? res['bm_server'].length ? true : false : false;
       case 'macdevices': return res['mac_device'] ? res['mac_device'].length ? true : false : false;
-      case 'containercontrollers': return this.isVcenterCloud(res) || res['nutanix'] ? false : true;
+      case 'containercontrollers': return this.isVcenterCloud(res) || this.isVergeioCloud(res) || res['nutanix'] ? false : true;
       case 'storagedevices': return res['storage_device'] ? res['storage_device'].length ? true : false : false;
-      case 's3account': return this.isVcenterCloud(res) || res['nutanix'] ? false : true;
-      case 'databases': return this.isVcenterCloud(res) || res['nutanix'] ? false : true;
+      case 's3account': return this.isVcenterCloud(res) || this.isVergeioCloud(res) || res['nutanix'] ? false : true;
+      case 'databases': return this.isVcenterCloud(res) || this.isVergeioCloud(res) || res['nutanix'] ? false : true;
       case 'otherdevices': return res['customdevice'] ? res['customdevice'].length ? true : false : false;
       case 'clusters': return res['nutanix'] ? res.nutanix.cluster?.total ? true : false : false;
       case 'vcclusters': return res['clusters'] ? res['clusters'].length ? true : false : false;
@@ -123,6 +123,13 @@ export class PrivateCloudComponent implements OnInit, OnDestroy {
   isVcenterCloud(res: PrivateCloudType) {
     const cloudPlatform = this.utilService.getCloudTypeByPlatformType(res.platform_type);
     if (this.pcId == res.uuid && (cloudPlatform == PlatFormMapping.VMWARE || cloudPlatform == PlatFormMapping.UNITED_PRIVATE_CLOUD_VCENTER)) {
+      return true;
+    }
+  }
+
+  isVergeioCloud(res: PrivateCloudType) {
+    const cloudPlatform = this.utilService.getCloudTypeByPlatformType(res.platform_type);
+    if (this.pcId == res.uuid && cloudPlatform == PlatFormMapping.VERGEIO) {
       return true;
     }
   }

@@ -52,5 +52,10 @@ export const PrivateCloudsWidgetMetadata: PrivateCloudsWidgetMetadataType[] = [
         imageURL:  `nutanix.svg`,
         altText: 'Nutanix',
         platFormType: ServerSidePlatFormMapping.NUTANIX
+    },
+    {
+        imageURL:  `vergeio.svg`,
+        altText: 'VergeIO',
+        platFormType: ServerSidePlatFormMapping.VERGEIO
     }
 ]

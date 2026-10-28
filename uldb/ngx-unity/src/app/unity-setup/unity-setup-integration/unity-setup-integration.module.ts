@@ -111,6 +111,10 @@ import { UsiPrivateCloudNutanixWidgetComponent } from './usi-private-cloud-nutan
 import { UsiPcVmwareVcenterCrudComponent } from './usi-private-clouds/usi-pc-vmware-vcenter-crud/usi-pc-vmware-vcenter-crud.component';
 import { UsiPrivateCloudsResourcesComponent } from './usi-private-clouds/usi-private-clouds-resources/usi-private-clouds-resources.component';
 import { UsiPrivateCloudsComponent } from './usi-private-clouds/usi-private-clouds.component';
+import { UsiVergeioComponent } from './usi-vergeio/usi-vergeio.component';
+import { UsiVergeioCrudComponent } from './usi-vergeio/usi-vergeio-crud/usi-vergeio-crud.component';
+import { UsiVergeioDetailComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-detail.component';
+import { UsiVergeioVmMonitoringComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-vm-monitoring/usi-vergeio-vm-monitoring.component';
 import { UsiPublicCloudAwsWidgetComponent } from './usi-public-cloud-aws-widget/usi-public-cloud-aws-widget.component';
 import { UsiPublicCloudAwsCrudComponent } from './usi-public-cloud-aws/usi-public-cloud-aws-crud/usi-public-cloud-aws-crud.component';
 import { UsiPublicCloudAwsResourceDataComponent } from './usi-public-cloud-aws/usi-public-cloud-aws-resource-data/usi-public-cloud-aws-resource-data.component';
@@ -247,6 +251,10 @@ import { PrivateCloudEsxiCrudComponent } from 'src/app/app-shared-crud/private-c
     UsiEventIngestionNewRelicCrudComponent,
     UsiEventIngestionNewRelicWidgetComponent,
     UsiPrivateCloudsComponent,
+    UsiVergeioComponent,
+    UsiVergeioCrudComponent,
+    UsiVergeioDetailComponent,
+    UsiVergeioVmMonitoringComponent,
     UsiPcVmwareVcenterCrudComponent,
     UsiEventIngestionCrudComponent,
     UsiEventIngestionCustomComponent,

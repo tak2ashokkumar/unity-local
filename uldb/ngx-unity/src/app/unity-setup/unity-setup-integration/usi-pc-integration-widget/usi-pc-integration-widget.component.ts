@@ -36,6 +36,7 @@ export class UsiPcIntegrationWidgetComponent implements OnInit, OnDestroy {
     // this.getPrivateCloudFast();
     if (this.userService.hasViewAccess(UnityModules.PRIVATE_CLOUD)) {
       this.getCloudCount();
+      this.getVergeioCount();
     }
   }
 
@@ -49,6 +50,14 @@ export class UsiPcIntegrationWidgetComponent implements OnInit, OnDestroy {
       this.privateCloudCountData = res;
       this.updatePrivateCloudViewEnabled();
     })
+  }
+
+  getVergeioCount() {
+    this.svc.getVergeioCount().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      if (res && res.count > 0) {
+        this.privateClouds.vergeio.length = res.count;
+      }
+    });
   }
 
   // getPrivateCloudFast() {
@@ -211,6 +220,17 @@ export class UsiPcIntegrationWidgetComponent implements OnInit, OnDestroy {
       return;
     }
     this.router.navigate(['nutanix'], { relativeTo: this.route });
+  }
+
+  addVergeioPvtCloud() {
+    this.router.navigate(['vergeio/add'], { relativeTo: this.route });
+  }
+
+  goToVergeioViewDetails() {
+    if (!this.privateClouds.vergeio.length) {
+      return;
+    }
+    this.router.navigate(['vergeio'], { relativeTo: this.route });
   }
 
   onCrud(event: CRUDActionTypes) {

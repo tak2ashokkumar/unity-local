@@ -267,6 +267,10 @@ app.use((req, res) => {
     if (/\/execute\/?$|\/sync\/?$|\/migrate\/?$|\/run\/?$/i.test(req.path)) {
       return res.json({ task_id: createTask() });
     }
+    // Connection/auth checks return a simple connected flag, not an echo.
+    if (/\/check_connection\/?$/i.test(req.path)) {
+      return res.json({ connected: true });
+    }
     const body = req.body && typeof req.body === "object" ? req.body : {};
     return res.status(201).json({ id: Date.now(), uuid: generateUUID(), ...body });
   }

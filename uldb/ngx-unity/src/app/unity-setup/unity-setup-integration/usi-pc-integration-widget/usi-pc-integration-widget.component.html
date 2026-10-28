@@ -288,6 +288,38 @@
             </div>
         </div>
     </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.vergeio.imageURL" class="w-100" [alt]="'VergeIO'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.vergeio.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.vergeio.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.vergeio.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToVergeioViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addVergeioPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- <pc-crud [isAddorEditEnabled]="false" (onCrud)="onCrud($event)"></pc-crud> -->

@@ -51,6 +51,9 @@ import { UsincViptelaComponent } from './usi-network-controllers/usinc-viptela/u
 import { UsiNutanixCrudComponent } from './usi-nutanix/usi-nutanix-crud/usi-nutanix-crud.component';
 import { UsiNutanixDiscovedDevicesComponent } from './usi-nutanix/usi-nutanix-discoved-devices/usi-nutanix-discoved-devices.component';
 import { UsiNutanixComponent } from './usi-nutanix/usi-nutanix.component';
+import { UsiVergeioComponent } from './usi-vergeio/usi-vergeio.component';
+import { UsiVergeioCrudComponent } from './usi-vergeio/usi-vergeio-crud/usi-vergeio-crud.component';
+import { UsiVergeioDetailComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-detail.component';
 import { UsioSdwanCrudComponent } from './usi-others/usio-sdwan/usio-sdwan-crud/usio-sdwan-crud.component';
 import { UsioSdwanComponent } from './usi-others/usio-sdwan/usio-sdwan.component';
 import { UsioFirewallManagementCenterCrudComponent } from './usi-others/usio-firewall-management-center/usio-firewall-management-center-crud/usio-firewall-management-center-crud.component';
@@ -553,6 +556,42 @@ const routes: Routes = [
         data: {
           breadcrumb: {
             title: 'Nutanix'
+          }
+        }
+      },
+      {
+        path: 'vergeio',
+        component: UsiVergeioComponent,
+        data: {
+          breadcrumb: {
+            title: 'VergeIO'
+          }
+        }
+      },
+      {
+        path: 'vergeio/add',
+        component: UsiVergeioCrudComponent,
+        data: {
+          breadcrumb: {
+            title: 'VergeIO'
+          }
+        }
+      },
+      {
+        path: 'vergeio/:instanceId/edit',
+        component: UsiVergeioCrudComponent,
+        data: {
+          breadcrumb: {
+            title: 'VergeIO'
+          }
+        }
+      },
+      {
+        path: 'vergeio/:instanceId/detail',
+        component: UsiVergeioDetailComponent,
+        data: {
+          breadcrumb: {
+            title: 'VergeIO'
           }
         }
       },

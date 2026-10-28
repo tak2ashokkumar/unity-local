@@ -1,0 +1,101 @@
+<div class="card mb-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Monitoring - {{vmName}}</span>
+        <a class="card-header-action btn-close" (click)="onClose()">
+            <i class="fas fa-times"></i>
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- Current status -->
+        <div class="row mx-0 mb-3" *ngIf="config">
+            <div class="col-12 d-flex align-items-center font-sm flex-wrap">
+                <span class="mr-3">
+                    <span class="text-muted">Configured:</span>
+                    <span class="fas fa-circle ml-1" [ngClass]="config.configured ? 'text-success' : 'text-muted'"></span>
+                </span>
+                <span class="mr-3">
+                    <span class="text-muted">Enabled:</span>
+                    <span class="fas fa-circle ml-1" [ngClass]="config.enabled ? 'text-success' : 'text-muted'"></span>
+                </span>
+                <span class="mr-3" *ngIf="config.connection_type">
+                    <span class="text-muted">Connection:</span>
+                    <span class="ml-1 font-500">{{config.connection_type}}</span>
+                </span>
+                <span class="mr-3" *ngIf="config.os_name">
+                    <span class="text-muted">OS:</span>
+                    <span class="ml-1">{{config.os_name}}</span>
+                </span>
+                <span *ngIf="config.configured">
+                    <span class="badge badge-danger" *ngIf="alertCount">{{alertCount}} Alerts</span>
+                    <span class="badge badge-success" *ngIf="!alertCount">No Alerts</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Configuration form -->
+        <form *ngIf="configForm" [formGroup]="configForm">
+            <div class="row">
+                <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="connection_type">Connection Type<em>*</em></label>
+                    <select class="form-control" id="connection_type" formControlName="connection_type"
+                        [ngClass]="{'is-invalid': configFormErrors.connection_type}">
+                        <option *ngFor="let type of connectionTypes" [value]="type">{{type}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="configFormErrors.connection_type">
+                        {{configFormErrors.connection_type}}</div>
+                </div>
+                <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="ip_address">IP Address<em>*</em></label>
+                    <input class="form-control" id="ip_address" type="text" formControlName="ip_address"
+                        placeholder="Enter IP Address" [ngClass]="{'is-invalid': configFormErrors.ip_address}">
+                    <div class="invalid-feedback" *ngIf="configFormErrors.ip_address">{{configFormErrors.ip_address}}
+                    </div>
+                </div>
+                <div class="col-12 form-group">
+                    <label class="form-col-form-label" for="mtp_templates">Templates</label>
+                    <input class="form-control" id="mtp_templates" type="text" formControlName="mtp_templates"
+                        placeholder="Comma separated template IDs (e.g. 10001, 10002)">
+                </div>
+            </div>
+        </form>
+
+        <!-- Metrics -->
+        <div class="row mx-0 mt-2" *ngIf="config?.configured && metrics">
+            <div class="col-12">
+                <div class="font-500 mb-1">Metrics</div>
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <th>Metric</th>
+                        <th class="text-center">Value</th>
+                        <th class="text-center">Units</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let m of metrics.cpu">
+                            <td>{{m.name}}</td>
+                            <td class="text-center">{{m.lastvalue}}</td>
+                            <td class="text-center">{{m.units}}</td>
+                        </tr>
+                        <tr *ngFor="let m of metrics.memory">
+                            <td>{{m.name}}</td>
+                            <td class="text-center">{{m.lastvalue}}</td>
+                            <td class="text-center">{{m.units}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        <button class="btn btn-sm btn-danger mr-1" type="button" *ngIf="config?.configured" (click)="deleteConfig()"
+            [disabled]="loading" accessControl moduleName="Private Cloud" accessType="Manage Private Cloud"
+            elementType="btn">Remove</button>
+        <button class="btn btn-sm btn-secondary mr-1" type="button" *ngIf="config?.configured && config?.enabled"
+            (click)="stopMonitoring()" [disabled]="loading" accessControl moduleName="Private Cloud"
+            accessType="Manage Private Cloud" elementType="btn">Stop</button>
+        <button class="btn btn-sm btn-success mr-1" type="button" *ngIf="config?.configured && !config?.enabled"
+            (click)="startMonitoring()" [disabled]="loading" accessControl moduleName="Private Cloud"
+            accessType="Manage Private Cloud" elementType="btn">Start</button>
+        <button class="btn btn-sm btn-warning" type="button" (click)="save()" [disabled]="loading" accessControl
+            moduleName="Private Cloud" accessType="Manage Private Cloud" elementType="btn">Save</button>
+    </div>
+</div>
