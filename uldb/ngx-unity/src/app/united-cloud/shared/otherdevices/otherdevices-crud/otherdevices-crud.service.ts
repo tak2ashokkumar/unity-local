@@ -1,11 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { GET_ADVANCED_DISCOVERY_CREDENTIALS, GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
-import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { NoWhitespaceValidator, UrlValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { OtherDevice } from '../../entities/other-device.type';
@@ -34,7 +33,7 @@ export class OtherdevicesCrudService {
 
   getUrlsFormGroup(url: UrlsDataType) {
     let group = this.builder.group({
-      'url': [url.url, [Validators.required, NoWhitespaceValidator]],
+      'url': [url.url, [Validators.required, NoWhitespaceValidator, UrlValidator]],
       'name': [url.name, [Validators.required, NoWhitespaceValidator]],
       'url_availabilty': [url.url_availabilty],
       'login_availability': [url.login_availability],
@@ -80,7 +79,7 @@ export class OtherdevicesCrudService {
       if (d.type === 'Web Console') {
         form.get('description').setValidators([Validators.required, NoWhitespaceValidator]);
         form.get('description').updateValueAndValidity();
-        form.addControl('url', new FormControl(d.url, [Validators.required, NoWhitespaceValidator, RxwebValidators.url()]));
+        form.addControl('url', new FormControl(d.url, [Validators.required, NoWhitespaceValidator, UrlValidator]));
         form.addControl('port', new FormControl(d.port || 443, [Validators.min(1), Validators.max(65535)]));
         const credentialType = d.is_local_credential ? 'local' : (d.login_username || d.login_password ? 'my_cred' : '');
         form.addControl('cred', new FormControl(credentialType));
@@ -119,7 +118,7 @@ export class OtherdevicesCrudService {
 
   buildUrls() {
     let group = this.builder.group({
-      'url': ['', [Validators.required, NoWhitespaceValidator, RxwebValidators.url()]],
+      'url': ['', [Validators.required, NoWhitespaceValidator, UrlValidator]],
       'name': ['', [Validators.required, NoWhitespaceValidator]],
       'url_availabilty': [true],
       'login_availability': [false],

@@ -1,11 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
-import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { NoWhitespaceValidator, UrlValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 
@@ -83,7 +82,7 @@ export class ZabbixOtherdeviceMonitoringConfigService {
   buildUrlForm(obj?: UrlsDataType) {
     if (obj) {
       let group = this.builder.group({
-        'url': [obj.url, [Validators.required, NoWhitespaceValidator, RxwebValidators.url()]],
+        'url': [obj.url, [Validators.required, NoWhitespaceValidator, UrlValidator]],
         'uuid': [obj.uuid],
         'name': [obj.name, [Validators.required]],
         'url_availabilty': [obj.url_availabilty],
@@ -111,7 +110,7 @@ export class ZabbixOtherdeviceMonitoringConfigService {
       return group;
     } else {
       return this.builder.group({
-        'url': ['', [Validators.required, NoWhitespaceValidator, RxwebValidators.url()]],
+        'url': ['', [Validators.required, NoWhitespaceValidator, UrlValidator]],
         'name': ['', [Validators.required]],
         'url_availabilty': [true],
         'login_availability': [false],
@@ -174,7 +173,8 @@ export class ZabbixOtherdeviceMonitoringConfigService {
     },
     'urls': {
       'url': {
-        'required': 'Url is required'
+        'required': 'Url is required',
+        'url': 'Url is invalid'
       },
       'name': {
         'required': 'Name is required'

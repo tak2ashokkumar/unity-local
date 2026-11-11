@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { OtherdevicesCrudService } from './otherdevices-crud.service';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { AppUtilityService, DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, DeviceMapping, NoWhitespaceValidator, UrlValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { takeUntil } from 'rxjs/operators';
@@ -14,7 +14,6 @@ import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity
 import { OtherDevice } from '../../entities/other-device.type';
 import { cloneDeep as _clone } from 'lodash-es'
 import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
-import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 
 @Component({
@@ -156,7 +155,7 @@ export class OtherdevicesCrudComponent implements OnInit, OnDestroy {
 
   configureCategoryFields(type: string) {
     if (type === 'Web Console') {
-      this.otherDevicesForm.addControl('url', new FormControl('', [Validators.required, NoWhitespaceValidator, RxwebValidators.url()]));
+      this.otherDevicesForm.addControl('url', new FormControl('', [Validators.required, NoWhitespaceValidator, UrlValidator]));
       this.otherDevicesForm.addControl('port', new FormControl(443, [Validators.min(1), Validators.max(65535)]));
       this.otherDevicesForm.addControl('cred', new FormControl(''));
       this.handleCredentialSubscription();

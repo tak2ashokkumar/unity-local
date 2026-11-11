@@ -1071,6 +1071,17 @@ export function IPAddressValidator(control: AbstractControl): { [key: string]: a
   return null;
 }
 
+// Accepts public and internal URLs: any scheme with any host (http://STGLIMAP1071:8077), and without
+// a scheme an IP, a dotted domain or host:port. Plain text is invalid.
+export function UrlValidator(control: AbstractControl): { [key: string]: any } | null {
+  if (control.value && control.value.length) {
+    const re: RegExp = /^(?:[a-z][a-z0-9+.-]*:\/\/(?:[^\s\/?#@]+@)?(?:\[[0-9a-f:.]+\]|[a-z0-9_-]+(?:\.[a-z0-9_-]+)*\.?)|\[[0-9a-f:.]+\]|\d{1,3}(?:\.\d{1,3}){3}|(?:[a-z0-9_-]+\.)+[a-z]{2,}|[a-z0-9_-]+(?=:\d))(?::\d{1,5})?(?:[\/?#]\S*)?$/i;
+    const isValid = re.test(control.value);
+    return isValid ? null : { 'url': true };
+  }
+  return null;
+}
+
 export function MustMatch(controlName: string, matchingControlName: string) {
   return (formGroup: FormGroup) => {
     const control = formGroup.controls[controlName];
