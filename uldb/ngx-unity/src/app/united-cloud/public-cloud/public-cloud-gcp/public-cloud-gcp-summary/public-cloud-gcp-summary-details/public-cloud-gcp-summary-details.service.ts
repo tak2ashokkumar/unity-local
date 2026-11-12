@@ -128,6 +128,16 @@ export class PublicCloudGcpSummaryDetailsService {
       data.instanceType = account.instance_type;
       data = this.updateIconStatus(data, state);
       data.monitoring = account.monitoring;
+      if (account.resource_type === 'VM instances') {
+        data.statsTooltipMessage = data.monitoring && data.monitoring.configured ? 'VM Statistics' : 'Monitoring not configured';
+        data.isStatsEnabled = !!(data.monitoring && data.monitoring.configured);
+      } else if (data.monitoring && !data.monitoring.configured) {
+        data.statsTooltipMessage = 'Monitoring not configured';
+        data.isStatsEnabled = false;
+      } else {
+        data.statsTooltipMessage = `${data.resourceType} Statistics`;
+        data.isStatsEnabled = true;
+      }
       viewData.push(data);
     });
     return viewData;
@@ -265,6 +275,8 @@ export class GcpResourcesViewData {
   isPowerIconEnabled: boolean;
   createTicketTooltipMessage: string;
   isCreateTicketIconEnabled: boolean;
+  statsTooltipMessage: string;
+  isStatsEnabled: boolean;
 }
 export class AccountsDetailListViewData {
   constructor() { }

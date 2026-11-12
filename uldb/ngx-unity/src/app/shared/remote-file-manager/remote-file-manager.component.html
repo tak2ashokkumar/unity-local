@@ -1,0 +1,177 @@
+<div class="rfm" [class.rfm-drag]="dragOver">
+  <div class="rfm-header">
+    <div class="rfm-title">
+      <i class="far fa-folder-open mr-2"></i>
+      <span>Remote File Manager</span>
+      <small *ngIf="session">
+        {{session.device_name}} · {{session.host}} · {{session.protocol | uppercase}} ·
+        {{session.driver == 'ztc' ? 'ZTC Collector' : 'Collector'}}<span *ngIf="session.collector_name"> {{session.collector_name}}</span>
+      </small>
+    </div>
+    <span class="rfm-status" [ngClass]="'rfm-status-' + state">
+      {{state == 'ready' ? 'Connected' : state == 'connecting' ? 'Connecting' : state == 'credentials' ? 'Login required' : state == 'closed' ? 'Disconnected' : 'Failed'}}
+    </span>
+  </div>
+
+  <!-- Connecting / failed / closed -->
+  <div class="rfm-center" *ngIf="state == 'connecting'">
+    <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+    <div>Connecting to the VM through its collector...</div>
+  </div>
+
+  <div class="rfm-center" *ngIf="state == 'failed' || state == 'closed'">
+    <i class="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
+    <div class="mb-3">{{errorMessage || 'The file manager session has ended.'}}</div>
+    <button class="btn btn-sm btn-primary" type="button" (click)="connect()">Reconnect</button>
+  </div>
+
+  <!-- Credentials -->
+  <div class="rfm-center" *ngIf="state == 'credentials'">
+    <form class="rfm-login" (ngSubmit)="submitCredentials()" #loginForm="ngForm" autocomplete="off">
+      <h6 class="mb-1">Log in to the VM</h6>
+      <p class="text-muted small">No stored credentials were found for this VM. They are used only for this session.</p>
+      <div class="alert alert-danger py-2 small" *ngIf="errorMessage">{{errorMessage}}</div>
+      <div class="form-group">
+        <label class="small mb-1">Username</label>
+        <input class="form-control form-control-sm" name="username" [(ngModel)]="credentials.username" required>
+      </div>
+      <div class="form-group">
+        <div class="custom-control custom-switch small">
+          <input type="checkbox" class="custom-control-input" id="rfmUseKey" name="useKey" [(ngModel)]="useKey">
+          <label class="custom-control-label" for="rfmUseKey">Use private key</label>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="!useKey">
+        <label class="small mb-1">Password</label>
+        <input class="form-control form-control-sm" type="password" name="password" [(ngModel)]="credentials.password" required>
+      </div>
+      <div class="form-group" *ngIf="useKey">
+        <label class="small mb-1">Private key</label>
+        <textarea class="form-control form-control-sm rfm-key" name="private_key" [(ngModel)]="credentials.private_key" required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="small mb-1">SSH port</label>
+        <input class="form-control form-control-sm" type="number" name="port" [(ngModel)]="credentials.port" min="1" max="65535" required>
+      </div>
+      <button class="btn btn-sm btn-primary btn-block" type="submit" [disabled]="loginForm.invalid || connecting">
+        <i class="fas fa-spinner fa-spin mr-1" *ngIf="connecting"></i>Connect
+      </button>
+    </form>
+  </div>
+
+  <!-- Browser -->
+  <ng-container *ngIf="state == 'ready'">
+    <div class="rfm-toolbar">
+      <button class="btn btn-sm btn-light" type="button" (click)="goUp()" [disabled]="path == '/'" title="Up one level">
+        <i class="fas fa-level-up-alt"></i>
+      </button>
+      <form class="rfm-path" (ngSubmit)="open(pathInput)">
+        <input class="form-control form-control-sm" name="path" [(ngModel)]="pathInput" spellcheck="false">
+      </form>
+      <button class="btn btn-sm btn-light" type="button" (click)="refresh()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+      <button class="btn btn-sm btn-light" type="button" (click)="newFolder()" title="New folder"><i class="fas fa-folder-plus"></i></button>
+      <button class="btn btn-sm btn-primary" type="button" (click)="fileInput.click()"><i class="fas fa-upload mr-1"></i>Upload Files</button>
+      <button class="btn btn-sm btn-outline-primary" type="button" (click)="folderInput.click()"><i class="fas fa-folder mr-1"></i>Upload Folder</button>
+      <input #fileInput type="file" multiple hidden (change)="onFilesSelected(fileInput)">
+      <input #folderInput type="file" webkitdirectory directory multiple hidden (change)="onFolderSelected(folderInput)">
+    </div>
+
+    <div class="rfm-crumbs small">
+      <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+        <a href="javascript:void(0)" (click)="open(crumb.path)">{{crumb.name}}</a><span *ngIf="!last && crumb.path != '/'" class="mx-1">/</span>
+      </ng-container>
+    </div>
+
+    <div class="alert alert-danger alert-dismissible py-2 mx-3 mb-2 small" *ngIf="errorMessage">
+      {{errorMessage}}
+      <button type="button" class="close py-1" (click)="errorMessage = ''">&times;</button>
+    </div>
+
+    <div class="rfm-table">
+      <table class="table table-sm table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th class="text-right">Size</th>
+            <th>Modified</th>
+            <th>Permissions</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="loading">
+            <td colspan="5" class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Loading...</td>
+          </tr>
+          <tr *ngIf="!loading && !entries.length">
+            <td colspan="5" class="text-center text-muted py-4">This folder is empty. Drop files here to upload.</td>
+          </tr>
+          <ng-container *ngIf="!loading">
+            <tr *ngFor="let entry of entries" (dblclick)="onRowOpen(entry)">
+              <td class="rfm-name">
+                <i class="fas fa-fw mr-2" [ngClass]="icon(entry)"></i>
+                <a *ngIf="entry.type == 'dir'; else plainName" href="javascript:void(0)" (click)="onRowOpen(entry)">{{entry.name}}</a>
+                <ng-template #plainName>{{entry.name}}</ng-template>
+              </td>
+              <td class="text-right text-nowrap">{{entry.type == 'dir' ? 'Folder' : formatSize(entry.size)}}</td>
+              <td class="text-nowrap">{{entry.modified * 1000 | date:'MMM d, y HH:mm'}}</td>
+              <td class="text-monospace small">{{entry.permissions}}</td>
+              <td class="text-center text-nowrap">
+                <button class="action-icons mb-0 fas fa-download font-sm ml-1" type="button" *ngIf="entry.type != 'link'"
+                  [tooltip]="entry.type == 'dir' ? 'Download as ZIP' : 'Download'" container="body" (click)="download(entry)"></button>
+                <button class="action-icons mb-0 fas fa-pen font-sm ml-1" type="button" tooltip="Rename" container="body"
+                  (click)="rename(entry)"></button>
+                <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" type="button" tooltip="Delete" container="body"
+                  (click)="remove(entry)"></button>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rfm-transfers" *ngIf="jobs.length">
+      <div class="rfm-transfers-head small">
+        <strong>Transfers</strong>
+        <a href="javascript:void(0)" (click)="clearFinished()">Clear finished</a>
+      </div>
+      <div class="rfm-job small" *ngFor="let job of jobs">
+        <i class="fas fa-fw mr-2" [ngClass]="job.direction == 'upload' ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+        <span class="rfm-job-name" [title]="job.name">{{job.name}}</span>
+        <ng-container [ngSwitch]="job.status">
+          <span *ngSwitchCase="'running'" class="rfm-job-progress">
+            <span class="progress"><span class="progress-bar" [style.width.%]="job.percent"></span></span>
+            <span class="text-nowrap ml-2">{{formatSize(job.doneBytes)}} / {{formatSize(job.totalBytes)}}</span>
+          </span>
+          <span *ngSwitchCase="'queued'" class="text-muted">Queued</span>
+          <span *ngSwitchCase="'completed'" class="text-success">{{job.direction == 'download' ? 'Started in browser' : 'Completed'}}</span>
+          <span *ngSwitchCase="'cancelled'" class="text-muted">Cancelled</span>
+          <span *ngSwitchCase="'failed'" class="text-danger" [title]="job.error">Failed: {{job.error}}</span>
+        </ng-container>
+        <button class="btn btn-link btn-sm py-0" type="button" *ngIf="job.status == 'running' || job.status == 'queued'"
+          (click)="cancel(job)">Cancel</button>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="rfm-drop-hint" *ngIf="dragOver">Drop files to upload to {{path}}</div>
+</div>
+
+<ng-template #promptModal>
+  <div class="modal-header">
+    <h6 class="modal-title">{{prompt?.title}}</h6>
+    <button type="button" class="close" (click)="closePrompt(false)">&times;</button>
+  </div>
+  <form (ngSubmit)="closePrompt(true)">
+    <div class="modal-body">
+      <p class="mb-0" *ngIf="prompt?.message">{{prompt.message}}</p>
+      <input *ngIf="prompt?.kind == 'mkdir' || prompt?.kind == 'rename'" class="form-control form-control-sm" name="promptValue"
+        [(ngModel)]="prompt.value" placeholder="Name" autofocus required pattern="[^/\\]+">
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-sm btn-light" (click)="closePrompt(false)">Cancel</button>
+      <button type="submit" class="btn btn-sm" [ngClass]="prompt?.kind == 'delete' ? 'btn-danger' : 'btn-primary'">
+        {{prompt?.kind == 'delete' ? 'Delete' : prompt?.kind == 'overwrite' ? 'Replace' : 'Save'}}
+      </button>
+    </div>
+  </form>
+</ng-template>

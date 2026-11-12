@@ -1,0 +1,265 @@
+<ng-template #editVMRef>
+  <div class="card mb-0 set-min-height" *ngIf="editData">
+    <div class="card-header">
+      Edit Settings
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="editVmModelRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body py-0" id="add-vm-card">
+      <div class="row">
+        <div class="col-12" id="container-col">
+          <div class="card border-0 mb-0" style="height: 100%;">
+            <div class="card-body">
+              <ng-container *ngTemplateOutlet="EDIT_HARDWARE"></ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitEdit()">Submit</button>
+      <button class="btn btn-sm btn-outline-danger pull-right" (click)="editVmModelRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #EDIT_HARDWARE>
+  <div class="row">
+    <div class="col-12">
+      <div class="btn-group float-right pb-2" dropdown placement="bottom right">
+        <button id="button-alignment" dropdownToggle type="button" class="btn btn-primary btn-sm dropdown-toggle"
+          aria-controls="dropdown-alignment">
+          Add New Device <span class="caret"></span>
+        </button>
+        <ul id="dropdown-alignment" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu"
+          aria-labelledby="button-alignment">
+          <li role="menuitem"><a class="dropdown-item" (click)="addNewHardDiskToEdit()">Hard Disk</a></li>
+          <li role="menuitem">
+            <a class="dropdown-item" (click)="addNewNetworkToEdit()">Network Adapter</a>
+          </li>
+          <li role="menuitem"><a class="dropdown-item" (click)="addNewDvdDriveToEdit()">CD/DVD Drive</a></li>
+          <li role="menuitem"><a class="dropdown-item" (click)="addScsiControllerToEdit()">SCSI Controller</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="hardware-wrapper">
+    <div class="row">
+      <div class="col-12">
+        <div class="float-left w-100 row-item border">
+          <div class="label-wrapper float-left border-right px-2">
+            <label class="form-col-form-label mb-0">CPU</label>
+          </div>
+          <div class="value-wrapper float-left px-2 py-1">
+            <div class="row">
+              <div class="col-8">
+                <select class="form-control form-control-sm col-3" [(ngModel)]="editData.cpu"
+                  (ngModelChange)="hyperVService.validateHardwareCpu(editData)"
+                  [class.is-invalid]="editData.cpuError" [disabled]="!editData.editable">
+                  <option [value]="cpu" *ngFor="let cpu of cpuOptions; trackBy: trackByIndex">{{cpu}}</option>
+                </select>
+                <div class="invalid-feedback d-inline-block" *ngIf="editData.cpuError">{{editData.cpuError}}</div>
+              </div>
+              <div class="col"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="float-left w-100 row-item border border-top-0">
+          <div class="label-wrapper float-left border-right px-2">
+            <label class="form-col-form-label mb-0">Memory</label>
+          </div>
+          <div class="value-wrapper float-left px-2 py-1">
+            <div class="row">
+              <div class="col-8">
+                <input type="number" min="4" class="form-control form-control-sm float-left col-3 mr-3"
+                  [(ngModel)]="editData.memory.memory"
+                  (ngModelChange)="hyperVService.validateHardwareMemory(editData.memory)"
+                  [class.is-invalid]="editData.memory.memoryError" [disabled]="!editData.editable" />
+                <select class="form-control form-control-sm col-2" [(ngModel)]="editData.memory.memoryUnit"
+                  (ngModelChange)="hyperVService.validateHardwareMemory(editData.memory)"
+                  [disabled]="!editData.editable">
+                  <option [value]="'MB'">MB</option>
+                  <option [value]="'GB'">GB</option>
+                  <option [value]="'TB'">TB</option>
+                </select>
+                <div class="invalid-feedback d-inline-block" *ngIf="editData.memory.memoryError">
+                  {{editData.memory.memoryError}}</div>
+              </div>
+              <div class="col"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12" *ngFor="let hd of editData.hardDisks; let i = index; trackBy: trackByIndex">
+        <ng-container *ngTemplateOutlet="HARD_DISK; context: { hd: hd, index: i, isNew: false }"></ng-container>
+      </div>
+      <div class="col-12" *ngFor="let hd of editData.newHardDisks; let i = index; trackBy: trackByIndex">
+        <ng-container *ngTemplateOutlet="HARD_DISK; context: { hd: hd, index: i, isNew: true }"></ng-container>
+      </div>
+      <div class="col-12" *ngFor="let controller of editData.scsiControllers; let i = index; trackBy: trackByIndex">
+        <ng-container *ngTemplateOutlet="SCSI_CONTROLLER; context: { controller: controller, index: i, isNew: false }"></ng-container>
+      </div>
+      <div class="col-12" *ngFor="let controller of editData.newScsiControllers; let i = index; trackBy: trackByIndex">
+        <ng-container *ngTemplateOutlet="SCSI_CONTROLLER; context: { controller: controller, index: i, isNew: true }"></ng-container>
+      </div>
+      <div class="col-12" *ngFor="let nw of editData.network; let i = index; trackBy: trackByIndex">
+        <ng-container *ngTemplateOutlet="NETWORK; context: { nw: nw, index: i, isNew: false }"></ng-container>
+      </div>
+      <div class="col-12" *ngFor="let nw of editData.newNetwork; let i = index; trackBy: trackByIndex">
+        <ng-container *ngTemplateOutlet="NETWORK; context: { nw: nw, index: i, isNew: true }"></ng-container>
+      </div>
+      <div class="col-12" *ngFor="let dvd of editData.dvdDrives; let i = index;">
+        <ng-container *ngTemplateOutlet="DVD_DRIVE; context: { dvd: dvd, index: i, isNew: false }"></ng-container>
+      </div>
+      <div class="col-12" *ngFor="let dvd of editData.newDvdDrives; let i = index;">
+        <ng-container *ngTemplateOutlet="DVD_DRIVE; context: { dvd: dvd, index: i, isNew: true }"></ng-container>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #SCSI_CONTROLLER let-controller="controller" let-index="index" let-isNew="isNew">
+  <div class="float-left w-100 row-item border border-top-0">
+    <div class="label-wrapper float-left border-right px-2">
+      <label class="form-col-form-label mb-0">{{isNew ? 'SCSI controller' : controller.label}}</label>
+    </div>
+    <div class="value-wrapper float-left px-2 py-1">
+      <div class="row" *ngIf="!controller.controllerDeleted">
+        <div class="col-8">
+          <select class="form-control form-control-sm select-md" [(ngModel)]="controller.value">
+            <option [value]="'VirtualLsiLogicSASController'">LSI Logic SAS</option>
+            <option [value]="'VirtualBusLogicController'">BusLogic Parallel</option>
+            <option [value]="'VirtualLsiLogicController'">LSI Logic Parallel</option>
+            <option [value]="'ParaVirtualSCSIController'">VMware Paravirtual</option>
+          </select>
+        </div>
+        <div class="col">
+          <i class="far fa-times-circle float-right m-2"
+            (click)="isNew ? removeNewScsiControllerToEdit(index) : removeOldScsiControllerToEdit(index)"></i>
+        </div>
+      </div>
+      <div class="row" *ngIf="controller.controllerDeleted">
+        <div class="col-8">Device will be removed</div>
+        <div class="col">
+          <i class="fas fa-redo fa-flip-horizontal float-right m-2" (click)="restoreOldScsiControllerToEdit(index)"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #DVD_DRIVE let-dvd="dvd" let-index="index" let-isNew="isNew">
+  <div class="float-left w-100 row-item border border-top-0">
+    <div class="label-wrapper float-left border-right px-2">
+      <label class="form-col-form-label mb-0">{{isNew ? 'CD/DVD drive' : dvd.label}}</label>
+    </div>
+    <div class="value-wrapper float-left px-2 py-1">
+      <div class="row" *ngIf="!dvd.dvdDeleted">
+        <div class="col-8">
+          <input type="text" class="form-control form-control-sm float-left col-9 mr-3"
+            [ngModel]="dvd.path || 'Remote ATAPI'" readonly />
+          <button type="button" class="btn btn-outline-primary btn-sm" (click)="dvd.path = ''">Change</button>
+          <div class="invalid-feedback d-inline-block" *ngIf="dvd.dvdError">{{dvd.dvdError}}</div>
+        </div>
+        <div class="col">
+          <i class="far fa-times-circle float-right m-2"
+            (click)="isNew ? removeNewDvdDriveToEdit(index) : removeOldDvdDriveToEdit(index)"></i>
+        </div>
+      </div>
+      <div class="row" *ngIf="dvd.dvdDeleted">
+        <div class="col-8">Device will be removed</div>
+        <div class="col">
+          <i class="fas fa-redo fa-flip-horizontal float-right m-2" (click)="restoreOldDvdDriveToEdit(index)"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #HARD_DISK let-hd="hd" let-index="index" let-isNew="isNew">
+  <div class="float-left w-100 row-item border border-top-0">
+    <div class="label-wrapper float-left border-right px-2">
+      <label class="form-col-form-label mb-0">{{isNew ? 'New Hard Disk' : hd.label}}</label>
+    </div>
+    <div class="value-wrapper float-left px-2 py-1">
+      <div class="row" *ngIf="!hd.hardDiskDeleted">
+        <div class="col-8">
+          <input type="number" min="1" class="form-control form-control-sm float-left col-3 mr-3"
+            [(ngModel)]="hd.hardDisk" (ngModelChange)="hyperVService.validateHardwareDisk(hd)"
+            [class.is-invalid]="hd.hardDiskError" [readonly]="!hd.editable" />
+          <select class="form-control form-control-sm col-2" [(ngModel)]="hd.hardDiskUnit"
+            (ngModelChange)="hyperVService.validateHardwareDisk(hd)" [disabled]="!hd.editable">
+            <option [value]="'MB'">MB</option>
+            <option [value]="'GB'">GB</option>
+            <option [value]="'TB'">TB</option>
+          </select>
+          <div class="invalid-feedback d-inline-block" *ngIf="hd.hardDiskError">{{hd.hardDiskError}}</div>
+        </div>
+        <div class="col">
+          <i class="fas float-right m-2" [ngClass]="hd.hardDiskExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+            (click)="hd.hardDiskExpand = !hd.hardDiskExpand"></i>
+          <i class="far fa-times-circle float-right m-2"
+            (click)="isNew ? removeNewHardDiskToEdit(index) : removeOldHardDiskToEdit(index)"></i>
+        </div>
+      </div>
+      <div class="float-left w-100 mt-2" [ngClass]="hd.hardDiskExpand ? 'd-block' : 'd-none'"
+        *ngIf="!hd.hardDiskDeleted">
+        <div class="form-group extra-field float-left mb-0">
+          <label class="form-label float-left w-100 mb-0">Maximum Size</label>
+          <input type="text" class="form-control form-control-sm float-left w-100" value="20.0 TB" readonly />
+        </div>
+      </div>
+      <div class="row" *ngIf="hd.hardDiskDeleted">
+        <div class="col-8">Device will be removed</div>
+        <div class="col">
+          <i class="fas fa-redo fa-flip-horizontal float-right m-2" (click)="restoreOldHardDiskToEdit(index)"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #NETWORK let-nw="nw" let-index="index" let-isNew="isNew">
+  <div class="float-left w-100 row-item border border-top-0">
+    <div class="label-wrapper float-left border-right px-2">
+      <label class="form-col-form-label mb-0">{{isNew ? 'Network Adapter' : nw.name}}</label>
+    </div>
+    <div class="value-wrapper float-left px-2 py-1">
+      <div class="row" *ngIf="!nw.networkDeleted">
+        <div class="col-4">
+          <input type="text" class="form-control form-control-sm" [(ngModel)]="nw.name"
+            (ngModelChange)="hyperVService.validateHardwareNetwork(nw)" [class.is-invalid]="nw.nameError"
+            [readonly]="!isNew" placeholder="Name" />
+          <div class="invalid-feedback d-inline-block" *ngIf="nw.nameError">{{nw.nameError}}</div>
+        </div>
+        <div class="col-4">
+          <select *ngIf="editData.switches && editData.switches.length" class="form-control form-control-sm" [(ngModel)]="nw.switchName"
+            (ngModelChange)="hyperVService.validateHardwareNetwork(nw)" [class.is-invalid]="nw.networkError"
+            >
+            <option [value]="''">Select Switch</option>
+            <option [value]="switchName" *ngFor="let switchName of editData.switches; trackBy: trackByIndex">{{switchName}}</option>
+          </select>
+          <input *ngIf="!editData.switches || !editData.switches.length" type="text" class="form-control form-control-sm"
+            [(ngModel)]="nw.switchName" (ngModelChange)="hyperVService.validateHardwareNetwork(nw)"
+            [class.is-invalid]="nw.networkError" placeholder="Switch Name" />
+          <div class="invalid-feedback d-inline-block" *ngIf="nw.networkError">{{nw.networkError}}</div>
+        </div>
+        <div class="col">
+          <i class="far fa-times-circle float-right m-2"
+            (click)="isNew ? removeNewNetworkToEdit(index) : removeOldNetworkToEdit(index)"></i>
+        </div>
+      </div>
+      <div class="row" *ngIf="nw.networkDeleted">
+        <div class="col-8">Device will be removed</div>
+        <div class="col">
+          <i class="fas fa-redo fa-flip-horizontal float-right m-2" (click)="restoreOldNetworkToEdit(index)"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

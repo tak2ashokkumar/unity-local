@@ -1,5 +1,5 @@
 import { DOCUMENT, Location } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Inject, OnInit, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Inject, NgZone, OnInit, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
 import Drawflow from 'drawflow';
 import * as dagre from 'dagre';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
@@ -32,6 +32,12 @@ interface SelectedConnection {
   input_id: number;
   output_class: string;
   input_class: string;
+}
+
+interface AgentPopup {
+  nodeId: number;
+  position: { x: number; y: number; caretX: number };
+  dragOver: boolean;
 }
 
 interface LLMModelOption {
@@ -103,6 +109,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   selectedCategory: any; // add interface
   latestDroppedNode: NodeDetails;
   realTimeDetails;
+  agentPopups: AgentPopup[] = [];
+  agentPopupScale = 1;
+  flashingAgentToolId = '';
+  private agentPopupFrame: number | null = null;
+  private agentToolFlashTimer: ReturnType<typeof setTimeout>;
   currentAgentNodeId: number | null = null;
   selectedNode; // add interface
   taskDetails; // add interface
@@ -152,6 +163,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   private nodeConfigurationLoading = new Set<string>();
   backModalRef: BsModalRef;
   @ViewChild('confirmBack') confirmBack: ElementRef;
+  deleteNodeModalRef: BsModalRef;
+  @ViewChild('confirmDeleteNode') confirmDeleteNode: ElementRef;
+  private nodeIdPendingDelete: number | null = null;
   selectedConnection: SelectedConnection | null = null;
   selectedConnectionShape: ConnectorShape = 'rounded';
   showBulkConnectorShapeAction = false;
@@ -244,6 +258,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     private storage: StorageService,
     private svc: WfDynamicContainerService,
     private leftPanelSvc: WfDynamicLeftService,
+    private zone: NgZone,
     private location: Location
   ) {
     this.currentCriteria = { searchValue: '', pageSize: 0 };
@@ -288,6 +303,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
   setWorkspaceMode(mode: 'workflow' | 'execution'): void {
     if (this.workspaceMode === mode) return;
+    this.closeAgentPopup();
     if (mode === 'workflow') {
       if (this.designerAvailable) {
         if (!this.selectedExecution) {
@@ -572,6 +588,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   ngOnDestroy() {
+    this.closeAgentPopup();
+    clearTimeout(this.agentToolFlashTimer);
     this.destroyed = true;
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -1047,21 +1065,12 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.document.addEventListener('click', this.closeLLMModelDropdowns);
 
     (window as any).handleAgentDrop = (event: DragEvent, agentNodeId: number) => {
-      this.onAgentDrop(event, agentNodeId);
+      this.zone.run(() => this.onAgentDrop(event, agentNodeId));
     };
 
-    (window as any).toggleMemoryIcon = (nodeId, el: HTMLImageElement) => {
-      if (this.isViewMode) return;
-
-      const isEnabled = el.getAttribute('data-enabled') === 'true';
-      const newState = !isEnabled;
-
-      const node = this.nodeDetailsArr.find(n => n.node_id === nodeId);
-      if (node) {
-        node.enable_memory = newState;  // direct on node, not node.config
-      }
-
-      el.setAttribute('data-enabled', newState.toString());
+    (window as any).toggleAgentPopup = (nodeId: number, event: Event) => {
+      event.stopPropagation();
+      this.zone.run(() => this.toggleAgentPopup(nodeId));
     };
 
     (window as any).toggleWorkflowModelDropdown = (nodeId: number, el: HTMLButtonElement, event: Event) => {
@@ -1115,28 +1124,139 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     });
   };
 
-  // onAgentDrop(event: DragEvent, agentNodeId: number) {
-  //   event.preventDefault();
+  getAgentToolRows(nodeId: number): any[][] {
+    const tools = this.getToolsForAgent(nodeId);
+    const rows = [];
+    for (let i = 0; i < tools.length; i += 6) rows.push(tools.slice(i, i + 6));
+    return rows;
+  }
 
-  //   console.log('Tool dropped into AI Agent:', agentNodeId);
+  trackAgentPopup(index: number, popup: AgentPopup): number { return popup.nodeId; }
 
-  //   this.currentAgentNodeId = agentNodeId;
-  //   this.droppedAsTool = true;
-  // }
+  trackAgentToolRow(index: number): number { return index; }
 
-  onAgentDrop(event: DragEvent, agentNodeId: number): void {
+  agentToolKey(tool: any): string {
+    return this.normalizeToolId(tool.tool_id || tool.node_id);
+  }
+
+  openAgentTool(tool: any): void {
+    const id = this.agentToolKey(tool);
+    this.getConnectedNodeDetails(id);
+    this.openNodeModal(id);
+  }
+
+  removeAgentPopupTool(nodeId: number, tool: any, event: Event): void {
+    event.stopPropagation();
+    this.removeTool(Number(this.agentToolKey(tool).replace('tool-', '')), nodeId);
+  }
+
+  onAgentTrayDragOver(event: DragEvent, popup: AgentPopup): void {
     event.preventDefault();
     event.stopPropagation();
+    popup.dragOver = !this.isViewMode && !this.isExecutionMode;
+  }
 
-    console.log('Tool dropped into AI Agent:', agentNodeId); // kept, unchanged
-
-    this.currentAgentNodeId = agentNodeId;
-    this.droppedAsTool = true;
-    const nodeData = event.dataTransfer?.getData('value');
-    const data = nodeData ? JSON.parse(nodeData) : null;
-    if (!data) {
+  toggleAgentPopup(nodeId: number): void {
+    nodeId = Number(nodeId);
+    if (this.agentPopups.some(popup => popup.nodeId === nodeId)) {
+      this.closeAgentPopup(nodeId);
       return;
     }
+    this.agentPopups = [...this.agentPopups, { nodeId, position: { x: 8, y: 8, caretX: 130 }, dragOver: false }];
+    this.closeConnectionEditor();
+    this.updateAgentPopupPosition();
+    this.syncAgentSettingsBadge();
+  }
+
+  closeAgentPopup(nodeId?: number): void {
+    this.agentPopups = nodeId === undefined ? [] : this.agentPopups.filter(popup => popup.nodeId !== nodeId);
+    if (!this.agentPopups.length) this.stopAgentPopupTracking();
+    this.syncAgentSettingsBadge();
+  }
+
+  private syncAgentSettingsBadge(): void {
+    this.drawflowContainer?.nativeElement.querySelectorAll('.agent-settings-badge').forEach(badge => {
+      const active = this.agentPopups.some(popup => badge.closest('.drawflow-node')?.id === `node-${popup.nodeId}`);
+      badge.classList.toggle('active', active);
+      badge.setAttribute('aria-expanded', String(active));
+    });
+  }
+
+  updateAgentPopupPosition(): void {
+    if (!this.agentPopups.length || this.destroyed) return;
+    const canvas = this.drawflowContainer?.nativeElement;
+    if (!canvas) return;
+    const container = canvas.getBoundingClientRect();
+    this.agentPopupScale = this.editor?.zoom || 1;
+    const popupWidth = Math.min(260, Math.max(0, container.width - 16));
+    const scaledWidth = popupWidth * this.agentPopupScale;
+    for (const popup of [...this.agentPopups]) {
+      const box = canvas.querySelector(`#node-${popup.nodeId} .node-box`);
+      if (!box) {
+        this.closeAgentPopup(popup.nodeId);
+        continue;
+      }
+      const bounds = box.getBoundingClientRect();
+      const centre = bounds.left + bounds.width / 2 - container.left;
+      const x = Math.max(8, Math.min(centre - scaledWidth / 2, container.width - scaledWidth - 8));
+      popup.position = {
+        x, y: bounds.bottom - container.top + 44 * this.agentPopupScale,
+        caretX: Math.max(12, Math.min((centre - x) / this.agentPopupScale, popupWidth - 12))
+      };
+    }
+    this.syncAgentSettingsBadge();
+  }
+
+  @HostListener('document:keydown.escape')
+  onAgentPopupEscape(): void { this.closeAgentPopup(); }
+
+  @HostListener('window:resize')
+  onAgentPopupResize(): void { this.updateAgentPopupPosition(); }
+
+  @HostListener('document:mousedown', ['$event'])
+  startAgentPopupTracking(event: MouseEvent): void {
+    if (!this.agentPopups.length || !(event.target as Element)?.closest('#dynamic-drawflow')) return;
+    this.stopAgentPopupTracking();
+    const track = () => {
+      this.updateAgentPopupPosition();
+      if (this.agentPopups.length) this.agentPopupFrame = requestAnimationFrame(track);
+    };
+    this.agentPopupFrame = requestAnimationFrame(track);
+  }
+
+  @HostListener('document:mouseup')
+  stopAgentPopupTracking(): void {
+    if (this.agentPopupFrame !== null) cancelAnimationFrame(this.agentPopupFrame);
+    this.agentPopupFrame = null;
+  }
+
+  onAgentDrop(event: DragEvent, agentNodeId: number): void {
+    this.addToolToAgent(event, agentNodeId, { openPopup: true });
+  }
+
+  onAgentTrayDrop(event: DragEvent, nodeId: number): void {
+    this.addToolToAgent(event, nodeId, { openPopup: false });
+  }
+
+  private addToolToAgent(event: DragEvent, agentNodeId: number, options: { openPopup: boolean }): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const popup = this.agentPopups.find(item => item.nodeId === agentNodeId);
+    if (popup) popup.dragOver = false;
+    this.document.getElementById(`node-${agentNodeId}`)?.querySelector('.node-box')?.classList.remove('node-drop-hover');
+    if (this.isViewMode || this.isExecutionMode) return;
+    let data: any;
+    try {
+      data = JSON.parse(event.dataTransfer?.getData('value') || 'null');
+    } catch { return; }
+    if (!data) return;
+    if (![nodeTypes.OrchestrationTask, nodeTypes.Source, nodeTypes.Action].includes(data.node_type)) {
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'none';
+      this.notification.error(new Notification('Only Task, Source Task, and Action Task can be added as AI Agent tools.'));
+      return;
+    }
+    this.currentAgentNodeId = agentNodeId;
+    this.droppedAsTool = true;
 
     const positionX = event.clientX * (this.editor.precanvas.clientWidth / (this.editor.precanvas.clientWidth * this.editor.zoom)) - (this.editor.precanvas.getBoundingClientRect().x * (this.editor.precanvas.clientWidth / (this.editor.precanvas.clientWidth * this.editor.zoom)));
     const positionY = event.clientY * (this.editor.precanvas.clientHeight / (this.editor.precanvas.clientHeight * this.editor.zoom)) - (this.editor.precanvas.getBoundingClientRect().y * (this.editor.precanvas.clientHeight / (this.editor.precanvas.clientHeight * this.editor.zoom)));
@@ -1166,6 +1286,15 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       this.getLatestNodeIdForAITools() + 1
     );
     this.addNode(row, positionX, positionY);
+    const tools = this.getToolsForAgent(agentNodeId);
+    const newTool = tools[tools.length - 1];
+    if (newTool) {
+      this.flashingAgentToolId = this.agentToolKey(newTool);
+      clearTimeout(this.agentToolFlashTimer);
+      this.agentToolFlashTimer = setTimeout(() => this.flashingAgentToolId = '', 700);
+      if (options.openPopup && !this.agentPopups.some(popup => popup.nodeId === agentNodeId)) this.toggleAgentPopup(agentNodeId);
+    }
+    this.updateAgentPopupPosition();
   }
 
   initializeDrawflow() {
@@ -1295,6 +1424,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
       this.editor.on('click', (event: MouseEvent) => {
         this.lastCanvasPointerEvent = event;
+        if (!(event.target as Element)?.closest('.drawflow-node')) this.closeAgentPopup();
       });
 
       this.editor.on('connectionSelected', (connection: SelectedConnection) => {
@@ -1315,6 +1445,10 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
       this.editor.on('zoom', () => {
         this.closeConnectionEditor();
+      });
+
+      ['translate', 'zoom', 'import', 'connectionCreated', 'nodeMoved', 'mouseMove'].forEach(name => {
+        this.editor.on(name, () => requestAnimationFrame(() => this.updateAgentPopupPosition()));
       });
 
       // Handle node creation (Only runs once globally)
@@ -1365,8 +1499,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         if (deleteBtn) {
           deleteBtn.addEventListener('click', (event) => {
             event.stopPropagation();
-            this.editor.removeNodeId(`node-${id}`);
-            this.updateHasNode();
+            this.requestNodeDelete(Number(id));
           });
         }
 
@@ -1571,6 +1704,28 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.applyConnectionShapes();
   }
 
+  private getSwitchOutputLabel(node: any, outputClass: string): string {
+    const outputIndex = Number(outputClass.replace('output_', '')) - 1;
+    const conditions =
+      node?.formData?.properties?.conditions ??
+      node?.config?.properties?.conditions ??
+      node?.config?.config?.properties?.conditions ??
+      [];
+    const branch = conditions[outputIndex]?.condition ?? conditions[outputIndex];
+
+    const findField = (condition: any): string => {
+      if (!condition || typeof condition !== 'object') return '';
+      if (condition.field_label || condition.field || condition.condition_key) {
+        return String(condition.field_label || condition.field || condition.condition_key);
+      }
+      return Array.isArray(condition.children)
+        ? condition.children.map(findField).find(Boolean) || ''
+        : '';
+    };
+
+    return outputIndex >= 0 && Array.isArray(conditions) ? findField(branch) : '';
+  }
+
   private applyConnectionShapes(): void {
     const container = document.getElementById('dynamic-drawflow');
     if (!container) return;
@@ -1629,6 +1784,29 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
         path.setAttribute('d', pathData);
       });
+
+      connectionElement.querySelector('.workflow-connector-label')?.remove();
+      const outputNodeId = Number(outputNodeClass.slice('node_out_node-'.length));
+      const outputNode = this.nodeDetailsArr.find(node => Number(node.node_id) === outputNodeId);
+      const branchLabel = outputNode?.node_type === nodeTypes.IfElse
+        ? outputClass === 'output_1' ? 'True' : outputClass === 'output_2' ? 'False' : ''
+        : outputNode?.node_type === nodeTypes.Switch
+          ? this.getSwitchOutputLabel(outputNode, outputClass)
+          : '';
+      const path = connectionElement.querySelector<SVGPathElement>('.main-path');
+
+      if (branchLabel && path?.getAttribute('d')) {
+        const pathLength = path.getTotalLength();
+        const labelPosition = path.getPointAtLength(pathLength * 0.25);
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.classList.add('workflow-connector-label');
+        label.setAttribute('x', String(labelPosition.x));
+        const isFalseBranch = outputNode?.node_type === nodeTypes.IfElse && branchLabel === 'False';
+        label.setAttribute('y', String(labelPosition.y + (isFalseBranch ? 14 : -7)));
+        label.setAttribute('text-anchor', 'middle');
+        label.textContent = branchLabel;
+        connectionElement.appendChild(label);
+      }
     });
   }
 
@@ -2157,7 +2335,10 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
       if (nodeEl) {
         const contentNode = nodeEl.querySelector('.drawflow_content_node');
         if (contentNode) {
+          // Preserve the action listeners when settings regenerate the agent HTML.
+          const actions = node?.node_type === nodeTypes.AIAgent ? contentNode.querySelector('.node-actions') : null;
           contentNode.innerHTML = this.getHtmlForNodes(node, nodeId);
+          if (actions) contentNode.querySelector('.node-actions')?.replaceWith(actions);
         }
       }
       const tempDiv = document.createElement('div');
@@ -2240,7 +2421,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     return typeMatches.length === 1 ? typeMatches[0] : undefined;
   }
 
-  private getNodeIconUrl(node: any): string {
+  getNodeIconUrl(node: any): string {
     return this.svc.getNewCenterImageUrl(this.getNodeIconPath(node));
   }
 
@@ -2260,7 +2441,6 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
           node.node_type === nodeTypes.AIAgent ? 'node-box aiagent' :
             node.node_type === nodeTypes.Loop ? 'node-box loop' : 'node-box';
 
-    const iconClass = node.node_type === nodeTypes.LLM ? 'node-center-icon-llm' : 'node-center-icon-ai';
     const statusFa = this.hasRealTimeData ? this.getStatusFaClass(node.status) : '';
     const hasErrors = node.hasErrors;
     const errorTitle = hasErrors ? 'Validation errors' : 'All required fields are filled up!';
@@ -2285,107 +2465,53 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     // ─── AI Agent ─────────────────────────────────────────────────────────────
     if (node.node_type === nodeTypes.AIAgent) {
-      const model = this.normalizeLLMModel(node?.model ?? node?.config?.model);
-      const modelValue = model.llm_integ;
-      const modelId = model.llm_integ === 'PRO' ? model.id : null;
-      const memoryEnabled = (node?.enable_memory ?? node?.config?.enable_memory) === true;
-
       return `
         <div class="agentic-custom-node" id="node-${nodeId}">
-          <div class="node-actions-agentic"
-               onclick="event.stopPropagation();"
-               onmousedown="event.stopPropagation();"
-               onmouseup="event.stopPropagation();">
-            ${this.isViewMode
-          ? ''
-          : `<i class="fas fa-play action test" title="Test"></i>
-             <i class="fas fa-pen action edit" title="Edit"></i>
-             <i class="fas fa-trash action delete" title="Delete"></i>`}
+          <div class="node-actions" onclick="event.stopPropagation()"
+               onmousedown="event.stopPropagation()" onmouseup="event.stopPropagation()">
+            ${this.isViewMode ? '' : `<i class="fas fa-play action test" title="Test"></i>
+              <i class="fas fa-pen action edit" title="Edit"></i>
+              <i class="fas fa-trash action delete" title="Delete"></i>`}
           </div>
-
-          <div class="node-box ainode">
-
-            <!-- Header -->
-            <div class="node-header"  style="display: flex; align-items: center; justify-content: center; gap: 0px;">
-              <div class="${iconClass}">
-                <img src="${this.getNodeIconUrl(node)}" loading="eager"/>
-              </div>
-              <span class="node-title" title="${nodeName}">${nodeName}</span>
-              ${statusHtml}
-              ${statusBadge}
+          <div class="node-wrapper">
+            <div class="node-box aiagent"
+                 ondragover="event.preventDefault(); event.stopPropagation(); ${this.isViewMode || this.isExecutionMode ? '' : "this.classList.add('node-drop-hover')"}"
+                 ondragleave="this.classList.remove('node-drop-hover')"
+                 ondrop="window.handleAgentDrop(event, ${nodeId})">
+              ${statusHtml}${statusBadge}
+              <div class="node-center-icon"><img src="${this.getNodeIconUrl(node)}" loading="eager" /></div>
+              <button type="button" class="agent-settings-badge d-flex align-items-center justify-content-center p-0${this.agentPopups.some(popup => popup.nodeId === Number(nodeId)) ? ' active' : ''}"
+                aria-label="Agent settings" aria-expanded="${this.agentPopups.some(popup => popup.nodeId === Number(nodeId))}"
+                onclick="window.toggleAgentPopup(${nodeId}, event)" onmousedown="event.stopPropagation()"
+                onmouseup="event.stopPropagation()" ondblclick="event.stopPropagation()"
+                ondragover="event.preventDefault(); event.stopPropagation()"
+                ondrop="event.preventDefault(); event.stopPropagation()">
+                <i class="fas fa-cog d-block" aria-hidden="true"></i>
+              </button>
             </div>
-
-            <!-- Config Row -->
-            <div class="row m-0 p-0">
-              <div class="col-8 p-0 pr-1">
-                <span class="config-label">Model</span>
-                ${this.getLLMModelSelectorHtml(nodeId, modelValue, modelId)}
-              </div>
-
-              <div class="col-4 p-0 memory-col d-flex flex-column align-items-center">
-                <span class="config-label">Memory</span>
-                <img class="memory-icon memory-brain-icon"
-                    data-enabled="${memoryEnabled}"
-                    ${this.isViewMode
-          ? 'aria-disabled="true" title="Memory is read-only in view mode"'
-          : `onclick="window.toggleMemoryIcon(${nodeId}, this)"`}
-                    src="${environment.assetsUrl}external-brand/workflow/dynamic/Brain.svg"
-                    loading="eager"/>
-              </div>
-            </div>
-
-            <!-- Tools -->
-            <div class="tools-container"></div>
-
-            <!-- Drop Zone -->
-            <div class="drop-zone"
-                id="agent-drop-zone"
-                ondragover="event.preventDefault()"
-                ondrop="window.handleAgentDrop(event, ${nodeId})">
-              <i class="fas fa-plus-circle mr-1" style="font-size:11px;opacity:0.5;"></i>
-              Drop tools here
-            </div>
-
           </div>
+          <div class="node-label" title="${nodeName}">${nodeName}</div>
+          <small class="agent-tool-count text-muted">${this.getToolsForAgent(nodeId).length} tools</small>
         </div>`;
     }
 
     // ─── LLM ──────────────────────────────────────────────────────────────────
     if (node.node_type === nodeTypes.LLM) {
-      const model = this.normalizeLLMModel(node?.model ?? node?.config?.model);
-      const modelValue = model.llm_integ;
-      const modelId = model.llm_integ === 'PRO' ? model.id : null;
-
       return `
         <div class="agentic-custom-node" id="node-${nodeId}">
-          <div class="node-actions-llm"
-              onclick="event.stopPropagation();"
-              onmousedown="event.stopPropagation();"
-              onmouseup="event.stopPropagation();">
-            ${this.isViewMode
-          ? ''
-          : `<i class="fas fa-play action test" title="Test"></i>
-             <i class="fas fa-pen action edit" title="Edit"></i>
-             <i class="fas fa-trash action delete" title="Delete"></i>`}
+          <div class="node-actions" onclick="event.stopPropagation()"
+               onmousedown="event.stopPropagation()" onmouseup="event.stopPropagation()">
+            ${this.isViewMode ? '' : `<i class="fas fa-play action test" title="Test"></i>
+              <i class="fas fa-pen action edit" title="Edit"></i>
+              <i class="fas fa-trash action delete" title="Delete"></i>`}
           </div>
-
-          <div class="node-box llm">
-            <div class="icon-and-title" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-              <div class="${iconClass}">
-                <img src="${this.getNodeIconUrl(node)}" loading="eager"/>
-              </div>
-              <span class="node-title" title="${nodeName}">${nodeName}</span>
-              ${statusHtml}
-              ${statusBadge}
-            </div>
-
-            <div class="row m-0 p-0 mt-2">
-              <div class="col-12 p-2">
-                <span class="config-label">Model</span>
-                ${this.getLLMModelSelectorHtml(nodeId, modelValue, modelId)}
-              </div>
+          <div class="node-wrapper">
+            <div class="node-box llm">
+              ${statusHtml}${statusBadge}
+              <div class="node-center-icon"><img src="${this.getNodeIconUrl(node)}" loading="eager" /></div>
             </div>
           </div>
+          <div class="node-label" title="${nodeName}">${nodeName}</div>
         </div>`;
     }
 
@@ -2462,6 +2588,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
   }
 
   handleNodeRemove(nodeId: number) {
+    this.closeAgentPopup(Number(nodeId));
     const nodeIndex = this.nodeDetailsArr.findIndex(n => Number(n.node_id) === Number(nodeId));
     if (nodeIndex !== -1) {
       this.nodeDetailsArr.splice(nodeIndex, 1);
@@ -2607,118 +2734,27 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
 
   updateAgentTools(nodeId: number, tools: any[]) {
-
-    const getId = (val: any) =>
-      val?.includes?.('-') ? val.split('-')[1] : val;
-
-    const safeTools = (tools || []).filter(t => t && (t?.node_id || t?.tool_id));
-    const deleteIconHtml = this.isViewMode ? '' : '<div class="tool-delete-icon">×</div>';
-
-    const toolsHTML = safeTools.map(tool => {
-      const id = Number(getId(tool?.node_id || tool?.tool_id));
-
-      return `<div class="tool-chip" data-node-id="${id}"  title="${tool?.name}">
-            ${deleteIconHtml}
-  
-            <div class="tool-icon">
-              <img src="${this.getNodeIconUrl(tool)}" loading="eager" />
-            </div>
-  
-            <span class="tool-name">${tool.name}</span>
-          </div>`;
-    }).join('');
-
-
-    // ${tool?.human_approval ?
-    //   '<div class="human-in-loop-icon"> <i class="fas fa-user-check" title="Human in the Loop"></i></div>'
-    //   : ''}
-
-    /* ---------- Update Live DOM ---------- */
-
-    const nodeEl = document.getElementById(`node-${nodeId}`);
-    if (nodeEl) {
-      const toolsContainer = nodeEl.querySelector('.drawflow_content_node .tools-container') as HTMLElement | null;
-      if (toolsContainer) {
-        toolsContainer.innerHTML = toolsHTML;
-      } else {
-        console.warn('Tools container not found for node', nodeId);
-      }
+    const count = (tools || []).filter(tool => tool && (tool.node_id || tool.tool_id)).length;
+    const countLabel = this.document.getElementById(`node-${nodeId}`)?.querySelector('.agent-tool-count');
+    if (countLabel) countLabel.textContent = `${count} tools`;
+    const dfNode = this.editor?.drawflow.drawflow.Home.data[nodeId];
+    if (dfNode?.html) {
+      const stored = this.document.createElement('div');
+      stored.innerHTML = String(dfNode.html);
+      const label = stored.querySelector('.agent-tool-count');
+      if (label) label.textContent = `${count} tools`;
+      dfNode.html = stored.innerHTML;
     }
-
-    /* ---------- Update Stored HTML ---------- */
-
-    const dfNode = this.editor.drawflow.drawflow.Home.data[nodeId];
-    const htmlString = String(dfNode?.html || '');
-
-    if (htmlString) {
-      const temp = document.createElement('div');
-      temp.innerHTML = htmlString.trim();
-
-      const toolsContainer = temp.querySelector('.drawflow_content_node .tools-container') as HTMLElement | null;
-
-      if (toolsContainer) {
-        toolsContainer.innerHTML = toolsHTML;
-        dfNode.html = temp.innerHTML;
-      }
-    }
-
-    /* ---------- STEP 3: Attach Double Click Handlers ---------- */
-
-    const toolElements = nodeEl.querySelectorAll('.tool-chip');
-
-    toolElements.forEach((toolEl: HTMLElement) => {
-
-      const toolNodeId = toolEl.getAttribute('data-node-id');
-
-      toolEl.ondblclick = (event: any) => {
-
-        event.stopPropagation();
-        const id = `tool-${toolNodeId}`;
-
-        this.getConnectedNodeDetails(id);
-        this.openNodeModal(id);
-
-      };
-
-      toolEl.oncontextmenu = (event: any) => {
-        if (this.isViewMode) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        // remove from all tools
-        nodeEl.querySelectorAll('.tool-chip')
-          .forEach(el => el.classList.remove('show-delete'));
-
-        // add only to clicked tool
-        toolEl.classList.add('show-delete');
-      };
-
-      // CLICK DELETE ICON
-      const deleteIcon = toolEl.querySelector('.tool-delete-icon');
-
-      deleteIcon?.addEventListener('click', (event: any) => {
-        event.stopPropagation();
-
-        const toolId = Number(toolEl.getAttribute('data-node-id'));
-
-        this.removeTool(toolId, nodeId);
-      });
-
-    });
-
-    // Tool chips change the AI Agent's height. Recalculate the SVG endpoints
-    // after the browser has applied the new layout instead of waiting for a
-    // later node move/drag event to correct the connection.
+    // The Angular tray reads toolsArr directly, including configuration errors.
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        this.editor?.updateConnectionNodes(`node-${nodeId}`);
-      });
+      if (this.destroyed) return;
+      this.editor?.updateConnectionNodes(`node-${nodeId}`);
+      this.updateAgentPopupPosition();
     });
   }
 
   removeTool(toolId: number, agentNodeId: number) {
-    if (this.isViewMode) return;
+    if (this.isViewMode || this.isExecutionMode) return;
 
     const normalizedAgentId = this.normalizeAgentNodeId(agentNodeId);
     const toolKey = this.normalizeToolId(toolId);
@@ -2786,19 +2822,8 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
 
     if (node?.node_type === nodeTypes.AIAgent) {
-      //  MEMORY
-      const memoryEl = root.querySelector('.memory-icon') as HTMLImageElement;
-      if (memoryEl) {
-        const isEnabled = (node?.enable_memory ?? config?.enable_memory) === true;
-        node.enable_memory = isEnabled;
-
-        memoryEl.src = `${environment.assetsUrl}external-brand/workflow/dynamic/Brain.svg`;
-
-        memoryEl.setAttribute('data-enabled', isEnabled.toString());
-      }
-
+      node.enable_memory = (node?.enable_memory ?? config?.enable_memory) === true;
       this.updateAgentTools(nodeId, _clone(this.getToolsForAgent(nodeId)));
-
     }
 
     //  MODEL
@@ -2975,7 +3000,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             if (!modalState.success) return;
 
             this.tabbedFormData = formDatas;
-            const currentExistingFormData = Object.values(formDatas).reduce(
+            const currentExistingFormData = Object.values(formDatas).reduce<Record<string, any>>(
               (acc: any, tabData: any) => ({ ...acc, ...tabData }),
               {}
             );
@@ -3012,11 +3037,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             const nodeFormErrors = { ...(modalState.errors ?? {}) };
 
             if (
-              (this.selectedNode?.node_type === nodeTypes.AIAgent || this.selectedNode?.node_type === nodeTypes.LLM) &&
-              !this.selectedNode?.model?.llm_integ
+              this.selectedNode?.node_type === nodeTypes.LLM &&
+              !currentExistingFormData?.model?.llm_integ
             ) {
               nodeFormErrors.model = 'Model is required';
-            } else {
+            } else if (this.selectedNode?.node_type === nodeTypes.LLM) {
               delete nodeFormErrors.model;
             }
             const hasErrors = this.hasAnyErrors(nodeFormErrors);
@@ -3059,6 +3084,12 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
                     inputs: [],
                     name: modalState.updateNodeName ?? node.name,
                     formData: _clone(formDatas),
+                    ...(node.node_type === nodeTypes.AIAgent || node.node_type === nodeTypes.LLM ? {
+                      model: currentExistingFormData.model,
+                    } : {}),
+                    ...(node.node_type === nodeTypes.AIAgent ? {
+                      enable_memory: currentExistingFormData.enable_memory,
+                    } : {}),
                     formErrors: nodeFormErrors,
                     hasErrors,
                   }
@@ -3070,6 +3101,9 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
                 hasErrors,
                 hasErrors ? tooltip : 'All required fields are filled up!'
               );
+              if (this.selectedNode?.node_type === nodeTypes.Switch) {
+                requestAnimationFrame(() => this.editor.updateConnectionNodes(`node-${numericNodeId}`));
+              }
             }
 
             console.log('tools ->', this.toolsArr);
@@ -3144,6 +3178,12 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     return {
       ...legacyApprovalValues,
+      ...(node?.node_type === nodeTypes.AIAgent || node?.node_type === nodeTypes.LLM ? {
+        model: node?.model ?? node?.node_meta?.model ?? config?.model,
+      } : {}),
+      ...(node?.node_type === nodeTypes.AIAgent ? {
+        enable_memory: node?.enable_memory ?? node?.node_meta?.enable_memory ?? config?.enable_memory,
+      } : {}),
       ...tabValues
     };
   }
@@ -3298,10 +3338,12 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     const outputs: NodeListOf<HTMLElement> = nodeEl.querySelectorAll('.output');
     const total = outputs.length;
+    const nodeBox = nodeEl.querySelector<HTMLElement>('.node-box');
+    const nodeHeight = nodeBox?.offsetHeight || nodeEl.offsetHeight;
+    const spacing = nodeHeight / (total + 1);
 
     outputs.forEach((output: HTMLElement, index: number) => {
-      const spacing = 70 / (total + 1);  // divide height evenly
-      this.renderer.setStyle(output, 'top', `${spacing * (index + 1)}%`);
+      this.renderer.setStyle(output, 'top', `${spacing * (index + 1)}px`);
       this.renderer.setStyle(output, 'right', '-6px');
       this.renderer.setStyle(output, 'transform', 'translateY(-50%)');
     });
@@ -4074,8 +4116,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
             if (deleteBtn) {
               deleteBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
-                this.editor.removeNodeId(`node-${id}`);
-                this.updateHasNode();
+                this.requestNodeDelete(Number(id));
               });
             }
 
@@ -4195,10 +4236,11 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     if (normalizedNode?.node_type === nodeTypes.AIAgent) {
       normalizedNode.model = _clone(
-        nodeMeta?.model ?? normalizedNode?.model ?? normalizedNode?.config?.model ?? {}
+        normalizedNode?.config?.properties?.model ?? nodeMeta?.model ?? normalizedNode?.model ?? normalizedNode?.config?.model ?? {}
       );
       normalizedNode.model = this.normalizeLLMModel(normalizedNode.model);
       normalizedNode.enable_memory =
+        normalizedNode?.config?.properties?.enable_memory ??
         nodeMeta?.enable_memory ??
         normalizedNode?.enable_memory ??
         normalizedNode?.config?.enable_memory ??
@@ -4210,7 +4252,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
 
     if (normalizedNode?.node_type === nodeTypes.LLM) {
       normalizedNode.model = _clone(
-        nodeMeta?.model ?? normalizedNode?.model ?? normalizedNode?.config?.model ?? {}
+        normalizedNode?.config?.properties?.model ?? nodeMeta?.model ?? normalizedNode?.model ?? normalizedNode?.config?.model ?? {}
       );
       normalizedNode.model = this.normalizeLLMModel(normalizedNode.model);
     }
@@ -4250,7 +4292,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
         const nodeClone = _clone(n);
 
         if (n?.node_type === nodeTypes.AIAgent) {
-          // Tool chips are rendered from toolsArr in every workspace mode.
+          // The tool tray and node count read toolsArr in every workspace mode.
           // Execution snapshots still carry the tools on the agent node, so
           // hydrate the separate collection before the execution-mode return.
           const tools = _clone(n?.tools);
@@ -5147,6 +5189,7 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     this.editor.canvas_y = translateY;
     this.editor.precanvas.style.transform =
       `translate(${translateX}px, ${translateY}px) scale(${zoom})`;
+    this.updateAgentPopupPosition();
   }
 
   openWorkflowVarModal(event: Event) {
@@ -5364,6 +5407,28 @@ export class WfDynamicContainerComponent implements OnInit, AfterViewInit {
     }
 
     this.backModalRef = this.modalService.show(this.confirmBack, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  requestNodeDelete(nodeId: number): void {
+    this.nodeIdPendingDelete = nodeId;
+    this.deleteNodeModalRef = this.modalService.show(this.confirmDeleteNode, Object.assign({}, {
+      class: '',
+      keyboard: true,
+      ignoreBackdropClick: true
+    }));
+  }
+
+  deletePendingNode(): void {
+    if (this.nodeIdPendingDelete === null) return;
+
+    this.editor.removeNodeId(`node-${this.nodeIdPendingDelete}`);
+    this.updateHasNode();
+    this.closeDeleteNodeConfirmation();
+  }
+
+  closeDeleteNodeConfirmation(): void {
+    this.deleteNodeModalRef?.hide();
+    this.nodeIdPendingDelete = null;
   }
 
   returnToList() {

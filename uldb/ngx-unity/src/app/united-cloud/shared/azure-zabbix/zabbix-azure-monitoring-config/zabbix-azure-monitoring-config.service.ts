@@ -38,11 +38,11 @@ export class ZabbixAzureMonitoringConfigService {
   }
 
   enableMonitoring(deviceId: string, deviceType: DeviceMapping, data: AzureMonitoringConfig): Observable<AzureMonitoringConfig> {
-    return this.http.post<AzureMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), data);
+    return this.http.post<AzureMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), { ...data, collector: data.collector?.uuid ? data.collector : null });
   }
 
   updateMonitoring(deviceId: string, deviceType: DeviceMapping, data: AzureMonitoringConfig): Observable<AzureMonitoringConfig> {
-    return this.http.patch<AzureMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), data);
+    return this.http.patch<AzureMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), { ...data, collector: data.collector?.uuid ? data.collector : null });
   }
 
   deleteMonitoring(deviceId: string, deviceType: DeviceMapping): Observable<AzureMonitoringConfig> {
@@ -59,7 +59,7 @@ export class ZabbixAzureMonitoringConfigService {
       'tenant_id': [{ value: (obj && obj.tenant_id) ? obj.tenant_id : '', disabled: false }, [Validators.required, NoWhitespaceValidator]],
       'client_secret': [{ value: (obj && obj.client_secret) ? obj.client_secret : '', disabled: false }, [Validators.required, NoWhitespaceValidator]],
       'collector': this.builder.group({
-        'uuid': [obj?.collector ? obj.collector.uuid : '', [Validators.required]]
+        'uuid': [obj?.collector ? obj.collector.uuid : '']
       }),
     });
     return this.form;

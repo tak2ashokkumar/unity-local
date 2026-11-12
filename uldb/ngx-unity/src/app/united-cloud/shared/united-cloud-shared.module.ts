@@ -204,6 +204,10 @@ import { SwitchesZabbixComponent } from './switches/switches-zabbix/switches-zab
 import { ZabbixSwitchDetailsComponent } from './switches/switches-zabbix/zabbix-switch-details/zabbix-switch-details.component';
 import { SwitchesComponent } from './switches/switches.component';
 import { SwitchesService } from './switches/switches.service';
+import { RoutersComponent } from './routers/routers.component';
+import { RoutersCrudComponent } from './routers/routers-crud/routers-crud.component';
+import { RoutersCrudService } from './routers/routers-crud/routers-crud.service';
+import { RoutersService } from './routers/routers.service';
 import { UnitedCloudSharedService } from './united-cloud-shared.service';
 import { UnityS3AccountComponent } from './unity-s3-account/unity-s3-account.component';
 import { UnityS3TabsComponent } from './unity-s3-account/unity-s3-tabs/unity-s3-tabs.component';
@@ -215,6 +219,7 @@ import { VmsListCustomCrudComponent } from './vms/vms-list-custom/vms-list-custo
 import { VmsListCustomCrudService } from './vms/vms-list-custom/vms-list-custom-crud/vms-list-custom-crud.service';
 import { VmsListCustomComponent } from './vms/vms-list-custom/vms-list-custom.component';
 import { VmsListEsxiComponent } from './vms/vms-list-esxi/vms-list-esxi.component';
+import { VmsListHypervEditComponent } from './vms/vms-list-hyperv/vms-list-hyperv-edit/vms-list-hyperv-edit.component';
 import { VmsListHypervComponent } from './vms/vms-list-hyperv/vms-list-hyperv.component';
 import { VmsListOpenstackComponent } from './vms/vms-list-openstack/vms-list-openstack.component';
 import { VmsListProxmoxComponent } from './vms/vms-list-proxmox/vms-list-proxmox.component';
@@ -310,6 +315,8 @@ import { NutanixVirtualDisksComponent } from './nutanix/nutanix-virtual-disks/nu
 import { NutanixDetailsComponent } from './nutanix/nutanix-zabbix/nutanix-details/nutanix-details.component';
 import { NutanixZabbixComponent } from './nutanix/nutanix-zabbix/nutanix-zabbix.component';
 import { NutanixComponent } from './nutanix/nutanix.component';
+import { OciZabbixComponent } from './oci-zabbix/oci-zabbix.component';
+import { ZabbixOciMonitoringConfigComponent } from './oci-zabbix/zabbix-oci-monitoring-config/zabbix-oci-monitoring-config.component';
 import { OtherdevicesCrudComponent } from './otherdevices/otherdevices-crud/otherdevices-crud.component';
 import { OtherdevicesZabbixComponent } from './otherdevices/otherdevices-zabbix/otherdevices-zabbix.component';
 import { ZabbixOtherdeviceDetailsComponent } from './otherdevices/otherdevices-zabbix/zabbix-otherdevice-details/zabbix-otherdevice-details.component';
@@ -365,8 +372,6 @@ import { VmsListVergeioComponent } from './vms/vms-list-vergeio/vms-list-vergeio
 import { ZabbixEventsComponent } from './zabbix-events/zabbix-events.component';
 import { ZabbixGraphsComponent } from './zabbix-graphs/zabbix-graphs.component';
 import { ZabbixTriggerScriptsComponent } from './zabbix-trigger-scripts/zabbix-trigger-scripts.component';
-import { OciZabbixComponent } from './oci-zabbix/oci-zabbix.component';
-import { ZabbixOciMonitoringConfigComponent } from './oci-zabbix/zabbix-oci-monitoring-config/zabbix-oci-monitoring-config.component';
 /**
  * Change format according to need
  */
@@ -385,7 +390,7 @@ export const MY_NATIVE_FORMATS = {
   declarations: [
     AllDevicesComponent,
     HypervisorsComponent, BmServersComponent,
-    VmsComponent, SwitchesComponent, FirewallsComponent,
+    VmsComponent, SwitchesComponent, RoutersComponent, FirewallsComponent,
     LoadbalancersComponent, OtherdevicesComponent,
     DeviceTabComponent, HypervisorOverviewComponent,
     HypervisorGraphComponent, HypervisorHealthComponent,
@@ -480,7 +485,7 @@ export const MY_NATIVE_FORMATS = {
     FirewallsCrudComponent,
     HypervisorsCrudComponent,
     LoadbalancersCrudComponent,
-    SwitchesCrudComponent,
+    SwitchesCrudComponent, RoutersCrudComponent,
     BmServersCrudComponent,
     ContainerControllersComponent,
     GcpVirtualMachinesComponent,
@@ -540,6 +545,7 @@ export const MY_NATIVE_FORMATS = {
     UnityS3TabsComponent,
     UnityS3BucketFilesComponent,
     VmsListHypervComponent,
+    VmsListHypervEditComponent,
     DatabaseServersComponent,
     DatabaseServerCrudComponent,
     DatabaseMonitoringComponent,
@@ -739,7 +745,7 @@ export const MY_NATIVE_FORMATS = {
     BmServersOverviewService,
     BmServersStatsService,
     VmsOverviewService,
-    SwitchesService,
+    SwitchesService, RoutersService,
     SwitchesOverviewService,
     FirewallsService,
     FirewallsOverviewService,
@@ -752,7 +758,7 @@ export const MY_NATIVE_FORMATS = {
     BmServersCrudService,
     HypervisorsCrudService,
     LoadbalancersCrudService,
-    SwitchesCrudService,
+    SwitchesCrudService, RoutersCrudService,
     PduRecycleService,
     StorageDevicesService,
     StorageCrudService,

@@ -159,7 +159,7 @@ export class UsiVergeioCrudComponent implements OnInit, OnDestroy {
   saveInstance() {
     this.nonFieldErr = '';
     this.spinnerSvc.start('main');
-    const payload = this.removeBlankPasswordFromEditPayload(this.credentialForm.getRawValue());
+    const payload = this.removeBlankApiTokenFromEditPayload(this.credentialForm.getRawValue());
     this.svc.saveInstance(payload, this.instanceId).pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.spinnerSvc.stop('main')))
       .subscribe(() => {
         this.notificationSvc.success(new Notification(`VergeIO account ${this.action === 'Edit' ? 'updated' : 'added'} successfully.`));
@@ -197,9 +197,9 @@ export class UsiVergeioCrudComponent implements OnInit, OnDestroy {
     }
   }
 
-  private removeBlankPasswordFromEditPayload(data: any): any {
-    if ('password' in data && (!data.password || !data.password.trim())) {
-      delete data.password;
+  private removeBlankApiTokenFromEditPayload(data: any): any {
+    if ('api_token' in data && (!data.api_token || !data.api_token.trim())) {
+      delete data.api_token;
     }
     return data;
   }
@@ -210,13 +210,13 @@ export class UsiVergeioCrudComponent implements OnInit, OnDestroy {
       hostname: raw.hostname,
       port: raw.port,
       username: raw.username,
-      password: raw.password,
+      api_token: raw.api_token,
       verify_ssl: raw.verify_ssl,
       collector: raw.collector,
     };
-    // On edit a blank password means "keep the stored one" - let the backend use it.
-    if (!payload.password || !payload.password.trim()) {
-      delete payload.password;
+    // On edit a blank API token means "keep the stored one" - let the backend use it.
+    if (!payload.api_token || !payload.api_token.trim()) {
+      delete payload.api_token;
     }
     return payload;
   }

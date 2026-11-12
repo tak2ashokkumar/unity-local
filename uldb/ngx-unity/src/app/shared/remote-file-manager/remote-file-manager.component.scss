@@ -1,0 +1,185 @@
+.rfm {
+  background: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  width: 100vw;
+}
+
+.rfm-header {
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #e1e5eb;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 16px;
+}
+
+.rfm-title {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+
+  span {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  small {
+    color: #6c757d;
+  }
+}
+
+.rfm-status {
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+}
+
+.rfm-status-ready {
+  background: #e6f6ec;
+  color: #1e8e3e;
+}
+
+.rfm-status-connecting,
+.rfm-status-credentials {
+  background: #fff4e0;
+  color: #b06d00;
+}
+
+.rfm-status-failed,
+.rfm-status-closed {
+  background: #fdecea;
+  color: #c5221f;
+}
+
+.rfm-center {
+  align-items: center;
+  color: #495057;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.rfm-login {
+  background: #fff;
+  border: 1px solid #e1e5eb;
+  border-radius: 6px;
+  max-width: 360px;
+  padding: 20px;
+  text-align: left;
+  width: 100%;
+}
+
+.rfm-key {
+  font-family: monospace;
+  font-size: 11px;
+  height: 120px;
+}
+
+.rfm-toolbar {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px 6px;
+}
+
+.rfm-path {
+  flex: 1;
+  min-width: 120px;
+
+  input {
+    font-family: monospace;
+  }
+}
+
+.rfm-crumbs {
+  background: #fff;
+  border-bottom: 1px solid #e1e5eb;
+  padding: 0 16px 8px;
+}
+
+.rfm-table {
+  background: #fff;
+  flex: 1;
+  margin: 12px 16px;
+  overflow: auto;
+
+  thead th {
+    background: #f8f9fa;
+    border-top: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+}
+
+.rfm-name {
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rfm-transfers {
+  background: #fff;
+  border-top: 1px solid #e1e5eb;
+  max-height: 30vh;
+  overflow: auto;
+  padding: 8px 16px;
+}
+
+.rfm-transfers-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.rfm-job {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.rfm-job-name {
+  flex: 0 0 30%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rfm-job-progress {
+  align-items: center;
+  display: flex;
+  flex: 1;
+
+  .progress {
+    flex: 1;
+    height: 6px;
+  }
+}
+
+.rfm-drag .rfm-table {
+  outline: 2px dashed #3d8bfd;
+}
+
+.rfm-drop-hint {
+  background: #3d8bfd;
+  border-radius: 4px;
+  bottom: 24px;
+  color: #fff;
+  left: 50%;
+  padding: 6px 14px;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-50%);
+}

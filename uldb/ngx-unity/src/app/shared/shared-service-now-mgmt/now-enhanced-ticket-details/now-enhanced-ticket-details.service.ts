@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AppUtilityService, NoWhitespaceValidator, SERVICE_NOW_TICKET_TYPE } from '../../app-utility/app-utility.service';
-import { GET_SERVICE_NOW_ATTACHMENTS_BY_TICKET_ID, GET_SERVICE_NOW_COMMENTS_BY_TICKET_ID, PUT_SERVICE_NOW_TICKET_BY_ID } from '../../api-endpoint.const';
+import { GET_SERVICE_NOW_ATTACHMENTS_BY_TICKET_ID, GET_SERVICE_NOW_COMMENTS_BY_TICKET_ID, GET_SERVICE_NOW_WORKLOGS_BY_TICKET_ID, PUT_SERVICE_NOW_TICKET_BY_ID, PUT_SERVICE_NOW_TICKET_WORKLOG } from '../../api-endpoint.const';
 import { AttachmentType, ServiceNowCommentType, ServicenowSopFormDataType, ServicenowSopUpdateType, ServiceNowTicketDetailsType, similarTicketType } from './now-enhanced-ticket-details.type';
 
 @Injectable()
@@ -13,8 +13,9 @@ export class NowEnhancedTicketDetailsService {
     private builder: FormBuilder,
     private utilSvc: AppUtilityService) { }
 
-  getTicketDetails(ticketId: string): Observable<ServiceNowTicketDetailsType> {
-    return this.http.get<ServiceNowTicketDetailsType>(`/api/handle-ticket/${ticketId}/`);
+  getTicketDetails(ticketId: string, instanceId: string): Observable<ServiceNowTicketDetailsType> {
+    let params: HttpParams = new HttpParams().set('instance', instanceId);
+    return this.http.get<ServiceNowTicketDetailsType>(`/api/handle-ticket/${ticketId}/`, { params: params });
   }
 
   getAttachments(instanceId: string, ticketId: string): Observable<AttachmentType[]> {
@@ -23,6 +24,11 @@ export class NowEnhancedTicketDetailsService {
 
   getComments(instanceId: string, ticketId: string): Observable<ServiceNowCommentType[]> {
     return this.http.get<ServiceNowCommentType[]>(GET_SERVICE_NOW_COMMENTS_BY_TICKET_ID(instanceId, ticketId));
+  }
+
+  // Worklogs come back in the same shape as comments, so ServiceNowCommentType is reused.
+  getWorklogs(instanceId: string, ticketId: string): Observable<ServiceNowCommentType[]> {
+    return this.http.get<ServiceNowCommentType[]>(GET_SERVICE_NOW_WORKLOGS_BY_TICKET_ID(instanceId, ticketId));
   }
 
   sopUpate(ticketId: string, data: ServicenowSopFormDataType): Observable<ServicenowSopUpdateType> {
@@ -160,6 +166,29 @@ export class NowEnhancedTicketDetailsService {
 
   postComment(instanceId: string, ticketId: string, type: string, data: { comments: string }) {
     return this.http.put(PUT_SERVICE_NOW_TICKET_BY_ID(instanceId, type, ticketId), data);
+  }
+
+  resetWorklogFormErrors(): any {
+    let formErrors = {
+      'work_notes': ''
+    };
+    return formErrors;
+  }
+
+  worklogFormValidationMessages = {
+    'work_notes': {
+      'required': 'Worklog is required'
+    }
+  };
+
+  buildWorklogForm(): FormGroup {
+    return this.builder.group({
+      'work_notes': ['', [Validators.required, NoWhitespaceValidator]]
+    });
+  }
+
+  postWorklog(instanceId: string, ticketId: string, type: string, data: { work_notes: string }) {
+    return this.http.put(PUT_SERVICE_NOW_TICKET_WORKLOG(instanceId, type, ticketId), data);
   }
 
 }

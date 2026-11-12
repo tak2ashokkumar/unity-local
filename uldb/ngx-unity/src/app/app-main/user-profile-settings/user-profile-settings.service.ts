@@ -6,9 +6,9 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { TicketMgmtList } from 'src/app/shared/SharedEntityTypes/ticket-mgmt-list.type';
-import { GET_TICKET_MGMT_LIST, GET_USER_PROFILE, GET_ZENDESK_STATUS, LIST_USER, UNITY_ORG_SETTINGS, UNITY_ORG_SETTINGS_DETAILS, UPDATE_PASSWORD, UPDATE_TIMEZONE } from 'src/app/shared/api-endpoint.const';
+import { AIOPS_CORRELATION_MODE, GET_TICKET_MGMT_LIST, GET_USER_PROFILE, GET_ZENDESK_STATUS, LIST_USER, UNITY_ORG_SETTINGS, UNITY_ORG_SETTINGS_DETAILS, UPDATE_PASSWORD, UPDATE_TIMEZONE } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
-import { LLMConfig, UnityOrganizationSettings } from './user-profile-settings.type';
+import { CorrelationMode, CorrelationModeSettings, LLMConfig, UnityOrganizationSettings } from './user-profile-settings.type';
 import { AppDashboardListType } from 'src/app/app-dashboard/app-dashboard.type';
 import { AILLMModel } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-model.type';
 
@@ -43,6 +43,14 @@ export class UserProfileSettingsService {
 
   updateOrgSettings(settings: UnityOrganizationSettings): Observable<UnityOrganizationSettings> {
     return this.http.put<UnityOrganizationSettings>(UNITY_ORG_SETTINGS_DETAILS(settings.uuid), settings);
+  }
+
+  getCorrelationMode(): Observable<CorrelationModeSettings> {
+    return this.http.get<CorrelationModeSettings>(AIOPS_CORRELATION_MODE());
+  }
+
+  updateCorrelationMode(mode: CorrelationMode): Observable<CorrelationModeSettings> {
+    return this.http.patch<CorrelationModeSettings>(AIOPS_CORRELATION_MODE(), { mode: mode });
   }
 
   getTcktMgmtList() {

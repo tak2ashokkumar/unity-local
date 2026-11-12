@@ -1,14 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { RxwebValidators } from '@rxweb/reactive-form-validators';
+import { Observable } from 'rxjs';
 import { GET_ADVANCED_DISCOVERY_CREDENTIALS, GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
 import { NoWhitespaceValidator, UrlValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
+import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { OtherDevice } from '../../entities/other-device.type';
-import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 
 @Injectable()
 export class OtherdevicesCrudService {

@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
 import { Observable, forkJoin } from 'rxjs';
@@ -10,6 +11,7 @@ import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/pri
 import { UnityCredentialsFast } from 'src/app/shared/SharedEntityTypes/unity-credentials.type';
 import { CABINET_FAST_BY_DEVICE_ID, DEVICES_FAST_BY_DEVICE_TYPE, DEVICE_BY_ID, DEVICE_MANUFACTURERS, DEVICE_MODELS, DEVICE_SERIAL_NUMBER_BY_DEVICE_TYPE, DEVICE_UPTIME_BY_DEVICE_ID, GET_AGENT_CONFIGURATIONS, PRIVATE_CLOUD_FAST_BY_DC_ID, UNITY_CREDENTIALS_FAST, ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { SwitchCRUDManufacturer, SwitchCRUDModel } from '../../../entities/switch-crud.type';
 import { Switch } from '../../../entities/switch.type';
@@ -18,16 +20,32 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class ZabbixSwitchDetailsService {
   constructor(private http: HttpClient,
-    private builder: FormBuilder) { }
+    private builder: FormBuilder,
+    private storageService: StorageService,
+    private router: Router) { }
+
+  private get deviceType(): DeviceMapping {
+    if (this.router.url.includes('/routers/')) {
+      return DeviceMapping.ROUTERS;
+    }
+    if (this.router.url.includes('/switches/')) {
+      return DeviceMapping.SWITCHES;
+    }
+    return this.storageService.extractByKey('device', StorageType.SESSIONSTORAGE)?.deviceType || DeviceMapping.SWITCHES;
+  }
+
+  getDeviceType(): DeviceMapping {
+    return this.deviceType;
+  }
 
   getDropdownData() {
-    const manufacturers = this.http.get<SwitchCRUDManufacturer[]>(DEVICE_MANUFACTURERS(DeviceMapping.SWITCHES));
+    const manufacturers = this.http.get<SwitchCRUDManufacturer[]>(DEVICE_MANUFACTURERS(this.deviceType));
     const datacenters = this.http.get<DatacenterFast[]>(DEVICES_FAST_BY_DEVICE_TYPE(DeviceMapping.DC_VIZ));
     return forkJoin([manufacturers, datacenters]);
   }
 
   getDeviceDetails(deviceId: string): Observable<Switch> {
-    return this.http.get<Switch>(DEVICE_BY_ID(DeviceMapping.SWITCHES, deviceId)).pipe(
+    return this.http.get<Switch>(DEVICE_BY_ID(this.deviceType, deviceId)).pipe(
       map((data: Switch) => {
         data.credentials_m2m = data.credentials_m2m.map(c => ({
           ...c,
@@ -57,7 +75,7 @@ export class ZabbixSwitchDetailsService {
   }
 
   getModels(manufacturer: string): Observable<Array<SwitchCRUDModel>> {
-    return this.http.get<Array<SwitchCRUDModel>>(DEVICE_MODELS(DeviceMapping.SWITCHES, manufacturer));
+    return this.http.get<Array<SwitchCRUDModel>>(DEVICE_MODELS(this.deviceType, manufacturer));
   }
 
   getCabinets(dcId: string): Observable<CabinetFast[]> {
@@ -246,18 +264,18 @@ export class ZabbixSwitchDetailsService {
   }
 
   getDeviceData(deviceId: string): Observable<DeviceData> {
-    return this.http.get<DeviceData>(ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE(DeviceMapping.SWITCHES, deviceId));
+    return this.http.get<DeviceData>(ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE(this.deviceType, deviceId));
   }
 
   updateDevice(uuid: string, data: any): Observable<Switch> {
-    return this.http.put<Switch>(DEVICE_BY_ID(DeviceMapping.SWITCHES, uuid), data);
+    return this.http.put<Switch>(DEVICE_BY_ID(this.deviceType, uuid), data);
   }
 
   syncUptime(uuid: string): Observable<any> {
-    return this.http.get<any>(DEVICE_UPTIME_BY_DEVICE_ID(DeviceMapping.SWITCHES, uuid));
+    return this.http.get<any>(DEVICE_UPTIME_BY_DEVICE_ID(this.deviceType, uuid));
   }
 
   syncSerialNumber(uuid: string): Observable<string> {
-    return this.http.get<string>(DEVICE_SERIAL_NUMBER_BY_DEVICE_TYPE(DeviceMapping.SWITCHES, uuid));
+    return this.http.get<string>(DEVICE_SERIAL_NUMBER_BY_DEVICE_TYPE(this.deviceType, uuid));
   }
 }

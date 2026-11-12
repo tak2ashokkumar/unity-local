@@ -7,9 +7,9 @@
     </button>
 
     <div class="schema-loader d-flex flex-column align-items-center justify-content-center h-100"
-        *ngIf="isSchemaLoading">
+        *ngIf="isModalLoading">
         <div class="spinner-border text-primary" role="status" aria-label="Loading node properties"></div>
-        <div class="text-muted mt-3">Loading node properties...</div>
+        <div class="text-muted mt-3">{{ modalLoadingText }}</div>
     </div>
 
     <div class="schema-loader d-flex flex-column align-items-center justify-content-center h-100 px-4 text-center"
@@ -19,7 +19,7 @@
     </div>
 
     <div class="row d-flex flex-nowrap align-items-stretch h-100 overflow-hidden m-0 p-0 params-layout"
-        [class.input-panel-collapsed]="inputPanelCollapsed" *ngIf="!isSchemaLoading && !schemaLoadError">
+        [class.input-panel-collapsed]="inputPanelCollapsed" *ngIf="!isModalLoading && !schemaLoadError">
         <div class="side-panel position-relative h-100 overflow-hidden m-0 p-0"
             [class.is-collapsed]="inputPanelCollapsed"
             [style.flex-basis.px]="inputPanelCollapsed ? collapsedPanelWidth : inputPanelWidth">
@@ -200,7 +200,7 @@
                             Node</button>
                     </div>
                 </div>
-                <ul class="nav nav-tabs custom-tabs bg-header" *ngIf="visibleTabs.length !== 0">
+                <ul class="nav nav-tabs custom-tabs bg-header mb-0" *ngIf="visibleTabs.length !== 0">
                     <li class="nav-item" *ngFor="let tab of visibleTabs"
                         [hidden]="isPromptExpanded && activeTab !== tab.id">
                         <a class="nav-link" [class.active]="activeTab === tab.id" (click)="activeTab = tab.id">
@@ -208,7 +208,7 @@
                         </a>
                     </li>
                 </ul>
-                <div class="mt-3 px-3 properties" *ngIf="!isPromptExpanded">
+                <div class="px-3 pt-3 properties" *ngIf="!isPromptExpanded">
                     <form [formGroup]="nodeForm" class="w-100" *ngIf="dynamicSchema?.tabs?.length">
                         <fieldset class="border-0 m-0 p-0" [disabled]="isViewMode">
                             <ng-container *ngFor="let field of activeFields">
@@ -223,7 +223,7 @@
                     </p>
                 </div>
 
-                <div class="mt-3 px-3 properties expanded-field-editor d-flex flex-column"
+                <div class="px-3 pt-3 properties expanded-field-editor d-flex flex-column"
                     *ngIf="isPromptExpanded && expandedField && expandedForm">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label text-muted mb-1">{{ expandedLabel }}</label>
@@ -275,7 +275,8 @@
                                 [attr.title]="getDynamicTooltip(field)">
                             </span>
                         </label>
-                        <div class="field-mode-toggle d-flex overflow-hidden border rounded ml-auto">
+                        <div *ngIf="field.supports_expression !== false"
+                            class="field-mode-toggle d-flex overflow-hidden border rounded ml-auto">
                             <div (click)="setFieldMode(field, form, 'normal')" class="field-mode-option px-1 py-1"
                                 [style.background]="getFieldMode(field, form) === 'normal' ? '#b2dfdb' : 'transparent'"
                                 [style.color]="getFieldMode(field, form) === 'normal' ? '#245c57' : '#6c757d'">
@@ -545,6 +546,7 @@
                                         [multiple]="false" [searchable]="field.searchable !== false"
                                         [clearable]="field.clearable !== false"
                                         [closeOnSelect]="field.close_on_select !== false"
+                                        [addTag]="field.allow_custom_values ? addDynamicOptionTag : false"
                                         [searchFn]="searchDynamicOption"
                                         [loading]="isDynamicOptionsLoading(field, form)"
                                         [loadingText]="field.loadingText" [notFoundText]="field.noOptionsText"
@@ -552,10 +554,42 @@
                                         [placeholder]="field.placeholder || ('Select ' + (field.label || field.control_name))"
                                         [class.is-invalid]="getDynamicError(errors, field)"
                                         (change)="onDynamicFieldChange(field, form)">
+                                        <ng-template ng-label-tmp let-item="item">
+                                            <ng-container *ngIf="isLLMModelField(field); else defaultSelectLabel">
+                                                <div class="llm-model-selection">
+                                                    <span class="llm-model-icon-wrap">
+                                                        <img [src]="getLLMModelIcon(item)" alt="" />
+                                                    </span>
+                                                    <span class="llm-model-name">{{ getLLMModelName(item) }}</span>
+                                                </div>
+                                            </ng-container>
+                                            <ng-template #defaultSelectLabel>{{ item.label }}</ng-template>
+                                        </ng-template>
                                         <ng-template ng-option-tmp let-item="item">
-                                            <div>{{ item.label }}</div>
-                                            <small class="text-muted" *ngIf="item.description">{{ item.description
-                                                }}</small>
+                                            <ng-container *ngIf="isLLMModelField(field); else defaultSelectOption">
+                                                <div class="llm-model-option"
+                                                    [class.unity-model-option]="isUnityModelOption(item)">
+                                                    <span class="llm-model-icon-wrap">
+                                                        <img [src]="getLLMModelIcon(item)" alt="" />
+                                                    </span>
+                                                    <span class="llm-model-option-content">
+                                                        <span class="llm-model-name">{{ getLLMModelName(item) }}</span>
+                                                        <span class="llm-model-multiplier"
+                                                            *ngIf="getLLMModelMultiplier(item) as multiplier">
+                                                            {{ multiplier }}
+                                                        </span>
+                                                        <span class="llm-model-no-multiplier"
+                                                            *ngIf="!isUnityModelOption(item) && !getLLMModelMultiplier(item)">
+                                                            No multiplier
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </ng-container>
+                                            <ng-template #defaultSelectOption>
+                                                <div>{{ item.label }}</div>
+                                                <small class="text-muted" *ngIf="item.description">{{ item.description
+                                                    }}</small>
+                                            </ng-template>
                                         </ng-template>
                                     </ng-select>
 
@@ -671,6 +705,145 @@
                                 </div>
                             </div>
 
+                            <div *ngSwitchCase="'target_selection'" class="mb-3 target-selection-field">
+                                <label class="form-label text-muted mb-2">
+                                    {{ field.label || field.control_name }}
+                                    <em *ngIf="isDynamicFieldRequired(field)">*</em>
+                                    <span *ngIf="getDynamicTooltip(field)"
+                                        class="fas fa-info-circle text-primary pointer-link text-info pl-1"
+                                        [attr.title]="getDynamicTooltip(field)"></span>
+                                </label>
+
+                                <div class="border rounded p-3" [formGroupName]="field.control_name">
+                                    <div class="form-group">
+                                        <label class="text-muted d-block">Target Source <em>*</em></label>
+                                        <div class="dynamic-radio-options">
+                                            <label class="form-check dynamic-radio-option">
+                                                <input class="form-check-input" type="radio"
+                                                    formControlName="target_source" value="INVENTORY"
+                                                    (change)="onTargetSourceChange(field, form)" />
+                                                <span class="form-check-label">Inventory</span>
+                                            </label>
+                                            <label class="form-check dynamic-radio-option">
+                                                <input class="form-check-input" type="radio"
+                                                    formControlName="target_source" value="DIRECT"
+                                                    (change)="onTargetSourceChange(field, form)" />
+                                                <span class="form-check-label">Direct</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-muted">Target <em>*</em></label>
+                                        <ng-select #targetSelectionDropdown
+                                            *ngIf="getDynamicFormGroup(form, field.control_name).get('target_source')?.value === 'INVENTORY'; else directTarget"
+                                            class="dynamic-ng-select"
+                                            [items]="getTargetSelectionOptions(field, 'target')"
+                                            bindLabel="label" bindValue="value" formControlName="target"
+                                            [multiple]="true" [searchable]="true" [clearable]="true"
+                                            [closeOnSelect]="false"
+                                            [compareWith]="compareTargetSelectionValues"
+                                            [searchFn]="matchRemoteOption"
+                                            [loading]="isTargetSelectionLoading(field, 'target')"
+                                            (open)="onTargetSelectionOpen(field, form, 'target')"
+                                            (search)="onTargetSelectionSearch(field, form, 'target', $event.term, targetSelectionDropdown)"
+                                            loadingText="Loading targets..." notFoundText="No targets found"
+                                            placeholder="Select inventory targets">
+                                            <ng-template ng-label-tmp let-item="item" let-label="label" let-clear="clear">
+                                                <span class="ng-value-label">{{ label }}</span>
+                                                <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">&times;</span>
+                                            </ng-template>
+                                            <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                                <div class="d-flex align-items-start">
+                                                    <i *ngIf="item$.selected"
+                                                        class="fas fa-check text-success mr-2 mt-1"
+                                                        aria-hidden="true"></i>
+                                                    <span>{{ item.label }}</span>
+                                                </div>
+                                            </ng-template>
+                                        </ng-select>
+                                        <ng-template #directTarget>
+                                            <input type="text" class="form-control" formControlName="target"
+                                                placeholder="Enter comma-separated host names or addresses" />
+                                        </ng-template>
+                                    </div>
+
+                                    <div class="form-group"
+                                        *ngIf="getDynamicFormGroup(form, field.control_name).get('target_source')?.value === 'DIRECT'">
+                                        <label class="text-muted">Collector <em>*</em></label>
+                                        <ng-select #collectorSelectionDropdown class="dynamic-ng-select"
+                                            [items]="getTargetSelectionOptions(field, 'collector')"
+                                            bindLabel="label" formControlName="collector"
+                                            [searchable]="true" [clearable]="true"
+                                            [compareWith]="compareTargetSelectionValues"
+                                            [searchFn]="matchRemoteOption"
+                                            [loading]="isTargetSelectionLoading(field, 'collector')"
+                                            (open)="onTargetSelectionOpen(field, form, 'collector')"
+                                            (search)="onTargetSelectionSearch(field, form, 'collector', $event.term, collectorSelectionDropdown)"
+                                            loadingText="Loading collectors..." notFoundText="No collectors found"
+                                            placeholder="Select collector">
+                                        </ng-select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="form-row">
+                                            <div class="col-md-8">
+                                                <label class="text-muted">Connection Type <em>*</em></label>
+                                                <select class="form-control" formControlName="connection_type"
+                                                    (change)="onTargetConnectionTypeChange(field, form)">
+                                                    <option *ngFor="let connection of field.target_selection_ui?.connection_types"
+                                                        [value]="connection.value">{{ connection.label }}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="text-muted">Port <em>*</em></label>
+                                                <input type="number" class="form-control" formControlName="port" min="1" max="65535" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group"
+                                        *ngIf="getDynamicFormGroup(form, field.control_name).get('target_source')?.value === 'INVENTORY'">
+                                        <label class="text-muted d-block">Credential Source <em>*</em></label>
+                                        <div class="dynamic-radio-options">
+                                            <label class="form-check dynamic-radio-option">
+                                                <input class="form-check-input" type="radio"
+                                                    formControlName="credential_source" value="AUTO"
+                                                    (change)="onTargetCredentialSourceChange(field, form)" />
+                                                <span class="form-check-label">Use Target's Credential</span>
+                                            </label>
+                                            <label class="form-check dynamic-radio-option">
+                                                <input class="form-check-input" type="radio"
+                                                    formControlName="credential_source" value="SELECT"
+                                                    (change)="onTargetCredentialSourceChange(field, form)" />
+                                                <span class="form-check-label">Select Credential</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mb-0"
+                                        *ngIf="getDynamicFormGroup(form, field.control_name).get('target_source')?.value === 'DIRECT' || getDynamicFormGroup(form, field.control_name).get('credential_source')?.value === 'SELECT'">
+                                        <label class="text-muted">Credential <em>*</em></label>
+                                        <ng-select #credentialSelectionDropdown class="dynamic-ng-select"
+                                            [items]="getTargetSelectionOptions(field, 'credential')"
+                                            bindLabel="label" formControlName="credential"
+                                            [searchable]="true" [clearable]="true"
+                                            [compareWith]="compareTargetSelectionValues"
+                                            [searchFn]="matchRemoteOption"
+                                            [loading]="isTargetSelectionLoading(field, 'credential')"
+                                            (open)="onTargetSelectionOpen(field, form, 'credential')"
+                                            (search)="onTargetSelectionSearch(field, form, 'credential', $event.term, credentialSelectionDropdown)"
+                                            loadingText="Loading credentials..." notFoundText="No credentials found"
+                                            placeholder="Select credential">
+                                        </ng-select>
+                                    </div>
+                                </div>
+
+                                <div class="invalid-feedback d-block" *ngIf="getDynamicError(errors, field)">
+                                    {{ getDynamicError(errors, field) }}
+                                </div>
+                            </div>
+
                             <div *ngSwitchCase="'target_search'" class="mb-3">
                                 <ng-container
                                     *ngTemplateOutlet="fieldModeHeader; context: { field: field, form: form }">
@@ -701,12 +874,16 @@
                                 </ng-container>
 
                                 <ng-container *ngIf="getFieldMode(field, form) === 'normal'">
-                                    <ng-select class="dynamic-ng-select" [items]="getDynamicSelectOptions(field, form)"
+                                    <ng-select #dynamicMultiselect class="dynamic-ng-select" [items]="getDynamicSelectOptions(field, form)"
                                         bindLabel="label" bindValue="value" [formControlName]="field.control_name"
                                         [multiple]="true" [searchable]="field.searchable !== false"
                                         [clearable]="field.clearable !== false"
-                                        [closeOnSelect]="field.close_on_select === true"
-                                        [searchFn]="searchDynamicOption"
+                                        [closeOnSelect]="!field.remoteSearch && field.close_on_select === true"
+                                        [clearSearchOnAdd]="!field.remoteSearch && field.close_on_select === true"
+                                        [addTag]="field.allow_custom_values ? addDynamicOptionTag : false"
+                                        [searchFn]="field.remoteSearch ? matchRemoteOption : searchDynamicOption"
+                                        (search)="onDynamicOptionsSearch(field, form, $event.term, dynamicMultiselect)"
+                                        (close)="onDynamicOptionsSearch(field, form, '')"
                                         [loading]="isDynamicOptionsLoading(field, form)"
                                         [loadingText]="field.loadingText" [notFoundText]="field.noOptionsText"
                                         [compareWith]="getDynamicOptionCompareWith(field)"
@@ -718,10 +895,16 @@
                                             <span class="ng-value-icon right" (click)="clear(item)"
                                                 aria-hidden="true">&times;</span>
                                         </ng-template>
-                                        <ng-template ng-option-tmp let-item="item">
-                                            <div>{{ item.label }}</div>
-                                            <small class="text-muted" *ngIf="item.description">{{ item.description
-                                                }}</small>
+                                        <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                            <div class="d-flex align-items-start">
+                                                <i *ngIf="item$.selected" class="fas fa-check text-success mr-2 mt-1"
+                                                    aria-hidden="true"></i>
+                                                <div>
+                                                    <div>{{ item.label }}</div>
+                                                    <small class="text-muted" *ngIf="item.description">{{ item.description
+                                                        }}</small>
+                                                </div>
+                                            </div>
                                         </ng-template>
                                     </ng-select>
                                     <div class="text-danger mt-1"
@@ -786,7 +969,7 @@
                                             [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'"
                                             readonly />
                                         <div class="input-group-append" [owlDateTimeTrigger]="datePicker">
-                                            <span class="input-group-text bg-white">
+                                            <span class="input-group-text bg-white date-picker-icon">
                                                 <i class="fas fa-calendar-alt"></i>
                                             </span>
                                         </div>
@@ -853,7 +1036,7 @@
                                             [style.width]="field.width === 'full' ? '100%' : field.width === 'auto' ? 'auto' : '50%'"
                                             readonly />
                                         <div class="input-group-append" [owlDateTimeTrigger]="dateTimePicker">
-                                            <span class="input-group-text bg-white">
+                                            <span class="input-group-text bg-white date-picker-icon">
                                                 <i class="fas fa-calendar-alt"></i>
                                             </span>
                                         </div>
@@ -898,26 +1081,38 @@
                             <div *ngSwitchCase="'condition'" class="w-100">
                                 <label class="form-label text-muted mb-0" *ngIf="field?.label">{{ field.label }}<em
                                         class="text-danger" *ngIf="(field?.min_conditions>0)">*</em></label>
-                                <ng-template #groupTemplate let-group let-depth="depth">
-                                    <div class="condition-group" [class.nested-group]="depth > 0">
-                                        <div class="condition-header d-flex align-items-center">
+                                <ng-template #groupTemplate let-group let-depth="depth" let-parent="parent"
+                                    let-index="index">
+                                    <details class="condition-group" [class.nested-group]="depth > 0" open>
+                                        <summary class="condition-header d-flex align-items-center">
                                             <span class="condition-title">
                                                 WHEN
                                             </span>
                                             <div class="logic-switch d-flex overflow-hidden">
                                                 <button type="button" [class.active]="group.condition === 'AND'"
-                                                    (click)="group.condition='AND'">
+                                                    (click)="$event.preventDefault(); $event.stopPropagation(); group.condition='AND'">
                                                     AND
                                                 </button>
                                                 <button type="button" [class.active]="group.condition === 'OR'"
-                                                    (click)="group.condition='OR'">
+                                                    (click)="$event.preventDefault(); $event.stopPropagation(); group.condition='OR'">
                                                     OR
                                                 </button>
                                             </div>
                                             <span class="condition-suffix text-muted">
                                                 of the following match
                                             </span>
-                                        </div>
+                                            <button *ngIf="depth > 0" type="button"
+                                                class="remove-group-icon border-0 bg-transparent ml-auto"
+                                                aria-label="Remove group"
+                                                (click)="$event.preventDefault(); $event.stopPropagation(); removeChild(parent, index, field)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            <span class="condition-collapse-icon" [class.ml-auto]="depth === 0"
+                                                aria-hidden="true">
+                                                <i class="fas fa-chevron-up collapse-open-icon"></i>
+                                                <i class="fas fa-chevron-down collapse-closed-icon"></i>
+                                            </span>
+                                        </summary>
 
                                         <!-- EMPTY STATE -->
                                         <div class="condition-empty text-muted py-2 text-center small"
@@ -937,12 +1132,23 @@
 
                                                 <!-- RULE -->
                                                 <ng-container *ngIf="child.type === 'rule'">
-                                                    <div class="rule-container position-relative">
-                                                        <button type="button"
-                                                            class="remove-icon position-absolute border-0 bg-transparent"
-                                                            (click)="removeChild(group, i, field)">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+                                                    <details class="rule-container" open>
+                                                        <summary class="rule-header d-flex align-items-center">
+                                                            <span class="rule-title text-truncate">
+                                                                {{ child.field_label || child.field || 'Rule' }}
+                                                            </span>
+                                                            <button type="button"
+                                                                class="remove-icon border-0 bg-transparent ml-auto"
+                                                                aria-label="Remove rule"
+                                                                (click)="$event.preventDefault(); $event.stopPropagation(); removeChild(group, i, field)">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                            <span class="condition-collapse-icon" aria-hidden="true">
+                                                                <i class="fas fa-chevron-up collapse-open-icon"></i>
+                                                                <i class="fas fa-chevron-down collapse-closed-icon"></i>
+                                                            </span>
+                                                        </summary>
+                                                        <div class="rule-body">
 
                                                         <!-- FIELD -->
                                                         <div class="row">
@@ -1063,67 +1269,97 @@
                                                             [ngSwitch]="valueKind">
                                                             <div class="col-md-12" *ngIf="valueKind !== 'none'">
                                                                 <div class="mb-3">
-                                                                    <label class="form-label text-muted mb-0">
-                                                                        {{ getSubFieldConfig('value').label }}
-                                                                        <em
-                                                                            *ngIf="getSubFieldConfig('value').required">*</em>
-                                                                    </label>
-
-                                                                    <!-- dynamic field with a fixed option list -->
-                                                                    <select *ngSwitchCase="'dropdown'"
-                                                                        class="form-control text-dark"
-                                                                        [ngModel]="child.value"
-                                                                        [class.is-invalid]="isRuleInvalid(child, 'value')"
-                                                                        (ngModelChange)="child.value = $event"
-                                                                        [ngModelOptions]="{ standalone: true }">
-                                                                        <option [ngValue]="''" disabled>
-                                                                            {{ getValuePlaceholder('dropdown') }}
-                                                                        </option>
-                                                                        <option
-                                                                            *ngFor="let opt of getValueOptions(field, child)"
-                                                                            [ngValue]="opt.value">
-                                                                            {{ opt.label }}
-                                                                        </option>
-                                                                    </select>
-
-                                                                    <input *ngSwitchCase="'text'" type="text"
-                                                                        class="form-control text-dark"
-                                                                        [class.is-invalid]="isRuleInvalid(child, 'value')"
-                                                                        [placeholder]="getValuePlaceholder('text')"
-                                                                        [value]="child.value"
-                                                                        (input)="child.value = $any($event.target).value" />
-
-                                                                    <input *ngSwitchCase="'number'" type="number"
-                                                                        class="form-control text-dark"
-                                                                        [class.is-invalid]="isRuleInvalid(child, 'value')"
-                                                                        [placeholder]="getValuePlaceholder('number')"
-                                                                        [value]="child.value"
-                                                                        (input)="child.value = $any($event.target).value" />
-
-                                                                    <!-- datetime: Value mode -->
-                                                                    <ng-container *ngSwitchCase="'datetime'">
-                                                                        <owl-date-time #conditionDatePicker
-                                                                            [pickerType]="'both'"
-                                                                            [hour12Timer]="true"></owl-date-time>
-                                                                        <div class="d-flex"
-                                                                            [hidden]="child._mode === 'expression'">
-                                                                            <input
-                                                                                class="form-control rounded-left text-dark"
-                                                                                [owlDateTimeTrigger]="conditionDatePicker"
-                                                                                [class.is-invalid]="isRuleInvalid(child, 'value')"
-                                                                                [owlDateTime]="conditionDatePicker"
-                                                                                [value]="child.value"
-                                                                                (dateTimeChange)="child.value = $event.value ? $event.value.toISOString() : ''"
-                                                                                [attr.placeholder]="'Select date & time'"
-                                                                                type="text" readonly />
-                                                                            <div class="input-group-append"
-                                                                                [owlDateTimeTrigger]="conditionDatePicker">
-                                                                                <span class="input-group-text bg-white">
-                                                                                    <i class="fas fa-calendar-alt"></i>
-                                                                                </span>
+                                                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                                                        <label class="form-label text-muted mb-0">
+                                                                            {{ getSubFieldConfig('value').label }}
+                                                                            <em
+                                                                                *ngIf="getSubFieldConfig('value').required">*</em>
+                                                                        </label>
+                                                                        <div
+                                                                            class="field-mode-toggle d-flex overflow-hidden border rounded ml-auto">
+                                                                            <div
+                                                                                (click)="setConditionValueMode(child, 'normal')"
+                                                                                class="field-mode-option px-1 py-1"
+                                                                                [style.background]="getConditionValueMode(child) === 'normal' ? '#b2dfdb' : 'transparent'"
+                                                                                [style.color]="getConditionValueMode(child) === 'normal' ? '#245c57' : '#6c757d'">
+                                                                                Value
+                                                                            </div>
+                                                                            <div
+                                                                                (click)="setConditionValueMode(child, 'expression')"
+                                                                                class="field-mode-option border-left px-1 py-1"
+                                                                                [style.background]="getConditionValueMode(child) === 'expression' ? '#b2dfdb' : 'transparent'"
+                                                                                [style.color]="getConditionValueMode(child) === 'expression' ? '#245c57' : '#6c757d'">
+                                                                                Expr
                                                                             </div>
                                                                         </div>
+                                                                    </div>
+
+                                                                    <ng-container
+                                                                        *ngIf="getConditionValueMode(child) === 'normal'; else conditionExpressionValue">
+                                                                        <!-- dynamic field with a fixed option list -->
+                                                                        <select *ngSwitchCase="'dropdown'"
+                                                                            class="form-control text-dark"
+                                                                            [ngModel]="child.value"
+                                                                            [class.is-invalid]="isRuleInvalid(child, 'value')"
+                                                                            (ngModelChange)="setConditionValue(child, $event)"
+                                                                            [ngModelOptions]="{ standalone: true }">
+                                                                            <option [ngValue]="''" disabled>
+                                                                                {{ getValuePlaceholder('dropdown') }}
+                                                                            </option>
+                                                                            <option
+                                                                                *ngFor="let opt of getValueOptions(field, child)"
+                                                                                [ngValue]="opt.value">
+                                                                                {{ opt.label }}
+                                                                            </option>
+                                                                        </select>
+
+                                                                        <input *ngSwitchCase="'text'" type="text"
+                                                                            class="form-control text-dark"
+                                                                            [class.is-invalid]="isRuleInvalid(child, 'value')"
+                                                                            [placeholder]="getValuePlaceholder('text')"
+                                                                            [value]="child.value"
+                                                                            (input)="setConditionValue(child, $any($event.target).value)" />
+
+                                                                        <input *ngSwitchCase="'number'" type="number"
+                                                                            class="form-control text-dark"
+                                                                            [class.is-invalid]="isRuleInvalid(child, 'value')"
+                                                                            [placeholder]="getValuePlaceholder('number')"
+                                                                            [value]="child.value"
+                                                                            (input)="setConditionValue(child, $any($event.target).value)" />
+
+                                                                        <!-- datetime: Value mode -->
+                                                                        <ng-container *ngSwitchCase="'datetime'">
+                                                                            <owl-date-time #conditionDatePicker
+                                                                                [pickerType]="'both'"
+                                                                                [hour12Timer]="true"></owl-date-time>
+                                                                            <div class="d-flex">
+                                                                                <input
+                                                                                    class="form-control rounded-left text-dark"
+                                                                                    [owlDateTimeTrigger]="conditionDatePicker"
+                                                                                    [class.is-invalid]="isRuleInvalid(child, 'value')"
+                                                                                    [owlDateTime]="conditionDatePicker"
+                                                                                    [value]="child.value"
+                                                                                    (dateTimeChange)="setConditionValue(child, $event.value ? $event.value.toISOString() : '')"
+                                                                                    [attr.placeholder]="'Select date & time'"
+                                                                                    type="text" readonly />
+                                                                                <div class="input-group-append"
+                                                                                    [owlDateTimeTrigger]="conditionDatePicker">
+                                                                                    <span class="input-group-text bg-white date-picker-icon">
+                                                                                        <i class="fas fa-calendar-alt"></i>
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </ng-container>
                                                                     </ng-container>
+
+                                                                    <ng-template #conditionExpressionValue>
+                                                                        <input type="text"
+                                                                            class="form-control text-dark text-monospace"
+                                                                            [class.is-invalid]="isRuleInvalid(child, 'value')"
+                                                                            placeholder="Drop expression here"
+                                                                            [value]="child.value"
+                                                                            (input)="setConditionValue(child, $any($event.target).value)" />
+                                                                    </ng-template>
 
                                                                     <small class="text-danger d-block"
                                                                         *ngIf="isRuleInvalid(child, 'value')">
@@ -1132,19 +1368,15 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                        </div>
+                                                    </details>
                                                 </ng-container>
 
                                                 <!-- GROUP -->
                                                 <ng-container *ngIf="child.type === 'group'">
                                                     <div class="nested-wrapper position-relative mt-2">
-                                                        <button type="button"
-                                                            class="remove-group-icon position-absolute border-0 bg-transparent"
-                                                            (click)="removeChild(group, i, field)">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
                                                         <ng-container
-                                                            *ngTemplateOutlet="groupTemplate; context: { $implicit: child, depth: depth + 1 }">
+                                                            *ngTemplateOutlet="groupTemplate; context: { $implicit: child, depth: depth + 1, parent: group, index: i }">
                                                         </ng-container>
                                                     </div>
                                                 </ng-container>
@@ -1164,7 +1396,7 @@
                                                 + Group
                                             </button>
                                         </div>
-                                    </div>
+                                    </details>
                                 </ng-template>
 
                                 <ng-container

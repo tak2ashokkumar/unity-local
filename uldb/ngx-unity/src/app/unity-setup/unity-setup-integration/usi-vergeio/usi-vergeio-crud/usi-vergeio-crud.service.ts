@@ -46,7 +46,7 @@ export class UsiVergeioCrudService {
         'hostname': [data.hostname ? data.hostname : '', [Validators.required, NoWhitespaceValidator]],
         'port': [data.port != null ? data.port : VERGEIO_DEFAULT_PORT, [Validators.required, Validators.min(1), Validators.max(65535)]],
         'username': [data.username ? data.username : '', [Validators.required, NoWhitespaceValidator]],
-        'password': ['', []],
+        'api_token': ['', []],
         'verify_ssl': [data.verify_ssl != null ? data.verify_ssl : true],
         'collector': [data.collector ? data.collector : '', [Validators.required]],
         'enabled': [data.enabled ? data.enabled : false],
@@ -58,7 +58,7 @@ export class UsiVergeioCrudService {
         'hostname': ['', [Validators.required, NoWhitespaceValidator]],
         'port': [VERGEIO_DEFAULT_PORT, [Validators.required, Validators.min(1), Validators.max(65535)]],
         'username': ['', [Validators.required, NoWhitespaceValidator]],
-        'password': ['', [Validators.required, NoWhitespaceValidator]],
+        'api_token': ['', [Validators.required, NoWhitespaceValidator]],
         'verify_ssl': [true],
         'collector': ['', [Validators.required]],
         'enabled': [true],
@@ -73,7 +73,7 @@ export class UsiVergeioCrudService {
       'hostname': '',
       'port': '',
       'username': '',
-      'password': '',
+      'api_token': '',
       'collector': '',
     };
   }
@@ -93,8 +93,8 @@ export class UsiVergeioCrudService {
     'username': {
       'required': 'Username is required'
     },
-    'password': {
-      'required': 'Password is required'
+    'api_token': {
+      'required': 'API token is required'
     },
     'collector': {
       'required': 'Collector is required'

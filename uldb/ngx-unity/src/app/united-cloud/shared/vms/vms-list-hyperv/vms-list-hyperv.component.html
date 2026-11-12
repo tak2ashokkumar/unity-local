@@ -68,10 +68,17 @@
             <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1" [tooltip]="view.newTabToolipMessage"
               [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}" (click)="consoleNewTab(view)" accessControl
               moduleName="Private Cloud" accessType="Remote Management" elementType="actionbtn"></button>
+
+            <button class="action-icons mb-0 fas fa-folder-open font-sm ml-1" [tooltip]="view.fileManagerMsg"
+              [ngClass]="{'action-icons-disabled':!view.fileManagerEnabled}" (click)="openFileManager(view)" accessControl
+              moduleName="Private Cloud" accessType="Remote Management" elementType="actionbtn"></button>
             <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
               [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring" accessType="View Monitoring"
               elementType="actionbtn">
             </button>
+            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" *ngIf="!inDevicesPage"
+              tooltip="Edit Settings" container="body" (click)="editVM(view)" accessControl moduleName="Private Cloud"
+              accessType="Manage Private Cloud" elementType="actionbtn"></button>
             <button class="action-icons mb-0 fa fa-info-circle font-sm ml-1" tooltip="VM Info"
               (click)="showInfo(view)"></button>
             <button class="action-icons mb-0 fas fa-tag font-sm ml-1" tooltip="Update Tags" container="body"
@@ -105,6 +112,7 @@
 </ng-template>
 
 <vms-tags-crud (onCrud)="onCrud($event)"></vms-tags-crud>
+<vms-list-hyperv-edit *ngIf="!inDevicesPage" [pcId]="pcId" (created)="createTaskAndPoll()"></vms-list-hyperv-edit>
 <ng-template #serverinfo>
   <div class="card mb-0">
     <div class="card-header">

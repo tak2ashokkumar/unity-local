@@ -164,7 +164,7 @@ export class ZabbixSwitchDetailsComponent implements OnInit, OnDestroy {
     this.detailService.getDeviceDetails(this.deviceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.view = res;
       this.getCredentials();
-      this.storageService.put('device', { name: res.name, deviceType: DeviceMapping.SWITCHES, configured: res.monitoring.configured, redfish: res.redfish }, StorageType.SESSIONSTORAGE);
+      this.storageService.put('device', { name: res.name, deviceType: this.detailService.getDeviceType(), configured: res.monitoring.configured, redfish: res.redfish }, StorageType.SESSIONSTORAGE);
       this.buildForm();
     }, err => {
       this.spinner.stop('main');

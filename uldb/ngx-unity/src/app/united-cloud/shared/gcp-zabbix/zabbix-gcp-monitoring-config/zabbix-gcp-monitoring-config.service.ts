@@ -40,11 +40,11 @@ export class ZabbixGcpMonitoringConfigService {
   }
 
   enableMonitoring(deviceId: string, deviceType: DeviceMapping, data: GcpMonitoringConfig): Observable<GcpMonitoringConfig> {
-    return this.http.post<GcpMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), data);
+    return this.http.post<GcpMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), { ...data, collector: data.collector?.uuid ? data.collector : null });
   }
 
   updateMonitoring(deviceId: string, deviceType: DeviceMapping, data: GcpMonitoringConfig): Observable<GcpMonitoringConfig> {
-    return this.http.patch<GcpMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), data);
+    return this.http.patch<GcpMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), { ...data, collector: data.collector?.uuid ? data.collector : null });
   }
 
   deleteMonitoring(deviceId: string, deviceType: DeviceMapping): Observable<GcpMonitoringConfig> {
@@ -61,7 +61,7 @@ export class ZabbixGcpMonitoringConfigService {
       'service_account_info': [{ value: (obj && obj.service_account_info) ? obj.service_account_info : '', disabled: false }, [Validators.required, NoWhitespaceValidator, RxwebValidators.json()]],
       // 'client_secret': [{ value: (obj && obj.client_secret) ? obj.client_secret : '', disabled: false }, [Validators.required, NoWhitespaceValidator]]
       'collector': this.builder.group({
-        'uuid': [obj?.collector ? obj.collector.uuid : '', [Validators.required]]
+        'uuid': [obj?.collector ? obj.collector.uuid : '']
       }),
     });
     return this.form;

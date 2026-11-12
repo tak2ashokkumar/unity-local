@@ -68,6 +68,11 @@
                             <td class="action-icons-column">
                                 <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
                                     tooltip="Manage by creating support ticket" (click)="createTicket(view)"></button>
+                                <button class="action-icons mb-0 fas fa-folder-open font-sm ml-1"
+                                    [tooltip]="view.fileManagerMsg"
+                                    [ngClass]="{'action-icons-disabled':!view.fileManagerEnabled}"
+                                    (click)="openFileManager(view)" accessControl moduleName="Private Cloud"
+                                    accessType="Remote Management" elementType="actionbtn"></button>
                             </td>
                         </tr>
                     </tbody>

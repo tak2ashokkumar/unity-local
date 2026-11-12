@@ -220,10 +220,10 @@ export class DeviceDetailsComponentsComponent implements OnInit, OnChanges, OnDe
       })
     }
 
-    this.isNetworkDeviceType = this.deviceType == DeviceMapping.SWITCHES || this.deviceType == DeviceMapping.FIREWALL
+    this.isNetworkDeviceType = this.deviceType == DeviceMapping.SWITCHES || this.deviceType == DeviceMapping.ROUTERS || this.deviceType == DeviceMapping.FIREWALL
       || this.deviceType == DeviceMapping.LOAD_BALANCER;
 
-    let supportBGPPeers: boolean = this.deviceType == DeviceMapping.SWITCHES || this.deviceType == DeviceMapping.FIREWALL
+    let supportBGPPeers: boolean = this.deviceType == DeviceMapping.SWITCHES || this.deviceType == DeviceMapping.ROUTERS || this.deviceType == DeviceMapping.FIREWALL
       || this.deviceType == DeviceMapping.LOAD_BALANCER;
     if (supportBGPPeers) {
       this.view = 'bgp_peers';
@@ -233,7 +233,7 @@ export class DeviceDetailsComponentsComponent implements OnInit, OnChanges, OnDe
     }
 
     this.redfishInteg = <DeviceTabData>this.storage.getByKey('device', StorageType.SESSIONSTORAGE);
-    let supportRedfish: boolean = this.deviceType == DeviceMapping.SWITCHES || this.deviceType == DeviceMapping.BARE_METAL_SERVER
+    let supportRedfish: boolean = this.deviceType == DeviceMapping.SWITCHES || this.deviceType == DeviceMapping.ROUTERS || this.deviceType == DeviceMapping.BARE_METAL_SERVER
       || this.deviceType == DeviceMapping.STORAGE_DEVICES;
     if (this.redfishInteg.redfish && supportRedfish) {
 

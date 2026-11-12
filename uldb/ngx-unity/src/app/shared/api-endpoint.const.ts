@@ -191,6 +191,7 @@ export const DEVICE_LIST_BY_DEVICE_TYPE = (deviceType: DeviceMapping) => {
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return ``
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/`;
         case DeviceMapping.SWITCHES: return `customer/switches/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `/rest/vmware/migrate/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/`;
         case DeviceMapping.CLOUD_CONTROLLER: return `customer/private_cloud/`;
@@ -209,6 +210,7 @@ export const DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: 
     switch (deviceType) {
         case DeviceMapping.FIREWALL: return `customer/observium/firewall/${deviceId}/get_device_data/`;
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_device_data/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_device_data/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/observium/load_balancer/${deviceId}/get_device_data/`;
         case DeviceMapping.HYPERVISOR: return `customer/observium/servers/${deviceId}/get_device_data/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/observium/bm_servers/${deviceId}/get_device_data/`;
@@ -247,6 +249,7 @@ export const CHECK_AUTH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/check_auth/`;
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/check_auth/`;
         case DeviceMapping.VERGEIO_VIRTUAL_MACHINE: return `customer/vergeio/virtual_machines/${deviceId}/check_auth/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/check_auth/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI: return `rest/vmware_vms/${deviceId}/check_auth/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/check_auth/`;
@@ -272,6 +275,7 @@ export const CONSOLE_ACCESS_DETAILS_BY_DEVICE_TYPE = (deviceType: DeviceMapping,
         // case DeviceMapping.OTHER_DEVICES: return `customer/bm_servers/${deviceId}/check_auth`;
         case DeviceMapping.PDU: return `customer/pdus/${deviceId}/`;
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI: return `customer/vmware_vms/${deviceId}/get_vm_details/`;
         case DeviceMapping.HYPER_V: return `customer/hyperv/vms/${deviceId}/`;
@@ -293,6 +297,7 @@ export const GET_DEVICE_SENSOR_BY_DEVICETYPE = (deviceType: DeviceMapping, devic
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_sensor_data/`
         // case DeviceMapping.OTHER_DEVICES: return `customer/bm_servers/${deviceId}/check_auth`;
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_sensor_data/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_sensor_data/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_sensor_data/`;
@@ -317,6 +322,7 @@ export const GET_DEVICE_STATUS_BY_DEVICETYPE = (deviceType: DeviceMapping, devic
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_status_data/`
         // case DeviceMapping.OTHER_DEVICES: return `customer/bm_servers/${deviceId}/check_auth`;
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_status_data/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_status_data/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_status_data/`;
@@ -350,6 +356,7 @@ export const GET_GRAPH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: st
         case DeviceMapping.LOAD_BALANCER: return `customer/observium/load_balancer/${deviceId}/get_graph_set_by_type/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_graph_set_by_type/`
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_graph_set_by_type/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_graph_set_by_type/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_graph_set_by_type/`;
@@ -375,6 +382,7 @@ export const GET_GRAPH_BY_GRAPH_TYPE = (deviceType: DeviceMapping, deviceId: str
         case DeviceMapping.LB: return `customer/observium/load_balancer/${deviceId}/get_graph_by_type/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_graph_by_type/`
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_graph_by_type/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_graph_by_type/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_graph_by_type/`;
@@ -399,6 +407,7 @@ export const GET_GRAPH_BY_OBSERVIUM_ID = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.LOAD_BALANCER: return `customer/observium/load_balancer/${deviceId}/get_graph_by_observium_id/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_graph_by_observium_id/`
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_graph_by_observium_id/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_graph_by_observium_id/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_graph_by_observium_id/`;
@@ -423,6 +432,7 @@ export const GET_GRAPH_SET_BY_DEVICE_ID = (deviceType: DeviceMapping, deviceId: 
         case DeviceMapping.LOAD_BALANCER: return `customer/observium/load_balancer/${deviceId}/get_graph_set_by_id/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_graph_set_by_id/`
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_graph_set_by_id/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_graph_set_by_id/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_graph_set_by_id/`;
@@ -447,6 +457,7 @@ export const GET_PORTS_BY_DEVICE_TYPE_AND_DEVICEID = (deviceType: DeviceMapping,
         case DeviceMapping.LOAD_BALANCER: return `customer/observium/load_balancer/${deviceId}/get_device_port_details/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_device_port_details/`
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_device_port_details/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_device_port_details/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_device_port_details/`;
@@ -471,6 +482,7 @@ export const GET_PORT_GRAPH_BY_DEVICE_TYPE_DEVICEID = (deviceType: DeviceMapping
         case DeviceMapping.LOAD_BALANCER: return `customer/observium/load_balancer/${deviceId}/get_port_details_graph_set/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_port_details_graph_set/`
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_port_details_graph_set/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_port_details_graph_set/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_port_details_graph_set/`;
@@ -495,6 +507,7 @@ export const GET_ALERTS_BY_DEVICE_TYPE_AND_DEVICEID = (deviceType: DeviceMapping
         case DeviceMapping.LOAD_BALANCER: return `customer/observium/load_balancer/${deviceId}/get_alert_data/`;
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/observium/openstack/${deviceId}/get_alert_data/`
         case DeviceMapping.SWITCHES: return `customer/observium/switch/${deviceId}/get_alert_data/`;
+        case DeviceMapping.ROUTERS: return `customer/observium/router/${deviceId}/get_alert_data/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE:
         case DeviceMapping.ESXI:
             return `customer/observium/vmware/${deviceId}/get_alert_data/`;
@@ -1974,6 +1987,8 @@ export const GET_SERVICE_NOW_STATES = (uuid: string, type: string) => `customer/
 
 export const GET_SERVICE_NOW_PRIORITIES = (uuid: string, type: string) => `customer/service_now/${uuid}/get_ticket_priorities/${type ? '?ticket_type=' + type : ''}`;
 
+export const GET_SERVICE_NOW_ASSIGNMENT_GROUPS = (uuid: string) => `customer/service_now/${uuid}/get_assignment_groups/`;
+
 export const GET_SERVICE_NOW_TICKET_BY_ID = (uuid: string, ticketId: string, type?: string) => `customer/service_now/${uuid}/get_ticket/?ticket_id=${ticketId}${type ? '&ticket_type=' + type : ''}`;
 
 export const GET_SERVICE_NOW_ATTACHMENTS_BY_TICKET_ID = (uuid: string, ticketId: string) => `customer/service_now/${uuid}/get_attachments/?ticket_id=${ticketId}`;
@@ -2125,6 +2140,7 @@ export const MONITORING_CONFIGURATION_BY_DEVICE_TYPE = (deviceType: DeviceMappin
     if (k8s) return `${k8s}monitoring/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/monitoring/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/`;
         case DeviceMapping.DB_SERVER: return `customer/database_servers/${deviceId}/monitoring/`;
@@ -2169,6 +2185,7 @@ export const TOGGLE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, devi
     if (k8s) return `${k8s}monitoring/${action}/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/${action}/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/${action}/`;
@@ -2207,6 +2224,7 @@ export const TOGGLE_SNMP_TRAP_BY_DEVICE_TYPE = (deviceType: DeviceMapping, devic
     const action: string = enabled ? 'stop' : 'start';
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/${action}/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/${action}/`;
@@ -2233,6 +2251,7 @@ export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, 
     if (k8s) return k8s;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return SWITCH_UPDATE(deviceId);
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/`;
         case DeviceMapping.FIREWALL: return FIREWALL_UPDATE(deviceId);
         case DeviceMapping.LOAD_BALANCER: return LOAD_BALANCER_UPDATE(deviceId);
         case DeviceMapping.HYPERVISOR: return HYPERVISOR_UPDATE(deviceId);
@@ -2270,6 +2289,7 @@ export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, 
 export const ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/device_data/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/device_data/`;
@@ -2308,6 +2328,7 @@ export const ZABBIX_DEVICE_ALERTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
     if (k8s) return `${k8s}monitoring/alerts/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/alerts/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/alerts/`;
@@ -2344,6 +2365,7 @@ export const ZABBIX_DEVICE_GRAPHS = (deviceType: DeviceMapping, deviceId: string
     if (k8s) return `${k8s}monitoring/graphs/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/graphs/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.LB: return `customer/load_balancers/${deviceId}/monitoring/graphs/`;
@@ -2370,6 +2392,7 @@ export const ZABBIX_DEVICE_GRAPHS = (deviceType: DeviceMapping, deviceId: string
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/graphs/`;
+        case DeviceMapping.GCP_RESOURCES: return `/customer/managed/gcp/resources/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/graphs/`;
@@ -2395,6 +2418,7 @@ export const MANAGE_ZABBIX_DEVICE_GRAPH = (deviceType: DeviceMapping, deviceId: 
     if (k8s) return `${k8s}monitoring/graphs/${graphId}/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/graphs/${graphId}/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/graphs/${graphId}/`;
@@ -2419,6 +2443,7 @@ export const MANAGE_ZABBIX_DEVICE_GRAPH = (deviceType: DeviceMapping, deviceId: 
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/graphs/${graphId}/`;
+        case DeviceMapping.GCP_RESOURCES: return `/customer/managed/gcp/resources/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/graphs/${graphId}/`;
@@ -2442,6 +2467,7 @@ export const ZABBIX_DEVICE_GRAPH_IMAGE = (deviceType: DeviceMapping, deviceId: s
     if (k8s) return `${k8s}monitoring/graph_image/${graphId}/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/graph_image/${graphId}/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/graph_image/${graphId}/`;
@@ -2460,6 +2486,8 @@ export const ZABBIX_DEVICE_GRAPH_IMAGE = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.DB_SERVER: return DB_GRAPH_IMAGE(deviceId, graphId);
         case DeviceMapping.AZURE_ACCOUNTS: return `customer/managed/azure/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.GCP_ACCOUNTS: return `customer/managed/gcp/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
+        case DeviceMapping.GCP_VIRTUAL_MACHINE: return `customer/managed/gcp/resources/${deviceId}/monitoring/graph_image/${graphId}/`;
+        case DeviceMapping.GCP_RESOURCES: return `customer/managed/gcp/resources/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `customer/managed/azure/resources/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.AWS_ACCOUNTS: return `customer/managed/aws/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/graph_image/${graphId}/`;
@@ -2490,6 +2518,7 @@ export const ZABBIX_DEVICE_GRAPH_ITEMS = (deviceType: DeviceMapping, deviceId: s
     if (k8s) return `${k8s}monitoring/items/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/items/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/monitoring/items/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/items/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/items/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/items/`;
@@ -2509,11 +2538,13 @@ export const ZABBIX_DEVICE_GRAPH_ITEMS = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.AZURE_ACCOUNTS: return `customer/managed/azure/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.GCP_ACCOUNTS: return `customer/managed/gcp/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `customer/managed/azure/resources/${deviceId}/monitoring/items/`;
+        case DeviceMapping.GCP_VIRTUAL_MACHINE: return `customer/managed/gcp/resources/${deviceId}/monitoring/items/`;
         case DeviceMapping.AWS_ACCOUNTS: return `/customer/managed/aws/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/items/`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/items/`;
         case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/items/`;
+        case DeviceMapping.GCP_RESOURCES: return `/customer/managed/gcp/resources/${deviceId}/monitoring/items/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/items/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/items/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/items/`;
@@ -2538,6 +2569,7 @@ export const ZABBIX_DEVICE_GRAPH_NUMBERIC_ITEMS = (deviceType: DeviceMapping, de
     if (k8s) return `${k8s}monitoring/numeric_items/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/numeric_items/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/numeric_items/`;
@@ -2559,9 +2591,11 @@ export const ZABBIX_DEVICE_GRAPH_NUMBERIC_ITEMS = (deviceType: DeviceMapping, de
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `customer/managed/azure/resources/${deviceId}/monitoring/items/`;
         case DeviceMapping.AWS_ACCOUNTS: return `/customer/managed/aws/accounts/${deviceId}/monitoring/numeric_items/`
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/virtualmachine/${deviceId}/monitoring/items/`;
+        case DeviceMapping.GCP_VIRTUAL_MACHINE: return `/customer/managed/gcp/virtualmachine/${deviceId}/monitoring/items/`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/numeric_items/`;
+        case DeviceMapping.GCP_RESOURCES: return `/customer/managed/gcp/resources/${deviceId}/monitoring/numeric_items/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/items/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/items/`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/items/`;
@@ -2584,6 +2618,7 @@ export const ZABBIX_DEVICE_GRAPH_NUMBERIC_ITEMS = (deviceType: DeviceMapping, de
 export const ZABBIX_SENSOR_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/sensor_data/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/sensor_data/`;
@@ -2609,6 +2644,7 @@ export const TRIGGERS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: str
     if (k8s) return `${k8s}monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
@@ -2630,9 +2666,11 @@ export const TRIGGERS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: str
         case DeviceMapping.AWS_ACCOUNTS: return `customer/managed/aws/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.GCP_ACCOUNTS: return `customer/managed/gcp/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.AWS_VIRTUAL_MACHINE: return `/customer/managed/aws/resources/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
+        case DeviceMapping.GCP_VIRTUAL_MACHINE: return `/customer/managed/gcp/resources/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
+        case DeviceMapping.GCP_RESOURCES: return `/customer/managed/gcp/resources/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.DOCKER_CONTAINER: return `/customer/docker/containers/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
@@ -2655,6 +2693,7 @@ export const TRIGGERS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: str
 export const GET_OBSERVIUM_ALL_DEVICE_ALERTS = (deviceType: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/observium/switch/get_device_alerts/?alert_type=failed`;
+        case DeviceMapping.ROUTERS: return `/customer/observium/router/get_device_alerts/?alert_type=failed`;
         case DeviceMapping.FIREWALL: return `/customer/observium/firewall/get_device_alerts/?alert_type=failed`;
         case DeviceMapping.LOAD_BALANCER: return `/customer/observium/load_balancer/get_device_alerts/?alert_type=failed`;
         case DeviceMapping.BARE_METAL_SERVER: return `/customer/observium/bm_servers/get_device_alerts/?alert_type=failed`;
@@ -2678,6 +2717,7 @@ export const GET_OBSERVIUM_ALL_DEVICE_ALERTS = (deviceType: string) => {
 export const GET_ZABBIX_ALL_DEVICE_ALERTS_BY_DEVICE_TYPE = (deviceType: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/monitoring/all_alerts/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/monitoring/all_alerts/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/monitoring/all_alerts/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/monitoring/all_alerts/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/monitoring/all_alerts/`;
@@ -2754,6 +2794,7 @@ export const GET_ADVANCED_DISCOVERY_SCAN_OUTPUT = (discoveryId: string, deviceTy
     switch (deviceType) {
         case DeviceMapping.PDU: return `${endpoint}/${discoveryId}/resources/?resource_type=pdu`;
         case DeviceMapping.SWITCHES: return `${endpoint}/${discoveryId}/resources/?resource_type=switch`;
+        case DeviceMapping.ROUTERS: return `${endpoint}/${discoveryId}/resources/?resource_type=router`;
         case DeviceMapping.FIREWALL: return `${endpoint}/${discoveryId}/resources/?resource_type=firewall`;
         case DeviceMapping.LOAD_BALANCER: return `${endpoint}/${discoveryId}/resources/?resource_type=load_balancer`;
         case DeviceMapping.HYPERVISOR: return `${endpoint}/${discoveryId}/resources/?resource_type=hypervisor`;
@@ -2768,6 +2809,7 @@ export const SAVE_ADVANCED_SCAN_DEVICE_BY_DEVICETYPE = (discoveryId?: string, re
     switch (deviceType) {
         case DeviceMapping.PDU: return `customer/unity_discovery/pdus/`;
         case DeviceMapping.SWITCHES: return `customer/unity_discovery/switches/`;
+        case DeviceMapping.ROUTERS: return `customer/unity_discovery/routers/`;
         case DeviceMapping.FIREWALL: return `customer/unity_discovery/firewalls/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/unity_discovery/loadbalancers/`;
         case DeviceMapping.HYPERVISOR: return `customer/unity_discovery/servers/`;
@@ -2803,6 +2845,7 @@ export const CO2_EMISSION_VALUE_BY_DEVICE_TYPE = (id: string, deviceType?: Devic
 export const DEVICES_FAST_BY_DEVICE_TYPE = (deviceType: DeviceMapping, withShared?: boolean) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/fast/switches/?page_size=0${withShared ? '' : '&is_shared=False'}`;
+        case DeviceMapping.ROUTERS: return `/customer/fast/routers/?page_size=0${withShared ? '' : '&is_shared=False'}`;
         case DeviceMapping.FIREWALL: return `/customer/fast/firewalls/?page_size=0${withShared ? '' : '&is_shared=False'}`;
         case DeviceMapping.LOAD_BALANCER: return `/customer/fast/load_balancers/?page_size=0${withShared ? '' : '&is_shared=False'}`;
         case DeviceMapping.HYPERVISOR: return `/customer/fast/servers/?page_size=0`;
@@ -2834,6 +2877,7 @@ export const CABINET_FAST_BY_DEVICE_ID = (dcId: string) => `/customer/cabinets_f
 export const ZABBIX_DEVICE_GRAPH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string, graphId: number) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
@@ -2984,6 +3028,10 @@ export const VCENTER_VM_HARDWARE_DETAILS = (pcId: string, cloudName: string, nam
 
 export const UPDATE_VCENTER_VM = (pcId: string, cloudName: string) => `/customer/managed/${cloudName}/accounts/${pcId}/update_vm/`;
 
+export const HYPERV_VM_HARDWARE_DETAILS = (pcId: string, name: string) => `/customer/hyperv/cluster/${pcId}/fetch_vm_hardware/?vm=${encodeURIComponent(name)}`;
+
+export const UPDATE_HYPERV_VM = (pcId: string) => `/customer/hyperv/cluster/${pcId}/update_vm/`;
+
 export const GET_UNITED_CONNECT_PORTS = () => `/customer/zabbix/mapped_ports/`;
 
 export const GET_PORTS_BY_DEVICE = (deviceType: string, deviceId: string) => `/customer/${deviceType}/${deviceId}/monitoring/port_items/`;
@@ -3057,6 +3105,7 @@ export const DELETE_FILE_FROM_VCENTER_CONTENT_LIBRARY = (pcId: string) => `custo
 export const DEVICE_BY_ID = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/`;
@@ -3093,6 +3142,7 @@ export const DEVICE_BY_ID = (deviceType: DeviceMapping, deviceId: string) => {
 export const DEVICE_INTERFACES_BY_DEVICE_ID = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/interfaces/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/interfaces/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/interfaces/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/interfaces/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/interfaces/`;
@@ -3116,6 +3166,7 @@ export const DEVICE_INTERFACES_BY_DEVICE_ID = (deviceType: DeviceMapping, device
 export const DEVICE_CUSTOM_ATTRIBUTES_BY_DEVICE_ID = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/custom_attribute/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/custom_attribute/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/custom_attribute/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/custom_attribute/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/custom_attribute/`;
@@ -3141,6 +3192,7 @@ export const DEVICE_CUSTOM_ATTRIBUTES_BY_DEVICE_ID = (deviceType: DeviceMapping,
 export const DEVICE_MANUFACTURERS = (deviceType: DeviceMapping) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `rest/manufacturer/?page_size=0`;
+        case DeviceMapping.ROUTERS: return `rest/manufacturer/?page_size=0`;
         case DeviceMapping.FIREWALL: return `rest/manufacturer/?page_size=0`;
         case DeviceMapping.LOAD_BALANCER: return `rest/manufacturer/?page_size=0`;
         case DeviceMapping.HYPERVISOR: return `rest/server_manufacturer/?page_size=0`;;
@@ -3155,6 +3207,7 @@ export const DEVICE_MANUFACTURERS = (deviceType: DeviceMapping) => {
 export const DEVICE_MODELS = (deviceType: DeviceMapping, manufacturer: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `rest/switchmodel/?manufacturer=${manufacturer}&page_size=0`;
+        case DeviceMapping.ROUTERS: return `rest/routermodel/?manufacturer=${manufacturer}&page_size=0`;
         case DeviceMapping.FIREWALL: return `rest/firewallmodel/?manufacturer=${manufacturer}&page_size=0`;
         case DeviceMapping.LOAD_BALANCER: return `rest/loadbalancermodel/?manufacturer=${manufacturer}&page_size=0`;
         case DeviceMapping.HYPERVISOR: return `rest/server_model/?manufacturer=${manufacturer}&page_size=0`;
@@ -3179,6 +3232,7 @@ export const ORG_ZABBIX_EMAIL_ALERT_CONFIG = (orgId: string) => `customer/organi
 export const DEVICE_ZABBIX_EMAIL_ALERT_CONFIG = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/alert_notification_config/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/alert_notification_config/`;
         case DeviceMapping.FIREWALL: return `/customer/firewalls/${deviceId}/alert_notification_config/`;
         case DeviceMapping.LOAD_BALANCER: return `/customer/load_balancers/${deviceId}/alert_notification_config/`;
         case DeviceMapping.HYPERVISOR: return `/customer/servers/${deviceId}/alert_notification_config/`;
@@ -3402,6 +3456,7 @@ export const ZABBIX_GRAPH_PORT_GRAPH = (portId: string) => `/customer/zabbix/map
 export const DEVICE_UPTIME_BY_DEVICE_ID = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/uptime/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/uptime/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${uuid}/uptime/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${uuid}/uptime/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${uuid}/uptime/`;
@@ -3508,6 +3563,8 @@ export const IMAGE_MAPPING = (uuid?: string) => uuid ? `orchestration/vmimage/${
 export const UNITY_ORG_SETTINGS = () => `/customer/organization_settings/?page_size=0`;
 
 export const UNITY_ORG_SETTINGS_DETAILS = (uuid: string) => `/customer/organization_settings/${uuid}/`;
+
+export const AIOPS_CORRELATION_MODE = () => `/customer/aiops/correlation_mode/`;
 
 export const REPORT_SCHEDULE_COUNT = () => `customer/reporting/reports/report_counts/`;
 
@@ -3769,6 +3826,7 @@ export const DEVICES_LIST_BY_DEVICE_TYPE = (deviceType: DeviceMapping) => {
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `rest/openstack/migration/`
         case DeviceMapping.OTHER_DEVICES: return `customer/customdevices/`;
         case DeviceMapping.SWITCHES: return `customer/switches/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/`;
         case DeviceMapping.VMWARE_VIRTUAL_MACHINE: return `/rest/vmware/migrate/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/`;
         case DeviceMapping.PDU: return `customer/pdus/`;
@@ -3785,6 +3843,7 @@ export const DEVICES_LIST_BY_DEVICE_TYPE = (deviceType: DeviceMapping) => {
 export const ADD_TARGET_DEVICE_FOR_INTERFACE_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/interfaces_map/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/interfaces_map/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/interfaces_map/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/interfaces_map/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/interfaces_map/`;
@@ -3805,6 +3864,7 @@ export const ADD_TARGET_DEVICE_FOR_INTERFACE_BY_DEVICE_TYPE = (deviceType: Devic
 export const DEVICE_SERIAL_NUMBER_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/serial_number/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/serial_number/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/serial_number/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/serial_number/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/serial_number/`;
@@ -3824,6 +3884,7 @@ export const DEVICE_SERIAL_NUMBER_BY_DEVICE_TYPE = (deviceType: DeviceMapping, d
 export const GET_INTERFACE_DETAILS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string, interfaceId: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${deviceId}/interface_details/?interface_id=${interfaceId}`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${deviceId}/interface_details/?interface_id=${interfaceId}`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/interface_details/?interface_id=${interfaceId}`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/interface_details/?interface_id=${interfaceId}`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/interface_details/?interface_id=${interfaceId}`;
@@ -3934,6 +3995,7 @@ export const ZABBIX_DEVICE_EVENTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
     if (k8s) return `${k8s}monitoring/events/`;
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `/customer/switches/${deviceId}/monitoring/events/`;
+        case DeviceMapping.ROUTERS: return `/customer/routers/${deviceId}/monitoring/events/`;
         case DeviceMapping.FIREWALL: return `customer/firewalls/${deviceId}/monitoring/events/`;
         case DeviceMapping.LOAD_BALANCER: return `customer/load_balancers/${deviceId}/monitoring/events/`;
         case DeviceMapping.HYPERVISOR: return `customer/servers/${deviceId}/monitoring/events/`;
@@ -3958,6 +4020,7 @@ export const ZABBIX_DEVICE_EVENTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
         case DeviceMapping.AWS_RESOURCES: return `/customer/managed/aws/resources/${deviceId}/monitoring/events/`;
         case DeviceMapping.OCI_ACCOUNTS: return `/customer/managed/oci/accounts/${deviceId}/monitoring/events/`;
         case DeviceMapping.OCI_RESOURCES: return `/customer/managed/oci/resources/${deviceId}/monitoring/events/`;
+        case DeviceMapping.GCP_RESOURCES: return `/customer/managed/gcp/resources/${deviceId}/monitoring/events/`;
         case DeviceMapping.NUTANIX_ACCOUNT: return `customer/nutanix/${deviceId}/monitoring/events/`;
         case DeviceMapping.CONTAINER_CONTROLLER: return `customer/docker/account/${deviceId}/monitoring/events/`;
         case DeviceMapping.DOCKER_CONTAINER: return `customer/docker/containers/${deviceId}/monitoring/events/`;
@@ -4021,6 +4084,7 @@ export const GET_IOT_DEVICE_Models = (deviceType: DeviceMapping) => {
 export const SYNC_REDFISH_SYSTEM = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_system/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_system/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_system/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_system/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4030,6 +4094,7 @@ export const SYNC_REDFISH_SYSTEM = (deviceType: DeviceMapping, uuid: string) => 
 export const DEVICE_OVERVIEW_BY_HEALTH_SERVERS = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/server_health/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/server_health/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/server_health/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/server_health/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4039,6 +4104,7 @@ export const DEVICE_OVERVIEW_BY_HEALTH_SERVERS = (deviceType: DeviceMapping, uui
 export const DEVICE_OVERVIEW_BY_SYNC_SERVER_INFO = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_system/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_system/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_system/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_system/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4048,6 +4114,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_SERVER_INFO = (deviceType: DeviceMapping, u
 export const DEVICE_OVERVIEW_BY_SERVER_INFO = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/server_info/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/server_info/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/server_info/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/server_info/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4057,6 +4124,7 @@ export const DEVICE_OVERVIEW_BY_SERVER_INFO = (deviceType: DeviceMapping, uuid: 
 export const DEVICE_OVERVIEW_BY_SYNC_FAN_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_fans/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_fans/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_fans/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_fans/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4066,6 +4134,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_FAN_DATA = (deviceType: DeviceMapping, uuid
 export const DEVICE_OVERVIEW_BY_FAN_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/fans/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/fans/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/fans/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/fans/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4075,6 +4144,7 @@ export const DEVICE_OVERVIEW_BY_FAN_DATA = (deviceType: DeviceMapping, uuid: str
 export const DEVICE_OVERVIEW_BY_SYNC_POWER_STATS = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_power_supplies/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_power_supplies/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_power_supplies/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_power_supplies/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4084,6 +4154,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_POWER_STATS = (deviceType: DeviceMapping, u
 export const DEVICE_OVERVIEW_BY_POWER_STATS = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/power_supplies/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/power_supplies/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/power_supplies/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/power_supplies/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4093,6 +4164,7 @@ export const DEVICE_OVERVIEW_BY_POWER_STATS = (deviceType: DeviceMapping, uuid: 
 export const DEVICE_OVERVIEW_BY_SYNC_CPU_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_processors/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_processors/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_processors/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_processors/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4102,6 +4174,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_CPU_DATA = (deviceType: DeviceMapping, uuid
 export const DEVICE_OVERVIEW_BY_CPU_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/processors/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/processors/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/processors/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/processors/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4111,6 +4184,7 @@ export const DEVICE_OVERVIEW_BY_CPU_DATA = (deviceType: DeviceMapping, uuid: str
 export const DEVICE_OVERVIEW_BY_SYNC_MEMORY_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_memories/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_memories/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_memories/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_memories/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4120,6 +4194,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_MEMORY_DATA = (deviceType: DeviceMapping, u
 export const DEVICE_OVERVIEW_BY_MEMORY_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/memories/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/memories/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/memories/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/memories/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4129,6 +4204,7 @@ export const DEVICE_OVERVIEW_BY_MEMORY_DATA = (deviceType: DeviceMapping, uuid: 
 export const DEVICE_OVERVIEW_BY_SYNC_TEMPERATURE_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_temperatures/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_temperatures/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_temperatures/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_temperatures/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4138,6 +4214,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_TEMPERATURE_DATA = (deviceType: DeviceMappi
 export const DEVICE_OVERVIEW_BY_TEMPERATURE_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/temperatures/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/temperatures/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/temperatures/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/temperatures/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4147,6 +4224,7 @@ export const DEVICE_OVERVIEW_BY_TEMPERATURE_DATA = (deviceType: DeviceMapping, u
 export const DEVICE_OVERVIEW_BY_SYNC_PHYSICAL_DISKS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_physical_disks/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_physical_disks/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_physical_disks/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_physical_disks/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4156,6 +4234,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_PHYSICAL_DISKS_DATA = (deviceType: DeviceMa
 export const DEVICE_OVERVIEW_BY_PHYSICAL_DISKS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/physical_disks/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/physical_disks/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/physical_disks/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/physical_disks/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4165,6 +4244,7 @@ export const DEVICE_OVERVIEW_BY_PHYSICAL_DISKS_DATA = (deviceType: DeviceMapping
 export const DEVICE_OVERVIEW_BY_SYNC_VIRTUAL_DISKS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_virtual_disks/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_virtual_disks/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_virtual_disks/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_virtual_disks/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4175,6 +4255,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_VIRTUAL_DISKS_DATA = (deviceType: DeviceMap
 export const DEVICE_OVERVIEW_BY_VIRTUAL_DISKS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/virtual_disks/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/virtual_disks/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/virtual_disks/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/virtual_disks/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4184,6 +4265,7 @@ export const DEVICE_OVERVIEW_BY_VIRTUAL_DISKS_DATA = (deviceType: DeviceMapping,
 export const DEVICE_OVERVIEW_BY_SYNC_CHASSIS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_chassis/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_chassis/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_chassis/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_chassis/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4193,6 +4275,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_CHASSIS_DATA = (deviceType: DeviceMapping, 
 export const DEVICE_OVERVIEW_BY_CHASSIS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/chassis/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/chassis/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/chassis/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/chassis/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4202,6 +4285,7 @@ export const DEVICE_OVERVIEW_BY_CHASSIS_DATA = (deviceType: DeviceMapping, uuid:
 export const DEVICE_OVERVIEW_BY_SYNC_VOLTAGE_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_voltages/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_voltages/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_voltages/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_voltages/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4211,6 +4295,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_VOLTAGE_DATA = (deviceType: DeviceMapping, 
 export const DEVICE_OVERVIEW_BY_VOLTAGE_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/voltages/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/voltages/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/voltages/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/voltages/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4220,6 +4305,7 @@ export const DEVICE_OVERVIEW_BY_VOLTAGE_DATA = (deviceType: DeviceMapping, uuid:
 export const DEVICE_OVERVIEW_BY_PROCESSORS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/processors/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/processors/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/processors/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/processors/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4229,6 +4315,7 @@ export const DEVICE_OVERVIEW_BY_PROCESSORS_DATA = (deviceType: DeviceMapping, uu
 export const DEVICE_OVERVIEW_BY_SYNC_MANAGERS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_managers/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_managers/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_managers/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_managers/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4238,6 +4325,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_MANAGERS_DATA = (deviceType: DeviceMapping,
 export const DEVICE_OVERVIEW_BY_MANAGERS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/managers/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/managers/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/managers/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/managers/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4247,6 +4335,7 @@ export const DEVICE_OVERVIEW_BY_MANAGERS_DATA = (deviceType: DeviceMapping, uuid
 export const DEVICE_OVERVIEW_BY_SYNC_ENCLOSURES_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_enclosures/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_enclosures/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_enclosures/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_enclosures/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4256,6 +4345,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_ENCLOSURES_DATA = (deviceType: DeviceMappin
 export const DEVICE_OVERVIEW_BY_ENCLOSURES_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/enclosures/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/enclosures/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/enclosures/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/enclosures/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4265,6 +4355,7 @@ export const DEVICE_OVERVIEW_BY_ENCLOSURES_DATA = (deviceType: DeviceMapping, uu
 export const DEVICE_OVERVIEW_BY_SYNC_STORAGE_CONTROLLERS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_storage_controllers/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_storage_controllers/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_storage_controllers/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_storage_controllers/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4274,6 +4365,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_STORAGE_CONTROLLERS_DATA = (deviceType: Dev
 export const DEVICE_OVERVIEW_BY_STORAGE_CONTROLLERS_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/storage_controllers/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/storage_controllers/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/storage_controllers/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/storage_controllers/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4283,6 +4375,7 @@ export const DEVICE_OVERVIEW_BY_STORAGE_CONTROLLERS_DATA = (deviceType: DeviceMa
 export const DEVICE_OVERVIEW_BY_SYNC_BATTERIES_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/sync_redfish_batteries/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/sync_redfish_batteries/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/sync_redfish_batteries/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/sync_redfish_batteries/`;
         default: console.error('Invalid device type : ', deviceType);
@@ -4292,6 +4385,7 @@ export const DEVICE_OVERVIEW_BY_SYNC_BATTERIES_DATA = (deviceType: DeviceMapping
 export const DEVICE_OVERVIEW_BY_BATTERIES_DATA = (deviceType: DeviceMapping, uuid: string) => {
     switch (deviceType) {
         case DeviceMapping.SWITCHES: return `customer/switches/${uuid}/batteries/`;
+        case DeviceMapping.ROUTERS: return `customer/routers/${uuid}/batteries/`;
         case DeviceMapping.BARE_METAL_SERVER: return `customer/bm_servers/${uuid}/batteries/`;
         case DeviceMapping.STORAGE_DEVICES: return `customer/storagedevices/${uuid}/batteries/`;
         default: console.error('Invalid device type : ', deviceType);

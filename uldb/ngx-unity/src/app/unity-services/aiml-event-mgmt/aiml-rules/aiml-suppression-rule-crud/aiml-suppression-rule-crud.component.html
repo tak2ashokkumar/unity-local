@@ -122,6 +122,68 @@
                 </div>
             </div>
 
+            <!-- Advanced suppression-decision controls -->
+            <div class="row mt-3">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="critical_bypass_policy">Critical Bypass Policy</label>
+                        <select class="form-control" id="critical_bypass_policy" formControlName="critical_bypass_policy">
+                            <option *ngFor="let opt of criticalBypassPolicyOptions" [value]="opt.value">{{opt.label}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="recovery_event_policy">Recovery Event Policy</label>
+                        <select class="form-control" id="recovery_event_policy" formControlName="recovery_event_policy">
+                            <option *ngFor="let opt of recoveryEventPolicyOptions" [value]="opt.value">{{opt.label}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="repeat_compression_policy">Repeat Compression Policy</label>
+                        <select class="form-control" id="repeat_compression_policy" formControlName="repeat_compression_policy">
+                            <option *ngFor="let opt of repeatCompressionPolicyOptions" [value]="opt.value">{{opt.label}}</option>
+                        </select>
+                        <small class="form-text text-muted">Currently informational/audit-only — does not yet change which alerts get merged.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="flap_threshold">Flap threshold override (status transitions before flagged as flapping)</label>
+                        <input class="form-control" id="flap_threshold" type="number" min="0" placeholder="Default"
+                            formControlName="flap_threshold">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="storm_threshold">Storm sensitivity override (event count threshold)</label>
+                        <input class="form-control" id="storm_threshold" type="number" min="0" placeholder="Default"
+                            formControlName="storm_threshold">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="decision_reason">Custom audit reason (logged when this rule matches/suppresses an event)</label>
+                        <input class="form-control" id="decision_reason" type="text" formControlName="decision_reason">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-4">
+                    <label>&nbsp;</label>
+                    <div class="form-check checkbox"><input id="dry_run" type="checkbox" class="form-check-input mt-0"
+                            style="width: 20px;height: 20px;" formControlName="dry_run">
+                        <label for="dry_run" class="form-check-label ml-2">Dry run (log what would be suppressed without actually suppressing)</label>
+                    </div>
+                </div>
+            </div>
+
             <!-- <div class="row mt-3">
                 <div class="form-group col-2">olp
                     <label>&nbsp;</label>

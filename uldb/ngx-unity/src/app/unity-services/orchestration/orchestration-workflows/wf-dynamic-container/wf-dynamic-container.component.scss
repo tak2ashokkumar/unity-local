@@ -13,12 +13,13 @@ $shadow-lifted: 0 8px 32px rgba(60, 72, 82, 0.17);
 $transition-snap: cubic-bezier(0.4, 0, 0.2, 1);
 $transition-panel: 0.22s $transition-snap;
 
-$tab-active-color: #378ad8; // matches your existing custom-tabs active colour
-$tab-active-bg: rgba(55, 138, 216, 0.08);
+$tab-active-color: $accent;
+$tab-active-bg: $accent-glow;
 $tab-hover-bg: rgba(92, 104, 115, 0.07);
+$workflow-button-blue: #0b69c2;
 $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
-::ng-deep .workflow-category-select.ng-select.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
+::ng-deep .workflow-category-select.ng-select.ng-select-focused:not(.ng-select-opened)>.ng-select-container {
     border-color: #ced4da;
     box-shadow: none;
 }
@@ -102,11 +103,39 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
 
 // ─── Card Header ─────────────────────────────────────────────────────────────
 .card-header.wf-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
     height: 44px;
     border-bottom-color: $border-color !important;
     padding: 0.25rem 0.75rem !important;
     box-shadow: 0 1px 4px rgba(60, 72, 82, 0.07);
     z-index: 50;
+
+    .workflow-header-name {
+        grid-column: 1;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .workflow-header-name-value {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .workflow-header-name-text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .workflow-header-actions {
+        grid-column: 3;
+        justify-self: end;
+        min-width: 0;
+        white-space: nowrap;
+    }
 
     .workflow-name-field {
         flex: 0 1 18rem;
@@ -139,8 +168,23 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
+.btn-outline-primary {
+    color: $workflow-button-blue;
+    border-color: $workflow-button-blue;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        color: #ffffff;
+        background-color: $workflow-button-blue;
+        border-color: $workflow-button-blue;
+        box-shadow: none;
+    }
+}
+
 // ─── Header Mode Toggle ─────────────────────────────────────────────────────
 .workflow-mode-toggle {
+    grid-column: 2;
+    justify-self: center;
     gap: 0.3rem;
     background: $surface-alt;
     border: 1px solid $border-color;
@@ -171,15 +215,15 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     &.active {
-        color: $background-color;
-        background: $tab-active-color;
-        box-shadow: 0 3px 8px rgba(55, 138, 216, 0.18);
+        color: $tab-active-color;
+        background: $tab-active-bg;
+        box-shadow: inset 0 0 0 1px rgba(74, 144, 164, 0.32);
     }
 
     &.active:hover:not(:disabled),
     &.active:focus-visible {
-        color: $background-color;
-        background: $tab-active-color;
+        color: $tab-active-color;
+        background: $tab-active-bg;
     }
 
     &:disabled {
@@ -557,4 +601,183 @@ $snap: cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 30;
     gap: 8px;
     padding: 0 14px;
+}
+
+:host ::ng-deep #dynamic-drawflow {
+    .drawflow-node.agentic-default-node:has(.node-box.aiagent) {
+
+        .input,
+        .output {
+            position: absolute !important;
+            top: 30px !important;
+            margin-bottom: 0;
+            transform: translateY(-50%);
+        }
+
+        .input {
+            left: calc(50% - 33.5px) !important;
+        }
+
+        .output {
+            left: calc(50% + 24px) !important;
+            right: auto !important;
+        }
+    }
+
+    .agent-settings-badge {
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        border-radius: 8px;
+        border: 1px solid rgba(74, 144, 164, 0.35);
+        background: #edf5f7;
+        box-shadow: 0 0 0 2px $background-color, 0 2px 4px rgba(60, 72, 82, 0.12);
+        color: $accent;
+        font-size: 12px;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 3;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+        .fa-cog {
+            position: static;
+            flex: 0 0 auto;
+            font-size: inherit;
+            width: auto;
+            height: auto;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+            transform: none;
+
+            &::before {
+                display: block;
+            }
+        }
+
+        &.active,
+        &:hover {
+            background: $accent;
+            border-color: $accent;
+            color: $background-color;
+        }
+
+        &:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        &:focus-visible {
+            outline: 2px solid $accent;
+            outline-offset: 3px;
+        }
+    }
+
+    .node-drop-hover {
+        outline: 1.5px dashed $accent;
+        outline-offset: 4px;
+    }
+
+    .agent-tool-count {
+        font-size: 10px;
+    }
+}
+
+.agent-popup {
+    position: absolute;
+    transform-origin: top left;
+    width: 260px;
+    max-width: calc(100% - 16px);
+    z-index: 30;
+    background: $background-color;
+    border: 0.5px solid $accent;
+    border-radius: 12px;
+    box-shadow: $shadow-panel;
+    color: $color-dark;
+}
+
+.agent-popup-caret {
+    position: absolute;
+    top: -5px;
+    width: 9px;
+    height: 9px;
+    background: $background-color;
+    border-top: 0.5px solid $accent;
+    border-left: 0.5px solid $accent;
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.agent-tool-tray {
+    min-height: 60px;
+    border: 1px dashed #aebfc6;
+    border-radius: 8px;
+    background: $surface-alt;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+
+    &.drag-over {
+        border-color: $accent;
+        background: #edf5f7;
+        box-shadow: 0 0 0 2px $accent-glow;
+    }
+}
+
+.agent-tool-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    background: $surface-alt;
+    border: 1px solid $border-color;
+
+    img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+
+    &.flash {
+        animation: agent-tool-flash 700ms ease-out;
+    }
+
+    &:hover .agent-tool-remove,
+    &:focus-within .agent-tool-remove {
+        opacity: 1;
+    }
+}
+
+.agent-tool-remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 14px;
+    height: 14px;
+    line-height: 10px;
+    border-radius: 50%;
+    border: 1px solid $border-color;
+    background: $background-color;
+    color: $color-dark;
+    opacity: 0;
+}
+
+.agent-tool-warning {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--warning, #ffc107);
+    pointer-events: none;
+}
+
+@keyframes agent-tool-flash {
+    from {
+        box-shadow: 0 0 0 5px $accent-glow;
+        border-color: $accent;
+    }
+
+    to {
+        box-shadow: 0 0 0 0 transparent;
+    }
 }

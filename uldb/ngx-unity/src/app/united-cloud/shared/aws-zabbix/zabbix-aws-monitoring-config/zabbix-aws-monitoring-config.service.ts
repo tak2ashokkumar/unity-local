@@ -38,11 +38,11 @@ export class ZabbixAwsMonitoringConfigService {
   }
 
   enableMonitoring(deviceId: string, deviceType: DeviceMapping, data: AwsZabbixMonitoringConfig): Observable<AwsZabbixMonitoringConfig> {
-    return this.http.post<AwsZabbixMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), data);
+    return this.http.post<AwsZabbixMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), { ...data, collector: data.collector?.uuid ? data.collector : null });
   }
 
   updateMonitoring(deviceId: string, deviceType: DeviceMapping, data: AwsZabbixMonitoringConfig): Observable<AwsZabbixMonitoringConfig> {
-    return this.http.put<AwsZabbixMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), data);
+    return this.http.put<AwsZabbixMonitoringConfig>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId), { ...data, collector: data.collector?.uuid ? data.collector : null });
   }
 
   deleteMonitoring(deviceId: string, deviceType: DeviceMapping): Observable<AwsZabbixMonitoringConfig> {
@@ -58,7 +58,7 @@ export class ZabbixAwsMonitoringConfigService {
       'access_key': [{ value: (obj && obj.access_key) ? obj.access_key : '', disabled: false }, [Validators.required, NoWhitespaceValidator]],
       'secret_key': [{ value: (obj && obj.secret_key) ? obj.secret_key : '', disabled: false }, [Validators.required, NoWhitespaceValidator]],
       'collector': this.builder.group({
-        'uuid': [obj?.collector ? obj.collector.uuid : '', [Validators.required]]
+        'uuid': [obj?.collector ? obj.collector.uuid : '']
       }),
     });
     return this.form;

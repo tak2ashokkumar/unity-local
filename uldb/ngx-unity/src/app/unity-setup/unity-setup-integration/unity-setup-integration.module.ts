@@ -111,10 +111,6 @@ import { UsiPrivateCloudNutanixWidgetComponent } from './usi-private-cloud-nutan
 import { UsiPcVmwareVcenterCrudComponent } from './usi-private-clouds/usi-pc-vmware-vcenter-crud/usi-pc-vmware-vcenter-crud.component';
 import { UsiPrivateCloudsResourcesComponent } from './usi-private-clouds/usi-private-clouds-resources/usi-private-clouds-resources.component';
 import { UsiPrivateCloudsComponent } from './usi-private-clouds/usi-private-clouds.component';
-import { UsiVergeioComponent } from './usi-vergeio/usi-vergeio.component';
-import { UsiVergeioCrudComponent } from './usi-vergeio/usi-vergeio-crud/usi-vergeio-crud.component';
-import { UsiVergeioDetailComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-detail.component';
-import { UsiVergeioVmMonitoringComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-vm-monitoring/usi-vergeio-vm-monitoring.component';
 import { UsiPublicCloudAwsWidgetComponent } from './usi-public-cloud-aws-widget/usi-public-cloud-aws-widget.component';
 import { UsiPublicCloudAwsCrudComponent } from './usi-public-cloud-aws/usi-public-cloud-aws-crud/usi-public-cloud-aws-crud.component';
 import { UsiPublicCloudAwsResourceDataComponent } from './usi-public-cloud-aws/usi-public-cloud-aws-resource-data/usi-public-cloud-aws-resource-data.component';
@@ -149,6 +145,8 @@ import { UsiWorkflowIntegrationHistoryComponent } from './usi-workflow-integrati
 import { UsiWorkflowIntegrationWidgetComponent } from './usi-workflow-integration/usi-workflow-integration-widget/usi-workflow-integration-widget.component';
 import { UsiWorkflowIntegrationComponent } from './usi-workflow-integration/usi-workflow-integration.component';
 
+import { PrivateCloudEsxiCrudComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi-crud/private-cloud-esxi-crud.component';
+import { PrivateCloudEsxiComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi.component';
 import { SharedContainerControllersModule } from 'src/app/shared/shared-container-controllers/shared-container-controllers.module';
 import { UsiContainersDockerCrudComponent } from './usi-containers/usi-containers-docker-crud/usi-containers-docker-crud.component';
 import { UsiContainersKubernetesCrudComponent } from './usi-containers/usi-containers-kubernetes-crud/usi-containers-kubernetes-crud.component';
@@ -162,8 +160,10 @@ import { UsiUnityoneItsmComponent } from './usi-unityone-itsm/usi-unityone-itsm.
 import { UsiVaultsCrudComponent } from './usi-vaults/usi-vaults-crud/usi-vaults-crud.component';
 import { UsiVaultsCyberarcComponent } from './usi-vaults/usi-vaults-cyberarc/usi-vaults-cyberarc.component';
 import { UsiVaultsComponent } from './usi-vaults/usi-vaults.component';
-import { PrivateCloudEsxiComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi.component';
-import { PrivateCloudEsxiCrudComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi-crud/private-cloud-esxi-crud.component';
+import { UsiVergeioCrudComponent } from './usi-vergeio/usi-vergeio-crud/usi-vergeio-crud.component';
+import { UsiVergeioDetailComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-detail.component';
+import { UsiVergeioVmMonitoringComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-vm-monitoring/usi-vergeio-vm-monitoring.component';
+import { UsiVergeioComponent } from './usi-vergeio/usi-vergeio.component';
 
 @NgModule({
   declarations: [

@@ -115,12 +115,12 @@ const tabData: TabData[] = [
     task: 'DevOps Automation',
     permission: 'View'
   },
-  {
-    name: 'Image Mapping',
-    url: '/services/orchestration/image-mapping',
-    task: 'DevOps Automation',
-    permission: 'View'
-  },
+  // {
+  //   name: 'Image Mapping',
+  //   url: '/services/orchestration/image-mapping',
+  //   task: 'DevOps Automation',
+  //   permission: 'View'
+  // },
   {
     name: 'Integration',
     url: '/services/orchestration/integration'

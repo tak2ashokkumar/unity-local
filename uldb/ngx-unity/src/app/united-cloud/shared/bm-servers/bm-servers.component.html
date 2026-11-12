@@ -97,6 +97,11 @@
                   (click)="consoleNewTab(view.bmServerId,view.newTabConsoleAccessUrl,i)" accessControl
                   moduleName="Datacenter" accessType="Remote Management" elementType="actionbtn"></button>
 
+                <button class="action-icons mb-0 fas fa-folder-open font-sm ml-1" [tooltip]="view.fileManagerMsg"
+                  [ngClass]="{'action-icons-disabled':!view.fileManagerEnabled}" (click)="openFileManager(view)"
+                  accessControl moduleName="Private Cloud" accessType="Remote Management"
+                  elementType="actionbtn"></button>
+
                 <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
                   [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring"
                   accessType="View Monitoring" elementType="actionbtn">

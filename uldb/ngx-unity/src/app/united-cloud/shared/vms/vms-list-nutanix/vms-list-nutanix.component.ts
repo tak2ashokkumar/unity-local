@@ -3,11 +3,14 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { cloneDeep as _clone } from 'lodash-es';
+import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageType } from 'src/app/shared/app-storage/storage-type';
 import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { TICKET_SUBJECT, NUTANIX_VM_TICKET_METADATA } from 'src/app/shared/create-ticket.const';
+import { RemoteFileResourceType, RemoteFileService } from 'src/app/shared/remote-file-manager/remote-file.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { SearchCriteria, PAGE_SIZES } from 'src/app/shared/table-functionality/search-criteria';
 import { NutanixVMViewData, VmsListNutanixService } from './vms-list-nutanix.service';
@@ -32,7 +35,9 @@ export class VmsListNutanixComponent implements OnInit {
     private svc: VmsListNutanixService,
     private spinner: AppSpinnerService,
     private ticketService: SharedCreateTicketService,
-    private storageService: StorageService) {
+    private storageService: StorageService,
+    private notification: AppNotificationService,
+    private remoteFileService: RemoteFileService) {
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
@@ -131,6 +136,15 @@ export class VmsListNutanixComponent implements OnInit {
   // saveCriteria() {
   //   this.storageService.put('criteria', { criteria: this.currentCriteria, deviceType: DeviceMapping.OTHER_DEVICES }, StorageType.SESSIONSTORAGE);    
   // }
+
+  openFileManager(view: NutanixVMViewData) {
+    if (!view.fileManagerEnabled) {
+      return;
+    }
+    if (!this.remoteFileService.openFileManager(RemoteFileResourceType.NUTANIX_VM, view.uuid)) {
+      this.notification.error(new Notification('Popup blocked. Allow popups for UnityOne and try again.'));
+    }
+  }
 
   createTicket(data: NutanixVMViewData) {
     this.ticketService.createTicket({

@@ -83,6 +83,10 @@
               [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}" (click)="consoleNewTab(view)" accessControl
               moduleName="Private Cloud" accessType="Remote Management" elementType="actionbtn"></button>
 
+            <button class="action-icons mb-0 fas fa-folder-open font-sm ml-1" [tooltip]="view.fileManagerMsg"
+              [ngClass]="{'action-icons-disabled':!view.fileManagerEnabled}" (click)="openFileManager(view)" accessControl
+              moduleName="Private Cloud" accessType="Remote Management" elementType="actionbtn"></button>
+
             <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1"
               [ngClass]="{'action-icons-disabled':view.popOverDetails.uptime=='0'|| !view.popOverDetails.uptime}"
               routerLinkActive="text-success" (click)="goToStats(view)" [tooltip]="view.statsTooltipMessage"

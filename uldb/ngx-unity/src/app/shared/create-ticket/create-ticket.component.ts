@@ -11,7 +11,7 @@ import { takeUntil, take } from 'rxjs/operators';
 import { DeviceServiceCatalog } from './device-service-catalog.type';
 import { UserInfoService } from '../user-info.service';
 import { TicketMgmtList } from '../SharedEntityTypes/ticket-mgmt-list.type';
-import { ServiceNowTicketType } from '../shared-service-now-mgmt/service-now-ticket-type';
+import { ServiceNowAssignmentGroup, ServiceNowDisplayValueType, ServiceNowTicketType } from '../shared-service-now-mgmt/service-now-ticket-type';
 
 @Component({
   selector: 'create-ticket',
@@ -46,6 +46,9 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
   ticketTypeList: string[] = [];
   isEditFlow: boolean = false;
   editContext: CreateTicketEditContext = null;
+  assignmentGroupList: ServiceNowAssignmentGroup[] = [];
+  private assignmentGroupSub: Subscription;
+  private editAssignmentGroup: ServiceNowDisplayValueType = null;
   constructor(private ticketService: CreateTicketService,
     private modalService: BsModalService,
     private spinner: AppSpinnerService,
@@ -58,6 +61,7 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
       this.isFeedback = !!param.input.feedback;
       this.isEditFlow = !!param.editContext;
       this.editContext = param.editContext ? param.editContext : null;
+      this.editAssignmentGroup = null;
       //Category dropdown should be shown only for service request.
       this.showSvcCategory = param.input.type == TICKET_TYPE.PROBLEM && !param.input.feedback && !param.input.webaccess && !param.input.aiops;
       this.deviceMapping = param.deviceMapping ? param.deviceMapping : null;
@@ -141,6 +145,47 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
         }
       }
     }
+    this.setAssignmentGroupControl();
+  }
+
+  // Assignment group is only for ServiceNow, so other ITSM payloads stay unchanged.
+  setAssignmentGroupControl() {
+    if (this.assignmentGroupSub) {
+      this.assignmentGroupSub.unsubscribe();
+    }
+    this.assignmentGroupList = [];
+    if (!this.selectedTcktMgmt || this.selectedTcktMgmt.type != 'ServiceNow') {
+      this.ticketForm.removeControl('assignment_group');
+      return;
+    }
+
+    this.ticketForm.setControl('assignment_group', new FormControl({ value: '', disabled: true }));
+    this.assignmentGroupSub = this.ticketService.getServiceNowAssignmentGroups(this.selectedTcktMgmt.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.assignmentGroupList = res;
+      if (this.assignmentGroupList.length) {
+        this.ticketForm.get('assignment_group').enable({ emitEvent: false });
+      }
+      this.setEditAssignmentGroup();
+    }, err => {
+      this.setEditAssignmentGroup();
+      this.notificationService.error(new Notification('Error while fetching assignment groups.'));
+    });
+  }
+
+  // Groups and ticket details load in parallel, so whichever finishes last selects the ticket's group.
+  private setEditAssignmentGroup() {
+    const control = this.ticketForm.get('assignment_group');
+    if (!this.isServiceNowEditFlow() || !this.editAssignmentGroup || !control) {
+      return;
+    }
+    const groupId = this.editAssignmentGroup.value;
+    // Keep the ticket's current group selectable even if it is inactive, so an update does not clear it.
+    if (!this.assignmentGroupList.find(group => group.sys_id == groupId)) {
+      this.assignmentGroupList = [{ sys_id: groupId, name: this.editAssignmentGroup.display_value || groupId }, ...this.assignmentGroupList];
+    }
+    control.enable({ emitEvent: false });
+    // The modal view renders the new options on the next tick; selecting before that falls back to the first group.
+    setTimeout(() => control.patchValue(groupId, { emitEvent: false }));
   }
 
   getReadableTicketType(type: string) {
@@ -297,5 +342,7 @@ export class CreateTicketComponent implements OnInit, OnDestroy {
       description: ticket.description ? ticket.description.display_value : '',
       type: this.editContext.ticketType
     }, { emitEvent: false });
+    this.editAssignmentGroup = ticket.assignment_group && ticket.assignment_group.value ? ticket.assignment_group : null;
+    this.setEditAssignmentGroup();
   }
 }

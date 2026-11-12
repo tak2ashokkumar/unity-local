@@ -11,6 +11,14 @@ export interface OrgZabbixAlertConfigUser {
     email: string;
 }
 
+export type CorrelationMode = 'auto' | 'manual';
+
+export interface CorrelationModeSettings {
+    mode: CorrelationMode;
+    created_datetime: string;
+    updated_datetime: string;
+}
+
 export interface UnityOrganizationSettings {
     id: number;
     uuid: string;

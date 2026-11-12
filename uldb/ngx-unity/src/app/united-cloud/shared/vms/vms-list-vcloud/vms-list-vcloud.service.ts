@@ -90,6 +90,23 @@ export class VmsListVcloudService {
       a.isPowerButtonEnabled = false;
       a.powerTooltipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
     }
+
+    if (!this.user.isManagementEnabled) {
+      a.fileManagerEnabled = false;
+      a.fileManagerMsg = MANAGEMENT_NOT_ENABLED_MESSAGE();
+    } else if (!vm.management_ip) {
+      a.fileManagerEnabled = false;
+      a.fileManagerMsg = 'Management IP not Configured';
+    } else if (!a.powerStatusOn) {
+      a.fileManagerEnabled = false;
+      a.fileManagerMsg = 'VM is Down';
+    } else if (!a.collectorUuid) {
+      a.fileManagerEnabled = false;
+      a.fileManagerMsg = 'Collector not Configured';
+    } else {
+      a.fileManagerEnabled = true;
+      a.fileManagerMsg = 'File Manager';
+    }
     return a;
   }
 
@@ -170,6 +187,8 @@ export class VCloudVMViewData {
   isNewTabEnabled: boolean;
   newTabToolipMessage: string;
   newTabConsoleAccessUrl: string;
+  fileManagerEnabled: boolean;
+  fileManagerMsg: string;
 
   statsTooltipMessage: string;
   constructor() { }

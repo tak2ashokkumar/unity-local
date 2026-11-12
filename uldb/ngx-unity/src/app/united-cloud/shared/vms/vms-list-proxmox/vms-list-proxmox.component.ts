@@ -16,6 +16,7 @@ import { AppUtilityService, CRUDActionTypes, DeviceMapping, PlatFormMapping } fr
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { PROXMOX_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
+import { RemoteFileResourceType, RemoteFileService } from 'src/app/shared/remote-file-manager/remote-file.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { environment } from 'src/environments/environment';
@@ -75,7 +76,8 @@ export class VmsListProxmoxComponent implements OnInit, OnDestroy {
     private storageService: StorageService,
     private modalService: BsModalService,
     private ticketService: SharedCreateTicketService,
-    private termService: FloatingTerminalService) {
+    private termService: FloatingTerminalService,
+    private remoteFileService: RemoteFileService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
       this.inDevicesPage = this.pcId ? false : true;
@@ -267,6 +269,16 @@ export class VmsListProxmoxComponent implements OnInit, OnDestroy {
       obj.newTab = true;
       this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
       window.open(view.newTabConsoleAccessUrl);
+    }
+  }
+
+  openFileManager(view: ProxmoxVMViewData) {
+    if (!view.fileManagerEnabled) {
+      return;
+    }
+    const resourceType = this.platformType == PlatFormMapping.G3_KVM ? RemoteFileResourceType.G3_KVM_VM : RemoteFileResourceType.PROXMOX_VM;
+    if (!this.remoteFileService.openFileManager(resourceType, view.uuid)) {
+      this.notification.error(new Notification('Popup blocked. Allow popups for UnityOne and try again.'));
     }
   }
 

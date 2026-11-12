@@ -38,6 +38,7 @@ import { OTHER_DEVICE_ROUTES } from './otherdevices/otherdevices-routing.const';
 import { ALL_DEVICES_STORAGE_ROUTES, STORAGE_ROUTES } from './storage-devices/storage-routing.const';
 import { SummaryComponent } from './summary/summary.component';
 import { ALL_DEVICES_SWITCH_ROUTES, SWITCH_ROUTES } from './switches/switches-routing.const';
+import { ROUTER_ROUTES } from './routers/routers-routing.const';
 import { UnityS3AccountComponent } from './unity-s3-account/unity-s3-account.component';
 import { UnityS3TabsComponent } from './unity-s3-account/unity-s3-tabs/unity-s3-tabs.component';
 import { UnityS3BucketFilesComponent } from './unity-s3-account/unity-s3/unity-s3-bucket-files/unity-s3-bucket-files.component';
@@ -583,6 +584,7 @@ export const DevicesRoutes: Routes = [
     },
     ...tempRoute,
     ...SWITCH_ROUTES,
+    ...ROUTER_ROUTES,
     ...FIREWALL_ROUTES,
     ...LOADBALANCER_ROUTES,
     ...BMS_ROUTES,

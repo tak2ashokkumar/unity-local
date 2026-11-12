@@ -106,6 +106,7 @@ export class AppUtilityService {
   getDeviceMappingByDeviceType(deviceType: string,): DeviceMapping {
     switch (deviceType) {
       case 'switch': return DeviceMapping.SWITCHES;
+      case 'router': return DeviceMapping.ROUTERS;
       case 'firewall': return DeviceMapping.FIREWALL;
       case 'load_balancer': return DeviceMapping.LOAD_BALANCER;
       case 'hypervisor': return DeviceMapping.HYPERVISOR;
@@ -207,6 +208,7 @@ export class AppUtilityService {
   getDeviceAPIMappingByDeviceMapping(deviceType: DeviceMapping): string {
     switch (deviceType) {
       case DeviceMapping.SWITCHES: return 'switch';
+      case DeviceMapping.ROUTERS: return 'router';
       case DeviceMapping.FIREWALL: return 'firewall';
       case DeviceMapping.LOAD_BALANCER: return 'load_balancer';
       case DeviceMapping.HYPERVISOR: return 'hypervisor';
@@ -240,6 +242,7 @@ export class AppUtilityService {
   getDeviceAPIPluralMappingByDeviceMapping(deviceType: DeviceMapping): string {
     switch (deviceType) {
       case DeviceMapping.SWITCHES: return 'switches';
+      case DeviceMapping.ROUTERS: return 'routers';
       case DeviceMapping.FIREWALL: return 'firewalls';
       case DeviceMapping.LOAD_BALANCER: return 'load_balancers';
       case DeviceMapping.HYPERVISOR: return 'servers';
@@ -307,6 +310,7 @@ export class AppUtilityService {
       case 'colocloud': return `unitycloud/datacenter/${device.uuid}/cabinets/`;
       case 'cabinet': return `unitycloud/datacenter/${device.dc_uuid}/cabinets/${device.uuid}/view`;
       case 'switch': return `/unitycloud/devices/switches`;
+      case 'router': return `/unitycloud/devices/routers`;
       case 'firewall': return `/unitycloud/devices/firewalls`;
       case 'load_balancer': return `/unitycloud/devices/loadbalancers`;
       case 'hypervisor': return `/unitycloud/devices/hypervisors`;
@@ -726,10 +730,13 @@ export enum DeviceMapping {
   GCP_VIRTUAL_MACHINE = 'GCP VM',
   OCI_ACCOUNTS = 'OCI',
   OCI_RESOURCES = 'OCI RESOURCES',
+  GCP_RESOURCES = 'GCP RESOURCES',
+
   ORACLE_VIRTUAL_MACHINE = 'OCI VM',
 
   PDU = 'PDU',
   SWITCHES = 'Switch',
+  ROUTERS = 'Router',
   FIREWALL = 'Firewall',
   LOAD_BALANCER = 'Load Balancer',
   LB = 'LoadBalancer',
@@ -1071,7 +1078,7 @@ export function IPAddressValidator(control: AbstractControl): { [key: string]: a
   return null;
 }
 
-// Accepts public and internal URLs: any scheme with any host (http://STGLIMAP1071:8077), and without
+// Accepts public and internal URLs: any scheme with any host and without
 // a scheme an IP, a dotted domain or host:port. Plain text is invalid.
 export function UrlValidator(control: AbstractControl): { [key: string]: any } | null {
   if (control.value && control.value.length) {

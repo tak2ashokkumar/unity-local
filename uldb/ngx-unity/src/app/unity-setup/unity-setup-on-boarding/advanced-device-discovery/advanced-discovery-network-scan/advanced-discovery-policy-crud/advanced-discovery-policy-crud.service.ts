@@ -111,7 +111,11 @@ export class AdvancedDiscoveryPolicyCrudService {
         form.addControl('ip_range_to', new FormControl(policyData.discover_ips[1], [NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]));
       }
       if (policyData.network_type == 'subnet' || policyData.network_type == 'ip') {
-        form.addControl('discover_ips', new FormControl(policyData.discover_ips[0]));
+        const discoverIps = policyData.discover_ips || [];
+        const discoverIpsValue = policyData.network_type == 'ip'
+          ? discoverIps.join(',')
+          : discoverIps[0];
+        form.addControl('discover_ips', new FormControl(discoverIpsValue));
       }
       if (policyData.update_location) {
         form.addControl('default_datacenter', new FormControl(policyData.default_datacenter.id, [NoWhitespaceValidator, Validators.required]));

@@ -62,6 +62,7 @@ export class PublicCloudGcpSummaryDetailsComponent implements OnInit, OnDestroy 
   machineTypeList: GCPVMMachineType[] = [];
 
   actionInput: GcpResourcesViewData;
+  allowedStatsResources = ['VM instances', 'Cloud SQL Instances'];
   confirmInput: PowerToggleInput;
   @ViewChild('confirmPower') confirm: ElementRef;
   confirmModalRef: BsModalRef;
@@ -157,6 +158,27 @@ export class PublicCloudGcpSummaryDetailsComponent implements OnInit, OnDestroy 
     this.loadData();
     this.getGcpSubscriptionDetails();
     this.getGcpLocations();
+  }
+
+  goToStats(view: GcpResourcesViewData) {
+    if (!view.isStatsEnabled) {
+      return;
+    }
+    this.storageService.put('device', {
+      name: view.name,
+      deviceType: this.selectedResourceName === 'VM instances' ? DeviceMapping.GCP_VIRTUAL_MACHINE
+        : this.selectedResourceName === 'Cloud SQL Instances' ? DeviceMapping.GCP_RESOURCES : DeviceMapping.GCP_ACCOUNTS,
+      configured: view.monitoring.configured, uuid: `${view.account}`
+    }, StorageType.SESSIONSTORAGE);
+    if (this.selectedResourceName === 'VM instances') {
+      this.router.navigate([view.uuid, 'zbx', 'monitoring-graphs'], { relativeTo: this.route.parent });
+      return;
+    }
+    if (view.monitoring.zabbix) {
+      if (view.monitoring.configured) {
+        this.router.navigate([view.uuid, 'zbx', 'monitoring-graphs'], { relativeTo: this.route.parent });
+      }
+    }
   }
 
   ngOnDestroy(): void {

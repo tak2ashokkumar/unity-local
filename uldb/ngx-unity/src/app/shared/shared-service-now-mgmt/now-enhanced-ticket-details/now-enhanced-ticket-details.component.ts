@@ -45,6 +45,13 @@ export class NowEnhancedTicketDetailsComponent implements OnInit, OnDestroy {
   commentFormErrors: any;
   commentValidationMessages: any;
 
+  worklogs: CommentViewdata[] = [];
+  worklogPostedLoader: boolean = false;
+
+  worklogForm: FormGroup;
+  worklogFormErrors: any;
+  worklogValidationMessages: any;
+
   aiRecomendationImg: string = `${environment.assetsUrl}stars.svg`;
   constructor(private svc: NowEnhancedTicketDetailsService,
     private router: Router,
@@ -65,6 +72,7 @@ export class NowEnhancedTicketDetailsComponent implements OnInit, OnDestroy {
       this.getTicketDetails();
       this.getAttachments();
       this.getComments();
+      this.getWorklogs();
     });
   }
 
@@ -82,7 +90,7 @@ export class NowEnhancedTicketDetailsComponent implements OnInit, OnDestroy {
   }
 
   getTicketDetails() {
-    this.svc.getTicketDetails(this.ticketId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.getTicketDetails(this.ticketId, this.instanceId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.viewData = this.svc.convertToViewData(res, this.instanceId, this.isAllTicketsTabActive);
       this.spinner.stop('main');
     }, (err: HttpErrorResponse) => {
@@ -219,6 +227,51 @@ export class NowEnhancedTicketDetailsComponent implements OnInit, OnDestroy {
       }, (err: HttpErrorResponse) => {
         this.cancelComment();
         this.notificationSvc.error(new Notification('Error while posting ticket comment.'));
+        this.spinner.stop('main');
+      });
+    }
+  }
+
+  getWorklogs() {
+    this.svc.getWorklogs(this.instanceId, this.selectedTicketSysId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.worklogs = this.svc.convertToCommentsViewData(res);
+      this.worklogPostedLoader = false;
+    }, (err: Error) => {
+      this.worklogs = [];
+      this.worklogPostedLoader = false;
+      this.notificationSvc.error(new Notification('Error while loading worklogs'));
+    });
+  }
+
+  addWorklog() {
+    this.worklogForm = this.svc.buildWorklogForm();
+    this.worklogFormErrors = this.svc.resetWorklogFormErrors();
+    this.worklogValidationMessages = this.svc.worklogFormValidationMessages;
+  }
+
+  cancelWorklog() {
+    this.worklogForm = null;
+    this.worklogFormErrors = null;
+    this.worklogValidationMessages = null;
+  }
+
+  onWorklogSubmit() {
+    if (this.worklogForm.invalid) {
+      this.worklogFormErrors = this.utilService.validateForm(this.worklogForm, this.worklogValidationMessages, this.worklogFormErrors);
+      this.worklogForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((data: any) => { this.worklogFormErrors = this.utilService.validateForm(this.worklogForm, this.worklogValidationMessages, this.worklogFormErrors); });
+      return;
+    } else {
+      this.spinner.start('main');
+      this.worklogFormErrors = this.svc.resetWorklogFormErrors();
+      this.svc.postWorklog(this.instanceId, this.viewData.sysId, this.viewData.ticketType, this.worklogForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+        this.worklogPostedLoader = true;
+        this.cancelWorklog();
+        this.getWorklogs();
+        this.spinner.stop('main');
+      }, (err: HttpErrorResponse) => {
+        this.cancelWorklog();
+        this.notificationSvc.error(new Notification('Error while posting ticket worklog.'));
         this.spinner.stop('main');
       });
     }

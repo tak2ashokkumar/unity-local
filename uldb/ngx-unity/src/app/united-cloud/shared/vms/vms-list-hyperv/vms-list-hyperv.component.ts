@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -15,6 +15,7 @@ import { AppUtilityService, CRUDActionTypes, DeviceMapping, PlatFormMapping } fr
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { HYPERV_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
+import { RemoteFileResourceType, RemoteFileService } from 'src/app/shared/remote-file-manager/remote-file.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { TaskError, TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
@@ -36,7 +37,7 @@ enum HypervPowerAction {
   styleUrls: ['./vms-list-hyperv.component.scss'],
   providers: [VmsListHypervService]
 })
-export class VmsListHypervComponent implements OnInit {
+export class VmsListHypervComponent implements OnInit, OnDestroy {
   @Input('platform') platformType: PlatFormMapping;
   @Input('deviceMapping') deviceMapping: DeviceMapping;
   popData: DevicePopoverData;
@@ -71,7 +72,8 @@ export class VmsListHypervComponent implements OnInit {
     private spinnerService: AppSpinnerService,
     private utilService: AppUtilityService,
     private tagsCrudService: VmsTagsCrudService,
-    private notification: AppNotificationService) {
+    private notification: AppNotificationService,
+    private remoteFileService: RemoteFileService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
       this.inDevicesPage = this.pcId ? false : true;
@@ -267,6 +269,15 @@ export class VmsListHypervComponent implements OnInit {
     this.termService.openTerminal(obj);
   }
 
+  openFileManager(view: HypervVMViewData) {
+    if (!view.fileManagerEnabled) {
+      return;
+    }
+    if (!this.remoteFileService.openFileManager(RemoteFileResourceType.HYPERV_VM, view.uuid)) {
+      this.notification.error(new Notification('Popup blocked. Allow popups for UnityOne and try again.'));
+    }
+  }
+
   consoleNewTab(view: HypervVMViewData) {
     if (!view.isNewTabEnabled) {
       return;
@@ -400,5 +411,9 @@ export class VmsListHypervComponent implements OnInit {
       this.notification.error(new Notification('Something went wrong!! Please try again.'));
     }
     this.spinnerService.stop('main');
+  }
+
+  editVM(view: HypervVMViewData): void {
+    this.hyperVService.editVM(view.vmId, view.name);
   }
 }

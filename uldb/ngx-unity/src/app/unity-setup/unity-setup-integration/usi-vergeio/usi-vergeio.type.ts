@@ -11,7 +11,7 @@ export interface VergeIOAccount {
     hostname: string;
     port: number;
     username: string;
-    password: string;
+    api_token: string;
     verify_ssl: boolean;
     collector: DeviceDiscoveryAgentConfigurationType;
     status: string;
@@ -23,7 +23,7 @@ export interface VergeIOConnectionCheck {
     hostname: string;
     port: number;
     username: string;
-    password?: string;
+    api_token?: string;
     verify_ssl: boolean;
     collector: DeviceDiscoveryAgentConfigurationType;
 }

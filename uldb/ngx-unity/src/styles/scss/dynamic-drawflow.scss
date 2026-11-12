@@ -116,8 +116,8 @@ $transition-snap: cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .node-box.llm {
-        height: 110px !important;
-        width: 150px !important;
+        height: 60px !important;
+        width: 60px !important;
     }
 
     //  Node wrapper 
@@ -175,14 +175,14 @@ $transition-snap: cubic-bezier(0.4, 0, 0.2, 1);
 
     //  LLM port overrides 
     .drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .input {
-        left: -3px !important;
+        left: 52px !important;
         top: 50% !important;
         transform: translateY(-50%);
     }
 
     .drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .output {
-        right: -5px !important;
-        top: 50% !important;
+        right: 50px !important;
+        top: 30px !important;
     }
 
     //  Connections 
@@ -204,6 +204,17 @@ $transition-snap: cubic-bezier(0.4, 0, 0.2, 1);
     .drawflow .connection .main-path.selected {
         stroke: $accent !important;
         stroke-width: 2.5px !important;
+    }
+
+    .drawflow .connection .workflow-connector-label {
+        fill: $color-dark;
+        stroke: $surface-alt;
+        stroke-width: 4px;
+        paint-order: stroke;
+        font-size: 10px;
+        font-weight: 600;
+        pointer-events: none;
+        user-select: none;
     }
 
     // The connection editor replaces Drawflow's right-click cross control.

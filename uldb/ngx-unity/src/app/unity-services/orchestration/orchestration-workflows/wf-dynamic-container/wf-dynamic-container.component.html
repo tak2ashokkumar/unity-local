@@ -14,9 +14,9 @@
     <!-- CARD HEADER -->
     <div
       class="card-header wf-header bg-white border-bottom d-flex align-items-center justify-content-between flex-shrink-0">
-      <div class="d-flex align-items-center pl-3">
-        <div>
-          <span class="font-lg-xl font-500">{{workFlowViewData?.name}}</span>
+      <div class="workflow-header-name d-flex align-items-center pl-3">
+        <div class="workflow-header-name-value">
+          <span class="workflow-header-name-text font-lg-xl font-500" [title]="workFlowViewData?.name">{{workFlowViewData?.name}}</span>
         </div>
         <div *ngIf="workFlowViewData?.name && !isViewMode">
           <button class="btn btn-null text-muted fas fa-pencil-alt" title="Edit Workflow"
@@ -38,9 +38,9 @@
         </button>
       </nav>
 
-      <div class="d-flex align-items-center justify-content-start gap-2 pr-3">
+      <div class="workflow-header-actions d-flex align-items-center justify-content-start gap-2 pr-3">
 
-        <button *ngIf="workFlowId && designerAvailable" class="btn btn-sm btn-primary font-500 mr-2" type="button"
+        <button *ngIf="workFlowId && designerAvailable" class="btn btn-sm btn-outline-primary font-500 mr-2" type="button"
           (click)="toggleWorkflowMode()">
           <i class="fas mr-1" [ngClass]="isViewMode ? 'fa-edit' : 'fa-eye'" aria-hidden="true"></i>
           <span class="font-xs-sm mx-1">{{ isViewMode ? 'Edit' : 'View' }}</span>
@@ -53,7 +53,7 @@
           <span class="font-xs-sm mx-1">{{ isSavingWorkflow ? 'Saving...' : isWorkflowSaved ? 'Saved' : 'Save
             Workflow'}}</span>
         </button>
-        <button type="button" class="btn btn-primary btn-sm ml-2" (click)="openHelpPanel()">
+        <button type="button" class="btn btn-outline-primary btn-sm ml-2" (click)="openHelpPanel()">
           <i class="fas fa-question-circle"></i>
         </button>
         <button class="btn btn-pill btn-warning rounded-circle pull-right btn-sm ml-2" type="button" container="body"
@@ -111,6 +111,40 @@
                       Apply {{ selectedConnectionShape === 'right-angle' ? 'right angled' : selectedConnectionShape }}
                       to all connections
                     </button>
+                  </div>
+                </div>
+                <div *ngFor="let agentPopup of agentPopups; trackBy: trackAgentPopup" class="agent-popup p-2" role="dialog" aria-label="Agent node settings"
+                  [style.left.px]="agentPopup.position.x" [style.top.px]="agentPopup.position.y"
+                  [style.transform]="'scale(' + agentPopupScale + ')'"
+                  (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()"
+                  (dblclick)="$event.stopPropagation()">
+                  <span class="agent-popup-caret" [style.left.px]="agentPopup.position.caretX"></span>
+                  <div class="row no-gutters align-items-center border-bottom pb-2 mb-2">
+                    <span class="col-9 font-weight-bold"><i class="fas fa-robot mr-2"></i>Agent node</span>
+                    <div class="col-3 d-flex justify-content-end">
+                      <button type="button" class="btn btn-null btn-sm p-0" aria-label="Close agent settings" (click)="closeAgentPopup(agentPopup.nodeId)">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="small text-muted mb-1">Tools</div>
+                  <div class="agent-tool-tray p-2" [class.drag-over]="agentPopup.dragOver"
+                    (dragover)="onAgentTrayDragOver($event, agentPopup)" (dragleave)="agentPopup.dragOver = false"
+                    (drop)="onAgentTrayDrop($event, agentPopup.nodeId)">
+                    <div *ngFor="let row of getAgentToolRows(agentPopup.nodeId); trackBy: trackAgentToolRow" class="row no-gutters align-items-center mb-2">
+                    <div *ngFor="let tool of row" class="col-2 d-flex justify-content-center">
+                    <div class="agent-tool-icon position-relative flex-shrink-0 rounded-circle"
+                      [class.flash]="flashingAgentToolId === agentToolKey(tool)">
+                      <button type="button" class="btn btn-null p-0 w-100 h-100 d-flex align-items-center justify-content-center rounded-circle" [title]="tool.name" (click)="openAgentTool(tool)">
+                        <img [src]="getNodeIconUrl(tool)" [alt]="tool.name" />
+                      </button>
+                      <span *ngIf="tool.hasErrors" class="agent-tool-warning" title="Validation errors"></span>
+                      <button *ngIf="!isViewMode && !isExecutionMode" type="button" class="agent-tool-remove p-0"
+                        aria-label="Remove tool" (click)="removeAgentPopupTool(agentPopup.nodeId, tool, $event)">&times;</button>
+                    </div>
+                    </div>
+                    </div>
+                    <small class="text-muted d-block ml-1">Drop tools here.</small>
                   </div>
                 </div>
               </div>
@@ -209,25 +243,25 @@
                 <span class="font-xs-sm mx-1">Stop</span>
               </button>
 
-              <button *ngIf="!isExecutionMode && currentSessionId && resumeBtn && !isRunning" class="btn btn-sm btn-primary font-500"
+              <button *ngIf="!isExecutionMode && currentSessionId && resumeBtn && !isRunning" class="btn btn-sm btn-outline-primary font-500"
                 type="button" (click)="onResume()" [disabled]="erroredNodesCount > 0">
                 <span class="font-xs-sm mx-1">Resume</span>
               </button>
 
-              <button *ngIf="!isExecutionMode && hasNode && !isRunning && !resumeBtn" class="btn btn-sm btn-primary font-500"
+              <button *ngIf="!isExecutionMode && hasNode && !isRunning && !resumeBtn" class="btn btn-sm btn-outline-primary font-500"
                 type="button" (click)="toggleRightPanel();run()" [disabled]="erroredNodesCount > 0">
                 <i class="fas fa-play mr-1"></i>
                 <span class="font-xs-sm mx-1">{{ isViewMode ? 'Run' : 'Test' }}</span>
               </button>
 
               <button *ngIf="!isExecutionMode && ((hasNode && resumeBtn && !isRunning) || (hasNode && isRunning))"
-                class="btn btn-sm btn-primary font-500" type="button"
+                class="btn btn-sm btn-outline-primary font-500" type="button"
                 (click)="toggleRightPanel();viewExecution()" [disabled]="erroredNodesCount > 0">
                 <i class="fas fa-play mr-1"></i>
                 <span class="font-xs-sm mx-1">{{ isViewMode ? 'Run' : 'Test' }}</span>
               </button>
 
-              <button *ngIf="isExecutionMode" class="btn btn-sm btn-primary font-500"
+              <button *ngIf="isExecutionMode" class="btn btn-sm btn-outline-primary font-500"
                 type="button" (click)="run()" [disabled]="!selectedExecution || !hasNode || !designerAvailable || erroredNodesCount > 0 || selectedExecutionInputs === undefined">
                 <i class="fas fa-redo mr-1"></i>
                 <span class="font-xs-sm mx-1">Re-Run</span>
@@ -253,7 +287,7 @@
                     </button>
 
                     <button *ngIf="currentSessionId && resumeBtn && !isRunning"
-                      class="btn btn-sm btn-primary font-500" type="button" (click)="onResume()">
+                      class="btn btn-sm btn-outline-primary font-500" type="button" (click)="onResume()">
                       <span class="font-xs-sm mx-1">Resume</span>
                     </button>
 
@@ -462,6 +496,26 @@
     <div class="card-footer">
       <button class="btn btn-sm btn-warning pull-right ml-1" type="button" (click)="returnToList()">Yes</button>
       <button class="btn btn-sm btn-outline-dark pull-right" (click)="backModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmDeleteNode>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closeDeleteNodeConfirmation()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete this node?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right ml-1" type="button" (click)="deletePendingNode()">Delete</button>
+      <button class="btn btn-sm btn-outline-dark pull-right" type="button" (click)="closeDeleteNodeConfirmation()">Cancel</button>
     </div>
   </div>
 </ng-template>

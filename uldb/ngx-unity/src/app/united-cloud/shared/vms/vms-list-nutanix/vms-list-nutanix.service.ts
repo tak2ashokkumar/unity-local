@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { MANAGEMENT_NOT_ENABLED_MESSAGE } from 'src/app/app-constants';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { NutanixVMType } from 'src/app/shared/SharedEntityTypes/nutanix.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -9,12 +10,14 @@ import { GET_VM_LIST_BY_PLATFORM, NUTANIX_VIRTUAL_MACHINES } from 'src/app/share
 import { PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
+import { UserInfoService } from 'src/app/shared/user-info.service';
 
 @Injectable()
 export class VmsListNutanixService {
   
   constructor(private tableService: TableApiServiceService,    
-    private builder: FormBuilder) { }
+    private builder: FormBuilder,
+    private user: UserInfoService) { }
 
   getVMs(pcId:string, criteria: SearchCriteria): Observable<PaginatedResult<NutanixVMType>> {
     return this.tableService.getData<PaginatedResult<NutanixVMType>>(NUTANIX_VIRTUAL_MACHINES(pcId), criteria);
@@ -39,6 +42,21 @@ export class VmsListNutanixService {
       a.freeStoragePct = d.free_storage_pct ? d.free_storage_pct : 'NA';
       a.cpuUsage = d.cpu_usage ? d.cpu_usage : 'NA';
       a.memoryUsage = d.memory_usage ? d.memory_usage : 'NA';
+
+      const hasIp = d.ip_address && d.ip_address.length ? true : false;
+      if (!this.user.isManagementEnabled) {
+        a.fileManagerEnabled = false;
+        a.fileManagerMsg = MANAGEMENT_NOT_ENABLED_MESSAGE();
+      } else if (!hasIp) {
+        a.fileManagerEnabled = false;
+        a.fileManagerMsg = 'IP Address not Available';
+      } else if (d.power_state != 'on') {
+        a.fileManagerEnabled = false;
+        a.fileManagerMsg = 'VM is Down';
+      } else {
+        a.fileManagerEnabled = true;
+        a.fileManagerMsg = 'File Manager';
+      }
       viewData.push(a);
     });
     return viewData;
@@ -75,4 +93,6 @@ export class NutanixVMViewData {
   freeStoragePct: string;
   status?: string;
   monitoring?: DeviceMonitoringType;
+  fileManagerEnabled: boolean;
+  fileManagerMsg: string;
 }

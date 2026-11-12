@@ -65,6 +65,7 @@ export class DeviceDetailsBulkUpdatePopupService {
     'loadbalancers': (value: string) => `/rest/loadbalancermodel/?manufacturer=${value}&page_size=0`,
     'storage-devices': (value: string) => `/rest/storage_model/?manufacturer=${value}&page_size=0`,
     'switch': (value: string) => `/rest/switchmodel/?manufacturer=${value}&page_size=0`,
+    'router': (value: string) => `/rest/routermodel/?manufacturer=${value}&page_size=0`,
     'default': (value: string) => `/rest/server_model/?manufacturer=${value}&page_size=0`
   };
 

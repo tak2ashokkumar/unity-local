@@ -1,20 +1,20 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { OtherdevicesCrudService } from './otherdevices-crud.service';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { AppUtilityService, DeviceMapping, NoWhitespaceValidator, UrlValidator } from 'src/app/shared/app-utility/app-utility.service';
-import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
-import { takeUntil } from 'rxjs/operators';
+import { cloneDeep as _clone } from 'lodash-es';
 import { Subject } from 'rxjs';
-import { Notification } from 'src/app/shared/app-notification/notification.type';
-import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntil } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { Notification } from 'src/app/shared/app-notification/notification.type';
+import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
+import { AppUtilityService, DeviceMapping, NoWhitespaceValidator, UrlValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { OtherDevice } from '../../entities/other-device.type';
-import { cloneDeep as _clone } from 'lodash-es'
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
-import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
+import { OtherdevicesCrudService } from './otherdevices-crud.service';
 
 @Component({
   selector: 'otherdevices-crud',

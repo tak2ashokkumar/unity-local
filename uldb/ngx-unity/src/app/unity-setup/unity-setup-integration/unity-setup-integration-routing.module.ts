@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { PcCrudComponent } from 'src/app/app-shared-crud/pc-crud/pc-crud.component';
+import { PrivateCloudEsxiCrudComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi-crud/private-cloud-esxi-crud.component';
+import { PrivateCloudEsxiComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi.component';
 import { UnitySetupLdapCrudComponent } from 'src/app/app-shared-crud/unity-setup-ldap-crud/unity-setup-ldap-crud.component';
 import { UsiOntapCrudNewComponent } from 'src/app/app-shared-crud/usi-ontap-crud-new/usi-ontap-crud-new.component';
 import { DOCKER_TABS_CHILDREN, KUBERNETES_TABS_CHILDREN } from 'src/app/shared/shared-container-controllers/container-controllers-routing.const';
@@ -51,13 +53,10 @@ import { UsincViptelaComponent } from './usi-network-controllers/usinc-viptela/u
 import { UsiNutanixCrudComponent } from './usi-nutanix/usi-nutanix-crud/usi-nutanix-crud.component';
 import { UsiNutanixDiscovedDevicesComponent } from './usi-nutanix/usi-nutanix-discoved-devices/usi-nutanix-discoved-devices.component';
 import { UsiNutanixComponent } from './usi-nutanix/usi-nutanix.component';
-import { UsiVergeioComponent } from './usi-vergeio/usi-vergeio.component';
-import { UsiVergeioCrudComponent } from './usi-vergeio/usi-vergeio-crud/usi-vergeio-crud.component';
-import { UsiVergeioDetailComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-detail.component';
-import { UsioSdwanCrudComponent } from './usi-others/usio-sdwan/usio-sdwan-crud/usio-sdwan-crud.component';
-import { UsioSdwanComponent } from './usi-others/usio-sdwan/usio-sdwan.component';
 import { UsioFirewallManagementCenterCrudComponent } from './usi-others/usio-firewall-management-center/usio-firewall-management-center-crud/usio-firewall-management-center-crud.component';
 import { UsioFirewallManagementCenterComponent } from './usi-others/usio-firewall-management-center/usio-firewall-management-center.component';
+import { UsioSdwanCrudComponent } from './usi-others/usio-sdwan/usio-sdwan-crud/usio-sdwan-crud.component';
+import { UsioSdwanComponent } from './usi-others/usio-sdwan/usio-sdwan.component';
 import { UsioVeeamBackupVmsComponent } from './usi-others/usio-veeam/usio-veeam-backups/usio-veeam-backup-vms/usio-veeam-backup-vms.component';
 import { UsioVeeamBackupsComponent } from './usi-others/usio-veeam/usio-veeam-backups/usio-veeam-backups.component';
 import { UsioVeeamCrudComponent } from './usi-others/usio-veeam/usio-veeam-crud/usio-veeam-crud.component';
@@ -87,11 +86,12 @@ import { UsiUnityoneItsmCrudComponent } from './usi-unityone-itsm/usi-unityone-i
 import { UsiUnityoneItsmComponent } from './usi-unityone-itsm/usi-unityone-itsm.component';
 import { UsiVaultsCrudComponent } from './usi-vaults/usi-vaults-crud/usi-vaults-crud.component';
 import { UsiVaultsCyberarcComponent } from './usi-vaults/usi-vaults-cyberarc/usi-vaults-cyberarc.component';
+import { UsiVergeioCrudComponent } from './usi-vergeio/usi-vergeio-crud/usi-vergeio-crud.component';
+import { UsiVergeioDetailComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-detail.component';
+import { UsiVergeioComponent } from './usi-vergeio/usi-vergeio.component';
 import { UsiWorkflowIntegrationCrudComponent } from './usi-workflow-integration/usi-workflow-integration-crud/usi-workflow-integration-crud.component';
 import { UsiWorkflowIntegrationHistoryComponent } from './usi-workflow-integration/usi-workflow-integration-history/usi-workflow-integration-history.component';
 import { UsiWorkflowIntegrationComponent } from './usi-workflow-integration/usi-workflow-integration.component';
-import { PrivateCloudEsxiCrudComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi-crud/private-cloud-esxi-crud.component';
-import { PrivateCloudEsxiComponent } from 'src/app/app-shared-crud/private-cloud-esxi/private-cloud-esxi.component';
 
 const routes: Routes = [
   {

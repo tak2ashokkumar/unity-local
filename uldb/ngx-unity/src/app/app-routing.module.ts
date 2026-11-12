@@ -13,6 +13,7 @@ import { GlobalSearchComponent } from './global-search/global-search.component';
 import { LeftPanelRouteAccessGuard } from './shared/app-guards/left-panel-route-access.guard';
 import { ConditionInvestigationTerminalNewTabComponent } from './shared/condition-investigation/condition-investigation-terminal-new-tab/condition-investigation-terminal-new-tab.component';
 import { RemoteWebViewerComponent } from './shared/remote-web-viewer/remote-web-viewer.component';
+import { RemoteFileManagerComponent } from './shared/remote-file-manager/remote-file-manager.component';
 import { AiInfraMgmtGuard } from './unity-ai-infra-mgmt/unity-ai-infra-mgmt.guard';
 import { UnityCopilotGuard } from './unity-copilot/unity-copilot.guard';
 import { CostAnalysisGuard } from './unity-cost-analysis/unity-cost-analysis.guard';
@@ -241,6 +242,10 @@ export const routes: Routes = [
   {
     path: 'unityterminal',
     component: AppTermialViewComponent
+  },
+  {
+    path: 'remote-files/:resourceType/:resourceId',
+    component: RemoteFileManagerComponent
   },
 ];
 

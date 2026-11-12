@@ -12,10 +12,16 @@ export interface ServiceNowTicketType {
     urgency: ServiceNowDisplayValueType;
     severity: ServiceNowDisplayValueType;
     impact: ServiceNowDisplayValueType;
+    assignment_group?: ServiceNowDisplayValueType;
     sys_id: ServiceNowDisplayValueType;
     collaborators?: ServiceNowDisplayValueType;
     watch_list?: ServiceNowDisplayValueType;
     ticket_type: string;
+}
+
+export interface ServiceNowAssignmentGroup {
+    sys_id: string;
+    name: string;
 }
 
 export interface ServiceNowChoices {

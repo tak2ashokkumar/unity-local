@@ -43,6 +43,11 @@ const tabData: TabData[] = [
     icon: FaIconMapping.SWITCH
   },
   {
+    name: 'Routers',
+    url: '/unitycloud/devices/routers',
+    icon: FaIconMapping.SWITCH
+  },
+  {
     name: 'Firewalls',
     url: '/unitycloud/devices/firewalls',
     icon: FaIconMapping.FIREWALL

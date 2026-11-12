@@ -7,6 +7,7 @@ import { DockerTabsComponent } from 'src/app/shared/shared-container-controllers
 import { KubernetesTabsComponent } from 'src/app/shared/shared-container-controllers/kubernetes-tabs/kubernetes-tabs.component';
 import { VmBackupHistoryComponent } from 'src/app/shared/vm-backup-history/vm-backup-history.component';
 import { SWITCH_ROUTES } from 'src/app/united-cloud/shared/switches/switches-routing.const';
+import { ROUTER_ROUTES } from 'src/app/united-cloud/shared/routers/routers-routing.const';
 import { AwsDeviceTabComponent } from '../shared/aws-device-tab/aws-device-tab.component';
 import { ZABBIX_AWS_ACCOUNT_ROUTES } from '../shared/aws-zabbix/aws-zabbix-routing.const';
 import { AwsZabbixComponent } from '../shared/aws-zabbix/aws-zabbix.component';
@@ -677,6 +678,7 @@ const routes: Routes = [
     children: [
       ...tempRoutes,
       ...SWITCH_ROUTES,
+      ...ROUTER_ROUTES,
       ...FIREWALL_ROUTES,
       ...LOADBALANCER_ROUTES,
       ...BMS_ROUTES,

@@ -47,14 +47,14 @@
                                         {{credentialFormErrors.username}}</div>
                                 </div>
                                 <div class="col-6 form-group">
-                                    <label for="password" class="form-col-form-label">Password<em
+                                    <label for="api_token" class="form-col-form-label">API Token<em
                                             *ngIf="action === 'Add'">*</em></label>
-                                    <input id="password" class="form-control" type="password"
-                                        formControlName="password"
-                                        [placeholder]="action === 'Edit' ? 'Leave blank to keep unchanged' : 'Enter Password'"
-                                        [class.is-invalid]="credentialFormErrors.password">
-                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.password">
-                                        {{credentialFormErrors.password}}</div>
+                                    <input id="api_token" class="form-control" type="password"
+                                        formControlName="api_token"
+                                        [placeholder]="action === 'Edit' ? 'Leave blank to keep unchanged' : 'Enter API Token'"
+                                        [class.is-invalid]="credentialFormErrors.api_token">
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.api_token">
+                                        {{credentialFormErrors.api_token}}</div>
                                 </div>
                                 <div class="col-6 form-group">
                                     <label for="collector" class="form-col-form-label">Collector<em>*</em></label>

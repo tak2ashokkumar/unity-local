@@ -92,6 +92,9 @@ export class CatalogCrudComponent implements OnInit {
   frequencyOptions = FREQUENCY_OPTIONS;
 
   cloudAccounts: any[] = [];
+  private taskCloudAccounts: any[] = [];
+  private taskTargetType = '';
+  private taskCloudType = '';
   credentials: any[] = [];
 
   logoUploadError = '';
@@ -231,7 +234,10 @@ export class CatalogCrudComponent implements OnInit {
     );
 
     this.svc.getCloudAccounts().pipe(takeUntil(this.ngUnsubscribe)).subscribe(
-      (res) => { this.cloudAccounts = res.results || res || []; },
+      (res) => {
+        this.cloudAccounts = res.results || res || [];
+        this.filterTaskCloudAccounts();
+      },
       () => { /* stays empty on failure */ }
     );
 
@@ -494,6 +500,22 @@ export class CatalogCrudComponent implements OnInit {
     }
     this.ensureSelectedTaskLoaded();
     this.ensureSelectedWorkflowLoaded();
+    this.taskTargetType = '';
+    this.taskCloudType = '';
+    this.filterTaskCloudAccounts();
+    const taskUuid = this.form.get('task').value;
+    if (taskUuid) { this.onTaskChange(taskUuid, true); }
+  }
+
+  get availableCloudAccounts(): any[] {
+    return this.activeAutomationType === 'Task' ? this.taskCloudAccounts : this.cloudAccounts;
+  }
+
+  private filterTaskCloudAccounts(): void {
+    this.taskCloudAccounts = this.taskTargetType === 'cloud'
+      ? this.cloudAccounts.filter(account => this.taskCloudType &&
+          (account.cloud_type || '').trim().toLowerCase() === this.taskCloudType)
+      : (this.taskTargetType ? this.cloudAccounts : []);
   }
 
   private bindTaskValueChanges(): void {
@@ -502,19 +524,26 @@ export class CatalogCrudComponent implements OnInit {
     });
   }
 
-  onTaskChange(uuid: string): void {
-    this.automationMappingsInitialized.Task = false;
+  onTaskChange(uuid: string, preserveMappings = false): void {
+    this.taskTargetType = '';
+    this.taskCloudType = '';
+    this.filterTaskCloudAccounts();
+    if (!preserveMappings) { this.automationMappingsInitialized.Task = false; }
     if (!uuid) {
       this.automationMappings.Task = [];
       if (this.activeAutomationType === 'Task') { this.setInputMappings([]); }
       this.automationMappingsInitialized.Task = true;
       return;
     }
-    if (this.activeAutomationType === 'Task') { this.setInputMappings([]); }
+    if (!preserveMappings && this.activeAutomationType === 'Task') { this.setInputMappings([]); }
     this.svc.getTaskParameters(uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       (data) => {
         if (this.form.get('task').value !== uuid) { return; }
-        const mappings = this.svc.buildInputMappingsFromTaskData(data, this.cloudAccounts);
+        this.taskTargetType = (data.target_type || '').trim().toLowerCase();
+        this.taskCloudType = (data.cloud_type || '').trim().toLowerCase();
+        this.filterTaskCloudAccounts();
+        if (preserveMappings) { return; }
+        const mappings = this.svc.buildInputMappingsFromTaskData(data, this.taskCloudAccounts);
         this.automationMappings.Task = mappings;
         this.automationMappingsInitialized.Task = true;
         if (this.activeAutomationType === 'Task' && this.form.get('task').value === uuid) {
@@ -1205,8 +1234,8 @@ export class CatalogCrudComponent implements OnInit {
   compareCloudAccount = (a: any, b: any): boolean => {
     if (a === b) { return true; }
     if (!a || !b) { return false; }
-    const idA = a.uuid ?? a.id;
-    const idB = b.uuid ?? b.id;
+    const idA = typeof a === 'object' ? (a.uuid ?? a.id) : a;
+    const idB = typeof b === 'object' ? (b.uuid ?? b.id) : b;
     return idA !== undefined && idA !== null && idA === idB;
   };
 

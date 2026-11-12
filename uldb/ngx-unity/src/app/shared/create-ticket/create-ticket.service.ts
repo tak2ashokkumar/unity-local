@@ -3,12 +3,12 @@ import { Injectable, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { AppLevelService } from 'src/app/app-level.service';
-import { CREATE_REPORT_AN_ISSUE, CREATE_SERVICE_NOW_TICKET, CREATE_TICKET, DYNAMICCRM_TICKETS_BY_TYPE, GET_SERVICE_CATEGORY, GET_SERVICE_NOW_TICKET_BY_ID, GET_TERMS_BY_SERVICE_CATALOGUE, GET_TICKET_MGMT_LIST, SERVICE_CATALOG_BY_DEVICE_TYPE, UPDATE_SERVICE_NOW_TICKET } from '../api-endpoint.const';
+import { CREATE_REPORT_AN_ISSUE, CREATE_SERVICE_NOW_TICKET, CREATE_TICKET, DYNAMICCRM_TICKETS_BY_TYPE, GET_SERVICE_CATEGORY, GET_SERVICE_NOW_ASSIGNMENT_GROUPS, GET_SERVICE_NOW_TICKET_BY_ID, GET_TERMS_BY_SERVICE_CATALOGUE, GET_TICKET_MGMT_LIST, SERVICE_CATALOG_BY_DEVICE_TYPE, UPDATE_SERVICE_NOW_TICKET } from '../api-endpoint.const';
 import { DeviceMapping, NoWhitespaceValidator, SERVICE_NOW_TICKET_TYPE, MS_DYNAMICS_TICKET_TYPE, TICKET_TYPE } from '../app-utility/app-utility.service';
 import { TicketMgmtList } from '../SharedEntityTypes/ticket-mgmt-list.type';
 import { UserInfoService } from '../user-info.service';
 import { DeviceServiceCatalog, DeviceServiceCatalogTerms } from './device-service-catalog.type';
-import { ServiceNowTicketType } from '../shared-service-now-mgmt/service-now-ticket-type';
+import { ServiceNowAssignmentGroup, ServiceNowTicketType } from '../shared-service-now-mgmt/service-now-ticket-type';
 
 @Injectable({
   providedIn: 'root'
@@ -110,6 +110,10 @@ export class CreateTicketService {
 
   getServiceNowTicketData(instanceId: string, ticketId: string, type: string): Observable<ServiceNowTicketType> {
     return this.http.get<ServiceNowTicketType>(GET_SERVICE_NOW_TICKET_BY_ID(instanceId, ticketId, type));
+  }
+
+  getServiceNowAssignmentGroups(instanceId: string): Observable<ServiceNowAssignmentGroup[]> {
+    return this.http.get<ServiceNowAssignmentGroup[]>(GET_SERVICE_NOW_ASSIGNMENT_GROUPS(instanceId));
   }
 
   /**

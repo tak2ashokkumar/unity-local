@@ -37,6 +37,14 @@
           </select>
           <div class="invalid-feedback" *ngIf="formErrors.type">{{formErrors.type}}</div>
         </div>
+        <div class="form-group" *ngIf="ticketForm.controls.assignment_group">
+          <label for="assignment_group">Assignment Group</label>
+          <select class="form-control text-capitalize" id="assignment_group" name="assignment_group"
+            formControlName="assignment_group">
+            <option [value]="''" disabled>Select Assignment Group</option>
+            <option *ngFor="let group of assignmentGroupList" [value]="group.sys_id">{{group.name}}</option>
+          </select>
+        </div>
         <div class="form-group" *ngIf="showPriority">
           <label for="priority">Priority<em>*</em></label>
           <select class="form-control text-capitalize" id="priority" name="priority" formControlName="priority"

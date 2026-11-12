@@ -79,7 +79,7 @@ export class ZabbixOciMonitoringConfigService {
       'fingerprint': ['', textValidators],
       'key_content': ['', []],
       'collector': this.builder.group({
-        'uuid': [obj?.collector ? obj.collector.uuid : '', [Validators.required]]
+        'uuid': [obj?.collector ? obj.collector.uuid : '']
       })
     });
 
@@ -132,7 +132,7 @@ export class ZabbixOciMonitoringConfigService {
         const region = Array.isArray(value) ? value[0] : value;
         formData.append(key, region || '');
       } else if (key === 'collector') {
-        formData.append(key, JSON.stringify(value));
+        formData.append(key, JSON.stringify(value?.uuid ? value : null));
       } else {
         formData.append(key, value || '');
       }

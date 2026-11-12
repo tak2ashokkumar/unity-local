@@ -75,6 +75,19 @@ export class VmsListCustomService {
         a.isNewTabEnabled = false;
       }
 
+      if (!this.user.isManagementEnabled) {
+        a.fileManagerEnabled = false;
+        a.fileManagerMsg = MANAGEMENT_NOT_ENABLED_MESSAGE();
+      } else if (!vm.management_ip) {
+        a.fileManagerEnabled = false;
+        a.fileManagerMsg = 'Management IP not Configured';
+      } else if (!a.collectorUuid) {
+        a.fileManagerEnabled = false;
+        a.fileManagerMsg = 'Collector not Configured';
+      } else {
+        a.fileManagerEnabled = true;
+        a.fileManagerMsg = 'File Manager';
+      }
       viewData.push(a);
     });
     return viewData;
@@ -133,6 +146,8 @@ export class CustomVmViewData {
   isNewTabEnabled: boolean;
   newTabToolipMessage: string;
   newTabConsoleAccessUrl: string;
+  fileManagerEnabled: boolean;
+  fileManagerMsg: string;
   constructor() { }
 }
 

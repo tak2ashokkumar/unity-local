@@ -93,11 +93,24 @@ export class VmsListProxmoxService {
       }
       a.updateIpIconEnabled = true;
       a.updateIpIconMsg = 'Update Management Ip';
+
+      a.fileManagerEnabled = (vm.management_ip ? true : false) && a.powerStatusOn && (a.collectorUuid ? true : false);
+      if (!vm.management_ip) {
+        a.fileManagerMsg = 'Management IP not Configured';
+      } else if (!a.powerStatusOn) {
+        a.fileManagerMsg = 'VM is Down';
+      } else if (!a.collectorUuid) {
+        a.fileManagerMsg = 'Collector not Configured';
+      } else {
+        a.fileManagerMsg = 'File Manager';
+      }
     } else {
       a.isSameTabEnabled = false;
       a.sameTabTootipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
       a.isNewTabEnabled = false;
       a.newTabToolipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
+      a.fileManagerEnabled = false;
+      a.fileManagerMsg = MANAGEMENT_NOT_ENABLED_MESSAGE();
       // a.powerStatusOn = false;
       // a.isPowerButtonEnabled = false;
       // a.powerTooltipMessage = 'This feature is not enabled';
@@ -110,6 +123,8 @@ export class VmsListProxmoxService {
       a.sameTabTootipMessage = 'Feature Not Available For Template';
       a.isNewTabEnabled = false;
       a.newTabToolipMessage = 'Feature Not Available For Template';
+      a.fileManagerEnabled = false;
+      a.fileManagerMsg = 'Feature Not Available For Template';
       // a.powerStatusOn = false;
       // a.isPowerButtonEnabled = false;
       // a.powerTooltipMessage = 'Feature Not Available For Template';
@@ -252,6 +267,8 @@ export class ProxmoxVMViewData {
   isNewTabEnabled: boolean;
   newTabToolipMessage: string;
   newTabConsoleAccessUrl: string;
+  fileManagerEnabled: boolean;
+  fileManagerMsg: string;
   lastRebootTime: string;
   tags: string[];
 

@@ -2,12 +2,15 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, from, interval } from 'rxjs';
 import { mergeMap, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService, CRUDActionTypes, DeviceMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { CUSTOM_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
+import { RemoteFileResourceType, RemoteFileService } from 'src/app/shared/remote-file-manager/remote-file.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { environment } from 'src/environments/environment';
@@ -40,7 +43,9 @@ export class VmsListCustomComponent implements OnInit, OnDestroy {
     private storageService: StorageService,
     private ticketService: SharedCreateTicketService,
     private tagsCrudService: VmsTagsCrudService,
-    private termService: FloatingTerminalService) {
+    private termService: FloatingTerminalService,
+    private notification: AppNotificationService,
+    private remoteFileService: RemoteFileService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
       this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ 'cloud_id': this.pcId }] };
@@ -142,6 +147,15 @@ export class VmsListCustomComponent implements OnInit, OnDestroy {
     this.termService.openTerminal(obj);
     // this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
     // this.router.navigate([view.vmId, 'console'], { relativeTo: this.route });
+  }
+
+  openFileManager(view: CustomVmViewData) {
+    if (!view.fileManagerEnabled) {
+      return;
+    }
+    if (!this.remoteFileService.openFileManager(RemoteFileResourceType.CUSTOM_VM, view.vmId)) {
+      this.notification.error(new Notification('Popup blocked. Allow popups for UnityOne and try again.'));
+    }
   }
 
   consoleNewTab(view: CustomVmViewData) {

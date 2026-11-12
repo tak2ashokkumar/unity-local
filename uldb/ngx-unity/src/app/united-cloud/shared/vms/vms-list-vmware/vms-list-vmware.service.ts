@@ -182,11 +182,24 @@ export class VmsListVmwareService {
       }
       a.updateIpIconEnabled = true;
       a.updateIpIconMsg = 'Update Management Ip';
+
+      a.fileManagerEnabled = (vm.mgmt_ip_address ? true : false) && a.powerStatusOn && (a.collectorUuid ? true : false);
+      if (!vm.mgmt_ip_address) {
+        a.fileManagerMsg = 'Management IP not Configured';
+      } else if (!a.powerStatusOn) {
+        a.fileManagerMsg = 'VM is Down';
+      } else if (!a.collectorUuid) {
+        a.fileManagerMsg = 'Collector not Configured';
+      } else {
+        a.fileManagerMsg = 'File Manager';
+      }
     } else {
       a.isSameTabEnabled = false;
       a.sameTabTootipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
       a.isNewTabEnabled = false;
       a.newTabToolipMessage = MANAGEMENT_NOT_ENABLED_MESSAGE();
+      a.fileManagerEnabled = false;
+      a.fileManagerMsg = MANAGEMENT_NOT_ENABLED_MESSAGE();
     }
     if (vm.is_template) {
       a.popOverDetails.uptime = '0';
@@ -196,6 +209,8 @@ export class VmsListVmwareService {
       a.sameTabTootipMessage = 'Feature Not Available For Template';
       a.isNewTabEnabled = false;
       a.newTabToolipMessage = 'Feature Not Available For Template';
+      a.fileManagerEnabled = false;
+      a.fileManagerMsg = 'Feature Not Available For Template';
       a.updateIpIconEnabled = false;
       a.updateIpIconMsg = 'Feature Not Available For Template';
       a.editTooltipMessage = 'Feature Not Available For Template';
@@ -468,6 +483,8 @@ export class VMwareViewData {
   isNewTabEnabled: boolean;
   newTabToolipMessage: string;
   newTabConsoleAccessUrl: string;
+  fileManagerEnabled: boolean;
+  fileManagerMsg: string;
 
   statsTooltipMessage: string;
   isStatsButtonEnabled: boolean;

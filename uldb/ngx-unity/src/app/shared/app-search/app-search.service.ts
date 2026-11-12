@@ -59,6 +59,7 @@ export class AppSearchService {
         } else {
           switch (device.type) {
             case 'switch':
+            case 'router':
             case 'firewall':
             case 'load_balancer':
             // case 'sdwan_device':
@@ -85,6 +86,7 @@ export class AppSearchService {
       case 'colocloud': return `unitycloud/datacenter/${device.uuid}/cabinets/`;
       case 'cabinet': return `unitycloud/datacenter/${device.dc_uuid}/cabinets/${device.uuid}/view`;
       case 'switch': return `/unitycloud/devices/switches`;
+      case 'router': return `/unitycloud/devices/routers`;
       case 'firewall': return `/unitycloud/devices/firewalls`;
       // case 'sdwan': return `/unitycloud/devices/sdwans`;
       // case 'sdwan_device': return `/unitycloud/devices/sdwans/${device.account_uuid}/details`;

@@ -48,8 +48,8 @@ export class NcHistoryService {
       view.executedBy = d.executed_by ? d.executed_by : 'N/A';
       view.downloadURL = `/customer/device_configuration/${d.uuid}/configuration/`;
       view.duration = diff ? duration : 'N/A';
-      view.openConfigEnabled = d.config_device_type == "cisco_ftd" || d.is_encrypted ? false : true;
-      view.compareVersionsEnabled = d.config_device_type == "cisco_ftd" ? false : true;
+      view.openConfigEnabled = ["cisco_ftd", "fortiweb"].includes(d.config_device_type) || d.is_encrypted ? false : true;
+      view.compareVersionsEnabled = ["cisco_ftd", "fortiweb"].includes(d.config_device_type) ? false : true;
       viewData.push(view);
     });
     return viewData;

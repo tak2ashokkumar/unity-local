@@ -182,6 +182,42 @@
                     </div>
                 </ng-container>
             </div>
+            <div class="row" *ngIf="aimlPermissionSet.view && correlationMode">
+                <div class="col-12 px-0 mb-2" [class.nopointerevents]="!aimlPermissionSet.manage || isGlobalReadOnly">
+                    <div class="card shadow-sm mb-0">
+                        <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                            <div class="mr-3">
+                                <div class="font-lg-xl font-500">Event Correlation Mode</div>
+                                <span class="text-muted" *ngIf="correlationMode === 'auto'">Auto: alerts are grouped
+                                    into conditions by the evidence-based correlation engine. Your own correlation
+                                    rules are not used for new conditions.</span>
+                                <span class="text-muted" *ngIf="correlationMode === 'manual'">Manual: alerts are grouped
+                                    into conditions using your configured correlation rules.</span>
+                            </div>
+                            <div class="d-flex align-items-center flex-shrink-0">
+                                <div class="chat-mode-toggle d-flex align-items-center" role="group"
+                                    aria-label="Event correlation mode">
+                                    <button type="button" class="chat-mode-toggle-option"
+                                        [ngClass]="{'selected': correlationMode === 'auto'}"
+                                        [attr.aria-pressed]="correlationMode === 'auto'"
+                                        (click)="setCorrelationMode('auto')">
+                                        AUTO
+                                    </button>
+                                    <button type="button" class="chat-mode-toggle-option"
+                                        [ngClass]="{'selected': correlationMode === 'manual'}"
+                                        [attr.aria-pressed]="correlationMode === 'manual'"
+                                        (click)="setCorrelationMode('manual')">
+                                        MANUAL
+                                    </button>
+                                </div>
+                                <i class="fas fa-info-circle text-muted ml-2"
+                                    tooltip="Applies to your whole organization from the next correlation cycle. Conditions that are already open keep being updated by the rule that created them."
+                                    container="body" placement="top"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row" *ngIf="aimlPermissionSet.view">
                 <div class="col-12 px-0" [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
                     <div class="card shadow-sm mb-3">
@@ -470,6 +506,24 @@
                 (click)="defaultDashboardModalRef.hide()">Cancel</button>
             <button class="btn btn-sm btn-pill btn-warning ml-2 px-4 font-500" type="button"
                 (click)="confirmSetDefaultDashboard()">Yes</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmCorrelationModeRef>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div *ngIf="pendingCorrelationMode === 'auto'">Switch event correlation to Auto mode? New alerts will be
+                grouped by the correlation engine instead of your own correlation rules. Your rules are kept and you can
+                switch back at any time.</div>
+            <div *ngIf="pendingCorrelationMode === 'manual'">Switch event correlation to Manual mode? New alerts will
+                be grouped only by your configured correlation rules.</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-outline-warning font-500" type="button"
+                (click)="correlationModeModalRef.hide()">Cancel</button>
+            <button class="btn btn-sm btn-pill btn-warning ml-2 px-4 font-500" type="button"
+                (click)="confirmCorrelationMode()">Yes</button>
         </div>
     </div>
 </ng-template>

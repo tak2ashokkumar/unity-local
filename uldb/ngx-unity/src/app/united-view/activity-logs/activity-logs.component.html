@@ -149,7 +149,18 @@
                 <tbody>
                   <tr *ngFor="let c of log.changes_log | keyvalue" class="text-wrap">
                     <td>{{ c.key }}</td>
-                    <td [tooltip]="c.value[0]" container="body">{{c.value[0]| slice:0:30}}</td>
+                    <td *ngIf="c.key === 'nodes'">
+                      <div *ngFor="let node of c.value[0]">
+                        <span>Name: {{ node.name || 'N/A' }}</span>,
+                        <span>Type: {{ node.type || 'N/A' }}</span>
+                        <span *ngIf="node.task_uuid">,
+                          Task UUID: {{ node.task_uuid }}
+                        </span>
+                      </div>
+                    </td>
+                    <td *ngIf="c.key !== 'nodes'" [tooltip]="c.value[0]" container="body">
+                      {{c.value[0]| slice:0:30}}
+                    </td>
                     <td *ngIf="log.action === 'Updated'" [tooltip]="c.value[1]" container="body">
                       {{ c.value[1]| slice:0:30 }}</td>
                   </tr>

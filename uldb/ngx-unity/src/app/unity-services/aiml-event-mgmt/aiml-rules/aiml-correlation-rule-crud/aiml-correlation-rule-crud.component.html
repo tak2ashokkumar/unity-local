@@ -131,6 +131,142 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="metric_match_mode">Metric Match Mode<em>*</em></label>
+                        <select class="form-control" id="metric_match_mode" formControlName="metric_match_mode"
+                            [ngClass]="{'is-invalid' : formErrors.metric_match_mode}">
+                            <option *ngFor="let opt of metricMatchModeOptions" [value]="opt.value">{{opt.label}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.metric_match_mode">
+                            {{formErrors.metric_match_mode}}</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="component_match_mode">Component Match Mode<em>*</em></label>
+                        <select class="form-control" id="component_match_mode"
+                            formControlName="component_match_mode"
+                            [ngClass]="{'is-invalid' : formErrors.component_match_mode}">
+                            <option *ngFor="let opt of componentMatchModeOptions" [value]="opt.value">{{opt.label}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.component_match_mode">
+                            {{formErrors.component_match_mode}}</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="conflict_strategy">Conflict Strategy<em>*</em></label>
+                        <select class="form-control" id="conflict_strategy" formControlName="conflict_strategy"
+                            [ngClass]="{'is-invalid' : formErrors.conflict_strategy}">
+                            <option *ngFor="let opt of conflictStrategyOptions" [value]="opt.value">{{opt.label}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.conflict_strategy">
+                            {{formErrors.conflict_strategy}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="temporal_policy">Temporal Policy<em>*</em></label>
+                        <select class="form-control" id="temporal_policy" formControlName="temporal_policy"
+                            [ngClass]="{'is-invalid' : formErrors.temporal_policy}">
+                            <option *ngFor="let opt of temporalPolicyOptions" [value]="opt.value">{{opt.label}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.temporal_policy">
+                            {{formErrors.temporal_policy}}</div>
+                    </div>
+                </div>
+                <div class="col-3" *ngIf="form.controls.temporal_policy.value === 'burst'">
+                    <div class="form-group">
+                        <label for="storm_burst_window_minutes">Burst window (minutes)</label>
+                        <input class="form-control" id="storm_burst_window_minutes" type="number" min="0"
+                            formControlName="storm_burst_window_minutes"
+                            [class.is-invalid]="formErrors.storm_burst_window_minutes">
+                        <div class="invalid-feedback" *ngIf="formErrors.storm_burst_window_minutes">
+                            {{formErrors.storm_burst_window_minutes}}</div>
+                    </div>
+                </div>
+                <div class="col-3" *ngIf="form.controls.correlators.value?.includes('topology')">
+                    <div class="form-group">
+                        <label for="topology_hops">Topology Hops</label>
+                        <input class="form-control" id="topology_hops" type="number" min="1"
+                            formControlName="topology_hops" [class.is-invalid]="formErrors.topology_hops">
+                        <div class="invalid-feedback" *ngIf="formErrors.topology_hops">
+                            {{formErrors.topology_hops}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="min_group_size">Minimum Group Size<em>*</em></label>
+                        <input class="form-control" id="min_group_size" type="number" min="2"
+                            formControlName="min_group_size" [class.is-invalid]="formErrors.min_group_size">
+                        <div class="invalid-feedback" *ngIf="formErrors.min_group_size">
+                            {{formErrors.min_group_size}}</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="reopen_window">Reopen Window (minutes)</label>
+                        <i class="fa fa-info-circle text-muted ml-2" container="body"
+                            containerClass="info-multi-line"
+                            [tooltip]="'0 disables reopening of resolved correlated conditions.'"></i>
+                        <input class="form-control" id="reopen_window" type="number" min="0"
+                            formControlName="reopen_window" [class.is-invalid]="formErrors.reopen_window">
+                        <div class="invalid-feedback" *ngIf="formErrors.reopen_window">
+                            {{formErrors.reopen_window}}</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="auto_resolve_grace_period">Auto-Resolve Grace Period (minutes)</label>
+                        <i class="fa fa-info-circle text-muted ml-2" container="body"
+                            containerClass="info-multi-line"
+                            [tooltip]="'0 disables automatic resolution grace period.'"></i>
+                        <input class="form-control" id="auto_resolve_grace_period" type="number" min="0"
+                            formControlName="auto_resolve_grace_period"
+                            [class.is-invalid]="formErrors.auto_resolve_grace_period">
+                        <div class="invalid-feedback" *ngIf="formErrors.auto_resolve_grace_period">
+                            {{formErrors.auto_resolve_grace_period}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="storm_event_count_threshold">Storm sensitivity override (event count
+                            threshold)</label>
+                        <input class="form-control" id="storm_event_count_threshold" type="number" min="0"
+                            formControlName="storm_event_count_threshold"
+                            [class.is-invalid]="formErrors.storm_event_count_threshold">
+                        <div class="invalid-feedback" *ngIf="formErrors.storm_event_count_threshold">
+                            {{formErrors.storm_event_count_threshold}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group form-check">
+                        <input class="form-check-input" id="explain_decisions" type="checkbox"
+                            formControlName="explain_decisions">
+                        <label class="form-check-label" for="explain_decisions">Log detailed decision explanations
+                            (audit trail)</label>
+                    </div>
+                </div>
+            </div>
+
         </form>
     </div>
     <div class="card-footer d-flex justify-content-center bg-white border-top-0" *ngIf="!isView">

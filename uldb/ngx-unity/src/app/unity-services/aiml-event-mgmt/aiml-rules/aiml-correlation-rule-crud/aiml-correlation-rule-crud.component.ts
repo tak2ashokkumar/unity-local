@@ -16,7 +16,7 @@ import { QueryBuilderComponent } from 'src/app/shared/query-builder/query-builde
 import { QueryBuilderClassNames, QueryBuilderConfig, RuleSet } from 'src/app/shared/query-builder/query-builder.interfaces';
 import { AimlRulesService } from '../aiml-rules.service';
 import { AIMLCorrelationRule } from '../aiml-rules.type';
-import { AimlCorrelationRuleCrudService, correlatorOptions, correlatorWeights, queryBuilderClassNames, queryBuilderConfig } from './aiml-correlation-rule-crud.service';
+import { AimlCorrelationRuleCrudService, componentMatchModeOptions, conflictStrategyOptions, correlatorOptions, correlatorWeights, metricMatchModeOptions, queryBuilderClassNames, queryBuilderConfig, temporalPolicyOptions } from './aiml-correlation-rule-crud.service';
 
 @Component({
   selector: 'aiml-correlation-rule-crud',
@@ -44,6 +44,11 @@ export class AimlCorrelationRuleCrudComponent implements OnInit, OnDestroy {
   correlators = correlatorOptions;
   specificity: number;
   currentRuleSetValue: RuleSet;
+
+  metricMatchModeOptions = metricMatchModeOptions;
+  componentMatchModeOptions = componentMatchModeOptions;
+  temporalPolicyOptions = temporalPolicyOptions;
+  conflictStrategyOptions = conflictStrategyOptions;
 
   valueFieldSettings: IMultiSelectSettings = {
     isSimpleArray: true,

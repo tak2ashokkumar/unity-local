@@ -995,7 +995,7 @@
                                             [compareWith]="compareCloudAccount"
                                             [class.is-invalid]="m.get('value').invalid && (m.get('value').touched || m.get('value').dirty)">
                                             <option [value]="''">Select cloud account</option>
-                                            <option *ngFor="let ca of cloudAccounts" [ngValue]="ca">{{ ca.account_name
+                                            <option *ngFor="let ca of availableCloudAccounts" [ngValue]="ca">{{ ca.account_name
                                                 || ca.name }}</option>
                                         </select>
 

@@ -7,6 +7,28 @@ import { AIOPS_SUPPRESSION_RULE, AIOPS_SUPPRESSION_RULE_BY_ID } from 'src/app/sh
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { AIMLSuppressionRule, AIMLSuppressionRuleCondition } from '../aiml-rules.type';
 
+// Defaults below reproduce today's (legacy) suppression behavior when a rule
+// is saved without the user touching these advanced controls.
+export const CRITICAL_BYPASS_POLICY_DEFAULT = 'legacy';
+export const RECOVERY_EVENT_POLICY_DEFAULT = 'legacy';
+export const REPEAT_COMPRESSION_POLICY_DEFAULT = 'none';
+
+export const criticalBypassPolicyOptions = [
+  { value: 'legacy', label: 'Legacy' },
+  { value: 'bypass_critical', label: 'Bypass Critical (never suppress critical-severity events)' },
+];
+
+export const recoveryEventPolicyOptions = [
+  { value: 'legacy', label: 'Legacy' },
+  { value: 'never_suppress_recovery', label: 'Never Suppress Recovery Events' },
+];
+
+export const repeatCompressionPolicyOptions = [
+  { value: 'none', label: 'None' },
+  { value: 'exact_signature', label: 'Exact Signature' },
+  { value: 'metric_aware_signature', label: 'Metric Aware Signature' },
+];
+
 @Injectable()
 export class AimlSuppressionRuleCrudService {
   conditionDropdownData: SuppressionConditionDropdown[] = suppressionConditionDropdownData;
@@ -70,6 +92,13 @@ export class AimlSuppressionRuleCrudService {
             'conditions': this.builder.array(formRule.conditions.map(rule => this.getConditionsFormGroup(rule))),
             'description': [{ value: formRule.description, disabled: readOnly }],
             // 'timeline': [{ value: rule.timeline, disabled: readOnly }],
+            'critical_bypass_policy': [{ value: formRule.critical_bypass_policy || CRITICAL_BYPASS_POLICY_DEFAULT, disabled: readOnly }],
+            'recovery_event_policy': [{ value: formRule.recovery_event_policy || RECOVERY_EVENT_POLICY_DEFAULT, disabled: readOnly }],
+            'repeat_compression_policy': [{ value: formRule.repeat_compression_policy || REPEAT_COMPRESSION_POLICY_DEFAULT, disabled: readOnly }],
+            'flap_threshold': [{ value: (formRule.flap_policy && formRule.flap_policy.flap_threshold != null) ? formRule.flap_policy.flap_threshold : null, disabled: readOnly }],
+            'storm_threshold': [{ value: (formRule.storm_policy && formRule.storm_policy.event_count_threshold != null) ? formRule.storm_policy.event_count_threshold : null, disabled: readOnly }],
+            'decision_reason': [{ value: formRule.decision_reason || '', disabled: readOnly }],
+            'dry_run': [{ value: formRule.dry_run || false, disabled: readOnly }],
           });
           // if (rule.timeline) {
           //   form.addControl('start_date', new FormControl([{ value: rule.start_date ? moment(rule.start_date) : '', disabled: readOnly }, [Validators.required]]));
@@ -84,6 +113,13 @@ export class AimlSuppressionRuleCrudService {
         'conditions': this.builder.array([this.newCondition()]),
         'description': [{ value: '', disabled: readOnly }],
         // 'timeline': [false],
+        'critical_bypass_policy': [{ value: CRITICAL_BYPASS_POLICY_DEFAULT, disabled: readOnly }],
+        'recovery_event_policy': [{ value: RECOVERY_EVENT_POLICY_DEFAULT, disabled: readOnly }],
+        'repeat_compression_policy': [{ value: REPEAT_COMPRESSION_POLICY_DEFAULT, disabled: readOnly }],
+        'flap_threshold': [{ value: null, disabled: readOnly }],
+        'storm_threshold': [{ value: null, disabled: readOnly }],
+        'decision_reason': [{ value: '', disabled: readOnly }],
+        'dry_run': [{ value: false, disabled: readOnly }],
       }));
     }
   }
@@ -159,7 +195,20 @@ export class AimlSuppressionRuleCrudService {
       }
     }
     delete (rule.conditions);
-    return Object.assign({}, rule, { filter_rule_meta: conditions });
+
+    // flap_policy/storm_policy are exposed in the UI as single flattened numeric
+    // inputs; re-assemble them into the JSON objects the API expects and leave
+    // them out entirely (null) when the user hasn't set an override.
+    const flapThreshold = rule.flap_threshold;
+    const stormThreshold = rule.storm_threshold;
+    delete (rule.flap_threshold);
+    delete (rule.storm_threshold);
+    const flap_policy = (flapThreshold !== null && flapThreshold !== undefined && <any>flapThreshold !== '')
+      ? { flap_threshold: Number(flapThreshold) } : null;
+    const storm_policy = (stormThreshold !== null && stormThreshold !== undefined && <any>stormThreshold !== '')
+      ? { event_count_threshold: Number(stormThreshold) } : null;
+
+    return Object.assign({}, rule, { filter_rule_meta: conditions, flap_policy, storm_policy });
   }
 
   createRule(rule: AIMLSuppressionRule) {

@@ -16,6 +16,7 @@ import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service
 import { BM_SERVER_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { DeviceZabbixEmailNotificationService } from 'src/app/shared/device-zabbix-email-notification/device-zabbix-email-notification.service';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
+import { RemoteFileResourceType, RemoteFileService } from 'src/app/shared/remote-file-manager/remote-file.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { UserInfoService } from 'src/app/shared/user-info.service';
@@ -72,7 +73,8 @@ export class BmServersComponent implements OnInit, OnDestroy {
     private notification: AppNotificationService,
     private crudService: BmServersCrudService,
     private zabbixAlertConfig: DeviceZabbixEmailNotificationService,
-    private termService: FloatingTerminalService) {
+    private termService: FloatingTerminalService,
+    private remoteFileService: RemoteFileService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
       this.inDevicesPage = this.pcId ? false : true;
@@ -381,6 +383,15 @@ export class BmServersComponent implements OnInit, OnDestroy {
       obj.newTab = true;
       this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
       window.open(accessUrl);
+    }
+  }
+
+  openFileManager(view: BMServerViewData) {
+    if (!view.fileManagerEnabled) {
+      return;
+    }
+    if (!this.remoteFileService.openFileManager(RemoteFileResourceType.BM_SERVER, view.bmServerId)) {
+      this.notification.error(new Notification('Popup blocked. Allow popups for UnityOne and try again.'));
     }
   }
 

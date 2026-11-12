@@ -68,7 +68,9 @@ export interface ApiVisibleWhen {
 
 export interface ApiField {
   key?: string;
+  supports_expression?: boolean;
   type?: string;
+  data_type?: string;
   label?: string;
   placeholder?: string;
   help_text?: string;
@@ -96,6 +98,11 @@ export interface ApiField {
   close_on_select?: boolean;
   no_options_text?: string;
   loading_text?: string;
+  allow_custom_values?: boolean;
+  read_only?: boolean;
+  allow_expression?: boolean;
+  ui?: TargetSelectionUi;
+  option_template?: 'llm_model';
 }
 export interface ApiTab {
   id: string;
@@ -122,6 +129,7 @@ export interface DynamicVisibleWhen {
 
 export interface DynamicField {
   control_name: string;
+  supports_expression?: boolean;
   type: string;
   label?: string;
   placeholder?: string;
@@ -157,8 +165,14 @@ export interface DynamicField {
   searchable?: boolean;
   clearable?: boolean;
   close_on_select?: boolean;
+  remoteSearch?: boolean;
   noOptionsText?: string;
   loadingText?: string;
+  allow_custom_values?: boolean;
+  read_only?: boolean;
+  allow_expression?: boolean;
+  target_selection_ui?: TargetSelectionUi;
+  optionTemplate?: 'llm_model';
 }
 
 export interface DynamicTab {
@@ -171,32 +185,55 @@ export interface DynamicSchema {
   tabs: DynamicTab[];
 }
 
-interface ApiOptionsApi {
+export interface ApiOptionsApi {
   depends_on: string;
   endpoint?: string;
   endpoint_by_value?: Record<string, string>;
   method?: 'GET' | 'POST';
   query_param?: string;
   static_params?: Record<string, any>;
+  params?: Record<string, any>;
   label_key?: string;
   search_key?: string;
   value_key?: string | string[];
+  value_defaults?: Record<string, any>;
   data_path?: string;
 }
 
 
 
-interface DynamicOptionsApi {
+export interface DynamicOptionsApi {
   depends_on: string;
   endpoint?: string;
   endpoint_by_value?: Record<string, string>;
   method?: 'GET' | 'POST';
   query_param?: string;
   static_params?: Record<string, any>;
+  params?: Record<string, any>;
   label_key?: string;
   search_key?: string;
   value_key?: string | string[];
+  value_defaults?: Record<string, any>;
   data_path?: string;
+}
+
+export interface TargetSelectionConnectionType {
+  label: string;
+  value: string;
+  port?: number;
+}
+
+export interface TargetSelectionUi {
+  widget?: string;
+  label?: string;
+  target_options_api?: TargetSelectionOptionsApi;
+  collector_options_api?: TargetSelectionOptionsApi;
+  credential_options_api?: TargetSelectionOptionsApi;
+  connection_types?: TargetSelectionConnectionType[];
+}
+
+export interface TargetSelectionOptionsApi extends Omit<ApiOptionsApi, 'depends_on'> {
+  depends_on?: string | string[];
 }
 
 export const manualData = {

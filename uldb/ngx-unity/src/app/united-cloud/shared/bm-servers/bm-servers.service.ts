@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
+import { GET_WINDOWS_RDP_URL_FOR_ZTC_COLLECTOR, MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT, WINDOWS_CONSOLE_CLIENT, WINDOWS_CONSOLE_VIA_AGENT } from 'src/app/app-constants';
 import { Handle404Header } from 'src/app/app-http-interceptor';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
@@ -89,6 +89,7 @@ export class BmServersService {
       a.collectorUuid = d.collector?.uuid;
       a.isCollectorZtc = d.collector?.is_ztc; 
       this.setXtermAttributes(a);
+      this.setFileManagerAttributes(a);
       viewData.push(a);
     });
     return viewData;
@@ -139,6 +140,22 @@ export class BmServersService {
           return of(new Map<string, BMServerPowerStatus>().set(bmServerId, null));
         })
       );
+  }
+
+  private setFileManagerAttributes(viewData: BMServerViewData) {
+    if (!this.user.isManagementEnabled) {
+      viewData.fileManagerEnabled = false;
+      viewData.fileManagerMsg = MANAGEMENT_NOT_ENABLED_MESSAGE();
+    } else if (viewData.managementIP == 'N/A') {
+      viewData.fileManagerEnabled = false;
+      viewData.fileManagerMsg = 'Management IP not Configured';
+    } else if (!viewData.collectorUuid) {
+      viewData.fileManagerEnabled = false;
+      viewData.fileManagerMsg = 'Collector not Configured';
+    } else {
+      viewData.fileManagerEnabled = true;
+      viewData.fileManagerMsg = 'File Manager';
+    }
   }
 
   private setXtermAttributes(viewData: BMServerViewData) {
@@ -309,6 +326,8 @@ export class BMServerViewData {
   tags: string[];
   collectorUuid: string;
   isCollectorZtc: boolean;
+  fileManagerEnabled: boolean;
+  fileManagerMsg: string;
   isSelected: boolean;
   redfish: boolean;
 

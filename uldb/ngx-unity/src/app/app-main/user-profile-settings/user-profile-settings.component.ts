@@ -16,7 +16,7 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { TabData } from 'src/app/shared/tabdata';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { LlmConfigViewData, providerImages, UserProfileGroupViewData, UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
-import { UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
+import { CorrelationMode, UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
 import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
 import { UnityModules, UnityPermissionSet } from 'src/app/shared/unity-rbac-permissions/unity-permission-set';
 import { UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
@@ -68,6 +68,11 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
   @ViewChild('confirmdelete') confirmdelete: ElementRef;
   modelDeleteModalRef: BsModalRef;
   providerImages = providerImages;
+
+  correlationMode: CorrelationMode;
+  pendingCorrelationMode: CorrelationMode;
+  @ViewChild('confirmCorrelationModeRef') confirmCorrelationModeRef: ElementRef;
+  correlationModeModalRef: BsModalRef;
 
   severityTypeSettings: IMultiSelectSettings = {
     isSimpleArray: false,
@@ -133,6 +138,9 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     this.getItsmList();
     this.getDashboardList();
     this.getLLMList();
+    if (this.aimlPermissionSet.view) {
+      this.getCorrelationMode();
+    }
   }
 
   ngOnDestroy() {
@@ -140,6 +148,7 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     this.changeTZModalRef?.hide();
     this.defaultDashboardModalRef?.hide();
     this.modelDeleteModalRef?.hide();
+    this.correlationModeModalRef?.hide();
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -190,6 +199,7 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
   getItsmList() {
     this.profileSvc.getTcktMgmtList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.itsmInstances = res;
+      this.selectDefaultItsmInstance();
     }, (err: HttpErrorResponse) => {
       this.itsmInstances = [];
       this.notification.error(new Notification('Failed to fetch ITSM Instances.'));
@@ -206,6 +216,37 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     }, (err: HttpErrorResponse) => {
       this.dashboardList = [];
       this.notification.error(new Notification('Failed to fetch Dashboard List.'));
+    });
+  }
+
+  getCorrelationMode() {
+    this.profileSvc.getCorrelationMode().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.correlationMode = res.mode;
+    }, (err: HttpErrorResponse) => {
+      this.correlationMode = null;
+      this.notification.error(new Notification('Failed to fetch event correlation mode.'));
+    });
+  }
+
+  setCorrelationMode(mode: CorrelationMode) {
+    if (!this.correlationMode || this.correlationMode === mode) {
+      return;
+    }
+    this.pendingCorrelationMode = mode;
+    this.correlationModeModalRef = this.modalService.show(this.confirmCorrelationModeRef, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  confirmCorrelationMode() {
+    this.correlationModeModalRef.hide();
+    let label = this.pendingCorrelationMode === 'auto' ? 'Auto' : 'Manual';
+    this.spinner.start('main');
+    this.profileSvc.updateCorrelationMode(this.pendingCorrelationMode).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.correlationMode = res.mode;
+      this.spinner.stop('main');
+      this.notification.success(new Notification(`Event correlation mode set to ${label} successfully.`));
+    }, (err: HttpErrorResponse) => {
+      this.spinner.stop('main');
+      this.notification.error(new Notification(`Failed to set event correlation mode to ${label}.`));
     });
   }
 
@@ -296,6 +337,21 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     this.autoTicketingForm = this.profileSvc.buildAutoTicketingForm(this.orgSettings);
     this.autoTicketingFormErrors = this.profileSvc.resetAutoTicketingFormErrors();
     this.autoTicketingValidationMessages = this.profileSvc.autoTicketingFormValidationMessages;
+    this.selectDefaultItsmInstance();
+  }
+
+  // Settings and instances load separately, so this runs after whichever finishes last.
+  // Only preselects: an instance already saved is kept, and nothing is saved until the user does.
+  selectDefaultItsmInstance() {
+    const control = this.autoTicketingForm?.get('ticketing_instance');
+    if (!control || control.value) {
+      return;
+    }
+    const savableTypes = ['ServiceNow', 'Jira', 'DynamicsCrm'];
+    const defaultInstance = this.itsmInstances.find(ins => ins.default && savableTypes.includes(ins.type));
+    if (defaultInstance) {
+      control.setValue(defaultInstance);
+    }
   }
 
   compareInstances(val1: UnityOrganizationSettingsTicketInstance, val2: UnityOrganizationSettingsTicketInstance) {

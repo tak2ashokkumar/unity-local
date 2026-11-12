@@ -18,6 +18,7 @@ import { AppUtilityService, CRUDActionTypes, DeviceMapping, NoWhitespaceValidato
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { TICKET_SUBJECT, VM_WARE_TICKET_METADATA } from 'src/app/shared/create-ticket.const';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
+import { RemoteFileResourceType, RemoteFileService } from 'src/app/shared/remote-file-manager/remote-file.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { environment } from 'src/environments/environment';
@@ -106,7 +107,8 @@ export class VmsListVmwareComponent implements OnInit, OnDestroy {
     private termService: FloatingTerminalService,
     private ovfService: VmsListVmwareDeployOvfService,
     private ovaService: VmsListVmwareDeployOvaService,
-    private ucSharedService: UnitedCloudSharedService) {
+    private ucSharedService: UnitedCloudSharedService,
+    private remoteFileService: RemoteFileService) {
 
     if (this.router.url.includes('vcclusters')) {
       this.route.parent.parent.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
@@ -367,6 +369,15 @@ export class VmsListVmwareComponent implements OnInit, OnDestroy {
     obj.newTab = true;
     this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
     window.open(view.newTabConsoleAccessUrl);
+  }
+
+  openFileManager(view: VMwareViewData) {
+    if (!view.fileManagerEnabled) {
+      return;
+    }
+    if (!this.remoteFileService.openFileManager(RemoteFileResourceType.VMWARE_VM, view.vmId)) {
+      this.notification.error(new Notification('Popup blocked. Allow popups for UnityOne and try again.'));
+    }
   }
 
   newWebConsole(view: VMwareViewData) {

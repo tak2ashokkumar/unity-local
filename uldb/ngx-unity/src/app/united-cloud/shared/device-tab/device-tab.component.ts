@@ -49,6 +49,7 @@ export class DeviceTabComponent implements OnInit, OnDestroy {
 
   private isZabbixIntegrated() {
     return this.device.deviceType == DeviceMapping.SWITCHES
+      || this.device.deviceType == DeviceMapping.ROUTERS
       || this.device.deviceType == DeviceMapping.FIREWALL
       || this.device.deviceType == DeviceMapping.LOAD_BALANCER
       || this.device.deviceType == DeviceMapping.HYPERVISOR

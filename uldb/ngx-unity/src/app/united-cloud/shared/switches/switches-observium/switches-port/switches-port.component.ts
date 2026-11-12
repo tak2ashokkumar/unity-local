@@ -5,6 +5,7 @@ import { UnitedCloudSharedService } from '../../../united-cloud-shared.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { mergeMap, takeUntil } from 'rxjs/operators';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
 
@@ -23,11 +24,16 @@ export class SwitchesPortComponent implements OnInit, OnDestroy {
     private cloudSharedService: UnitedCloudSharedService,
     private spinner: AppSpinnerService,
     public sanitizer: DomSanitizer,
-    private refreshService: DataRefreshBtnService) {
+    private refreshService: DataRefreshBtnService,
+    private storageService: StorageService) {
     this.route.parent.paramMap.subscribe((params: ParamMap) => this.deviceId = params.get('deviceid'));
     this.refreshService.refreshAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
       this.getPorts();
     });
+  }
+
+  private get deviceType(): DeviceMapping {
+    return this.storageService.extractByKey('device', StorageType.SESSIONSTORAGE)?.deviceType || DeviceMapping.SWITCHES;
   }
 
   ngOnInit() {
@@ -43,7 +49,7 @@ export class SwitchesPortComponent implements OnInit, OnDestroy {
 
   getPorts() {
     this.spinner.start('swports');
-    this.cloudSharedService.getPortsByDeviceTypeAndDeviceId(DeviceMapping.SWITCHES, this.deviceId)
+    this.cloudSharedService.getPortsByDeviceTypeAndDeviceId(this.deviceType, this.deviceId)
       .pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
         this.ports = res;
         this.spinner.stop('swports');
@@ -54,7 +60,7 @@ export class SwitchesPortComponent implements OnInit, OnDestroy {
   }
 
   getPortGraph() {
-    from(Object.keys(this.ports)).pipe(mergeMap(portId => this.cloudSharedService.getPortGraphByDeviceTypeDeviceIdAndPortId(DeviceMapping.SWITCHES, this.deviceId, portId)),
+    from(Object.keys(this.ports)).pipe(mergeMap(portId => this.cloudSharedService.getPortGraphByDeviceTypeDeviceIdAndPortId(this.deviceType, this.deviceId, portId)),
       takeUntil(this.ngUnsubscribe)).subscribe((res: Map<string, PortGraph>) => {
         const key = res.keys().next().value;
         this.ports[key].graph = res.get(key);

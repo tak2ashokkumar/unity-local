@@ -7,7 +7,14 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
-import { AimlSuppressionRuleCrudService, SuppressionConditionDropdown, suppressionConditionDropdownData } from './aiml-suppression-rule-crud.service';
+import {
+  AimlSuppressionRuleCrudService,
+  SuppressionConditionDropdown,
+  suppressionConditionDropdownData,
+  criticalBypassPolicyOptions,
+  recoveryEventPolicyOptions,
+  repeatCompressionPolicyOptions
+} from './aiml-suppression-rule-crud.service';
 import { takeUntil } from 'rxjs/operators';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -42,6 +49,9 @@ export class AimlSuppressionRuleCrudComponent implements OnInit, OnDestroy {
   nonFieldErr: string = '';
 
   conditionDropdownData: SuppressionConditionDropdown[] = suppressionConditionDropdownData;
+  criticalBypassPolicyOptions = criticalBypassPolicyOptions;
+  recoveryEventPolicyOptions = recoveryEventPolicyOptions;
+  repeatCompressionPolicyOptions = repeatCompressionPolicyOptions;
   valueFieldSettings: IMultiSelectSettings = {
     isSimpleArray: true,
     enableSearch: false,

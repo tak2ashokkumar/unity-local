@@ -726,7 +726,8 @@ const UNITED_CLOUD_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
             icon: 'fa fa-table',
             attributes: {
                 module: UnityModules.SERVICES,
-                access: 'View'
+                access: 'View',
+                hide: true
             }
         },
         {

@@ -100,6 +100,7 @@ import { ConditionInvestigationFloatingTerminalComponent } from './condition-inv
 import { ConditionInvestigationFloatingTerminalItemComponent } from './condition-investigation/condition-investigation-floating-terminal/condition-investigation-floating-terminal-item/condition-investigation-floating-terminal-item.component';
 import { EchartsxModule } from 'echarts-for-angular';
 import { RemoteWebViewerComponent } from './remote-web-viewer/remote-web-viewer.component';
+import { RemoteFileManagerComponent } from './remote-file-manager/remote-file-manager.component';
 import { AppGenericTableComponent } from './app-generic-table/app-generic-table.component';
 import { CtCellTemplateDirective } from './app-generic-table/app-generic-table-cell.directive';
 
@@ -174,6 +175,7 @@ import { CtCellTemplateDirective } from './app-generic-table/app-generic-table-c
     DevicesFileUploadComponent,
     SharedApplicationTopologyComponent,
     RemoteWebViewerComponent,
+    RemoteFileManagerComponent,
     AppDirectivesModule,
     AppFiltersModule,
     AppSharedCrudModule,
@@ -272,6 +274,7 @@ import { CtCellTemplateDirective } from './app-generic-table/app-generic-table-c
     ConditionInvestigationFloatingTerminalComponent,
     ConditionInvestigationFloatingTerminalItemComponent,
     RemoteWebViewerComponent,
+    RemoteFileManagerComponent,
     AppGenericTableComponent,
     CtCellTemplateDirective,
   ],

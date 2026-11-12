@@ -143,8 +143,9 @@
                             <th>Account Name</th>
                             <th>Service</th>
                             <th>Location</th>
-                            <th class="action-icons-column" *ngIf="selectedResourceName == 'VM instances'">
-                                Action
+                            <th class="action-icons-column"
+                                *ngIf="selectedResourceName == 'VM instances' || allowedStatsResources.includes(selectedResourceName)">
+                                Actions
                             </th>
                         </tr>
                     </thead>
@@ -169,15 +170,26 @@
                             <td>
                                 <div>{{view.location}}</div>
                             </td>
-                            <td class="action-icons-column" *ngIf="selectedResourceName == 'VM instances'">
-                                <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerStatusIcon"
+                            <td class="action-icons-column"
+                                *ngIf="selectedResourceName == 'VM instances' || allowedStatsResources.includes(selectedResourceName)">
+                                <button *ngIf="selectedResourceName == 'VM instances'"
+                                    class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerStatusIcon"
                                     [ngClass]="{'action-icons-on':view.powerStatusOn, 'action-icons-disabled':!view.isPowerIconEnabled}"
                                     [tooltip]="view.powerTooltipMessage" (click)="powerToggle(view)" accessControl
                                     moduleName="Public Cloud" accessType="Manage Public Cloud"
                                     elementType="actionbtn"></button>
-                                <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                <button *ngIf="selectedResourceName == 'VM instances'"
+                                    class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
                                     [ngClass]="{'action-icons-disabled':!view.isCreateTicketIconEnabled}"
                                     tooltip="Manage by creating support ticket" (click)="createVMTicket(view)"></button>
+                                <button *ngIf="allowedStatsResources.includes(selectedResourceName)"
+                                    class="action-icons mb-0 font-sm ml-1"
+                                    [ngClass]="{'action-icons-disabled': !view.isStatsEnabled}"
+                                    (click)="goToStats(view)" [tooltip]="view.statsTooltipMessage" container="body"
+                                    accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                    elementType="actionbtn">
+                                    <i class="fas fa-chart-line"></i>
+                                </button>
                             </td>
                         </tr>
                     </tbody>

@@ -1025,11 +1025,6 @@ export class WfDynamicParamsService {
     return this.http.get<any>(`customer/advanced_search_fast/`, { params: params });
   }
 
-  getHostByEndpoint(endpoint: string, search: string): Observable<any> {
-    let params = new HttpParams().set('page_size', 0).set('search', search);
-    return this.http.get<any>(endpoint, { params });
-  }
-
   buildParameterForm(isDefaultRequired: boolean = false): FormGroup {
     return this.fb.group({
       param_name: ['', [Validators.required, paramNameValidator]],
