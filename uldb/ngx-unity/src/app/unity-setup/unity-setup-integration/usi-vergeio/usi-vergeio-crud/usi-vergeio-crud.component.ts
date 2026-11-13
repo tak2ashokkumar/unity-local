@@ -30,6 +30,7 @@ export class UsiVergeioCrudComponent implements OnInit, OnDestroy {
   instance: VergeIOAccount;
   collectorList: DeviceDiscoveryAgentConfigurationType[] = [];
   revalidationBound: boolean = false;
+  formReady: boolean = false;
 
   testing: boolean = false;
   connectionTested: boolean = false;
@@ -48,6 +49,7 @@ export class UsiVergeioCrudComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.action = this.instanceId ? 'Edit' : 'Add';
+    this.spinnerSvc.start('main');
     this.getCollectors();
   }
 
@@ -66,6 +68,8 @@ export class UsiVergeioCrudComponent implements OnInit, OnDestroy {
       this.getDetails();
     } else {
       this.buildCredentialForm();
+      this.formReady = true;
+      this.spinnerSvc.stop('main');
     }
   }
 
@@ -76,12 +80,14 @@ export class UsiVergeioCrudComponent implements OnInit, OnDestroy {
   }
 
   getDetails() {
-    this.spinnerSvc.start('main');
-    this.svc.getDetails(this.instanceId).pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.spinnerSvc.stop('main')))
+    this.svc.getDetails(this.instanceId).pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         this.instance = res;
         this.buildCredentialForm();
+        this.formReady = true;
+        this.spinnerSvc.stop('main');
       }, (err: HttpErrorResponse) => {
+        this.spinnerSvc.stop('main');
         this.notificationSvc.error(new Notification('Failed to get VergeIO account details. Please try again.'));
       });
   }

@@ -162,7 +162,6 @@ import { UsiVaultsCyberarcComponent } from './usi-vaults/usi-vaults-cyberarc/usi
 import { UsiVaultsComponent } from './usi-vaults/usi-vaults.component';
 import { UsiVergeioCrudComponent } from './usi-vergeio/usi-vergeio-crud/usi-vergeio-crud.component';
 import { UsiVergeioDetailComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-detail.component';
-import { UsiVergeioVmMonitoringComponent } from './usi-vergeio/usi-vergeio-detail/usi-vergeio-vm-monitoring/usi-vergeio-vm-monitoring.component';
 import { UsiVergeioComponent } from './usi-vergeio/usi-vergeio.component';
 
 @NgModule({
@@ -254,7 +253,6 @@ import { UsiVergeioComponent } from './usi-vergeio/usi-vergeio.component';
     UsiVergeioComponent,
     UsiVergeioCrudComponent,
     UsiVergeioDetailComponent,
-    UsiVergeioVmMonitoringComponent,
     UsiPcVmwareVcenterCrudComponent,
     UsiEventIngestionCrudComponent,
     UsiEventIngestionCustomComponent,

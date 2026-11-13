@@ -26,17 +26,19 @@ export class UsiVergeioComponent implements OnInit, OnDestroy {
   count: number;
   viewData: VergeIOAccountViewData[] = [];
   selectedView: VergeIOAccountViewData;
+  selectedToggleView: VergeIOAccountViewData;
 
   discoveryView: VergeIOAccountViewData;
   discoveryHistoryData: VergeIODiscoveryViewData[] = [];
   discoveryHistoryCount: number;
   discoveryCriteria: SearchCriteria;
-  discoveryRunning: boolean = false;
 
   @ViewChild('confirm') confirm: TemplateRef<void>;
   deleteModalRef: BsModalRef;
   @ViewChild('discoveryHistory') discoveryHistory: TemplateRef<void>;
   discoveryHistoryRef: BsModalRef;
+  @ViewChild('confirmToggle') confirmToggleTemplate: TemplateRef<void>;
+  toggleModalRef: BsModalRef;
 
   constructor(private svc: UsiVergeioService,
     private router: Router,
@@ -56,6 +58,7 @@ export class UsiVergeioComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.deleteModalRef?.hide();
     this.discoveryHistoryRef?.hide();
+    this.toggleModalRef?.hide();
     this.spinnerSvc.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -144,14 +147,25 @@ export class UsiVergeioComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleEnabled(view: VergeIOAccountViewData) {
+  toggleEnabled(view: VergeIOAccountViewData, event: Event) {
+    // Keep the switch in its current position until the user confirms: revert the
+    // native checkbox the click just flipped, then ask for confirmation.
+    (event.target as HTMLInputElement).checked = view.enabled;
     if (view.statusInProgress) {
+      return;
+    }
+    this.selectedToggleView = view;
+    this.toggleModalRef = this.modalSvc.show(this.confirmToggleTemplate, CONFIRM_MODAL_CONFIG);
+  }
+
+  confirmToggle() {
+    this.toggleModalRef?.hide();
+    const view = this.selectedToggleView;
+    if (!view) {
       return;
     }
     const newValue = !view.enabled;
     view.statusInProgress = true;
-    // Deliberately no markForCheck here: leave the switch in its clicked position
-    // until the response, then re-sync (revert on failure) in finalize.
     this.svc.toggleEnabled(view.uuid, newValue).pipe(takeUntil(this.ngUnsubscribe), finalize(() => {
       view.statusInProgress = false;
       this.cdr.markForCheck();
@@ -193,23 +207,6 @@ export class UsiVergeioComponent implements OnInit, OnDestroy {
     this.discoveryCriteria.pageSize = pageSize;
     this.discoveryCriteria.pageNo = 1;
     this.getDiscoveryHistory();
-  }
-
-  runDiscovery() {
-    if (this.discoveryRunning) {
-      return;
-    }
-    this.discoveryRunning = true;
-    this.cdr.markForCheck();
-    this.svc.runDiscovery(this.discoveryView.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
-      this.discoveryRunning = false;
-      this.notificationSvc.success(new Notification('Discovery started for VergeIO account.'));
-      this.getDiscoveryHistory();
-    }, (err: HttpErrorResponse) => {
-      this.discoveryRunning = false;
-      this.cdr.markForCheck();
-      this.notificationSvc.error(new Notification('Failed to start discovery. Please try again.'));
-    });
   }
 
   deleteAccount(view: VergeIOAccountViewData) {

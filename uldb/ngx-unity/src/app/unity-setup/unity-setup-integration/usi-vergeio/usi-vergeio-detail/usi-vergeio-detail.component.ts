@@ -1,7 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { interval, Subject } from 'rxjs';
 import { finalize, switchMap, take, takeUntil, takeWhile } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -39,17 +38,12 @@ export class UsiVergeioDetailComponent implements OnInit, OnDestroy {
   currentCriteria: SearchCriteria;
   vmCount: number;
   vmViewData: VergeIOVmViewData[] = [];
-  selectedVm: VergeIOVmViewData;
-
-  @ViewChild('monitoring') monitoring: TemplateRef<void>;
-  monitoringRef: BsModalRef;
 
   constructor(private svc: UsiVergeioDetailService,
     private router: Router,
     private route: ActivatedRoute,
     private spinnerSvc: AppSpinnerService,
     private notificationSvc: AppNotificationService,
-    private modalSvc: BsModalService,
     private cdr: ChangeDetectorRef) {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.instanceId = params.get('instanceId');
@@ -64,15 +58,9 @@ export class UsiVergeioDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.monitoringRef?.hide();
     this.spinnerSvc.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
-  }
-
-  openMonitoring(vm: VergeIOVmViewData) {
-    this.selectedVm = vm;
-    this.monitoringRef = this.modalSvc.show(this.monitoring, { class: 'modal-lg', keyboard: true, ignoreBackdropClick: true });
   }
 
   getAccount() {

@@ -40,10 +40,6 @@ export class UsiVergeioService {
     return this.http.post<CeleryTask>(VERGEIO_SYNC(instanceId), { components: VERGEIO_SYNC_COMPONENTS });
   }
 
-  runDiscovery(instanceId: string): Observable<CeleryTask> {
-    return this.http.post<CeleryTask>(VERGEIO_DISCOVERY(instanceId), { components: VERGEIO_SYNC_COMPONENTS });
-  }
-
   getDiscoveryHistory(instanceId: string, criteria: SearchCriteria): Observable<PaginatedResult<VergeIODiscoveryHistory>> {
     return this.tableService.getData<PaginatedResult<VergeIODiscoveryHistory>>(VERGEIO_DISCOVERY(instanceId), criteria);
   }

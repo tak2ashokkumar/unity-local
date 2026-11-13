@@ -1,0 +1,125 @@
+// VergeIO detail page - scoped styling.
+// Only covers what Bootstrap utilities cannot do: soft icon tiles, status pills,
+// hover states and a brand accent. Layout and spacing stay on Bootstrap classes.
+
+// Brand accent badge in the page header (ties to the VergeIO orange mark).
+.vergeio-header-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    color: #d9693b;
+    background: rgba(217, 105, 59, 0.14);
+}
+
+// KPI / summary stat cards.
+.vergeio-stat-card {
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(31, 45, 61, 0.12) !important;
+    }
+}
+
+.vergeio-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    flex: 0 0 auto;
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.12);
+}
+
+.vergeio-stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.1;
+    color: #1f2d3d;
+}
+
+.vergeio-stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+// Distinct accent per summary card so the row reads as a set, not a wall of blue.
+.vergeio-stat-row>div:nth-child(2) .vergeio-stat-icon {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+}
+
+.vergeio-stat-row>div:nth-child(3) .vergeio-stat-icon {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.14);
+}
+
+.vergeio-stat-row>div:nth-child(4) .vergeio-stat-icon {
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.14);
+}
+
+.vergeio-stat-row>div:nth-child(5) .vergeio-stat-icon {
+    color: #06b6d4;
+    background: rgba(6, 182, 212, 0.12);
+}
+
+// Status / power-state pills and the small health counters in the VM header.
+.vergeio-status-pill,
+.vergeio-health-pill,
+.vergeio-state-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 0.15rem 0.55rem;
+    border-radius: 50rem;
+    white-space: nowrap;
+}
+
+.vergeio-state-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    margin-right: 0.35rem;
+    background: currentColor;
+    flex: 0 0 auto;
+}
+
+// Shared colour variants (text colour drives the dot via currentColor).
+.is-up,
+.vergeio-state-pill.text-success {
+    color: #1e9e52;
+    background: rgba(40, 167, 69, 0.12);
+}
+
+.is-down,
+.vergeio-state-pill.text-danger {
+    color: #d6455a;
+    background: rgba(220, 53, 69, 0.12);
+}
+
+.is-unknown,
+.vergeio-state-pill.text-muted {
+    color: #6c757d;
+    background: rgba(108, 117, 125, 0.12);
+}
+
+// VM table polish.
+.vergeio-vm-table {
+    tbody tr {
+        transition: background 0.12s ease;
+    }
+
+    tbody tr:hover {
+        background: rgba(59, 130, 246, 0.04);
+    }
+}
+
+.vergeio-empty-icon {
+    color: #c7cdd6;
+}
