@@ -4,7 +4,17 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ADD_TARGET_DEVICE_FOR_INTERFACE_BY_DEVICE_TYPE, DEVICES_FAST_BY_DEVICE_TYPE, DEVICE_INTERFACES_BY_DEVICE_ID } from '../../shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping } from '../../shared/app-utility/app-utility.service';
 import { Observable, Subject } from 'rxjs';
-import { DeviceDataType, DeviceTypesOptionsType, InterfaceDetailsType, TargetDeviceFormDataType } from '../../shared/SharedEntityTypes/device-interface.type';
+import { DeviceDataType, DeviceTypesOptionsType, InterfaceDetailsType, RemoteDevicesType, TargetDeviceFormDataType } from '../../shared/SharedEntityTypes/device-interface.type';
+
+export interface DeviceInterfaceCrudData {
+  uuid: string;
+  deviceType: DeviceMapping;
+  interfaceUuid?: string;
+  name: string;
+  description: string;
+  remote_devices?: RemoteDevicesType;
+  validateRemoteMapping?: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +25,10 @@ export class DeviceInterfaceCrudService {
     private builder: FormBuilder,
     private utilSvc: AppUtilityService) { }
 
-  private addTargetDeviceAnnouncedSource = new Subject<{ uuid: string, deviceType: DeviceMapping, interfaceUuid?: string, name: string, description: string }>();
+  private addTargetDeviceAnnouncedSource = new Subject<DeviceInterfaceCrudData>();
   addTagetDeviceAnnounced$ = this.addTargetDeviceAnnouncedSource.asObservable();
 
-  addTargetDeviceForInterface(interfaceData: { uuid: string, deviceType: DeviceMapping, interfaceUuid?: string, name: string, description: string }) {
+  addTargetDeviceForInterface(interfaceData: DeviceInterfaceCrudData) {
     this.addTargetDeviceAnnouncedSource.next(interfaceData);
   }
 
@@ -62,7 +72,7 @@ export class DeviceInterfaceCrudService {
     }
   }
 
-  addTargetDevice(interfaceData: { uuid: string, deviceType: DeviceMapping, interfaceUuid?: string, name: string, description: string }, obj: TargetDeviceFormDataType) {
+  addTargetDevice(interfaceData: DeviceInterfaceCrudData, obj: TargetDeviceFormDataType) {
     return this.http.post(ADD_TARGET_DEVICE_FOR_INTERFACE_BY_DEVICE_TYPE(interfaceData.deviceType, interfaceData.uuid), {
       ...obj,
       source_interface_uuid: interfaceData.interfaceUuid

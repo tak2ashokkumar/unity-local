@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { DeviceInterfaceCrudService, deviceTypesOptions } from './device-interface-crud.service';
+import { DeviceInterfaceCrudData, DeviceInterfaceCrudService, deviceTypesOptions } from './device-interface-crud.service';
 import { FormGroup } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { takeUntil } from 'rxjs/operators';
@@ -27,7 +27,7 @@ export class DeviceInterfaceCrudComponent implements OnInit, OnDestroy {
   targetDeviceFormData: TargetDeviceFormDataType;
 
   nonFieldErr: string = '';
-  interfaceData: { uuid: string, deviceType: DeviceMapping, interfaceUuid?: string, name: string, description: string };
+  interfaceData: DeviceInterfaceCrudData;
   devices: DeviceDataType[] = [];
   interfaceDetails: InterfaceDetailsType[] = [];
 
@@ -40,6 +40,13 @@ export class DeviceInterfaceCrudComponent implements OnInit, OnDestroy {
     private notificationService: AppNotificationService) {
     this.interfaceCrudSvc.addTagetDeviceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((data) => {
       this.interfaceData = data;
+      if (this.interfaceData?.validateRemoteMapping && this.interfaceData?.remote_devices?.unity_map === true) {
+        const targetDevice = this.interfaceData?.remote_devices?.target_device || '';
+        const targetInterface = this.interfaceData?.remote_devices?.interfaces?.name;
+        const mapping = targetInterface ? `${targetDevice} (${targetInterface})` : targetDevice;
+        this.notificationService.error(new Notification(`Interface is already mapped to ${mapping}.`));
+        return;
+      }
       this.buildTargetDeviceForm();
     })
   }
@@ -95,16 +102,20 @@ export class DeviceInterfaceCrudComponent implements OnInit, OnDestroy {
   getInterfaceDetails() {
     this.interfaceDetails = [];
     this.interfaceCrudSvc.getInterfaceDetails(this.targetDeviceFormData.device_type, this.targetDeviceFormData.remote_device.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: InterfaceDetailsType[]) => {
-      this.interfaceDetails = res;
+      this.interfaceDetails = this.interfaceData.validateRemoteMapping
+        ? res.filter(interfaceDetails => interfaceDetails.remote_devices?.unity_map !== true)
+        : res;
     });
   }
 
   handleError(err: any) {
     this.targetDeviceFormErrors = this.interfaceCrudSvc.resetTargetDeviceFormErrors();
-    if (err && err.non_field_errors) {
+    if (typeof err === 'string') {
+      this.nonFieldErr = err;
+    } else if (err && err.non_field_errors) {
       this.nonFieldErr = err.non_field_errors[0];
-    } else if (err && (err.error || err.detail)) {
-      this.nonFieldErr = err.error || err.detail;
+    } else if (err && (err.error || err.detail || err.message)) {
+      this.nonFieldErr = err.error || err.detail || err.message;
     } else if (err) {
       let hasFieldError = false;
       for (const field in err) {

@@ -604,19 +604,19 @@
                                 </td>
                                 <td [ngClass]="{'tdw-15':inf.remote_devices}">
                                     <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
-                                        [tooltip]="inf.remote_devices?.target_device" *ngIf="inf.remote_devices"
-                                        (click)="goToTargetDeviceDetails(inf.remote_devices)">{{inf.remote_devices?.target_device
+                                        [tooltip]="inf.remote_devices?.target_device" *ngIf="inf.remote_devices?.unity_map === true"
+                                        (click)="goToTargetDeviceDetails(inf.remote_devices)">Mapped to: {{inf.remote_devices?.target_device
                                         || 'NA'}}</button>
                                     <button class="action-icons fas fa-plus"
                                         [ngClass]="{'action-icons-disabled':!inf.name || !inf.description}"
                                         [tooltip]="getTooltipMsgForAddTargetDevice(inf)"
-                                        [disabled]="!inf.name || !inf.description" *ngIf="!inf.remote_devices"
+                                        [disabled]="!inf.name || !inf.description" *ngIf="inf.remote_devices?.unity_map !== true"
                                         (click)="addTargetDevice(inf)" accessControl moduleName="Monitoring"
                                         accessType="Manage Monitoring" elementType="actionbtn"></button>
                                 </td>
                                 <td class="tdw-15">
-                                    <div [tooltip]="inf.remote_devices?.interfaces?.description">
-                                        {{inf.remote_devices?.interfaces?.description || 'NA'}}</div>
+                                    <div [tooltip]="inf.remote_devices?.interfaces?.name">
+                                        <ng-container *ngIf="inf.remote_devices?.unity_map === true">Interface: </ng-container>{{inf.remote_devices?.interfaces?.name || 'NA'}}</div>
                                 </td>
                             </tr>
                         </tbody>
