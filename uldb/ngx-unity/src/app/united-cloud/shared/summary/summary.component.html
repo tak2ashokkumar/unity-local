@@ -9,6 +9,9 @@
     <ng-container *ngSwitchCase="platFormMapping?.NUTANIX">
       <nutanix></nutanix>
     </ng-container>
+    <ng-container *ngSwitchCase="platFormMapping?.VERGEIO">
+      <vergeio></vergeio>
+    </ng-container>
 
     <ng-container *ngSwitchDefault>
       <ng-container *ngTemplateOutlet="pcSummaryRef"></ng-container>

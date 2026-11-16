@@ -5,7 +5,7 @@ import { VMware, Base, Vcloud, Openstack, Proxmox } from './pc-crud.type';
 import { DataCenter } from '../../shared/../united-cloud/datacenter/tabs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
-import { DATA_CENTERS, ADD_PRIVATE_CLOUD, PRIVATE_CLOUD_BY_ID, PRIVATE_CLOUD_OTHER_DETAILS, PRIVATE_CLOUD_CHANGE_PASSWORD, CREATE_TASK_BY_CLOUD_ID_AND_PLATFORM, GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
+import { DATA_CENTERS, ADD_PRIVATE_CLOUD, PRIVATE_CLOUD_BY_ID, PRIVATE_CLOUD_OTHER_DETAILS, PRIVATE_CLOUD_CHANGE_PASSWORD, CREATE_TASK_BY_CLOUD_ID_AND_PLATFORM, GET_AGENT_CONFIGURATIONS, VERGEIO_ACCOUNT_BY_ID } from 'src/app/shared/api-endpoint.const';
 import { ServerSidePlatFormMapping, NoWhitespaceValidator, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { map, switchMap, take } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
@@ -96,6 +96,9 @@ export class PcCrudService {
   deletePrivateCloud(pdId: string) {
     if (!this.cloudName || this.cloudName == '') {
       return this.http.delete(PRIVATE_CLOUD_BY_ID(pdId));
+    } else if (this.cloudName == 'vergeio') {
+      // VergeIO lives in its own namespace, not customer/managed/<cloud>/accounts/.
+      return this.http.delete(VERGEIO_ACCOUNT_BY_ID(pdId));
     } else {
       return this.http.delete(`/customer/managed/${this.cloudName}/accounts/${pdId}/`);
     }

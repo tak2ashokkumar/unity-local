@@ -68,6 +68,8 @@ export const VM_LIST_BY_PLATFORM = (cloud_id: string, platformType: string) => {
             return `rest/vmware/esxi_vms/?platform_type=${platformType}&cloud_id=${cloud_id}`;
         case PlatFormMapping.NUTANIX:
             return `customer/nutanix-devices/virtual_machines/?platform_type=${platformType}&cloud_id=${cloud_id}`;
+        case PlatFormMapping.VERGEIO:
+            return `customer/vergeio/vms/?cloud_uuid=${cloud_id}`;
         default: console.error('Invalid platform type : ', platformType);
     }
 };
@@ -131,10 +133,17 @@ export const VERGEIO_SYNC = (accountId: string) => `customer/vergeio/accounts/${
 
 export const VERGEIO_COMPONENT_SUMMARY = (accountId: string) => `customer/vergeio/accounts/${accountId}/component_summary/`;
 
+// Discovered VergeIO resource lists (resourceType = clusters | hosts | datastores | networks), scoped by cloud_uuid.
+export const VERGEIO_RESOURCE_LIST = (resourceType: string) => `customer/vergeio/${resourceType}/`;
+
 export const VERGEIO_DISCOVERY = (accountId: string) => `customer/vergeio/accounts/${accountId}/discovery/`;
 
 export const VERGEIO_PROVISION_VM = (accountId: string) => `customer/vergeio/accounts/${accountId}/provision_vm/`;
 
+// Private-cloud VM summary list (per the backend contract, scoped by cloud_uuid).
+export const VERGEIO_VMS = () => `customer/vergeio/vms/`;
+
+// Detailed VM API (full VM records, per-VM operations and monitoring).
 export const VERGEIO_VIRTUAL_MACHINES = () => `customer/vergeio/virtual_machines/`;
 
 export const VERGEIO_VM_SUMMARY = () => `customer/vergeio/virtual_machines/summary/`;

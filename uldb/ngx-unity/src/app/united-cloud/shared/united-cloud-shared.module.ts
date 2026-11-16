@@ -315,6 +315,8 @@ import { NutanixVirtualDisksComponent } from './nutanix/nutanix-virtual-disks/nu
 import { NutanixDetailsComponent } from './nutanix/nutanix-zabbix/nutanix-details/nutanix-details.component';
 import { NutanixZabbixComponent } from './nutanix/nutanix-zabbix/nutanix-zabbix.component';
 import { NutanixComponent } from './nutanix/nutanix.component';
+import { VergeioComponent } from './vergeio/vergeio.component';
+import { VergeioResourcesComponent } from './vergeio/vergeio-resources/vergeio-resources.component';
 import { OciZabbixComponent } from './oci-zabbix/oci-zabbix.component';
 import { ZabbixOciMonitoringConfigComponent } from './oci-zabbix/zabbix-oci-monitoring-config/zabbix-oci-monitoring-config.component';
 import { OtherdevicesCrudComponent } from './otherdevices/otherdevices-crud/otherdevices-crud.component';
@@ -624,6 +626,8 @@ export const MY_NATIVE_FORMATS = {
     ZabbixAwsMonitoringConfigComponent,
     ZabbixEventsComponent,
     NutanixComponent,
+    VergeioComponent,
+    VergeioResourcesComponent,
     NutanixClustersComponent,
     NutanixClusterDetailsComponent,
     NutanixHostsComponent,

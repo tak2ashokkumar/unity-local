@@ -34,7 +34,7 @@ export class UsiVergeioDetailService {
   }
 
   getVms(instanceId: string, criteria: SearchCriteria): Observable<PaginatedResult<VergeIOVM>> {
-    return this.tableService.getData<PaginatedResult<VergeIOVM>>(`${VERGEIO_VIRTUAL_MACHINES()}?cloud_id=${instanceId}`, criteria);
+    return this.tableService.getData<PaginatedResult<VergeIOVM>>(`${VERGEIO_VIRTUAL_MACHINES()}?cloud_uuid=${instanceId}`, criteria);
   }
 
   powerAction(vmId: string, action: string): Observable<VergeIOVmActionResponse> {

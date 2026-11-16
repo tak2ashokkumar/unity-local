@@ -48,6 +48,7 @@ import { VcenterClustersComponent } from './vcenter-cloud/vcenter-clusters/vcent
 import { VcenterDatastoresComponent } from './vcenter-cloud/vcenter-datastores/vcenter-datastores.component';
 import { VcenterNetworksComponent } from './vcenter-cloud/vcenter-networks/vcenter-networks.component';
 import { ZABBIX_VCENTER_ROUTES } from './vcenter-cloud/vcenter-zabbix/vcenter-zabbix-routing.const';
+import { VergeioResourcesComponent } from './vergeio/vergeio-resources/vergeio-resources.component';
 import { VcenterZabbixComponent } from './vcenter-cloud/vcenter-zabbix/vcenter-zabbix.component';
 import { VcenterContentLibraryFilesComponent } from './vcenter-content-library/vcenter-content-library-files/vcenter-content-library-files.component';
 import { VcenterContentLibraryComponent } from './vcenter-content-library/vcenter-content-library.component';
@@ -567,6 +568,30 @@ const VCENTER_ROUTES: Routes = [
     }
 ]
 
+// VergeIO discovered-resource listings (Clusters / Hosts / Datastores / Networks).
+const VERGEIO_RESOURCE_ROUTES: Routes = [
+    {
+        path: 'vergeioclusters',
+        component: VergeioResourcesComponent,
+        data: { resourceType: 'clusters', title: 'Clusters', breadcrumb: { title: 'Clusters', stepbackCount: 0 } }
+    },
+    {
+        path: 'vergeiohosts',
+        component: VergeioResourcesComponent,
+        data: { resourceType: 'hosts', title: 'Hosts', breadcrumb: { title: 'Hosts', stepbackCount: 0 } }
+    },
+    {
+        path: 'vergeiodatastores',
+        component: VergeioResourcesComponent,
+        data: { resourceType: 'datastores', title: 'Datastores', breadcrumb: { title: 'Datastores', stepbackCount: 0 } }
+    },
+    {
+        path: 'vergeionetworks',
+        component: VergeioResourcesComponent,
+        data: { resourceType: 'networks', title: 'Networks', breadcrumb: { title: 'Networks', stepbackCount: 0 } }
+    }
+];
+
 export const DevicesRoutes: Routes = [
     ...SUMMARY_ROUTES,
     ...allDeviceTempRoute,
@@ -609,5 +634,6 @@ export const DevicesRoutes: Routes = [
     ...OTHER_DEVICE_ROUTES,
     ...NUTANIX_ROUTES,
     ...NUTANIX_ZABBIX_ROUTES,
-    ...VCENTER_ROUTES
+    ...VCENTER_ROUTES,
+    ...VERGEIO_RESOURCE_ROUTES
 ];

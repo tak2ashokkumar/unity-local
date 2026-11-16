@@ -1,0 +1,41 @@
+@import "variables";
+
+.tab-content {
+  cursor: default;
+}
+
+table {
+  width: 100%;
+}
+
+// Colored circular component-summary icons (same style as the other private clouds).
+.summary-icons {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  cursor: default;
+  color: $white !important;
+  outline: none;
+  text-align: center;
+
+  &.hypervisor {
+    background-color: $hypervisor;
+  }
+
+  &.vms {
+    background-color: $vms;
+  }
+
+  &.bms {
+    background-color: $bms;
+  }
+
+  &.lbs {
+    background-color: $lbs;
+  }
+
+  &.switches {
+    background-color: $switches;
+  }
+}

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
-import { VERGEIO_VIRTUAL_MACHINES } from 'src/app/shared/api-endpoint.const';
+import { VERGEIO_VMS } from 'src/app/shared/api-endpoint.const';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 
@@ -12,7 +12,7 @@ export class VmsListVergeioService {
   constructor(private tableService: TableApiServiceService) { }
 
   getVMs(pcId: string, criteria: SearchCriteria): Observable<PaginatedResult<VergeioVmType>> {
-    return this.tableService.getData<PaginatedResult<VergeioVmType>>(`${VERGEIO_VIRTUAL_MACHINES()}?cloud_id=${pcId}`, criteria);
+    return this.tableService.getData<PaginatedResult<VergeioVmType>>(`${VERGEIO_VMS()}?cloud_uuid=${pcId}`, criteria);
   }
 
   convertToViewData(data: VergeioVmType[]): VergeioVmViewData[] {

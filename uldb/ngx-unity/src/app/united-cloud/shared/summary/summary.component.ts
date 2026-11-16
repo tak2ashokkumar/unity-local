@@ -71,7 +71,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
       this.activeCloud = data.tabItems.find((ti: PrivateCLoudFast) => ti.uuid == this.pcId);
       if (this.activeCloud) {
         this.platformType = this.utilService.getCloudTypeByPlatformType(this.activeCloud.platform_type);
-        if (this.platformType != PlatFormMapping.VMWARE && this.platformType != PlatFormMapping.NUTANIX) {
+        if (this.platformType != PlatFormMapping.VMWARE && this.platformType != PlatFormMapping.NUTANIX && this.platformType != PlatFormMapping.VERGEIO) {
           this.getCloudDetails();
         }
       }
