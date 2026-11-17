@@ -1497,11 +1497,23 @@ export class WfDynamicParamsComponent implements OnInit {
     if (value === this.expandedHighlightSource) return this.expandedPreviewMarkdown;
     this.expandedHighlightSource = value;
     this.expandedPreviewTokens = [];
+    const isHtmlDocument = /<!doctype\s+html\b|<html\b/i.test(value);
+    const isHtml = /<!doctype\s+html\b|<!--|<[a-z][\w:-]*(?:\s|\/?>)/i.test(value);
+    // A title belongs to the browser document head. Angular strips that wrapper
+    // in an inline preview but retains its text, duplicating the visible heading.
+    // Marked also treats lines indented by four or more spaces as code after an
+    // HTML block boundary, so remove presentation-only indentation.
+    const previewSource = isHtmlDocument
+      ? value.replace(/<title\b[^>]*>[\s\S]*?<\/title\s*>/gi, '')
+      : value;
+    const previewValue = isHtml
+      ? previewSource.replace(/^[ \t]+/gm, '')
+      : previewSource;
     // Protect Jinja from Markdown interpreting underscores, asterisks or HTML.
     let prefix = 'WFJINJATOKEN';
-    while (value.includes(prefix)) prefix += 'X';
+    while (previewValue.includes(prefix)) prefix += 'X';
     const jinja = /\{\{[\s\S]*?\}\}|\{%[\s\S]*?%\}|\{#[\s\S]*?#\}/g;
-    this.expandedPreviewMarkdown = value.replace(jinja, (text: string) => {
+    this.expandedPreviewMarkdown = previewValue.replace(jinja, (text: string) => {
       const className = text.startsWith('{%') ? 'ph-s' : text.startsWith('{#') ? 'ph-c' : 'ph-x';
       const marker = `${prefix}${this.expandedPreviewTokens.length}END`;
       this.expandedPreviewTokens.push({ marker, text, className });
@@ -2538,8 +2550,10 @@ export class WfDynamicParamsComponent implements OnInit {
     if (field.remoteSearch && Array.isArray(selection)) {
       selection.forEach(value => {
         if (!options.some(option => this.areDynamicOptionValuesEqual(option.value, value, field))) {
-          options.push({ label: this.getDynamicOptionLabel(value, field), value,
-            searchValue: undefined, description: undefined, disabled: false, rawOption: value });
+          options.push({
+            label: this.getDynamicOptionLabel(value, field), value,
+            searchValue: undefined, description: undefined, disabled: false, rawOption: value
+          });
         }
       });
     }
@@ -2561,8 +2575,10 @@ export class WfDynamicParamsComponent implements OnInit {
 
     const cacheKey = this.getDynamicOptionsCacheKey(field, form);
     const query = (term || '').trim();
-    const state = { term: query, cacheKey, dropdown: dropdown || previous?.dropdown,
-      subscription: undefined as Subscription | undefined };
+    const state = {
+      term: query, cacheKey, dropdown: dropdown || previous?.dropdown,
+      subscription: undefined as Subscription | undefined
+    };
     this.remoteOptionSearches.set(stateKey, state);
     this.dynamicOptionLoading[cacheKey] = false;
     delete this.dynamicOptionErrors[cacheKey];
@@ -3129,6 +3145,10 @@ export class WfDynamicParamsComponent implements OnInit {
       if (dependencies.some(dependency =>
         dependency === changedControlName || dependency.endsWith(`.${changedControlName}`)
       )) {
+        const group = this.getDynamicFormGroup(form, field.control_name);
+        if (kind === 'target' && group?.get('target_source')?.value === 'INVENTORY') {
+          group.get('target')?.setValue([], { emitEvent: false });
+        }
         if (this.targetSelectionFetched.get(field)?.[kind]) {
           this.loadTargetSelectionOptions(field, form, kind, true);
         }

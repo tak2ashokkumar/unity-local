@@ -2,6 +2,7 @@ import { DeviceMonitoringType } from "src/app/shared/SharedEntityTypes/devices-m
 import { DataCenterCabinet } from "../../shared/entities/datacenter-cabinet.type";
 import { CabinetFast } from 'src/app/shared/SharedEntityTypes/cabinet.type';
 import { PrivateCloudRemoteWebAccessType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
+import { CabinetType } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 
 export interface PDU {
     id: number;
@@ -14,6 +15,7 @@ export interface PDU {
     model_id: string;
     ip_address: string;
     cabinet: CabinetFast;
+    connected_cabinets: Array<{ id: number; name?: string }>;
     max_amps: number;
     outlet_count: number;
     outlet_type: string;
@@ -22,6 +24,7 @@ export interface PDU {
     colo_cloud_uuid: string;
     position: string;
     size: number;
+    type: CabinetType;
     pdu_type: string;
     asset_tag: string;
     sockets: number;

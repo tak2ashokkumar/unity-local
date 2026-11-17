@@ -3,6 +3,7 @@ export interface DataCenter {
     name: string;
     uuid: string;
     location: string;
+    environment?: string;
     lat: string;
     long: string;
 }

@@ -50,6 +50,8 @@ export class DatacenterPdusService {
       a.outletCount = d.outlet_count;
       a.socketsCount = d.sockets;
       a.pduType = d.pdu_type;
+      a.type = d.type;
+      a.connectedCabinets = d.connected_cabinets || [];
       a.size = d.size;
       a.monitoring = d.monitoring;
       a.tags = d.tags.filter(tg => tg);
@@ -311,6 +313,8 @@ export class PDUViewData {
   outletCount: number;
   socketsCount: number;
   pduType: string;
+  type: string;
+  connectedCabinets: Array<{ id: number; name?: string }> = [];
   size: number;
   recycleIconEnabled: boolean = false;
   recycleIconTooltip: string;

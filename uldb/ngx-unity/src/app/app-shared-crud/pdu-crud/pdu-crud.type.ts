@@ -1,5 +1,10 @@
 import { DataCenterCustomersItem, DataCenterCabinetType, DataCenterColocloudSetItem } from 'src/app/united-cloud/shared/entities/datacenter-cabinet.type';
 
+export enum CabinetType {
+    DEDICATED = 'dedicated',
+    SHARED = 'shared'
+}
+
 /**
  * DropDowns for PDU Model and Cabinets
  */

@@ -35,10 +35,10 @@ import { NutanixVirtualDisksComponent } from './nutanix/nutanix-virtual-disks/nu
 import { NUTANIX_ZABBIX_ROUTES } from './nutanix/nutanix-zabbix/nutanix-zabbix-routing.const';
 import { NutanixZabbixComponent } from './nutanix/nutanix-zabbix/nutanix-zabbix.component';
 import { OTHER_DEVICE_ROUTES } from './otherdevices/otherdevices-routing.const';
+import { ROUTER_ROUTES } from './routers/routers-routing.const';
 import { ALL_DEVICES_STORAGE_ROUTES, STORAGE_ROUTES } from './storage-devices/storage-routing.const';
 import { SummaryComponent } from './summary/summary.component';
 import { ALL_DEVICES_SWITCH_ROUTES, SWITCH_ROUTES } from './switches/switches-routing.const';
-import { ROUTER_ROUTES } from './routers/routers-routing.const';
 import { UnityS3AccountComponent } from './unity-s3-account/unity-s3-account.component';
 import { UnityS3TabsComponent } from './unity-s3-account/unity-s3-tabs/unity-s3-tabs.component';
 import { UnityS3BucketFilesComponent } from './unity-s3-account/unity-s3/unity-s3-bucket-files/unity-s3-bucket-files.component';
@@ -48,10 +48,10 @@ import { VcenterClustersComponent } from './vcenter-cloud/vcenter-clusters/vcent
 import { VcenterDatastoresComponent } from './vcenter-cloud/vcenter-datastores/vcenter-datastores.component';
 import { VcenterNetworksComponent } from './vcenter-cloud/vcenter-networks/vcenter-networks.component';
 import { ZABBIX_VCENTER_ROUTES } from './vcenter-cloud/vcenter-zabbix/vcenter-zabbix-routing.const';
-import { VergeioResourcesComponent } from './vergeio/vergeio-resources/vergeio-resources.component';
 import { VcenterZabbixComponent } from './vcenter-cloud/vcenter-zabbix/vcenter-zabbix.component';
 import { VcenterContentLibraryFilesComponent } from './vcenter-content-library/vcenter-content-library-files/vcenter-content-library-files.component';
 import { VcenterContentLibraryComponent } from './vcenter-content-library/vcenter-content-library.component';
+import { VergeioResourcesComponent } from './vergeio/vergeio-resources/vergeio-resources.component';
 import { OBSERVIUM_VMS_ROUTES } from './vms/vms-observium/vms-obs-routing.const';
 import { ALL_DEVICES_VMS_ROUTES, VMS_ROUTES } from './vms/vms-routing.const';
 import { ZABBIX_VMS_ROUTES } from './vms/vms-zabbix/vms-zabbix-routing.const';

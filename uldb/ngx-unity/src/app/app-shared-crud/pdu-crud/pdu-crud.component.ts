@@ -5,13 +5,14 @@ import { ActivatedRoute } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { AppLevelService } from 'src/app/app-level.service';
 import { AppNotificationService } from '../../shared/app-notification/app-notification.service';
 import { Notification } from '../../shared/app-notification/notification.type';
 import { AppSpinnerService } from '../../shared/app-spinner/app-spinner.service';
 import { AppUtilityService, CRUDActionTypes, NoWhitespaceValidator, PDUTypes } from '../../shared/app-utility/app-utility.service';
 import { PDU_WEB_URL_PATTERN, PDUCrudFormData, PduCrudService } from './pdu-crud.service';
-import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from './pdu-crud.type';
+import { CabinetType, PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from './pdu-crud.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 
 @Component({
@@ -20,6 +21,7 @@ import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity
   styleUrls: ['./pdu-crud.component.scss']
 })
 export class PduCrudComponent implements OnInit, OnDestroy {
+  cabinetTypes = CabinetType;
   @Output('onCrud') onCrud = new EventEmitter<CRUDActionTypes>();
 
   private ngUnsubscribe = new Subject();
@@ -40,6 +42,25 @@ export class PduCrudComponent implements OnInit, OnDestroy {
   manufacturers: Array<PDUCRUDManufacturer> = [];
   models: Array<PDUCRUDModel> = [];
   cabinets: Array<PDUCRUDCabinet> = [];
+  connectedCabinets: Array<PDUCRUDCabinet> = [];
+  connectedCabinetsSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    selectAsObject: true,
+    lableToDisplay: 'name',
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block',
+    dynamicTitleMaxItems: 1,
+    displayAllSelectedText: true,
+    showCheckAll: false,
+    showUncheckAll: false,
+    appendToBody: true,
+    disableOptionsOfDifferentTypes: true
+  };
+  connectedCabinetsTexts: IMultiSelectTexts = {
+    defaultTitle: 'Select cabinet'
+  };
+  private cabinetsRequestId = 0;
   powercircuits: Array<PDUCRUDPowerCircuit> = [];
   tagsAutocompleteItems: string[] = [];
   collectors: DeviceDiscoveryAgentConfigurationType[] = [];
@@ -64,7 +85,7 @@ export class PduCrudComponent implements OnInit, OnDestroy {
       this.nonFieldErr = '';
       this.pduModelRef = null;
       this.isBillingCrud = param.isBillingCrud;
-      this.getCabinets();
+      // this.getCabinets();
       this.getTags();
       this.buildAddEditForm(param.pduId, param.isBillingCrud);
     });
@@ -107,10 +128,58 @@ export class PduCrudComponent implements OnInit, OnDestroy {
     });
   }
 
-  getCabinets() {
-    this.crudService.getCabinets(this.dcId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.cabinets = res;
+  get cabinetType(): CabinetType {
+    const cabinetType = this.pduForm?.get('type')?.value;
+    return cabinetType === CabinetType.SHARED ? CabinetType.SHARED : CabinetType.DEDICATED;
+  }
+
+  getCabinets(cabinetType?: CabinetType) {
+    const selectedCabinetType = cabinetType ?? this.cabinetType;
+    const requestId = ++this.cabinetsRequestId;
+    this.crudService.getCabinets(this.dcId, selectedCabinetType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      if (requestId === this.cabinetsRequestId) {
+        this.cabinets = res;
+        if (selectedCabinetType === CabinetType.SHARED) {
+          this.setConnectedCabinetOptions(res);
+        }
+      }
     });
+  }
+
+  private setConnectedCabinetOptions(cabinets: PDUCRUDCabinet[]) {
+    const dedicatedCabinetId = this.pduForm?.get('cabinet.id')?.value;
+    const selectedCabinets = this.pduForm?.get('connected_cabinets')?.value || [];
+    this.connectedCabinets = cabinets.map(cabinet => ({
+      ...cabinet,
+      type: 'cabinet',
+      isDisabled: cabinet.id === dedicatedCabinetId
+    }));
+    const cabinetsById = new Map(this.connectedCabinets.map(cabinet => [cabinet.id, cabinet]));
+    this.pduForm?.get('connected_cabinets')?.setValue(
+      selectedCabinets
+        .filter(cabinet => cabinet.id !== dedicatedCabinetId)
+        .map(cabinet => cabinetsById.get(cabinet.id) || cabinet),
+      { emitEvent: false }
+    );
+  }
+
+  private updateConnectedCabinetState(cabinetType: CabinetType) {
+    const connectedCabinetsControl = this.pduForm.get('connected_cabinets');
+    if (cabinetType === CabinetType.SHARED) {
+      if (!connectedCabinetsControl) {
+        this.pduForm.addControl('connected_cabinets', new FormControl({
+          value: [],
+          disabled: this.isBillingCrud
+        }));
+      } else if (!this.isBillingCrud) {
+        connectedCabinetsControl.enable({ emitEvent: false });
+      }
+      return;
+    }
+    if (connectedCabinetsControl) {
+      this.pduForm.removeControl('connected_cabinets');
+    }
+    this.connectedCabinets = [];
   }
 
   getCollectors() {
@@ -157,6 +226,9 @@ export class PduCrudComponent implements OnInit, OnDestroy {
   buildAddEditForm(pduId: string, isBillingCRUD: boolean) {
     this.crudService.createPDUForm(pduId, isBillingCRUD).pipe(takeUntil(this.ngUnsubscribe)).subscribe(form => {
       this.pduForm = form;
+      const cabinetType = this.pduForm.get('type').value as CabinetType;
+      this.updateConnectedCabinetState(cabinetType);
+      this.getCabinets(cabinetType);
       this.monitoringEnabled = this.pduForm.controls.snmp_community ? true : false;
       this.managementEnabled = this.pduForm.controls.backend_url ? true : false;
       this.backUpdata.backend_url = this.pduForm.controls.backend_url ? this.pduForm.controls.backend_url.value : '';
@@ -174,6 +246,10 @@ export class PduCrudComponent implements OnInit, OnDestroy {
         this.pduForm.get('size').disable();
         this.crudService.setDerivedSize(this.pduForm, val);
       });
+      this.pduForm.get('type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((cabinetType: CabinetType) => {
+        this.updateConnectedCabinetState(cabinetType);
+        this.getCabinets(cabinetType);
+      });
       this.pduForm.get('sockets').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
         this.crudService.setDerivedSize(this.pduForm, this.pduForm.get('pdu_type').value);
       });
@@ -183,6 +259,9 @@ export class PduCrudComponent implements OnInit, OnDestroy {
           this.pduForm.get('position').enable();
         } else {
           this.pduForm.get('position').disable();
+        }
+        if (this.cabinetType === CabinetType.SHARED && this.connectedCabinets.length) {
+          this.setConnectedCabinetOptions(this.connectedCabinets);
         }
       });
       this.pduForm.get('position').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
@@ -218,7 +297,7 @@ export class PduCrudComponent implements OnInit, OnDestroy {
     } else {
       this.spinnerService.start('main');
       if (this.dcPduId) {
-        this.crudService.updatePdu(<PDUCrudFormData>this.pduForm.getRawValue(), this.dcPduId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+        this.crudService.updatePdu(this.getPduPayload(), this.dcPduId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
           this.pduModelRef.hide();
           this.spinnerService.stop('main');
           this.notification.success(new Notification('PDU updated successfully.'));
@@ -227,7 +306,7 @@ export class PduCrudComponent implements OnInit, OnDestroy {
           this.handleError(err.error);
         });
       } else {
-        this.crudService.createPdu(<PDUCrudFormData>this.pduForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+        this.crudService.createPdu(this.getPduPayload()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
           this.pduModelRef.hide();
           this.spinnerService.stop('main');
           this.notification.success(new Notification('PDU Created successfully.'));
@@ -237,6 +316,14 @@ export class PduCrudComponent implements OnInit, OnDestroy {
         });
       }
     }
+  }
+
+  private getPduPayload(): PDUCrudFormData {
+    const payload = this.pduForm.getRawValue();
+    return {
+      ...payload,
+      connected_cabinets: (payload.connected_cabinets || []).map((cabinet: PDUCRUDCabinet) => ({ id: cabinet.id }))
+    } as PDUCrudFormData;
   }
 
   confirmPDUDelete() {

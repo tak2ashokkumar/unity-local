@@ -5,9 +5,9 @@ import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
 import { Observable, of, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PDU } from 'src/app/united-cloud/datacenter/entities/pdus.type';
-import { CABINET_FAST_BY_DEVICE_ID, DEVICE_LIST_BY_DEVICE_TYPE, DEVICE_MODELS, GET_AGENT_CONFIGURATIONS, PDU_DELETE, PDU_MANUFACTURERS, PDU_POWER_CIRCUITS, PDU_UPDATE } from '../../shared/api-endpoint.const';
+import { CABINET_FAST_ALL, CABINET_FAST_BY_DEVICE_ID, DEVICE_LIST_BY_DEVICE_TYPE, DEVICE_MODELS, GET_AGENT_CONFIGURATIONS, PDU_DELETE, PDU_MANUFACTURERS, PDU_POWER_CIRCUITS, PDU_UPDATE } from '../../shared/api-endpoint.const';
 import { DeviceMapping, HPDU_SOCKETS_PER_UNIT, NoWhitespaceValidator, PDU_MAX_SOCKETS, PDUTypes } from '../../shared/app-utility/app-utility.service';
-import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from './pdu-crud.type';
+import { CabinetType, PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from './pdu-crud.type';
 import { UserInfoService } from '../../shared/user-info.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 
@@ -42,8 +42,8 @@ export class PduCrudService {
     return this.http.get<PDUCRUDModel[]>(DEVICE_MODELS(DeviceMapping.PDU, manufacturer));
   }
 
-  getCabinets(dcId: string): Observable<PDUCRUDCabinet[]> {
-    return this.http.get<PDUCRUDCabinet[]>(CABINET_FAST_BY_DEVICE_ID(dcId));
+  getCabinets(dcId: string, cabinetType: CabinetType = CabinetType.DEDICATED): Observable<PDUCRUDCabinet[]> {
+    return this.http.get<PDUCRUDCabinet[]>(cabinetType === CabinetType.SHARED ? CABINET_FAST_ALL() : CABINET_FAST_BY_DEVICE_ID(dcId));
   }
 
   getPowerCircuits(): Observable<PDUCRUDPowerCircuit[]> {
@@ -71,7 +71,12 @@ export class PduCrudService {
     if (dcPduId) {
       return this.http.get<PDU>(PDU_UPDATE(dcPduId)).pipe(
         map(pd => {
+          const cabinetType = pd.type || CabinetType.DEDICATED;
+          const connectedCabinets = cabinetType === CabinetType.SHARED
+            ? (pd.connected_cabinets || [])
+            : [];
           let form = this.builder.group({
+            'type': [{ value: cabinetType, disabled: isBillingCRUD }],
             'name': [{ value: pd.name, disabled: isBillingCRUD }, [Validators.required, NoWhitespaceValidator]],
             'asset_tag': [{ value: pd.asset_tag, disabled: isBillingCRUD }, [NoWhitespaceValidator]],
             'manufacturer': this.builder.group({
@@ -95,6 +100,12 @@ export class PduCrudService {
             'annual_escalation': [pd.annual_escalation, [Validators.min(0), Validators.max(100)]],
             'tags': [pd.tags.filter(tg => tg)]
           });
+          if (cabinetType === CabinetType.SHARED) {
+            form.addControl('connected_cabinets', this.builder.control({
+              value: connectedCabinets,
+              disabled: isBillingCRUD
+            }));
+          }
           if (pd.backend_url) {
             form.addControl('backend_url', this.builder.control(pd.backend_url, [Validators.required, NoWhitespaceValidator, Validators.pattern(PDU_WEB_URL_PATTERN)]));
           }
@@ -112,6 +123,7 @@ export class PduCrudService {
         }));
     } else {
       return of(this.builder.group({
+        'type': [CabinetType.DEDICATED],
         'name': ['', [Validators.required, NoWhitespaceValidator]],
         'asset_tag': ['', [NoWhitespaceValidator]],
         'manufacturer': this.builder.group({
@@ -255,6 +267,7 @@ export class PduCrudService {
 }
 
 export class PDUCrudFormData {
+  type: CabinetType;
   name: string;
   asset_tag: string;
   manufacturer: {
@@ -265,8 +278,9 @@ export class PDUCrudFormData {
   }
   pdu_type: string;
   cabinet: {
-    id: string;
+    id: number;
   }
+  connected_cabinets: Array<{ id: number }>;
   power_circuit: {
     id: string;
   }

@@ -20,7 +20,7 @@ import { DataRefreshBtnComponent } from './data-refresh-btn/data-refresh-btn.com
 import { DeviceZabbixEmailNotificationComponent } from './device-zabbix-email-notification/device-zabbix-email-notification.component';
 import { FloatingTerminalComponent } from './floating-terminal/floating-terminal.component';
 import { TeminalItemComponent } from './floating-terminal/teminal-item/teminal-item.component';
-import { MultiselectDropdownComponent, MultiSelectSearchFilter } from './multiselect-dropdown/multiselect-dropdown.component';
+import { MultiselectDropdownModule } from './multiselect-dropdown/multiselect-dropdown.module';
 import { ReportIssueComponent } from './report-issue/report-issue.component';
 import { ScrollableTabComponent } from './scrollable-tab/scrollable-tab.component';
 import { SelfHelpPopupComponent } from './self-help-popup/self-help-popup.component';
@@ -106,7 +106,7 @@ import { CtCellTemplateDirective } from './app-generic-table/app-generic-table-c
 
 @NgModule({
   imports: [AppCoreModule, ChartsModule, ResizableModule, PerfectScrollbarModule,
-    TypeaheadModule.forRoot(), AppDirectivesModule, AppFiltersModule, AppSharedCrudModule, MarkdownModule, EchartsxModule,
+    TypeaheadModule.forRoot(), AppDirectivesModule, AppFiltersModule, AppSharedCrudModule, MultiselectDropdownModule, MarkdownModule, EchartsxModule,
     NgSelectModule],
   exports: [
     AppMainTabComponent,
@@ -122,9 +122,8 @@ import { CtCellTemplateDirective } from './app-generic-table/app-generic-table-c
     ConsoleAccessComponent,
     CreateTicketComponent,
     TextWrapperComponent,
-    MultiselectDropdownComponent,
+    MultiselectDropdownModule,
     ImageDropdownComponent,
-    MultiSelectSearchFilter,
     DashboardSharedTcktMgmtComponent,
     TcktMgmtComponent,
     FloatingTerminalComponent,
@@ -197,9 +196,7 @@ import { CtCellTemplateDirective } from './app-generic-table/app-generic-table-c
     ReportIssueComponent,
     CreateTicketComponent,
     TextWrapperComponent,
-    MultiselectDropdownComponent,
     ImageDropdownComponent,
-    MultiSelectSearchFilter,
     DashboardSharedTcktMgmtComponent,
     TcktMgmtComponent,
     TicketDetailsComponent,

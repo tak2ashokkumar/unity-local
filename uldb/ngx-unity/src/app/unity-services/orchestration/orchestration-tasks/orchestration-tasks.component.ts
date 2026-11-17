@@ -516,6 +516,7 @@ export class OrchestrationTasksComponent implements OnInit, OnDestroy {
   toggleStatus(status: boolean, view: TaskViewData) {
     view['taskStatus'] = status;
     this.orchestraionTaskService.toggleStatus(view.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      this.getListSummary();
     }, (err: HttpErrorResponse) => {
       view['taskStatus'] = !status;
       this.notification.error(new Notification('Failed to change status'));

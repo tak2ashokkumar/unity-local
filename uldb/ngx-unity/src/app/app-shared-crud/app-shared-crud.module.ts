@@ -17,13 +17,15 @@ import { UnitySetupLdapCrudComponent } from './unity-setup-ldap-crud/unity-setup
 import { UsiOntapCrudNewComponent } from './usi-ontap-crud-new/usi-ontap-crud-new.component';
 import { UsiOntapCrudComponent } from './usi-ontap-crud/usi-ontap-crud.component';
 import { UsiPureStorageCrudComponent } from './usi-pure-storage-crud/usi-pure-storage-crud.component';
+import { MultiselectDropdownModule } from '../shared/multiselect-dropdown/multiselect-dropdown.module';
 
 
 @NgModule({
   imports: [
     AppCoreModule,
     AppDirectivesModule,
-    AppFiltersModule
+    AppFiltersModule,
+    MultiselectDropdownModule
   ],
   declarations: [
     CabinetCrudComponent,
@@ -57,7 +59,7 @@ import { UsiPureStorageCrudComponent } from './usi-pure-storage-crud/usi-pure-st
     UnityDevicesCustomAttributesCrudComponent,
     UsiOntapCrudComponent,
     UsiOntapCrudNewComponent,
-    UsiPureStorageCrudComponent
+    UsiPureStorageCrudComponent,
   ]
 })
 export class AppSharedCrudModule { }

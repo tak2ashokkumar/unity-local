@@ -35,6 +35,7 @@ export class DcCrudService {
       'name': '',
       'searchlocation': '',
       'location': '',
+      'environment': '',
       'lat': '',
       'long': ''
     };
@@ -67,6 +68,7 @@ export class DcCrudService {
             'name': [dc ? dc.name : '', [Validators.required, NoWhitespaceValidator]],
             'searchlocation': [dc ? dc.location : '', [Validators.required]],
             'location': [dc ? dc.location : '', [RxwebValidators.compare({ fieldName: 'searchlocation' })]],
+            'environment': [dc ? dc.environment : ''],
             'lat': [dc ? dc.lat : '', RxwebValidators.required({
               conditionalExpression: (x: any) =>
                 x.location && x.lat == '' && x.long == ''
@@ -79,6 +81,7 @@ export class DcCrudService {
         'name': ['', [Validators.required, NoWhitespaceValidator]],
         'searchlocation': ['', [Validators.required]],
         'location': ['', [RxwebValidators.compare({ fieldName: 'searchlocation' })]],
+        'environment': [''],
         'lat': ['', RxwebValidators.required({
           conditionalExpression: (x: any) =>
             x.location && x.lat == '' && x.long == ''
@@ -88,7 +91,7 @@ export class DcCrudService {
     }
   }
 
-   getOfflineLocations(): Observable<OfflineLocationDetails[]> {
+  getOfflineLocations(): Observable<OfflineLocationDetails[]> {
     if (this.locationCache) return of(this.locationCache);
     return this.http.get<OfflineLocationDetails[]>(GET_OFFLINE_LOCATION_DATA()).pipe(
       map(cities => { this.locationCache = cities; return cities; })

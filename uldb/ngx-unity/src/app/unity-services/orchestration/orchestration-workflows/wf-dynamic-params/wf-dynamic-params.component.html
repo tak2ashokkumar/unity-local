@@ -958,7 +958,7 @@
                                     <owl-date-time #datePicker [pickerType]="'calendar'"
                                         [hour12Timer]="true"></owl-date-time>
                                     <div class="d-flex">
-                                        <input class="form-control rounded-left text-dark"
+                                        <input class="form-control date-picker-input text-dark"
                                             [owlDateTimeTrigger]="datePicker" [owlDateTime]="datePicker"
                                             [value]="getDisplayValue(field, form)"
                                             (dateTimeChange)="onDateChange($event, field, form)"
@@ -1025,7 +1025,7 @@
                                     <owl-date-time #dateTimePicker [pickerType]="'both'"
                                         [hour12Timer]="true"></owl-date-time>
                                     <div class="d-flex">
-                                        <input class="form-control rounded-left text-dark"
+                                        <input class="form-control date-picker-input text-dark"
                                             [owlDateTimeTrigger]="dateTimePicker" [owlDateTime]="dateTimePicker"
                                             [value]="getDisplayValue(field, form)"
                                             (dateTimeChange)="onDateChange($event, field, form)"
@@ -1334,7 +1334,7 @@
                                                                                 [hour12Timer]="true"></owl-date-time>
                                                                             <div class="d-flex">
                                                                                 <input
-                                                                                    class="form-control rounded-left text-dark"
+                                                                                    class="form-control date-picker-input text-dark"
                                                                                     [owlDateTimeTrigger]="conditionDatePicker"
                                                                                     [class.is-invalid]="isRuleInvalid(child, 'value')"
                                                                                     [owlDateTime]="conditionDatePicker"

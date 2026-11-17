@@ -55,6 +55,15 @@
             {{formErrors.location}}</div>
           <div class="invalid-feedback" *ngIf="formErrors.lat">{{formErrors.lat}}</div>
         </div>
+        <div class="form-group">
+          <label for="environment">Environment</label>
+          <select id="environment" class="form-control" formControlName="environment"
+            [ngClass]="{'is-invalid' : formErrors.environment}">
+            <option value="">Select Environment</option>
+            <option *ngFor="let environment of environments" [value]="environment">{{environment}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="formErrors.environment">{{formErrors.environment}}</div>
+        </div>
       </form>
     </div>
     <div class="card-footer">

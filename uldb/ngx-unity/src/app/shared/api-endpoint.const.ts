@@ -2882,6 +2882,7 @@ export const DEVICES_FAST_BY_DEVICE_TYPE = (deviceType: DeviceMapping, withShare
 export const PRIVATE_CLOUD_FAST_BY_DC_ID = (dcId: string) => `/customer/private_cloud_fast/?datacenter=${dcId}&page_size=0`;
 
 export const CABINET_FAST_BY_DEVICE_ID = (dcId: string) => `/customer/cabinets_fast/?datacenter=${dcId}&page_size=0`;
+export const CABINET_FAST_ALL = () => '/customer/cabinets_fast/?page_size=0';
 
 export const ZABBIX_DEVICE_GRAPH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: string, graphId: number) => {
     switch (deviceType) {

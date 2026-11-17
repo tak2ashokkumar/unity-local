@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { VERGEIO_VMS } from 'src/app/shared/api-endpoint.const';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
-import { VERGEIO_VMS } from 'src/app/shared/api-endpoint.const';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 

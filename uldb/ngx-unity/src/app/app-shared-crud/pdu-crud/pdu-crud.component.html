@@ -85,7 +85,7 @@
             <label class="font-col-form-label" for="cabinetid">Cabinet<em>*</em></label>
             <select id="cabinetid" class="form-control" formControlName="id" [class.is-invalid]="pduFormErrors.cabinet.id">
               <option value="" disabled>Select Cabinet</option>
-              <option *ngFor="let cabinet of cabinets" [value]="cabinet.id">
+              <option *ngFor="let cabinet of cabinets" [ngValue]="cabinet.id">
                 {{cabinet.name}}</option>
             </select>
             <div class="invalid-feedback" *ngIf="pduFormErrors.cabinet.id">{{pduFormErrors.cabinet.id}}</div>
@@ -110,6 +110,25 @@
               [class.is-invalid]="pduFormErrors.management_ip">
             <div class="invalid-feedback" *ngIf="pduFormErrors.management_ip">
               {{pduFormErrors.management_ip}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="type">Type<em>*</em></label>
+            <select class="form-control" id="type" formControlName="type">
+              <option [value]="cabinetTypes.DEDICATED">Dedicated</option>
+              <option [value]="cabinetTypes.SHARED">Shared</option>
+            </select>
+          </div>
+          <div class="form-group col-6" *ngIf="cabinetType === cabinetTypes.SHARED">
+            <label class="form-col-form-label" for="connected_cabinets">Connected Cabinets</label>
+            <multiselect-dropdown
+              id="connected_cabinets"
+              [options]="connectedCabinets"
+              [settings]="connectedCabinetsSettings"
+              [texts]="connectedCabinetsTexts"
+              formControlName="connected_cabinets"
+              class="form-control p-0"
+              style="height:auto;">
+            </multiselect-dropdown>
           </div>
           <div class="form-group col-6">
             <label for="cost">Cost</label>

@@ -173,6 +173,21 @@
           <td>{{info?.cabinet}}</td>
         </tr>
         <tr>
+          <td><strong>Type</strong></td>
+          <td>{{info?.type}}</td>
+        </tr>
+        <tr *ngIf="info?.type === 'shared'">
+          <td><strong>Connected Cabinets</strong></td>
+          <td>
+            <ng-container *ngIf="info?.connectedCabinets?.length; else noConnectedCabinets">
+              <span *ngFor="let cabinet of info.connectedCabinets; let last = last">
+                {{cabinet.name || cabinet.id}}{{last ? '' : ', '}}
+              </span>
+            </ng-container>
+            <ng-template #noConnectedCabinets>N/A</ng-template>
+          </td>
+        </tr>
+        <tr>
           <td><strong>IP Address</strong></td>
           <td>{{info?.ip}}</td>
         </tr>

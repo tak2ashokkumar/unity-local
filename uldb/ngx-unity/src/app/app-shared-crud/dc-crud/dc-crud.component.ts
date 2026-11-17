@@ -34,6 +34,7 @@ export class DcCrudComponent implements OnInit, OnDestroy {
   isOnline = navigator.onLine;
   locationSuggestions: OfflineLocationDetails[] = [];
   showSuggestions = false;
+  environments: string[] = ['Primary', 'DR'];
 
   @ViewChild('confirm') confirm: ElementRef;
   confirmModalRef: BsModalRef;
