@@ -3,8 +3,8 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { forkJoin, of, Subject, Subscription } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { MonitoringTemplate } from 'src/app/shared/SharedEntityTypes/monitoring-templates.type';
 import { DOWNLOAD_AGENT_BY_DEVICE_TYPE, KUBERNETES_MONITORING_SEGMENT } from 'src/app/shared/api-endpoint.const';
@@ -29,6 +29,8 @@ import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity
 })
 export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
   monitoringDetails: SNMPCrudType;
+  private deviceDetails: any;
+  private snmpCredentials: any[] = [];
   private ngUnsubscribe = new Subject();
   private subscr: Subscription;
   deviceId: string = '';
@@ -108,7 +110,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.isAPIOptionRequired = apiDeviceTypes.has(this.device?.deviceType) || this.device?.hasPureOs || this.device?.devicePlatform === 'Dell Storage';
     this.isAgentOptionRequired = !(this.device?.deviceType == DeviceMapping.STORAGE_DEVICES || this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT || this.device?.deviceType == DeviceMapping.SENSOR || this.device?.deviceType == DeviceMapping.SMART_PDU || this.device?.deviceType == DeviceMapping.RFID_READER);
     this.isSNMPOptionRequired = !(this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT);
-    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.VERGEIO_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
+    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
 
     /** THIS IS BC FOR STATS DRILLDOWN
     *   OBSERVIUM server.uuid is used and zabbix bms.uuid is used
@@ -172,22 +174,107 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
   }
 
   getMonitoringDetails() {
-    this.configSvc.getMonitoringConfig(this.itemId, this.device.deviceType).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.monitoringDetails = res;
-      if (res?.mon_connection_type) {
-        this.monitoringDetails.connection_type = res.mon_connection_type;
-        this.monitoringDetails.ip_address = res.ip_address;
+    forkJoin({
+      monitoring: this.configSvc.getMonitoringConfig(this.itemId, this.device.deviceType).pipe(catchError(() => of(null))),
+      details: this.configSvc.getDeviceDetails(this.itemId, this.device.deviceType).pipe(catchError(() => of(null))),
+      snmpCredentials: this.configSvc.getSnmpCredentials().pipe(catchError(() => of([])))
+    }).pipe(takeUntil(this.ngUnsubscribe)).subscribe(({ monitoring, details, snmpCredentials }) => {
+      this.deviceDetails = details;
+      this.snmpCredentials = snmpCredentials || [];
+      this.monitoringDetails = this.applySnmpCredential(monitoring);
+      if (!this.monitoringDetails && (this.device.deviceType == DeviceMapping.CONTAINER_CONTROLLER || KUBERNETES_MONITORING_SEGMENT[this.device.deviceType])) {
+        this.monitoringDetails = { connection_type: 'Agent', ip_address: '' };
+      }
+      if (this.monitoringDetails?.mon_connection_type) {
+        this.monitoringDetails.connection_type = this.monitoringDetails.mon_connection_type;
+        this.monitoringDetails.ip_address = this.monitoringDetails.ip_address || this.monitoringDetails.host_ip;
       }
       this.spinnerService.stop('main');
       this.buildForm();
     }, err => {
       this.monitoringDetails = null;
+      this.deviceDetails = null;
+      this.snmpCredentials = [];
       if (this.device.deviceType == DeviceMapping.CONTAINER_CONTROLLER || KUBERNETES_MONITORING_SEGMENT[this.device.deviceType]) {
         this.monitoringDetails = { connection_type: 'Agent', ip_address: '' };
       }
       this.spinnerService.stop('main');
       this.buildForm();
     });
+  }
+
+  private applySnmpCredential(details: SNMPCrudType): SNMPCrudType {
+    const snmpValues = this.getSnmpCredentialValues();
+    if (!snmpValues || details?.mon_connection_type) {
+      return details;
+    }
+
+    return {
+      ...(details || { connection_type: 'SNMP' }),
+      connection_type: details?.connection_type || 'SNMP',
+      ip_address: snmpValues.ip_address || details?.ip_address,
+      snmp_version: snmpValues.snmp_version || details?.snmp_version,
+      snmp_community: snmpValues.snmp_community || details?.snmp_community,
+      snmp_authlevel: snmpValues.snmp_authlevel || details?.snmp_authlevel,
+      snmp_authname: snmpValues.snmp_authname || details?.snmp_authname,
+      snmp_authpass: snmpValues.snmp_authpass || details?.snmp_authpass,
+      snmp_authalgo: snmpValues.snmp_authalgo || details?.snmp_authalgo,
+      snmp_cryptopass: snmpValues.snmp_cryptopass || details?.snmp_cryptopass,
+      snmp_cryptoalgo: snmpValues.snmp_cryptoalgo || details?.snmp_cryptoalgo
+    };
+  }
+
+  private getSnmpCredentialValues(): Partial<SNMPCrudType> {
+    const discoveryCredentials = this.deviceDetails?.discovery_credentials;
+    const configuredSnmp = discoveryCredentials?.SNMP || discoveryCredentials?.snmp;
+    let credential = Array.isArray(configuredSnmp) ? configuredSnmp[0] : configuredSnmp;
+    if (!credential) {
+      const assignedCredentialUuids = (this.deviceDetails?.credentials_m2m || [])
+        .map(assignedCredential => String(assignedCredential.uuid));
+      credential = this.snmpCredentials.find(snmpCredential =>
+        assignedCredentialUuids.includes(String(snmpCredential.uuid)) ||
+        (snmpCredential.devices || []).some(device => String(device.uuid) === String(this.itemId))
+      );
+    }
+    if (!credential) {
+      return null;
+    }
+    const credentialType = String(credential.type || '').toLowerCase();
+    const version = credential.snmp_version || credential.version ||
+      (credentialType === 'snmpv1' ? SNMPVersionMapping.V1 :
+        credentialType === 'snmpv2' || credentialType === 'snmpv2c' ? SNMPVersionMapping.V2C :
+          credentialType === 'snmpv3' ? SNMPVersionMapping.V3 : undefined);
+    return {
+      ip_address: credential.ip_address,
+      snmp_version: version,
+      snmp_community: credential.snmp_community || credential.community,
+      snmp_authlevel: credential.snmp_authlevel || credential.security_level,
+      snmp_authname: credential.snmp_authname || credential.security_name,
+      snmp_authpass: credential.snmp_authpass || credential.authentication_passphrase,
+      snmp_authalgo: credential.snmp_authalgo || credential.authentication_protocol,
+      snmp_cryptopass: credential.snmp_cryptopass || credential.privacy_passphrase,
+      snmp_cryptoalgo: credential.snmp_cryptoalgo || credential.privacy_protocol
+    };
+  }
+
+  private patchSnmpCredential(): void {
+    const values = this.getSnmpCredentialValues();
+    if (!values) {
+      return;
+    }
+    if (values.snmp_version && this.form.get('snmp_version')) {
+      this.form.get('snmp_version').setValue(values.snmp_version);
+    }
+    if (values.snmp_authlevel && this.form.get('snmp_authlevel')) {
+      this.form.get('snmp_authlevel').setValue(values.snmp_authlevel);
+    }
+    const populatedValues = Object.keys(values).reduce((result, key) => {
+      if (values[key] !== undefined && values[key] !== null) {
+        result[key] = values[key];
+      }
+      return result;
+    }, {});
+    this.form.patchValue(populatedValues, { emitEvent: false });
   }
 
   getCollectors() {
@@ -200,7 +287,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.selectedTemplates = [];
     this.nonFieldErr = '';
     this.showSNMPTrap = this.device.deviceType == DeviceMapping.STORAGE_DEVICES &&
-      this.monitoringDetails.is_snmptrap_enabled != null;
+      this.monitoringDetails?.is_snmptrap_enabled != null;
     this.form = this.configSvc.buildForm(this.monitoringDetails, this.device.deviceType, this.onPublicCloudVmConfig, this.device.devicePlatform);
     this.formErrors = this.configSvc.resetFormErrors();
     this.formValidationMessages = this.configSvc.switchValidationMessages;
@@ -209,9 +296,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       this.formButtons = true;
       if (this.monitoringDetails?.mon_credential_mode === 'local') {
         const type = connectionTypeValue === 'SSH' ? 'SSH' : 'Windows';
-        this.loadCredentials(type, () => {
-          this.form.patchValue({ mon_credential_id: this.monitoringDetails.mon_credential_id });
-        });
+        this.loadCredentials(type);
       }
       let templates = <number[]>this.form.get('mtp_templates')?.value || [];
       if (templates.length) {
@@ -230,9 +315,6 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       this.showSNMPTrap = false;
     } else {
       if (!this.deviceId) {
-        this.form.get('connection_type').disable({ emitEvent: false });
-      }
-      if (this.device?.configured) {
         this.form.get('connection_type').disable({ emitEvent: false });
       }
       this.formButtons = true;
@@ -254,13 +336,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
         this.formButtons = true;
         this.configSvc.setSnmpFields();
         this.subscribeToSnmpVerionChanges();
-        if (this.monitoringDetails?.ip_address) {     // ← add
-          this.form.get('ip_address')?.setValue(this.monitoringDetails.ip_address);
-        }
-        if (this.monitoringDetails?.snmp_version) {   // ← add
-          this.form.get('snmp_version')?.setValue(this.monitoringDetails.snmp_version);
-        }
-        // this.subscribeToSnmpVerionChanges();
+        this.patchSnmpCredential();
       } else if (val == 'HTTP') {
         this.configSvc.clearSshWinRmFields();
         this.onPublicCloudVmConfig && this.form.removeControl('collector');
@@ -521,10 +597,19 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     this.configSvc.getCredentials(type)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
-        this.credentialList = res || [];
+        this.credentialList = res?.results || res || [];
+        const matchingCredential = this.credentialList.find(credential =>
+          (credential.devices || []).some(device => String(device.uuid) === String(this.itemId))
+        );
+        if (this.form?.get('mon_credential_mode')?.value === 'local') {
+          this.form.get('mon_credential_id').setValue(matchingCredential?.uuid || '');
+        }
         if (callback) callback();
       }, err => {
         this.credentialList = [];
+        if (this.form?.get('mon_credential_mode')?.value === 'local') {
+          this.form.get('mon_credential_id').setValue('');
+        }
       });
   }
 }

@@ -24,6 +24,7 @@ export class VergeioService {
     return this.http.get<UsageData>(PRIVATE_CLOUD_WIDGET_DATA(pcId));
   }
 
+
   // Build the account-level monitoring-icon view model (mirrors the vCenter summary
   // getActionIconViewData); the tooltip reflects the account monitoring state.
   getActionIconViewData(data: VergeioAccountSummary): VergeioIconViewData {

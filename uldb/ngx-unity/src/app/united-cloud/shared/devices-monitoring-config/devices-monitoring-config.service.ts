@@ -2,10 +2,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
-import { Observable, Subject } from 'rxjs';
+import { forkJoin, Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { DeviceMonitoringResponseType, DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { MonitoringTemplate } from 'src/app/shared/SharedEntityTypes/monitoring-templates.type';
-import { GET_AGENT_CONFIGURATIONS, GET_DEVICE_MONITORING_BY_DEVICE_TYPE, MONITORING_CONFIGURATION_BY_DEVICE_TYPE, TENANT_TEMPLATES, TOGGLE_MONITORING_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
+import { DEVICE_BY_ID, GET_AGENT_CONFIGURATIONS, GET_DEVICE_MONITORING_BY_DEVICE_TYPE, MONITORING_CONFIGURATION_BY_DEVICE_TYPE, TENANT_TEMPLATES, TOGGLE_MONITORING_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { AuthLevelMapping, DeviceMapping, NoWhitespaceValidator, SNMPVersionMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { SNMPCrudType } from '../entities/snmp-crud.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
@@ -30,13 +31,28 @@ export class DevicesMonitoringConfigService {
     return this.http.get<SNMPCrudType>(MONITORING_CONFIGURATION_BY_DEVICE_TYPE(deviceType, deviceId));
   }
 
+  getDeviceDetails(deviceId: string, deviceType: DeviceMapping): Observable<any> {
+    return this.http.get<any>(DEVICE_BY_ID(deviceType, deviceId));
+  }
+
   getCollectors() {
     const params = new HttpParams().set('page_size', '0');
     return this.http.get<DeviceDiscoveryAgentConfigurationType[]>(GET_AGENT_CONFIGURATIONS(), { params: params });
   }
 
-  getCredentials(type: string) {
-    return this.http.get<any[]>(`/customer/unity_discovery/credential/?page_size=0&type=${type}`);
+  getCredentials(type: string): Observable<any> {
+    return this.http.get<any>(`/customer/unity_discovery/credential/?page_size=0&type=${type}`);
+  }
+
+  getSnmpCredentials(): Observable<any[]> {
+    return forkJoin([
+      this.getCredentials('SNMPv1'),
+      this.getCredentials('SNMPv2'),
+      this.getCredentials('SNMPv3')
+    ]).pipe(map(responses => responses.reduce((credentials, response) => {
+      const result = response?.results || response || [];
+      return credentials.concat(result);
+    }, [])));
   }
 
   monitoringEnabled() {
@@ -95,7 +111,7 @@ export class DevicesMonitoringConfigService {
     //TODO:Remove after server side fixed
     if (obj?.mon_connection_type === 'SSH' || obj?.mon_connection_type === 'WinRM') {
       this.form = this.builder.group({
-        connection_type: [{ value: obj.mon_connection_type, disabled: true }, Validators.required],
+        connection_type: [{ value: obj.mon_connection_type, disabled: false }, Validators.required],
         host_ip: [obj.ip_address || '', [Validators.required, NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
         mon_port: [obj.mon_port || (obj.mon_connection_type === 'SSH' ? 22 : 5985)],
         mon_credential_mode: [obj.mon_credential_mode || 'local', Validators.required],
@@ -113,7 +129,7 @@ export class DevicesMonitoringConfigService {
     if (deviceType == 'Azure VM' || deviceType == 'Viptela' || deviceType == 'Meraki' || deviceType == 'RFID Reader') {
       this.form.addControl('connection_type', new FormControl({ value: (obj && obj.connection_type) ? obj.connection_type : 'API', disabled: false }, [Validators.required, NoWhitespaceValidator]));
     } else {
-      this.form.addControl('connection_type', new FormControl({ value: (obj && obj.connection_type) ? obj.connection_type : 'SNMP', disabled: (obj && obj.connection_type) ? true : false }, [Validators.required, NoWhitespaceValidator]));
+      this.form.addControl('connection_type', new FormControl({ value: (obj && obj.connection_type) ? obj.connection_type : 'SNMP', disabled: false }, [Validators.required, NoWhitespaceValidator]));
     }
     if (this.form.get('connection_type').value == 'SNMP') {
       this.form.addControl('mtp_templates', new FormControl(obj && obj.mtp_templates ? obj.mtp_templates : [], [Validators.required]));

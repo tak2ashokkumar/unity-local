@@ -85,9 +85,11 @@ export class CabinetWidgetService {
           for (let j = 0; j < 4; j++) {
             const cabinetIndex = ((i * 4) + j);
             if (cabinetIndex < datacenter.cabinets.length) {
-              datacenter.cabinets[cabinetIndex].cabinet_url = `${obj.datacenter_url}/${datacenter.cabinets[cabinetIndex].cabinet_uuid}/view`;
-              data.cabinets.push(this.getCabinetPDUViewData(datacenter.cabinets[cabinetIndex]));
-              dcTotalPower += datacenter.cabinets[cabinetIndex].total_power;
+              const cabinet = datacenter.cabinets[cabinetIndex];
+              cabinet.cabinet_url = `${obj.datacenter_url}/${cabinet.cabinet_uuid}/view`;
+              cabinet.total_power /= 1000;
+              data.cabinets.push(this.getCabinetPDUViewData(cabinet));
+              dcTotalPower += cabinet.total_power;
             }
           }
           obj.dcTotalPower = dcTotalPower.toFixed(2)
