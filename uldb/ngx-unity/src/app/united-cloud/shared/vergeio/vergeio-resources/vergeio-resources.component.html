@@ -64,48 +64,6 @@
                                 </tbody>
                             </table>
 
-                            <!-- Hosts -->
-                            <table class="table table-sm text-left" *ngSwitchCase="'hosts'">
-                                <thead class="bg-light">
-                                    <th class="tdw-16 text-nowrap">Name</th>
-                                    <th class="tdw-8 text-center text-nowrap">Cluster</th>
-                                    <th class="tdw-18 text-nowrap">Model</th>
-                                    <th class="tdw-22 text-nowrap">CPU</th>
-                                    <th class="tdw-8 text-center text-nowrap">Cores</th>
-                                    <th class="tdw-10 text-center text-nowrap">RAM (MB)</th>
-                                    <th class="tdw-12 text-nowrap">OS Version</th>
-                                    <th class="tdw-6 text-center text-nowrap">Maintenance</th>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let view of viewData; trackBy: trackByUuid" truncateText>
-                                        <td class="tdw-16">
-                                            <div [tooltip]="view.name">{{view.name}}</div>
-                                        </td>
-                                        <td class="tdw-8 text-center">
-                                            <div [tooltip]="view.cluster_id">{{view.cluster_id || 'NA'}}</div>
-                                        </td>
-                                        <td class="tdw-18">
-                                            <div [tooltip]="view.data?.model">{{view.data?.model || 'NA'}}</div>
-                                        </td>
-                                        <td class="tdw-22">
-                                            <div [tooltip]="view.data?.cpu">{{view.data?.cpu || 'NA'}}</div>
-                                        </td>
-                                        <td class="tdw-8 text-center">
-                                            <div>{{view.data?.cores != null ? view.data.cores : 'NA'}}</div>
-                                        </td>
-                                        <td class="tdw-10 text-center">
-                                            <div>{{view.data?.ram != null ? view.data.ram : 'NA'}}</div>
-                                        </td>
-                                        <td class="tdw-12">
-                                            <div [tooltip]="view.data?.os_version">{{view.data?.os_version || 'NA'}}</div>
-                                        </td>
-                                        <td class="tdw-6 text-center">
-                                            <span [ngClass]="view.data?.maintenance ? 'text-warning' : 'text-success'">{{view.data?.maintenance ? 'Yes' : 'No'}}</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
                             <!-- Datastores -->
                             <table class="table table-sm text-left" *ngSwitchCase="'datastores'">
                                 <thead class="bg-light">

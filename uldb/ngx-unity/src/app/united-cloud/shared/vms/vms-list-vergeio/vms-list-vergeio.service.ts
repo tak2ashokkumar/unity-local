@@ -23,11 +23,22 @@ export class VmsListVergeioService {
       a.name = d.name ? d.name : 'NA';
       a.powerState = d.power_state ? d.power_state : 'NA';
       a.powerStateClass = this.getPowerStateClass(d.power_state);
+      a.powerStatus = this.getPowerStatus(d.power_state);
       a.clusterId = d.cluster_id ? d.cluster_id : 'NA';
       a.hostId = d.host_id ? d.host_id : 'NA';
       a.cpuCores = d.data && d.data.cpu_cores != null ? d.data.cpu_cores.toString() : 'NA';
       a.ram = d.data && d.data.ram != null ? d.data.ram.toString() : 'NA';
       a.monitoring = d.monitoring;
+      // Mirror the VMware VM list monitoring-icon convention: a dynamic tooltip that
+      // reflects the monitoring state (Configure / Enable / VM Statistics).
+      a.isStatsButtonEnabled = true;
+      if (!d.monitoring || !d.monitoring.configured) {
+        a.statsTooltipMessage = 'Configure Monitoring';
+      } else if (!d.monitoring.enabled) {
+        a.statsTooltipMessage = 'Enable monitoring';
+      } else {
+        a.statsTooltipMessage = 'VM Statistics';
+      }
       viewData.push(a);
     });
     return viewData;
@@ -38,6 +49,16 @@ export class VmsListVergeioService {
       case 'running': return 'text-success';
       case 'stopped': return 'text-danger';
       default: return 'text-muted';
+    }
+  }
+
+  // Map the raw power state to the shared Up/Down/Unknown status so the Power State
+  // column renders the same green/red/grey dot as the other cloud VM lists.
+  private getPowerStatus(state: string): string {
+    switch ((state || '').toLowerCase()) {
+      case 'running': return 'Up';
+      case 'stopped': return 'Down';
+      default: return 'Unknown';
     }
   }
 }
@@ -63,9 +84,12 @@ export class VergeioVmViewData {
   name: string;
   powerState: string;
   powerStateClass: string;
+  powerStatus: string;
   clusterId: string;
   hostId: string;
   cpuCores: string;
   ram: string;
   monitoring: DeviceMonitoringType;
+  statsTooltipMessage: string;
+  isStatsButtonEnabled: boolean = false;
 }

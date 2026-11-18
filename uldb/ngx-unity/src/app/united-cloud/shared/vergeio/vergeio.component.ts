@@ -4,12 +4,13 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { AppUtilityService, FaIconMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, DeviceMapping, FaIconMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { PcCrudService } from 'src/app/app-shared-crud/pc-crud/pc-crud.service';
+import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { SUMMARY_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { UsageData, UsageStatsPercent } from '../entities/usage-data.type';
-import { VergeioAccountSummary, VergeioComponentSummary, VergeioService, VergeioUsageViewData } from './vergeio.service';
+import { VergeioAccountSummary, VergeioComponentSummary, VergeioIconViewData, VergeioService, VergeioUsageViewData } from './vergeio.service';
 
 @Component({
   selector: 'vergeio',
@@ -23,6 +24,7 @@ export class VergeioComponent implements OnInit, OnDestroy {
   activeCloud: PrivateCLoudFast;
 
   account: VergeioAccountSummary;
+  view: VergeioIconViewData;
   summary: VergeioComponentSummary;
   iconMapping = FaIconMapping;
 
@@ -36,6 +38,7 @@ export class VergeioComponent implements OnInit, OnDestroy {
     private spinnerService: AppSpinnerService,
     private utilService: AppUtilityService,
     private crudSvc: PcCrudService,
+    private storageSvc: StorageService,
     private ticketSvc: SharedCreateTicketService) {
     this.route.parent.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.pcId = params.get('pcId');
@@ -63,6 +66,7 @@ export class VergeioComponent implements OnInit, OnDestroy {
     this.spinnerService.start('main');
     this.svc.getAccount(this.pcId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.account = res;
+      this.view = this.svc.getActionIconViewData(res);
     }, () => { });
     this.svc.getComponentSummary(this.pcId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.summary = res;
@@ -104,6 +108,15 @@ export class VergeioComponent implements OnInit, OnDestroy {
 
   deletePrivateCloud() {
     this.crudSvc.delete(this.pcId, 'vergeio');
+  }
+
+  goToStats(view: VergeioIconViewData) {
+    this.storageSvc.put('device', { name: view.name, deviceType: DeviceMapping.VERGEIO_ACCOUNT, configured: view.monitoring?.configured }, StorageType.SESSIONSTORAGE);
+    if (view.monitoring?.configured && view.monitoring?.enabled) {
+      this.router.navigate(['vergeio', 'zbx', 'monitoring-graphs'], { relativeTo: this.route });
+    } else {
+      this.router.navigate(['vergeio', 'zbx', 'configure'], { relativeTo: this.route });
+    }
   }
 
   createTicket() {

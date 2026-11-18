@@ -108,6 +108,19 @@ const SUMMARY_ROUTES: Routes = [
         children: ZABBIX_VCENTER_ROUTES
     },
     {
+        // VergeIO account-level monitoring reuses the shared vCenter zbx shell; the
+        // page is driven entirely by the stored device's deviceType (VERGEIO_ACCOUNT).
+        path: 'summary/vergeio/zbx',
+        component: VcenterZabbixComponent,
+        data: {
+            breadcrumb: {
+                title: 'Summary',
+                stepbackCount: 0
+            }
+        },
+        children: ZABBIX_VCENTER_ROUTES
+    },
+    {
         path: 'summary/add',
         component: PcCrudComponent
     },
@@ -568,17 +581,13 @@ const VCENTER_ROUTES: Routes = [
     }
 ]
 
-// VergeIO discovered-resource listings (Clusters / Hosts / Datastores / Networks).
+// VergeIO discovered-resource listings (Clusters / Datastores / Networks).
+// Hosts are shown via the shared, platform-agnostic Hypervisors tab instead.
 const VERGEIO_RESOURCE_ROUTES: Routes = [
     {
         path: 'vergeioclusters',
         component: VergeioResourcesComponent,
         data: { resourceType: 'clusters', title: 'Clusters', breadcrumb: { title: 'Clusters', stepbackCount: 0 } }
-    },
-    {
-        path: 'vergeiohosts',
-        component: VergeioResourcesComponent,
-        data: { resourceType: 'hosts', title: 'Hosts', breadcrumb: { title: 'Hosts', stepbackCount: 0 } }
     },
     {
         path: 'vergeiodatastores',

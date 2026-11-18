@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PRIVATE_CLOUD_WIDGET_DATA, VERGEIO_ACCOUNT_BY_ID, VERGEIO_COMPONENT_SUMMARY } from 'src/app/shared/api-endpoint.const';
+import { DeviceMonitoringType } from 'src/app/shared/SharedEntityTypes/devices-monitoring.type';
 import { UsageData } from '../entities/usage-data.type';
 
 @Injectable()
@@ -21,6 +22,24 @@ export class VergeioService {
 
   getUsageData(pcId: string): Observable<UsageData> {
     return this.http.get<UsageData>(PRIVATE_CLOUD_WIDGET_DATA(pcId));
+  }
+
+  // Build the account-level monitoring-icon view model (mirrors the vCenter summary
+  // getActionIconViewData); the tooltip reflects the account monitoring state.
+  getActionIconViewData(data: VergeioAccountSummary): VergeioIconViewData {
+    let view = new VergeioIconViewData();
+    view.uuid = data.uuid;
+    view.name = data.name;
+    view.monitoring = data.monitoring;
+    view.isStatsButtonEnabled = true;
+    if (data.monitoring?.configured && data.monitoring?.enabled) {
+      view.statsTooltipMessage = 'Statistics';
+    } else if (data.monitoring?.configured && !data.monitoring?.enabled) {
+      view.statsTooltipMessage = 'Enable monitoring';
+    } else {
+      view.statsTooltipMessage = 'Configure Monitoring';
+    }
+    return view;
   }
 
   convertToUsageViewData(widgetData: UsageData): VergeioUsageViewData {
@@ -56,6 +75,15 @@ export interface VergeioAccountSummary {
   status: string;
   enabled: boolean;
   is_managed: boolean;
+  monitoring?: DeviceMonitoringType;
+}
+
+export class VergeioIconViewData {
+  uuid: string;
+  name: string;
+  monitoring: DeviceMonitoringType;
+  isStatsButtonEnabled: boolean = false;
+  statsTooltipMessage: string;
 }
 
 export interface VergeioComponentSummary {

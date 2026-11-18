@@ -102,12 +102,13 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       DeviceMapping.MERAKI_ACCOUNT,
       DeviceMapping.HYPERVISOR,
       DeviceMapping.VMWARE_VIRTUAL_MACHINE,
+      DeviceMapping.VERGEIO_VIRTUAL_MACHINE,
       DeviceMapping.RFID_READER
     ]);
     this.isAPIOptionRequired = apiDeviceTypes.has(this.device?.deviceType) || this.device?.hasPureOs || this.device?.devicePlatform === 'Dell Storage';
     this.isAgentOptionRequired = !(this.device?.deviceType == DeviceMapping.STORAGE_DEVICES || this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT || this.device?.deviceType == DeviceMapping.SENSOR || this.device?.deviceType == DeviceMapping.SMART_PDU || this.device?.deviceType == DeviceMapping.RFID_READER);
     this.isSNMPOptionRequired = !(this.device?.deviceType == DeviceMapping.VIPTELA_ACCOUNT || this.device?.deviceType == DeviceMapping.MERAKI_ACCOUNT);
-    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
+    this.isWmiSshOptionRequired = (this.device?.deviceType == DeviceMapping.VMWARE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CUSTOM_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.HYPER_V || this.device?.deviceType == DeviceMapping.VCLOUD || this.device?.deviceType == DeviceMapping.AWS_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.AZURE_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.GCP_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.NUTANIX_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.VERGEIO_VIRTUAL_MACHINE || this.device?.deviceType == DeviceMapping.CONTAINER_CONTROLLER);
 
     /** THIS IS BC FOR STATS DRILLDOWN
     *   OBSERVIUM server.uuid is used and zabbix bms.uuid is used
@@ -225,7 +226,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
     } else if (this.form.get('connection_type').value == "API") {
       this.form.removeControl('ip_address');
       this.form.removeControl('mtp_templates');
-      this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs || this.device.devicePlatform === 'Dell Storage';
+      this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.VERGEIO_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs || this.device.devicePlatform === 'Dell Storage';
       this.showSNMPTrap = false;
     } else {
       if (!this.deviceId) {
@@ -279,7 +280,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
           this.formButtons = true;
         } else {
           this.configSvc.setAPIField();
-          this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs;
+          this.formButtons = [DeviceMapping.VIPTELA_ACCOUNT, DeviceMapping.MERAKI_ACCOUNT, DeviceMapping.HYPERVISOR, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.VERGEIO_VIRTUAL_MACHINE, DeviceMapping.RFID_READER].includes(this.device.deviceType) || this.device.hasPureOs;
         }
       } else if ((val === 'SSH' || val === 'WinRM') && this.isWmiSshOptionRequired) {
         this.configSvc.setSshWinRmFields(val);
@@ -424,7 +425,7 @@ export class DevicesMonitoringConfigComponent implements OnInit, OnDestroy {
       }
       let arr = [DeviceMapping.AZURE_VIRTUAL_MACHINE, DeviceMapping.VMWARE_VIRTUAL_MACHINE, DeviceMapping.VCLOUD, DeviceMapping.HYPER_V,
       DeviceMapping.ESXI, DeviceMapping.OPENSTACK_VIRTUAL_MACHINE, DeviceMapping.CUSTOM_VIRTUAL_MACHINE, DeviceMapping.HYPERVISOR,
-      DeviceMapping.STORAGE_DEVICES, DeviceMapping.CONTAINER_CONTROLLER, DeviceMapping.MAC_MINI]
+      DeviceMapping.STORAGE_DEVICES, DeviceMapping.CONTAINER_CONTROLLER, DeviceMapping.MAC_MINI, DeviceMapping.VERGEIO_VIRTUAL_MACHINE]
       if (this.form.get('connection_type').value == 'Agent' && !arr.includes(this.device.deviceType)) {
         return;
       }

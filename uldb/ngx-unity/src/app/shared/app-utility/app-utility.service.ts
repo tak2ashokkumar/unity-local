@@ -716,6 +716,7 @@ export enum DeviceMapping {
   G3_KVM = 'UnitedPrivateCloud - KVM',
   NUTANIX_ACCOUNT = 'Nutanix',
   NUTANIX_VIRTUAL_MACHINE = 'Nutanix VM',
+  VERGEIO_ACCOUNT = 'VergeIO',
   VERGEIO_VIRTUAL_MACHINE = 'VergeIO VM',
   //NUTANIX_VM = 'Virtual Machine',
   CUSTOM_VIRTUAL_MACHINE = 'Custom VM',

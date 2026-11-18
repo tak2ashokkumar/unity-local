@@ -94,6 +94,21 @@ export class PrivateCloudComponent implements OnInit, OnDestroy {
   }
 
   showDeviceTab(tab: TabData, res: PrivateCloudType): boolean {
+    // VergeIO reuses the shared, platform-agnostic Hypervisors tab for its hosts and
+    // uses dedicated VergeIO tabs for Clusters / Datastores / Networks (the shared
+    // vCenter tabs for those are bound to VMware-only endpoints). Restrict VergeIO to
+    // just these tabs (plus Summary) so the generic VMware tabs do not appear.
+    if (this.isVergeioCloud(res)) {
+      switch (tab.url) {
+        case 'summary':
+        case 'vergeioclusters':
+        case 'vergeiodatastores':
+        case 'vergeionetworks': return true;
+        // Hosts reuse the shared Hypervisors tab (fetches by cloud uuid).
+        case 'hypervisors': return res['hypervisors'] ? res['hypervisors'].length ? true : false : false;
+        default: return false;
+      }
+    }
     switch (tab.url) {
       case 'alldevices': return res['nutanix'] || this.isVergeioCloud(res) ? false : true;
       case 'switches': return res['switch'] ? res['switch'].length ? true : false : false;
@@ -117,7 +132,6 @@ export class PrivateCloudComponent implements OnInit, OnDestroy {
       case 'datastores': return res['datastores'] ? res['datastores'].length ? true : false : false;
       case 'networks': return this.isVcenterCloud(res) ? true : false;
       case 'vergeioclusters':
-      case 'vergeiohosts':
       case 'vergeiodatastores':
       case 'vergeionetworks': return this.isVergeioCloud(res) ? true : false;
       default: return true;
@@ -379,11 +393,6 @@ const tabData: TabData[] = [
     name: 'Clusters',
     url: 'vergeioclusters',
     icon: FaIconMapping.CLUSTER
-  },
-  {
-    name: 'Hosts',
-    url: 'vergeiohosts',
-    icon: FaIconMapping.HOST
   },
   {
     name: 'Datastores',

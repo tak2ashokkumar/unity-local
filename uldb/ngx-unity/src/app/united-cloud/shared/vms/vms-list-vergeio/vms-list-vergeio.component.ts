@@ -86,9 +86,18 @@ export class VmsListVergeioComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToMonitoring(view: VergeioVmViewData) {
+  goToDetails(view: VergeioVmViewData) {
     this.storageService.put('device', { name: view.name, deviceType: DeviceMapping.VERGEIO_VIRTUAL_MACHINE, configured: view.monitoring?.configured }, StorageType.SESSIONSTORAGE);
     this.router.navigate([view.uuid, 'zbx', 'details'], { relativeTo: this.route });
+  }
+
+  goToStats(view: VergeioVmViewData) {
+    this.storageService.put('device', { name: view.name, deviceType: DeviceMapping.VERGEIO_VIRTUAL_MACHINE, configured: view.monitoring?.configured }, StorageType.SESSIONSTORAGE);
+    if (view.monitoring?.configured && view.monitoring?.enabled) {
+      this.router.navigate([view.uuid, 'zbx', 'monitoring-graphs'], { relativeTo: this.route });
+    } else {
+      this.router.navigate([view.uuid, 'zbx', 'configure'], { relativeTo: this.route });
+    }
   }
 
   trackByUuid(index: number, view: VergeioVmViewData): string {

@@ -240,6 +240,7 @@ export const DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: 
         case DeviceMapping.DB_SERVER: return `customer/database_servers/${deviceId}/monitoring/status/`;
 
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/status/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/status/`;
         default: console.error('Invalid device type : ', deviceType);
     }
 }
@@ -2177,6 +2178,7 @@ export const MONITORING_CONFIGURATION_BY_DEVICE_TYPE = (deviceType: DeviceMappin
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `/customer/managed/azure/resources/${deviceId}/monitoring/`;
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/managed/vcenter/accounts/${deviceId}/monitoring/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/monitoring/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/monitoring/`;
         case DeviceMapping.SENSOR: return `/customer/sensors/${deviceId}/monitoring/`;
@@ -2220,6 +2222,7 @@ export const TOGGLE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, devi
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `/customer/managed/azure/resources/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `/customer/integration/vcenter/accounts/${deviceId}/monitoring/${action}/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/monitoring/${action}/`;
         case DeviceMapping.SENSOR: return `/customer/sensors/${deviceId}/monitoring/${action}/`;
@@ -2286,6 +2289,7 @@ export const GET_DEVICE_MONITORING_BY_DEVICE_TYPE = (deviceType: DeviceMapping, 
         case DeviceMapping.AZURE_VIRTUAL_MACHINE: return `/customer/managed/azure/resources/${deviceId}/`;
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/managed/vcenter/accounts/${deviceId}/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/`;
         case DeviceMapping.SENSOR: return `/customer/sensors/${deviceId}/`;
@@ -2321,6 +2325,7 @@ export const ZABBIX_DEVICE_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, dev
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.SDWAN_DEVICES: return `/customer/sdwan/devices/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/device_data/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.VIPTELA_DEVICE: return `/customer/viptela/devices/${deviceId}/monitoring/device_data/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/monitoring/device_data/`;
@@ -2365,6 +2370,7 @@ export const ZABBIX_DEVICE_ALERTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
         case DeviceMapping.DOCKER_CONTAINER: return `customer/docker/containers/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.AZURE_SERVICES: return `customer/managed/azure/resources/${deviceId}/monitoring/alerts/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/alerts/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/alerts/`;
         default: console.error('Invalid device type : ', deviceType);
     }
 }
@@ -2409,6 +2415,7 @@ export const ZABBIX_DEVICE_GRAPHS = (deviceType: DeviceMapping, deviceId: string
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.SDWAN_DEVICES: return `customer/sdwan/devices/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/graphs/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.VIPTELA_DEVICE: return `/customer/viptela/devices/${deviceId}/monitoring/graphs/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/monitoring/graphs/`;
@@ -2459,6 +2466,7 @@ export const MANAGE_ZABBIX_DEVICE_GRAPH = (deviceType: DeviceMapping, deviceId: 
         case DeviceMapping.AZURE_SERVICES: return `customer/managed/azure/resources/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/graphs/${graphId}/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `customer/viptela/accounts/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.VIPTELA_DEVICE: return `customer/viptela/devices/${deviceId}/monitoring/graphs/${graphId}/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `customer/meraki/accounts/${deviceId}/monitoring/graphs/${graphId}/`;
@@ -2510,6 +2518,7 @@ export const ZABBIX_DEVICE_GRAPH_IMAGE = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.SDWAN_DEVICES: return `/customer/sdwan/devices/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.VIPTELA_DEVICE: return `/customer/viptela/devices/${deviceId}/monitoring/graph_image/${graphId}/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/monitoring/graph_image/${graphId}/`;
@@ -2561,6 +2570,7 @@ export const ZABBIX_DEVICE_GRAPH_ITEMS = (deviceType: DeviceMapping, deviceId: s
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.SDWAN_DEVICES: return `/customer/sdwan/devices/${deviceId}/monitoring/items/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/items/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.VIPTELA_DEVICE: return `/customer/viptela/devices/${deviceId}/monitoring/items/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/monitoring/items/`;
@@ -2612,6 +2622,7 @@ export const ZABBIX_DEVICE_GRAPH_NUMBERIC_ITEMS = (deviceType: DeviceMapping, de
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.SDWAN_DEVICES: return `/customer/sdwan/devices/${deviceId}/monitoring/items/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/items/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/monitoring/items/`;
         case DeviceMapping.VIPTELA_DEVICE: return `/customer/viptela/devices/${deviceId}/monitoring/items/`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/monitoring/items/`;
@@ -2644,6 +2655,7 @@ export const ZABBIX_SENSOR_DATA_BY_DEVICE_TYPE = (deviceType: DeviceMapping, dev
         case DeviceMapping.MAC_MINI: return `customer/macdevices/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.CUSTOM_VIRTUAL_MACHINE: return `rest/customer/virtual_machines/${deviceId}/monitoring/sensor_data/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/sensor_data/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/sensor_data/`;
         default: console.error('Invalid device type : ', deviceType);
     }
 }
@@ -2687,6 +2699,7 @@ export const TRIGGERS_BY_DEVICE_TYPE = (deviceType: DeviceMapping, deviceId: str
         case DeviceMapping.SDWAN_ACCOUNTS: return `/customer/sdwan/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.SDWAN_DEVICES: return `/customer/sdwan/devices/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.VIPTELA_ACCOUNT: return `/customer/viptela/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.VIPTELA_DEVICE: return `/customer/viptela/devices/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
         case DeviceMapping.MERAKI_ACCOUNT: return `/customer/meraki/accounts/${deviceId}/monitoring/triggers/${triggerId ? triggerId.concat('/') : ''}`;
@@ -2904,6 +2917,7 @@ export const ZABBIX_DEVICE_GRAPH_BY_DEVICE_TYPE = (deviceType: DeviceMapping, de
         case DeviceMapping.OPENSTACK_VIRTUAL_MACHINE: return `customer/openstack/migration/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.CUSTOM_VIRTUAL_MACHINE: return `/customer/virtual_machines/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/preview_graph_image/${graphId}/`;
         default: console.error('Invalid device type : ', deviceType);
     }
 }
@@ -4038,6 +4052,7 @@ export const ZABBIX_DEVICE_EVENTS_BY_DEVICE_TYPE_AND_DEVICE_ID = (deviceType: De
         case DeviceMapping.SDWAN_ACCOUNTS: return `customer/sdwan/accounts/${deviceId}/monitoring/events/`;
         case DeviceMapping.SDWAN_DEVICES: return `customer/sdwan/devices/${deviceId}/monitoring/events/`;
         case DeviceMapping.VMWARE_ACCOUNT: return `customer/integration/vcenter/accounts/${deviceId}/monitoring/events/`;
+        case DeviceMapping.VERGEIO_ACCOUNT: return `customer/vergeio/accounts/${deviceId}/monitoring/events/`;
         case DeviceMapping.DB_SERVER: return `/customer/database_servers/${deviceId}/monitoring/events/`
         case DeviceMapping.VIPTELA_ACCOUNT: return `customer/viptela/accounts/${deviceId}/monitoring/events/`;
         case DeviceMapping.VIPTELA_DEVICE: return `customer/viptela/devices/${deviceId}/monitoring/events/`;
