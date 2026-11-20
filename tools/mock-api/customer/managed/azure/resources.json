@@ -1,0 +1,77 @@
+[
+  {
+    "name": "az-web-vm-01",
+    "region": "eastus",
+    "resource_type": "virtualMachines",
+    "tags": {},
+    "resource_group": "rg-unity-prod",
+    "account_name": "Azure",
+    "subscription": "0f1e2d3c-4b5a-4968-8776-5a4b3c2d1e0f",
+    "uuid": "7c2d1e0f-3a4b-4c5d-9e6f-000000000301",
+    "account": 222,
+    "account_uuid": "8645477c-6bb0-4e26-af77-14dbc58fdf5a",
+    "power_state": "VM running",
+    "id": 9101,
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    },
+    "ip_type": "Private",
+    "management_ip": "10.20.0.101",
+    "os_name": "Ubuntu 22.04",
+    "os_type": "Linux",
+    "collector": null
+  },
+  {
+    "name": "az-db-vm-02",
+    "region": "eastus",
+    "resource_type": "virtualMachines",
+    "tags": {},
+    "resource_group": "rg-unity-prod",
+    "account_name": "Azure",
+    "subscription": "0f1e2d3c-4b5a-4968-8776-5a4b3c2d1e0f",
+    "uuid": "7c2d1e0f-3a4b-4c5d-9e6f-000000000302",
+    "account": 222,
+    "account_uuid": "8645477c-6bb0-4e26-af77-14dbc58fdf5a",
+    "power_state": "VM deallocated",
+    "id": 9102,
+    "monitoring": {
+      "configured": false,
+      "enabled": false,
+      "zabbix": true,
+      "observium": false
+    },
+    "ip_type": "Private",
+    "management_ip": "10.20.0.102",
+    "os_name": "Ubuntu 20.04",
+    "os_type": "Linux",
+    "collector": null
+  },
+  {
+    "name": "unitystorageprod",
+    "region": "eastus",
+    "resource_type": "storageAccounts",
+    "tags": {},
+    "resource_group": "rg-unity-prod",
+    "account_name": "Azure",
+    "subscription": "0f1e2d3c-4b5a-4968-8776-5a4b3c2d1e0f",
+    "uuid": "7c2d1e0f-3a4b-4c5d-9e6f-000000000401",
+    "account": 222,
+    "account_uuid": "8645477c-6bb0-4e26-af77-14dbc58fdf5a",
+    "power_state": null,
+    "id": 9103,
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    },
+    "ip_type": "Private",
+    "management_ip": "10.20.0.103",
+    "os_name": null,
+    "os_type": null,
+    "collector": null
+  }
+]

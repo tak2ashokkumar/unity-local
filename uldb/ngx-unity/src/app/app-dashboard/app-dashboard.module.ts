@@ -49,6 +49,14 @@ import { StorageDashboardComponent } from './app-default-dashboards/storage-dash
 import { NetappStorageDashboardComponent } from './app-default-dashboards/storage-dashboard/netapp-storage-dashboard/netapp-storage-dashboard.component';
 import { PureStorageDashboardComponent } from './app-default-dashboards/storage-dashboard/pure-storage-dashboard/pure-storage-dashboard.component';
 import { NavigatorCentralComponent } from './app-default-dashboards/navigator-central/navigator-central.component';
+import { AppCustomDashboardsComponent } from './app-custom-dashboards/app-custom-dashboards.component';
+import { AppCustomDashboardCrudComponent } from './app-custom-dashboards/app-custom-dashboard-crud/app-custom-dashboard-crud.component';
+import { AppCustomDashboardPanelsComponent } from './app-custom-dashboards/app-custom-dashboard-panels/app-custom-dashboard-panels.component';
+import { AppCustomDashboardPanelCrudComponent } from './app-custom-dashboards/app-custom-dashboard-panel-crud/app-custom-dashboard-panel-crud.component';
+import { AppCustomDashboardPanelPreviewComponent } from './app-custom-dashboards/app-custom-dashboard-panel-preview/app-custom-dashboard-panel-preview.component';
+import { AppCustomDashboardGlobalFiltersComponent } from './app-custom-dashboards/app-custom-dashboard-global-filters/app-custom-dashboard-global-filters.component';
+import { AppCustomDashboardDataScopeComponent } from './app-custom-dashboards/app-custom-dashboard-data-scope/app-custom-dashboard-data-scope.component';
+import { AppCustomDashboardViewComponent } from './app-custom-dashboards/app-custom-dashboard-view/app-custom-dashboard-view.component';
 // import { DashboardMapWidgetComponent } from '../app-home/dashboard-map-widget/dashboard-map-widget.component';
 
 export const MY_NATIVE_FORMATS = {
@@ -94,7 +102,15 @@ export const MY_NATIVE_FORMATS = {
     NetworkDashboardComponent,
     StorageDashboardComponent,
     NetappStorageDashboardComponent,
-    PureStorageDashboardComponent
+    PureStorageDashboardComponent,
+    AppCustomDashboardsComponent,
+    AppCustomDashboardCrudComponent,
+    AppCustomDashboardPanelsComponent,
+    AppCustomDashboardPanelCrudComponent,
+    AppCustomDashboardPanelPreviewComponent,
+    AppCustomDashboardGlobalFiltersComponent,
+    AppCustomDashboardDataScopeComponent,
+    AppCustomDashboardViewComponent
   ],
   imports: [
     AppCoreModule,

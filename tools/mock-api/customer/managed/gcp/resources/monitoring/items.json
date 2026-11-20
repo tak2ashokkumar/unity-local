@@ -1,0 +1,37 @@
+{
+  "_comment": "Zabbix item templates per resource_type. The mock route turns them into monitoring/items for each monitored resource in resources.json (item_id is derived per resource). unit is only used by the mock to generate chart values; the real items API does not return it.",
+  "VM instances": [
+    {
+      "name": "CPU utilization",
+      "key": "gcp.compute.cpu_utilization",
+      "value_type": 0,
+      "unit": "%"
+    },
+    {
+      "name": "Received bytes",
+      "key": "gcp.compute.received_bytes",
+      "value_type": 3,
+      "unit": "B"
+    },
+    {
+      "name": "Sent bytes",
+      "key": "gcp.compute.sent_bytes",
+      "value_type": 3,
+      "unit": "B"
+    }
+  ],
+  "Disk": [
+    {
+      "name": "Read bytes",
+      "key": "gcp.disk.read_bytes",
+      "value_type": 3,
+      "unit": "B"
+    },
+    {
+      "name": "Write bytes",
+      "key": "gcp.disk.write_bytes",
+      "value_type": 3,
+      "unit": "B"
+    }
+  ]
+}

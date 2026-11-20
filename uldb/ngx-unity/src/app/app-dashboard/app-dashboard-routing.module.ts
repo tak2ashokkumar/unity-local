@@ -5,6 +5,9 @@ import { AppCollectionDashboardViewComponent } from "./app-dashboard-collections
 import { AppDashboardCollectionsViewComponent } from "./app-dashboard-collections/app-dashboard-collections-view/app-dashboard-collections-view.component";
 import { AppDashboardCollectionsComponent } from "./app-dashboard-collections/app-dashboard-collections.component";
 import { AppDashboardComponent } from "./app-dashboard.component";
+import { AppCustomDashboardCrudComponent } from "./app-custom-dashboards/app-custom-dashboard-crud/app-custom-dashboard-crud.component";
+import { AppCustomDashboardsComponent } from "./app-custom-dashboards/app-custom-dashboards.component";
+import { AppCustomDashboardViewComponent } from "./app-custom-dashboards/app-custom-dashboard-view/app-custom-dashboard-view.component";
 import { DEFAULT_DASHBOARD_ROUTES } from "./app-default-dashboards/app-default-dashboards-routing.const";
 import { AppDefaultDashboardsComponent } from "./app-default-dashboards/app-default-dashboards.component";
 import { AppPersonaDashboardCrudComponent } from "./app-persona-dashboards/app-persona-dashboard-crud/app-persona-dashboard-crud.component";
@@ -115,6 +118,45 @@ const routes: Routes = [
                 data: {
                     breadcrumb: {
                         title: 'My Dashboard',
+                        stepbackCount: 1
+                    }
+                },
+            },
+            {
+                path: 'custom-dashboards',
+                component: AppCustomDashboardsComponent,
+                data: {
+                    breadcrumb: {
+                        title: 'Custom Dashboards'
+                    }
+                },
+            },
+            {
+                path: 'custom-dashboards/create',
+                component: AppCustomDashboardCrudComponent,
+                data: {
+                    breadcrumb: {
+                        title: 'Create',
+                        stepbackCount: 1
+                    }
+                },
+            },
+            {
+                path: 'custom-dashboards/:dashboardId/edit',
+                component: AppCustomDashboardCrudComponent,
+                data: {
+                    breadcrumb: {
+                        title: 'Edit',
+                        stepbackCount: 1
+                    }
+                },
+            },
+            {
+                path: 'custom-dashboards/:dashboardId/view',
+                component: AppCustomDashboardViewComponent,
+                data: {
+                    breadcrumb: {
+                        title: 'View',
                         stepbackCount: 1
                     }
                 },

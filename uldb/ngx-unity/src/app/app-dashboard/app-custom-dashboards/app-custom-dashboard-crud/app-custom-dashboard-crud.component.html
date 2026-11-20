@@ -1,0 +1,183 @@
+<!-- Title band: full width, white, green title (as in the design). -->
+<div class="bg-white border-bottom px-4 py-2">
+    <span class="wizard-title text-success">{{action}} Dashboard</span>
+</div>
+
+<div class="container-fluid px-3">
+    <!-- Stepper -->
+    <div class="d-flex justify-content-center mt-3 mb-2">
+        <div class="wizard-stepper d-flex">
+            <div *ngFor="let label of steps; let i = index; trackBy: trackByIndex"
+                class="wizard-step d-flex flex-column align-items-center text-center pointer-link"
+                [class.active]="currentStep === i + 1" [class.done]="isStepDone(i + 1)" (click)="goToStep(i + 1)">
+                <div class="wizard-step-num d-flex align-items-center justify-content-center">
+                    <i *ngIf="isStepDone(i + 1)" class="fas fa-check wizard-step-check"></i>{{i + 1}}
+                </div>
+                <div class="wizard-step-label mt-2">{{label}}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 1: Dashboard Basics -->
+    <ng-container *ngIf="currentStep === 1">
+        <div class="mb-3">
+            <h4 class="wizard-step-heading mb-1">Dashboard Basics</h4>
+            <p class="wizard-hint mb-0">Name the dashboard, describe what it's for, tag it with a category, and choose
+                who's allowed to view it.</p>
+        </div>
+        <div class="wizard-card bg-white border rounded shadow-sm px-4 pt-4 pb-2 mb-3">
+            <form class="form-horizontal" *ngIf="basicsForm" [formGroup]="basicsForm">
+                <div class="form-group text-center" *ngIf="nonFieldErr">
+                    <div class="invalid-credentials">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-2 col-form-label col-form-label-sm text-right wizard-label" for="name">
+                        Name<span class="text-danger">*</span> :</label>
+                    <div class="col-3">
+                        <input id="name" class="form-control form-control-sm" type="text"
+                            placeholder="e.g. Executive Overview Dashboard" formControlName="name"
+                            [ngClass]="{'is-invalid' : basicsFormErrors.name}">
+                        <div class="invalid-feedback" *ngIf="basicsFormErrors.name">{{basicsFormErrors.name}}</div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-2 col-form-label col-form-label-sm text-right wizard-label"
+                        for="description">Description :</label>
+                    <div class="col-8">
+                        <textarea id="description" class="form-control form-control-sm" rows="4"
+                            placeholder="Enter Description" formControlName="description"
+                            [ngClass]="{'is-invalid' : basicsFormErrors.description}"></textarea>
+                        <div class="invalid-feedback" *ngIf="basicsFormErrors.description">
+                            {{basicsFormErrors.description}}</div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-2 col-form-label col-form-label-sm text-right wizard-label">Category :</label>
+                    <div class="col-3">
+                        <multiselect-dropdown [options]="categories" [settings]="categorySettings"
+                            [texts]="categoryTexts" class="form-control form-control-sm p-0 h-auto"
+                            formControlName="categories" [ngClass]="{'is-invalid' : basicsFormErrors.categories}">
+                        </multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="basicsFormErrors.categories">
+                            {{basicsFormErrors.categories}}</div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-2 col-form-label col-form-label-sm text-right wizard-label">Roles
+                        <i class="fas fa-info-circle text-muted ml-1" container="body"
+                            tooltip="Anyone with this role can view the dashboard. Access is the union of Roles and Specific users."></i>
+                        :</label>
+                    <div class="col-3">
+                        <multiselect-dropdown [options]="roles" [settings]="roleSettings" [texts]="roleTexts"
+                            class="form-control form-control-sm p-0 h-auto" formControlName="roles"
+                            [ngClass]="{'is-invalid' : basicsFormErrors.roles}"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="basicsFormErrors.roles">{{basicsFormErrors.roles}}</div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-2 col-form-label col-form-label-sm text-right wizard-label">Specific users
+                        <i class="fas fa-info-circle text-muted ml-1" container="body"
+                            tooltip="These individuals can view the dashboard regardless of role. Access is the union of Roles and Specific users."></i>
+                        :</label>
+                    <div class="col-3">
+                        <multiselect-dropdown [options]="users" [settings]="userSettings" [texts]="userTexts"
+                            class="form-control form-control-sm p-0 h-auto" formControlName="specific_users"
+                            [ngClass]="{'is-invalid' : basicsFormErrors.specific_users}"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="basicsFormErrors.specific_users">
+                            {{basicsFormErrors.specific_users}}</div>
+                    </div>
+                </div>
+                <!-- The interval only matters while auto refresh is on, so it sits next to the switch. -->
+                <div class="form-group row">
+                    <label class="col-2 col-form-label col-form-label-sm text-right wizard-label" for="refresh">Auto
+                        Refresh :</label>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="refresh"
+                                    formControlName="refresh">
+                                <label class="custom-control-label wizard-switch-label" for="refresh">
+                                    {{basicsForm.get('refresh').value ? 'Enabled' : 'Disabled'}}</label>
+                            </div>
+                            <ng-container *ngIf="basicsForm.get('refresh').value">
+                                <label class="col-form-label-sm wizard-label mb-0 ml-4 mr-2"
+                                    for="refresh_interval_in_sec">Every<span class="text-danger">*</span> :</label>
+                                <select id="refresh_interval_in_sec" class="form-control form-control-sm w-auto"
+                                    formControlName="refresh_interval_in_sec"
+                                    [ngClass]="{'is-invalid' : basicsFormErrors.refresh_interval_in_sec}">
+                                    <option [ngValue]="null" disabled>Select Interval</option>
+                                    <option *ngFor="let interval of refreshIntervals; trackBy: trackByIndex"
+                                        [ngValue]="interval.valueInSecs">{{interval.label}}</option>
+                                </select>
+                            </ng-container>
+                        </div>
+                        <div class="text-danger font-xs mt-1"
+                            *ngIf="basicsForm.get('refresh').value && basicsFormErrors.refresh_interval_in_sec">
+                            {{basicsFormErrors.refresh_interval_in_sec}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </ng-container>
+
+    <!-- Step 2: Smart Panel -->
+    <app-custom-dashboard-panels *ngIf="currentStep === 2 && dashboard" [dashboard]="dashboard"
+        (dashboardChange)="onDashboardChange($event)"></app-custom-dashboard-panels>
+
+    <!-- Step 3: Global Filters -->
+    <app-custom-dashboard-global-filters *ngIf="currentStep === 3 && dashboard" [dashboard]="dashboard">
+    </app-custom-dashboard-global-filters>
+
+    <!-- Step 4: Review & Publish -->
+    <ng-container *ngIf="currentStep === 4 && dashboard">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h4 class="wizard-step-heading mb-1"><i class="fas fa-eye text-primary mr-2"></i>Live Panel Previews
+                    ({{reviewPanels.length}} {{reviewPanels.length === 1 ? 'Panel' : 'Panels'}})</h4>
+                <p class="wizard-hint mb-0">Below is the live presentation of all your configured Smart Panels, using
+                    the timeframe and global filter defaults.</p>
+            </div>
+            <span *ngIf="review?.ready" class="badge badge-pill badge-success px-3 py-2">
+                <i class="fas fa-check-circle mr-1"></i>Ready to publish</span>
+        </div>
+
+        <div *ngIf="review && !review.publishing?.available" class="alert alert-warning py-2">
+            <i class="fas fa-exclamation-triangle mr-1"></i>Publishing is not available:
+            {{review.publishing?.reason || 'please try again later.'}}
+        </div>
+        <div *ngIf="review && !review.ready && review.errors?.length" class="alert alert-warning py-2">
+            <div class="font-weight-bold mb-1">Resolve these before publishing:</div>
+            <ul class="mb-0 pl-3">
+                <li *ngFor="let e of review.errors; trackBy: trackByIndex">{{e.message}}</li>
+            </ul>
+        </div>
+        <div *ngIf="publishErrors.length" class="alert alert-danger py-2">
+            <div class="font-weight-bold mb-1">The dashboard could not be published:</div>
+            <ul class="mb-0 pl-3">
+                <li *ngFor="let e of publishErrors; trackBy: trackByIndex">{{e.message}}</li>
+            </ul>
+        </div>
+
+        <div *ngIf="!reviewPanels.length" class="card shadow-sm">
+            <div class="card-body text-center text-muted py-5">No panels yet. Add one in the Smart Panel step.</div>
+        </div>
+        <div class="row">
+            <div *ngFor="let panel of reviewPanels; trackBy: trackByPanel" class="mb-3"
+                [ngClass]="getPanelColumnClass(panel)">
+                <app-custom-dashboard-panel-preview [panel]="panel" [timeframe]="dashboard.timeframe"
+                    [filters]="panelFilters[panel.id]" [showTitle]="true"></app-custom-dashboard-panel-preview>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Footer -->
+    <div class="d-flex justify-content-center my-4">
+        <button class="btn btn-md btn-outline-danger px-4" type="button" (click)="onBack()">
+            {{currentStep === 1 ? 'Cancel' : 'Back'}}</button>
+        <button class="btn btn-md btn-outline-danger px-4 ml-2" type="button" (click)="onSaveAsDraft()">Save as
+            Draft</button>
+        <button class="btn btn-md btn-primary px-4 ml-2" type="button" (click)="onNext()"
+            [disabled]="currentStep === 4 && !canPublish()">
+            {{currentStep === 4 ? 'Publish Dashboard' : 'Next'}}</button>
+    </div>
+</div>

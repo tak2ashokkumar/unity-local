@@ -1,0 +1,31 @@
+{
+  "_comment": "Zabbix item templates per resource_type. The mock route turns them into monitoring/items for each monitored resource in resources.json (item_id is derived per resource). unit is only used by the mock to generate chart values; the real items API does not return it.",
+  "Instances": [
+    {
+      "name": "CPU utilization",
+      "key": "oci.compute.cpu_utilization",
+      "value_type": 0,
+      "unit": "%"
+    },
+    {
+      "name": "Memory utilization",
+      "key": "oci.compute.memory_utilization",
+      "value_type": 0,
+      "unit": "%"
+    }
+  ],
+  "Buckets": [
+    {
+      "name": "Stored bytes",
+      "key": "oci.objectstorage.stored_bytes",
+      "value_type": 3,
+      "unit": "B"
+    },
+    {
+      "name": "Object count",
+      "key": "oci.objectstorage.object_count",
+      "value_type": 3,
+      "unit": ""
+    }
+  ]
+}

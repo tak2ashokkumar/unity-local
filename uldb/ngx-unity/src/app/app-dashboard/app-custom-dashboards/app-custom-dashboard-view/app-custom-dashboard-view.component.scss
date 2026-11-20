@@ -1,0 +1,369 @@
+// Look and spacing follow the default dashboards (Navigator Central, Public Cloud Compute).
+// Flex layout comes from Bootstrap classes in the template; this file only holds the
+// spacing, sizes and colours those dashboards use.
+
+:host {
+  display: block;
+}
+
+.custom-dashboard-view {
+  color: #202a33;
+  background: #f4f3ef;
+  font-size: 13px;
+}
+
+// ---------- Top bar ----------
+
+.dashboard-topbar {
+  gap: 12px;
+  padding: 8px 16px 7px;
+  background: #ffffff;
+  border-bottom: 1px solid #cfd6dc;
+}
+
+// Takes the remaining width so long names / scopes never push the actions off the bar.
+.topbar-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dashboard-title {
+  color: #00ad73;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.dashboard-subtitle {
+  color: #7b8794;
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.scope-summary {
+  gap: 3px;
+}
+
+.scope-separator {
+  margin: 0 3px;
+}
+
+.scope-more-count {
+  color: #1f7ed0;
+  cursor: default;
+  font-weight: 600;
+}
+
+.scope-popover-list {
+  max-width: 240px;
+  max-height: 180px;
+  overflow-y: auto;
+  color: #202a33;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.scope-popover-item + .scope-popover-item {
+  margin-top: 4px;
+}
+
+.topbar-right {
+  flex: 0 0 auto;
+}
+
+.dashboard-filter-actions {
+  gap: 6px;
+  padding-left: 3px;
+}
+
+// ---------- Global filters: up to 3 in the title bar ----------
+
+.filter-loading-surface {
+  position: relative;
+  width: 480px;
+  min-height: 28px;
+}
+
+.dashboard-filters {
+  gap: 6px;
+  margin: 0;
+}
+
+.filter-control {
+  width: 142px;
+}
+
+.dashboard-action-separator {
+  width: 1px;
+  height: 26px;
+  background: #b8c2cc;
+  margin: 0 4px 0 8px;
+}
+
+// ---------- Global filters: more than 3 in their own bar ----------
+
+// A white strip under the title bar; the filters sit in an even grid that wraps cleanly.
+.dashboard-filter-bar {
+  position: relative;
+  margin: 0;
+  padding: 6px 16px 2px;
+  background: #ffffff;
+  border-bottom: 1px solid #cfd6dc;
+}
+
+.filter-cell {
+  margin-bottom: 6px;
+}
+
+.filter-label {
+  display: block;
+  max-width: 100%;
+  margin: 0 0 2px;
+  font-size: 11px;
+  line-height: 13px;
+  color: #202a33;
+}
+
+.dashboard-multiselect {
+  height: 28px;
+  padding: 0;
+  background: #ffffff;
+  border-color: #b8c2cc;
+}
+
+:host ::ng-deep .dashboard-multiselect {
+  .dropdown {
+    width: 100%;
+  }
+
+  .btn {
+    height: 26px;
+    min-height: 26px;
+    padding: 3px 8px;
+    border: 0;
+    box-shadow: none;
+    color: #5b6672;
+    background: #ffffff;
+    font-size: 12px;
+  }
+
+  .dropdown-menu {
+    min-width: 190px;
+    font-size: 12px;
+    z-index: 2050;
+  }
+}
+
+.round-action-btn {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #ff8900;
+  margin-bottom: 0;
+}
+
+// ---------- Loaders ----------
+
+:host ::ng-deep .custom-dashboard-view app-spinner .spinner-wrapper {
+  background: rgba(255, 255, 255, 0.72);
+  opacity: 1;
+  border-radius: inherit;
+}
+
+:host ::ng-deep .custom-dashboard-view app-spinner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:host ::ng-deep .custom-dashboard-view app-spinner .wave-spinner > div {
+  background-color: #ff8900 !important;
+}
+
+// ---------- Content ----------
+
+.dashboard-content {
+  padding: 8px 16px 18px;
+  background: #f4f3ef;
+}
+
+.dashboard-no-data-state {
+  min-height: calc(100vh - 58px);
+  padding: 24px;
+  color: #6c757d;
+  font-size: 14px;
+  text-align: center;
+  background: #f4f3ef;
+}
+
+// Panel header (one per panel section).
+.section-title {
+  min-height: 34px;
+  margin-bottom: 0.3rem;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e252c;
+  line-height: 18px;
+}
+
+.panel-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// A panel's own filters sit in its header, next to the view toggle, on the same line.
+.panel-filters {
+  gap: 10px;
+  margin: 0;
+  font-weight: 400;
+}
+
+.panel-filter-select {
+  width: 160px;
+}
+
+.dashboard-card {
+  // Reserve height so every panel card keeps a proper size while loading (spinner only) and in the empty state.
+  min-height: 300px;
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #cbd3da;
+  border-radius: 7px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+// No inner padding: the panel content uses the whole card.
+.panel-card {
+  overflow: hidden;
+}
+
+// Rounded segmented view toggle, matching the Public Cloud Compute Dashboard look.
+.public-cloud-view-toggle {
+  padding: 2px;
+  border: 1px solid #c7d2dd;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.public-cloud-view-toggle-btn {
+  min-width: 92px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #68798a;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+.public-cloud-view-toggle-btn--active {
+  background: #2f86de;
+  color: #ffffff;
+}
+
+// Widgets sit edge to edge in the card. Each one draws a line on its right and bottom; the row
+// is pulled out by 1px so the card (overflow hidden) clips the lines on its outer edges, which
+// leaves only the dividers between widgets.
+.panel-widget-row {
+  margin: 0 -1px -1px 0;
+}
+
+.panel-widget {
+  height: 100%;
+  background: #ffffff;
+  border-right: 1px solid #e9edf1;
+  border-bottom: 1px solid #e9edf1;
+}
+
+.capacity-chart-title {
+  padding: 9px 14px;
+  background: #f7f8fa;
+  border-bottom: 1px solid #e9edf1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2b3441;
+}
+
+.capacity-chart-subtitle {
+  color: #7a8391;
+  font-size: 11px;
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.panel-chart-body {
+  position: relative;
+  min-height: 260px;
+}
+
+.kpi-tile {
+  min-width: 140px;
+  margin: 8px;
+  padding: 12px 16px;
+  border: 1px solid #e3e8ed;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.kpi-value {
+  color: #2588df;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.kpi-unit {
+  margin-left: 4px;
+  color: #708092;
+  font-size: 12px;
+}
+
+.kpi-label {
+  color: #708092;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.widget-no-data {
+  min-height: 166px;
+  color: #6c757d;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+// Table view of a panel.
+.panel-table-body {
+  position: relative;
+  min-height: 298px;
+}
+
+.panel-table-wrap {
+  max-height: 360px;
+  overflow: auto;
+}
+
+.panel-metric-table {
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #f2f5f8;
+    color: #46525f;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-top: none;
+  }
+
+  td {
+    color: #333f4a;
+    font-size: 13px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,202 @@
+<div class="custom-dashboard-view">
+    <!-- Top bar: name, a refresh line (always one line) and the applied scope; actions on the right. -->
+    <div class="dashboard-topbar d-flex justify-content-between align-items-center">
+        <div class="topbar-info">
+            <div class="dashboard-title text-truncate" [tooltip]="dashboard?.name" container="body">
+                {{dashboard?.name || 'Custom Dashboard'}}</div>
+            <div class="dashboard-subtitle text-nowrap">
+                Refreshed: {{refreshedText || 'Loading'}}
+                <span class="scope-separator">|</span>Auto Refresh: {{refreshLabel || 'Loading'}}
+                <ng-container *ngIf="refreshCountdown"> (next in {{getCountdownLabel()}})</ng-container>
+            </div>
+            <div class="dashboard-subtitle">
+                Scope:
+                <ng-container *ngIf="filterForm; else pendingScope">
+                    <ng-container *ngIf="scopeSummaries.length; else allScope">
+                        <ng-container *ngFor="let summary of scopeSummaries; let last = last; trackBy: trackByIndex">
+                            <ng-container *ngTemplateOutlet="filterScopeSummaryTmpl; context: { summary: summary }"></ng-container>
+                            <span class="scope-separator" *ngIf="!last">|</span>
+                        </ng-container>
+                    </ng-container>
+                    <ng-template #allScope>All</ng-template>
+                </ng-container>
+                <ng-template #pendingScope>{{dashboardUnavailable ? 'No data available' : 'Loading filters'}}</ng-template>
+            </div>
+        </div>
+        <div class="topbar-right d-flex align-items-end">
+            <div class="filter-loading-surface" *ngIf="!filterForm && !dashboardUnavailable">
+                <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
+            </div>
+            <!-- Up to 3 global filters sit here in the title bar, as in the default dashboards. -->
+            <form class="dashboard-filters d-flex align-items-end" *ngIf="filterForm && topFilters.length && inlineFilters"
+                [formGroup]="filterForm">
+                <div class="filter-control" *ngFor="let filter of topFilters; trackBy: trackByFilter">
+                    <label class="filter-label text-truncate" [title]="filter.label">{{filter.label}}</label>
+                    <multiselect-dropdown [options]="filter.options" [settings]="getMultiselectSettings(filter)"
+                        [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
+                        [formControlName]="filter.key">
+                    </multiselect-dropdown>
+                </div>
+                <button class="round-action-btn d-inline-flex align-items-center justify-content-center" type="button"
+                    (click)="applyFilters()" [tooltip]="'Apply Filters'" container="body">
+                    <i class="fas fa-filter"></i>
+                </button>
+                <span class="dashboard-action-separator"></span>
+            </form>
+            <div class="dashboard-filter-actions d-flex align-items-center">
+                <button class="round-action-btn d-inline-flex align-items-center justify-content-center" type="button"
+                    (click)="refreshFilters()" [tooltip]="dashboardUnavailable ? 'Reload' : 'Reset Filters'"
+                    container="body">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button *ngIf="!dashboardUnavailable"
+                    class="round-action-btn d-inline-flex align-items-center justify-content-center" type="button"
+                    (click)="goToEdit()" [tooltip]="'Edit Dashboard'" container="body" accessControl
+                    moduleName="Dashboard" accessType="Manage Dashboard" elementType="btn">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+                <button class="round-action-btn d-inline-flex align-items-center justify-content-center" type="button"
+                    (click)="goBack()" [tooltip]="'Go Back'" container="body">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- More than 3 global filters: their own bar, in an even grid, applied with the Apply button. -->
+    <form class="dashboard-filter-bar" *ngIf="filterForm && topFilters.length && !inlineFilters" [formGroup]="filterForm">
+        <div class="form-row align-items-end">
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 filter-cell"
+                *ngFor="let filter of topFilters; trackBy: trackByFilter">
+                <label class="filter-label text-truncate" [title]="filter.label">{{filter.label}}</label>
+                <multiselect-dropdown [options]="filter.options" [settings]="getMultiselectSettings(filter)"
+                    [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
+                    [formControlName]="filter.key">
+                </multiselect-dropdown>
+            </div>
+            <div class="col-auto filter-cell">
+                <button class="round-action-btn d-inline-flex align-items-center justify-content-center"
+                    type="button" (click)="applyFilters()" [tooltip]="'Apply Filters'" container="body">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <ng-template #filterScopeSummaryTmpl let-summary="summary">
+        <span class="scope-summary d-inline-flex align-items-center">
+            <span>{{summary.primaryLabel}}</span>
+            <span class="scope-more-count" *ngIf="summary.remainingLabels.length" [popover]="scopePopoverTmpl"
+                [popoverContext]="{ labels: summary.remainingLabels }" triggers="mouseenter:mouseleave"
+                placement="bottom" container="body">
+                +{{summary.remainingLabels.length}}
+            </span>
+        </span>
+    </ng-template>
+
+    <ng-template #scopePopoverTmpl let-labels="labels">
+        <div class="scope-popover-list">
+            <div class="scope-popover-item" *ngFor="let label of labels; trackBy: trackByIndex">{{label}}</div>
+        </div>
+    </ng-template>
+
+    <div class="dashboard-no-data-state d-flex align-items-center justify-content-center" *ngIf="dashboardUnavailable">No data available</div>
+
+    <div class="dashboard-content" *ngIf="filterForm && !dashboardUnavailable">
+        <div class="dashboard-no-data-state d-flex align-items-center justify-content-center" *ngIf="!panelViews.length">No data available</div>
+        <div class="row" *ngIf="panelViews.length">
+            <!-- Each panel is one section; the section wrapper (column) owns the gap below it. -->
+            <div *ngFor="let view of panelViews; trackBy: trackByPanel" class="mb-3" [ngClass]="view.columnClass">
+                <div class="d-flex align-items-center justify-content-between section-title">
+                    <span class="panel-title" [tooltip]="view.title" container="body">{{view.title}}</span>
+                    <div class="d-flex align-items-center">
+                        <!-- The panel's own filters: label beside the dropdown so the header stays one line. -->
+                        <form class="panel-filters d-flex align-items-center" *ngIf="view.filters.length"
+                            [formGroup]="view.filterForm">
+                            <div class="panel-filter-control d-flex align-items-center"
+                                *ngFor="let filter of view.filters; trackBy: trackByFilter">
+                                <label class="filter-label mb-0 mr-2 text-nowrap">{{filter.label}}</label>
+                                <multiselect-dropdown [options]="filter.options" [settings]="getMultiselectSettings(filter)"
+                                    [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect panel-filter-select"
+                                    [formControlName]="filter.key">
+                                </multiselect-dropdown>
+                            </div>
+                            <button class="round-action-btn d-inline-flex align-items-center justify-content-center"
+                                type="button" (click)="applyPanelFilters(view)" [tooltip]="'Apply Panel Filters'"
+                                container="body">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </form>
+                        <div class="public-cloud-view-toggle d-inline-flex align-items-center ml-3"
+                            *ngIf="view.viewMode === 'both'" role="group" aria-label="Switch panel view">
+                            <button type="button" class="public-cloud-view-toggle-btn"
+                                [class.public-cloud-view-toggle-btn--active]="view.activeView === 'table'"
+                                (click)="setPanelView(view, 'table')">
+                                Table View
+                            </button>
+                            <button type="button" class="public-cloud-view-toggle-btn"
+                                [class.public-cloud-view-toggle-btn--active]="view.activeView === 'chart'"
+                                (click)="setPanelView(view, 'chart')">
+                                Chart View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card panel-card">
+                    <ng-container *ngIf="view.activeView === 'chart'">
+                        <div class="widget-no-data d-flex align-items-center justify-content-center" *ngIf="!view.widgets.length">No data available</div>
+                        <!-- Widgets fill the card edge to edge; thin lines divide them when there are several. -->
+                        <div class="row no-gutters panel-widget-row" *ngIf="view.widgets.length">
+                            <div *ngFor="let widget of view.widgets; trackBy: trackByWidget"
+                                [ngClass]="view.widgets.length > 1 ? 'col-xl-6' : 'col-12'">
+                                <div class="panel-widget">
+                                    <div class="capacity-chart-title">{{widget.title}}
+                                        <span class="capacity-chart-subtitle">{{widget.chartTypeLabel}}</span>
+                                    </div>
+                                    <div class="panel-chart-body">
+                                        <app-spinner [name]="widget.loader" [width]="0"></app-spinner>
+                                        <div *ngIf="widget.chartData" echarts [options]="widget.chartData.options"
+                                            [extentions]="widget.chartData.extensions" [defaultHeight]="260"></div>
+                                        <div *ngIf="widget.kpiValues.length" class="kpi-row d-flex flex-wrap justify-content-center">
+                                            <div *ngFor="let kpi of widget.kpiValues; trackBy: trackByIndex" class="kpi-tile">
+                                                <div class="kpi-value">{{kpi.value}}<small class="kpi-unit">{{kpi.unit}}</small></div>
+                                                <div class="kpi-label">{{kpi.label}}</div>
+                                            </div>
+                                        </div>
+                                        <div class="widget-no-data d-flex align-items-center justify-content-center" *ngIf="widget.message">{{widget.message}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Time-series grid: one row per time bucket and up to 20 metric columns. It is a
+                         deliberately wide, horizontally scrolling table (column count varies with the
+                         panel), so the column-sizing directives are not used here. -->
+                    <div *ngIf="view.activeView === 'table'" class="panel-table-body">
+                        <app-spinner [name]="view.tableLoader" [width]="0"></app-spinner>
+                        <div class="widget-no-data d-flex align-items-center justify-content-center" *ngIf="view.tableMessage">{{view.tableMessage}}</div>
+                        <div class="panel-table-wrap" *ngIf="view.table.rows.length">
+                            <table class="table table-sm panel-metric-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">Time</th>
+                                        <th *ngFor="let header of view.table.headers; trackBy: trackByIndex"
+                                            class="text-nowrap">{{header}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of view.table.rows; trackBy: trackByRow">
+                                        <td class="text-nowrap">{{row.time}}</td>
+                                        <td *ngFor="let value of row.values; trackBy: trackByIndex" class="text-nowrap">
+                                            {{value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -253,6 +253,12 @@ if (fs.existsSync(celeryDir)) {
   });
 }
 
+// Custom Dashboard: in-memory CRUD + panel operations (see utils/analyticsDashboards.js).
+require("./utils/analyticsDashboards")(app);
+
+// Public Cloud resources + their monitoring items, with filters (see utils/publicCloudResources.js).
+require("./utils/publicCloudResources")(app);
+
 app.get("/task/:id/", (req, res) => {
   res.json(getTask(req.params.id));
 });

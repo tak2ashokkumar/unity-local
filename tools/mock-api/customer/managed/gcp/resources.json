@@ -1,0 +1,74 @@
+[
+  {
+    "name": "gke-node-pool-a1",
+    "region": "us-central1",
+    "resource_type": "VM instances",
+    "service": "Compute",
+    "tags": {},
+    "account_name": "GCP",
+    "uuid": "9a8b7c6d-5e4f-4a3b-8c2d-000000000501",
+    "account": 224,
+    "account_uuid": "e29aacbd-de3e-487e-8d0d-3a6aff8b7975",
+    "status": "RUNNING",
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "name": "ci-runner-02",
+    "region": "us-central1",
+    "resource_type": "VM instances",
+    "service": "Compute",
+    "tags": {},
+    "account_name": "GCP",
+    "uuid": "9a8b7c6d-5e4f-4a3b-8c2d-000000000502",
+    "account": 224,
+    "account_uuid": "e29aacbd-de3e-487e-8d0d-3a6aff8b7975",
+    "status": "RUNNING",
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "name": "legacy-app-03",
+    "region": "us-central1",
+    "resource_type": "VM instances",
+    "service": "Compute",
+    "tags": {},
+    "account_name": "GCP",
+    "uuid": "9a8b7c6d-5e4f-4a3b-8c2d-000000000503",
+    "account": 224,
+    "account_uuid": "e29aacbd-de3e-487e-8d0d-3a6aff8b7975",
+    "status": "TERMINATED",
+    "monitoring": {
+      "configured": false,
+      "enabled": false,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "name": "gke-node-pool-a1-disk",
+    "region": "us-central1",
+    "resource_type": "Disk",
+    "service": "Compute",
+    "tags": {},
+    "account_name": "GCP",
+    "uuid": "9a8b7c6d-5e4f-4a3b-8c2d-000000000601",
+    "account": 224,
+    "account_uuid": "e29aacbd-de3e-487e-8d0d-3a6aff8b7975",
+    "status": "READY",
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    }
+  }
+]

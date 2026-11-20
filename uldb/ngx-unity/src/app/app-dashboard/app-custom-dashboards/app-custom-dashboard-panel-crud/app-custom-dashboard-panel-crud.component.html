@@ -1,0 +1,168 @@
+<form [formGroup]="panelForm" *ngIf="panelForm">
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="form-group">
+                <label class="font-weight-bold text-body mb-1" for="panelTitle{{panelNumber}}">Panel Heading :</label>
+                <input id="panelTitle{{panelNumber}}" type="text" class="form-control form-control-sm text-body"
+                    formControlName="title" placeholder="Enter panel heading"
+                    [ngClass]="{'is-invalid' : panelFormErrors.title}">
+                <div class="invalid-feedback" *ngIf="panelFormErrors.title">{{panelFormErrors.title}}</div>
+            </div>
+            <div class="form-group d-flex align-items-center">
+                <label class="font-weight-bold text-body mb-0 mr-3 panel-label">Panel Width
+                    <i class="fas fa-info-circle text-muted ml-1"
+                        tooltip="Choose how much width of the dashboard row this panel occupies." container="body"></i>
+                    :</label>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button *ngFor="let w of widths; trackBy: trackByIndex" type="button" class="btn px-3"
+                        [ngClass]="panelForm.get('width').value === w ? 'btn-primary' : 'btn-outline-secondary text-body'"
+                        (click)="setWidth(w)">{{w}}%</button>
+                </div>
+            </div>
+            <div class="form-group d-flex align-items-center">
+                <label class="font-weight-bold text-body mb-0 mr-3 panel-label">Panel View Mode :</label>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button *ngFor="let m of viewModes; trackBy: trackByIndex" type="button" class="btn px-3"
+                        [ngClass]="panelForm.get('view_mode').value === m.value ? 'btn-primary' : 'btn-outline-secondary text-body'"
+                        (click)="setViewMode(m.value)">{{m.label}}</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <app-custom-dashboard-panel-preview [panel]="previewPanel" [timeframe]="dashboard?.timeframe">
+            </app-custom-dashboard-panel-preview>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs mt-3">
+        <li class="nav-item">
+            <a class="nav-link pointer-link text-body" [class.active]="activeTab === 'datascope'"
+                [class.font-weight-bold]="activeTab === 'datascope'" (click)="setTab('datascope')">
+                Data Scope <span class="badge badge-success ml-1" tooltip="Selected metrics"
+                    container="body">{{dataScopeCount}}</span>
+                <i *ngIf="hasTabError('datascope')" class="fas fa-exclamation-circle text-danger ml-1"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link pointer-link text-body" [class.active]="activeTab === 'table'"
+                [class.font-weight-bold]="activeTab === 'table'" (click)="setTab('table')">Table View
+                <i *ngIf="hasTabError('table')" class="fas fa-exclamation-circle text-danger ml-1"></i></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link pointer-link text-body" [class.active]="activeTab === 'chart'"
+                [class.font-weight-bold]="activeTab === 'chart'" (click)="setTab('chart')">Chart View
+                <i *ngIf="hasTabError('chart')" class="fas fa-exclamation-circle text-danger ml-1"></i></a>
+        </li>
+    </ul>
+
+    <div class="border border-top-0 rounded-bottom p-3 bg-white">
+        <!-- Data Scope: kept alive (hidden, not removed) so its selection and lookups survive tab switches. -->
+        <app-custom-dashboard-data-scope [ngClass]="activeTab === 'datascope' ? 'd-block' : 'd-none'"
+            [sources]="initialSources" [metrics]="initialMetrics" [submitted]="submitted"
+            (scopeChange)="onScopeChange($event)"></app-custom-dashboard-data-scope>
+
+        <!-- Table View -->
+        <ng-container *ngIf="activeTab === 'table'">
+            <h6 class="font-weight-bold text-body mb-1">Table Columns</h6>
+            <p class="text-muted font-sm mb-3">One column per selected metric and device. Rename the header, hide a
+                column or make it sortable.</p>
+            <div *ngIf="submitted && panelErrors.columns" class="text-danger font-sm mb-2">{{panelErrors.columns}}</div>
+            <div *ngIf="!tableColumns.length" class="text-muted text-center py-4">Select metrics in Data Scope first.</div>
+            <table *ngIf="tableColumns.length" class="table table-sm text-left mb-0" formArrayName="table_columns">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Show</th>
+                        <th>Column Header</th>
+                        <th>Metric</th>
+                        <th>Sortable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let column of tableColumns.controls; let i = index; trackBy: trackByIndex"
+                        [formGroupName]="i" truncateText>
+                        <td class="checkbox-column">
+                            <input type="checkbox" [checked]="!column.get('hidden').value" aria-label="Show column"
+                                (change)="toggleColumnVisibility($any(column), $any($event.target).checked)">
+                        </td>
+                        <td class="tdw-40">
+                            <div>
+                                <input type="text" class="form-control form-control-sm" formControlName="header"
+                                    [ngClass]="{'is-invalid' : submitted && column.get('header').invalid}">
+                                <div class="invalid-feedback" *ngIf="submitted && column.get('header').invalid">
+                                    Column header is required</div>
+                            </div>
+                        </td>
+                        <td class="tdw-45">
+                            <div [tooltip]="getColumnMetricLabel(column.get('metric_key').value)">
+                                {{getColumnMetricLabel(column.get('metric_key').value)}}</div>
+                        </td>
+                        <td class="tdw-15">
+                            <div><input type="checkbox" formControlName="sortable"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </ng-container>
+
+        <!-- Chart View -->
+        <ng-container *ngIf="activeTab === 'chart'">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h6 class="font-weight-bold text-body mb-1">Widgets</h6>
+                    <p class="text-muted font-sm mb-0">Each widget is one chart built from the selected metrics.</p>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="addWidget()"
+                    [disabled]="!selectedMetrics.length"><i class="fas fa-plus mr-1"></i>Add Widget</button>
+            </div>
+            <div *ngIf="submitted && panelErrors.widgets" class="text-danger font-sm mb-2">{{panelErrors.widgets}}</div>
+            <div *ngIf="!widgets.length" class="text-muted text-center py-4">
+                {{selectedMetrics.length ? 'Click Add Widget to create a chart.' : 'Select metrics in Data Scope first.'}}</div>
+            <div formArrayName="widgets">
+                <div *ngFor="let widget of widgets.controls; let i = index; trackBy: trackByIndex" [formGroupName]="i"
+                    class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="font-weight-bold text-primary">Widget {{i + 1}}</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeWidget(i)"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <label class="text-body font-weight-bold font-sm mb-1">Chart Type</label>
+                    <div class="d-flex flex-wrap mb-2">
+                        <label *ngFor="let t of chartTypes; trackBy: trackByIndex"
+                            class="btn btn-sm mr-2 mb-1 pointer-link"
+                            [ngClass]="widget.get('chart_type').value === t.value ? 'btn-primary' : 'btn-outline-secondary text-body'">
+                            <input type="radio" class="d-none" formControlName="chart_type" [value]="t.value"
+                                (change)="onChartTypeChange(i)">
+                            <i class="mr-1" [ngClass]="t.icon"></i>{{t.label}}
+                        </label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 form-group" *ngIf="getVariants(widget.get('chart_type').value).length">
+                            <label class="text-body font-weight-bold font-sm mb-1">Variant</label>
+                            <select class="form-control form-control-sm" formControlName="variant">
+                                <option [ngValue]="''">Default</option>
+                                <option *ngFor="let v of getVariants(widget.get('chart_type').value); trackBy: trackByIndex"
+                                    [ngValue]="v">{{v}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <label class="text-body font-weight-bold font-sm mb-1">Metrics<em>*</em></label>
+                            <multiselect-dropdown [options]="metricSelectOptions" [settings]="metricSettings"
+                                class="form-control form-control-sm p-0 h-auto" formControlName="metric_keys"
+                                [ngClass]="{'is-invalid' : submitted && widget.get('metric_keys').invalid}">
+                            </multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="submitted && widget.get('metric_keys').invalid">
+                                Select at least one metric for this widget.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <div class="d-flex justify-content-end align-items-center mt-3">
+        <span *ngIf="isDirty() || isNew()" class="text-warning font-sm mr-3"><i
+                class="fas fa-exclamation-circle mr-1"></i>{{isNew() ? 'Not saved yet' : 'Unsaved changes'}}</span>
+        <button type="button" class="btn btn-success" (click)="savePanel()"><i class="fas fa-save mr-1"></i>Save
+            Panel</button>
+    </div>
+</form>

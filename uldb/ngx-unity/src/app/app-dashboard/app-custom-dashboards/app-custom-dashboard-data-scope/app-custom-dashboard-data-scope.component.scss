@@ -1,0 +1,81 @@
+// Small uppercase box titles, as in the design.
+.scope-box-title {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #57606f;
+}
+
+// Every box keeps the same height; its list scrolls inside.
+.scope-box {
+    min-height: 260px;
+}
+
+.scope-box-list {
+    max-height: 210px;
+    overflow-y: auto;
+}
+
+// Devices table scrolls under a sticky header.
+.device-table-wrap {
+    max-height: 170px;
+    overflow-y: auto;
+
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: #f0f3f5;
+        border-top: 0;
+    }
+}
+
+// Clear (x) button inside the search inputs.
+.search-clear {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    line-height: 1;
+}
+
+.metric-search {
+    width: 220px;
+}
+
+.metric-category-list {
+    width: 170px;
+    min-width: 170px;
+    max-height: 210px;
+    overflow-y: auto;
+}
+
+.metric-list {
+    max-height: 210px;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+.metric-row:hover,
+.metric-row-active {
+    background-color: #f5f7fa;
+}
+
+.metric-details {
+    width: 220px;
+    min-width: 220px;
+    max-height: 210px;
+    overflow-y: auto;
+    word-break: break-word;
+}
+
+// Arrow buttons between Metrics and Selected (count badge above the arrow).
+.move-btn {
+    width: 40px;
+    min-height: 42px;
+}
+
+.aggregation-select {
+    max-width: 80px;
+}

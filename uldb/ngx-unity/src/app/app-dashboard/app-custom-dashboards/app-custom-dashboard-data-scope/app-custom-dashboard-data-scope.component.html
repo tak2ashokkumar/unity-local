@@ -1,0 +1,369 @@
+<h6 class="font-weight-bold text-body mb-1">Metrics Mapping</h6>
+<p class="text-muted font-sm mb-3">Metrics are only available for devices already configured for monitoring in
+    UnityOne. Pick data sources and device types, select devices, then move the metrics you need to Selected.</p>
+
+<div *ngIf="submitted && getValidationError()" class="alert alert-danger py-2 font-sm">
+    <i class="fas fa-exclamation-circle mr-1"></i>{{getValidationError()}}</div>
+
+<!-- Row 1: Data Source / Device Type / Devices -->
+<div class="row">
+    <!-- Data Source -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="border rounded bg-white p-2 h-100 d-flex flex-column scope-box">
+            <label class="d-flex align-items-center pb-2 mb-0 border-bottom pointer-link">
+                <input type="checkbox" class="mr-2" [checked]="areAllSelected(getAllScopes())"
+                    [indeterminate]="areSomeSelected(getAllScopes())" [disabled]="!getAllScopes().length"
+                    (change)="toggleAllScopes($any($event.target))">
+                <span class="scope-box-title">Data Source</span>
+            </label>
+            <div class="pt-2 flex-grow-1 scope-box-list">
+                <div *ngFor="let node of sourceNodes; trackBy: trackByNode" class="mb-2">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <label class="d-flex align-items-center mb-0 font-weight-bold text-body pointer-link">
+                            <input type="checkbox" class="mr-2" [checked]="areAllSelected(getNodeScopes(node))"
+                                [indeterminate]="areSomeSelected(getNodeScopes(node))"
+                                [disabled]="!getNodeScopes(node).length"
+                                (change)="toggleNode(node, $any($event.target))">
+                            {{node.label}}
+                        </label>
+                        <button type="button" class="btn btn-link btn-sm p-0 px-1 text-muted"
+                            [attr.aria-label]="(node.expanded ? 'Collapse ' : 'Expand ') + node.label"
+                            (click)="node.expanded = !node.expanded">
+                            <i class="fas" [ngClass]="node.expanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i></button>
+                    </div>
+                    <div *ngIf="node.expanded" class="pl-3 pt-1">
+                        <div *ngIf="node.loading" class="text-muted font-xs"><i
+                                class="fas fa-spinner fa-spin mr-1"></i>Loading...</div>
+                        <div *ngIf="!node.loading && !node.groups.length" class="text-muted font-xs">
+                            {{node.kind === 'public_cloud' ? 'No public cloud accounts found.' : 'No ' + (node.label |
+                            lowercase) + ' sources found.'}}</div>
+                        <ng-container *ngFor="let group of node.groups; trackBy: trackByScopeGroup">
+                            <div *ngIf="group.label; else flatScopes" class="border-left pl-2 mb-2">
+                                <label class="d-flex align-items-center mb-1 font-weight-bold text-body pointer-link">
+                                    <input type="checkbox" class="mr-2"
+                                        [checked]="areAllSelected(getSelectableScopes(group.scopes))"
+                                        [indeterminate]="areSomeSelected(getSelectableScopes(group.scopes))"
+                                        [disabled]="!getSelectableScopes(group.scopes).length"
+                                        (change)="toggleScopes(getSelectableScopes(group.scopes), $any($event.target).checked)">
+                                    {{group.label}}
+                                </label>
+                                <div class="border-left ml-1 pl-3">
+                                    <ng-container *ngFor="let scope of group.scopes; trackBy: trackByScope">
+                                        <ng-container *ngTemplateOutlet="scopeRow; context: { $implicit: scope }">
+                                        </ng-container>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <ng-template #flatScopes>
+                                <ng-container *ngFor="let scope of group.scopes; trackBy: trackByScope">
+                                    <ng-container *ngTemplateOutlet="scopeRow; context: { $implicit: scope }">
+                                    </ng-container>
+                                </ng-container>
+                            </ng-template>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Type -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="border rounded bg-white p-2 h-100 d-flex flex-column scope-box">
+            <div class="d-flex align-items-center justify-content-between pb-2 border-bottom">
+                <label class="d-flex align-items-center mb-0 pointer-link">
+                    <input type="checkbox" class="mr-2" [checked]="areAllDeviceTypesSelected()"
+                        [indeterminate]="selectedDeviceTypes.length && !areAllDeviceTypesSelected()"
+                        [disabled]="!deviceTypeOptions.length" (change)="toggleAllDeviceTypes($any($event.target))">
+                    <span class="scope-box-title">Device Type</span>
+                </label>
+                <span class="badge badge-light border font-weight-normal"
+                    tooltip="A panel can use up to {{maxSources}} device types." container="body">
+                    {{selectedDeviceTypes.length}} / {{maxSources}} Selected</span>
+            </div>
+            <div class="pt-2 flex-grow-1 scope-box-list">
+                <div *ngIf="deviceTypesLoading" class="text-muted font-xs mb-2"><i
+                        class="fas fa-spinner fa-spin mr-1"></i>Loading...</div>
+                <div *ngIf="!deviceTypesLoading && !deviceTypeOptions.length" class="text-muted font-sm">
+                    {{selectedScopeIds.length ? 'No device types found for the selected data sources.' : 'Select a data source to list its device types.'}}
+                </div>
+                <label *ngFor="let option of deviceTypeOptions; trackBy: trackByDeviceType"
+                    class="d-flex align-items-center mb-2 pointer-link"
+                    [ngClass]="option.available ? 'text-body' : 'text-muted'"
+                    [tooltip]="option.available ? '' : (option.reason || 'This device type is not available.')"
+                    container="body">
+                    <input type="checkbox" class="mr-2 flex-shrink-0" [checked]="isDeviceTypeSelected(option)"
+                        [disabled]="!option.available" (change)="toggleDeviceType(option, $any($event.target))">
+                    <span class="flex-grow-1 text-truncate">{{option.label}}</span>
+                    <span class="text-muted font-xs ml-2 text-truncate">{{option.category}}{{hasMultipleKinds() ?
+                        ' - ' + getKindLabel(option.kind) : ''}}</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Devices -->
+    <div class="col-xl-6 mb-3">
+        <div class="border rounded bg-white p-2 h-100 d-flex flex-column scope-box">
+            <div class="d-flex align-items-center justify-content-between pb-2 border-bottom">
+                <div class="d-flex align-items-center">
+                    <span class="badge badge-light border font-weight-normal mr-1">{{devicesCount}}</span>
+                    <span class="scope-box-title">Devices</span>
+                </div>
+                <span class="badge badge-light border font-weight-normal"
+                    tooltip="A panel can use up to {{maxDevices}} devices." container="body">
+                    {{selectedDevices.length}} / {{maxDevices}} Selected</span>
+            </div>
+            <div class="d-flex flex-wrap align-items-center py-2 border-bottom">
+                <div class="position-relative flex-grow-1 mr-2 mb-1">
+                    <input type="text" class="form-control form-control-sm pr-4" placeholder="Search device..."
+                        aria-label="Search device" [(ngModel)]="deviceSearch" [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="onDeviceFilterChange()">
+                    <button *ngIf="deviceSearch" type="button" class="btn btn-link btn-sm p-0 text-muted search-clear"
+                        aria-label="Clear search" (click)="clearDeviceSearch()"><i class="fas fa-times"></i></button>
+                </div>
+                <select class="form-control form-control-sm w-auto mr-2 mb-1" aria-label="Device status"
+                    [(ngModel)]="deviceStatus" [ngModelOptions]="{standalone: true}" (ngModelChange)="onDeviceStatusChange()">
+                    <option *ngFor="let s of deviceStatuses; trackBy: trackByIndex" [ngValue]="s.value">{{s.label}}</option>
+                </select>
+                <select class="form-control form-control-sm w-auto mr-2 mb-1" aria-label="Device type"
+                    [(ngModel)]="deviceTypeFilter" [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="onDeviceFilterChange()">
+                    <option [ngValue]="'all'">All Device Types</option>
+                    <option *ngFor="let t of selectedDeviceTypes; trackBy: trackByIndex"
+                        [ngValue]="t.kind + '|' + t.device_type">{{getDeviceTypeLabel(t.device_type)}}</option>
+                </select>
+                <select class="form-control form-control-sm w-auto mb-1" aria-label="Device selection"
+                    [(ngModel)]="deviceSelectionFilter" [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="onDeviceFilterChange()">
+                    <option *ngFor="let s of deviceSelections; trackBy: trackByIndex" [ngValue]="s.value">{{s.label}}</option>
+                </select>
+            </div>
+            <div class="flex-grow-1 position-relative device-table-wrap">
+                <div *ngIf="devicesLoading" class="text-muted font-sm py-3 text-center"><i
+                        class="fas fa-spinner fa-spin mr-1"></i>Loading devices...</div>
+                <ng-container *ngIf="!devicesLoading">
+                    <table *ngIf="filteredDevices.length" class="table table-sm table-hover text-left mb-0 font-sm">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-column">
+                                    <input type="checkbox" aria-label="Select all listed devices"
+                                        [checked]="areAllDevicesSelected()" [indeterminate]="areSomeDevicesSelected()"
+                                        (change)="toggleAllDevices($any($event.target))">
+                                </th>
+                                <th>Device Name</th>
+                                <th>Device Type</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let device of filteredDevices; trackBy: trackByDevice" truncateText>
+                                <td class="checkbox-column">
+                                    <input type="checkbox" [attr.aria-label]="'Select ' + device.name"
+                                        [checked]="isDeviceSelected(device.device_id)"
+                                        (change)="toggleDevice(device, $any($event.target))">
+                                </td>
+                                <td class="tdw-45">
+                                    <div class="font-weight-bold text-body" [tooltip]="device.name">{{device.name}}</div>
+                                    <div class="text-muted font-xs text-truncate">{{getDeviceLocation(device)}}</div>
+                                </td>
+                                <td class="tdw-30">
+                                    <div><span class="badge badge-light border font-weight-normal">
+                                            {{getDeviceTypeLabel(device.device_type)}}</span></div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div><span class="badge badge-light border font-weight-normal"
+                                            [ngClass]="device.status === 'monitored' ? 'text-success' : 'text-danger'">
+                                            {{device.status === 'monitored' ? 'Monitored' : 'Not Monitored'}}</span></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="!filteredDevices.length" class="text-muted font-sm py-3 text-center">
+                        {{!selectedDeviceTypes.length ? 'Select a device type to list its devices.' : (deviceOptions.length ?
+                        'No devices match the filters.' : 'No devices found.')}}</div>
+                </ng-container>
+            </div>
+            <div *ngIf="devicesTruncated" class="text-muted font-xs pt-1">Showing the first {{deviceOptions.length}}
+                of {{devicesCount}} devices.</div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 2: Metrics / move buttons / Selected -->
+<div class="row">
+    <!-- Metrics -->
+    <div class="col-xl-8 mb-3">
+        <div class="border rounded bg-white p-2 h-100 d-flex flex-column scope-box">
+            <div class="d-flex flex-wrap align-items-center justify-content-between pb-2 border-bottom">
+                <label class="d-flex align-items-center mb-0 pointer-link">
+                    <input type="checkbox" class="mr-2" aria-label="Check all listed metrics"
+                        [checked]="areAllVisibleGroupsChecked()" [disabled]="!availableGroups.length"
+                        (change)="toggleAllVisibleGroups($any($event.target).checked)">
+                    <span class="badge badge-light border font-weight-normal mr-1">{{remainingCount}}</span>
+                    <span class="scope-box-title">Metrics</span>
+                </label>
+                <div class="position-relative metric-search">
+                    <input type="text" class="form-control form-control-sm pr-4" placeholder="Search metrics..."
+                        aria-label="Search metrics" [(ngModel)]="metricSearch" [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="onMetricFilterChange()">
+                    <button *ngIf="metricSearch" type="button" class="btn btn-link btn-sm p-0 text-muted search-clear"
+                        aria-label="Clear search" (click)="clearMetricSearch()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="d-flex flex-grow-1 pt-2">
+                <!-- Category (device type) radio list -->
+                <div class="border-right pr-2 metric-category-list">
+                    <div class="custom-control custom-radio mb-2">
+                        <input type="radio" class="custom-control-input" id="metricCategoryAll{{metricRadioName}}"
+                            [name]="metricRadioName" [checked]="metricCategory === 'all'"
+                            (change)="metricCategory = 'all'; onMetricFilterChange()">
+                        <label class="custom-control-label text-body pointer-link"
+                            for="metricCategoryAll{{metricRadioName}}">All</label>
+                    </div>
+                    <div *ngFor="let category of metricCategories; let i = index; trackBy: trackByCategory"
+                        class="custom-control custom-radio mb-2">
+                        <input type="radio" class="custom-control-input" id="metricCategory{{i}}{{metricRadioName}}"
+                            [name]="metricRadioName" [checked]="metricCategory === category.device_type"
+                            (change)="metricCategory = category.device_type; onMetricFilterChange()">
+                        <label class="custom-control-label text-body pointer-link w-100"
+                            for="metricCategory{{i}}{{metricRadioName}}">{{category.label}} <span
+                                class="text-muted font-xs">({{category.count}})</span></label>
+                    </div>
+                </div>
+                <!-- Metric list -->
+                <div class="flex-grow-1 pl-2 metric-list">
+                    <div *ngIf="itemsLoading" class="text-muted font-sm py-3 text-center"><i
+                            class="fas fa-spinner fa-spin mr-1"></i>Loading metrics...</div>
+                    <ng-container *ngIf="!itemsLoading">
+                        <div *ngFor="let group of availableGroups; trackBy: trackByGroup"
+                            class="d-flex align-items-center py-1 pr-1 metric-row"
+                            [class.metric-row-active]="detailsGroup === group">
+                            <label class="d-flex align-items-center mb-0 flex-grow-1 text-truncate pointer-link"
+                                [ngClass]="group.selectable ? 'text-body' : 'text-muted'"
+                                [tooltip]="group.selectable ? '' : 'This metric cannot be charted.'" container="body">
+                                <input type="checkbox" class="mr-2 flex-shrink-0" [checked]="isGroupChecked(group)"
+                                    [disabled]="!group.selectable" (change)="toggleGroupCheck(group, $any($event.target).checked)">
+                                <span class="text-truncate">{{group.name}}</span>
+                                <span *ngIf="group.unit" class="text-muted font-xs ml-1">({{group.unit}})</span>
+                            </label>
+                            <span class="text-muted font-xs mx-2 text-nowrap">{{getGroupDeviceCount(group.key)}}
+                                {{getGroupDeviceCount(group.key) === 1 ? 'device' : 'devices'}}</span>
+                            <span class="badge badge-light border font-weight-normal mr-2">
+                                {{getDeviceTypeLabel(group.device_type)}}</span>
+                            <button type="button" class="btn btn-link btn-sm p-0 text-muted" aria-label="Metric details"
+                                tooltip="Details" container="body" (click)="toggleDetails(group)">
+                                <i class="fas fa-info-circle"></i></button>
+                        </div>
+                        <div *ngIf="!availableGroups.length" class="text-muted font-sm py-3 text-center">
+                            {{!selectedDevices.length ? 'Select devices to list their metrics.' : (remainingCount ?
+                            'No metrics match the search.' : (metricGroups.length ? 'All metrics are selected.' :
+                            'The selected devices report no metrics.'))}}</div>
+                    </ng-container>
+                </div>
+                <!-- Metric details -->
+                <div *ngIf="detailsGroup" class="border-left pl-2 ml-2 metric-details">
+                    <div class="d-flex justify-content-between align-items-start border-bottom pb-1 mb-2">
+                        <span class="font-weight-bold text-body font-sm">{{detailsGroup.name}}</span>
+                        <button type="button" class="close ml-1" aria-label="Close details" (click)="closeDetails()">
+                            <span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <dl class="font-xs mb-0">
+                        <dt class="text-muted font-weight-normal">Device Type</dt>
+                        <dd class="text-body">{{getDeviceTypeLabel(detailsGroup.device_type)}}</dd>
+                        <dt class="text-muted font-weight-normal">Telemetry Key</dt>
+                        <dd><code class="text-body">{{detailsGroup.itemKey || '-'}}</code></dd>
+                        <dt class="text-muted font-weight-normal">Unit</dt>
+                        <dd class="text-body">{{detailsGroup.unit || '-'}}</dd>
+                        <dt class="text-muted font-weight-normal">Data Type</dt>
+                        <dd class="text-body">{{getValueTypeLabel(detailsGroup.value_type)}}</dd>
+                        <dt class="text-muted font-weight-normal">Aggregations</dt>
+                        <dd class="text-body">{{detailsGroup.aggregations.join(', ') || '-'}}</dd>
+                        <dt class="text-muted font-weight-normal">Data Available</dt>
+                        <dd class="text-body">{{detailsGroup.dataAvailable ? 'Yes' : 'Not confirmed yet'}}</dd>
+                        <dt class="text-muted font-weight-normal">Devices</dt>
+                        <dd class="text-body mb-0">{{getGroupDeviceNames(detailsGroup)}}</dd>
+                    </dl>
+                </div>
+            </div>
+            <div *ngIf="itemsTruncated" class="text-muted font-xs pt-1">Only part of the metric list could be
+                loaded; narrow the device selection to see every metric.</div>
+        </div>
+    </div>
+
+    <!-- Move buttons -->
+    <div class="col-xl-1 d-flex flex-xl-column justify-content-center align-items-center mb-3">
+        <button type="button" class="btn btn-sm move-btn mb-xl-2 mr-2 mr-xl-0"
+            [ngClass]="checkedGroupKeys.length ? 'btn-primary' : 'btn-outline-secondary text-body'"
+            [disabled]="!checkedGroupKeys.length" aria-label="Move checked metrics to Selected" (click)="moveRight()">
+            <span *ngIf="checkedGroupKeys.length" class="badge badge-light d-block mb-1">{{checkedGroupKeys.length}}</span>
+            <i class="fas fa-arrow-right"></i></button>
+        <button type="button" class="btn btn-sm move-btn"
+            [ngClass]="checkedSelectedKeys.length ? 'btn-primary' : 'btn-outline-secondary text-body'"
+            [disabled]="!checkedSelectedKeys.length" aria-label="Remove checked metrics from Selected"
+            (click)="moveLeft()">
+            <span *ngIf="checkedSelectedKeys.length" class="badge badge-light d-block mb-1">{{checkedSelectedKeys.length}}</span>
+            <i class="fas fa-arrow-left"></i></button>
+    </div>
+
+    <!-- Selected -->
+    <div class="col-xl-3 mb-3">
+        <div class="border rounded bg-white p-2 h-100 d-flex flex-column scope-box"
+            [class.border-danger]="submitted && getValidationError()">
+            <div class="d-flex align-items-center justify-content-between pb-2 border-bottom">
+                <label class="d-flex align-items-center mb-0 pointer-link">
+                    <input type="checkbox" class="mr-2" aria-label="Check all selected metrics"
+                        [checked]="areAllSelectedChecked()" [disabled]="!selectedGroups.length"
+                        (change)="toggleAllSelectedChecks($any($event.target).checked)">
+                    <span class="badge badge-light border font-weight-normal mr-1">{{getSelectedCount()}}</span>
+                    <span class="scope-box-title">Selected</span>
+                </label>
+                <button *ngIf="getSelectedCount()" type="button" class="btn btn-link btn-sm p-0 text-danger font-xs"
+                    (click)="clearAll()">clear all</button>
+            </div>
+            <div class="font-xs pt-1" [ngClass]="currentMetrics.length > maxMetrics ? 'text-danger' : 'text-muted'"
+                tooltip="Each selected metric is shown for every selected device that reports it." container="body">
+                Metric series: {{currentMetrics.length}} / {{maxMetrics}}</div>
+            <div class="pt-2 flex-grow-1 scope-box-list">
+                <div *ngFor="let group of selectedGroups; trackBy: trackByGroup" class="mb-2">
+                    <div class="d-flex align-items-center">
+                        <label class="d-flex align-items-center mb-0 flex-grow-1 text-truncate text-body pointer-link">
+                            <input type="checkbox" class="mr-2 flex-shrink-0" [checked]="isSelectedChecked(group)"
+                                (change)="toggleSelectedCheck(group, $any($event.target).checked)">
+                            <span class="text-truncate" [tooltip]="group.name" container="body">{{group.name}}</span>
+                        </label>
+                        <select class="form-control form-control-sm w-auto ml-1 aggregation-select"
+                            aria-label="Aggregation" tooltip="Aggregation" container="body"
+                            (change)="onAggregationChange(group, $any($event.target).value)">
+                            <option *ngFor="let a of group.aggregations; trackBy: trackByIndex" [value]="a"
+                                [selected]="a === group.aggregation">{{a}}</option>
+                        </select>
+                    </div>
+                    <div class="font-xs pl-4" [ngClass]="getGroupDeviceCount(group.key) ? 'text-muted' : 'text-warning'">
+                        {{getDeviceTypeLabel(group.device_type)}} - {{getGroupDeviceCount(group.key) ?
+                        getGroupDeviceCount(group.key) + (getGroupDeviceCount(group.key) === 1 ? ' device' : ' devices') :
+                        'no selected device reports it'}}</div>
+                </div>
+                <div *ngIf="!metricsHydrated && currentMetrics.length" class="text-muted font-sm p-2">
+                    <ng-container *ngIf="!itemsFailed; else savedNotMatched">
+                        <i class="fas fa-spinner fa-spin mr-1"></i>Loading the {{currentMetrics.length}} saved metric
+                        series...</ng-container>
+                    <ng-template #savedNotMatched>{{currentMetrics.length}} saved metric series are kept as they are;
+                        their details could not be loaded. Use clear all to pick metrics again.</ng-template>
+                </div>
+                <div *ngIf="metricsHydrated && !selectedGroups.length" class="text-muted font-sm p-2">
+                    No items moved under selection yet.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #scopeRow let-scope>
+    <label class="d-flex align-items-center mb-1 pointer-link"
+        [ngClass]="isScopeSelectable(scope) ? 'text-body' : 'text-muted'" [tooltip]="getScopeTooltip(scope)"
+        container="body">
+        <input type="checkbox" class="mr-2 flex-shrink-0" [checked]="isScopeSelected(scope)"
+            [disabled]="!isScopeSelectable(scope)" (change)="toggleScopes([scope], $any($event.target).checked)">
+        <span class="text-truncate">{{scope.name}}</span>
+    </label>
+</ng-template>

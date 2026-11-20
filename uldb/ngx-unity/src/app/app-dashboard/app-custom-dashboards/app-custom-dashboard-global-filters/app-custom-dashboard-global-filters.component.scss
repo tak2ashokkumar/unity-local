@@ -1,0 +1,53 @@
+// Step heading and hint: same values as the wizard's other steps.
+.step-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #23282c;
+}
+
+.step-hint {
+    font-size: 0.8125rem;
+    color: #6b7684;
+}
+
+// Flat cards with a thin border, as in the design.
+.filter-card {
+    border-color: #e1e5eb;
+    border-radius: 0.5rem;
+}
+
+.filter-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #23282c;
+}
+
+// Light grip; grab cursor on the reorder handle.
+.drag-handle {
+    color: #b0b8c2;
+    cursor: grab;
+}
+
+// Even widths inside the On/Off and Single/Multi toggles.
+.toggle-btn {
+    min-width: 3.75rem;
+}
+
+// Applies-to checkboxes sit at the same height as the dropdowns next to them.
+.applies-to {
+    min-height: calc(1.5em + 0.5rem + 2px);
+}
+
+// Compact fixed-width fields, as in the design (instead of stretching to grid columns).
+.filter-field {
+    width: 220px;
+}
+
+.filter-field-wide {
+    width: 300px;
+}
+
+// Filters the server reports as unavailable are shown faded.
+.filter-unavailable {
+    opacity: 0.6;
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "kind": "datacenter",
+    "id": "a1b2c3d4-0000-4000-8000-000000000002",
+    "name": "DC-West",
+    "parent": null,
+    "provider": null,
+    "available": true,
+    "device_catalog_available": true,
+    "device_catalog_reason": null
+  },
+  {
+    "kind": "datacenter",
+    "id": "a1b2c3d4-0000-4000-8000-000000000003",
+    "name": "DC-East",
+    "parent": null,
+    "provider": null,
+    "available": true,
+    "device_catalog_available": true,
+    "device_catalog_reason": null
+  },
+  {
+    "kind": "datacenter",
+    "id": "a1b2c3d4-0000-4000-8000-000000000005",
+    "name": "DC-Lab",
+    "parent": null,
+    "provider": null,
+    "available": true,
+    "device_catalog_available": false,
+    "device_catalog_reason": "Device catalog is not configured for this datacenter."
+  },
+  {
+    "kind": "private_cloud",
+    "id": "a1b2c3d4-0000-4000-8000-000000000001",
+    "name": "vCenter-Prod",
+    "parent": { "kind": "datacenter", "id": "a1b2c3d4-0000-4000-8000-000000000002", "name": "DC-West" },
+    "provider": { "id": "VMware", "name": "VMware vCenter", "source": "platform_type" },
+    "available": true,
+    "device_catalog_available": true,
+    "device_catalog_reason": null
+  },
+  {
+    "kind": "private_cloud",
+    "id": "a1b2c3d4-0000-4000-8000-000000000004",
+    "name": "Nutanix-PC-East",
+    "parent": { "kind": "datacenter", "id": "a1b2c3d4-0000-4000-8000-000000000003", "name": "DC-East" },
+    "provider": { "id": "Nutanix", "name": "Nutanix Prism Central", "source": "platform_type" },
+    "available": true,
+    "device_catalog_available": true,
+    "device_catalog_reason": null
+  }
+]

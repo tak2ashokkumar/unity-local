@@ -3,6 +3,10 @@ export interface UnityNavRouteAccess {
 }
 
 export const UNITY_ROUTE_ACCESS = {
+    // Custom Dashboard (new My Dashboards) is reachable by URL only until it replaces My Dashboards.
+    DASHBOARD_MY_DASHBOARDS: {
+        aliases: ['/app-dashboard/custom-dashboards']
+    },
     SETUP_COST_PLAN_RESOURCE_MODEL: {
         aliases: ['/setup/cost-plan/resource-mapping']
     },

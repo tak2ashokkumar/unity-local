@@ -1,0 +1,10 @@
+// Room for the spinner while a widget or the table is loading.
+.preview-widget-body {
+    min-height: 120px;
+}
+
+// Keep the time-series table inside the card; it scrolls instead of growing the page.
+.preview-table {
+    max-height: 320px;
+    overflow-y: auto;
+}

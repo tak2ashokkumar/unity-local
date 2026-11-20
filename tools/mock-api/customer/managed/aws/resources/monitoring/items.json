@@ -1,0 +1,49 @@
+{
+  "_comment": "Zabbix item templates per resource_type. The mock route turns them into monitoring/items for each monitored resource in resources.json (item_id is derived per resource). unit is only used by the mock to generate chart values; the real items API does not return it.",
+  "Instance": [
+    {
+      "name": "CPU utilization",
+      "key": "aws.ec2.cpu_utilization",
+      "value_type": 0,
+      "unit": "%"
+    },
+    {
+      "name": "Network in",
+      "key": "aws.ec2.network_in",
+      "value_type": 3,
+      "unit": "B"
+    },
+    {
+      "name": "Network out",
+      "key": "aws.ec2.network_out",
+      "value_type": 3,
+      "unit": "B"
+    },
+    {
+      "name": "Status check failed",
+      "key": "aws.ec2.status_check_failed",
+      "value_type": 3,
+      "unit": ""
+    },
+    {
+      "name": "Instance state",
+      "key": "aws.ec2.instance_state",
+      "value_type": 1,
+      "unit": ""
+    }
+  ],
+  "Bucket": [
+    {
+      "name": "Bucket size",
+      "key": "aws.s3.bucket_size_bytes",
+      "value_type": 3,
+      "unit": "B"
+    },
+    {
+      "name": "Number of objects",
+      "key": "aws.s3.number_of_objects",
+      "value_type": 3,
+      "unit": ""
+    }
+  ]
+}

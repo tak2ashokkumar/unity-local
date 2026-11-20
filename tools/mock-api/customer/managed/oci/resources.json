@@ -1,0 +1,56 @@
+[
+  {
+    "id": 8101,
+    "uuid": "2f3e4d5c-6b7a-4980-9a1b-000000000701",
+    "name": "oci-app-instance-01",
+    "region": "us-ashburn-1",
+    "resource_type": "Instances",
+    "account": "OCI",
+    "status": "RUNNING",
+    "icon_path": null,
+    "account_uuid": "a8c08c17-ea72-46d5-93e8-05b2c36e9f96",
+    "tags": {},
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "id": 8102,
+    "uuid": "2f3e4d5c-6b7a-4980-9a1b-000000000702",
+    "name": "oci-bastion-02",
+    "region": "us-ashburn-1",
+    "resource_type": "Instances",
+    "account": "OCI",
+    "status": "STOPPED",
+    "icon_path": null,
+    "account_uuid": "a8c08c17-ea72-46d5-93e8-05b2c36e9f96",
+    "tags": {},
+    "monitoring": {
+      "configured": false,
+      "enabled": false,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "id": 8103,
+    "uuid": "2f3e4d5c-6b7a-4980-9a1b-000000000801",
+    "name": "oci-backup-bucket",
+    "region": "us-ashburn-1",
+    "resource_type": "Buckets",
+    "account": "OCI",
+    "status": "ACTIVE",
+    "icon_path": null,
+    "account_uuid": "a8c08c17-ea72-46d5-93e8-05b2c36e9f96",
+    "tags": {},
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    }
+  }
+]

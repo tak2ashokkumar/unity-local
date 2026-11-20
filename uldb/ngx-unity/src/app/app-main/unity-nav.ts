@@ -866,7 +866,8 @@ const DASBOARD_NAV_ITEMS = (svc: PermissionService) => {
             icon: 'fas fa-tachometer-alt',
             attributes: {
                 module: UnityModules.DASHBOARD,
-            }
+            },
+            routeAccess: UNITY_ROUTE_ACCESS.DASHBOARD_MY_DASHBOARDS
         },
     ];
     navItems = navItems.map(nav => nav.attributes ? filterRequiredNavItems(nav, svc) : nav)

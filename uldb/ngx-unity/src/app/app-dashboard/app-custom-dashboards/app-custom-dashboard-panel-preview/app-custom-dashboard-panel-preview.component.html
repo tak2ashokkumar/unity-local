@@ -1,0 +1,74 @@
+<div class="card mb-0 shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-eye text-primary mr-2"></i>
+            <span class="font-weight-bold text-uppercase font-sm">{{heading}}</span>
+            <span class="badge badge-light border ml-2">Width: {{panel?.width || 100}}%</span>
+        </div>
+        <div class="btn-group btn-group-sm" role="group" *ngIf="(panel?.view_mode || 'both') === 'both'">
+            <button type="button" class="btn" [ngClass]="activeView === 'chart' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="setView('chart')">Chart View</button>
+            <button type="button" class="btn" [ngClass]="activeView === 'table' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="setView('table')">Table View</button>
+        </div>
+    </div>
+    <div class="card-body p-2">
+        <div *ngIf="showTitle" class="bg-light rounded px-3 py-2 mb-2 font-weight-bold">{{panel?.title}}</div>
+
+        <ng-container *ngIf="activeView === 'chart'">
+            <div *ngIf="!widgetViews.length" class="text-muted text-center py-4">
+                Add a widget in Chart View to see a preview.
+            </div>
+            <div class="row">
+                <div *ngFor="let w of widgetViews; trackBy: trackByWidget" class="mb-2"
+                    [ngClass]="widgetViews.length > 1 ? 'col-md-6' : 'col-12'">
+                    <div class="border border-primary rounded p-2 position-relative">
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-1 mb-2">
+                            <span class="text-primary font-weight-bold font-sm">{{w.title}}</span>
+                            <span class="badge badge-info">{{w.chartTypeLabel}}</span>
+                        </div>
+                        <div class="position-relative preview-widget-body">
+                            <app-spinner [name]="w.loader"></app-spinner>
+                            <div *ngIf="w.chartData" echarts [options]="w.chartData.options"
+                                [extentions]="w.chartData.extensions" [defaultHeight]="220"></div>
+                            <div *ngIf="w.kpiValues.length" class="d-flex flex-wrap justify-content-center">
+                                <div *ngFor="let kpi of w.kpiValues; trackBy: trackByIndex"
+                                    class="border rounded text-center px-3 py-2 m-1">
+                                    <div class="font-2xl font-weight-bold text-primary">{{kpi.value}}<small
+                                            class="ml-1 text-muted">{{kpi.unit}}</small></div>
+                                    <div class="font-xs text-muted">{{kpi.label}}</div>
+                                </div>
+                            </div>
+                            <div *ngIf="w.message" class="text-muted text-center py-4 font-sm">{{w.message}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- Time-series grid: one row per time bucket and up to 20 metric columns. It is a
+             deliberately wide, horizontally scrolling table (column count varies with the
+             selection), so the column-sizing directives are not used here. -->
+        <div *ngIf="activeView === 'table'" class="position-relative preview-widget-body">
+            <app-spinner [name]="tableLoader"></app-spinner>
+            <div *ngIf="tableMessage" class="text-muted text-center py-4 font-sm">{{tableMessage}}</div>
+            <div *ngIf="tableView.rows.length" class="table-responsive preview-table">
+                <table class="table table-sm table-bordered text-left mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="text-nowrap">Time</th>
+                            <th *ngFor="let header of tableView.headers; trackBy: trackByIndex" class="text-nowrap">
+                                {{header}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of tableView.rows; trackBy: trackByRow">
+                            <td class="text-nowrap">{{row.time}}</td>
+                            <td *ngFor="let value of row.values; trackBy: trackByIndex" class="text-nowrap">{{value}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

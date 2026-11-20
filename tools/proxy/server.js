@@ -2,7 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
-const { createProxyMiddleware } = require("http-proxy-middleware");
+const { createProxyMiddleware, responseInterceptor } = require("http-proxy-middleware");
 
 const app = express();
 
@@ -45,7 +45,7 @@ const API_ENVIRONMENTS = {
 };
 
 // Older name for the SF environment, still accepted so nothing breaks.
-const ENV_ALIASES = { prod: "alpha" };
+const ENV_ALIASES = { prod: "mock" };
 
 /* ---------------------------------------------------------------------
  *  WHICH ENVIRONMENT IS ACTIVE?
@@ -286,11 +286,42 @@ const prodProxy = createProxyMiddleware({
 /* The one place that decides where API traffic goes. */
 const apiProxy = IS_LIVE ? prodProxy : mockProxy;
 
+/* CSRF HELPER STUB FOR THE LOCAL UI PAGES
+ * In production Django serves the app page from templates/base/customer/ngx-init.html, which
+ * defines a global `csrfTokenObject`. app-http-interceptor.ts calls `new csrfTokenObject()`
+ * on every POST / DELETE. The static index.html served locally has no such global, so
+ * every local POST / DELETE failed inside the browser before it was sent. The proxy adds
+ * the same global to the HTML it serves (empty token: the mock does not check it, and
+ * for live environments the proxy already sends X-CSRFToken from the session cookie).
+ * Only HTML pages are changed; scripts, styles and API traffic pass through untouched. */
+const CSRF_STUB_SCRIPT =
+  "<script>window.csrfTokenObject = window.csrfTokenObject || function () { this.csrf_token = ''; };</script>";
+
+function injectCsrfStub(html) {
+  if (html.indexOf("csrfTokenObject") !== -1) {
+    return html;
+  }
+  return html.indexOf("</head>") !== -1
+    ? html.replace("</head>", CSRF_STUB_SCRIPT + "</head>")
+    : CSRF_STUB_SCRIPT + html;
+}
+
+function createUiProxy(target) {
+  return createProxyMiddleware({
+    target,
+    changeOrigin: true,
+    selfHandleResponse: true,
+    on: {
+      proxyRes: responseInterceptor(async (buffer, proxyRes) => {
+        const ctype = String(proxyRes.headers["content-type"] || "");
+        return ctype.indexOf("text/html") !== -1 ? injectCsrfStub(buffer.toString("utf8")) : buffer;
+      })
+    }
+  });
+}
+
 /* UNITY UI PROXY */
-const unityProxy = createProxyMiddleware({
-  target: "http://localhost:8090",
-  changeOrigin: true
-});
+const unityProxy = createUiProxy("http://localhost:8090");
 
 /* ADMIN PORTAL PROXY
  * ADMIN_UI selects which admin panel serves /admin:
@@ -389,10 +420,7 @@ server.on("upgrade", (req, socket, head) => {
 /* MTP DEDICATED PROXY — :8061 */
 const mtpApp = express();
 
-const mtpStaticProxy = createProxyMiddleware({
-  target: "http://localhost:8060",
-  changeOrigin: true
-});
+const mtpStaticProxy = createUiProxy("http://localhost:8060");
 
 /* Same environment switch as the main proxy, so ngx-mtp follows API_ENV too. */
 mtpApp.get("/__admin_env", (req, res) => {

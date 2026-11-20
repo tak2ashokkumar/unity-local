@@ -1,0 +1,104 @@
+<div class="mb-3">
+    <span class="step-title d-block mb-1">Global Filters</span>
+    <p class="step-hint mb-0">Configure once here &mdash; set each filter's default, whether it applies to the whole
+        dashboard or specific sections/widgets, and every widget can still Inherit, Ignore, or Override it
+        individually.</p>
+</div>
+
+<form *ngIf="filtersForm" [formGroup]="filtersForm">
+    <div formArrayName="filters" cdkDropList (cdkDropListDropped)="onDrop($event)">
+        <div *ngFor="let filter of filters.controls; let i = index; trackBy: trackByIndex" [formGroupName]="i" cdkDrag
+            class="card mb-3 filter-card" [class.filter-unavailable]="!getGroup(filter.get('key').value).available">
+            <div class="card-body px-4 py-3">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                    <div class="d-flex align-items-center">
+                        <i cdkDragHandle class="fas fa-grip-vertical mr-3 drag-handle" aria-label="Drag to reorder"></i>
+                        <span class="filter-title">{{getDef(filter.get('key').value).label}}</span>
+                        <i class="fas fa-info-circle text-muted ml-2" container="body"
+                            [tooltip]="getDef(filter.get('key').value).description"></i>
+                        <span *ngIf="!getGroup(filter.get('key').value).available" class="text-muted font-sm ml-3">
+                            {{getGroup(filter.get('key').value).reason}}</span>
+                    </div>
+                    <div class="d-flex">
+                        <div class="mr-4">
+                            <label class="d-block font-sm font-weight-bold text-body mb-1">Status</label>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn toggle-btn"
+                                    [disabled]="!getGroup(filter.get('key').value).available"
+                                    [ngClass]="filter.get('enabled').value ? 'btn-primary' : 'btn-outline-secondary text-body'"
+                                    (click)="setEnabled(filter, true)">On</button>
+                                <button type="button" class="btn toggle-btn"
+                                    [ngClass]="!filter.get('enabled').value ? 'btn-primary' : 'btn-outline-secondary text-body'"
+                                    (click)="setEnabled(filter, false)">Off</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="d-block font-sm font-weight-bold text-body mb-1">Selection mode</label>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn toggle-btn"
+                                    [ngClass]="!filter.get('multi').value ? 'btn-primary' : 'btn-outline-secondary text-body'"
+                                    (click)="setMulti(filter, false)">Single</button>
+                                <button type="button" class="btn toggle-btn"
+                                    [ngClass]="filter.get('multi').value ? 'btn-primary' : 'btn-outline-secondary text-body'"
+                                    (click)="setMulti(filter, true)">Multi</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap align-items-start pl-4" *ngIf="filter.get('enabled').value">
+                    <div class="form-group mb-0 mr-4 filter-field">
+                        <label class="d-block font-sm font-weight-bold text-body mb-1">Default value</label>
+                        <!-- Two instances so the selection limit is applied fresh when the mode changes. -->
+                        <multiselect-dropdown *ngIf="filter.get('multi').value"
+                            [options]="getGroup(filter.get('key').value).options" [settings]="multiSettings"
+                            [texts]="defaultValueTexts" class="form-control form-control-sm p-0 h-auto"
+                            formControlName="default_values">
+                        </multiselect-dropdown>
+                        <multiselect-dropdown *ngIf="!filter.get('multi').value"
+                            [options]="getGroup(filter.get('key').value).options" [settings]="singleSettings"
+                            [texts]="defaultValueTexts" class="form-control form-control-sm p-0 h-auto"
+                            formControlName="default_values">
+                        </multiselect-dropdown>
+                    </div>
+                    <div class="form-group mb-0 mr-4">
+                        <label class="d-block font-sm font-weight-bold text-body mb-1">Applies to
+                            <i class="fas fa-question-circle text-muted ml-1" container="body"
+                                tooltip="Whole dashboard shows this filter at the top of the dashboard for every panel. Specific panels gives each chosen panel its own filter, which overrides the top one for that panel. Tick both to have both."></i>
+                        </label>
+                        <div class="d-flex align-items-center applies-to">
+                            <div class="custom-control custom-checkbox mr-3">
+                                <input type="checkbox" class="custom-control-input" id="appliesDashboard{{i}}"
+                                    formControlName="applies_dashboard">
+                                <label class="custom-control-label text-body pointer-link"
+                                    for="appliesDashboard{{i}}">Whole dashboard</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="appliesPanels{{i}}"
+                                    formControlName="applies_panels">
+                                <label class="custom-control-label text-body pointer-link"
+                                    for="appliesPanels{{i}}">Specific panels</label>
+                            </div>
+                        </div>
+                        <div class="text-danger font-xs mt-1" *ngIf="submitted && filter.hasError('appliesToRequired')">
+                            Choose Whole dashboard, Specific panels, or both.</div>
+                    </div>
+                    <div class="form-group mb-0 filter-field-wide" *ngIf="filter.get('applies_panels').value">
+                        <label class="d-block font-sm font-weight-bold text-body mb-1">Select Panels</label>
+                        <multiselect-dropdown [options]="panelOptions" [settings]="panelSettings" [texts]="panelTexts"
+                            class="form-control form-control-sm p-0 h-auto" formControlName="targets"
+                            [ngClass]="{'is-invalid' : submitted && filter.hasError('targetsRequired')}">
+                        </multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="submitted && filter.hasError('targetsRequired')">
+                            Select at least one panel.</div>
+                        <div *ngIf="!panelOptions.length" class="text-muted font-xs mt-1">Save a panel in the Smart
+                            Panel step first.</div>
+                        <div *ngIf="panelOptions.length" class="text-muted font-xs mt-1">
+                            {{filter.get('applies_dashboard').value
+                            ? 'These panels get their own filter, which overrides the one at the top.'
+                            : 'Only these panels get this filter, each with its own selection.'}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

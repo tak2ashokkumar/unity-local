@@ -1,0 +1,94 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <div class="d-flex align-items-center mb-1">
+            <span class="step-title">Smart Panels Configuration</span>
+            <span class="badge badge-light border font-weight-normal ml-2"
+                tooltip="Panels in this dashboard, and how many of them are saved" container="body">
+                {{cards.length}} {{cards.length === 1 ? 'panel' : 'panels'}} - {{getSavedCount()}} saved</span>
+        </div>
+        <p class="step-hint mb-0">Each panel picks its data, then shows it as a table, charts, or both. Drag a saved
+            panel by its handle to change the order.</p>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="addPanel()">
+        <i class="fas fa-plus mr-1"></i>Smart Panel</button>
+</div>
+
+<div cdkDropList (cdkDropListDropped)="onDrop($event)">
+    <div *ngFor="let card of cards; trackBy: trackByCard" cdkDrag [cdkDragDisabled]="!card.panelId"
+        class="card mb-3 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+            <div class="d-flex align-items-center flex-wrap">
+                <i *ngIf="card.panelId" cdkDragHandle class="fas fa-grip-vertical text-muted mr-2 drag-handle"
+                    tooltip="Drag to reorder" container="body"></i>
+                <i class="fas fa-layer-group text-primary mr-2"></i>
+                <span class="font-weight-bold mr-2">{{card.panel?.title || ('New Panel ' + card.number)}}</span>
+                <ng-container *ngIf="card.panelId; else draftBadge">
+                    <span class="badge badge-pill badge-light border mr-1">1. Data Scope ({{getSummary(card).sources}})</span>
+                    <span class="badge badge-pill badge-light border mr-1">2. Table View ({{getSummary(card).columns}})</span>
+                    <span class="badge badge-pill badge-light border mr-1">3. Chart View ({{getSummary(card).widgets}})</span>
+                </ng-container>
+                <ng-template #draftBadge>
+                    <span class="badge badge-pill badge-warning">Not saved yet</span>
+                </ng-template>
+            </div>
+            <div class="d-flex align-items-center">
+                <button *ngIf="card.panelId" type="button" class="btn btn-sm btn-link text-muted"
+                    tooltip="Duplicate" container="body" aria-label="Duplicate panel" (click)="duplicatePanel(card)">
+                    <i class="far fa-copy"></i></button>
+                <button type="button" class="btn btn-sm btn-link text-danger" tooltip="Delete" container="body"
+                    aria-label="Delete panel" (click)="confirmDeletePanel(card)">
+                    <i class="fas fa-trash-alt"></i></button>
+                <button type="button" class="btn btn-sm btn-link text-muted" aria-label="Expand or collapse panel"
+                    (click)="toggleCard(card)">
+                    <i class="fas" [ngClass]="card.expanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i></button>
+            </div>
+        </div>
+        <div class="card-body" *ngIf="card.expanded">
+            <app-custom-dashboard-panel-crud [dashboard]="dashboard" [panel]="card.panel" [panelNumber]="card.number"
+                (saved)="onPanelSaved(card, $event)"></app-custom-dashboard-panel-crud>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmDelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Delete Panel
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete
+            <strong>{{selectedCard?.panel?.title || ('New Panel ' + selectedCard?.number)}}</strong>?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="deletePanel()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="confirmDeleteModalRef.hide()">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDiscard>
+    <div class="card mb-0">
+        <div class="card-header">
+            Discard Changes
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDiscardModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This panel has unsaved changes. Collapse it and discard them?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="discardChanges()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="confirmDiscardModalRef.hide()">No</button>
+        </div>
+    </div>
+</ng-template>

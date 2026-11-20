@@ -1,0 +1,100 @@
+// Wizard stepper: numbered circles joined by a line; done steps show a check and a green line.
+// Pseudo-element connectors and circle sizing cannot be done with Bootstrap utilities.
+.wizard-stepper {
+    width: 600px;
+    max-width: 100%;
+}
+
+.wizard-step {
+    flex: 1 1 0;
+    position: relative;
+    padding: 0 4px;
+
+    &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 17px;
+        left: 58%;
+        width: 84%;
+        height: 2px;
+        background: #dfe3e8;
+        z-index: 0;
+    }
+
+    &.done:not(:last-child)::after {
+        background: #20a65b;
+    }
+}
+
+.wizard-step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #eef0f2;
+    color: #7c8794;
+    font-weight: 700;
+    font-size: 14px;
+    border: 2px solid #dfe3e8;
+    position: relative;
+    z-index: 1;
+}
+
+.wizard-step.active .wizard-step-num {
+    background: #20a65b;
+    border-color: #20a65b;
+    color: #ffffff;
+}
+
+.wizard-step.done .wizard-step-num {
+    background: #ffffff;
+    border-color: #20a65b;
+    color: #20a65b;
+}
+
+.wizard-step-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5a6472;
+    max-width: 120px;
+}
+
+.wizard-step.active .wizard-step-label {
+    color: #23282c;
+}
+
+// Done steps show a check in front of the number.
+.wizard-step-check {
+    font-size: 11px;
+    margin-right: 2px;
+}
+
+// Title band and step text sizes follow the design.
+.wizard-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+// Step headings stay compact; Smart Panel and Global Filters use the same values.
+.wizard-step-heading {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #23282c;
+}
+
+.wizard-hint {
+    font-size: 0.8125rem;
+    color: #6b7684;
+}
+
+// Labels use the same size as the inputs next to them.
+.wizard-label {
+    color: #3d4655;
+}
+
+// The switch text follows the small label size used across the form.
+.wizard-switch-label {
+    font-size: 0.765625rem;
+    color: #3d4655;
+    line-height: 1.5rem;
+}

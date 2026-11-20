@@ -1,0 +1,54 @@
+{
+  "datacenter": {
+    "results": [
+      {
+        "device_type": "baremetal",
+        "inventory_device_type": "bm_server",
+        "category": "Server Device",
+        "available": true,
+        "reason": null,
+        "status": { "available": true, "source": "unityone_enabled_zabbix_mapping", "values": ["all", "monitored", "not"], "health_checked": false }
+      },
+      {
+        "device_type": "switch",
+        "inventory_device_type": "switch",
+        "category": "Network Device",
+        "available": true,
+        "reason": null,
+        "status": { "available": true, "source": "unityone_enabled_zabbix_mapping", "values": ["all", "monitored", "not"], "health_checked": false }
+      },
+      {
+        "device_type": "firewall",
+        "inventory_device_type": "firewall",
+        "category": "Network Device",
+        "available": true,
+        "reason": null,
+        "status": { "available": true, "source": "unityone_enabled_zabbix_mapping", "values": ["all", "monitored", "not"], "health_checked": false }
+      }
+    ],
+    "unsupported_integrations": ["public_cloud"],
+    "other_categories_available": false
+  },
+  "private_cloud": {
+    "results": [
+      {
+        "device_type": "vmware_vm",
+        "inventory_device_type": "vm",
+        "category": "Virtualization Device",
+        "available": true,
+        "reason": null,
+        "status": { "available": true, "source": "unityone_enabled_zabbix_mapping", "values": ["all", "monitored", "not"], "health_checked": false }
+      },
+      {
+        "device_type": "hypervisor",
+        "inventory_device_type": "hypervisor",
+        "category": "Hypervisor",
+        "available": true,
+        "reason": null,
+        "status": { "available": true, "source": "unityone_enabled_zabbix_mapping", "values": ["all", "monitored", "not"], "health_checked": false }
+      }
+    ],
+    "unsupported_integrations": ["public_cloud"],
+    "other_categories_available": false
+  }
+}

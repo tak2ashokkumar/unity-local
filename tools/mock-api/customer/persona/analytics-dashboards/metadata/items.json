@@ -1,0 +1,285 @@
+{
+  "_comment": "Item templates per device_type. The mock route expands them for each monitored device in devices.json (item_id and monitoring are derived per device); not-monitored devices return no items.",
+  "baremetal": [
+    {
+      "name": "CPU utilization",
+      "key": "system.cpu.util",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Memory utilization",
+      "key": "vm.memory.utilization",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Disk space used",
+      "key": "vfs.fs.size[/,pused]",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Network in",
+      "key": "net.if.in[eth0]",
+      "unit": "bps",
+      "value_type": 3,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "System uptime",
+      "key": "system.uptime",
+      "unit": "s",
+      "value_type": 3,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Load average (1m)",
+      "key": "system.cpu.load[all,avg1]",
+      "unit": "",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Operating system",
+      "key": "system.sw.os",
+      "unit": "",
+      "value_type": 4,
+      "aggregations": [],
+      "selectable": false
+    }
+  ],
+  "switch": [
+    {
+      "name": "CPU utilization",
+      "key": "system.cpu.util",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Memory utilization",
+      "key": "vm.memory.utilization",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Bits received",
+      "key": "net.if.in[ge-0/0/1]",
+      "unit": "bps",
+      "value_type": 3,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Bits sent",
+      "key": "net.if.out[ge-0/0/1]",
+      "unit": "bps",
+      "value_type": 3,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Interface errors in",
+      "key": "net.if.in.errors[ge-0/0/1]",
+      "unit": "",
+      "value_type": 3,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "ICMP response time",
+      "key": "icmppingsec",
+      "unit": "s",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    }
+  ],
+  "firewall": [
+    {
+      "name": "CPU utilization",
+      "key": "system.cpu.util",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Memory utilization",
+      "key": "vm.memory.utilization",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Active sessions",
+      "key": "fw.sessions.active",
+      "unit": "",
+      "value_type": 3,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    }
+  ],
+  "vmware_vm": [
+    {
+      "name": "CPU usage",
+      "key": "vmware.vm.cpu.usage.perf",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Memory usage",
+      "key": "vmware.vm.memory.usage.perf",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Disk read rate",
+      "key": "vmware.vm.vfs.dev.read",
+      "unit": "B/s",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Uptime",
+      "key": "vmware.vm.uptime",
+      "unit": "s",
+      "value_type": 3,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    }
+  ],
+  "hypervisor": [
+    {
+      "name": "CPU usage",
+      "key": "vmware.hv.cpu.usage.perf",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Memory used",
+      "key": "vmware.hv.memory.used.perf",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "Datastore free space",
+      "key": "vmware.hv.datastore.free",
+      "unit": "%",
+      "value_type": 0,
+      "aggregations": [
+        "latest",
+        "avg",
+        "min",
+        "max"
+      ]
+    }
+  ]
+}

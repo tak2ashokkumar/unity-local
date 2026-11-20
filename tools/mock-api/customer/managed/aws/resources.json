@@ -1,0 +1,117 @@
+[
+  {
+    "name": "web-prod-01",
+    "region": "us-east-1",
+    "resource_type": "Instance",
+    "tags": {},
+    "resource_group": null,
+    "account_name": "AWS",
+    "subscription": null,
+    "uuid": "5b1e0c10-1a2b-4c3d-8e4f-000000000101",
+    "account": 221,
+    "account_uuid": "c1516f3c-e890-4992-8bb6-4e22b870b4ce",
+    "service": "EC2",
+    "instance_state": "running",
+    "availability_zone": "us-east-1a",
+    "public_ip": "3.91.10.21",
+    "instance_type": "t3.medium",
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "name": "api-prod-02",
+    "region": "us-east-1",
+    "resource_type": "Instance",
+    "tags": {},
+    "resource_group": null,
+    "account_name": "AWS",
+    "subscription": null,
+    "uuid": "5b1e0c10-1a2b-4c3d-8e4f-000000000102",
+    "account": 221,
+    "account_uuid": "c1516f3c-e890-4992-8bb6-4e22b870b4ce",
+    "service": "EC2",
+    "instance_state": "running",
+    "availability_zone": "us-east-1a",
+    "public_ip": "3.91.10.22",
+    "instance_type": "t3.large",
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "name": "batch-dev-03",
+    "region": "us-east-1",
+    "resource_type": "Instance",
+    "tags": {},
+    "resource_group": null,
+    "account_name": "AWS",
+    "subscription": null,
+    "uuid": "5b1e0c10-1a2b-4c3d-8e4f-000000000103",
+    "account": 221,
+    "account_uuid": "c1516f3c-e890-4992-8bb6-4e22b870b4ce",
+    "service": "EC2",
+    "instance_state": "stopped",
+    "availability_zone": "us-east-1a",
+    "public_ip": null,
+    "instance_type": "t3.small",
+    "monitoring": {
+      "configured": false,
+      "enabled": false,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "name": "uo-assets-prod",
+    "region": "us-east-1",
+    "resource_type": "Bucket",
+    "tags": {},
+    "resource_group": null,
+    "account_name": "AWS",
+    "subscription": null,
+    "uuid": "5b1e0c10-1a2b-4c3d-8e4f-000000000201",
+    "account": 221,
+    "account_uuid": "c1516f3c-e890-4992-8bb6-4e22b870b4ce",
+    "service": "S3",
+    "instance_state": null,
+    "availability_zone": null,
+    "public_ip": null,
+    "instance_type": null,
+    "monitoring": {
+      "configured": true,
+      "enabled": true,
+      "zabbix": true,
+      "observium": false
+    }
+  },
+  {
+    "name": "uo-logs-archive",
+    "region": "us-east-1",
+    "resource_type": "Bucket",
+    "tags": {},
+    "resource_group": null,
+    "account_name": "AWS",
+    "subscription": null,
+    "uuid": "5b1e0c10-1a2b-4c3d-8e4f-000000000202",
+    "account": 221,
+    "account_uuid": "c1516f3c-e890-4992-8bb6-4e22b870b4ce",
+    "service": "S3",
+    "instance_state": null,
+    "availability_zone": null,
+    "public_ip": null,
+    "instance_type": null,
+    "monitoring": {
+      "configured": false,
+      "enabled": false,
+      "zabbix": true,
+      "observium": false
+    }
+  }
+]

@@ -1,0 +1,54 @@
+{
+  "results": [
+    { "key": "timerange", "available": true, "reason": null, "options": [
+      { "id": "last_1_hour", "name": "Last 1 hour" },
+      { "id": "last_24_hours", "name": "Last 24 hours" },
+      { "id": "last_7_days", "name": "Last 7 days" },
+      { "id": "last_30_days", "name": "Last 30 days" }
+    ] },
+    { "key": "datacenter", "available": true, "reason": null, "options": [
+      { "id": "a1b2c3d4-0000-4000-8000-000000000002", "name": "DC-West" },
+      { "id": "a1b2c3d4-0000-4000-8000-000000000003", "name": "DC-East" }
+    ] },
+    { "key": "environment", "available": true, "reason": null, "options": [
+      { "id": "prod", "name": "Production" },
+      { "id": "stage", "name": "Staging" },
+      { "id": "dev", "name": "Development" }
+    ] },
+    { "key": "cloudtype", "available": true, "reason": null, "options": [
+      { "id": "private", "name": "Private Cloud" },
+      { "id": "public", "name": "Public Cloud" },
+      { "id": "hybrid", "name": "Hybrid" }
+    ] },
+    { "key": "privatecloud", "available": true, "reason": null, "options": [
+      { "id": "a1b2c3d4-0000-4000-8000-000000000001", "name": "vCenter-Prod" },
+      { "id": "a1b2c3d4-0000-4000-8000-000000000004", "name": "Nutanix-PC-East" }
+    ] },
+    { "key": "publiccloud", "available": false, "reason": "Public Cloud metadata is unavailable.", "options": [] },
+    { "key": "region", "available": true, "reason": null, "options": [
+      { "id": "amer", "name": "AMER" },
+      { "id": "emea", "name": "EMEA" },
+      { "id": "apac", "name": "APAC" }
+    ] },
+    { "key": "account", "available": false, "reason": "Account metadata needs a public cloud integration.", "options": [] },
+    { "key": "businessunit", "available": true, "reason": null, "options": [
+      { "id": "it-ops", "name": "IT Operations" },
+      { "id": "finance", "name": "Finance" },
+      { "id": "engineering", "name": "Engineering" }
+    ] },
+    { "key": "costcenter", "available": true, "reason": null, "options": [
+      { "id": "cc-1001", "name": "CC-1001" },
+      { "id": "cc-2040", "name": "CC-2040" }
+    ] },
+    { "key": "application", "available": true, "reason": null, "options": [
+      { "id": "portal", "name": "Customer Portal" },
+      { "id": "billing", "name": "Billing Engine" },
+      { "id": "crm", "name": "Internal CRM" }
+    ] },
+    { "key": "service", "available": true, "reason": null, "options": [
+      { "id": "auth", "name": "Auth Service" },
+      { "id": "payment", "name": "Payment Service" },
+      { "id": "api-gw", "name": "API Gateway" }
+    ] }
+  ]
+}
